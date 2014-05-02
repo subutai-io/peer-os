@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.pig</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.pig</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

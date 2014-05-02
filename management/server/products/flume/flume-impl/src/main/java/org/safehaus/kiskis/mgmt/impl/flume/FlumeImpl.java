@@ -63,12 +63,18 @@ public class FlumeImpl implements Flume {
     public UUID installCluster(final Config config) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
-                String.format("Installing cluster %s", config.getClusterName()));
+                String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                if (getClusterConfig(config.getClusterName()) != null) {
+                if (config == null) {
+                    po.addLogFailed(
+                            "Malformed configuration\nInstallation aborted"
+                    );
+                    return;
+                }
+                if (getCluster(config.getClusterName()) != null) {
                     po.addLogFailed(String.format(
                             "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName()));
@@ -149,7 +155,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = getClusterConfig(clusterName);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format(
                             "Cluster with name %s does not exist\nOperation aborted",
@@ -204,7 +210,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (getClusterConfig(clusterName) == null) {
+                if (getCluster(clusterName) == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
@@ -261,7 +267,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (getClusterConfig(clusterName) == null) {
+                if (getCluster(clusterName) == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
@@ -318,7 +324,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                if (getClusterConfig(clusterName) == null) {
+                if (getCluster(clusterName) == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
@@ -368,7 +374,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = getClusterConfig(clusterName);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format(
                             "Cluster with name %s does not exist\nOperation aborted",
@@ -434,7 +440,7 @@ public class FlumeImpl implements Flume {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = getClusterConfig(clusterName);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format(
                             "Cluster with name %s does not exist\nOperation aborted",
@@ -496,7 +502,9 @@ public class FlumeImpl implements Flume {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
 
-    private Config getClusterConfig(String clusterName) {
+    @Override
+    public Config getCluster(String clusterName) {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
+
 }

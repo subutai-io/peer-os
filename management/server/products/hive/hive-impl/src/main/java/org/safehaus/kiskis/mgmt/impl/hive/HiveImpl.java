@@ -1,10 +1,11 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.handler.*;
+
+import java.util.List;
+import java.util.UUID;
 
 public class HiveImpl extends HiveBase {
 
@@ -80,6 +81,11 @@ public class HiveImpl extends HiveBase {
 
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
 }

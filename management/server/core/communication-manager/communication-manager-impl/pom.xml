@@ -21,8 +21,13 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>communication-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -55,11 +60,6 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-pool</artifactId>
             <version>${org.apache.activemq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>communication-manager-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>

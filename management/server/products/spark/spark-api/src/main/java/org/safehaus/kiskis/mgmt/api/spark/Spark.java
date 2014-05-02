@@ -5,30 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.api.spark;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Spark {
+public interface Spark extends ApiBase<Config> {
 
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(String clusterName);
 
     public UUID addSlaveNode(String clusterName, String lxcHostname);
 
     public UUID destroySlaveNode(String clusterName, String lxcHostname);
 
     public UUID changeMasterNode(String clusterName, String newMasterHostname, boolean keepSlave);
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
 
     /**
      * Starts the specified node

@@ -4,18 +4,16 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-
-import java.util.*;
-
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.flume.FlumeUI;
+
+import java.util.*;
 
 public class Manager {
 
@@ -117,12 +115,9 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    HadoopClusterInfo info = FlumeUI.getDbManager().
-                            getInfo(HadoopClusterInfo.SOURCE,
-                                    config.getClusterName(),
-                                    HadoopClusterInfo.class);
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config info = FlumeUI.getHadoopManager().getCluster(config.getClusterName());
                     if (info != null) {
-                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
@@ -164,8 +159,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for (Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = (Agent) it.next();
+        for (final Agent agent : agents) {
             final Button destroyBtn = new Button("Destroy");
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");

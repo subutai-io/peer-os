@@ -5,14 +5,14 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
+
+import java.util.*;
 
 public class Manager {
 
@@ -57,7 +57,7 @@ public class Manager {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config)event.getProperty().getValue();
+                config = (Config) event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -76,7 +76,7 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if(config == null) {
+                if (config == null) {
                     show("Select cluster");
                     return;
                 }
@@ -86,9 +86,10 @@ public class Manager {
                         new ConfirmationDialogCallback() {
 
                             public void response(boolean ok) {
-                                if(ok) destroyClusterHandler();
+                                if (ok) destroyClusterHandler();
                             }
-                        });
+                        }
+                );
             }
 
         });
@@ -98,22 +99,20 @@ public class Manager {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if(config == null) {
+                if (config == null) {
                     show("Select cluster");
                     return;
                 }
 
-                HadoopClusterInfo hci = SqoopUI.getDbManager().getInfo(
-                        HadoopClusterInfo.SOURCE, config.getClusterName(),
-                        HadoopClusterInfo.class);
-                if(hci == null) {
+                org.safehaus.kiskis.mgmt.api.hadoop.Config hci = SqoopUI.getHadoopManager().getCluster(config.getClusterName());
+                if (hci == null) {
                     show("Hadoop cluster info not found");
                     return;
                 }
 
-                Set<Agent> set = new HashSet<Agent>(hci.getAllAgents());
+                Set<Agent> set = new HashSet<Agent>(hci.getAllNodes());
                 set.removeAll(config.getNodes());
-                if(set.isEmpty()) {
+                if (set.isEmpty()) {
                     show("All nodes in Hadoop cluster have Sqoop installed");
                     return;
                 }
@@ -154,7 +153,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for(final Agent agent : agents) {
+        for (final Agent agent : agents) {
             final Button importBtn = new Button("Import");
             final Button exportBtn = new Button("Export");
             final Button destroyBtn = new Button("Destroy");
@@ -202,7 +201,7 @@ public class Manager {
 
                                 @Override
                                 public void response(boolean ok) {
-                                    if(!ok) return;
+                                    if (!ok) return;
                                     UUID trackID = SqoopUI.getManager().destroyNode(
                                             config.getClusterName(),
                                             agent.getHostname());
@@ -213,9 +212,11 @@ public class Manager {
                                                 public void windowClose(Window.CloseEvent e) {
                                                     refreshClustersInfo();
                                                 }
-                                            });
+                                            }
+                                    );
                                 }
-                            });
+                            }
+                    );
 
                 }
             });
@@ -224,7 +225,7 @@ public class Manager {
     }
 
     private void refreshUI() {
-        if(config != null) {
+        if (config != null) {
             populateTable(nodesTable, config.getNodes());
         } else {
             nodesTable.removeAllItems();
@@ -232,17 +233,17 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        Config current = (Config)clusterCombo.getValue();
+        Config current = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         List<Config> clustersInfo = SqoopUI.getManager().getClusters();
-        if(clustersInfo != null && clustersInfo.size() > 0) {
-            for(Config ci : clustersInfo) {
+        if (clustersInfo != null && clustersInfo.size() > 0) {
+            for (Config ci : clustersInfo) {
                 clusterCombo.addItem(ci);
                 clusterCombo.setItemCaption(ci, ci.getClusterName());
             }
-            if(current != null) {
-                for(Config ci : clustersInfo) {
-                    if(ci.getClusterName().equals(current.getClusterName())) {
+            if (current != null) {
+                for (Config ci : clustersInfo) {
+                    if (ci.getClusterName().equals(current.getClusterName())) {
                         clusterCombo.setValue(ci);
                         return;
                     }
@@ -268,11 +269,11 @@ public class Manager {
         table.addListener(new ItemClickEvent.ItemClickListener() {
 
             public void itemClick(ItemClickEvent event) {
-                if(event.isDoubleClick()) {
-                    String hostname = (String)table.getItem(event.getItemId())
+                if (event.isDoubleClick()) {
+                    String hostname = (String) table.getItem(event.getItemId())
                             .getItemProperty("Host").getValue();
                     Agent agent = SqoopUI.getAgentManager().getAgentByHostname(hostname);
-                    if(agent != null) {
+                    if (agent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(agent));
                         MgmtApplication.addCustomWindow(terminal);
                     } else {
@@ -286,7 +287,7 @@ public class Manager {
 
     private void destroyClusterHandler() {
 
-        UUID trackId = SqoopUI.getManager().removeCluster(config.getClusterName());
+        UUID trackId = SqoopUI.getManager().uninstallCluster(config.getClusterName());
 
         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackId,
                 new Window.CloseListener() {

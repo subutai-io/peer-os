@@ -5,34 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.api.accumulo;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
-public interface Accumulo {
+public interface Accumulo extends ApiBase<Config> {
 
-    public UUID installCluster(Config config);
+    public UUID startCluster(String clusterName);
 
-    public UUID uninstallCluster(String clusterName);
-
-    public UUID startNode(String clusterName, String lxcHostname);
-
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID stopCluster(String clusterName);
 
     public UUID checkNode(String clusterName, String lxcHostname);
 
-    public UUID addNode(String clusterName);
+    public UUID addNode(String clusterName, String lxcHostname, NodeType nodeType);
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode(String clusterName, String lxcHostname, NodeType nodeType);
 
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     *
-     */
-    public List<Config> getClusters();
 }

@@ -6,6 +6,7 @@
 package org.safehaus.kiskis.mgmt.api.accumulo;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,26 +14,25 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Accumulo";
     private String clusterName = "";
+    private String zkClusterName = "";
     private Agent masterNode;
     private Agent gcNode;
+    private Agent monitor;
     private Set<Agent> tracers;
-    private Set<Agent> monitors;
-    private Set<Agent> loggers;
-    private Set<Agent> tabletServers;
+    private Set<Agent> slaves;
 
     public Set<Agent> getAllNodes() {
         Set<Agent> allNodes = new HashSet<Agent>();
 
         allNodes.add(masterNode);
         allNodes.add(gcNode);
+        allNodes.add(monitor);
         allNodes.addAll(tracers);
-        allNodes.addAll(monitors);
-        allNodes.addAll(loggers);
-        allNodes.addAll(tabletServers);
+        allNodes.addAll(slaves);
 
         return allNodes;
     }
@@ -53,6 +53,14 @@ public class Config {
         this.gcNode = gcNode;
     }
 
+    public Agent getMonitor() {
+        return monitor;
+    }
+
+    public void setMonitor(Agent monitor) {
+        this.monitor = monitor;
+    }
+
     public Set<Agent> getTracers() {
         return tracers;
     }
@@ -61,28 +69,12 @@ public class Config {
         this.tracers = tracers;
     }
 
-    public Set<Agent> getMonitors() {
-        return monitors;
+    public Set<Agent> getSlaves() {
+        return slaves;
     }
 
-    public void setMonitors(Set<Agent> monitors) {
-        this.monitors = monitors;
-    }
-
-    public Set<Agent> getLoggers() {
-        return loggers;
-    }
-
-    public void setLoggers(Set<Agent> loggers) {
-        this.loggers = loggers;
-    }
-
-    public Set<Agent> getTabletServers() {
-        return tabletServers;
-    }
-
-    public void setTabletServers(Set<Agent> tabletServers) {
-        this.tabletServers = tabletServers;
+    public void setSlaves(Set<Agent> slaves) {
+        this.slaves = slaves;
     }
 
     public String getClusterName() {
@@ -93,26 +85,39 @@ public class Config {
         this.clusterName = clusterName;
     }
 
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
+
+    public String getZkClusterName() {
+        return zkClusterName;
+    }
+
+    public void setZkClusterName(String zkClusterName) {
+        this.zkClusterName = zkClusterName;
+    }
+
     public void reset() {
         clusterName = "";
+        zkClusterName = "";
         masterNode = null;
         gcNode = null;
+        monitor = null;
         tracers = null;
-        monitors = null;
-        loggers = null;
-        tabletServers = null;
+        slaves = null;
     }
 
     @Override
     public String toString() {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
+                "zkClusterName='" + zkClusterName + '\'' +
                 ", masterNode=" + masterNode +
                 ", gcNode=" + gcNode +
+                ", monitor=" + monitor +
                 ", tracers=" + tracers +
-                ", monitors=" + monitors +
-                ", loggers=" + loggers +
-                ", tabletServers=" + tabletServers +
+                ", slaves=" + slaves +
                 '}';
     }
 }

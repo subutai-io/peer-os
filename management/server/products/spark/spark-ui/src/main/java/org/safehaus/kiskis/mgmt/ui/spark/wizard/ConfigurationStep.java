@@ -10,7 +10,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
@@ -60,20 +60,17 @@ public class ConfigurationStep extends Panel {
         slaveNodesSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         slaveNodesSelect.setRequired(true);
 
-        List<HadoopClusterInfo> clusters = SparkUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+        List<Config> clusters = SparkUI.getHadoopManager().getClusters();
+
         if (clusters.size() > 0) {
-            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
+            for (Config hadoopClusterInfo : clusters) {
                 hadoopClustersCombo.addItem(hadoopClusterInfo);
                 hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = SparkUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE,
-                        wizard.getConfig().getClusterName(),
-                        HadoopClusterInfo.class);
+        Config info = SparkUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
         if (info != null) {
             hadoopClustersCombo.setValue(info);
@@ -82,13 +79,13 @@ public class ConfigurationStep extends Panel {
         }
 
         if (hadoopClustersCombo.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClustersCombo.getValue();
+            Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             slaveNodesSelect.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                            Agent.class, hadoopInfo.getAllNodes())
             );
-            for (Agent agent : hadoopInfo.getAllAgents()) {
+            for (Agent agent : hadoopInfo.getAllNodes()) {
                 masterNodeCombo.addItem(agent);
                 masterNodeCombo.setItemCaption(agent, agent.getHostname());
             }
@@ -98,15 +95,15 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     slaveNodesSelect.setValue(null);
                     slaveNodesSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     masterNodeCombo.setValue(null);
                     masterNodeCombo.removeAllItems();
-                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                    for (Agent agent : hadoopInfo.getAllNodes()) {
                         masterNodeCombo.addItem(agent);
                         masterNodeCombo.setItemCaption(agent, agent.getHostname());
                     }

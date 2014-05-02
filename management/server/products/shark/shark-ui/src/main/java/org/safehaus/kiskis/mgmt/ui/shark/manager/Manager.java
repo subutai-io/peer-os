@@ -124,10 +124,8 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    org.safehaus.kiskis.mgmt.api.spark.Config info = SharkUI.getDbManager().
-                            getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY,
-                                    config.getClusterName(),
-                                    org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                    org.safehaus.kiskis.mgmt.api.spark.Config info = SharkUI.getSparkManager().
+                            getCluster(config.getClusterName());
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());

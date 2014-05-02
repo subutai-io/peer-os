@@ -6,20 +6,20 @@
 package org.safehaus.kiskis.mgmt.ui.solr;
 
 import com.vaadin.ui.Component;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- *
  * @author dilshat
  */
 public class SolrUI implements Module {
 
-    public static final String MODULE_NAME = "Solr";
     private static Solr solrManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -37,12 +37,12 @@ public class SolrUI implements Module {
         return solrManager;
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
     public void setSolrManager(Solr solrManager) {
         SolrUI.solrManager = solrManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     public static AgentManager getAgentManager() {
@@ -65,7 +65,7 @@ public class SolrUI implements Module {
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

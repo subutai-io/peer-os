@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -13,7 +12,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -26,7 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Impl implements Api {
+public class ZookeeperImpl implements Zookeeper {
 
     private CommandRunner commandRunner;
     private AgentManager agentManager;
@@ -35,7 +34,7 @@ public class Impl implements Api {
     private LxcManager lxcManager;
     private ExecutorService executor;
 
-    public Impl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, LxcManager lxcManager) {
+    public ZookeeperImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, LxcManager lxcManager) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
@@ -55,15 +54,15 @@ public class Impl implements Api {
 
 
     public UUID installCluster(final Config config) {
-        Preconditions.checkNotNull(config, "Configuration is null");
 
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", config.getClusterName()));
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
             public void run() {
 
-                if (Strings.isNullOrEmpty(config.getZkName()) || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
+                if (config == null || Strings.isNullOrEmpty(config.getZkName())
+                        || Strings.isNullOrEmpty(config.getClusterName()) || config.getNumberOfNodes() <= 0) {
                     po.addLogFailed("Malformed configuration\nInstallation aborted");
                     return;
                 }
@@ -522,6 +521,11 @@ public class Impl implements Api {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
 }

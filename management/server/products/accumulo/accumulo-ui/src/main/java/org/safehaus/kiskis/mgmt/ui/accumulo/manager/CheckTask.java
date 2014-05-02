@@ -5,16 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.ui.accumulo.manager;
 
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 
+import java.util.UUID;
+
 /**
- *
  * @author dilshat
  */
 public class CheckTask implements Runnable {
@@ -32,17 +30,12 @@ public class CheckTask implements Runnable {
 
         UUID trackID = AccumuloUI.getAccumuloManager().checkNode(clusterName, lxcHostname);
 
-        NodeState state = NodeState.UNKNOWN;
         long start = System.currentTimeMillis();
         while (!Thread.interrupted()) {
             ProductOperationView po = AccumuloUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
             if (po != null) {
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains(NodeState.STOPPED.toString())) {
-                        state = NodeState.STOPPED;
-                    } else if (po.getLog().contains(NodeState.RUNNING.toString())) {
-                        state = NodeState.RUNNING;
-                    }
+                    completeEvent.onComplete(po.getLog());
                     break;
                 }
             }
@@ -56,7 +49,6 @@ public class CheckTask implements Runnable {
             }
         }
 
-        completeEvent.onComplete(state);
     }
 
 }

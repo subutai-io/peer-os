@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.lucene</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.lucene</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

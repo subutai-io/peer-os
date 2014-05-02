@@ -9,7 +9,7 @@ import com.vaadin.ui.Component;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Api;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -18,9 +18,9 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
  *
  * @author dilshat
  */
-public class UI implements Module {
+public class ZookeeperUI implements Module {
 
-    private static Api manager;
+    private static Zookeeper manager;
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static ExecutorService executor;
@@ -30,10 +30,10 @@ public class UI implements Module {
     }
 
     public void setTracker(Tracker tracker) {
-        UI.tracker = tracker;
+        ZookeeperUI.tracker = tracker;
     }
 
-    public static Api getManager() {
+    public static Zookeeper getManager() {
         return manager;
     }
 
@@ -41,8 +41,8 @@ public class UI implements Module {
         return executor;
     }
 
-    public void setManager(Api manager) {
-        UI.manager = manager;
+    public void setManager(Zookeeper manager) {
+        ZookeeperUI.manager = manager;
     }
 
     public static AgentManager getAgentManager() {
@@ -50,7 +50,7 @@ public class UI implements Module {
     }
 
     public void setAgentManager(AgentManager agentManager) {
-        UI.agentManager = agentManager;
+        ZookeeperUI.agentManager = agentManager;
     }
 
     public void init() {

@@ -8,6 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.hbase;
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hbase.Config;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executors;
  */
 public class HBaseUI implements Module {
 
-    public static final String MODULE_NAME = "HBase";
     private static HBase hbaseManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
@@ -39,12 +39,12 @@ public class HBaseUI implements Module {
         return hbaseManager;
     }
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
     public void setHbaseManager(HBase hbaseManager) {
         HBaseUI.hbaseManager = hbaseManager;
+    }
+
+    public static ExecutorService getExecutor() {
+        return executor;
     }
 
     public static AgentManager getAgentManager() {
@@ -55,10 +55,6 @@ public class HBaseUI implements Module {
         HBaseUI.agentManager = agentManager;
     }
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
-
     public static DbManager getDbManager() {
         return dbManager;
     }
@@ -67,15 +63,20 @@ public class HBaseUI implements Module {
         HBaseUI.dbManager = dbManager;
     }
 
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
     public void destroy() {
         hbaseManager = null;
         agentManager = null;
         tracker = null;
+        dbManager = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

@@ -5,15 +5,16 @@
  */
 package org.safehaus.kiskis.mgmt.api.presto;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 /**
  * @author dilshat
  */
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Presto";
     private String clusterName = "";
@@ -35,6 +36,11 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     public Set<Agent> getWorkers() {

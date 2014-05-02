@@ -5,20 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.api.lucene;
 
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+
+import java.util.Set;
 
 /**
- *
  * @author dilshat
  */
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Lucene";
+
     private String clusterName = "";
 
     private Set<Agent> nodes;
 
+    @Override
     public String getClusterName() {
         return clusterName;
     }
@@ -40,4 +43,8 @@ public class Config {
         return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
     }
 
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
 }

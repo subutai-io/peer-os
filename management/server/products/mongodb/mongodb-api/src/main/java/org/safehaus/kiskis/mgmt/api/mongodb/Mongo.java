@@ -5,36 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.mongodb;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Mongo {
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
-
-    /**
-     * Installs cluster according to the specified configuration
-     *
-     * @param config - cluster configuration
-     * @return - UUID of operation to track
-     */
-    public UUID installCluster(Config config);
-
-    /**
-     * Uninstalls the specified cluster
-     *
-     * @param clusterName - name of cluster
-     * @return - UUID of operation to track
-     */
-    public UUID uninstallCluster(String clusterName);
+public interface Mongo extends ApiBase<Config> {
 
     /**
      * adds node to the specified cluster

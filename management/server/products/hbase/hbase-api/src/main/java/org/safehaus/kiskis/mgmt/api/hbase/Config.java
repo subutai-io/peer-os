@@ -7,15 +7,15 @@ package org.safehaus.kiskis.mgmt.api.hbase;
 
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
-import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public class Config {
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "HBase";
     private int numberOfNodes = 4;
@@ -29,20 +29,20 @@ public class Config {
     private String clusterName = "";
     private Agent hadoopNameNode;
 
-    public Agent getHadoopNameNode() {
-        return hadoopNameNode;
-    }
-
-    public void setHadoopNameNode(Agent hadoopNameNode) {
-        this.hadoopNameNode = hadoopNameNode;
+    public Config() {
+        this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 
     public static String getProductKey() {
         return PRODUCT_KEY;
     }
 
-    public Config() {
-        this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+    public Agent getHadoopNameNode() {
+        return hadoopNameNode;
+    }
+
+    public void setHadoopNameNode(Agent hadoopNameNode) {
+        this.hadoopNameNode = hadoopNameNode;
     }
 
     public UUID getUuid() {
@@ -124,5 +124,10 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 }

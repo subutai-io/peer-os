@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.ui.commandrunner</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.commandrunner</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -42,18 +42,28 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>agent-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -76,16 +86,6 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
-            <artifactId>command-runner-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

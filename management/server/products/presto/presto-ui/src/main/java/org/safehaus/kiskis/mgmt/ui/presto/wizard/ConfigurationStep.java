@@ -10,7 +10,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
@@ -63,21 +63,18 @@ public class ConfigurationStep extends Panel {
         workersSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         workersSelect.setRequired(true);
 
-        List<HadoopClusterInfo> clusters = PrestoUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+        List<Config> clusters = PrestoUI.getHadoopManager().getClusters();
+
         //populate hadoop clusters combo
         if (clusters.size() > 0) {
-            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
+            for (Config hadoopClusterInfo : clusters) {
                 hadoopClustersCombo.addItem(hadoopClusterInfo);
                 hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = PrestoUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE,
-                        wizard.getConfig().getClusterName(),
-                        HadoopClusterInfo.class);
+        Config info = PrestoUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
         if (info != null) {
             //restore cluster
@@ -88,13 +85,13 @@ public class ConfigurationStep extends Panel {
 
         //populate selection controls
         if (hadoopClustersCombo.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClustersCombo.getValue();
+            Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             workersSelect.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                            Agent.class, hadoopInfo.getAllNodes())
             );
-            for (Agent agent : hadoopInfo.getAllAgents()) {
+            for (Agent agent : hadoopInfo.getAllNodes()) {
                 coordinatorNodeCombo.addItem(agent);
                 coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
             }
@@ -118,15 +115,15 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     workersSelect.setValue(null);
                     workersSelect.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     coordinatorNodeCombo.setValue(null);
                     coordinatorNodeCombo.removeAllItems();
-                    for (Agent agent : hadoopInfo.getAllAgents()) {
+                    for (Agent agent : hadoopInfo.getAllNodes()) {
                         coordinatorNodeCombo.addItem(agent);
                         coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
                     }
@@ -146,11 +143,11 @@ public class ConfigurationStep extends Panel {
                     wizard.getConfig().setCoordinatorNode(coordinator);
 
                     //clear workers
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClustersCombo.getValue();
+                    Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
                     if (!Util.isCollectionEmpty(wizard.getConfig().getWorkers())) {
                         wizard.getConfig().getWorkers().remove(coordinator);
                     }
-                    List<Agent> hadoopNodes = hadoopInfo.getAllAgents();
+                    List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.remove(coordinator);
                     workersSelect.getContainerDataSource().removeAllItems();
                     for (Agent agent : hadoopNodes) {
@@ -183,8 +180,8 @@ public class ConfigurationStep extends Panel {
                         coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
 
                     }
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClustersCombo.getValue();
-                    List<Agent> hadoopNodes = hadoopInfo.getAllAgents();
+                    Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+                    List<Agent> hadoopNodes = hadoopInfo.getAllNodes();
                     hadoopNodes.removeAll(wizard.getConfig().getWorkers());
                     coordinatorNodeCombo.removeAllItems();
                     for (Agent agent : hadoopNodes) {

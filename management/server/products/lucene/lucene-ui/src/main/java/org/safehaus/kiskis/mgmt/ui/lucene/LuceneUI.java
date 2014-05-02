@@ -6,29 +6,33 @@
 package org.safehaus.kiskis.mgmt.ui.lucene;
 
 import com.vaadin.ui.Component;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.api.lucene.Lucene;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- *
  * @author dilshat
  */
 public class LuceneUI implements Module {
 
-    public static final String MODULE_NAME = "Lucene";
     private static Lucene luceneManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static DbManager dbManager;
+    private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
     public static Tracker getTracker() {
         return tracker;
+    }
+
+    public void setTracker(Tracker tracker) {
+        LuceneUI.tracker = tracker;
     }
 
     public static Lucene getLuceneManager() {
@@ -39,16 +43,12 @@ public class LuceneUI implements Module {
         LuceneUI.luceneManager = luceneManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        LuceneUI.tracker = tracker;
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
-    public static DbManager getDbManager() {
-        return dbManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        LuceneUI.dbManager = dbManager;
+    public void setHadoopManager(Hadoop hadoopManager) {
+        LuceneUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -70,13 +70,13 @@ public class LuceneUI implements Module {
     public void destroy() {
         luceneManager = null;
         agentManager = null;
-        dbManager = null;
+        hadoopManager = null;
         tracker = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

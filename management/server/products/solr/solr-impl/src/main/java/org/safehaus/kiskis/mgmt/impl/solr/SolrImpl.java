@@ -50,7 +50,7 @@ public class SolrImpl implements Solr {
     }
 
     public UUID installCluster(final Config config) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Solr");
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
 
         executor.execute(new Runnable() {
 
@@ -418,6 +418,11 @@ public class SolrImpl implements Solr {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
 }

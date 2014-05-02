@@ -7,9 +7,11 @@ package org.safehaus.kiskis.mgmt.ui.accumulo;
 
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
+import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;
@@ -20,19 +22,27 @@ import java.util.concurrent.Executors;
  */
 public class AccumuloUI implements Module {
 
-    public static final String MODULE_NAME = "Accumulo";
     private static Accumulo accumuloManager;
+    private static Hadoop hadoopManager;
+    private static Zookeeper zookeeperManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static DbManager dbManager;
     private static ExecutorService executor;
 
-    public static DbManager getDbManager() {
-        return dbManager;
+    public static Zookeeper getZookeeperManager() {
+        return zookeeperManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
-        AccumuloUI.dbManager = dbManager;
+    public void setZookeeperManager(Zookeeper zookeeperManager) {
+        AccumuloUI.zookeeperManager = zookeeperManager;
+    }
+
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager) {
+        AccumuloUI.hadoopManager = hadoopManager;
     }
 
     public static Tracker getTracker() {
@@ -71,11 +81,13 @@ public class AccumuloUI implements Module {
         accumuloManager = null;
         agentManager = null;
         tracker = null;
+        hadoopManager = null;
+        zookeeperManager = null;
         executor.shutdown();
     }
 
     public String getName() {
-        return MODULE_NAME;
+        return Config.PRODUCT_KEY;
     }
 
     public Component createComponent() {

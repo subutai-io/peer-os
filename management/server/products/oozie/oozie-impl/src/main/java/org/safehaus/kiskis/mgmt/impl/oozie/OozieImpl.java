@@ -12,7 +12,10 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -129,11 +132,10 @@ public class OozieImpl implements Oozie {
         return po.getId();
     }
 
-    public UUID uninstallCluster(final Config config) {
+    public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", config.getClusterName()));
-        final String clusterName = config.getClusterName();
+                String.format("Destroying cluster %s", clusterName));
         executor.execute(new Runnable() {
 
             public void run() {
@@ -186,6 +188,11 @@ public class OozieImpl implements Oozie {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     @Override

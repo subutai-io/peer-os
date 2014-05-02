@@ -4,13 +4,16 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -151,16 +154,10 @@ public class HBaseImpl implements HBase {
         return po.getId();
     }
 
-    public UUID uninstallCluster(Config config) {
-        final String clusterName = config.getClusterName();
+    public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
                 String.format("Destroying cluster %s", clusterName));
-        final Set<Agent> allNodes = new HashSet<Agent>();
-        allNodes.add(config.getMaster());
-        allNodes.addAll(config.getRegion());
-        allNodes.addAll(config.getQuorum());
-        allNodes.add(config.getBackupMasters());
 
         executor.execute(new Runnable() {
 
@@ -170,8 +167,13 @@ public class HBaseImpl implements HBase {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
+                final Set<Agent> allNodes = new HashSet<Agent>();
+                allNodes.add(config.getMaster());
+                allNodes.addAll(config.getRegion());
+                allNodes.addAll(config.getQuorum());
+                allNodes.add(config.getBackupMasters());
 
-                po.addLog("Unistalling...");
+                po.addLog("Uninstalling...");
                 Command installCommand = Commands.getUninstallCommand(config.getNodes());
                 commandRunner.runCommand(installCommand);
 
@@ -200,6 +202,11 @@ public class HBaseImpl implements HBase {
 
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     @Override

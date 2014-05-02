@@ -1,9 +1,11 @@
 package org.safehaus.kiskis.mgmt.api.hive;
 
-import java.util.Set;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
-public class Config {
+import java.util.Set;
+
+public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Hive";
     private String clusterName = "";
@@ -16,6 +18,11 @@ public class Config {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     public Agent getServer() {

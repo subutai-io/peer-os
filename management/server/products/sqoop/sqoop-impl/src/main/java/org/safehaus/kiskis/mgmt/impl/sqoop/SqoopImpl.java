@@ -1,12 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.sqoop;
 
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ExportSetting;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ImportSetting;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.handler.*;
+
+import java.util.List;
+import java.util.UUID;
 
 public class SqoopImpl extends SqoopBase {
 
@@ -19,7 +20,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
-    public UUID removeCluster(String clusterName) {
+    public UUID uninstallCluster(String clusterName) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Remove Sqoop cluster " + clusterName);
         RemoveHandler h = new RemoveHandler(this, clusterName, po);
@@ -56,6 +57,11 @@ public class SqoopImpl extends SqoopBase {
 
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     public UUID exportData(ExportSetting settings) {

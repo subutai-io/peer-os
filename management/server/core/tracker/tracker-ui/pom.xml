@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.ui.tracker</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.tracker</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -42,12 +42,12 @@
             <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ui-vaadin-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
             <version>${project.version}</version>
         </dependency>

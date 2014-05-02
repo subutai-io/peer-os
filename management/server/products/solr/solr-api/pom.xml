@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.solr</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.solr</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

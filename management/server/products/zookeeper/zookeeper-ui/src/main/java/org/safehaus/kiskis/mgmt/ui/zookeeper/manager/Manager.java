@@ -18,7 +18,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
-import org.safehaus.kiskis.mgmt.ui.zookeeper.UI;
+import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;
 
 import java.util.List;
 import java.util.Set;
@@ -133,7 +133,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = UI.getManager().uninstallCluster(config.getClusterName());
+                                        UUID trackID = ZookeeperUI.getManager().uninstallCluster(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -168,7 +168,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = UI.getManager().addNode(config.getClusterName());
+                                        UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -262,7 +262,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    UI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    ZookeeperUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -289,7 +289,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    UI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    ZookeeperUI.getExecutor().execute(new StartTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -317,7 +317,7 @@ public class Manager {
                     stopBtn.setEnabled(false);
                     destroyBtn.setEnabled(false);
 
-                    UI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    ZookeeperUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                         public void onComplete(NodeState state) {
                             synchronized (progressIcon) {
@@ -347,7 +347,7 @@ public class Manager {
                                 @Override
                                 public void response(boolean ok) {
                                     if (ok) {
-                                        UUID trackID = UI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
+                                        UUID trackID = ZookeeperUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
                                         MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
@@ -373,7 +373,7 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = UI.getManager().getClusters();
+        List<Config> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
         Config clusterInfo = (Config) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
@@ -414,7 +414,7 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = UI.getAgentManager().getAgentByHostname(lxcHostname);
+                    Agent lxcAgent = ZookeeperUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);

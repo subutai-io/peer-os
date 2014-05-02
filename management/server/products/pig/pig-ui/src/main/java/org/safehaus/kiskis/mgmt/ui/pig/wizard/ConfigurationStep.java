@@ -9,25 +9,13 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
+import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.pig.PigUI;
+
+import java.util.*;
 
 /**
  * @author dilshat
@@ -54,20 +42,16 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setRequired(true);
         hadoopClusters.setNullSelectionAllowed(false);
 
-        List<HadoopClusterInfo> clusters = PigUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+        List<Config> clusters = PigUI.getHadoopManager().getClusters();
         if (clusters.size() > 0) {
-            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
+            for (Config hadoopClusterInfo : clusters) {
                 hadoopClusters.addItem(hadoopClusterInfo);
                 hadoopClusters.setItemCaption(hadoopClusterInfo,
                         hadoopClusterInfo.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = PigUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE,
-                        wizard.getConfig().getClusterName(),
-                        HadoopClusterInfo.class);
+        Config info = PigUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
         if (info != null) {
             hadoopClusters.setValue(info);
@@ -76,11 +60,11 @@ public class ConfigurationStep extends Panel {
         }
 
         if (hadoopClusters.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClusters.getValue();
+            Config hadoopInfo = (Config) hadoopClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                            Agent.class, hadoopInfo.getAllNodes())
             );
         }
 
@@ -88,11 +72,11 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     select.setValue(null);
                     select.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setNodes(new HashSet<Agent>());
@@ -102,7 +86,6 @@ public class ConfigurationStep extends Panel {
 
         select.setItemCaptionPropertyId("hostname");
         select.setRows(7);
-//        select.setNullSelectionAllowed(false);
         select.setMultiSelect(true);
         select.setImmediate(true);
         select.setLeftColumnCaption("Available Nodes");

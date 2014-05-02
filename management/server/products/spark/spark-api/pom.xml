@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.api.spark</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.spark</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

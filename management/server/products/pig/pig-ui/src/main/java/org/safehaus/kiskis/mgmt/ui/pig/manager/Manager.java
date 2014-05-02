@@ -12,12 +12,14 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.server.ui.modules.hadoop.HadoopClusterInfo;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.pig.PigUI;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -122,12 +124,10 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    HadoopClusterInfo info = PigUI.getDbManager().
-                            getInfo(HadoopClusterInfo.SOURCE,
-                                    config.getClusterName(),
-                                    HadoopClusterInfo.class);
+                    org.safehaus.kiskis.mgmt.api.hadoop.Config info = PigUI.getHadoopManager().getCluster(config.getClusterName());
+
                     if (info != null) {
-                        Set<Agent> nodes = new HashSet<Agent>(info.getAllAgents());
+                        Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());
                         if (!nodes.isEmpty()) {
                             AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);

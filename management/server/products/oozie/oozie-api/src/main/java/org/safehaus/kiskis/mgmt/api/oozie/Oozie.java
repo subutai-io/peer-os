@@ -5,24 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.oozie;
 
-import java.util.List;
+import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+
 import java.util.UUID;
 
 /**
  * @author dilshat
  */
-public interface Oozie {
-
-    public UUID installCluster(Config config);
-
-    public UUID uninstallCluster(Config config);
-
-    /**
-     * Returns list of configurations of installed clusters
-     *
-     * @return - list of configurations of installed clusters
-     */
-    public List<Config> getClusters();
+public interface Oozie extends ApiBase<Config> {
 
     UUID startServer(Config config);
 
