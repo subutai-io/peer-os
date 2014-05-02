@@ -1,112 +1,104 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by daralbaev on 02.04.14.
  */
 public class Commands {
-    public static Request getRequestTemplate() {
-        return CommandFactory.newRequest(
-                RequestType.EXECUTE_REQUEST, // type
-                null, //                        !! agent uuid
-                HadoopImpl.MODULE_NAME, //     source
-                null, //                        !! task uuid
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                null, //                        program
-                OutputRedirection.RETURN, //    std output redirection
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                30); //
-    }
 
-    public static Request getInstallCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                "sleep 10;" +
-                        "apt-get --force-yes --assume-yes install ksks-hadoop"
-        );
-        req.setTimeout(180);
-        return req;
-    }
-
-    public static Command getInstallCommand(List<Agent> agentList) {
+    public static Command getInstallCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
                 new RequestBuilder("sleep 10;" +
                         "apt-get --force-yes --assume-yes install ksks-hadoop")
                         .withTimeout(180),
-                new HashSet<Agent>(agentList)
+                new HashSet<Agent>(config.getAllNodes())
         );
     }
 
-    public static Request getClearMastersCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                ". /etc/profile && " +
-                        "hadoop-master-slave.sh masters clear"
+    public static Command getClearMastersCommand(Config config) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(". /etc/profile && " +
+                        "hadoop-master-slave.sh masters clear"),
+                Sets.newHashSet(config.getNameNode())
         );
-        return req;
     }
 
-    public static Request getClearSlavesCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                ". /etc/profile && " +
-                        "hadoop-master-slave.sh slaves clear"
+    public static Command getClearSlavesCommand(Config config) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(". /etc/profile && " +
+                        "hadoop-master-slave.sh slaves clear"),
+                Sets.newHashSet(config.getNameNode(), config.getJobTracker())
         );
-        return req;
     }
 
-    public static Request getSetMastersCommand(Agent nameNode, Agent jobTracker, Integer replicationFactor) {
-        Request req = getRequestTemplate();
-
-        req.setProgram(
-                ". /etc/profile && " +
-                        "hadoop-configure.sh"
+    public static Command getSetMastersCommand(Config config) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(". /etc/profile && " +
+                        "hadoop-configure.sh")
+                        .withCmdArgs(Lists.newArrayList(
+                                String.format("%s:%d", config.getNameNode().getHostname(), Config.NAME_NODE_PORT),
+                                String.format("%s:%d", config.getJobTracker().getHostname(), Config.JOB_TRACKER_PORT),
+                                String.format("%d", config.getReplicationFactor())
+                        )),
+                Sets.newHashSet(config.getAllNodes())
         );
-        req.setArgs(Arrays.asList(
-                String.format("%s:%d", nameNode.getHostname(), Config.NAME_NODE_PORT),
-                String.format("%s:%d", jobTracker.getHostname(), Config.JOB_TRACKER_PORT),
-                String.format("%d", replicationFactor)
-        ));
-        System.out.println(req.toString());
-        return req;
     }
 
-    public static Request getAddSecondaryNamenodeCommand(Agent secondaryNameNode) {
-        Request req = getRequestTemplate();
-        req.setProgram(String.format(
-                ". /etc/profile && " +
-                        "hadoop-master-slave.sh masters %s",
-                secondaryNameNode.getHostname()
-        ));
-        return req;
+    public static Command getAddSecondaryNamenodeCommand(Config config) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh masters %s",
+                        config.getSecondaryNameNode().getHostname()
+                )),
+                Sets.newHashSet(config.getNameNode())
+        );
     }
 
-    public static Request getAddSlaveCommand(Agent agent) {
-        Request req = getRequestTemplate();
-        req.setProgram(String.format(
-                ". /etc/profile && " +
-                        "hadoop-master-slave.sh slaves %s", agent.getHostname()
-        ));
-        return req;
+    public static Command getSetDataNodeCommand(Config config) {
+
+        StringBuilder cmd = new StringBuilder();
+        for (Agent agent : config.getDataNodes()) {
+            cmd.append(String.format(
+                    ". /etc/profile && " +
+                            "hadoop-master-slave.sh slaves %s; ",
+                    agent.getHostname()
+            ));
+        }
+
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(cmd.toString()),
+                Sets.newHashSet(config.getNameNode())
+        );
+    }
+
+    public static Command getSetTaskTrackerCommand(Config config) {
+
+        StringBuilder cmd = new StringBuilder();
+        for (Agent agent : config.getTaskTrackers()) {
+            cmd.append(String.format(
+                    ". /etc/profile && " +
+                            "hadoop-master-slave.sh slaves %s; ",
+                    agent.getHostname()
+            ));
+        }
+
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(cmd.toString()),
+                Sets.newHashSet(config.getJobTracker())
+        );
     }
 
     public static Request getRemoveSlaveCommand(Agent agent) {
@@ -158,13 +150,12 @@ public class Commands {
         return req;
     }
 
-    public static Request getFormatNameNodeCommand() {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                ". /etc/profile && " +
-                        "hadoop namenode -format"
+    public static Command getFormatNameNodeCommand(Config config) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(". /etc/profile && " +
+                        "hadoop namenode -format"),
+                Sets.newHashSet(config.getNameNode())
         );
-        return req;
     }
 
     public static Request getRefreshNameNodeCommand() {

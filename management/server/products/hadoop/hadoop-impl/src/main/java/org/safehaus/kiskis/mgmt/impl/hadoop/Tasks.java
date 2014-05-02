@@ -11,68 +11,6 @@ import java.util.ArrayList;
  */
 public class Tasks {
 
-    public static Task getInstallTask(Config cfg) {
-        Task task = new Task("Install Hadoop");
-        task.setData(TaskType.INSTALL);
-        for (Agent agent : cfg.getAllNodes()) {
-            task.addRequest(Commands.getInstallCommand(), agent);
-        }
-        return task;
-    }
-
-    public static Task getClearMasterTask(Config cfg) {
-        Task task = new Task("Clear SecondaryNameNode");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getClearMastersCommand(), cfg.getNameNode());
-        return task;
-    }
-
-    public static Task getClearSlaveTask(Config cfg) {
-        Task task = new Task("Clear slaves");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getClearSlavesCommand(), cfg.getNameNode());
-        task.addRequest(Commands.getClearSlavesCommand(), cfg.getJobTracker());
-        return task;
-    }
-
-    public static Task getSecondaryNameNodeTask(Config cfg) {
-        Task task = new Task("Set Secondary NameNode slaves");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getAddSecondaryNamenodeCommand(cfg.getSecondaryNameNode()), cfg.getNameNode());
-        return task;
-    }
-
-    public static Task getSetMastersTask(Config cfg) {
-        Task task = new Task("Set Master Nodes");
-        task.setData(TaskType.CONFIGURE);
-        for (Agent agent : cfg.getAllNodes()) {
-            task.addRequest(Commands.getSetMastersCommand(cfg.getNameNode(), cfg.getJobTracker(), cfg.getReplicationFactor()), agent);
-        }
-        return task;
-    }
-
-    public static ArrayList<Task> getSetDataNodeTask(Config cfg) {
-        ArrayList<Task> tasks = new ArrayList<Task>();
-        for (Agent agent : cfg.getDataNodes()) {
-            Task task = new Task("Set Data Nodes");
-            task.setData(TaskType.CONFIGURE);
-            task.addRequest(Commands.getAddSlaveCommand(agent), cfg.getNameNode());
-            tasks.add(task);
-        }
-        return tasks;
-    }
-
-    public static ArrayList<Task> getSetTaskTrackerTask(Config cfg) {
-        ArrayList<Task> tasks = new ArrayList<Task>();
-        for (Agent agent : cfg.getTaskTrackers()) {
-            Task task = new Task("Set Task Trackers");
-            task.setData(TaskType.CONFIGURE);
-            task.addRequest(Commands.getAddSlaveCommand(agent), cfg.getJobTracker());
-            tasks.add(task);
-        }
-        return tasks;
-    }
-
     public static Task getFormatNameNodeTask(Config cfg) {
         Task task = new Task("Set format NameNode");
         task.setData(TaskType.CONFIGURE);
@@ -132,7 +70,7 @@ public class Tasks {
     public static Task getSetDataNodeTask(Config cfg, Agent agent) {
         Task task = new Task("Set Data Nodes");
         task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getAddSlaveCommand(agent), cfg.getNameNode());
+        task.addRequest(Commands.getSetDataNodeCommand(agent), cfg.getNameNode());
 
         return task;
     }
@@ -140,7 +78,7 @@ public class Tasks {
     public static Task getSetTaskTrackerTask(Config cfg, Agent agent) {
         Task task = new Task("Set Task Trackers");
         task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getAddSlaveCommand(agent), cfg.getJobTracker());
+        task.addRequest(Commands.getSetDataNodeCommand(agent), cfg.getJobTracker());
 
         return task;
     }
