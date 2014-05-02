@@ -5,6 +5,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,10 +16,10 @@ import java.util.UUID;
  */
 public class ClustersTable extends Table {
 
-    Map<String, HadoopClusterInfo> hadoops = new HashMap<String, HadoopClusterInfo>();
+    Map<String, Config> hadoops = new HashMap<String, Config>();
 
     public ClustersTable() {
-        this.setCaption(" Hadoop Clusters");
+        this.setCaption("Hadoop Clusters");
         this.setContainerDataSource(getContainer());
 
         this.setWidth("100%");
@@ -34,8 +35,7 @@ public class ClustersTable extends Table {
         IndexedContainer container = new IndexedContainer();
 
         // Create the container properties
-        container.addContainerProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL, String.class, "");
-        container.addContainerProperty(HadoopClusterInfo.UUID_LABEL, UUID.class, "");
+        container.addContainerProperty("Cluster", String.class, "");
 
         // Create some orders
 //        List<HadoopClusterInfo> cdList = HadoopDAO.getHadoopClusterInfo();
@@ -46,12 +46,11 @@ public class ClustersTable extends Table {
         return container;
     }
 
-    private void addOrderToContainer(Container container, HadoopClusterInfo cluster) {
+    private void addOrderToContainer(Container container, Config cluster) {
         Object itemId = container.addItem();
         Item item = container.getItem(itemId);
 
-        item.getItemProperty(HadoopClusterInfo.CLUSTER_NAME_LABEL).setValue(cluster.getClusterName());
-        item.getItemProperty(HadoopClusterInfo.UUID_LABEL).setValue(cluster.getUuid());
+        item.getItemProperty("Cluster").setValue(cluster.getClusterName());
         hadoops.put(cluster.getClusterName(), cluster);
     }
 
@@ -59,7 +58,7 @@ public class ClustersTable extends Table {
         this.setContainerDataSource(getContainer());
     }
 
-    public HadoopClusterInfo getHCI(String name) {
+    public Config getHCI(String name) {
         return hadoops.get(name);
     }
 
