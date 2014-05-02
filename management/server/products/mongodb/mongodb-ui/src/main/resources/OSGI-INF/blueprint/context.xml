@@ -10,9 +10,9 @@
         
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager" />
-        <property name="mongoManager" ref="mongoManager"/>
-        <property name="tracker" ref="tracker"/>
+        <argument ref="agentManager" />
+        <argument ref="mongoManager"/>
+        <argument ref="tracker"/>
     </bean>
     
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

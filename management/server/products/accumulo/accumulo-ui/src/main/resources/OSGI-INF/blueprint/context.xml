@@ -16,11 +16,11 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="accumuloManager" ref="accumuloManager"/>
-        <property name="hadoopManager" ref="hadoopManager"/>
-        <property name="zookeeperManager" ref="zookeeperManager"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="accumuloManager"/>
+        <argument ref="hadoopManager"/>
+        <argument ref="zookeeperManager"/>
     </bean>
 
 

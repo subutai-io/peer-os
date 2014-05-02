@@ -66,7 +66,7 @@ public class LuceneImpl implements Lucene {
                     return;
                 }
 
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                if (getCluster(config.getClusterName()) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
@@ -146,7 +146,7 @@ public class LuceneImpl implements Lucene {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -204,7 +204,7 @@ public class LuceneImpl implements Lucene {
         executor.execute(new Runnable() {
 
             public void run() {
-                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -269,7 +269,7 @@ public class LuceneImpl implements Lucene {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;

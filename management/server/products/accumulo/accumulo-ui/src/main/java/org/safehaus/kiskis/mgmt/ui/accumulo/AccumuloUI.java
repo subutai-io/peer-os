@@ -29,36 +29,28 @@ public class AccumuloUI implements Module {
     private static Tracker tracker;
     private static ExecutorService executor;
 
-    public static Zookeeper getZookeeperManager() {
-        return zookeeperManager;
+    public AccumuloUI(AgentManager agentManager, Tracker tracker, Accumulo accumuloManager, Hadoop hadoopManager, Zookeeper zookeeperManager) {
+        AccumuloUI.agentManager = agentManager;
+        AccumuloUI.tracker = tracker;
+        AccumuloUI.accumuloManager = accumuloManager;
+        AccumuloUI.hadoopManager = hadoopManager;
+        AccumuloUI.zookeeperManager = zookeeperManager;
     }
 
-    public void setZookeeperManager(Zookeeper zookeeperManager) {
-        AccumuloUI.zookeeperManager = zookeeperManager;
+    public static Zookeeper getZookeeperManager() {
+        return zookeeperManager;
     }
 
     public static Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        AccumuloUI.hadoopManager = hadoopManager;
-    }
-
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        AccumuloUI.tracker = tracker;
-    }
-
     public static Accumulo getAccumuloManager() {
         return accumuloManager;
-    }
-
-    public void setAccumuloManager(Accumulo accumuloManager) {
-        AccumuloUI.accumuloManager = accumuloManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -67,10 +59,6 @@ public class AccumuloUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        AccumuloUI.agentManager = agentManager;
     }
 
     public void init() {

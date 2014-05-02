@@ -27,28 +27,24 @@ public class PrestoUI implements Module {
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public PrestoUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Presto prestoManager) {
+        PrestoUI.agentManager = agentManager;
+        PrestoUI.tracker = tracker;
+        PrestoUI.hadoopManager = hadoopManager;
+        PrestoUI.prestoManager = prestoManager;
+
     }
 
-    public void setTracker(Tracker tracker) {
-        PrestoUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Presto getPrestoManager() {
         return prestoManager;
     }
 
-    public void setPrestoManager(Presto prestoManager) {
-        PrestoUI.prestoManager = prestoManager;
-    }
-
     public static Hadoop getHadoopManager() {
         return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        PrestoUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +53,6 @@ public class PrestoUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        PrestoUI.agentManager = agentManager;
     }
 
     public void init() {

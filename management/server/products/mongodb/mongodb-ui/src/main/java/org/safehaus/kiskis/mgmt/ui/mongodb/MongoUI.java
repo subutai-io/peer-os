@@ -25,20 +25,18 @@ public class MongoUI implements Module {
     private static ExecutorService executor;
     private static Tracker tracker;
 
+    public MongoUI(AgentManager agentManager, Mongo mongoManager, Tracker tracker) {
+        MongoUI.agentManager = agentManager;
+        MongoUI.mongoManager = mongoManager;
+        MongoUI.tracker = tracker;
+    }
+
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        MongoUI.tracker = tracker;
-    }
-
     public static Mongo getMongoManager() {
         return mongoManager;
-    }
-
-    public void setMongoManager(Mongo mongoManager) {
-        MongoUI.mongoManager = mongoManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -47,10 +45,6 @@ public class MongoUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        MongoUI.agentManager = agentManager;
     }
 
     public void init() {

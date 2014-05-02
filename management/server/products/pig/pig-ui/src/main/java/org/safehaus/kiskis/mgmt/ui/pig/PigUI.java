@@ -27,28 +27,23 @@ public class PigUI implements Module {
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public PigUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Pig pigManager) {
+        PigUI.agentManager = agentManager;
+        PigUI.tracker = tracker;
+        PigUI.hadoopManager = hadoopManager;
+        PigUI.pigManager = pigManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        PigUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Pig getPigManager() {
         return pigManager;
     }
 
-    public void setPigManager(Pig pigManager) {
-        PigUI.pigManager = pigManager;
-    }
-
     public static Hadoop getHadoopManager() {
         return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        PigUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +52,6 @@ public class PigUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        PigUI.agentManager = agentManager;
     }
 
     public void init() {

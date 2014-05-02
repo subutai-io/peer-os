@@ -13,6 +13,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
+import org.safehaus.kiskis.mgmt.api.spark.Spark;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -30,15 +31,17 @@ public class SharkImpl implements Shark {
 
     private CommandRunner commandRunner;
     private AgentManager agentManager;
+    private Spark sparkManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public SharkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+    public SharkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Spark sparkManager) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
+        this.sparkManager = sparkManager;
 
         Commands.init(commandRunner);
     }
@@ -64,14 +67,13 @@ public class SharkImpl implements Shark {
                     return;
                 }
 
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                if (getCluster(config.getClusterName()) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, config.getClusterName(),
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        = sparkManager.getCluster(config.getClusterName());
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", config.getClusterName()));
                     return;
@@ -150,7 +152,7 @@ public class SharkImpl implements Shark {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -208,7 +210,7 @@ public class SharkImpl implements Shark {
         executor.execute(new Runnable() {
 
             public void run() {
-                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -273,7 +275,7 @@ public class SharkImpl implements Shark {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -292,8 +294,7 @@ public class SharkImpl implements Shark {
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        = sparkManager.getCluster(clusterName);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
@@ -376,15 +377,14 @@ public class SharkImpl implements Shark {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
                 }
 
                 org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
-                        = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.spark.Config.PRODUCT_KEY, clusterName,
-                        org.safehaus.kiskis.mgmt.api.spark.Config.class);
+                        = sparkManager.getCluster(clusterName);
                 if (sparkConfig == null) {
                     po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
                     return;
