@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.flume;
 
-public enum TaskType {
+public enum CommandType {
 
     STATUS, INSTALL, UNINSTALL, START, STOP;
 }
