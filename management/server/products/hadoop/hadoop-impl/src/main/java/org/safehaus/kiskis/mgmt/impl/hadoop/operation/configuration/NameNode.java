@@ -155,7 +155,7 @@ public class NameNode {
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (command.hasCompleted()) {
-                    AgentResult result = command.getResults().get(config.getJobTracker().getUuid());
+                    AgentResult result = command.getResults().get(config.getNameNode().getUuid());
                     if (result.getStdOut() != null && result.getStdOut().contains("NameNode")) {
                         String[] array = result.getStdOut().split("\n");
 

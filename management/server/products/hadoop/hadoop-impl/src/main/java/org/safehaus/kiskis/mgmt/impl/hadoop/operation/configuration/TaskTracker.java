@@ -44,7 +44,7 @@ public class TaskTracker {
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (command.hasCompleted()) {
-                    AgentResult result = command.getResults().get(config.getJobTracker().getUuid());
+                    AgentResult result = command.getResults().get(agent.getUuid());
                     if (result.getStdOut() != null && result.getStdOut().contains("TaskTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
