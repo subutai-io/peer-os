@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
-import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
@@ -43,13 +43,13 @@ public class SecondaryNameNode {
                     return;
                 }
 
-                Task task = Tasks.getNameNodeCommandTask(config.getSecondaryNameNode(), "status");
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getNameNodeCommand(config.getSecondaryNameNode(), "status");
+                HadoopImpl.getCommandRunner().runCommand(command);
 
                 NodeState nodeState = NodeState.UNKNOWN;
-                if (task.isCompleted()) {
-                    Result result = task.getResults().entrySet().iterator().next().getValue();
-                    if (result.getStdOut() != null && result.getStdOut().contains("NameNode")) {
+                if (command.hasCompleted()) {
+                    AgentResult result = command.getResults().get(config.getJobTracker().getUuid());
+                    if (result.getStdOut() != null && result.getStdOut().contains("SecondaryNameNode")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {

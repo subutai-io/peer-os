@@ -1,11 +1,10 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation;
 
 import com.google.common.base.Strings;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.common.InstallHadoopOperation;
@@ -93,14 +92,14 @@ public class Installation {
                         po.addLog("Hadoop installation started");
 
                         InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
-                        for (Task task : installOperation.getTaskList()) {
-                            po.addLog((String.format("%s started...", task.getDescription())));
-                            parent.getTaskRunner().executeTaskNWait(task);
+                        for (Command command : installOperation.getCommandList()) {
+                            po.addLog((String.format("%s started...", command.getDescription())));
+                            HadoopImpl.getCommandRunner().runCommand(command);
 
-                            if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                                po.addLogDone(String.format("%s succeeded", task.getDescription()));
+                            if (command.hasSucceeded()) {
+                                po.addLogDone(String.format("%s succeeded", command.getDescription()));
                             } else {
-                                po.addLogFailed(String.format("%s failed, %s", task.getDescription(), task.getFirstError()));
+                                po.addLogFailed(String.format("%s failed, %s", command.getDescription(), command.getAllErrors()));
                             }
                         }
 
