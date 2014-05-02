@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.accumulo.manager;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
@@ -22,8 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * TODO implement start/stop cluster methods
- *
  * @author dilshat
  */
 public class Manager {
@@ -233,7 +232,63 @@ public class Manager {
         });
         controlsContent.addComponent(addSlaveBtn);
 
+        HorizontalLayout customPropertyContent = new HorizontalLayout();
+        customPropertyContent.setSpacing(true);
+
+        Label propertyNameLabel = new Label("Property Name");
+        customPropertyContent.addComponent(propertyNameLabel);
+        final TextField propertyNameTextField = new TextField();
+        customPropertyContent.addComponent(propertyNameTextField);
+
+        Button removePropertyBtn = new Button("Remove");
+        removePropertyBtn.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (config != null) {
+                    String propertyName = (String) propertyNameTextField.getValue();
+                    if (Strings.isNullOrEmpty(propertyName)) {
+                        UiUtil.showMsg("Please, specify property name to remove", contentRoot.getWindow());
+                    } else {
+                        UUID trackID = AccumuloUI.getAccumuloManager().removeProperty(config.getClusterName(), propertyName);
+                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    }
+                } else {
+                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+                }
+            }
+        });
+        customPropertyContent.addComponent(removePropertyBtn);
+
+        Label propertyValueLabel = new Label("Property Value");
+        customPropertyContent.addComponent(propertyValueLabel);
+        final TextField propertyValueTextField = new TextField();
+        customPropertyContent.addComponent(propertyValueTextField);
+        Button addPropertyBtn = new Button("Add");
+        addPropertyBtn.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (config != null) {
+                    String propertyName = (String) propertyNameTextField.getValue();
+                    String propertyValue = (String) propertyValueTextField.getValue();
+                    if (Strings.isNullOrEmpty(propertyName)) {
+                        UiUtil.showMsg("Please, specify property name to add", contentRoot.getWindow());
+                    } else if (Strings.isNullOrEmpty(propertyValue)) {
+                        UiUtil.showMsg("Please, specify property value to set", contentRoot.getWindow());
+                    } else {
+                        UUID trackID = AccumuloUI.getAccumuloManager().addProperty(config.getClusterName(), propertyName, propertyValue);
+                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    }
+                } else {
+                    UiUtil.showMsg("Please, select cluster", contentRoot.getWindow());
+                }
+            }
+        });
+        customPropertyContent.addComponent(addPropertyBtn);
+
         content.addComponent(controlsContent);
+        content.addComponent(customPropertyContent);
+        content.setComponentAlignment(controlsContent, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(customPropertyContent, Alignment.TOP_RIGHT);
 
         content.addComponent(mastersTable);
         content.addComponent(tracersTable);
@@ -302,11 +357,11 @@ public class Manager {
             progressIcon.setVisible(false);
 
             table.addItem(masters ? new Object[]{
-                            (masters ? (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") : "") + agent.getHostname(),
+                            (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") + agent.getHostname(),
                             checkBtn,
                             resultHolder,
                             progressIcon} : new Object[]{
-                            (masters ? (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") : "") + agent.getHostname(),
+                            agent.getHostname(),
                             checkBtn,
                             destroyBtn,
                             resultHolder,

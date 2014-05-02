@@ -453,7 +453,7 @@ public class ZookeeperImpl implements Zookeeper {
 
                 po.addLog("Adding property...");
 
-                Command addPropertyCommand = Commands.addPropertyCommand(fileName, propertyName, propertyValue, config.getNodes());
+                Command addPropertyCommand = Commands.getAddPropertyCommand(fileName, propertyName, propertyValue, config.getNodes());
                 commandRunner.runCommand(addPropertyCommand);
 
                 if (addPropertyCommand.hasSucceeded()) {
@@ -499,7 +499,7 @@ public class ZookeeperImpl implements Zookeeper {
                     po.addLogFailed("Malformed arguments\nOperation aborted");
                     return;
                 }
-                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -507,7 +507,7 @@ public class ZookeeperImpl implements Zookeeper {
 
                 po.addLog("Removing property...");
 
-                Command removePropertyCommand = Commands.removePropertyCommand(fileName, propertyName, config.getNodes());
+                Command removePropertyCommand = Commands.getRemovePropertyCommand(fileName, propertyName, config.getNodes());
                 commandRunner.runCommand(removePropertyCommand);
 
                 if (removePropertyCommand.hasSucceeded()) {

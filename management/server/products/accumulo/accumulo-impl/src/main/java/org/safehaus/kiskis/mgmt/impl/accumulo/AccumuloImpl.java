@@ -469,6 +469,92 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    @Override
+    public UUID addProperty(final String clusterName, final String propertyName, final String propertyValue) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Adding property %s=%s", propertyName, propertyValue));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = getCluster(clusterName);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Adding property...");
+
+                Command addPropertyCommand = Commands.getAddPropertyCommand(propertyName, propertyValue, config.getAllNodes());
+                commandRunner.runCommand(addPropertyCommand);
+
+                if (addPropertyCommand.hasSucceeded()) {
+                    po.addLog("Property added successfully\nRestarting cluster...");
+
+                    Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                    commandRunner.runCommand(restartClusterCommand);
+                    if (restartClusterCommand.hasSucceeded()) {
+                        po.addLogDone("Cluster restarted successfully");
+                    } else {
+                        po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Adding property failed, %s", addPropertyCommand.getAllErrors()));
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
+    @Override
+    public UUID removeProperty(final String clusterName, final String propertyName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Removing property %s", propertyName));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = getCluster(clusterName);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Removing property...");
+
+                Command removePropertyCommand = Commands.getRemovePropertyCommand(propertyName, config.getAllNodes());
+                commandRunner.runCommand(removePropertyCommand);
+
+                if (removePropertyCommand.hasSucceeded()) {
+                    po.addLog("Property removed successfully\nRestarting cluster...");
+
+                    Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                    commandRunner.runCommand(restartClusterCommand);
+                    if (restartClusterCommand.hasSucceeded()) {
+                        po.addLogDone("Cluster restarted successfully");
+                    } else {
+                        po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Removing property failed, %s", removePropertyCommand.getAllErrors()));
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
     public UUID addNode(final String clusterName, final String lxcHostname, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,

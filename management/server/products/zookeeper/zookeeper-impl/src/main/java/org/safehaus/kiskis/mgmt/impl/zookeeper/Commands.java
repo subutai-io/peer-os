@@ -70,13 +70,13 @@ public class Commands extends CommandsSingleton {
         return createCommand(requestBuilders);
     }
 
-    public static Command addPropertyCommand(String fileName, String propertyName, String propertyValue, Set<Agent> agents) {
+    public static Command getAddPropertyCommand(String fileName, String propertyName, String propertyValue, Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder(String.format(". /etc/profile && zookeeper-property.sh add %s %s %s", fileName, propertyName, propertyValue)),
                 agents);
     }
 
-    public static Command removePropertyCommand(String fileName, String propertyName, Set<Agent> agents) {
+    public static Command getRemovePropertyCommand(String fileName, String propertyName, Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder(String.format(". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName)),
                 agents);
