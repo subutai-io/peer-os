@@ -39,7 +39,7 @@ public class UiUtil {
 
     }
 
-    public static Table createTableTemplate(String caption, int size, final Window window, boolean destroyButtonNeeded) {
+    public static Table createTableTemplate(String caption, int size, final Component parent, boolean destroyButtonNeeded) {
         final Table table = new Table(caption);
         table.addContainerProperty("Host", String.class, null);
         table.addContainerProperty("Check", Button.class, null);
@@ -64,7 +64,7 @@ public class UiUtil {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
                         MgmtApplication.addCustomWindow(terminal);
                     } else {
-                        showMsg("Agent is not connected", window);
+                        showMsg("Agent is not connected", parent.getWindow());
                     }
                 }
             }
