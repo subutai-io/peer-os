@@ -11,6 +11,8 @@
                interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
+    <reference id="zkManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
 
     <bean id="accumulo-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.accumulo.AccumuloImpl"
           init-method="init" destroy-method="destroy">
@@ -19,6 +21,7 @@
         <argument ref="dbManager"/>
         <argument ref="tracker"/>
         <argument ref="hadoopManager"/>
+        <argument ref="zkManager"/>
     </bean>
 
     <service ref="accumulo-impl" interface="org.safehaus.kiskis.mgmt.api.accumulo.Accumulo"/>
