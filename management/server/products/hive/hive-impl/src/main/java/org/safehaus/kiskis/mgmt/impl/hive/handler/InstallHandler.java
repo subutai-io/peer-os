@@ -1,16 +1,12 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.Product;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
@@ -26,7 +22,7 @@ public class InstallHandler extends AbstractHandler {
     }
 
     public void run() {
-        if(getClusterConfig() != null) {
+        if(manager.getCluster(clusterName) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     clusterName));
             return;
@@ -46,27 +42,34 @@ public class InstallHandler extends AbstractHandler {
 
         po.addLog("Check installed packages...");
         // server packages
-        Task checkTask = TaskFactory.checkPackages(config.getServer());
-        manager.getTaskRunner().executeTaskNWait(checkTask);
-        if(!checkTask.isCompleted()) {
+        String s = Commands.make(CommandType.LIST, null);
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s),
+                new HashSet<Agent>(Arrays.asList(config.getServer())));
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(!cmd.hasCompleted()) {
             po.addLogFailed("Failed to check installed packages for server node");
             return;
         }
-        Result res = checkTask.getResults().get(config.getServer().getUuid());
+        AgentResult res = cmd.getResults().get(config.getServer().getUuid());
         boolean skipHive = res.getStdOut().contains(Product.HIVE.getPackageName());
         boolean skipDerby = res.getStdOut().contains(Product.DERBY.getPackageName());
 
         // check clients
-        checkTask = TaskFactory.checkPackages(config.getClients());
-        checkTask = manager.getTaskRunner().executeTaskNWait(checkTask);
-        if(!checkTask.isCompleted()) {
+        s = Commands.make(CommandType.LIST, null);
+        cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
+                config.getClients());
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(!cmd.hasCompleted()) {
             po.addLogFailed("Failed to check installed packages");
             return;
         }
         Iterator<Agent> it = config.getClients().iterator();
         while(it.hasNext()) {
             Agent a = it.next();
-            res = checkTask.getResults().get(a.getUuid());
+            res = cmd.getResults().get(a.getUuid());
             if(res.getStdOut().contains(Product.HIVE.getPackageName())) {
                 po.addLog(String.format("Node '%s' has already Hive installed.\nOmitting from installation",
                         a.getHostname()));
@@ -84,27 +87,49 @@ public class InstallHandler extends AbstractHandler {
             po.addLog("Cluster info saved");
 
             po.addLog("Installing server...");
-            List<Task> serverTasks = TaskFactory.installServer(config.getServer(),
-                    skipHive, skipDerby);
-            for(Task t : serverTasks) {
-                manager.getTaskRunner().executeTaskNWait(t);
-                po.addLog(t.getDescription() + " " + t.getTaskStatus());
-                if(t.getTaskStatus() != TaskStatus.SUCCESS) {
-                    Result r = t.getResults().get(config.getServer().getUuid());
-                    po.addLogFailed(r.getStdErr());
+            if(!skipHive) {
+                s = Commands.make(CommandType.INSTALL, Product.HIVE);
+                cmd = manager.getCommandRunner().createCommand(
+                        new RequestBuilder(s).withTimeout(120),
+                        new HashSet<Agent>(Arrays.asList(config.getServer())));
+                manager.getCommandRunner().runCommand(cmd);
+                if(!cmd.hasSucceeded()) {
+                    po.addLogFailed(cmd.getAllErrors());
                     return;
                 }
+            }
+            if(!skipDerby) {
+                s = Commands.make(CommandType.INSTALL, Product.DERBY);
+                cmd = manager.getCommandRunner().createCommand(
+                        new RequestBuilder(s).withTimeout(120),
+                        new HashSet<Agent>(Arrays.asList(config.getServer())));
+                manager.getCommandRunner().runCommand(cmd);
+                if(!cmd.hasSucceeded()) {
+                    po.addLogFailed(cmd.getAllErrors());
+                    return;
+                }
+            }
+            // configure Hive server
+            s = Commands.configureHiveServer(config.getServer().getListIP().get(0));
+            cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
+                    new HashSet<Agent>(Arrays.asList(config.getServer())));
+            manager.getCommandRunner().runCommand(cmd);
+            if(!cmd.hasSucceeded()) {
+                po.addLogFailed("Failed to configure Hive server");
+                return;
             }
             po.addLog("Server successfully installed");
 
             po.addLog("Installing clients...");
-            Task clientTask = TaskFactory.installClient(config.getClients());
-            manager.getTaskRunner().executeTaskNWait(clientTask);
+            s = Commands.make(CommandType.INSTALL, Product.HIVE);
+            cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(s).withTimeout(120), config.getClients());
+            manager.getCommandRunner().runCommand(cmd);
 
-            if(clientTask.isCompleted()) {
+            if(cmd.hasCompleted()) {
                 List<Agent> readyClients = new ArrayList<Agent>();
                 for(Agent a : config.getClients()) {
-                    res = clientTask.getResults().get(a.getUuid());
+                    res = cmd.getResults().get(a.getUuid());
                     if(isZero(res.getExitCode())) {
                         readyClients.add(a);
                         po.addLog("Hive successfully installed on " + a.getHostname());
@@ -113,11 +138,13 @@ public class InstallHandler extends AbstractHandler {
                     }
                 }
                 if(readyClients.size() > 0) {
-                    Task configTask = TaskFactory.configureClient(readyClients,
-                            config.getServer());
-                    manager.getTaskRunner().executeTaskNWait(configTask);
+                    s = Commands.configureClient(config.getServer());
+                    cmd = manager.getCommandRunner().createCommand(
+                            new RequestBuilder(s),
+                            new HashSet<Agent>(readyClients));
+                    manager.getCommandRunner().runCommand(cmd);
                     for(Agent a : readyClients) {
-                        res = configTask.getResults().get(a.getUuid());
+                        res = cmd.getResults().get(a.getUuid());
                         if(isZero(res.getExitCode()))
                             po.addLog(String.format("Client node '%s' successfully configured",
                                     a.getHostname()));
@@ -129,7 +156,7 @@ public class InstallHandler extends AbstractHandler {
                 }
             } else {
                 po.addLogFailed("Failed to install client(s): "
-                        + clientTask.getFirstError());
+                        + cmd.getAllErrors());
             }
         } else {
             po.addLogFailed("Failed to save cluster info.\nInstallation aborted");

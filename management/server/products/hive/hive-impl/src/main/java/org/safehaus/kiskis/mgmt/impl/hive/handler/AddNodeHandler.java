@@ -1,14 +1,14 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.Product;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class AddNodeHandler extends AbstractHandler {
@@ -18,7 +18,7 @@ public class AddNodeHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
@@ -30,13 +30,16 @@ public class AddNodeHandler extends AbstractHandler {
             return;
         }
 
-        Task task = TaskFactory.checkPackages(agent);
-        manager.getTaskRunner().executeTaskNWait(task);
-        if(!task.isCompleted()) {
+        String s = Commands.make(CommandType.LIST, null);
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(!cmd.hasSucceeded()) {
             po.addLogFailed("Failed to check installed packages");
             return;
         }
-        Result res = task.getResults().get(agent.getUuid());
+        AgentResult res = cmd.getResults().get(agent.getUuid());
         boolean skipInstall;
         if(skipInstall = res.getStdOut().contains(Product.HIVE.getPackageName())) {
             po.addLog("Hive already installed on " + hostname);
@@ -53,25 +56,30 @@ public class AddNodeHandler extends AbstractHandler {
             boolean installed = false;
 
             if(!skipInstall) {
-                task = TaskFactory.installClient(set);
-                manager.getTaskRunner().executeTaskNWait(task);
-                res = task.getResults().get(agent.getUuid());
-                installed = task.isCompleted() && isZero(res.getExitCode());
+                s = Commands.make(CommandType.INSTALL, Product.HIVE);
+                cmd = manager.getCommandRunner().createCommand(
+                        new RequestBuilder(s), set);
+                manager.getCommandRunner().runCommand(cmd);
+                installed = cmd.hasSucceeded();
                 if(installed) {
-                    po.addLog(String.format("Node '%s' successfully added",
+                    po.addLog(String.format("Hive successfully installed on '%s'",
                             hostname));
                 } else {
-                    po.addLog("Failed to add node: " + res.getStdErr());
+                    po.addLog("Failed to add node: " + cmd.getAllErrors());
                 }
             }
 
             if(skipInstall || installed) {
-                task = TaskFactory.configureClient(set, config.getServer());
-                manager.getTaskRunner().executeTaskNWait(task);
-                res = task.getResults().get(agent.getUuid());
-                installed = task.isCompleted() && isZero(res.getExitCode());
+                // configure client
+                s = Commands.configureClient(config.getServer());
+                cmd = manager.getCommandRunner().createCommand(
+                        new RequestBuilder(s), set);
+                manager.getCommandRunner().runCommand(cmd);
+
+                res = cmd.getResults().get(agent.getUuid());
+                installed = cmd.hasSucceeded();
                 if(installed)
-                    po.addLog(task.getDescription() + " " + task.getTaskStatus());
+                    po.addLog("Hive client successfully configured");
                 else {
                     po.addLog(res.getStdOut());
                     po.addLog(res.getStdErr());

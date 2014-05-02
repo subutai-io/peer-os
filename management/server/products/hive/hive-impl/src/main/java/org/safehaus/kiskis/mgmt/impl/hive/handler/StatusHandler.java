@@ -1,12 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.Product;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StatusHandler extends AbstractHandler {
@@ -16,7 +17,7 @@ public class StatusHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
@@ -32,24 +33,32 @@ public class StatusHandler extends AbstractHandler {
         boolean ok = true;
         // if server node, check Derby first
         if(agent.equals(config.getServer())) {
-            Task checkMetastore = TaskFactory.status(agent, Product.DERBY);
-            manager.getTaskRunner().executeTaskNWait(checkMetastore);
 
-            Result res = checkMetastore.getResults().get(agent.getUuid());
+            String s = Commands.make(CommandType.STATUS, Product.DERBY);
+            Command cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(s),
+                    new HashSet<Agent>(Arrays.asList(agent)));
+            manager.getCommandRunner().runCommand(cmd);
+
+            AgentResult res = cmd.getResults().get(agent.getUuid());
             po.addLog(res.getStdOut());
             po.addLog(res.getStdErr());
 
-            ok = checkMetastore.isCompleted() && isZero(res.getExitCode());
+            ok = cmd.hasSucceeded();
         }
         if(ok) {
-            Task checkHiveTask = TaskFactory.status(agent, Product.HIVE);
-            manager.getTaskRunner().executeTaskNWait(checkHiveTask);
 
-            Result res = checkHiveTask.getResults().get(agent.getUuid());
+            String s = Commands.make(CommandType.STATUS, Product.HIVE);
+            Command cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(s),
+                    new HashSet(Arrays.asList(agent)));
+            manager.getCommandRunner().runCommand(cmd);
+
+            AgentResult res = cmd.getResults().get(agent.getUuid());
             po.addLog(res.getStdOut());
             po.addLog(res.getStdErr());
 
-            ok = checkHiveTask.isCompleted() && isZero(res.getExitCode());
+            ok = cmd.hasSucceeded();
         }
 
         if(ok) po.addLogDone("Done");
