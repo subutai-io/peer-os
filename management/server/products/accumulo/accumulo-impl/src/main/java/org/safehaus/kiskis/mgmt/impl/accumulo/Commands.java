@@ -146,18 +146,6 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-    public static Command getAddPropertyCommand(String propertyName, String propertyValue, Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue)),
-                nodes);
-    }
-
-    public static Command getClearPropertyCommand(String propertyName, Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh clear %s", propertyName)),
-                nodes);
-    }
-
     public static Command getBindZKClusterCommand(Set<Agent> nodes, Set<Agent> zkNodes) {
         StringBuilder zkNodesCommaSeparated = new StringBuilder();
         for (Agent zkNode : zkNodes) {
@@ -172,5 +160,17 @@ public class Commands extends CommandsSingleton {
                 ),
                 nodes
         );
+    }
+
+    public static Command getAddPropertyCommand(String propertyName, String propertyValue, Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh add %s %s", propertyName, propertyValue)),
+                agents);
+    }
+
+    public static Command getRemovePropertyCommand(String propertyName, Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh clear %s", propertyName)),
+                agents);
     }
 }

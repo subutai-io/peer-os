@@ -12,8 +12,8 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
@@ -425,6 +425,114 @@ public class ZookeeperImpl implements Zookeeper {
                             config.getClusterName()));
                 } else {
                     po.addLogDone("Done");
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
+    @Override
+    public UUID addProperty(final String clusterName, final String fileName, final String propertyName, final String propertyValue) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Adding property %s=%s to file %s", propertyName, propertyValue, fileName));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(fileName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Adding property...");
+
+                Command addPropertyCommand = Commands.getAddPropertyCommand(fileName, propertyName, propertyValue, config.getNodes());
+                commandRunner.runCommand(addPropertyCommand);
+
+                if (addPropertyCommand.hasSucceeded()) {
+                    po.addLog("Property added successfully\nRestarting cluster...");
+
+                    Command restartCommand = Commands.getRestartCommand(config.getNodes());
+                    final AtomicInteger count = new AtomicInteger();
+                    commandRunner.runCommand(restartCommand, new CommandCallback() {
+                        @Override
+                        public void onResponse(Response response, AgentResult agentResult, Command command) {
+                            if (agentResult.getStdOut().contains("STARTED")) {
+                                if (count.incrementAndGet() == config.getNodes().size()) {
+                                    stop();
+                                }
+                            }
+                        }
+                    });
+
+                    if (count.get() == config.getNodes().size()) {
+                        po.addLogDone("Cluster successfully restarted");
+                    } else {
+                        po.addLogFailed(String.format("Failed to restart cluster, %s", restartCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Adding property failed, %s", addPropertyCommand.getAllErrors()));
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
+    @Override
+    public UUID removeProperty(final String clusterName, final String fileName, final String propertyName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Removing property %s from file %s", propertyName, fileName));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(fileName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = getCluster(clusterName);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Removing property...");
+
+                Command removePropertyCommand = Commands.getRemovePropertyCommand(fileName, propertyName, config.getNodes());
+                commandRunner.runCommand(removePropertyCommand);
+
+                if (removePropertyCommand.hasSucceeded()) {
+                    po.addLog("Property removed successfully\nRestarting cluster...");
+
+                    Command restartCommand = Commands.getRestartCommand(config.getNodes());
+                    final AtomicInteger count = new AtomicInteger();
+                    commandRunner.runCommand(restartCommand, new CommandCallback() {
+                        @Override
+                        public void onResponse(Response response, AgentResult agentResult, Command command) {
+                            if (agentResult.getStdOut().contains("STARTED")) {
+                                if (count.incrementAndGet() == config.getNodes().size()) {
+                                    stop();
+                                }
+                            }
+                        }
+                    });
+
+                    if (count.get() == config.getNodes().size()) {
+                        po.addLogDone("Cluster successfully restarted");
+                    } else {
+                        po.addLogFailed(String.format("Failed to restart cluster, %s", restartCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Removing property failed, %s", removePropertyCommand.getAllErrors()));
                 }
             }
         });
