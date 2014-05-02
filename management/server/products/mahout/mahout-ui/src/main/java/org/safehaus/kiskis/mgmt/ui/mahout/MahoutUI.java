@@ -27,28 +27,23 @@ public class MahoutUI implements Module {
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public MahoutUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Mahout mahoutManager) {
+        MahoutUI.agentManager = agentManager;
+        MahoutUI.tracker = tracker;
+        MahoutUI.hadoopManager = hadoopManager;
+        MahoutUI.mahoutManager = mahoutManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        MahoutUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Mahout getMahoutManager() {
         return mahoutManager;
     }
 
-    public void setMahoutManager(Mahout mahoutManager) {
-        MahoutUI.mahoutManager = mahoutManager;
-    }
-
     public static Hadoop getHadoopManager() {
         return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        MahoutUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +52,6 @@ public class MahoutUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        MahoutUI.agentManager = agentManager;
     }
 
     public void init() {

@@ -12,10 +12,10 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.shark.SharkUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="sparkManager" ref="sparkManager"/>
-        <property name="sharkManager" ref="sharkManager"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="sparkManager"/>
+        <argument ref="sharkManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

@@ -27,28 +27,23 @@ public class SharkUI implements Module {
     private static Spark sparkManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public SharkUI(AgentManager agentManager, Tracker tracker, Spark sparkManager, Shark sharkManager) {
+        SharkUI.agentManager = agentManager;
+        SharkUI.tracker = tracker;
+        SharkUI.sparkManager = sparkManager;
+        SharkUI.sharkManager = sharkManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        SharkUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Shark getSharkManager() {
         return sharkManager;
     }
 
-    public void setSharkManager(Shark sharkManager) {
-        SharkUI.sharkManager = sharkManager;
-    }
-
     public static Spark getSparkManager() {
         return sparkManager;
-    }
-
-    public void setSparkManager(Spark sparkManager) {
-        SharkUI.sparkManager = sparkManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +52,6 @@ public class SharkUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        SharkUI.agentManager = agentManager;
     }
 
     public void init() {
