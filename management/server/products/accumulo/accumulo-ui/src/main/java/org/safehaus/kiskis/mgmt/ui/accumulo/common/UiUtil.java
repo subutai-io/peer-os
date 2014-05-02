@@ -15,6 +15,10 @@ import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
  */
 public class UiUtil {
 
+    public static final String MASTER_PREFIX = "Master: ";
+    public static final String GC_PREFIX = "GC: ";
+    public static final String MONITOR_PREFIX = "Monitor: ";
+
     public static ComboBox getCombo(String title) {
         ComboBox combo = new ComboBox(title);
         combo.setMultiSelect(false);
@@ -59,6 +63,7 @@ public class UiUtil {
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+                    lxcHostname = lxcHostname.replaceAll(MASTER_PREFIX, "").replaceAll(GC_PREFIX, "").replaceAll(MONITOR_PREFIX, "");
                     Agent lxcAgent = AccumuloUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
                         Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));

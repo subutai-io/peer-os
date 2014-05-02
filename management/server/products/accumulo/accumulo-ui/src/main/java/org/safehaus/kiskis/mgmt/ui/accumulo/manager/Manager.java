@@ -357,7 +357,7 @@ public class Manager {
             progressIcon.setVisible(false);
 
             table.addItem(masters ? new Object[]{
-                            (i == 1 ? "Master: " : i == 2 ? "GC: " : "Monitor: ") + agent.getHostname(),
+                            (i == 1 ? UiUtil.MASTER_PREFIX : i == 2 ? UiUtil.GC_PREFIX : UiUtil.MONITOR_PREFIX) + agent.getHostname(),
                             checkBtn,
                             resultHolder,
                             progressIcon} : new Object[]{
