@@ -193,10 +193,15 @@ public class Manager {
         HorizontalLayout customPropertyContent = new HorizontalLayout();
         customPropertyContent.setSpacing(true);
 
-        final TextField fileTextField = new TextField("File");
+        Label fileLabel = new Label("File");
+        customPropertyContent.addComponent(fileLabel);
+        final TextField fileTextField = new TextField();
         customPropertyContent.addComponent(fileTextField);
-        final TextField propertyNameTextField = new TextField("Property");
+        Label propertyNameLabel = new Label("Property Name");
+        customPropertyContent.addComponent(propertyNameLabel);
+        final TextField propertyNameTextField = new TextField();
         customPropertyContent.addComponent(propertyNameTextField);
+
         Button removePropertyBtn = new Button("Remove");
         removePropertyBtn.addListener(new Button.ClickListener() {
             @Override
@@ -218,7 +223,10 @@ public class Manager {
             }
         });
         customPropertyContent.addComponent(removePropertyBtn);
-        final TextField propertyValueTextField = new TextField("Value");
+
+        Label propertyValueLabel = new Label("Property Value");
+        customPropertyContent.addComponent(propertyValueLabel);
+        final TextField propertyValueTextField = new TextField();
         customPropertyContent.addComponent(propertyValueTextField);
         Button addPropertyBtn = new Button("Add");
         addPropertyBtn.addListener(new Button.ClickListener() {
@@ -246,6 +254,7 @@ public class Manager {
         customPropertyContent.addComponent(addPropertyBtn);
 
         content.addComponent(customPropertyContent);
+        content.setComponentAlignment(customPropertyContent, Alignment.TOP_CENTER);
 
         content.addComponent(nodesTable);
 
