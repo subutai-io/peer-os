@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.hbase;
 
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.hbase.Config;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -25,7 +25,7 @@ public class HBaseUI implements Module {
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static ExecutorService executor;
-    private static DbManager dbManager;
+    private static Hadoop hadoopManager;
 
     public static Tracker getTracker() {
         return tracker;
@@ -55,12 +55,12 @@ public class HBaseUI implements Module {
         HBaseUI.agentManager = agentManager;
     }
 
-    public static DbManager getDbManager() {
-        return dbManager;
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
-        HBaseUI.dbManager = dbManager;
+    public void setHadoopManager(Hadoop hadoopManager) {
+        HBaseUI.hadoopManager = hadoopManager;
     }
 
     public void init() {
@@ -71,7 +71,7 @@ public class HBaseUI implements Module {
         hbaseManager = null;
         agentManager = null;
         tracker = null;
-        dbManager = null;
+        hadoopManager = null;
         executor.shutdown();
     }
 

@@ -9,6 +9,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.oozie.OozieUI;
@@ -41,20 +42,16 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setRequired(true);
         hadoopClusters.setNullSelectionAllowed(false);
 
-        List<HadoopClusterInfo> clusters = OozieUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE, HadoopClusterInfo.class);
+        List<Config> clusters = OozieUI.getHadoopManager().getClusters();
         if (clusters.size() > 0) {
-            for (HadoopClusterInfo hadoopClusterInfo : clusters) {
-                hadoopClusters.addItem(hadoopClusterInfo);
-                hadoopClusters.setItemCaption(hadoopClusterInfo,
-                        hadoopClusterInfo.getClusterName());
+            for (Config Config : clusters) {
+                hadoopClusters.addItem(Config);
+                hadoopClusters.setItemCaption(Config,
+                        Config.getClusterName());
             }
         }
 
-        HadoopClusterInfo info = OozieUI.getDbManager().
-                getInfo(HadoopClusterInfo.SOURCE,
-                        wizard.getConfig().getClusterName(),
-                        HadoopClusterInfo.class);
+        Config info = OozieUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
         if (info != null) {
             hadoopClusters.setValue(info);
@@ -63,11 +60,11 @@ public class ConfigurationStep extends Panel {
         }
 
         if (hadoopClusters.getValue() != null) {
-            HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) hadoopClusters.getValue();
+            Config hadoopInfo = (Config) hadoopClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
-                            Agent.class, hadoopInfo.getAllAgents())
+                            Agent.class, hadoopInfo.getAllNodes())
             );
         }
 
@@ -75,11 +72,11 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    HadoopClusterInfo hadoopInfo = (HadoopClusterInfo) event.getProperty().getValue();
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     select.setValue(null);
                     select.setContainerDataSource(
                             new BeanItemContainer<Agent>(
-                                    Agent.class, hadoopInfo.getAllAgents())
+                                    Agent.class, hadoopInfo.getAllNodes())
                     );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                     wizard.getConfig().setHadoopNodes(new HashSet<Agent>());
