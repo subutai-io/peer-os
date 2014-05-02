@@ -73,7 +73,6 @@ public class Manager {
                 refreshUI();
             }
         });
-
         controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
@@ -151,7 +150,6 @@ public class Manager {
             }
 
         });
-
         controlsContent.addComponent(destroyClusterBtn);
 
         Button addNodeBtn = new Button("Add Node");
@@ -185,10 +183,7 @@ public class Manager {
                 }
             }
         });
-
         controlsContent.addComponent(addNodeBtn);
-
-        content.addComponent(controlsContent);
 
         HorizontalLayout customPropertyContent = new HorizontalLayout();
         customPropertyContent.setSpacing(true);
@@ -253,10 +248,13 @@ public class Manager {
         });
         customPropertyContent.addComponent(addPropertyBtn);
 
+        content.addComponent(controlsContent);
         content.addComponent(customPropertyContent);
-        content.setComponentAlignment(customPropertyContent, Alignment.TOP_CENTER);
-
         content.addComponent(nodesTable);
+
+        content.setComponentAlignment(controlsContent, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(customPropertyContent, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(nodesTable, Alignment.TOP_CENTER);
 
     }
 
