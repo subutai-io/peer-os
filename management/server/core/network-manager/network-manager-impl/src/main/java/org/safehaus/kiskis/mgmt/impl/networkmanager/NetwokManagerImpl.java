@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.networkmanager;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.List;
@@ -10,29 +10,33 @@ import java.util.List;
  * Created by daralbaev on 04.04.14.
  */
 public class NetwokManagerImpl implements NetworkManager {
-    private TaskRunner taskRunner;
+    private static CommandRunner commandRunner;
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
+    public void setCommandRunner(CommandRunner commandRunner) {
+        NetwokManagerImpl.commandRunner = commandRunner;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     @Override
     public boolean configSshOnAgents(List<Agent> agentList) {
-        return new SshManager(taskRunner, agentList).execute();
+        return new SshManager(agentList).execute();
     }
 
     @Override
     public boolean configSshOnAgents(List<Agent> agentList, Agent agent) {
-        return new SshManager(taskRunner, agentList).execute(agent);
+        return new SshManager(agentList).execute(agent);
     }
 
     @Override
     public boolean configHostsOnAgents(List<Agent> agentList, String domainName) {
-        return new HostManager(taskRunner, agentList, domainName).execute();
+        return new HostManager(agentList, domainName).execute();
     }
 
     @Override
     public boolean configHostsOnAgents(List<Agent> agentList, Agent agent, String domainName) {
-        return new HostManager(taskRunner, agentList, domainName).execute(agent);
+        return new HostManager(agentList, domainName).execute(agent);
     }
 }
