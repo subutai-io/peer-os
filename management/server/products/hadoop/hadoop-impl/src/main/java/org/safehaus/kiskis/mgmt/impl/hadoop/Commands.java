@@ -56,6 +56,19 @@ public class Commands {
         );
     }
 
+    public static Command getSetMastersCommand(Config config, Agent agent) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(". /etc/profile && " +
+                        "hadoop-configure.sh")
+                        .withCmdArgs(Lists.newArrayList(
+                                String.format("%s:%d", config.getNameNode().getHostname(), Config.NAME_NODE_PORT),
+                                String.format("%s:%d", config.getJobTracker().getHostname(), Config.JOB_TRACKER_PORT),
+                                String.format("%d", config.getReplicationFactor())
+                        )),
+                Sets.newHashSet(agent)
+        );
+    }
+
     public static Command getAddSecondaryNamenodeCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
                 new RequestBuilder(String.format(
@@ -118,6 +131,16 @@ public class Commands {
                 )
         );
         return req;
+    }
+
+    public static Command getExcludeDataNodeCommand(Config config, Agent agent) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format(
+                        ". /etc/profile && " +
+                                "hadoop-master-slave.sh dfs.exclude clear %s", agent.getHostname()
+                )),
+                Sets.newHashSet(config.getNameNode())
+        );
     }
 
     public static Request getExcludeTaskTrackerCommand(Agent agent) {
@@ -194,29 +217,19 @@ public class Commands {
         return req;
     }
 
-    public static Request getNameNodeCommand(String command) {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                String.format("service hadoop-dfs %s", command)
-        );
-        req.setTimeout(20);
-        return req;
-    }
-
     public static Command getNameNodeCommand(Agent agent, String command) {
         return HadoopImpl.getCommandRunner().createCommand(
                 new RequestBuilder(String.format("service hadoop-dfs %s", command))
                         .withTimeout(20),
-                Util.wrapAgentToSet(agent)
+                Sets.newHashSet(agent)
         );
     }
 
-    public static Request getJobTrackerCommand(String command) {
-        Request req = getRequestTemplate();
-        req.setProgram(
-                String.format("service hadoop-mapred %s", command)
+    public static Command getJobTrackerCommand(Agent agent, String command) {
+        return HadoopImpl.getCommandRunner().createCommand(
+                new RequestBuilder(String.format("service hadoop-mapred %s", command))
+                        .withTimeout(20),
+                Sets.newHashSet(agent)
         );
-        req.setTimeout(20);
-        return req;
     }
 }

@@ -11,34 +11,6 @@ import java.util.ArrayList;
  */
 public class Tasks {
 
-    public static Task getFormatNameNodeTask(Config cfg) {
-        Task task = new Task("Set format NameNode");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getFormatNameNodeCommand(), cfg.getNameNode());
-        return task;
-    }
-
-    public static Task getNameNodeCommandTask(Agent agent, String command) {
-        Task task = new Task("Run command on NameNode or DataNode");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getNameNodeCommand(command), agent);
-        return task;
-    }
-
-    public static Task getJobTrackerCommand(Agent agent, String command) {
-        Task task = new Task("Run command on JobTracker or TaskTracker");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getJobTrackerCommand(command), agent);
-        return task;
-    }
-
-    public static Task getSetMastersTask(Config cfg, Agent agent) {
-        Task task = new Task("Set Master Nodes");
-        task.setData(TaskType.CONFIGURE);
-        task.addRequest(Commands.getSetMastersCommand(cfg.getNameNode(), cfg.getJobTracker(), cfg.getReplicationFactor()), agent);
-        return task;
-    }
-
     public static Task getExcludeNameNodeCommand(Config cfg, Agent agent) {
         Task task = new Task("Exclude NameNode from blacklist");
         task.setData(TaskType.CONFIGURE);
