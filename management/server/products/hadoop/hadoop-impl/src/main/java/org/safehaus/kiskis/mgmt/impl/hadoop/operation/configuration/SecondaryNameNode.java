@@ -48,7 +48,7 @@ public class SecondaryNameNode {
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if (command.hasCompleted()) {
-                    AgentResult result = command.getResults().get(config.getJobTracker().getUuid());
+                    AgentResult result = command.getResults().get(config.getSecondaryNameNode().getUuid());
                     if (result.getStdOut() != null && result.getStdOut().contains("SecondaryNameNode")) {
                         String[] array = result.getStdOut().split("\n");
 
