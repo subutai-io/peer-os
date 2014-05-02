@@ -1,12 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.Product;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StopHandler extends AbstractHandler {
@@ -16,7 +17,7 @@ public class StopHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
@@ -29,26 +30,29 @@ public class StopHandler extends AbstractHandler {
             return;
         }
 
-        Task stopHiveTask = TaskFactory.stop(agent, Product.HIVE);
-        manager.getTaskRunner().executeTaskNWait(stopHiveTask);
+        String s = Commands.make(CommandType.STOP, Product.HIVE);
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
 
-        Result res = stopHiveTask.getResults().get(agent.getUuid());
+        AgentResult res = cmd.getResults().get(agent.getUuid());
         po.addLog(res.getStdOut());
         po.addLog(res.getStdErr());
 
-        boolean ok = stopHiveTask.isCompleted() && isZero(res.getExitCode());
+        boolean ok = cmd.hasSucceeded();
 
         // if server node, stop Derby
         if(ok && agent.equals(config.getServer())) {
 
-            Task stopDerbyTask = TaskFactory.stop(agent, Product.DERBY);
-            manager.getTaskRunner().executeTaskNWait(stopDerbyTask);
+            s = Commands.make(CommandType.STOP, Product.DERBY);
+            cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
+                    new HashSet<Agent>(Arrays.asList(agent)));
+            manager.getCommandRunner().runCommand(cmd);
 
-            res = stopDerbyTask.getResults().get(agent.getUuid());
+            res = cmd.getResults().get(agent.getUuid());
             po.addLog(res.getStdOut());
             po.addLog(res.getStdErr());
 
-            ok = stopDerbyTask.isCompleted() && isZero(res.getExitCode());
+            ok = cmd.hasSucceeded();
         }
 
         if(ok) po.addLogDone("Done");
