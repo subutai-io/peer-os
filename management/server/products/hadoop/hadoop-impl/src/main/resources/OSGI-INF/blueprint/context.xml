@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="taskRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
@@ -18,7 +16,6 @@
 
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl"
           init-method="init" destroy-method="destroy">
-        <property name="taskRunner" ref="taskRunner"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="tracker" ref="tracker"/>
         <property name="agentManager" ref="agentManager"/>
