@@ -195,10 +195,10 @@ public class FlumeImpl implements Flume {
         return po.getId();
     }
 
-    public UUID startNode(final String clusterName, final String lxcHostname) {
+    public UUID startNode(final String clusterName, final String hostname) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
-                String.format("Starting node %s in %s", lxcHostname, clusterName));
+                String.format("Starting node %s in %s", hostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -208,9 +208,9 @@ public class FlumeImpl implements Flume {
                     return;
                 }
 
-                final Agent node = agentManager.getAgentByHostname(lxcHostname);
+                final Agent node = agentManager.getAgentByHostname(hostname);
                 if(node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hostname));
                     return;
                 }
 
@@ -221,10 +221,16 @@ public class FlumeImpl implements Flume {
                 commandRunner.runCommand(cmd);
 
                 if(cmd.hasSucceeded()) {
-                    po.addLogDone(String.format("Node on %s started", lxcHostname));
+                    po.addLogDone(String.format("Node on %s started", hostname));
                 } else {
-                    po.addLogFailed(String.format("Failed to start node %s. %s",
-                            lxcHostname, cmd.getAllErrors()));
+                    AgentResult res = cmd.getResults().get(node.getUuid());
+                    if(res.getStdOut().contains("agent running"))
+                        po.addLogDone("Flume already started on " + hostname);
+                    else {
+                        po.addLog(res.getStdOut());
+                        po.addLog(res.getStdErr());
+                        po.addLogFailed("Failed to start node " + hostname);
+                    }
                 }
 
             }
@@ -233,10 +239,10 @@ public class FlumeImpl implements Flume {
         return po.getId();
     }
 
-    public UUID stopNode(final String clusterName, final String lxcHostname) {
+    public UUID stopNode(final String clusterName, final String hostname) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
-                String.format("Stopping node %s in %s", lxcHostname, clusterName));
+                String.format("Stopping node %s in %s", hostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -246,9 +252,9 @@ public class FlumeImpl implements Flume {
                     return;
                 }
 
-                final Agent node = agentManager.getAgentByHostname(lxcHostname);
+                final Agent node = agentManager.getAgentByHostname(hostname);
                 if(node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hostname));
                     return;
                 }
 
@@ -259,10 +265,10 @@ public class FlumeImpl implements Flume {
                 commandRunner.runCommand(cmd);
 
                 if(cmd.hasSucceeded()) {
-                    po.addLogDone(String.format("Node on %s stopped", lxcHostname));
+                    po.addLogDone(String.format("Node on %s stopped", hostname));
                 } else {
                     po.addLogFailed(String.format("Failed to stop node %s. %s",
-                            lxcHostname, cmd.getAllErrors()));
+                            hostname, cmd.getAllErrors()));
                 }
 
             }
@@ -271,10 +277,10 @@ public class FlumeImpl implements Flume {
         return po.getId();
     }
 
-    public UUID checkNode(final String clusterName, final String lxcHostname) {
+    public UUID checkNode(final String clusterName, final String hostname) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
-                String.format("Checking node %s in %s", lxcHostname, clusterName));
+                String.format("Checking node %s in %s", hostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -284,9 +290,9 @@ public class FlumeImpl implements Flume {
                     return;
                 }
 
-                final Agent node = agentManager.getAgentByHostname(lxcHostname);
+                final Agent node = agentManager.getAgentByHostname(hostname);
                 if(node == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hostname));
                     return;
                 }
 
@@ -308,9 +314,9 @@ public class FlumeImpl implements Flume {
 
                 if(NodeState.UNKNOWN.equals(nodeState)) {
                     po.addLogFailed(String.format("Failed to check status of %s, %s",
-                            lxcHostname, cmd.getAllErrors()));
+                            hostname, cmd.getAllErrors()));
                 } else {
-                    po.addLogDone(String.format("Node %s is %s", lxcHostname,
+                    po.addLogDone(String.format("Node %s is %s", hostname,
                             nodeState));
                 }
 
@@ -320,7 +326,7 @@ public class FlumeImpl implements Flume {
         return po.getId();
     }
 
-    public UUID addNode(final String clusterName, final String lxcHostname) {
+    public UUID addNode(final String clusterName, final String hostname) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
                 String.format("Adding node to %s", clusterName));
@@ -337,30 +343,31 @@ public class FlumeImpl implements Flume {
                 }
 
                 //check if node agent is connected
-                Agent agent = agentManager.getAgentByHostname(lxcHostname);
+                Agent agent = agentManager.getAgentByHostname(hostname);
                 if(agent == null) {
                     po.addLogFailed(String.format(
                             "Node %s is not connected\nOperation aborted",
-                            lxcHostname));
+                            hostname));
                     return;
                 }
                 Set<Agent> set = new HashSet<Agent>(Arrays.asList(agent));
 
                 po.addLog("Checking prerequisites...");
                 Command cmd = commandRunner.createCommand(
-                        new RequestBuilder(Commands.make(CommandType.START)), set);
+                        new RequestBuilder(Commands.make(CommandType.STATUS)), set);
+                commandRunner.runCommand(cmd);
                 if(!cmd.hasSucceeded()) {
-                    po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
+                    po.addLogFailed("Failed to check installed packages\nInstallation aborted");
                     return;
                 }
 
                 AgentResult result = cmd.getResults().get(agent.getUuid());
 
                 if(result.getStdOut().contains("ksks-flume")) {
-                    po.addLogFailed(String.format("Node %s already has Flume installed\nInstallation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Node %s already has Flume installed\nInstallation aborted", hostname));
                     return;
                 } else if(!result.getStdOut().contains("ksks-hadoop")) {
-                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nInstallation aborted", lxcHostname));
+                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nInstallation aborted", hostname));
                     return;
                 }
 
@@ -391,10 +398,10 @@ public class FlumeImpl implements Flume {
         return po.getId();
     }
 
-    public UUID destroyNode(final String clusterName, final String lxcHostname) {
+    public UUID destroyNode(final String clusterName, final String hostname) {
         final ProductOperation po = tracker.createProductOperation(
                 Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
+                String.format("Destroying %s in %s", hostname, clusterName));
 
         executor.execute(new Runnable() {
 
@@ -407,11 +414,11 @@ public class FlumeImpl implements Flume {
                     return;
                 }
 
-                Agent agent = agentManager.getAgentByHostname(lxcHostname);
+                Agent agent = agentManager.getAgentByHostname(hostname);
                 if(agent == null) {
                     po.addLogFailed(String.format(
                             "Agent with hostname %s is not connected\nOperation aborted",
-                            lxcHostname));
+                            hostname));
                     return;
                 }
 
