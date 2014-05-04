@@ -3,12 +3,9 @@ package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
-import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
@@ -98,14 +95,17 @@ public class DataNode {
                     return;
                 }
 
-                Task task = Tasks.getClearDataNodeTask(config, agent);
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getRemoveDataNodeCommand(config, agent);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
-                task = Tasks.getIncludeNameNodeCommand(config, agent);
-                parent.getTaskRunner().executeTaskNWait(task);
+                command = Commands.getIncludeDataNodeCommand(config, agent);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
-                task = Tasks.getRefreshNameNodeTask(config);
-                parent.getTaskRunner().executeTaskNWait(task);
+                command = Commands.getRefreshNameNodeCommand(config);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
                 config.getBlockedAgents().add(agent);
                 if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
@@ -115,13 +115,7 @@ public class DataNode {
                             "Blocking node aborted");
                 }
 
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
-                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
-                }
+
             }
         });
 
@@ -145,14 +139,17 @@ public class DataNode {
                     return;
                 }
 
-                Task task = Tasks.getSetDataNodeTask(config, agent);
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getSetDataNodeCommand(config, agent);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
-                task = Tasks.getExcludeNameNodeCommand(config, agent);
-                parent.getTaskRunner().executeTaskNWait(task);
+                command = Commands.getExcludeDataNodeCommand(config, agent);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
-                task = Tasks.getStartNameNodeTask(agent);
-                parent.getTaskRunner().executeTaskNWait(task);
+                command = Commands.getStartNameNodeCommand(agent);
+                HadoopImpl.getCommandRunner().runCommand(command);
+                logCommand(command, po);
 
                 config.getBlockedAgents().remove(agent);
                 if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
@@ -161,18 +158,20 @@ public class DataNode {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
                             "Blocking node aborted");
                 }
-
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
-                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
-                }
             }
         });
 
         return po.getId();
 
+    }
+
+    private void logCommand(Command command, ProductOperation po) {
+        if (command.hasSucceeded()) {
+            po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+        } else if (command.hasCompleted()) {
+            po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+        } else {
+            po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
+        }
     }
 }

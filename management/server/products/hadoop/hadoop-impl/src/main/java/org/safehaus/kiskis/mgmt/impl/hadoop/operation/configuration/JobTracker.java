@@ -1,12 +1,11 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation.configuration;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
-import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
@@ -43,15 +42,15 @@ public class JobTracker {
                     return;
                 }
 
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "start");
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "start");
+                HadoopImpl.getCommandRunner().runCommand(command);
 
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
-                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                if (command.hasSucceeded()) {
+                    po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+                } else if (command.hasCompleted()) {
+                    po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+                } else {
+                    po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
                 }
             }
         });
@@ -79,15 +78,15 @@ public class JobTracker {
                     return;
                 }
 
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "stop");
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "stop");
+                HadoopImpl.getCommandRunner().runCommand(command);
 
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
-                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                if (command.hasSucceeded()) {
+                    po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+                } else if (command.hasCompleted()) {
+                    po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+                } else {
+                    po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
                 }
             }
         });
@@ -114,15 +113,15 @@ public class JobTracker {
                     return;
                 }
 
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "restart");
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "restart");
+                HadoopImpl.getCommandRunner().runCommand(command);
 
-                if (task.getTaskStatus() == TaskStatus.SUCCESS) {
-                    po.addLogDone(String.format("Task's operation %s finished", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.FAIL) {
-                    po.addLogFailed(String.format("Task's operation %s failed", task.getDescription()));
-                } else if (task.getTaskStatus() == TaskStatus.TIMEDOUT) {
-                    po.addLogFailed(String.format("Task's operation %s timeout", task.getDescription()));
+                if (command.hasSucceeded()) {
+                    po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+                } else if (command.hasCompleted()) {
+                    po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+                } else {
+                    po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
                 }
             }
         });
@@ -150,19 +149,19 @@ public class JobTracker {
                     return;
                 }
 
-                Task task = Tasks.getJobTrackerCommand(config.getJobTracker(), "status");
-                parent.getTaskRunner().executeTaskNWait(task);
+                Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "status");
+                HadoopImpl.getCommandRunner().runCommand(command);
 
                 NodeState nodeState = NodeState.UNKNOWN;
-                if (task.isCompleted()) {
-                    Result result = task.getResults().entrySet().iterator().next().getValue();
+                if (command.hasCompleted()) {
+                    AgentResult result = command.getResults().get(config.getJobTracker().getUuid());
                     if (result.getStdOut() != null && result.getStdOut().contains("JobTracker")) {
                         String[] array = result.getStdOut().split("\n");
 
                         for (String status : array) {
                             if (status.contains("JobTracker")) {
                                 String temp = status.
-                                        replaceAll("JobTracker is ", "");
+                                        replaceAll("DataNode is ", "");
                                 if (temp.toLowerCase().contains("not")) {
                                     nodeState = NodeState.STOPPED;
                                 } else {

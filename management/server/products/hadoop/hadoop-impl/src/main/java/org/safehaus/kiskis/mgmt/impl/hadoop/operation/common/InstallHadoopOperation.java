@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation.common;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
+import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,30 +15,24 @@ import java.util.List;
  */
 public class InstallHadoopOperation {
     private final Config config;
-    private List<Task> taskList;
+    private List<Command> commandList;
 
     public InstallHadoopOperation(Config config) {
 
         this.config = config;
-        taskList = new ArrayList<Task>();
+        commandList = new ArrayList<Command>();
 
-        taskList.add(Tasks.getInstallTask(config));
-        taskList.add(Tasks.getClearMasterTask(config));
-        taskList.add(Tasks.getClearSlaveTask(config));
-        taskList.add(Tasks.getSetMastersTask(config));
-        taskList.add(Tasks.getSecondaryNameNodeTask(config));
-        List<Task> tasks = Tasks.getSetDataNodeTask(config);
-        for (Task task : tasks) {
-            taskList.add(task);
-        }
-        tasks = Tasks.getSetTaskTrackerTask(config);
-        for (Task task : tasks) {
-            taskList.add(task);
-        }
-        taskList.add(Tasks.getFormatNameNodeTask(config));
+        commandList.add(Commands.getInstallCommand(config));
+        commandList.add(Commands.getClearMastersCommand(config));
+        commandList.add(Commands.getClearSlavesCommand(config));
+        commandList.add(Commands.getSetMastersCommand(config));
+        commandList.add(Commands.getAddSecondaryNamenodeCommand(config));
+        commandList.add(Commands.getSetDataNodeCommand(config));
+        commandList.add(Commands.getSetTaskTrackerCommand(config));
+        commandList.add(Commands.getFormatNameNodeCommand(config));
     }
 
-    public List<Task> getTaskList() {
-        return taskList;
+    public List<Command> getCommandList() {
+        return commandList;
     }
 }

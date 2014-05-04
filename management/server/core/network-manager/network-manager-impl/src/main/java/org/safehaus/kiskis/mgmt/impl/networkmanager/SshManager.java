@@ -1,13 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.networkmanager;
 
 import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +12,10 @@ import java.util.List;
  * Created by daralbaev on 04.04.14.
  */
 public class SshManager {
-    private TaskRunner taskRunner;
     private List<Agent> agentList;
     private String keys;
 
-    public SshManager(TaskRunner taskRunner, List<Agent> agentList) {
-        this.taskRunner = taskRunner;
+    public SshManager(List<Agent> agentList) {
         this.agentList = agentList;
     }
 
@@ -56,147 +50,52 @@ public class SshManager {
     }
 
     private boolean read() {
-        Task task = Tasks.getReadSshTask(agentList);
+        Command command = Commands.getReadSSHCommand(agentList);
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-            final StringBuilder value = new StringBuilder();
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (!Util.isStringEmpty(response.getStdOut())) {
-                    value.append(response.getStdOut());
+        StringBuilder value = new StringBuilder();
+        if (command.hasCompleted()) {
+            for (Agent agent : agentList) {
+                AgentResult result = command.getResults().get(agent.getUuid());
+                if (!Strings.isNullOrEmpty(result.getStdOut())) {
+                    value.append(result.getStdOut());
                 }
-
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        keys = value.toString();
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
             }
         }
+        keys = value.toString();
 
-        if (!Strings.isNullOrEmpty(keys)) {
-            return task.getTaskStatus() == TaskStatus.SUCCESS;
+        if (!Strings.isNullOrEmpty(keys) && command.hasSucceeded()) {
+            return true;
         } else {
             return false;
         }
     }
 
     private boolean write() {
-        Task task = Tasks.getWriteSshTask(agentList, keys);
+        Command command = Commands.getWriteSSHCommand(agentList, keys);
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        return command.hasSucceeded();
     }
 
     private boolean create(Agent agent) {
-        Task task = Tasks.getCreateSshTask(Arrays.asList(agent));
+        Command command = Commands.getCreateSSHCommand(Arrays.asList(agent));
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        return command.hasSucceeded();
     }
 
     private boolean create() {
-        Task task = Tasks.getCreateSshTask(agentList);
+        Command command = Commands.getCreateSSHCommand(agentList);
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        return command.hasSucceeded();
     }
 
     private boolean config() {
-        Task task = Tasks.getConfigSshTask(agentList);
+        Command command = Commands.getConfigSSHCommand(agentList);
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        return command.hasSucceeded();
     }
 }
