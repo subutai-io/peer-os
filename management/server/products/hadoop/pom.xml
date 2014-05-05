@@ -18,5 +18,6 @@
         <module>hadoop-api</module>
         <module>hadoop-impl</module>
         <module>hadoop-ui</module>
+        <module>hadoop-cli</module>
     </modules>
 </project>
