@@ -124,7 +124,7 @@ public class CommandRunnerImplUT {
 
         commandRunner.runCommandAsync(command);
 
-        Awaitility.await().atMost(2050, TimeUnit.MILLISECONDS).with().pollInterval(10, TimeUnit.MILLISECONDS)
+        Awaitility.await().atMost(3050, TimeUnit.MILLISECONDS).with().pollInterval(10, TimeUnit.MILLISECONDS)
                 .untilCall(to(command).getCommandStatus(), is(CommandStatus.TIMEDOUT));
 
     }
