@@ -14,6 +14,7 @@ public class Commands {
 
     public static Command getInstallCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Installing hadoop deb package",
                 new RequestBuilder("sleep 10;" +
                         "apt-get --force-yes --assume-yes install ksks-hadoop")
                         .withTimeout(180),
@@ -23,6 +24,7 @@ public class Commands {
 
     public static Command getInstallCommand(Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Installing hadoop deb package",
                 new RequestBuilder("sleep 10;" +
                         "apt-get --force-yes --assume-yes install ksks-hadoop")
                         .withTimeout(180),
@@ -32,6 +34,7 @@ public class Commands {
 
     public static Command getClearMastersCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Clear master nodes for NameNode",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-master-slave.sh masters clear"),
                 Sets.newHashSet(config.getNameNode())
@@ -40,6 +43,7 @@ public class Commands {
 
     public static Command getClearSlavesCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Clear slave nodes for NameNode and JobTracker",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-master-slave.sh slaves clear"),
                 Sets.newHashSet(config.getNameNode(), config.getJobTracker())
@@ -48,6 +52,7 @@ public class Commands {
 
     public static Command getSetMastersCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set masters for nodes",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-configure.sh")
                         .withCmdArgs(Lists.newArrayList(
@@ -61,6 +66,7 @@ public class Commands {
 
     public static Command getSetMastersCommand(Config config, Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set masters for nodes",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-configure.sh")
                         .withCmdArgs(Lists.newArrayList(
@@ -74,6 +80,7 @@ public class Commands {
 
     public static Command getAddSecondaryNamenodeCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set Secondary NameNode master for NameNode",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh masters %s",
@@ -95,6 +102,7 @@ public class Commands {
         }
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set DataNodes for NameNode",
                 new RequestBuilder(cmd.toString()),
                 Sets.newHashSet(config.getNameNode())
         );
@@ -103,6 +111,7 @@ public class Commands {
     public static Command getSetDataNodeCommand(Config config, Agent agent) {
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set DataNodes for NameNode",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh slaves %s; ",
@@ -124,6 +133,7 @@ public class Commands {
         }
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set TaskTrackers for JobTracker",
                 new RequestBuilder(cmd.toString()),
                 Sets.newHashSet(config.getJobTracker())
         );
@@ -132,6 +142,7 @@ public class Commands {
     public static Command getSetTaskTrackerCommand(Config config, Agent agent) {
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Set TaskTrackers for JobTracker",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh slaves %s; ",
@@ -144,6 +155,7 @@ public class Commands {
     public static Command getRemoveDataNodeCommand(Config config, Agent agent) {
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Remove DataNode from NameNode",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh slaves clear %s", agent.getHostname()
@@ -155,6 +167,7 @@ public class Commands {
     public static Command getRemoveTaskTrackerCommand(Config config, Agent agent) {
 
         return HadoopImpl.getCommandRunner().createCommand(
+                "Remove TaskTrackers from JobTracker",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh slaves clear %s", agent.getHostname()
@@ -165,6 +178,7 @@ public class Commands {
 
     public static Command getExcludeDataNodeCommand(Config config, Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Remove DataNode from dfs blacklist",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh dfs.exclude clear %s", agent.getHostname()
@@ -175,6 +189,7 @@ public class Commands {
 
     public static Command getExcludeTaskTrackerCommand(Config config, Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Remove TaskTracker from mapred blacklist",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh mapred.exclude clear %s", agent.getHostname()
@@ -185,6 +200,7 @@ public class Commands {
 
     public static Command getIncludeDataNodeCommand(Config config, Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Add DataNode to dfs blacklist",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh dfs.exclude %s", agent.getHostname()
@@ -195,6 +211,7 @@ public class Commands {
 
     public static Command getIncludeTaskTrackerCommand(Config config, Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Add TaskTracker to mapred blacklist",
                 new RequestBuilder(String.format(
                         ". /etc/profile && " +
                                 "hadoop-master-slave.sh mapred.exclude %s", agent.getHostname()
@@ -205,6 +222,7 @@ public class Commands {
 
     public static Command getFormatNameNodeCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Format NameNode before first start",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop namenode -format"),
                 Sets.newHashSet(config.getNameNode())
@@ -213,6 +231,7 @@ public class Commands {
 
     public static Command getRefreshNameNodeCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Refresh NameNode",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop dfsadmin -refreshNodes"),
                 Sets.newHashSet(config.getNameNode())
@@ -221,6 +240,7 @@ public class Commands {
 
     public static Command getRefreshJobTrackerCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Refresh JobTracker",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop mradmin -refreshNodes"),
                 Sets.newHashSet(config.getJobTracker())
@@ -229,6 +249,7 @@ public class Commands {
 
     public static Command getStartNameNodeCommand(Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Start DataNode",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-daemons.sh start datanode")
                         .withTimeout(20),
@@ -238,6 +259,7 @@ public class Commands {
 
     public static Command getStartTaskTrackerCommand(Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Start TaskTracker",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-daemons.sh start tasktracker")
                         .withTimeout(20),
@@ -247,6 +269,7 @@ public class Commands {
 
     public static Command getNameNodeCommand(Agent agent, String command) {
         return HadoopImpl.getCommandRunner().createCommand(
+                String.format("Execute NameNode/SecondaryNameNode/DataNode command %s", command),
                 new RequestBuilder(String.format("service hadoop-dfs %s", command))
                         .withTimeout(20),
                 Sets.newHashSet(agent)
@@ -255,6 +278,7 @@ public class Commands {
 
     public static Command getJobTrackerCommand(Agent agent, String command) {
         return HadoopImpl.getCommandRunner().createCommand(
+                String.format("Execute JobTracker/TaskTracker command %s", command),
                 new RequestBuilder(String.format("service hadoop-mapred %s", command))
                         .withTimeout(20),
                 Sets.newHashSet(agent)
