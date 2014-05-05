@@ -1,5 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.handler.*;
@@ -8,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class HiveImpl extends HiveBase {
+
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public UUID installCluster(Config config) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,

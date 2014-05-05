@@ -29,6 +29,7 @@
         <module>hadoop</module>
         <module>zookeeper</module>
         <module>hive</module>
+        <module>hivequery</module>
         <module>sqoop</module>
         <module>oozie</module>
         <module>cassandra</module>
