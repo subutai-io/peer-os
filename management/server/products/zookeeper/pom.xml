@@ -18,5 +18,6 @@
         <module>zookeeper-api</module>
         <module>zookeeper-impl</module>
         <module>zookeeper-ui</module>
+        <module>zookeeper-cli</module>
     </modules>
 </project>

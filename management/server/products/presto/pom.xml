@@ -18,5 +18,6 @@
         <module>presto-api</module>
         <module>presto-impl</module>
         <module>presto-ui</module>
+        <module>presto-cli</module>
     </modules>
 </project>

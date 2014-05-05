@@ -18,5 +18,6 @@
         <module>oozie-api</module>
         <module>oozie-impl</module>
         <module>oozie-ui</module>
+        <module>oozie-cli</module>
     </modules>
 </project>

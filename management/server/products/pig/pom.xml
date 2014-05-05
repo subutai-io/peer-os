@@ -18,5 +18,6 @@
         <module>pig-api</module>
         <module>pig-impl</module>
         <module>pig-ui</module>
+        <module>pig-cli</module>
     </modules>
 </project>
