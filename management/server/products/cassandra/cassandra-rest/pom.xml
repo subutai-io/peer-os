@@ -119,7 +119,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.cli.cassandra</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.rest.cassandra</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
