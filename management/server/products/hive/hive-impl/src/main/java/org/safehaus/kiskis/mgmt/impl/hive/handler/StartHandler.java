@@ -1,12 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.Product;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StartHandler extends AbstractHandler {
@@ -16,7 +17,7 @@ public class StartHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
@@ -33,24 +34,31 @@ public class StartHandler extends AbstractHandler {
 
         // if server node, start Derby first
         if(agent.equals(config.getServer())) {
-            Task startDerbyTask = TaskFactory.start(agent, Product.DERBY);
-            manager.getTaskRunner().executeTaskNWait(startDerbyTask);
+            String s = Commands.make(CommandType.START, Product.DERBY);
+            Command cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(s).withTimeout(60),
+                    new HashSet<Agent>(Arrays.asList(agent)));
+            manager.getCommandRunner().runCommand(cmd);
 
-            Result res = startDerbyTask.getResults().get(agent.getUuid());
+            AgentResult res = cmd.getResults().get(agent.getUuid());
             po.addLog(res.getStdOut());
             po.addLog(res.getStdErr());
 
-            ok = startDerbyTask.isCompleted() && isZero(res.getExitCode());
+            ok = cmd.hasSucceeded();
         }
         if(ok) {
-            Task startHiveTask = TaskFactory.start(agent, Product.HIVE);
-            manager.getTaskRunner().executeTaskNWait(startHiveTask);
 
-            Result res = startHiveTask.getResults().get(agent.getUuid());
+            String s = Commands.make(CommandType.START, Product.HIVE);
+            Command cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(s).withTimeout(60),
+                    new HashSet<Agent>(Arrays.asList(agent)));
+            manager.getCommandRunner().runCommand(cmd);
+
+            AgentResult res = cmd.getResults().get(agent.getUuid());
             po.addLog(res.getStdOut());
             po.addLog(res.getStdErr());
 
-            ok = startHiveTask.isCompleted() && isZero(res.getExitCode());
+            ok = cmd.hasSucceeded();
         }
 
         if(ok) po.addLogDone("Done");

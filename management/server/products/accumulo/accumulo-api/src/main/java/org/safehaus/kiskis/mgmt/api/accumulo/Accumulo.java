@@ -24,4 +24,8 @@ public interface Accumulo extends ApiBase<Config> {
 
     public UUID destroyNode(String clusterName, String lxcHostname, NodeType nodeType);
 
+    public UUID addProperty(String clusterName, String propertyName, String propertyValue);
+
+    public UUID removeProperty(String clusterName, String propertyName);
+
 }

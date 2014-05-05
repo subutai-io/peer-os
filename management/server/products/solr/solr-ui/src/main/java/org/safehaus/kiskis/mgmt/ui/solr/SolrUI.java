@@ -25,20 +25,18 @@ public class SolrUI implements Module {
     private static Tracker tracker;
     private static ExecutorService executor;
 
+    public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager) {
+        SolrUI.agentManager = agentManager;
+        SolrUI.tracker = tracker;
+        SolrUI.solrManager = solrManager;
+    }
+
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        SolrUI.tracker = tracker;
-    }
-
     public static Solr getSolrManager() {
         return solrManager;
-    }
-
-    public void setSolrManager(Solr solrManager) {
-        SolrUI.solrManager = solrManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -47,10 +45,6 @@ public class SolrUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        SolrUI.agentManager = agentManager;
     }
 
     public void init() {

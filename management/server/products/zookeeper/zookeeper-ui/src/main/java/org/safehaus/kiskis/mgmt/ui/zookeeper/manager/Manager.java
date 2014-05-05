@@ -5,6 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.ui.zookeeper.manager;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -72,7 +73,6 @@ public class Manager {
                 refreshUI();
             }
         });
-
         controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
@@ -150,7 +150,6 @@ public class Manager {
             }
 
         });
-
         controlsContent.addComponent(destroyClusterBtn);
 
         Button addNodeBtn = new Button("Add Node");
@@ -184,12 +183,78 @@ public class Manager {
                 }
             }
         });
-
         controlsContent.addComponent(addNodeBtn);
 
-        content.addComponent(controlsContent);
+        HorizontalLayout customPropertyContent = new HorizontalLayout();
+        customPropertyContent.setSpacing(true);
 
+        Label fileLabel = new Label("File");
+        customPropertyContent.addComponent(fileLabel);
+        final TextField fileTextField = new TextField();
+        customPropertyContent.addComponent(fileTextField);
+        Label propertyNameLabel = new Label("Property Name");
+        customPropertyContent.addComponent(propertyNameLabel);
+        final TextField propertyNameTextField = new TextField();
+        customPropertyContent.addComponent(propertyNameTextField);
+
+        Button removePropertyBtn = new Button("Remove");
+        removePropertyBtn.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (config != null) {
+                    String fileName = (String) fileTextField.getValue();
+                    String propertyName = (String) propertyNameTextField.getValue();
+                    if (Strings.isNullOrEmpty(fileName)) {
+                        show("Please, specify file name where property resides");
+                    } else if (Strings.isNullOrEmpty(propertyName)) {
+                        show("Please, specify property name to remove");
+                    } else {
+                        UUID trackID = ZookeeperUI.getManager().removeProperty(config.getClusterName(), fileName, propertyName);
+                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    }
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+        customPropertyContent.addComponent(removePropertyBtn);
+
+        Label propertyValueLabel = new Label("Property Value");
+        customPropertyContent.addComponent(propertyValueLabel);
+        final TextField propertyValueTextField = new TextField();
+        customPropertyContent.addComponent(propertyValueTextField);
+        Button addPropertyBtn = new Button("Add");
+        addPropertyBtn.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (config != null) {
+                    String fileName = (String) fileTextField.getValue();
+                    String propertyName = (String) propertyNameTextField.getValue();
+                    String propertyValue = (String) propertyValueTextField.getValue();
+                    if (Strings.isNullOrEmpty(fileName)) {
+                        show("Please, specify file name where property will be added");
+                    } else if (Strings.isNullOrEmpty(propertyName)) {
+                        show("Please, specify property name to add");
+                    } else if (Strings.isNullOrEmpty(propertyValue)) {
+                        show("Please, specify property value to set");
+                    } else {
+                        UUID trackID = ZookeeperUI.getManager().addProperty(config.getClusterName(), fileName, propertyName, propertyValue);
+                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                    }
+                } else {
+                    show("Please, select cluster");
+                }
+            }
+        });
+        customPropertyContent.addComponent(addPropertyBtn);
+
+        content.addComponent(controlsContent);
+        content.addComponent(customPropertyContent);
         content.addComponent(nodesTable);
+
+        content.setComponentAlignment(controlsContent, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(customPropertyContent, Alignment.TOP_RIGHT);
+        content.setComponentAlignment(nodesTable, Alignment.TOP_CENTER);
 
     }
 

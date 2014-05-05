@@ -12,10 +12,10 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.pig.PigUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="hadoopManager" ref="hadoopManager"/>
-        <property name="pigManager" ref="pigManager"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="hadoopManager"/>
+        <argument ref="pigManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

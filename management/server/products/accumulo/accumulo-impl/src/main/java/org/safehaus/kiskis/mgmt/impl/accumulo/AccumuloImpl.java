@@ -12,6 +12,7 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
@@ -27,15 +28,17 @@ public class AccumuloImpl implements Accumulo {
     private DbManager dbManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
+    private Zookeeper zkManager;
     private ExecutorService executor;
 
 
-    public AccumuloImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Hadoop hadoopManager) {
+    public AccumuloImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Hadoop hadoopManager, Zookeeper zkManager) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.hadoopManager = hadoopManager;
+        this.zkManager = zkManager;
 
         Commands.init(commandRunner);
     }
@@ -69,7 +72,7 @@ public class AccumuloImpl implements Accumulo {
                     return;
                 }
 
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
+                if (getCluster(config.getClusterName()) != null) {
                     po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
                     return;
                 }
@@ -87,7 +90,7 @@ public class AccumuloImpl implements Accumulo {
                 }
 
 
-                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.zookeeper.Config.PRODUCT_KEY, config.getZkClusterName(), org.safehaus.kiskis.mgmt.api.zookeeper.Config.class);
+                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = zkManager.getCluster(config.getZkClusterName());
 
                 if (zkConfig == null) {
                     po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getZkClusterName()));
@@ -214,7 +217,7 @@ public class AccumuloImpl implements Accumulo {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -256,7 +259,7 @@ public class AccumuloImpl implements Accumulo {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -294,7 +297,7 @@ public class AccumuloImpl implements Accumulo {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -332,7 +335,7 @@ public class AccumuloImpl implements Accumulo {
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -380,7 +383,7 @@ public class AccumuloImpl implements Accumulo {
                     return;
                 }
 
-                final Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                final Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -469,6 +472,92 @@ public class AccumuloImpl implements Accumulo {
         return po.getId();
     }
 
+    @Override
+    public UUID addProperty(final String clusterName, final String propertyName, final String propertyValue) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Adding property %s=%s", propertyName, propertyValue));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = getCluster(clusterName);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Adding property...");
+
+                Command addPropertyCommand = Commands.getAddPropertyCommand(propertyName, propertyValue, config.getAllNodes());
+                commandRunner.runCommand(addPropertyCommand);
+
+                if (addPropertyCommand.hasSucceeded()) {
+                    po.addLog("Property added successfully\nRestarting cluster...");
+
+                    Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                    commandRunner.runCommand(restartClusterCommand);
+                    if (restartClusterCommand.hasSucceeded()) {
+                        po.addLogDone("Cluster restarted successfully");
+                    } else {
+                        po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Adding property failed, %s", addPropertyCommand.getAllErrors()));
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
+    @Override
+    public UUID removeProperty(final String clusterName, final String propertyName) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Removing property %s", propertyName));
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (Strings.isNullOrEmpty(clusterName) || Strings.isNullOrEmpty(propertyName)) {
+                    po.addLogFailed("Malformed arguments\nOperation aborted");
+                    return;
+                }
+                final Config config = getCluster(clusterName);
+                if (config == null) {
+                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                    return;
+                }
+
+                po.addLog("Removing property...");
+
+                Command removePropertyCommand = Commands.getRemovePropertyCommand(propertyName, config.getAllNodes());
+                commandRunner.runCommand(removePropertyCommand);
+
+                if (removePropertyCommand.hasSucceeded()) {
+                    po.addLog("Property removed successfully\nRestarting cluster...");
+
+                    Command restartClusterCommand = Commands.getRestartCommand(config.getMasterNode());
+                    commandRunner.runCommand(restartClusterCommand);
+                    if (restartClusterCommand.hasSucceeded()) {
+                        po.addLogDone("Cluster restarted successfully");
+                    } else {
+                        po.addLogFailed(String.format("Cluster restart failed, %s", restartClusterCommand.getAllErrors()));
+                    }
+                } else {
+                    po.addLogFailed(String.format("Removing property failed, %s", removePropertyCommand.getAllErrors()));
+                }
+            }
+        });
+
+        return po.getId();
+    }
+
     public UUID addNode(final String clusterName, final String lxcHostname, final NodeType nodeType) {
         final ProductOperation po
                 = tracker.createProductOperation(Config.PRODUCT_KEY,
@@ -485,7 +574,7 @@ public class AccumuloImpl implements Accumulo {
                     po.addLogFailed("Only tracer or slave node can be added");
                     return;
                 }
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                Config config = getCluster(clusterName);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -534,7 +623,7 @@ public class AccumuloImpl implements Accumulo {
                     return;
                 }
 
-                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = dbManager.getInfo(org.safehaus.kiskis.mgmt.api.zookeeper.Config.PRODUCT_KEY, config.getZkClusterName(), org.safehaus.kiskis.mgmt.api.zookeeper.Config.class);
+                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = zkManager.getCluster(config.getZkClusterName());
 
                 if (zkConfig == null) {
                     po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getZkClusterName()));

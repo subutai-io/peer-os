@@ -27,28 +27,23 @@ public class SparkUI implements Module {
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public SparkUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Spark sparkManager) {
+        SparkUI.agentManager = agentManager;
+        SparkUI.tracker = tracker;
+        SparkUI.hadoopManager = hadoopManager;
+        SparkUI.sparkManager = sparkManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        SparkUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Spark getSparkManager() {
         return sparkManager;
     }
 
-    public void setSparkManager(Spark sparkManager) {
-        SparkUI.sparkManager = sparkManager;
-    }
-
     public static Hadoop getHadoopManager() {
         return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        SparkUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +52,6 @@ public class SparkUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        SparkUI.agentManager = agentManager;
     }
 
     public void init() {

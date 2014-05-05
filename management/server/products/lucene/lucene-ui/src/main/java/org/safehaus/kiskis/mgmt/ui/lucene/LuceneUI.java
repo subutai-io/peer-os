@@ -27,28 +27,23 @@ public class LuceneUI implements Module {
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
+    public LuceneUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Lucene luceneManager) {
+        LuceneUI.agentManager = agentManager;
+        LuceneUI.tracker = tracker;
+        LuceneUI.hadoopManager = hadoopManager;
+        LuceneUI.luceneManager = luceneManager;
     }
 
-    public void setTracker(Tracker tracker) {
-        LuceneUI.tracker = tracker;
+    public static Tracker getTracker() {
+        return tracker;
     }
 
     public static Lucene getLuceneManager() {
         return luceneManager;
     }
 
-    public void setLuceneManager(Lucene luceneManager) {
-        LuceneUI.luceneManager = luceneManager;
-    }
-
     public static Hadoop getHadoopManager() {
         return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        LuceneUI.hadoopManager = hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -57,10 +52,6 @@ public class LuceneUI implements Module {
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        LuceneUI.agentManager = agentManager;
     }
 
     public void init() {

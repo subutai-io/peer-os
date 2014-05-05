@@ -1,13 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class DestroyNodeHandler extends AbstractHandler {
@@ -17,7 +17,7 @@ public class DestroyNodeHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
@@ -34,17 +34,17 @@ public class DestroyNodeHandler extends AbstractHandler {
             return;
         }
 
-        Set<Agent> set = new HashSet<Agent>(2);
-        set.add(agent);
-        Task task = TaskFactory.uninstallClient(set);
-        manager.getTaskRunner().executeTaskNWait(task);
+        String s = Commands.make(CommandType.PURGE, Product.HIVE);
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(s),
+                new HashSet<Agent>(Arrays.asList(agent)));
+        manager.getCommandRunner().runCommand(cmd);
 
-        Result res = task.getResults().get(agent.getUuid());
+        AgentResult res = cmd.getResults().get(agent.getUuid());
         po.addLog(res.getStdOut());
         po.addLog(res.getStdErr());
 
-        boolean ok = task.isCompleted() && isZero(res.getExitCode());
-        if(ok) {
+        if(cmd.hasSucceeded()) {
             config.getClients().remove(agent);
             po.addLog("Done");
 

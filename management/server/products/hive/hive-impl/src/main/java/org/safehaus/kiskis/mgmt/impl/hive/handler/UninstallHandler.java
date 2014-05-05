@@ -1,13 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashSet;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Result;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.impl.hive.TaskFactory;
+import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractHandler {
@@ -17,7 +17,7 @@ public class UninstallHandler extends AbstractHandler {
     }
 
     public void run() {
-        Config config = getClusterConfig();
+        Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
@@ -37,12 +37,14 @@ public class UninstallHandler extends AbstractHandler {
         }
 
         po.addLog("Removing Hive client(s)...");
-        Task task = TaskFactory.uninstallClient(config.getClients());
-        manager.getTaskRunner().executeTaskNWait(task);
+        String s = Commands.make(CommandType.PURGE, Product.HIVE);
+        Command cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
+                config.getClients());
+        manager.getCommandRunner().runCommand(cmd);
 
-        if(task.isCompleted()) {
+        if(cmd.hasCompleted()) {
             for(Agent agent : config.getClients()) {
-                Result res = task.getResults().get(agent.getUuid());
+                AgentResult res = cmd.getResults().get(agent.getUuid());
                 if(isZero(res.getExitCode()))
                     po.addLog("Hive removed from node " + agent.getHostname());
                 else
@@ -51,20 +53,23 @@ public class UninstallHandler extends AbstractHandler {
             }
 
         } else {
-            po.addLogFailed("Failed to remove client(s): " + task.getFirstError());
+            po.addLogFailed("Failed to remove client(s): " + cmd.getAllErrors());
             return;
         }
 
-        List<Task> removeTasks = TaskFactory.uninstallServer(config.getServer());
-        for(Task t : removeTasks) {
-            po.addLog(t.getDescription());
-            manager.getTaskRunner().executeTaskNWait(t);
-            po.addLog(t.getDescription() + " " + t.getTaskStatus());
-            if(task.getTaskStatus() != TaskStatus.SUCCESS) {
-                po.addLogFailed(task.getFirstError());
+        // remove products from server node
+        for(Product p : new Product[]{Product.HIVE, Product.DERBY}) {
+            s = Commands.make(CommandType.PURGE, p);
+            cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
+                    new HashSet<Agent>(Arrays.asList(config.getServer())));
+            manager.getCommandRunner().runCommand(cmd);
+
+            if(cmd.hasSucceeded()) {
+                po.addLog(p + " removed from server node");
+            } else {
+                po.addLogFailed("Failed to remove Hive from server");
                 return;
             }
-
         }
 
         po.addLog("Updating DB...");

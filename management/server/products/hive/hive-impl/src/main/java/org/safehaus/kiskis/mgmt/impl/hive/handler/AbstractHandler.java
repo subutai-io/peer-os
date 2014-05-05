@@ -28,11 +28,6 @@ public abstract class AbstractHandler implements Runnable {
         this.hostname = hostname;
     }
 
-    Config getClusterConfig() {
-        return manager.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName,
-                Config.class);
-    }
-
     boolean isServerNode(Config config, String hostname) {
         return config.getServer().getHostname().equalsIgnoreCase(hostname);
     }
