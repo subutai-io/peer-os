@@ -596,6 +596,11 @@
                                     <artifactId>accumulo-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>accumulo-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
                                 <!-- Presto -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
@@ -610,6 +615,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>presto-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>presto-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -629,6 +639,11 @@
                                     <artifactId>shark-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>shark-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Spark -->
                                 <artifactItem>
@@ -644,6 +659,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>spark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>spark-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -663,6 +683,11 @@
                                     <artifactId>mongodb-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Lucene -->
                                 <artifactItem>
@@ -678,6 +703,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>lucene-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>lucene-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -697,6 +727,11 @@
                                     <artifactId>pig-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>pig-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Mahout -->
                                 <artifactItem>
@@ -712,6 +747,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>mahout-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>mahout-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -731,6 +771,11 @@
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>solr-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Zookeeper -->
                                 <artifactItem>
@@ -746,6 +791,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>zookeeper-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>zookeeper-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -831,6 +881,11 @@
                                     <artifactId>flume-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>flume-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Hive -->
                                 <artifactItem>
@@ -846,6 +901,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hive-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hive-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -865,6 +925,11 @@
                                     <artifactId>sqoop-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>sqoop-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Hadoop -->
                                 <artifactItem>
@@ -880,6 +945,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>hadoop-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hadoop-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <!-- Products Modules - END -->
