@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>cassandra-parent</artifactId>
+        <artifactId>oozie-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>cassandra-cli</artifactId>
-    <name>Kiskis Management Cassandra CLI</name>
-    <description>Kiskis Management Cassandra CLI</description>
+    <artifactId>oozie-cli</artifactId>
+    <name>Kiskis Management Oozie CLI</name>
+    <description>Kiskis Management Oozie CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cassandra-api</artifactId>
+            <artifactId>oozie-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -100,7 +100,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.cli.cassandra</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.cli.oozie</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

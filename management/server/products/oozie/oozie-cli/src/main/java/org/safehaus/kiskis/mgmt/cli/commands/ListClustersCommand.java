@@ -7,7 +7,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "list-clusters", description = "mydescription")
+@Command(scope = "oozie", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
