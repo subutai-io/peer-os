@@ -17,5 +17,7 @@
     <modules>
         <module>hivequery-api</module>
         <module>hivequery-impl</module>
+        <module>hivequery-ui</module>
+        <module>hivequery-cli</module>
     </modules>
 </project>

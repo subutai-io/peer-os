@@ -861,6 +861,11 @@
                                     <artifactId>hivequery-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hivequery-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Sqoop -->
                                 <artifactItem>
