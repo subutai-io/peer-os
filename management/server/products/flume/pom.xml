@@ -18,5 +18,6 @@
         <module>flume-api</module>
         <module>flume-impl</module>
         <module>flume-ui</module>
+        <module>flume-cli</module>
     </modules>
 </project>

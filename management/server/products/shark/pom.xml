@@ -18,5 +18,6 @@
         <module>shark-api</module>
         <module>shark-impl</module>
         <module>shark-ui</module>
+        <module>shark-cli</module>
     </modules>
 </project>

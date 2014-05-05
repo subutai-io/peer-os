@@ -18,5 +18,6 @@
         <module>sqoop-api</module>
         <module>sqoop-impl</module>
         <module>sqoop-ui</module>
+        <module>sqoop-cli</module>
     </modules>
 </project>

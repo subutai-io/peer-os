@@ -18,5 +18,6 @@
         <module>solr-api</module>
         <module>solr-impl</module>
         <module>solr-ui</module>
+        <module>solr-cli</module>
     </modules>
 </project>

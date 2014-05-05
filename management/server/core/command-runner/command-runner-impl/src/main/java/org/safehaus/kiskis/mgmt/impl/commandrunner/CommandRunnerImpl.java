@@ -80,7 +80,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         CommandExecutor commandExecutor = new CommandExecutor(commandImpl, executor, commandCallback);
 
         //put command to cache
-        boolean queued = commandExecutors.put(commandImpl.getCommandUUID(), commandExecutor, commandImpl.getTimeout() * 1000 + 500, new EntryExpiryCallback<CommandExecutor>() {
+        boolean queued = commandExecutors.put(commandImpl.getCommandUUID(), commandExecutor, commandImpl.getTimeout() * 1000 + 2000, new EntryExpiryCallback<CommandExecutor>() {
 
             public void onEntryExpiry(CommandExecutor entry) {
                 try {
