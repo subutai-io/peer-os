@@ -14,6 +14,7 @@ public class Commands {
 
     public static Command getInstallCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Installing hadoop deb package",
                 new RequestBuilder("sleep 10;" +
                         "apt-get --force-yes --assume-yes install ksks-hadoop")
                         .withTimeout(180),
@@ -23,6 +24,7 @@ public class Commands {
 
     public static Command getInstallCommand(Agent agent) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Installing hadoop deb package",
                 new RequestBuilder("sleep 10;" +
                         "apt-get --force-yes --assume-yes install ksks-hadoop")
                         .withTimeout(180),
@@ -32,6 +34,7 @@ public class Commands {
 
     public static Command getClearMastersCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Clear master nodes for NameNode",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-master-slave.sh masters clear"),
                 Sets.newHashSet(config.getNameNode())
@@ -40,6 +43,7 @@ public class Commands {
 
     public static Command getClearSlavesCommand(Config config) {
         return HadoopImpl.getCommandRunner().createCommand(
+                "Clear slave nodes for NameNode and JobTracker",
                 new RequestBuilder(". /etc/profile && " +
                         "hadoop-master-slave.sh slaves clear"),
                 Sets.newHashSet(config.getNameNode(), config.getJobTracker())
