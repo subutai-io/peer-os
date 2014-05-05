@@ -1,20 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <reference id="cassandraManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
-    <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
-
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.cassandra.CassandraUI"
-          init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="cassandraManager" ref="cassandraManager"/>
-    </bean>
-
-    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
-
+<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="cassandra/list-clusters">
+        <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+        </action>
+    </command>
+</command-bundle>
 </blueprint>
