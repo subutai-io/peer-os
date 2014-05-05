@@ -7,7 +7,6 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Adding;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.Deletion;
@@ -25,7 +24,6 @@ import java.util.concurrent.Executors;
  */
 public class HadoopImpl implements Hadoop {
     public static final String MODULE_NAME = "Hadoop";
-    private TaskRunner taskRunner;
     private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
@@ -55,10 +53,6 @@ public class HadoopImpl implements Hadoop {
         this.agentManager = agentManager;
     }
 
-    public void setTaskRunner(TaskRunner taskRunner) {
-        this.taskRunner = taskRunner;
-    }
-
     public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
     }
@@ -73,10 +67,6 @@ public class HadoopImpl implements Hadoop {
 
     public void setNetworkManager(NetworkManager networkManager) {
         this.networkManager = networkManager;
-    }
-
-    public TaskRunner getTaskRunner() {
-        return taskRunner;
     }
 
     public DbManager getDbManager() {

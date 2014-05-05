@@ -1,11 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.networkmanager;
 
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskCallback;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskRunner;
-import org.safehaus.kiskis.mgmt.api.taskrunner.TaskStatus;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 import java.util.List;
 
@@ -13,12 +9,10 @@ import java.util.List;
  * Created by daralbaev on 04.04.14.
  */
 public class HostManager {
-    private TaskRunner taskRunner;
     private List<Agent> agentList;
     private String domainName;
 
-    public HostManager(TaskRunner taskRunner, List<Agent> agentList, String domainName) {
-        this.taskRunner = taskRunner;
+    public HostManager(List<Agent> agentList, String domainName) {
         this.agentList = agentList;
         this.domainName = domainName;
     }
@@ -42,30 +36,10 @@ public class HostManager {
 
     private boolean write() {
         String hosts = prepareHost();
-        Task task = Tasks.getWriteHostTask(agentList, hosts);
+        Command command = Commands.getWriteHostsCommand(agentList, hosts);
+        NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-        taskRunner.executeTask(task, new TaskCallback() {
-
-            public Task onResponse(Task task, Response response, String stdOut, String stdErr) {
-                if (task.isCompleted()) {
-                    synchronized (task) {
-                        task.notifyAll();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        synchronized (task) {
-            try {
-                task.wait(task.getAvgTimeout() * 1000 + 1000);
-            } catch (InterruptedException ex) {
-                return false;
-            }
-        }
-
-        return task.getTaskStatus() == TaskStatus.SUCCESS;
+        return command.hasSucceeded();
     }
 
     private String prepareHost() {

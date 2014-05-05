@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation.common;
 
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.api.taskrunner.Task;
-import org.safehaus.kiskis.mgmt.impl.hadoop.Tasks;
+import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.ArrayList;
@@ -13,26 +13,26 @@ import java.util.List;
  */
 public class AddNodeOperation {
     private final Config config;
-    private List<Task> taskList;
+    private List<Command> commandList;
     private Agent agent;
 
     public AddNodeOperation(Config config, Agent agent) {
 
         this.config = config;
         this.agent = agent;
-        taskList = new ArrayList<Task>();
+        commandList = new ArrayList<Command>();
 
-        taskList.add(Tasks.getInstallTask(agent));
-        taskList.add(Tasks.getSetMastersTask(config, agent));
-        taskList.add(Tasks.getExcludeNameNodeCommand(config, agent));
-        taskList.add(Tasks.getExcludeTaskTrackerCommand(config, agent));
-        taskList.add(Tasks.getSetDataNodeTask(config, agent));
-        taskList.add(Tasks.getSetTaskTrackerTask(config, agent));
-        taskList.add(Tasks.getStartNameNodeTask(agent));
-        taskList.add(Tasks.getStartTaskTrackerTask(agent));
+        commandList.add(Commands.getInstallCommand(agent));
+        commandList.add(Commands.getSetMastersCommand(config, agent));
+        commandList.add(Commands.getExcludeDataNodeCommand(config, agent));
+        commandList.add(Commands.getExcludeTaskTrackerCommand(config, agent));
+        commandList.add(Commands.getSetDataNodeCommand(config, agent));
+        commandList.add(Commands.getSetTaskTrackerCommand(config, agent));
+        commandList.add(Commands.getStartNameNodeCommand(agent));
+        commandList.add(Commands.getStartTaskTrackerCommand(agent));
     }
 
-    public List<Task> getTaskList() {
-        return taskList;
+    public List<Command> getCommandList() {
+        return commandList;
     }
 }
