@@ -765,6 +765,11 @@
                                     <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Cassandra -->
                                 <artifactItem>
@@ -782,6 +787,11 @@
                                     <artifactId>cassandra-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>cassandra-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Oozie -->
                                 <artifactItem>
@@ -797,6 +807,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>oozie-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
