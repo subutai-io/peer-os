@@ -24,11 +24,11 @@
     <!-- 3 -->
     <!-- Implementation of the rest service -->
     <bean id="restServiceImpl" class="org.safehaus.kiskis.mgmt.rest.services.HelloRestServiceImpl">
-        <property name="helloService" ref="helloServiceBean"/>  <!--Points to the reference below -->
+        <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
     </bean>
     <!-- 4 -->
     <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
-    <reference id="helloServiceBean"
-               interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">
-    </reference>
+    <!--<reference id="helloServiceBean"-->
+               <!--interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">-->
+    <!--</reference>-->
 </blueprint>

@@ -6,10 +6,11 @@ package org.safehaus.kiskis.mgmt.rest.services;
 
 public class HelloRestServiceImpl implements HelloRestService {
     //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-    private HelloService helloService;
+//    private HelloService helloService;
 
     public String handleGet(String name) {
-        return helloService.sayHello(name);
+//        return helloService.sayHello(name);
+        return "Hello " + name;
     }
 
     /*
@@ -21,11 +22,11 @@ public class HelloRestServiceImpl implements HelloRestService {
     /*
         Getters and Setters
      */
-    public HelloService getHelloService() {
-        return helloService;
-    }
-
-    public void setHelloService(HelloService helloService) {
-        this.helloService = helloService;
-    }
+//    public HelloService getHelloService() {
+//        return helloService;
+//    }
+//
+//    public void setHelloService(HelloService helloService) {
+//        this.helloService = helloService;
+//    }
 }
