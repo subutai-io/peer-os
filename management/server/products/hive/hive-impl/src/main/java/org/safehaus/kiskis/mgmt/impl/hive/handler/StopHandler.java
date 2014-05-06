@@ -35,6 +35,7 @@ public class StopHandler extends AbstractHandler {
         String s = Commands.make(CommandType.STOP, Product.HIVE);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
+        manager.getCommandRunner().runCommand(cmd);
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
         po.addLog(res.getStdOut());
