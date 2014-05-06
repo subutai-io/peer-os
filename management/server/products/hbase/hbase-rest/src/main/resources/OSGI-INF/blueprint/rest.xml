@@ -16,7 +16,7 @@
         </cxf:features>
     </cxf:bus>
     <!-- 2 -->
-    <jaxrs:server address="/hbase" id="someRestService">
+    <jaxrs:server address="/hbase" id="hbaseService">
         <jaxrs:serviceBeans>
             <ref component-id="restServiceImpl"/>
         </jaxrs:serviceBeans>
