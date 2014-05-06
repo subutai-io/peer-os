@@ -32,6 +32,7 @@
         <module>sqoop</module>
         <module>oozie</module>
         <module>cassandra</module>
+        <module>storm</module>
     </modules>
 
 </project>
