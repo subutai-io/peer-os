@@ -154,7 +154,9 @@
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
         </dependency>
-        <dependency>
+
+        <!--jersey-->
+        <!--<dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
             <version>${com.sun.jersey.version}</version>
@@ -163,7 +165,8 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${com.sun.jersey.version}</version>
-        </dependency>
+        </dependency>-->
+
         <dependency>
             <groupId>org.eclipse.jetty.orbit</groupId>
             <artifactId>javax.servlet</artifactId>
@@ -313,7 +316,8 @@
                                     <artifactId>elasticsearch</artifactId>
                                     <version>${org.elasticsearch.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+
+                                <!--<artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>${com.sun.jersey.version}</version>
@@ -322,7 +326,8 @@
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-server</artifactId>
                                     <version>${com.sun.jersey.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
+
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin</artifactId>
