@@ -624,6 +624,12 @@
                                     <artifactId>accumulo-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>accumulo-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Presto -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>

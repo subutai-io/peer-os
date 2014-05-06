@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.oozie.services;
+package org.safehaus.kiskis.mgmt.accumulo.services;
 
 /**
  * Created by bahadyr on 5/6/14.
@@ -10,7 +10,7 @@ public class RestServiceImpl implements RestService {
 
     public String handleGet(String name) {
 //        return helloService.sayHello(name);
-        return "Oozie " + name;
+        return "Accumulo " + name;
     }
 
     /*

@@ -10,7 +10,7 @@ public class RestServiceImpl implements RestService {
 
     public String handleGet(String name) {
 //        return helloService.sayHello(name);
-        return "Hello " + name;
+        return "HBase " + name;
     }
 
     /*
