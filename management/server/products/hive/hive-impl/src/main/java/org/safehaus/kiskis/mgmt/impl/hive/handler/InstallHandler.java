@@ -5,19 +5,16 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
-    private Config config;
+    private final Config config;
 
-    public InstallHandler(HiveImpl manager, String clusterName, ProductOperation po) {
-        super(manager, clusterName, po);
-    }
-
-    public void setConfig(Config config) {
+    public InstallHandler(HiveImpl manager, Config config) {
+        super(manager, config.getClusterName(),
+                "Installing cluster " + config.getClusterName());
         this.config = config;
     }
 
