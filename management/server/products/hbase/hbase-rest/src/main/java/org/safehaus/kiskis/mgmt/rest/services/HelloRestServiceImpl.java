@@ -10,7 +10,7 @@ public class HelloRestServiceImpl implements HelloRestService {
 
     public String handleGet(String name) {
 //        return helloService.sayHello(name);
-        return "Cassandra " + name;
+        return "Hello " + name;
     }
 
     /*
