@@ -19,5 +19,6 @@
         <module>shark-impl</module>
         <module>shark-ui</module>
         <module>shark-cli</module>
+        <module>shark-rest</module>
     </modules>
 </project>

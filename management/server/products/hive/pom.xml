@@ -19,5 +19,6 @@
         <module>hive-impl</module>
         <module>hive-ui</module>
         <module>hive-cli</module>
+        <module>hive-rest</module>
     </modules>
 </project>
