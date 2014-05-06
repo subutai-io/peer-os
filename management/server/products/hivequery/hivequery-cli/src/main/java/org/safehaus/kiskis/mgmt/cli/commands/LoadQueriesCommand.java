@@ -23,7 +23,7 @@ public class LoadQueriesCommand extends OsgiCommandSupport {
         this.manager = manager;
     }
 
-    protected Object doExecute() {
+    protected Object doExecute() throws Exception {
         List<Config> list = manager.load();
         for (Config query : list) {
             System.out.println(query);

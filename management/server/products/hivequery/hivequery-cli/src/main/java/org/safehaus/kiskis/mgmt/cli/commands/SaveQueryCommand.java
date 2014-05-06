@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.cli.commands;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
@@ -11,6 +12,15 @@ import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
  */
 @Command(scope = "hivequery", name = "save-query", description = "Saves hive query in db")
 public class SaveQueryCommand extends OsgiCommandSupport {
+
+    @Argument(index = 0, name = "name", description = "The name of query.", required = true, multiValued = false)
+    String name = null;
+    @Argument(index = 1, name = "query", description = "The sql of hive query.", required = true, multiValued = false)
+    String query = null;
+    @Argument(index = 2, name = "description", description = "The description of query.", required = true, multiValued = false)
+    String description = null;
+
+    // Interface to Hive Query API
     private HiveQuery manager;
 
     public HiveQuery getManager() {
@@ -21,13 +31,14 @@ public class SaveQueryCommand extends OsgiCommandSupport {
         this.manager = manager;
     }
 
-    protected Object doExecute() {
-        Config query = new Config();
-        query.setName("Sample select");
-        query.setQuery("select * from table");
-        query.setDescription("Sample description");
+    @Override
+    protected Object doExecute() throws Exception {
+        Config config = new Config();
+        config.setName(name);
+        config.setQuery(query);
+        config.setDescription(description);
 
-        manager.save(query);
+        manager.save(config);
 
         return null;
     }
