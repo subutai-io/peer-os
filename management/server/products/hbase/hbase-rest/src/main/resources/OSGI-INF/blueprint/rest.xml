@@ -18,12 +18,12 @@
     <!-- 2 -->
     <jaxrs:server address="/hbase" id="hbaseRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="restServiceImpl"/>
+            <ref component-id="hbaseRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <!-- 3 -->
     <!-- Implementation of the rest service -->
-    <bean id="restServiceImpl" class="org.safehaus.kiskis.mgmt.hbase.services.HelloRestServiceImpl">
+    <bean id="hbaseRestServiceImpl" class="org.safehaus.kiskis.mgmt.hbase.services.HelloRestServiceImpl">
         <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
     </bean>
     <!-- 4 -->

@@ -18,12 +18,12 @@
     <!-- 2 -->
     <jaxrs:server address="/cassandra" id="cassandraRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="restServiceImpl"/>
+            <ref component-id="cassandraRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <!-- 3 -->
     <!-- Implementation of the rest service -->
-    <bean id="restServiceImpl" class="org.safehaus.kiskis.mgmt.cassandra.services.HelloRestServiceImpl">
+    <bean id="cassandraRestServiceImpl" class="org.safehaus.kiskis.mgmt.cassandra.services.HelloRestServiceImpl">
         <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
     </bean>
     <!-- 4 -->
