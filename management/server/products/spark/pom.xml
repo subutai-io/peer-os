@@ -19,5 +19,6 @@
         <module>spark-impl</module>
         <module>spark-ui</module>
         <module>spark-cli</module>
+        <module>spark-rest</module>
     </modules>
 </project>
