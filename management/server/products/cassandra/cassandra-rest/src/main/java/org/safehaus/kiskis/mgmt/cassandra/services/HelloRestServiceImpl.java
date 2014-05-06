@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.rest.services;
+package org.safehaus.kiskis.mgmt.cassandra.services;
 
 /**
  * Created by bahadyr on 5/6/14.

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.rest.services;
+package org.safehaus.kiskis.mgmt.oozie.services;
 
 /**
  * Created by bahadyr on 5/6/14.

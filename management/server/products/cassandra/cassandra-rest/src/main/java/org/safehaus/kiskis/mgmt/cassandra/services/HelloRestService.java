@@ -1,9 +1,8 @@
-package org.safehaus.kiskis.mgmt.rest.services;
+package org.safehaus.kiskis.mgmt.cassandra.services;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-
 //Maps for the `say` in the URL
 @Path("say")
 public interface HelloRestService {
