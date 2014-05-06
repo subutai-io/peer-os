@@ -6,7 +6,7 @@
     <service id="fooService" ref="fooBean" interface="org.safehaus.kiskis.mgmt.rest.services.Foo">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
-            <entry key="service.exported.configs" value="org.everit.osgi.remote.jersey"/>
+            <!--<entry key="service.exported.configs" value="org.everit.osgi.remote.jersey"/>-->
         </service-properties>
     </service>
 
