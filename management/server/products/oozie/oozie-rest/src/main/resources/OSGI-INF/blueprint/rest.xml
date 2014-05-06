@@ -23,7 +23,7 @@
     </jaxrs:server>
     <!-- 3 -->
     <!-- Implementation of the rest service -->
-    <bean id="oozieRestServiceImpl" class="org.safehaus.kiskis.mgmt.oozie.services.HelloRestServiceImpl">
+    <bean id="oozieRestServiceImpl" class="org.safehaus.kiskis.mgmt.oozie.services.RestServiceImpl">
         <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
     </bean>
     <!-- 4 -->

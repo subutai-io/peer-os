@@ -154,19 +154,6 @@
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
         </dependency>
-
-        <!--jersey-->
-        <!--<dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${com.sun.jersey.version}</version>
-        </dependency>-->
-
         <dependency>
             <groupId>org.eclipse.jetty.orbit</groupId>
             <artifactId>javax.servlet</artifactId>

@@ -1,22 +1,22 @@
-package org.safehaus.kiskis.mgmt.cassandra.services;
+package org.safehaus.kiskis.mgmt.oozie.services;
 
 /**
  * Created by bahadyr on 5/6/14.
  */
 
-public class HelloRestServiceImpl implements HelloRestService {
+public class RestServiceImpl implements RestService {
     //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
 //    private HelloService helloService;
 
     public String handleGet(String name) {
 //        return helloService.sayHello(name);
-        return "Cassandra " + name;
+        return "Hello " + name;
     }
 
     /*
         Constructor
      */
-    public HelloRestServiceImpl() {
+    public RestServiceImpl() {
     }
 
     /*

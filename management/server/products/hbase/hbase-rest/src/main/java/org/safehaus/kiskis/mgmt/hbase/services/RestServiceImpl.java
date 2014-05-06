@@ -1,10 +1,10 @@
-package org.safehaus.kiskis.mgmt.oozie.services;
+package org.safehaus.kiskis.mgmt.hbase.services;
 
 /**
  * Created by bahadyr on 5/6/14.
  */
 
-public class HelloRestServiceImpl implements HelloRestService {
+public class RestServiceImpl implements RestService {
     //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
 //    private HelloService helloService;
 
@@ -16,7 +16,7 @@ public class HelloRestServiceImpl implements HelloRestService {
     /*
         Constructor
      */
-    public HelloRestServiceImpl() {
+    public RestServiceImpl() {
     }
 
     /*
