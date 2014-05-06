@@ -851,6 +851,11 @@
                                     <artifactId>hbase-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hbase-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Cassandra -->
                                 <artifactItem>
@@ -898,6 +903,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>oozie-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>oozie-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
