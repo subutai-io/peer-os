@@ -1,0 +1,34 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+           xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xsi:schemaLocation="
+  http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+  http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
+  http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+    <!-- 1 -->
+    <cxf:bus id="cxfBus1HBase">
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+    <!-- 2 -->
+    <jaxrs:server address="/hbase" id="hbaseRestService">
+        <jaxrs:serviceBeans>
+            <ref component-id="hbaseRestServiceImpl"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <!-- 3 -->
+    <!-- Implementation of the rest service -->
+    <bean id="hbaseRestServiceImpl" class="org.safehaus.kiskis.mgmt.hbase.services.RestServiceImpl">
+        <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
+    </bean>
+    <!-- 4 -->
+    <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
+    <!--<reference id="helloServiceBean"-->
+               <!--interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">-->
+    <!--</reference>-->
+</blueprint>

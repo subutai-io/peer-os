@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mongodb-cli</artifactId>
-    <name>Kiskis Management mongodb CLI</name>
-    <description>Kiskis Management mongodb CLI</description>
+    <name>Kiskis Management Mongodb CLI</name>
+    <description>Kiskis Management Mongodb CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -67,12 +67,6 @@
             <groupId>org.apache.karaf.shell</groupId>
             <artifactId>org.apache.karaf.shell.console</artifactId>
             <version>2.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.3.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

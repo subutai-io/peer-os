@@ -19,5 +19,6 @@
         <module>cassandra-impl</module>
         <module>cassandra-ui</module>
         <module>cassandra-cli</module>
+        <module>cassandra-rest</module>
     </modules>
 </project>

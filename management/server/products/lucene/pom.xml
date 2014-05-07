@@ -19,5 +19,6 @@
         <module>lucene-impl</module>
         <module>lucene-ui</module>
         <module>lucene-cli</module>
+        <module>lucene-rest</module>
     </modules>
 </project>

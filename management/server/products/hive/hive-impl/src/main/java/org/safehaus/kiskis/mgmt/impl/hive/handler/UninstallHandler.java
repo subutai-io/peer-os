@@ -6,14 +6,13 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractHandler {
 
-    public UninstallHandler(HiveImpl manager, String clusterName, ProductOperation po) {
-        super(manager, clusterName, po);
+    public UninstallHandler(HiveImpl manager, String clusterName) {
+        super(manager, clusterName, "Uninstalling cluster " + clusterName);
     }
 
     public void run() {

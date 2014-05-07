@@ -5,20 +5,19 @@
  */
 package org.safehaus.kiskis.mgmt.impl.pig;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Preconditions;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.api.pig.Pig;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.impl.pig.handler.AddNodeOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.pig.handler.DestroyNodeOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.pig.handler.InstallOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.pig.handler.UninstallOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -53,285 +52,56 @@ public class PigImpl implements Pig {
         executor.shutdown();
     }
 
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public DbManager getDbManager() {
+        return dbManager;
+    }
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
 
     public UUID installCluster(final Config config) {
 
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Installing %s", Config.PRODUCT_KEY));
+        Preconditions.checkNotNull(config, "Configuration is null");
 
-        executor.execute(new Runnable() {
+        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+        executor.execute(operationHandler);
 
-            public void run() {
-                if (config == null || Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getNodes())) {
-                    po.addLogFailed("Malformed configuration\nInstallation aborted");
-                    return;
-                }
-
-                if (getCluster(config.getClusterName()) != null) {
-                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
-                    return;
-                }
-
-                //check if node agent is connected
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
-                    Agent node = it.next();
-                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
-                        po.addLog(String.format("Node %s is not connected. Omitting this node from installation", node.getHostname()));
-                        it.remove();
-                    }
-                }
-
-                if (config.getNodes().isEmpty()) {
-                    po.addLogFailed("No nodes eligible for installation. Operation aborted");
-                    return;
-                }
-
-                po.addLog("Checking prerequisites...");
-
-                //check installed ksks packages
-                Command checkInstalledCommand = Commands.getCheckInstalledCommand(config.getNodes());
-                commandRunner.runCommand(checkInstalledCommand);
-
-                if (!checkInstalledCommand.hasCompleted()) {
-                    po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
-                    return;
-                }
-
-                for (Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
-                    Agent node = it.next();
-
-                    AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
-
-                    if (result.getStdOut().contains("ksks-pig")) {
-                        po.addLog(String.format("Node %s already has Pig installed. Omitting this node from installation", node.getHostname()));
-                        it.remove();
-                    } else if (!result.getStdOut().contains("ksks-hadoop")) {
-                        po.addLog(String.format("Node %s has no Hadoop installation. Omitting this node from installation", node.getHostname()));
-                        it.remove();
-                    }
-                }
-
-                if (config.getNodes().isEmpty()) {
-                    po.addLogFailed("No nodes eligible for installation. Operation aborted");
-                    return;
-                }
-                po.addLog("Updating db...");
-                //save to db
-                if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info saved to DB\nInstalling Pig...");
-
-                    //install pig            
-                    Command installCommand = Commands.getInstallCommand(config.getNodes());
-                    commandRunner.runCommand(installCommand);
-
-                    if (installCommand.hasSucceeded()) {
-                        po.addLogDone("Installation succeeded\nDone");
-                    } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
-                    }
-                } else {
-                    po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
-                }
-            }
-        });
-
-        return po.getId();
+        return operationHandler.getTrackerId();
     }
 
     public UUID uninstallCluster(final String clusterName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
 
-        executor.execute(new Runnable() {
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+        executor.execute(operationHandler);
 
-            public void run() {
-                Config config = getCluster(clusterName);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
-
-                for (Agent node : config.getNodes()) {
-                    if (agentManager.getAgentByHostname(node.getHostname()) == null) {
-                        po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
-                        return;
-                    }
-                }
-
-                po.addLog("Uninstalling Pig...");
-
-                Command uninstallCommand = Commands.getUninstallCommand(config.getNodes());
-                commandRunner.runCommand(uninstallCommand);
-
-                if (uninstallCommand.hasCompleted()) {
-                    for (AgentResult result : uninstallCommand.getResults().values()) {
-                        Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
-                        if (result.getExitCode() != null && result.getExitCode() == 0) {
-                            if (result.getStdOut().contains("Package ksks-pig is not installed, so not removed")) {
-                                po.addLog(String.format("Pig is not installed, so not removed on node %s",
-                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
-                            } else {
-                                po.addLog(String.format("Pig is removed from node %s",
-                                        agent == null ? result.getAgentUUID() : agent.getHostname()));
-                            }
-                        } else {
-                            po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                    agent == null ? result.getAgentUUID() : agent.getHostname()));
-                        }
-                    }
-                    po.addLog("Updating db...");
-                    if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-                        po.addLogDone("Cluster info deleted from DB\nDone");
-                    } else {
-                        po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
-                    }
-                } else {
-                    po.addLogFailed("Uninstallation failed, command timed out");
-                }
-
-            }
-        });
-
-        return po.getId();
+        return operationHandler.getTrackerId();
     }
 
     public UUID destroyNode(final String clusterName, final String lxcHostname) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying %s in %s", lxcHostname, clusterName));
 
-        executor.execute(new Runnable() {
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
 
-            public void run() {
-                final Config config = getCluster(clusterName);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
+        executor.execute(operationHandler);
 
-                Agent agent = agentManager.getAgentByHostname(lxcHostname);
-                if (agent == null) {
-                    po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
-                    return;
-                }
-
-                if (!config.getNodes().contains(agent)) {
-                    po.addLogFailed(String.format("Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName));
-                    return;
-                }
-
-                if (config.getNodes().size() == 1) {
-                    po.addLogFailed("This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted");
-                    return;
-                }
-                po.addLog("Uninstalling Pig...");
-                Command uninstallCommand = Commands.getUninstallCommand(Util.wrapAgentToSet(agent));
-                commandRunner.runCommand(uninstallCommand);
-
-                if (uninstallCommand.hasCompleted()) {
-                    AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
-                    if (result.getExitCode() != null && result.getExitCode() == 0) {
-                        if (result.getStdOut().contains("Package ksks-pig is not installed, so not removed")) {
-                            po.addLog(String.format("Pig is not installed, so not removed on node %s",
-                                    agent.getHostname()));
-                        } else {
-                            po.addLog(String.format("Pig is removed from node %s",
-                                    agent.getHostname()));
-                        }
-                    } else {
-                        po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                                agent.getHostname()));
-                    }
-
-                    config.getNodes().remove(agent);
-                    po.addLog("Updating db...");
-
-                    if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                        po.addLogDone("Cluster info update in DB\nDone");
-                    } else {
-                        po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
-                    }
-                } else {
-                    po.addLogFailed("Uninstallation failed, command timed out");
-                }
-            }
-        });
-
-        return po.getId();
+        return operationHandler.getTrackerId();
     }
 
     public UUID addNode(final String clusterName, final String lxcHostname) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Adding node to %s", clusterName));
 
-        executor.execute(new Runnable() {
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
 
-            public void run() {
-                Config config = getCluster(clusterName);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
+        executor.execute(operationHandler);
 
-                //check if node agent is connected
-                Agent agent = agentManager.getAgentByHostname(lxcHostname);
-                if (agent == null) {
-                    po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", lxcHostname));
-                    return;
-                }
-
-                if (config.getNodes().contains(agent)) {
-                    po.addLogFailed(String.format("Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName));
-                    return;
-                }
-
-                po.addLog("Checking prerequisites...");
-
-                //check installed ksks packages
-                Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));
-                commandRunner.runCommand(checkInstalledCommand);
-
-                if (!checkInstalledCommand.hasCompleted()) {
-                    po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
-                    return;
-                }
-
-                AgentResult result = checkInstalledCommand.getResults().get(agent.getUuid());
-
-                if (result.getStdOut().contains("ksks-pig")) {
-                    po.addLogFailed(String.format("Node %s already has Pig installed\nInstallation aborted", lxcHostname));
-                    return;
-                } else if (!result.getStdOut().contains("ksks-hadoop")) {
-                    po.addLogFailed(String.format("Node %s has no Hadoop installation\nInstallation aborted", lxcHostname));
-                    return;
-                }
-
-                config.getNodes().add(agent);
-                po.addLog("Updating db...");
-                //save to db
-                if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
-                    po.addLog("Cluster info updated in DB\nInstalling Pig...");
-                    //install pig            
-
-                    Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
-                    commandRunner.runCommand(installCommand);
-
-                    if (installCommand.hasSucceeded()) {
-                        po.addLogDone("Installation succeeded\nDone");
-                    } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
-                    }
-                } else {
-                    po.addLogFailed("Could not update cluster info in DB! Please see logs\nInstallation aborted");
-                }
-
-            }
-        });
-
-        return po.getId();
+        return operationHandler.getTrackerId();
     }
 
     public List<Config> getClusters() {

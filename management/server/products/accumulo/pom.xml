@@ -19,5 +19,6 @@
         <module>accumulo-impl</module>
         <module>accumulo-ui</module>
         <module>accumulo-cli</module>
+        <module>accumulo-rest</module>
     </modules>
 </project>

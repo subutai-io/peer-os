@@ -6,14 +6,16 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StopHandler extends AbstractHandler {
 
-    public StopHandler(HiveImpl manager, String clusterName, ProductOperation po) {
-        super(manager, clusterName, po);
+    private final String hostname;
+
+    public StopHandler(HiveImpl manager, String clusterName, String hostname) {
+        super(manager, clusterName, "Stop node " + hostname);
+        this.hostname = hostname;
     }
 
     public void run() {
@@ -33,6 +35,7 @@ public class StopHandler extends AbstractHandler {
         String s = Commands.make(CommandType.STOP, Product.HIVE);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
+        manager.getCommandRunner().runCommand(cmd);
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
         po.addLog(res.getStdOut());

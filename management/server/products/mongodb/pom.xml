@@ -19,5 +19,6 @@
         <module>mongodb-impl</module>
         <module>mongodb-ui</module>
         <module>mongodb-cli</module>
+        <module>mongodb-rest</module>
     </modules>
 </project>
