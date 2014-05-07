@@ -120,7 +120,13 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 } else {
 
                     RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
-                    requestBuilder.withType((RequestType) requestTypeCombo.getValue());
+
+                    if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && Util.isNumeric(programTxtFld.getValue().toString())) {
+                        requestBuilder.withPid(Integer.valueOf(programTxtFld.getValidators().toString()));
+                        requestBuilder.withType(RequestType.TERMINATE_REQUEST);
+                    } else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
+                        requestBuilder.withType(RequestType.PS_REQUEST);
+                    }
 
                     if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                         int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
