@@ -1,10 +1,34 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="cassandra/list-clusters">
-        <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
-        </action>
-    </command>
-</command-bundle>
+    <reference id="cassandraManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>
+    <reference id="tracker" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+
+        <command name="cassandra/list-clusters">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/uninstall-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallClusterCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/install-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.InstallClusterCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+    </command-bundle>
+
 </blueprint>
