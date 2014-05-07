@@ -19,5 +19,6 @@
         <module>sqoop-impl</module>
         <module>sqoop-ui</module>
         <module>sqoop-cli</module>
+        <module>sqoop-rest</module>
     </modules>
 </project>

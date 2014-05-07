@@ -1,82 +1,59 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
-import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.impl.hive.handler.*;
-
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.kiskis.mgmt.api.hive.Config;
+import org.safehaus.kiskis.mgmt.impl.hive.handler.*;
+import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
 
 public class HiveImpl extends HiveBase {
 
     public UUID installCluster(Config config) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Installing cluster " + config.getClusterName());
-        InstallHandler h = new InstallHandler(this, config.getClusterName(), po);
-        h.setConfig(config);
+        AbstractOperationHandler h = new InstallHandler(this, config);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID uninstallCluster(String clusterName) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Uninstalling cluster " + clusterName);
-        executor.execute(new UninstallHandler(this, clusterName, po));
-        return po.getId();
+        AbstractOperationHandler h = new UninstallHandler(this, clusterName);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     public UUID statusCheck(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Status check for " + hostname);
-        AbstractHandler h = new StatusHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new StatusHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID startNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Start node " + hostname);
-        AbstractHandler h = new StartHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new StartHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID stopNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Stop node " + hostname);
-        AbstractHandler h = new StopHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new StopHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID restartNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Restart node " + hostname);
-        AbstractHandler h = new RestartHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new RestartHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID addNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Add node to cluster: " + hostname);
-        AbstractHandler h = new AddNodeHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new AddNodeHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public UUID destroyNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Remove node from cluster: " + hostname);
-        AbstractHandler h = new DestroyNodeHandler(this, clusterName, po);
-        h.setHostname(hostname);
+        AbstractOperationHandler h = new DestroyNodeHandler(this, clusterName, hostname);
         executor.execute(h);
-        return po.getId();
+        return h.getTrackerId();
     }
 
     public List<Config> getClusters() {
