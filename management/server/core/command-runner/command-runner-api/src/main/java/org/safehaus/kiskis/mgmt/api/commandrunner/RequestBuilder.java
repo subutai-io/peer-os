@@ -185,6 +185,7 @@ public class RequestBuilder {
         request.setStdErrPath(stdErrPath);
         request.setRunAs(runAs);
         request.setArgs(cmdArgs);
+        request.setPid(pid);
         request.setEnvironment(envVars);
 
         return request;
