@@ -40,7 +40,7 @@ public class Util {
     }
 
     public static boolean isFinalResponse(Response response) {
-        return response != null && response.getType() != null && (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE || response.getType() == ResponseType.EXECUTE_TIMEOUTED);
+        return response != null && response.getType() != null && (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE || response.getType() == ResponseType.EXECUTE_TIMEOUT);
     }
 
     public static String getAgentIpByMask(Agent agent, String mask) {

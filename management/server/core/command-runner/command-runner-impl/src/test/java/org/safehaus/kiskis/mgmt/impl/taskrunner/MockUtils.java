@@ -62,7 +62,7 @@ public class MockUtils {
     public static Response getTimedOutResponse(UUID agentUUID, UUID commandUUID) {
         Response response = getIntermediateResponse(agentUUID, commandUUID);
         when(response.isFinal()).thenReturn(true);
-        when(response.getType()).thenReturn(ResponseType.EXECUTE_TIMEOUTED);
+        when(response.getType()).thenReturn(ResponseType.EXECUTE_TIMEOUT);
 
         return response;
     }
