@@ -141,6 +141,32 @@ public class Config implements ConfigBase {
         this.dataNodes = dataNodes;
     }
 
+    public NodeType getNodeType(Agent node) {
+        NodeType nodeType = null;
+
+        if (getRouterServers().contains(node)) {
+            nodeType = NodeType.ROUTER_NODE;
+        } else if (getConfigServers().contains(node)) {
+            nodeType = NodeType.CONFIG_NODE;
+        } else if (getDataNodes().contains(node)) {
+            nodeType = NodeType.DATA_NODE;
+        }
+
+        return nodeType;
+    }
+
+
+    public int getNodePort(Agent node) {
+
+        if (getRouterServers().contains(node)) {
+            return getRouterPort();
+        } else if (getConfigServers().contains(node)) {
+            return getCfgSrvPort();
+        }
+
+        return getDataNodePort();
+    }
+
     @Override
     public String toString() {
         return "ClusterConfig{" + "clusterName=" + clusterName + ", replicaSetName=" + replicaSetName + ", domainName=" + domainName + ", numberOfConfigServers=" + numberOfConfigServers + ", numberOfRouters=" + numberOfRouters + ", numberOfDataNodes=" + numberOfDataNodes + ", cfgSrvPort=" + cfgSrvPort + ", routerPort=" + routerPort + ", dataNodePort=" + dataNodePort + ", configServers=" + configServers + ", routerServers=" + routerServers + ", dataNodes=" + dataNodes + '}';
