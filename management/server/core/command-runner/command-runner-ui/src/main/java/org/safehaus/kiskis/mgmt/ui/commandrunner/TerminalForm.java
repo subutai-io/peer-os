@@ -121,9 +121,14 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
                     RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
 
-                    if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST && Util.isNumeric(programTxtFld.getValue().toString())) {
-                        requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue().toString()));
-                        requestBuilder.withType(RequestType.TERMINATE_REQUEST);
+                    if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
+                        if (Util.isNumeric(programTxtFld.getValue().toString())) {
+                            requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue().toString()));
+                            requestBuilder.withType(RequestType.TERMINATE_REQUEST);
+                        } else {
+                            show("Please, enter numeric PID to kill");
+                            return;
+                        }
                     } else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
                         requestBuilder.withType(RequestType.PS_REQUEST);
                     }
@@ -150,7 +155,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                 public void onResponse(Response response, AgentResult agentResult, Command command) {
                                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                     String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
-                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    StringBuilder out = new StringBuilder(host).append(" [").append(response.getPid()).append("]").append(":\n");
                                     if (!Strings.isNullOrEmpty(response.getStdOut())) {
                                         out.append(response.getStdOut()).append("\n");
                                     }
