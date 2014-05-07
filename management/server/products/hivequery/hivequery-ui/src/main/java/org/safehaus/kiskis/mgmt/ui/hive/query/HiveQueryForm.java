@@ -5,9 +5,9 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
-public class HiveForm extends CustomComponent {
+public class HiveQueryForm extends CustomComponent {
 
-    public HiveForm() {
+    public HiveQueryForm() {
         setSizeFull();
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing(true);

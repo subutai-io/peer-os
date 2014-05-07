@@ -72,7 +72,7 @@ public class HiveQueryUI implements Module {
     }
 
     public Component createComponent() {
-        return new HiveForm();
+        return new HiveQueryForm();
     }
 
 }

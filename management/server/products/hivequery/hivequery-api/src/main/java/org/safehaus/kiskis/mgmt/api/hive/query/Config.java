@@ -10,6 +10,15 @@ public class Config implements ConfigBase {
     private String query;
     private String description;
 
+    public Config() {
+    }
+
+    public Config(String name, String query, String description) {
+        this.name = name;
+        this.query = query;
+        this.description = description;
+    }
+
     @Override
     public String getClusterName() {
         return name;

@@ -13,8 +13,20 @@ public class HiveQueryImpl extends HiveQueryBase {
     }
 
     @Override
+    public boolean save(String name, String query, String description) {
+        return dbManager.saveInfo(Config.PRODUCT_KEY, name, new Config(name, query, description));
+    }
+
+    @Override
     public List<Config> load() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public List<org.safehaus.kiskis.mgmt.api.hadoop.Config> getHadoopClusters() {
+        return dbManager.getInfo(
+                org.safehaus.kiskis.mgmt.api.hadoop.Config.PRODUCT_KEY,
+                org.safehaus.kiskis.mgmt.api.hadoop.Config.class);
     }
 
 
@@ -37,4 +49,6 @@ public class HiveQueryImpl extends HiveQueryBase {
     public Config getCluster(String clusterName) {
         return null;
     }
+
+
 }
