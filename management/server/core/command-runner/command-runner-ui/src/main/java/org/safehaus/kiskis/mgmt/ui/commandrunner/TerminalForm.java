@@ -166,7 +166,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                             out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
                                         } else {
-                                            out.append("Command timed out").append("\n\n");
+                                            out.append(response.getType()).append("\n\n");
                                         }
                                     }
                                     addOutput(out.toString());
