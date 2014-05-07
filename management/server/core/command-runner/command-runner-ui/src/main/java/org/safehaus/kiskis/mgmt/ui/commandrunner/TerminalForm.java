@@ -19,9 +19,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,7 +64,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
         Label programLbl = new Label("Program");
         final TextField programTxtFld = new TextField();
         programTxtFld.setValue("pwd");
-        programTxtFld.setWidth(40, UNITS_PERCENTAGE);
+        programTxtFld.setWidth(300, UNITS_PIXELS);
         controls.addComponent(programLbl);
         controls.addComponent(programTxtFld);
         Label workDirLbl = new Label("Cwd");
@@ -75,6 +77,15 @@ public class TerminalForm extends CustomComponent implements Disposable {
         timeoutTxtFld.setValue("30");
         controls.addComponent(timeoutLbl);
         controls.addComponent(timeoutTxtFld);
+        Label requestTypeLabel = new Label("Request Type");
+        controls.addComponent(requestTypeLabel);
+        final ComboBox requestTypeCombo = new ComboBox(null, Arrays.asList(RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST));
+        requestTypeCombo.setMultiSelect(false);
+        requestTypeCombo.setImmediate(true);
+        requestTypeCombo.setTextInputAllowed(false);
+        requestTypeCombo.setNullSelectionAllowed(false);
+        requestTypeCombo.setValue(RequestType.EXECUTE_REQUEST);
+        controls.addComponent(requestTypeCombo);
         Button clearBtn = new Button("Clear");
         controls.addComponent(clearBtn);
         final Button sendBtn = new Button("Send");
@@ -86,6 +97,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
         indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
         controls.addComponent(indicator);
+
         grid.addComponent(controls, 0, 9, 19, 9);
 
         horizontalSplit.setSecondComponent(grid);
@@ -108,6 +120,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 } else {
 
                     RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
+                    requestBuilder.withType((RequestType) requestTypeCombo.getValue());
 
                     if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                         int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
