@@ -5,6 +5,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 import java.util.List;
@@ -42,7 +44,28 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
         UUID uuid = cassandraManager.uninstallCluster(clusterName);
-        System.out.println(String.format("Cassandra cluster %s uninstalled.", clusterName ));
+        int logSize = 0;
+        while (!Thread.interrupted()) {
+            ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+            if (po != null) {
+                if( logSize !=  po.getLog().length()) {
+                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
+                    System.out.flush();
+                    logSize = po.getLog().length();
+                }
+                if (po.getState() != ProductOperationState.RUNNING) {
+                    break;
+                }
+            } else {
+                System.out.println("Product operation not found. Check logs");
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                break;
+            }
+        }
         return null;
     }
 }

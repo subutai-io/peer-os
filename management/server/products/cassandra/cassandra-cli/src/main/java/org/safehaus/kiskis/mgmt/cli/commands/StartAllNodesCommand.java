@@ -46,18 +46,15 @@ public class StartAllNodesCommand extends OsgiCommandSupport {
     protected Object doExecute() throws IOException {
 
         UUID uuid = cassandraManager.startAllNodes(clusterName);
-//        ProductOperationView pow = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
-//        Runtime.getRuntime().exec("cls");
-//        System.out.println(pow.getLog());
-//        int logSize = 0;
+        int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
             if (po != null) {
-//                if( logSize !=  po.getLog().length()) {
-//                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
-                System.out.println(po.getLog());
-//                    logSize = po.getLog().length();
-//                }
+                if( logSize !=  po.getLog().length()) {
+                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
+                    System.out.flush();
+                    logSize = po.getLog().length();
+                }
                 if (po.getState() != ProductOperationState.RUNNING) {
                     break;
                 }
