@@ -7,8 +7,8 @@ import java.util.UUID;
  */
 public abstract class AbstractOperationHandler<T> implements Runnable {
 
-    protected T manager;
-    protected String clusterName;
+    protected final T manager;
+    protected final String clusterName;
 
     public AbstractOperationHandler(T manager, String clusterName) {
         this.manager = manager;
