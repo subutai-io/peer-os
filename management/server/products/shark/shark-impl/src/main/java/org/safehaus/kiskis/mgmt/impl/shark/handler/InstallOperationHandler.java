@@ -79,7 +79,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
                 po.addLogFailed(String.format("Node %s already has Shark installed\nInstallation aborted", node.getHostname()));
                 return;
             } else if (!result.getStdOut().contains("ksks-spark")) {
-                po.addLog(String.format("Node %s has no Spark installation\nInstallation aborted", node.getHostname()));
+                po.addLogFailed(String.format("Node %s has no Spark installation\nInstallation aborted", node.getHostname()));
                 return;
             }
         }
