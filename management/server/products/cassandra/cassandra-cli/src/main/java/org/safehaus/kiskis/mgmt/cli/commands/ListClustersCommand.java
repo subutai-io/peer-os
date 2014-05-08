@@ -45,8 +45,6 @@ public class ListClustersCommand extends OsgiCommandSupport {
             System.out.println(sb.toString());
         } else System.out.println("No clusters found...");
 
-        System.out.println("list clusters command executed");
-
         return null;
     }
 }

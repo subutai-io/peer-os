@@ -5,7 +5,6 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -17,8 +16,8 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
-public class InstallClusterCommand extends OsgiCommandSupport {
+@Command(scope = "cassandra", name = "check-cluster", description = "Command to check Cassandra cluster")
+public class CheckAllNodesCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
     private static Tracker tracker;
@@ -28,11 +27,11 @@ public class InstallClusterCommand extends OsgiCommandSupport {
     }
 
     public void setTracker(Tracker tracker) {
-        InstallClusterCommand.tracker = tracker;
+        CheckAllNodesCommand.tracker = tracker;
     }
 
     public void setCassandraManager(Cassandra cassandraManager) {
-        InstallClusterCommand.cassandraManager = cassandraManager;
+        CheckAllNodesCommand.cassandraManager = cassandraManager;
     }
 
     public static Cassandra getCassandraManager() {
@@ -43,23 +42,10 @@ public class InstallClusterCommand extends OsgiCommandSupport {
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
     String clusterName = null;
 
-    @Argument(index = 1, name = "domainName", description = "The domain name of the cluster.", required = true, multiValued = false)
-    String domainName = null;
-
-    @Argument(index = 2, name = "numberOfNodes", description = "Number of nodes in cluster.", required = true, multiValued = false)
-    String numberOfNodes = null;
-
-    @Argument(index = 3, name = "numberOfSeeds", description = "Number of seeds in cluster.", required = true, multiValued = false)
-    String numberOfSeeds = null;
 
     protected Object doExecute() throws IOException {
-        Config config = new Config();
-        config.setClusterName(clusterName);
-        config.setDomainName(domainName);
-        config.setNumberOfNodes(Integer.parseInt(numberOfNodes));
-        config.setNumberOfSeeds(Integer.parseInt(numberOfSeeds));
 
-        UUID uuid = cassandraManager.installCluster(config);
+        UUID uuid = cassandraManager.checkAllNodes(clusterName);
 //        int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
@@ -83,7 +69,6 @@ public class InstallClusterCommand extends OsgiCommandSupport {
             }
         }
 
-        System.out.println(String.format("Cassandra cluster %s installed.", clusterName));
         return null;
     }
 }

@@ -29,6 +29,33 @@
             </action>
         </command>
 
+        <command name="cassandra/start-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.StartAllNodesCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/stop-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.StopAllNodesCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/check-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.CheckAllNodesCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/describe-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.DescribeClusterCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+            </action>
+        </command>
+
     </command-bundle>
 
 </blueprint>
