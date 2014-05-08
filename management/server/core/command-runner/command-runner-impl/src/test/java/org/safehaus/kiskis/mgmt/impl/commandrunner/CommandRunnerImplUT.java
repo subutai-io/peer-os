@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import com.jayway.awaitility.Awaitility;
 import static com.jayway.awaitility.Awaitility.to;
@@ -21,7 +21,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandRunnerImpl;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
@@ -29,7 +28,6 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 

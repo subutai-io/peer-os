@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import com.jayway.awaitility.Awaitility;
 import static com.jayway.awaitility.Awaitility.to;
@@ -13,7 +13,6 @@ import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.ExpiringCache;
 
 /**
  *

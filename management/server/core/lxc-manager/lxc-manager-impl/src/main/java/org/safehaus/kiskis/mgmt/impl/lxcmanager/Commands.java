@@ -20,7 +20,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getCloneCommand(Agent physicalAgent, String lxcHostName) {
         return createCommand(
-                new RequestBuilder(String.format("/usr/bin/lxc-clone -o base-container -n %s", lxcHostName))
+                new RequestBuilder(String.format("/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s", lxcHostName))
                         .withTimeout(360),
                 Util.wrapAgentToSet(physicalAgent)
         );
@@ -29,7 +29,7 @@ public class Commands extends CommandsSingleton {
     public static Command getCloneNStartCommand(Agent physicalAgent, String lxcHostName) {
         return createCommand(
                 new RequestBuilder(String.format(
-                        "/usr/bin/lxc-clone -o base-container -n %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
+                        "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s;sleep 10;/usr/bin/lxc-start -n %1$s -d;sleep 10;/usr/bin/lxc-info -n %1$s",
                         lxcHostName))
                         .withTimeout(360),
                 Util.wrapAgentToSet(physicalAgent)

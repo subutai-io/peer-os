@@ -14,10 +14,8 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CommandFactory;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
@@ -291,13 +289,23 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * Sends ack to agent when it is registered with the management server
      */
     private void sendAck(UUID agentUUID) {
-        Request ack = CommandFactory.newRequest(
+        Request ack = new Request(
+                "AGENT-MANAGER",
                 RequestType.REGISTRATION_REQUEST_DONE,
                 agentUUID,
-                null, null, null, null, null,
-                OutputRedirection.NO,
-                OutputRedirection.RETURN,
-                null, null, null, null, null, null);
+                UUID.randomUUID(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         communicationService.sendRequest(ack);
     }
 

@@ -79,6 +79,7 @@ class AddNodeWindow extends Window {
                                 }
                             } else {
                                 setOutput("Product operation not found. Check logs");
+                                break;
                             }
                             try {
                                 Thread.sleep(1000);
