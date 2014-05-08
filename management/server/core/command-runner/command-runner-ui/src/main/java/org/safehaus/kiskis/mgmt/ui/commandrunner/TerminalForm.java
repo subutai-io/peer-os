@@ -122,11 +122,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
                     RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
 
                     if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
-                        if (Util.isNumeric(programTxtFld.getValue().toString())) {
+                        if (Util.isNumeric(programTxtFld.getValue().toString()) && Integer.valueOf(programTxtFld.getValue().toString()) > 0) {
                             requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue().toString()));
                             requestBuilder.withType(RequestType.TERMINATE_REQUEST);
                         } else {
-                            show("Please, enter numeric PID to kill");
+                            show("Please, enter numeric PID greater than 0 to kill");
                             return;
                         }
                     } else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
