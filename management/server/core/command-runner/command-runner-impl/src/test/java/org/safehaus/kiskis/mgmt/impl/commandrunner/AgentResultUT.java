@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import java.util.UUID;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static org.mockito.Mockito.when;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.AgentResultImpl;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 /**

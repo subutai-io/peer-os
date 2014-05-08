@@ -3,14 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CacheEntry;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CacheEntryWithExpiryCallback;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.EntryExpiryCallback;
 
 /**
  *

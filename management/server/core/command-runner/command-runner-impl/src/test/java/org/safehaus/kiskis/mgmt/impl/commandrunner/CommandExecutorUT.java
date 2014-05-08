@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import java.util.concurrent.ExecutorService;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandExecutor;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandImpl;
 
 /**
  *

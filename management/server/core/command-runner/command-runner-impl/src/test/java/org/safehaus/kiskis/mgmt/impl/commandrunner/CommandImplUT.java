@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 

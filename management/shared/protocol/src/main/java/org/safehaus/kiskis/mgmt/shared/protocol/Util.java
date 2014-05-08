@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
 import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.util.*;
 
@@ -37,10 +36,6 @@ public class Util {
         if (col1 != null && col2 != null) {
             col1.removeAll(col2);
         }
-    }
-
-    public static boolean isFinalResponse(Response response) {
-        return response != null && response.getType() != null && (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE || response.getType() == ResponseType.EXECUTE_TIMEOUT);
     }
 
     public static String getAgentIpByMask(Agent agent, String mask) {
