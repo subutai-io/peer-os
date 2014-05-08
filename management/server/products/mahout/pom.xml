@@ -19,5 +19,6 @@
         <module>mahout-impl</module>
         <module>mahout-ui</module>
         <module>mahout-cli</module>
+        <module>mahout-rest</module>
     </modules>
 </project>

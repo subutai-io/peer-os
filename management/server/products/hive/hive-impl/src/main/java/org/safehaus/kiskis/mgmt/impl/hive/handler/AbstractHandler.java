@@ -1,31 +1,25 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import java.util.Iterator;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-public abstract class AbstractHandler implements Runnable {
+abstract class AbstractHandler extends AbstractOperationHandler<HiveImpl> {
 
-    final HiveImpl manager;
-    final String clusterName;
     final ProductOperation po;
 
-    String hostname;
-
-    public AbstractHandler(HiveImpl manager, String clusterName, ProductOperation po) {
-        this.manager = manager;
-        this.clusterName = clusterName;
-        this.po = po;
+    public AbstractHandler(HiveImpl manager, String clusterName, String desc) {
+        super(manager, clusterName);
+        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY, desc);
     }
 
-    public String getHostname() {
-        return hostname;
-    }
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     boolean isServerNode(Config config, String hostname) {
