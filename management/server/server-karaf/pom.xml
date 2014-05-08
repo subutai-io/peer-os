@@ -991,6 +991,23 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Storm -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
                                 <!-- Hadoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
