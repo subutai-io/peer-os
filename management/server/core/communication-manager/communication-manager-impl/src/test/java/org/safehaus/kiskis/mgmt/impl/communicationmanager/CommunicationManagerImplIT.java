@@ -19,8 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author dilshat
@@ -87,9 +85,7 @@ public class CommunicationManagerImplIT {
         Destination testQueue = session.createQueue(uuid.toString());
         MessageConsumer consumer = session.createConsumer(testQueue);
 
-        Request request = TestUtils.getRequestTemplate();
-
-        request.setUuid(uuid);
+        Request request = TestUtils.getRequestTemplate(uuid);
 
         communicationManagerImpl.sendRequest(request);
 

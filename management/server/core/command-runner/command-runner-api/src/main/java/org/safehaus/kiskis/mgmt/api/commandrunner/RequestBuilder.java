@@ -115,8 +115,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withStdOutPath(String stdOutPath) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(stdOutPath),
-                "Std Out path is null or empty");
 
         this.stdOutPath = stdOutPath;
 
@@ -124,8 +122,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withErrPath(String stdErrPath) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(stdErrPath),
-                "Std Err path is null or empty");
 
         this.stdErrPath = stdErrPath;
 
@@ -133,6 +129,7 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withRunAs(String runAs) {
+
         Preconditions.checkArgument(!Strings.isNullOrEmpty(runAs),
                 "Run As is null or empty");
 
@@ -142,8 +139,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withCmdArgs(List<String> cmdArgs) {
-        Preconditions.checkArgument(cmdArgs != null && !cmdArgs.isEmpty(),
-                "Args are null or empty");
 
         this.cmdArgs = cmdArgs;
 
@@ -151,8 +146,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withEnvVars(Map<String, String> envVars) {
-        Preconditions.checkArgument(envVars != null && !envVars.isEmpty(),
-                "Env vars are null or empty");
 
         this.envVars = envVars;
 
@@ -169,26 +162,24 @@ public class RequestBuilder {
     }
 
     public Request build(UUID agentUUID, UUID taskUUID) {
-        Request request = new Request();
 
-        request.setSource(source);
-        request.setRequestSequenceNumber(requestSequenceNumber);
-        request.setProgram(command);
-        request.setUuid(agentUUID);
-        request.setTaskUuid(taskUUID);
-        request.setTimeout(timeout);
-        request.setWorkingDirectory(cwd);
-        request.setType(type);
-        request.setStdOut(outputRedirection);
-        request.setStdErr(errRedirection);
-        request.setStdOutPath(stdOutPath);
-        request.setStdErrPath(stdErrPath);
-        request.setRunAs(runAs);
-        request.setArgs(cmdArgs);
-        request.setPid(pid);
-        request.setEnvironment(envVars);
-
-        return request;
+        return new Request(
+                source,
+                type,
+                agentUUID,
+                taskUUID,
+                requestSequenceNumber,
+                cwd,
+                command,
+                outputRedirection,
+                errRedirection,
+                stdOutPath,
+                stdErrPath,
+                runAs,
+                cmdArgs,
+                envVars,
+                pid,
+                timeout);
     }
 
 }
