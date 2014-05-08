@@ -11,8 +11,8 @@
 
     <artifactId>storm-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Storm Impl</name>
-    <description>Kiskis Management Storm Impl</description>
+    <name>Kiskis Management Storm</name>
+    <description>Kiskis Management Storm</description>
 
     <build>
         <plugins>
@@ -44,6 +44,36 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>storm-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tracker-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>db-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>zookeeper-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
