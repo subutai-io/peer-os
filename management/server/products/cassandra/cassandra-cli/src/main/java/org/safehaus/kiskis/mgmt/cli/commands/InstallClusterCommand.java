@@ -17,7 +17,7 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
+@Command(scope = "cassandra", name = "install-cluster", description = "Command to install Cassandra cluster")
 public class InstallClusterCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
