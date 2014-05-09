@@ -7,13 +7,14 @@ package org.safehaus.kiskis.mgmt.api.commandrunner;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Represents command to agent. This class is used when the same command should
@@ -49,10 +50,8 @@ public class RequestBuilder {
     private List<String> cmdArgs;
     //environment variables
     private Map<String, String> envVars;
-
-    public Integer getTimeout() {
-        return timeout;
-    }
+    //PID for terminate_request
+    private int pid;
 
     /**
      * Constructor
@@ -64,6 +63,10 @@ public class RequestBuilder {
                 "Command is null or empty");
 
         this.command = command;
+    }
+
+    public Integer getTimeout() {
+        return timeout;
     }
 
     public RequestBuilder withCwd(String cwd) {
@@ -112,8 +115,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withStdOutPath(String stdOutPath) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(stdOutPath),
-                "Std Out path is null or empty");
 
         this.stdOutPath = stdOutPath;
 
@@ -121,8 +122,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withErrPath(String stdErrPath) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(stdErrPath),
-                "Std Err path is null or empty");
 
         this.stdErrPath = stdErrPath;
 
@@ -130,6 +129,7 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withRunAs(String runAs) {
+
         Preconditions.checkArgument(!Strings.isNullOrEmpty(runAs),
                 "Run As is null or empty");
 
@@ -139,8 +139,6 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withCmdArgs(List<String> cmdArgs) {
-        Preconditions.checkArgument(cmdArgs != null && !cmdArgs.isEmpty(),
-                "Args are null or empty");
 
         this.cmdArgs = cmdArgs;
 
@@ -148,34 +146,40 @@ public class RequestBuilder {
     }
 
     public RequestBuilder withEnvVars(Map<String, String> envVars) {
-        Preconditions.checkArgument(envVars != null && !envVars.isEmpty(),
-                "Env vars are null or empty");
 
         this.envVars = envVars;
 
         return this;
     }
 
+    public RequestBuilder withPid(int pid) {
+        Preconditions.checkArgument(pid > 0,
+                "PID is less then or equal to 0");
+
+        this.pid = pid;
+
+        return this;
+    }
+
     public Request build(UUID agentUUID, UUID taskUUID) {
-        Request request = new Request();
 
-        request.setSource(source);
-        request.setRequestSequenceNumber(requestSequenceNumber);
-        request.setProgram(command);
-        request.setUuid(agentUUID);
-        request.setTaskUuid(taskUUID);
-        request.setTimeout(timeout);
-        request.setWorkingDirectory(cwd);
-        request.setType(type);
-        request.setStdOut(outputRedirection);
-        request.setStdErr(errRedirection);
-        request.setStdOutPath(stdOutPath);
-        request.setStdErrPath(stdErrPath);
-        request.setRunAs(runAs);
-        request.setArgs(cmdArgs);
-        request.setEnvironment(envVars);
-
-        return request;
+        return new Request(
+                source,
+                type,
+                agentUUID,
+                taskUUID,
+                requestSequenceNumber,
+                cwd,
+                command,
+                outputRedirection,
+                errRedirection,
+                stdOutPath,
+                stdErrPath,
+                runAs,
+                cmdArgs,
+                envVars,
+                pid,
+                timeout);
     }
 
 }

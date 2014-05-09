@@ -19,8 +19,8 @@ public interface Tracker {
     /**
      * Get view of product operation by operation id
      *
-     * @param source - source of product operation, usually this is a module
-     * name
+     * @param source           - source of product operation, usually this is a module
+     *                         name
      * @param operationTrackId - id of operation
      * @return - product operation view
      */
@@ -29,7 +29,7 @@ public interface Tracker {
     /**
      * Creates product operation and save it to DB
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source      - source of product operation, usually this is a module
      * @param description - description of operation
      * @return - returns created product operation
      */
@@ -39,10 +39,10 @@ public interface Tracker {
      * Returns list of product operations (views) filtering them by date
      * interval
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source   - source of product operation, usually this is a module
      * @param fromDate - beginning date of filter
-     * @param toDate - ending date of filter
-     * @param limit - limit of records to return
+     * @param toDate   - ending date of filter
+     * @param limit    - limit of records to return
      * @return - list of product operation views
      */
     public List<ProductOperationView> getProductOperations(String source, Date fromDate, Date toDate, int limit);
@@ -54,5 +54,15 @@ public interface Tracker {
      * @return list of product operation sources
      */
     public List<String> getProductOperationSources();
+
+    /**
+     * Prints log of product operation to std out stream
+     *
+     * @param source                 - source of product operation, usually this is a module
+     *                               name
+     * @param operationTrackId       - id of operation
+     * @param maxOperationDurationMs - max operation duration timeout after which printing ceases
+     */
+    public void printOperationLog(String source, UUID operationTrackId, long maxOperationDurationMs);
 
 }
