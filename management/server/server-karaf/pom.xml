@@ -964,6 +964,28 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Hive Query-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hivequery-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hivequery-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hivequery-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>hivequery-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Sqoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
