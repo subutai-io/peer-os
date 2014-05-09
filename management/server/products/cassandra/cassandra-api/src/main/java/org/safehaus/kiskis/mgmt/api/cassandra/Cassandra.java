@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.api.cassandra;
 
 import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -19,4 +20,5 @@ public interface Cassandra extends ApiBase<Config> {
     UUID checkAllNodes(String clusterName);
 
     UUID stopAllNodes(String clusterName);
+
 }
