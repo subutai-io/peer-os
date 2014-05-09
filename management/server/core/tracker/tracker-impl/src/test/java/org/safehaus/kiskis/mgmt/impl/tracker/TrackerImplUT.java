@@ -5,16 +5,19 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
-import java.util.Date;
-import java.util.UUID;
+import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
+import java.util.Date;
+import java.util.UUID;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyVararg;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 /**
- *
  * @author dilshat
  */
 public class TrackerImplUT {
@@ -23,11 +26,19 @@ public class TrackerImplUT {
     private final String SOURCE = "source";
     private final String DESCRIPTION = "description";
 
+    private DbManager dbManager;
+    private TrackerImpl ti;
+
+
+    @Before
+    public void setupMethod() {
+        dbManager = mock(DbManager.class);
+        ti = new TrackerImpl();
+        ti.setDbManager(dbManager);
+    }
+
     @Test
     public void shouldCallDbManagerExecuteUpdateWhenCreatePO() {
-        DbManager dbManager = mock(DbManager.class);
-        TrackerImpl ti = new TrackerImpl();
-        ti.setDbManager(dbManager);
 
         ti.createProductOperation(SOURCE, DESCRIPTION);
 
@@ -36,9 +47,7 @@ public class TrackerImplUT {
 
     @Test
     public void shouldCallDbManagerExecuteUpdateWhenSavePO() {
-        DbManager dbManager = mock(DbManager.class);
-        TrackerImpl ti = new TrackerImpl();
-        ti.setDbManager(dbManager);
+
         ProductOperationImpl poi = new ProductOperationImpl(SOURCE, DESCRIPTION, ti);
 
         ti.saveProductOperation(SOURCE, poi);
@@ -48,9 +57,6 @@ public class TrackerImplUT {
 
     @Test
     public void shouldCallDbManagerExecuteQueryWhenGetPO() {
-        DbManager dbManager = mock(DbManager.class);
-        TrackerImpl ti = new TrackerImpl();
-        ti.setDbManager(dbManager);
 
         ti.getProductOperation(SOURCE, poID);
 
@@ -59,9 +65,6 @@ public class TrackerImplUT {
 
     @Test
     public void shouldCallDbManagerExecuteQueryWhenGetPOs() {
-        DbManager dbManager = mock(DbManager.class);
-        TrackerImpl ti = new TrackerImpl();
-        ti.setDbManager(dbManager);
 
         ti.getProductOperations(SOURCE, mock(Date.class), mock(Date.class), 1);
 
@@ -70,11 +73,16 @@ public class TrackerImplUT {
 
     @Test
     public void shouldCallDbManagerExecuteQueryWhenGetPOSources() {
-        DbManager dbManager = mock(DbManager.class);
-        TrackerImpl ti = new TrackerImpl();
-        ti.setDbManager(dbManager);
 
         ti.getProductOperationSources();
+
+        verify(dbManager).executeQuery(any(String.class), anyVararg());
+    }
+
+    @Test
+    public void shouldCallDbManagerExecuteQueryWhenPrintOperationLog() {
+
+        ti.printOperationLog(SOURCE, poID, 100);
 
         verify(dbManager).executeQuery(any(String.class), anyVararg());
     }

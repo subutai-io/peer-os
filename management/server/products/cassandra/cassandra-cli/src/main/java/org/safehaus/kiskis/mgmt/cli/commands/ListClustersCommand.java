@@ -2,6 +2,11 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
+import org.safehaus.kiskis.mgmt.api.cassandra.Config;
+import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+
+import java.util.List;
 
 
 /**
@@ -10,8 +15,36 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "cassandra", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
+    private static Cassandra cassandraManager;
+    private static Tracker tracker;
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+    public void setTracker(Tracker tracker) {
+        ListClustersCommand.tracker = tracker;
+    }
+
+    public void setCassandraManager(Cassandra cassandraManager) {
+        ListClustersCommand.cassandraManager = cassandraManager;
+    }
+
+    public static Cassandra getCassandraManager() {
+        return cassandraManager;
+    }
+
     protected Object doExecute() {
-        System.out.println("list clusters command executed");
+        List<Config> list = cassandraManager.getClusters();
+        if (list.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+
+            for (Config config : list) {
+                sb.append(config.getClusterName()).append("\n");
+            }
+            System.out.println(sb.toString());
+        } else System.out.println("No clusters found...");
+
         return null;
     }
 }

@@ -5,32 +5,36 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
-import java.util.Date;
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Rule;
+import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.dbmanager.DbManagerImpl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
- *
  * @author dilshat
  */
 public class TrackerImplIT {
 
-    @Rule
-    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("po.sql", true, true, "test"));
     private final DbManager dbManager = new DbManagerImpl();
     private final Tracker tracker = new TrackerImpl();
-
     private final String source = "source";
     private final String description = "description";
+    private final String testLog = "test";
+    @Rule
+    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("po.sql", true, true, "test"));
 
     @Before
     public void setUp() {
@@ -71,6 +75,21 @@ public class TrackerImplIT {
         tracker.createProductOperation("source3", description);
 
         assertEquals(3, tracker.getProductOperationSources().size());
+
+    }
+
+
+    @Test
+    public void testPrintOperationLog() {
+        final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(myOut));
+        ProductOperation po = tracker.createProductOperation(source, description);
+
+        po.addLogDone(testLog);
+
+        tracker.printOperationLog(source, po.getId(), 5 * 1000);
+
+        assertEquals(testLog, myOut.toString());
 
     }
 
