@@ -65,11 +65,13 @@ public class NodeSelectionStep extends Panel {
             for(org.safehaus.kiskis.mgmt.api.zookeeper.Config zkc : zk_list) {
                 zkClustersCombo.addItem(zkc);
                 zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
+                if(zkc.getClusterName().equals(wizard.getConfig().getClusterName()))
+                    zkClustersCombo.setValue(zkc);
             }
-
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zk;
-        zk = StormUI.getZookeeper().getCluster(wizard.getConfig().getClusterName());
-        if(zk != null) zkClustersCombo.setValue(zk);
+        // set selected values
+        if(wizard.getConfig().getNimbus() != null)
+            masterNodeCombo.setValue(wizard.getConfig().getNimbus());
+        select.setValue(wizard.getConfig().getSupervisors());
 
         Button next = new Button("Next");
         next.addListener(new Button.ClickListener() {
@@ -128,8 +130,6 @@ public class NodeSelectionStep extends Panel {
         tcs.setRightColumnCaption("Selected Nodes");
         tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         tcs.setRequired(true);
-        if(!Util.isCollectionEmpty(wizard.getConfig().getSupervisors()))
-            tcs.setValue(wizard.getConfig().getSupervisors());
         tcs.addListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
@@ -166,8 +166,6 @@ public class NodeSelectionStep extends Panel {
                 }
             }
         });
-        if(wizard.getConfig().getNimbus() != null)
-            cb.setValue(wizard.getConfig().getNimbus());
         return cb;
     }
 
