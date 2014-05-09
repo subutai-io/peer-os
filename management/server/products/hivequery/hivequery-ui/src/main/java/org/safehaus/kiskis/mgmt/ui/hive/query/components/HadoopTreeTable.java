@@ -49,12 +49,13 @@ public class HadoopTreeTable extends TreeTable {
                     null
             );
 
+            int index = 1;
             for (Agent agent : cluster.getDataNodes()) {
                 Object childID = null;
 
                 if (!cluster.getBlockedAgents().contains(agent)) {
                     childID = addItem(new Object[]{
-                                    new AgentContainer(agent, "DataNode")},
+                                    new AgentContainer(agent, "DataNode " + index++)},
                             null
                     );
                 }
