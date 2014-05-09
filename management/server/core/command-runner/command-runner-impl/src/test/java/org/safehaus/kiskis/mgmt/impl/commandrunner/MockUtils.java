@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.taskrunner;
+package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.impl.commandrunner.CommandRunnerImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
@@ -62,7 +61,7 @@ public class MockUtils {
     public static Response getTimedOutResponse(UUID agentUUID, UUID commandUUID) {
         Response response = getIntermediateResponse(agentUUID, commandUUID);
         when(response.isFinal()).thenReturn(true);
-        when(response.getType()).thenReturn(ResponseType.EXECUTE_TIMEOUTED);
+        when(response.getType()).thenReturn(ResponseType.EXECUTE_TIMEOUT);
 
         return response;
     }
@@ -127,11 +126,9 @@ public class MockUtils {
 
     public static Command getCommand(String program, CommandRunnerImpl commandRunner, UUID agentUUID, int timeout) {
 
-        Command command = commandRunner.createCommand(
+        return commandRunner.createCommand(
                 getRequestBuilder(program, timeout),
                 getAgents(agentUUID));
-
-        return command;
     }
 
 }

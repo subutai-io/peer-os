@@ -4,6 +4,8 @@
  */
 package org.safehaus.kiskis.mgmt.shared.protocol;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
 import java.io.Serializable;
@@ -41,6 +43,9 @@ public class Response implements Serializable {
     }
 
     public void setTransportId(String transportId) {
+
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(transportId), "Transport id is null or empty");
+
         this.transportId = transportId;
     }
 
@@ -69,6 +74,9 @@ public class Response implements Serializable {
     }
 
     public void setType(ResponseType type) {
+
+        Preconditions.checkNotNull(type, "Response type is null");
+
         this.type = type;
     }
 
@@ -106,11 +114,13 @@ public class Response implements Serializable {
 
     public boolean isFinal() {
         return ResponseType.EXECUTE_RESPONSE_DONE.equals(type)
-                || ResponseType.EXECUTE_TIMEOUTED.equals(type);
+                || ResponseType.EXECUTE_TIMEOUT.equals(type)
+                || ResponseType.TERMINATE_RESPONSE_DONE.equals(type)
+                || ResponseType.TERMINATE_RESPONSE_FAILED.equals(type);
     }
 
     public boolean hasSucceeded() {
-        return ResponseType.EXECUTE_RESPONSE_DONE.equals(type) && exitCode != null && exitCode == 0;
+        return (ResponseType.EXECUTE_RESPONSE_DONE.equals(type) || ResponseType.TERMINATE_RESPONSE_DONE.equals(type)) && exitCode != null && exitCode == 0;
     }
 
     @Override

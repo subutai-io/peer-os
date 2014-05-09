@@ -19,9 +19,11 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,33 +58,47 @@ public class TerminalForm extends CustomComponent implements Disposable {
         commandOutputTxtArea.setImmediate(true);
         commandOutputTxtArea.setWordwrap(false);
         grid.addComponent(commandOutputTxtArea, 0, 0, 19, 8);
+
+        HorizontalLayout controls = new HorizontalLayout();
+        controls.setSpacing(true);
         Label programLbl = new Label("Program");
         final TextField programTxtFld = new TextField();
         programTxtFld.setValue("pwd");
-        programTxtFld.setWidth(100, UNITS_PERCENTAGE);
-        grid.addComponent(programLbl, 0, 9, 1, 9);
-        grid.addComponent(programTxtFld, 2, 9, 11, 9);
+        programTxtFld.setWidth(300, UNITS_PIXELS);
+        controls.addComponent(programLbl);
+        controls.addComponent(programTxtFld);
         Label workDirLbl = new Label("Cwd");
         final TextField workDirTxtFld = new TextField();
         workDirTxtFld.setValue("/");
-        grid.addComponent(workDirLbl, 12, 9, 12, 9);
-        grid.addComponent(workDirTxtFld, 13, 9, 13, 9);
+        controls.addComponent(workDirLbl);
+        controls.addComponent(workDirTxtFld);
         Label timeoutLbl = new Label("Timeout");
         final TextField timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue("30");
-        grid.addComponent(timeoutLbl, 14, 9, 15, 9);
-        grid.addComponent(timeoutTxtFld, 16, 9, 16, 9);
+        controls.addComponent(timeoutLbl);
+        controls.addComponent(timeoutTxtFld);
+        Label requestTypeLabel = new Label("Request Type");
+        controls.addComponent(requestTypeLabel);
+        final ComboBox requestTypeCombo = new ComboBox(null, Arrays.asList(RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST));
+        requestTypeCombo.setMultiSelect(false);
+        requestTypeCombo.setImmediate(true);
+        requestTypeCombo.setTextInputAllowed(false);
+        requestTypeCombo.setNullSelectionAllowed(false);
+        requestTypeCombo.setValue(RequestType.EXECUTE_REQUEST);
+        controls.addComponent(requestTypeCombo);
         Button clearBtn = new Button("Clear");
-        grid.addComponent(clearBtn, 17, 9, 17, 9);
+        controls.addComponent(clearBtn);
         final Button sendBtn = new Button("Send");
-        grid.addComponent(sendBtn, 18, 9, 18, 9);
+        controls.addComponent(sendBtn);
         final Label indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
         indicator.setContentMode(Label.CONTENT_XHTML);
         indicator.setHeight(11, UNITS_PIXELS);
         indicator.setWidth(50, UNITS_PIXELS);
         indicator.setVisible(false);
-        grid.addComponent(indicator, 19, 9, 19, 9);
+        controls.addComponent(indicator);
+
+        grid.addComponent(controls, 0, 9, 19, 9);
 
         horizontalSplit.setSecondComponent(grid);
         setCompositionRoot(horizontalSplit);
@@ -104,6 +120,18 @@ public class TerminalForm extends CustomComponent implements Disposable {
                 } else {
 
                     RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue().toString());
+
+                    if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
+                        if (Util.isNumeric(programTxtFld.getValue().toString()) && Integer.valueOf(programTxtFld.getValue().toString()) > 0) {
+                            requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue().toString()));
+                            requestBuilder.withType(RequestType.TERMINATE_REQUEST);
+                        } else {
+                            show("Please, enter numeric PID greater than 0 to kill");
+                            return;
+                        }
+                    } else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
+                        requestBuilder.withType(RequestType.PS_REQUEST);
+                    }
 
                     if (timeoutTxtFld.getValue() != null && Util.isNumeric(timeoutTxtFld.getValue().toString())) {
                         int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
@@ -127,7 +155,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                 public void onResponse(Response response, AgentResult agentResult, Command command) {
                                     Agent agent = agentManager.getAgentByUUID(response.getUuid());
                                     String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
-                                    StringBuilder out = new StringBuilder(host).append(":\n");
+                                    StringBuilder out = new StringBuilder(host).append(" [").append(response.getPid()).append("]").append(":\n");
                                     if (!Strings.isNullOrEmpty(response.getStdOut())) {
                                         out.append(response.getStdOut()).append("\n");
                                     }
@@ -138,7 +166,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
                                         if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
                                             out.append("Exit code: ").append(response.getExitCode()).append("\n\n");
                                         } else {
-                                            out.append("Command timed out").append("\n\n");
+                                            out.append(response.getType()).append("\n\n");
                                         }
                                     }
                                     addOutput(out.toString());
