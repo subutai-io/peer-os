@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.ui.hive.query;
 
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -16,7 +15,6 @@ public class HiveQueryUI implements Module {
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static HiveQuery manager;
-    private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
     public static AgentManager getAgentManager() {
@@ -43,14 +41,6 @@ public class HiveQueryUI implements Module {
         HiveQueryUI.manager = manager;
     }
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
-
-    public void setHadoopManager(Hadoop hadoopManager) {
-        HiveQueryUI.hadoopManager = hadoopManager;
-    }
-
     public static ExecutorService getExecutor() {
         return executor;
     }
@@ -63,7 +53,6 @@ public class HiveQueryUI implements Module {
         agentManager = null;
         tracker = null;
         manager = null;
-        hadoopManager = null;
         executor.shutdown();
     }
 

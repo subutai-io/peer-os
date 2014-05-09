@@ -60,5 +60,4 @@ public interface Mongo extends ApiBase<Config> {
     public UUID checkNode(String clusterName, String lxcHostName);
 
 
-
 }

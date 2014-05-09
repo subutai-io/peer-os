@@ -1,13 +1,17 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class DestroyNodeHandler extends AbstractHandler {
 
@@ -20,18 +24,18 @@ public class DestroyNodeHandler extends AbstractHandler {
 
     public void run() {
         Config config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) {
+        if (agent == null) {
             po.addLogFailed(String.format("Node '%s' is not connected", hostname));
             return;
         }
 
-        if(config.getClients().size() == 1) {
+        if (config.getClients().size() == 1) {
             po.addLog("This is the last node in cluster. Destroy cluster instead");
             return;
         }
@@ -46,12 +50,12 @@ public class DestroyNodeHandler extends AbstractHandler {
         po.addLog(res.getStdOut());
         po.addLog(res.getStdErr());
 
-        if(cmd.hasSucceeded()) {
+        if (cmd.hasSucceeded()) {
             config.getClients().remove(agent);
             po.addLog("Done");
 
             po.addLog("Update cluster info...");
-            if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config))
+            if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config))
                 po.addLogDone("Cluster info successfully updated");
             else
                 po.addLogFailed("Failed to update cluster info");

@@ -1,13 +1,17 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class RestartHandler extends AbstractHandler {
 
@@ -20,14 +24,14 @@ public class RestartHandler extends AbstractHandler {
 
     public void run() {
         Config config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) {
+        if (agent == null) {
             po.addLogFailed(String.format("Node '%s' is not connected", hostname));
             return;
         }
@@ -45,7 +49,7 @@ public class RestartHandler extends AbstractHandler {
         boolean ok = cmd.hasSucceeded();
 
         // if server node, restart Derby as well
-        if(ok && agent.equals(config.getServer())) {
+        if (ok && agent.equals(config.getServer())) {
 
             s = Commands.make(CommandType.RESTART, Product.DERBY);
             cmd = manager.getCommandRunner().createCommand(
@@ -60,7 +64,7 @@ public class RestartHandler extends AbstractHandler {
             ok = cmd.hasSucceeded();
         }
 
-        if(ok) po.addLogDone("Done");
+        if (ok) po.addLogDone("Done");
         else po.addLogFailed(null);
 
     }

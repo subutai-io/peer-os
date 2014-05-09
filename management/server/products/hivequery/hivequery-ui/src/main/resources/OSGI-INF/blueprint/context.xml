@@ -7,15 +7,12 @@
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
-    <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>
         <property name="manager" ref="manager"/>
-        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
