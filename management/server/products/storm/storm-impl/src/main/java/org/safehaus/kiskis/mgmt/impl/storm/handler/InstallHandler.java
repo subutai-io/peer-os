@@ -55,7 +55,7 @@ public class InstallHandler extends AbstractHandler {
             Iterator<Agent> it = allNodes.iterator();
             while(it.hasNext()) {
                 Agent a = it.next();
-                AgentResult res = cmd.getResults().get(it.next().getUuid());
+                AgentResult res = cmd.getResults().get(a.getUuid());
                 if(isZero(res.getExitCode())) {
                     if(res.getStdOut().contains(Commands.PACKAGE_NAME)) {
                         po.addLog("Storm already installed on " + a.getHostname());
@@ -72,14 +72,6 @@ public class InstallHandler extends AbstractHandler {
             return;
         }
 
-        boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_NAME,
-                clusterName, config);
-        if(!saved) {
-            po.addLogFailed("Failed to save cluster info");
-            return;
-        }
-        po.addLog("Cluster info successfully saved");
-
         // install package
         po.addLog("Installing Storm on nodes");
         allNodes.removeAll(skipped);
@@ -89,6 +81,7 @@ public class InstallHandler extends AbstractHandler {
                     new RequestBuilder(s).withTimeout(60), allNodes);
             manager.getCommandRunner().runCommand(cmd);
             if(cmd.hasCompleted()) {
+                boolean masterFailed = false;
                 Iterator<Agent> it = allNodes.iterator();
                 while(it.hasNext()) {
                     Agent a = it.next();
@@ -96,15 +89,31 @@ public class InstallHandler extends AbstractHandler {
                     if(isZero(res.getExitCode()))
                         po.addLog("Storm successfully installed on " + a.getHostname());
                     else if(isNimbusNode(config, a.getHostname())) {
-                        po.addLogFailed("Failed to install on master node");
-                        return;
+                        po.addLog("Failed to install on master node");
+                        masterFailed = true;
                     } else {
                         po.addLog("Failed to install on " + a.getHostname());
                         config.getSupervisors().remove(a);
                     }
                 }
+                if(masterFailed) {
+                    po.addLogFailed(null);
+                    return;
+                }
+            } else {
+                po.addLog(cmd.getAllErrors());
+                po.addLogFailed("Installation not completed");
+                return;
             }
         }
+
+        boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_NAME,
+                clusterName, config);
+        if(!saved) {
+            po.addLogFailed("Failed to save cluster info");
+            return;
+        }
+        po.addLog("Cluster info successfully saved");
 
         if(configure())
             po.addLogDone("Storm cluster successfully configures");

@@ -248,6 +248,7 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    icon.setVisible(true);
                     for(Object e : items) {
                         if(e instanceof Button) ((Button)e).setEnabled(false);
                     }
@@ -268,6 +269,7 @@ public class Manager {
                             stopBtn.setEnabled(started);
                             restartBtn.setEnabled(started);
                             if(destroyBtn != null) destroyBtn.setEnabled(true);
+                            icon.setVisible(false);
                         }
                     });
                 }
@@ -277,6 +279,7 @@ public class Manager {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
+                    icon.setVisible(true);
                     for(Object e : items) {
                         if(e instanceof Button) ((Button)e).setEnabled(false);
                     }
@@ -297,6 +300,7 @@ public class Manager {
                             stopBtn.setEnabled(!stopped);
                             restartBtn.setEnabled(!stopped);
                             if(destroyBtn != null) destroyBtn.setEnabled(true);
+                            icon.setVisible(false);
                         }
                     });
 
@@ -306,6 +310,7 @@ public class Manager {
             restartBtn.addListener(new Button.ClickListener() {
 
                 public void buttonClick(Button.ClickEvent event) {
+                    icon.setVisible(true);
                     for(Object e : items) {
                         if(e instanceof Button) ((Button)e).setEnabled(false);
                     }
@@ -326,6 +331,7 @@ public class Manager {
                             stopBtn.setEnabled(ok);
                             restartBtn.setEnabled(true);
                             if(destroyBtn != null) destroyBtn.setEnabled(true);
+                            icon.setVisible(false);
                         }
                     });
                 }
