@@ -28,7 +28,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.api.storm</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.storm</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
