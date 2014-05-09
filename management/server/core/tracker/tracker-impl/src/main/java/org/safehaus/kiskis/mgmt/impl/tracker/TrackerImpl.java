@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
@@ -161,6 +162,45 @@ public class TrackerImpl implements Tracker {
             }
         }
         return sources;
+    }
+
+    /**
+     * Prints log of product operation to std out stream
+     *
+     * @param operationTrackId       - id of operation
+     * @param maxOperationDurationMs - max operation duration timeout after which printing ceases
+     */
+    @Override
+    public void printOperationLog(String source, UUID operationTrackId, long maxOperationDurationMs) {
+        int logSize = 0;
+        long startedTs = System.currentTimeMillis();
+        while (!Thread.interrupted()) {
+            ProductOperationView po = getProductOperation(source, operationTrackId);
+            if (po != null) {
+                //print log if anything new is appended to it
+                if (logSize != po.getLog().length()) {
+                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
+                    System.out.flush();
+                    logSize = po.getLog().length();
+                }
+                //return if operation is completed
+                if (po.getState() != ProductOperationState.RUNNING) {
+                    return;
+                }
+                //return if time limit is reached
+                if (System.currentTimeMillis() - startedTs > maxOperationDurationMs) {
+                    return;
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            } else {
+                System.out.println("Product operation not found");
+                return;
+            }
+        }
     }
 
 }
