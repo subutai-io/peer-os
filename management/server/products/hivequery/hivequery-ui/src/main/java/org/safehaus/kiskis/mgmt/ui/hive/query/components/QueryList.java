@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Select;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
@@ -18,10 +17,6 @@ public class QueryList extends Select {
 
         setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_CONTAINS);
         setNullSelectionAllowed(false);
-
-        this.setWidth("100%");
-        this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
-
         this.setImmediate(true);
         refreshDataSource();
     }
