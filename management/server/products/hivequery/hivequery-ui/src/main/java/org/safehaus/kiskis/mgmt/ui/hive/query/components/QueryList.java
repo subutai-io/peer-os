@@ -22,7 +22,7 @@ public class QueryList extends ListSelect {
         setImmediate(true);
         setRows(QueryList.ROW_SIZE);
 
-        refreshDataSource(null);
+        refreshDataSource("test");
     }
 
     public void refreshDataSource(String filter) {
