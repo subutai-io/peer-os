@@ -30,7 +30,7 @@ public class QueryList extends Select {
         List<Config> list = HiveQueryUI.getManager().load();
 
         BeanItemContainer<Config> beans =
-                new BeanItemContainer<>(Config.class);
+                new BeanItemContainer<Config>(Config.class);
 
         for (Config item : list) {
             beans.addBean(item);
