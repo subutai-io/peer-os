@@ -130,7 +130,7 @@ fd_set& KAStreamReader::getFileDec()
  *  \details   This method prepares pipelines using its file descriptor.
  *  		   It duplicates the stderr and stdout pipelines to its private pipes.
  */
-void KAStreamReader::PreparePipe()
+void KAStreamReader::preparePipe()
 {
 	dup2(mypipe[0], STDIN_FILENO);
 	if(identity == "output")

@@ -25,10 +25,14 @@
     <!-- Implementation of the rest service -->
     <bean id="cassandraRestServiceImpl" class="org.safehaus.kiskis.mgmt.cassandra.services.RestServiceImpl">
         <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
+        <property name="cassandraManager" ref="cassandraManager"/>
     </bean>
     <!-- 4 -->
     <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
     <!--<reference id="helloServiceBean"-->
                <!--interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">-->
     <!--</reference>-->
+
+    <reference id="cassandraManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>
 </blueprint>

@@ -20,15 +20,13 @@
  *  		   Each Execution runs concurrently and does the given command job.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.4
+ *  @date      May 08, 2014
  */
 #ifndef KATHREAD_H_
 #define KATHREAD_H_
 #include <pthread.h>
 #include <list>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include "KAUserID.h"
 #include "KACommand.h"
 #include "KAConnection.h"
@@ -39,20 +37,17 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/ipc/message_queue.hpp>
-#include <boost/thread.hpp>
 #include <ctime>
 
 using namespace std;
-using namespace boost::pthread;
 using namespace boost::interprocess;
-using namespace boost;
 
 class KAThread
 {
 public:
 	KAThread();
 	virtual ~KAThread();
-	bool threadFunction(message_queue*,KACommand*,char*[]);			//Execute command concurrently
+	int threadFunction(message_queue*,KACommand*,char*[]);			//Execute command concurrently
 	bool checkCWD(KACommand*);
 	bool checkUID(KACommand*);
 	static string getProcessPid(const char*);

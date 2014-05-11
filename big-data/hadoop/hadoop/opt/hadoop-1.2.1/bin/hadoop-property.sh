@@ -53,7 +53,7 @@ do_add()
 configure()
 {
         # Change the value of property if exists!
-        pattern1="<name>$escaped_name<\/name>\n(.*?)<value>(.*?)<\/value>"
+        pattern1="<name>([\s]*?)$escaped_name([\s]*?)<\/name>\n(.*?)<value>(.*?)<\/value>"
         pattern2="<name>$escaped_name<\/name>\n\t<value>$escaped_value<\/value>"
         #Edit configuration with $name_field in $fileName
         perl -0777 -i.original -pe "s/${pattern1}/${pattern2}/is" $fileName
@@ -81,7 +81,7 @@ add)
 
 remove)
 	escape_characters $name_field
-        pattern1="<property>([^\w]*?)<name>$escaped_name<\/name>([^\w]*?)<value>(.*?)<\/value>([^\w]*?)<\/property>"
+        pattern1="<property>([^\w]*?)<name>([\s]*?)$escaped_name([\s]*?)<\/name>([^\w]*?)<value>(.*?)<\/value>([^\w]*?)<\/property>"
         pattern2="([\s]*?)<\/configuration>"
 	pattern3="([\s]*?)<property>"
         #Remove configuration with $name_field in $fileName

@@ -19,8 +19,8 @@
  *  @details   KAResponsePack class is designed for creating message packets to be sent to ActiveMQ Broker.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.4
+ *  @date      May 8, 2014
  */
 #ifndef KARESPONSEPACK_H_
 #define KARESPONSEPACK_H_
@@ -33,10 +33,10 @@ public:
 	virtual ~KAResponsePack();
 	string createResponseMessage(string,int,int,int,string,string,string,string);			//Creating Response chunk messasge
 	string createExitMessage(string,int, int, int,string,string,int);						//Creating Response Exit_DONE messasge
-	string createRegistrationMessage(string,string,string,int);  								//Creating Registration Message
-	string createTerminateMessage(string,int,string); 											//Creating Terminate_DONE Message
-	string createFailTerminateMessage(string,int,string);										//Creating Fail Terminate Message
-	string createHeartBeatMessage(string,int,string,string,int,string,string);					//Creating HeartBeat Message
+	string createRegistrationMessage(string,string,string,string);  								//Creating Registration Message
+	string createTerminateMessage(string,int,string,string); 											//Creating Terminate_DONE Message
+	string createFailTerminateMessage(string,int,string,string);										//Creating Fail Terminate Message
+	string createHeartBeatMessage(string,int,string,string,string,string,string);					//Creating HeartBeat Message
 	string createTimeoutMessage(string,int,int,int,string,string,string,string);
 private:
 	string sendout;

@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-flume*/*
-cp -r ~/jobs/master.bigdata.flume/workspace/big-data/flume/flume/* ksks-flume*/
+cp -r ../workspace/big-data/flume/flume/* ksks-flume*/
 cd ksks-flume*
 rm -rf opt
 mkdir opt
@@ -18,7 +18,7 @@ mv opt/* opt/flume-1.4.0
 cd -
 rm ksks-flume*/opt/flume-1.4.0/lib/lucene*
 cp extraJar/* ksks-flume*/opt/flume-1.4.0/lib/
-cp -r ~/jobs/master.bigdata.flume/workspace/big-data/flume/flume/opt/flume-1.4.0/conf/* ksks-flume*/opt/flume-1.4.0/conf/
+cp -r ../workspace/big-data/flume/flume/opt/flume-1.4.0/conf/* ksks-flume*/opt/flume-1.4.0/conf/
 cd ksks-flume*/opt/flume-1.4.0
 mkdir logs
 cd -

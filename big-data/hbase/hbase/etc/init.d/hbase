@@ -6,9 +6,17 @@ hbase=hbase-0.94.16
 
 . /opt/$hbase/conf/hbase-env.sh
 
-pidRegion=`ls -alt /tmp | grep hbase-.*-regionserver.pid | head -1 | awk -F " " '{print $9}'`
-pidZookeeper=`ls -alt /tmp | grep hbase-.*-zookeeper.pid | head -1 | awk -F " " '{print $9}'`
-pidMaster=`ls -alt /tmp | grep hbase-.*-master.pid | head -1 | awk -F " " '{print $9}'`
+if [ ! -f "/tmp/*-regionserver.pid" ]; then
+        pidRegion=`ls -alt /tmp | grep hbase-.*-regionserver.pid | head -1 | awk -F " " '{print $9}'`
+fi
+
+if [ ! -f "/tmp/*-zookeeper.pid" ]; then
+        pidZookeeper=`ls -alt /tmp | grep hbase-.*-zookeeper.pid | head -1 | awk -F " " '{print $9}'`
+fi
+
+if [ ! -f "/tmp/*-master.pid" ]; then
+		pidMaster=`ls -alt /tmp | grep hbase-.*-master.pid | head -1 | awk -F " " '{print $9}'`
+fi
 
 CMD_PATT="hbase"
 is_master_running()
@@ -64,7 +72,11 @@ start)
 ;;
 
 stop)
-        start-stop-daemon --start --exec /opt/$hbase/bin/stop-hbase.sh
+	#start-stop-daemon --start --exec /opt/$hbase/bin/stop-hbase.sh
+	/opt/$hbase/bin/hbase-daemons.sh stop zookeeper
+	/opt/$hbase/bin/hbase-daemons.sh stop regionserver
+	/opt/$hbase/bin/hbase-daemon.sh stop master
+	/opt/$hbase/bin/hbase-daemons.sh stop master-backup
 ;;
 
 restart)
@@ -77,62 +89,79 @@ status)
         stat=$?
         case "$stat" in 
         0)
-			echo "HMaster is running"
-			echo "HQuorumPeer is running" 
-			echo "HRegionServer is running" ;;				
-		1)
-			echo "HMaster is running"
-			echo "HQuorumPeer is running" 
-			echo "HRegionServer is NOT running" ;;
+		echo "HMaster is running"
+		echo "HQuorumPeer is running" 
+		echo "HRegionServer is running" ;;				
+	1)
+		echo "HMaster is running"
+		echo "HQuorumPeer is running" 
+		echo "HRegionServer is NOT running" ;;
         2)
-			echo "HMaster is running"
-			echo "HQuorumPeer is NOT running"
-			echo "HRegionServer is running" ;;
-		3)
-			echo "HMaster is running"
-			echo "HQuorumPeer is NOT running"
-			echo "HRegionServer is NOT running" ;;
+		echo "HMaster is running"
+		echo "HQuorumPeer is NOT running"
+		echo "HRegionServer is running" ;;
+	3)
+		echo "HMaster is running"
+		echo "HQuorumPeer is NOT running"
+		echo "HRegionServer is NOT running" ;;
         4)
-			echo "HMaster is NOT running"
-			echo "HQuorumPeer is running"
-			echo "HRegionServer is running" ;;
-		5)
-			echo "HMaster is NOT running"
-			echo "HQuorumPeer is running" 
-			echo "HRegionServer is NOT running";;
+		echo "HMaster is NOT running"
+		echo "HQuorumPeer is running"
+		echo "HRegionServer is running" ;;
+	5)
+		echo "HMaster is NOT running"
+		echo "HQuorumPeer is running" 
+		echo "HRegionServer is NOT running";;
         6)
-			echo "HMaster is NOT running"
-			echo "HQuorumPeer is NOT running"
-			echo "HRegionServer is running" ;;
-		7)
-			echo "HMaster is NOT running"
-			echo "HQuorumPeer is NOT running"
-			echo "HRegionServer is NOT running" ;;
-		*)
-			echo "HMaster is NOT running"
-			echo "HQuorumPeer is NOT running"
-			echo "HRegionServer is NOT running" ;;
+		echo "HMaster is NOT running"
+		echo "HQuorumPeer is NOT running"
+		echo "HRegionServer is running" ;;
+	7)
+		echo "HMaster is NOT running"
+		echo "HQuorumPeer is NOT running"
+		echo "HRegionServer is NOT running" ;;
+	*)
+		echo "HMaster is NOT running"
+		echo "HQuorumPeer is NOT running"
+		echo "HRegionServer is NOT running" ;;
 	esac
 ;;
 calc)
 	calculate
 ;;
 kill)
-	start-stop-daemon -K -p "/tmp/$pidMaster" -R TERM/30/KILL/5 >/dev/null
+	is_master_running
+   	stat=$?
+	if [ "$stat" == "1" ]; then
+		start-stop-daemon -K -p "/tmp/$pidMaster" -R TERM/30/KILL/5 >/dev/null
+	fi
 	if [ -f /tmp/$pidMaster ];then
 		rm /tmp/$pidMaster
+	fi
+
+	is_zookeeper_running
+   	stat=$?
+	if [ "$stat" == "1" ]; then
+		start-stop-daemon -K -p "/tmp/$pidZookeeper" -R TERM/30/KILL/5 >/dev/null
 	fi 
 	start-stop-daemon -K -p "/tmp/$pidZookeeper" -R TERM/30/KILL/5 >/dev/null
 	if [ -f /tmp/$pidZookeeper ];then
 		rm /tmp/$pidZookeeper
 	fi	
+
+	is_region_running
+   	stat=$?
+	if [ "$stat" == "1" ]; then
+		start-stop-daemon -K -p "/tmp/$pidRegion" -R TERM/30/KILL/5 >/dev/null
+	fi
 	start-stop-daemon -K -p "/tmp/$pidRegion" -R TERM/30/KILL/5 >/dev/null
 	if [ -f /tmp/$pidRegion ];then
 		rm /tmp/$pidRegion
 	fi  
-	echo "killed"
+	echo "HBase services are stopped and pid files are deleted"
 ;;
 *)
         echo "Usage: $0 {start|stop|restart|status|kill}"
         exit 1
 esac
+

@@ -1,0 +1,75 @@
+#!/bin/bash
+# HBase init script
+#
+
+hbase=hbase-0.94.16
+
+. /opt/$hbase/conf/hbase-env.sh
+
+if [ ! -f "/tmp/*-regionserver.pid" ]; then
+        pidRegion=`ls -alt /tmp | grep hbase-.*-regionserver.pid | head -1 | awk -F " " '{print $9}'`
+	echo $pidRegion
+fi
+
+is_region_running()
+{
+    if [ -f /tmp/$pidRegion ] && [ "x$pidRegion" != "x" ]; then
+        pid=`cat /tmp/$pidRegion`
+        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 1
+        return 0
+    fi
+    return 2 
+}
+
+case "$1" in
+start)
+	/opt/$hbase/bin/hbase-daemons.sh start regionserver
+;;
+
+stop)
+	/opt/$hbase/bin/hbase-daemons.sh stop regionserver
+	#pid=`cat /tmp/$pidRegion`
+	#echo "Stopping HQuorumPeer with pid $pid"
+	#start-stop-daemon -K -p "$pidZookeeper" -R TERM/30/KILL/5 >/dev/null 
+;;
+
+restart)
+        $0 stop
+        $0 start
+;;
+
+status)
+        is_region_running 
+        stat=$?
+        case "$stat" in 
+        0)
+		echo "HRegionServer is NOT running"  ;;
+	1)
+		echo "HRegionServer is running"  ;;
+	2)
+		echo "HRegionServer is NOT running and pid file does not exists" ;;
+	*)
+		echo "Something went wrong !!!"
+		
+	esac
+;;
+calc)
+	calculate
+;;
+kill)
+	is_region_running
+   	stat=$?
+	if [ "$stat" == "1" ]; then
+		start-stop-daemon -K -p "/tmp/$pidRegion" -R TERM/30/KILL/5 >/dev/null
+	fi
+	start-stop-daemon -K -p "/tmp/$pidRegion" -R TERM/30/KILL/5 >/dev/null
+	if [ -f /tmp/$pidRegion ];then
+		rm /tmp/$pidRegion
+	fi	
+	echo "HRegionServer pid file is deleted."
+;;
+*)
+        echo "Usage: $0 {start|stop|restart|status|kill}"
+        exit 1
+esac
+

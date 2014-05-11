@@ -182,7 +182,6 @@ bool KACommand::deserialize(string& input)
 	{
 		setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
 	}
-
 	return true;
 }
 
