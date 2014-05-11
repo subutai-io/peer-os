@@ -1,20 +1,22 @@
 #!/bin/sh
 set -e
 # Check if any deb file exists!!!
-echo $BASE
-
+BASE=$(pwd)
 sh -c 'cd $BASE'
+echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/presto/presto"
+TARGET="/var/lib/jenkins/Automation/Bigdata/presto"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 if ls *.deb ; then
 	rm  *.deb
 fi
 
-BASE="/var/lib/jenkins/jobs/master.bigdata.presto/Presto"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.presto/workspace/big-data/presto/presto"
-TARGET="/var/lib/jenkins/Automation/Bigdata/presto"
-
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a $SOURCE/etc  $BASE/$fileName/
 cp -a $SOURCE/usr  $BASE/$fileName/

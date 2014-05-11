@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-hbase*/*
-cp -r ~/jobs/master.bigdata.hbase/workspace/big-data/hbase/hbase/* ksks-hbase*/
+cp -r ../workspace/big-data/hbase/hbase/* ksks-hbase*/
 cd ksks-hbase*
 rm -rf opt
 mkdir opt
@@ -16,8 +16,8 @@ tar -xvpf opt/*.tar.gz -C opt/
 rm -rf opt/*.tar.gz
 mkdir opt/hbase-0.94.16/zookeeper
 cd -
-cp -r ~/jobs/master.bigdata.hbase/workspace/big-data/hbase/hbase/opt/hbase-0.94.16/conf/* ksks-hbase*/opt/hbase-0.94.16/conf/
-cp -r ~/jobs/master.bigdata.hbase/workspace/big-data/hbase/hbase/opt/hbase-0.94.16/scripts ksks-hbase*/opt/hbase-0.94.16/
+cp -r ../workspace/big-data/hbase/hbase/opt/hbase-0.94.16/conf/* ksks-hbase*/opt/hbase-0.94.16/conf/
+cp -r ../workspace/big-data/hbase/hbase/opt/hbase-0.94.16/scripts ksks-hbase*/opt/hbase-0.94.16/
 rm ksks-hbase*/opt/hbase-0.94.16/lib/libthrift-0.8.0.jar
 cp libthrift-0.9.0.jar ksks-hbase*/opt/hbase-0.94.16/lib/
 chmod +x ksks-hbase*/opt/hbase-0.94.16/conf/hbase-env.sh

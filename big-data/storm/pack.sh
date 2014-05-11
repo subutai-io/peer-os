@@ -1,24 +1,28 @@
 #!/bin/sh
 set -e
 # Check if any deb file exists!!!
-echo $BASE
-
+BASE=$(pwd)
 sh -c 'cd $BASE'
+echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/storm/storm"
+TARGET="/var/lib/jenkins/Automation/Bigdata/storm"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 if ls *.deb ; then
 	rm  *.deb
 fi
 
-BASE="/var/lib/jenkins/jobs/master.bigdata.storm/Storm"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.storm/workspace/big-data/storm/storm"
-TARGET="/var/lib/jenkins/Automation/Bigdata/storm"
-
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
-rm -rf $BASE/$fileName/opt/*
-cp -a $SOURCE/opt/* $BASE/$fileName/opt/
+rm -rf $BASE/$fileName/opt/
+rm -r $BASE/$fileName/etc/
+cp -a $SOURCE/opt/ $BASE/$fileName/
+cp -a $SOURCE/etc/ $BASE/$fileName/
 
 #getting storm packages
 wget http://download.zeromq.org/zeromq-2.1.7.tar.gz  -P $fileName/opt/

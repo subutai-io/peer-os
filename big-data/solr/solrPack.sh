@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-solr*/*
-cp -r  ~/jobs/master.bigdata.solr/workspace/big-data/solr/solr/* ksks-solr*/
+cp -r  ../workspace/big-data/solr/solr/* ksks-solr*/
 
 cd ksks-solr*
 wget -P opt http://archive.apache.org/dist/lucene/solr/4.4.0/solr-4.4.0.tgz

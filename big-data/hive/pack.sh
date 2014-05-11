@@ -1,20 +1,22 @@
 #!/bin/sh
 set -e
 # Check if any deb file exists!!!
-
-BASE="/var/lib/jenkins/jobs/master.bigdata.hive/Hive"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.hive/workspace/big-data/hive/hive"
-TARGET="/var/lib/jenkins/Automation/Bigdata/hive"
-echo $BASE
-
+BASE=$(pwd)
 sh -c 'cd $BASE'
+echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/hive/hive"
+TARGET="/var/lib/jenkins/Automation/Bigdata/hive"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 if ls *.deb ; then
         rm  *.deb
 fi
-
+pwd
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: "$fileName
 
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/etc $BASE/$fileName/

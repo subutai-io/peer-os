@@ -168,7 +168,7 @@ void AgentTest::testResponseSerialize(void)
 {
 	//Test string for serialization
 	string input =	"{\"response\":{\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
-			"\"isLxc\":false,\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"type\":\"HEARTBEAT_RESPONSE\","
+			"\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"type\":\"HEARTBEAT_RESPONSE\","
 			"\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string result;
@@ -177,7 +177,6 @@ void AgentTest::testResponseSerialize(void)
 	resp->getIps().push_back("10.10.10.1");
 	resp->getIps().push_back("172.16.11.4");
 	resp->getIps().push_back("127.0.0.1");
-	resp->setIsLxc(0);
 	resp->setMacAddress("08:00:27:59:3b:2e");;
 	resp->setResponseSequenceNumber(1);
 	resp->setUuid("5373b7c4-a039-44a9-9270-9e0e45d549cf");
@@ -222,7 +221,6 @@ void AgentTest::testResponseClear(void)
 	resp->setSource("test");
 	resp->setTaskUuid("12345");
 	resp->setMacAddress("aa:bb:cc:dd:ee:ff");
-	resp->setIsLxc(-1);
 	resp->setHostname("test");
 
 	resp->clear();
@@ -237,7 +235,6 @@ void AgentTest::testResponseClear(void)
 	CPPUNIT_ASSERT(""== resp->getHostname());
 	CPPUNIT_ASSERT(""== resp->getStandardOutput());
 	CPPUNIT_ASSERT(""== resp->getStandardError());
-	CPPUNIT_ASSERT(-1== resp->getIsLxc());
 	CPPUNIT_ASSERT(-1== resp->getPid());
 }
 //KALogger-LoggingwithfileName
@@ -355,7 +352,7 @@ void AgentTest::testResponsePackCreateRegistration(void)
 {
 	//Test string for serialization
 	string input =	"{\"response\":{\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
-			"\"isLxc\":false,\"macAddress\":\"08:00:27:59:3b:2e\","
+			"\"macAddress\":\"08:00:27:59:3b:2e\","
 			"\"type\":\"REGISTRATION_REQUEST\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	vector<string> ipaddress;
@@ -368,10 +365,9 @@ void AgentTest::testResponsePackCreateRegistration(void)
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf" ;
 	string type = "REGISTRATION_REQUEST";
 	string hostname = "management";
-	int islxc = 0;
-
+	string parentHostName= "";
 	pack->setIps(ipaddress);
-	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,islxc);
+	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName);
 
 
 }
@@ -380,11 +376,12 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 {
 	//Test string for serialization
 	string input =	"{\"response\":{\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
-			"\"isLxc\":false,\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"type\":\"HEARTBEAT_RESPONSE\","
-			"\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
+                        "\"type\":\"HEARTBEAT_RESPONSE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string result;
 	string hostname = "management";
+	string parentHostName = "";
 	string type = "HEARTBEAT_RESPONSE";
 	vector<string> ipaddress;
 	ipaddress.push_back("10.10.10.1");
@@ -392,15 +389,16 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 	ipaddress.push_back("127.0.0.1");
 	pack->setIps(ipaddress);
 
-	int isLxc = 0;
+
 	string macAddress = "08:00:27:59:3b:2e";
+
 	int reqnumber = -1;
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
 
 	string source = "";
-	string taskuuid = "";
+	string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";
 
-	result = pack->createHeartBeatMessage(uuid,reqnumber,macAddress,hostname,isLxc,source,taskuuid);
+	result = pack->createHeartBeatMessage(uuid,reqnumber,macAddress,hostname,parentHostName,source,taskuuid);
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
@@ -409,13 +407,14 @@ void AgentTest::testResponsePackCreateTerminate(void)
 {
 	//Test string for serialization
 	string input =	"{\"response\":{\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,\"source\":\"AsyncRunner\","
-			"\"type\":\"TERMINATE_RESPONSE_DONE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
+                        "\"type\":\"TERMINATE_RESPONSE_DONE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
 	string source = "AsyncRunner";
 	int reqnumber = 1;
-
-	string result = pack->createTerminateMessage(uuid,reqnumber,source);
+        string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";
+	string result = pack->createTerminateMessage(uuid,reqnumber,source,taskuuid);
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
@@ -424,13 +423,14 @@ void AgentTest::testResponsePackCreateTerminateFail(void)
 {
 	//Test string for serialization
 	string input =	"{\"response\":{\"requestSequenceNumber\":1,\"responseSequenceNumber\":1,\"source\":\"AsyncRunner\","
+			"\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","		
 			"\"type\":\"TERMINATE_RESPONSE_FAILED\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
 	string source = "AsyncRunner";
 	int reqnumber = 1;
-
-	string result = pack->createFailTerminateMessage(uuid,reqnumber,source);
+       	string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";       
+	string result = pack->createFailTerminateMessage(uuid,reqnumber,source,taskuuid);
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
@@ -440,7 +440,7 @@ void AgentTest::testResponsePackCreateTimeout(void)
 	//Test string for serialization
 	string input ="{\"response\":{\"pid\":15020,\"requestSequenceNumber\":1,\"responseSequenceNumber\":2,"
 			"\"source\":\"AsyncRunner\",\"taskUuid\":\"58e7f9d0-9f98-11e3-b9d6-080027b00009\","
-			"\"type\":\"EXECUTE_TIMEOUTED\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
+			"\"type\":\"EXECUTE_TIMEOUT\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string result;
 	int pid = 15020;
@@ -450,7 +450,7 @@ void AgentTest::testResponsePackCreateTimeout(void)
 	string stdOut = "";
 	string source = "AsyncRunner";
 	string uuid = "5373b7c4-a039-44a9-9270-9e0e45d549cf";
-	string type = "EXECUTE_TIMEOUTED";
+	string type = "EXECUTE_TIMEOUT";
 	string taskuuid = "58e7f9d0-9f98-11e3-b9d6-080027b00009";
 
 	result = pack->createTimeoutMessage(uuid,pid,reqnumber,resnumber,stdOut,stdErr,source,taskuuid);

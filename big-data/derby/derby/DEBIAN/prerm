@@ -4,4 +4,6 @@
 set -e
 
 . /etc/profile
-service derby stop
+if [ -f /etc/init.d/derby ]; then
+	service derby stop
+fi

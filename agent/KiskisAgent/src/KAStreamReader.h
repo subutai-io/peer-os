@@ -19,8 +19,8 @@
  *  @details   KAStreamReader Class is used for capturing intermediate responses.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.3
+ *  @date      Apr 24, 2014
  */
 #ifndef KASTREAMREADER_H_
 #define KASTREAMREADER_H_
@@ -62,7 +62,7 @@ public:
 	fd_set& getFileDec();
 	void setExecutionState(bool);
 	bool& getExecutionState();
-	void PreparePipe();
+	void preparePipe();
 	int* getPipe();
 	bool openPipe();
 	void closePipe(int);

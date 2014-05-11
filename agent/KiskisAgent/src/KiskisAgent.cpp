@@ -21,13 +21,15 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.5
+ *  @date      May 8 , 2014
  */
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
- * 			   The Kiskis Agent is a simple daemon designed to connect securely to an AMQP server to reliably receive and send messages on queues and topics.
- * 	 	 	   It's purpose is to perform a very simple reduced set of instructions to manage any system administration task.
+ * 			   The Kiskis Agent is a simple daemon designed to connect securely to an AMQP server to
+ * 			   reliably receive and send messages on queues and topics.
+ * 	 	 	   It's purpose is to perform a very simple reduced set of instructions to
+ * 	 	 	   manage any system administration task.
  * 	 	 	   The agent may run on physical servers, virtual machines or inside Linux Containers.
  */
 #include "KACommand.h"
@@ -42,6 +44,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread/thread.hpp>
 
 /**
  *  \details   This method designed for Typically conversion from integer to string.
@@ -72,8 +75,10 @@ int getSettings(string & url, string & connectionOptions, string & loglevel, str
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 	clientpasswd = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
 	url = "failover:ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
-	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
-			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";		//combine connectionOptions string
+	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", "
+			"reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
+			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";
+	//combine connectionOptions string
 	return 0;
 }
 
@@ -148,6 +153,84 @@ bool getHostname(string& hostname)
 }
 
 /**
+ *  \details   ParentHostname of the KiskisAgent machine is fetched from environment parameters.
+ */
+bool getParentHostname(string& parentHostname)
+{
+	try
+	{
+		string dummyline = "";
+		ifstream file;
+		file.open("/etc/profile", std::ifstream::in);	//opening profile file
+
+		bool found_line=false;
+
+		if (file.is_open())
+		{
+			while ( getline(file,dummyline) )
+			{
+				if (dummyline.find("PHY_HOST")!= std::string::npos)
+				{
+					found_line=true;
+					break;
+				}
+			}
+			file.close();
+		}
+
+		if(found_line==true)
+		{
+			unsigned pos = dummyline.find("PHY_HOST");
+			parentHostname = dummyline.substr(pos+9,dummyline.size());
+		}
+		else
+		{
+			cout << "environment parameter is not found in /etc/profile file!!" << endl;
+		}
+
+		if(!parentHostname.empty())
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	catch(const std::exception& error)
+	{
+		cout << error.what()<< endl;
+	}
+	return false;
+}
+
+/**
+ *  \details   Checking the machine is lxc or not
+ */
+bool checkLXC()
+{
+	try
+	{
+		string firstline;
+		ifstream file("/proc/1/cgroup");	//opening root cgroup file
+		getline(file,firstline);
+		file.close();
+		int ret = firstline.find("lxc");
+		if(ret==-1)		//if cgroup is null or not reading successfully
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	catch(const std::exception& error)
+	{
+		cout << error.what()<< endl;
+	}
+	return false;
+}
+
+/**
  *  \details   IpAddress of the KiskisAgent machine is fetched from statically.
  */
 bool getIpAddresses(vector<string>& myips)
@@ -198,7 +281,8 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 		{
 			str.resize(2500);
 			mq->receive(&str[0],str.size(),recvd_size,priority);
-			logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>","New message comes to messagequeue to be sent:",str));
+			logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>",
+					"New message comes to messagequeue to be sent:",str));
 			connection->sendMessage(str);
 			str.clear();
 		}
@@ -267,7 +351,7 @@ int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
 	string clientpasswd;
-	string Uuid,macaddress,hostname;
+	string Uuid,macaddress,hostname,parentHostname;
 	int isLxc = -1;
 	vector<string> ipadress;
 	string serveraddress="SERVICE_QUEUE";
@@ -302,7 +386,6 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
 	if(!getSettings(url,connectionOptions,loglevel,clientpasswd))
 	{
-
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","URL:",url));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","ConnectionOptions:",connectionOptions));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","LogLevel:",loglevel));
@@ -334,27 +417,37 @@ int main(int argc,char *argv[],char *envp[])
 		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","MacAddress cannot be read !!"));
 	}
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent MacID:",macaddress));
-	if(!getHostname(hostname))		//getting Hostname
+
+	if(checkLXC()) //its lxc get the parenthostname from env
 	{
-		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Hostname cannot be read !!"));
-	}
-	else	// Hostname is read successfully
-	{
-		int ret = hostname.find("lxc");	//checking type of machine that physical or lxc
-		if(ret == -1)
+		isLxc = 1;
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is a Lxc Container.."));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		if(getParentHostname(parentHostname))	//trying to get parentHostname
 		{
-			isLxc = 0;
-			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is not a Lxc Container.."));
-			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+			getHostname(hostname);
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent ParentHostname:",parentHostname));
 		}
 		else
 		{
-			isLxc = 1;
-			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is a Lxc Container.."));
-			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+			logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","ParentHostname cannot be read !!"));
+			getHostname(hostname);
+			parentHostname="";
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
 		}
 	}
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
+	else	//its physical parent hostname is null
+	{
+		isLxc = 0;
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","This machine is not a Lxc Container.."));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IsLxc:",toString(isLxc)));
+		getHostname(hostname); //its physical there is no parenthost.
+		parentHostname="";
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent Hostname:",hostname));
+		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent ParentHostname:",parentHostname));
+	}
+
 	if(!getIpAddresses(ipadress))	//getting IPs
 	{
 		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","IpAddresses cannot be read !!"));
@@ -381,8 +474,8 @@ int main(int argc,char *argv[],char *envp[])
 	string sendout;
 
 	response.setIps(ipadress);
-	response.setIsLxc(isLxc);
 	response.setHostname(hostname);
+	response.setParentHostname(parentHostname);
 	response.setMacAddress(macaddress);
 	response.setUuid(Uuid); 	//setting Uuid for response messages.
 	if(!connection.openSession())
@@ -395,7 +488,9 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Successfully opened with ActiveMQ Broker: ",url));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to ActiveMQ Broker.."));
 
-	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),response.getIsLxc());
+	/*sending registration message*/
+	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),
+			response.getParentHostname());
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
 	connection.sendMessage(sendout);
 
@@ -416,6 +511,12 @@ int main(int argc,char *argv[],char *envp[])
 	unsigned int startsec  =  start.time_of_day().seconds();
 	bool overflag = false;
 	unsigned int count = 1;
+	list<int> pidList;
+	int ncores = -1;
+	ncores = sysconf(_SC_NPROCESSORS_CONF);
+	int currentProcess=0;
+	string str,str2; //
+	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Number of cpu core:", toString(ncores)));
 
 	while(true)
 	{
@@ -426,10 +527,10 @@ int main(int argc,char *argv[],char *envp[])
 				//timeout occured!!
 				response.clear();
 				response.setIps(ipadress);
-				response.setIsLxc(isLxc);
 				response.setHostname(hostname);
 				response.setMacAddress(macaddress);
-				string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,isLxc,command.getSource(),command.getTaskUuid());
+				string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),
+						macaddress,hostname,parentHostname,command.getSource(),command.getTaskUuid());
 				connection.sendMessage(resp);
 
 				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
@@ -441,6 +542,24 @@ int main(int argc,char *argv[],char *envp[])
 			}
 			usleep(20000);//20 ms delay for the main loop
 			command.clear();
+			for(list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
+			{
+				if(pidList.begin()!=pidList.end())
+				{
+					int status;
+					pid_t result = waitpid(*iter,&status,WNOHANG);
+					if(result == 0)
+					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Process continue! PID:",toString(*iter),"total running:",toString(currentProcess)));
+					}
+					else
+					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Process finished! PID:",toString(*iter),"total running:",toString(currentProcess)));
+						iter = pidList.erase(iter);
+						currentProcess--;
+					}
+				}
+			}
 			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
 			{
 				if(command.deserialize(input))
@@ -451,7 +570,8 @@ int main(int argc,char *argv[],char *envp[])
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command type:",command.getType()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command uuid:",command.getUuid()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command TaskUuid:",command.getTaskUuid()));
-					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command RequestSequenceNumber:",toString(command.getRequestSequenceNumber())));
+					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command RequestSequenceNumber:",
+							toString(command.getRequestSequenceNumber())));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command workingDirectory:",command.getWorkingDirectory()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command StdOut:",command.getStandardOutput()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command stdOutPath:",command.getStandardOutputPath()));
@@ -468,10 +588,19 @@ int main(int argc,char *argv[],char *envp[])
 					}
 					else if(command.getType()=="EXECUTE_REQUEST")	//execution request will be executed in other process.
 					{
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
+						fstream file;	//opening uuid.txt
+						file.open("/etc/ksks-agent/config/commandQueue.txt",fstream::in | fstream::out | fstream::app);
+						file << input << endl ;
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Received Message to internal currentProcess!"));
+						file.close();
+					}
+					else if(command.getType()=="PS_REQUEST")
+					{
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","PS execution operation is starting.."));
 						KAThread* mypointer = new KAThread;
 						mypointer->getLogger().setLogLevel(level);
-						mypointer->getResponse().setIsLxc(isLxc);
+						command.setProgram("for i in `ps aux | grep '[s]h -c' | awk -F \" \" '{print $2}'`; do ps aux | grep `pgrep -P $i` | sed '/grep/d' ; done 2> /dev/null");
+						command.setWorkingDirectory("/");
 						mypointer->threadFunction(&messageQueue,&command,argv);
 						delete mypointer;
 					}
@@ -480,10 +609,11 @@ int main(int argc,char *argv[],char *envp[])
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Heartbeat message has been taken.."));
 						response.clear();
 						response.setIps(ipadress);
-						response.setIsLxc(isLxc);
 						response.setHostname(hostname);
+						response.setParentHostname(parentHostname);
 						response.setMacAddress(macaddress);
-						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),macaddress,hostname,isLxc,command.getSource(),command.getTaskUuid());
+						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),
+								macaddress,hostname,parentHostname,command.getSource(),command.getTaskUuid());
 						connection.sendMessage(resp);
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 					}
@@ -491,25 +621,73 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Termination request ID:",toString(command.getPid())));
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Killing given PID.."));
-						int retstatus = kill(command.getPid(),SIGKILL);
-						if(retstatus == 0) //termination is successfully done
+						if(command.getPid() > 0)
 						{
-							string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
-							connection.sendMessage(resp);
-							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
+							int retstatus = kill(command.getPid(),SIGKILL);
+							if(retstatus == 0) //termination is successfully done
+							{
+								string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
+								connection.sendMessage(resp);
+								logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
+							}
+							else if (retstatus == -1) //termination is failed
+							{
+								string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
+								connection.sendMessage(resp);
+								logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate Fail Response! Received PID:",toString(command.getPid())));
+							}
 						}
-						else if (retstatus == -1) //termination is failed
+						else
 						{
-							string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource());
-							connection.sendMessage(resp);
-							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate Fail Response:", resp));
+							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Irrelevant Terminate Request"));
 						}
 					}
 				}
 				else
 				{
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
-					connection.sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),819,"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
+					connection.sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),819,
+							"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
+				}
+			}
+			else
+			{
+				if (currentProcess < ncores)
+				{
+					ifstream file2("/etc/ksks-agent/config/commandQueue.txt");
+					if(file2.peek()!=ifstream::traits_type::eof())
+					{
+						ofstream file3("/etc/ksks-agent/config/commandQueue2.txt");
+						input = "";
+						int count=0;
+						do
+						{
+							getline(file2,str2);
+							if(str2.find("{") != string::npos)
+								count++;
+							input=input + str2 + "\n";
+							str+=str2;
+							if(str2.find("}") != string::npos)
+								count--;
+						}while(count>0);
+						//					file3.open",fstream::in | fstream::out | fstream::app);
+						while(getline(file2,str2))
+						{
+							file3 << str2 << endl;
+						}
+						file3.close();
+						rename("/etc/ksks-agent/config/commandQueue2.txt","/etc/ksks-agent/config/commandQueue.txt");
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Message Fetched from internal queue!"));
+						if(input != "\n" && command.deserialize(input))
+						{
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
+							KAThread* mypointer = new KAThread;
+							mypointer->getLogger().setLogLevel(level);
+							pidList.push_back(mypointer->threadFunction(&messageQueue,&command,argv));
+							currentProcess++;
+							delete mypointer;
+						}
+					}
 				}
 			}
 		}
