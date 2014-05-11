@@ -73,6 +73,8 @@ public class InstallClusterCommand extends OsgiCommandSupport {
                 if (po.getState() != ProductOperationState.RUNNING) {
                     break;
                 }
+                System.out.print(".");
+                System.out.flush();
             } else {
                 System.out.println("Product operation not found. Check logs");
                 break;
@@ -83,6 +85,7 @@ public class InstallClusterCommand extends OsgiCommandSupport {
                 break;
             }
         }
+        System.out.println();
         return null;
     }
 }
