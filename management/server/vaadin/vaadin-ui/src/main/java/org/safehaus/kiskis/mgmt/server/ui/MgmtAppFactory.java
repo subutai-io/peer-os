@@ -20,10 +20,10 @@ public class MgmtAppFactory implements ApplicationFactory {
     private Tracker tracker;
     private ModuleNotifier moduleNotifier;
 
-    public MgmtAppFactory(String title, AgentManager agentManager, CommandRunner taskRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
+    public MgmtAppFactory(String title, AgentManager agentManager, CommandRunner commandRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
         this.title = title;
         this.agentManager = agentManager;
-        this.commandRunner = taskRunner;
+        this.commandRunner = commandRunner;
         this.tracker = tracker;
         this.moduleNotifier = moduleNotifier;
     }
