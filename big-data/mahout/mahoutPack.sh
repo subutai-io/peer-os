@@ -5,7 +5,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-mahout*/*
-cp -r ~/jobs/master.bigdata.mahout/workspace/big-data/mahout/mahout/* ksks-mahout*/
+cp -r ../workspace/big-data/mahout/mahout/* ksks-mahout*/
 cd ksks-mahout*
 mkdir opt
 cd opt
@@ -55,4 +55,3 @@ md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >>
 dpkg-deb -z8 -Zgzip --build $updatedFileName/
 
 cp *.deb ~/Automation/Bigdata/mahout
-

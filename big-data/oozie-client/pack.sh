@@ -1,20 +1,23 @@
 #!/bin/sh
 set -e
 # Check if any deb file exists!!!
-echo $BASE
 
+BASE=$(pwd)
 sh -c 'cd $BASE'
+echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/oozie-client/oozie-client"
+TARGET="/var/lib/jenkins/Automation/Bigdata/oozie-client"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 if ls *.deb ; then
 	rm  *.deb
 fi
 
-BASE="/var/lib/jenkins/jobs/master.bigdata.oozie-client/Oozie-client"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.oozie-client/workspace/big-data/oozie-client/oozie-client"
-TARGET="/var/lib/jenkins/Automation/Bigdata/oozie-client"
-
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 rm -rf $BASE/$fileName/opt/*

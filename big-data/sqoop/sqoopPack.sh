@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-sqoop*/*
-cp -r ~/jobs/master.bigdata.sqoop/workspace/big-data/sqoop/sqoop/* ksks-sqoop*/
+cp -r ../workspace/big-data/sqoop/sqoop/* ksks-sqoop*/
 cd ksks-sqoop*
 mkdir opt
 wget -P opt http://archive.apache.org/dist/sqoop/1.4.3/sqoop-1.4.3.bin__hadoop-1.0.0.tar.gz

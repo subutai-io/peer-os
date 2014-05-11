@@ -44,7 +44,7 @@ bool KAThread::checkCWD(KACommand *command)
 {
 	if ((chdir(command->getWorkingDirectory().c_str())) < 0)
 	{		//changing working directory first
-		logger.writeLog(3,logger.setLogData("<KAThread::threadFunction> " " Changing working Directory failed..","pid",toString(getpid()),"CWD",command->getWorkingDirectory()));
+		logger.writeLog(3,logger.setLogData("<KAThread::checkCWD> " " Changing working Directory failed..","pid",toString(getpid()),"CWD",command->getWorkingDirectory()));
 		return false;
 	}
 	else
@@ -59,14 +59,14 @@ bool KAThread::checkUID(KACommand *command)
 {
 	if(uid.getIDs(ruid,euid,command->getRunAs()))
 	{	//checking user id is on system ?
-		logger.writeLog(4,logger.setLogData("<KAThread::threadFunction> " "User id successfully found on system..","pid",toString(getpid()),"RunAs",command->getRunAs()));
+		logger.writeLog(4,logger.setLogData("<KAThread::checkUID> " "User id successfully found on system..","pid",toString(getpid()),"RunAs",command->getRunAs()));
 		uid.doSetuid(this->euid);
 		return true;
 	}
 	else
 	{
-		logger.writeLog(3,logger.setLogData("<KAThread::threadFunction> " "User id could not found on system..","pid",toString(getpid()),"RunAs",command->getRunAs()));
-		logger.writeLog(3,logger.setLogData("<KAThread::threadFunction> " "Thread will be closed..","pid",toString(getpid()),"RunAs",command->getRunAs()));
+		logger.writeLog(3,logger.setLogData("<KAThread::checkUID> " "User id could not found on system..","pid",toString(getpid()),"RunAs",command->getRunAs()));
+		logger.writeLog(3,logger.setLogData("<KAThread::checkUID> " "Thread will be closed..","pid",toString(getpid()),"RunAs",command->getRunAs()));
 		uid.undoSetuid(ruid);
 		return false;
 	}
@@ -82,12 +82,15 @@ string KAThread::createExecString(KACommand *command)
 	string arg,env;
 	exec.clear();
 	logger.writeLog(6,logger.setLogData("<KAThread::createExecString>""Method starts...","pid",toString(getpid())));
+	argument.clear();
+	environment.clear();
 	for(unsigned int i=0;i<command->getArguments().size();i++)	//getting arguments for creating Execution string
 	{
 		arg = command->getArguments()[i];
 		argument = argument + arg + " ";
 		logger.writeLog(7,logger.setLogData("<KAThread::createExecString>","pid",toString(getpid()),"Argument",arg.c_str()));
 	}
+	logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Full Argument List: ","Arguments:",argument));
 	for (std::list<pair<string,string> >::iterator it = command->getEnvironment().begin(); it != command->getEnvironment().end(); it++ )
 	{
 		arg = it->first.c_str();
@@ -95,17 +98,18 @@ string KAThread::createExecString(KACommand *command)
 		logger.writeLog(7,logger.setLogData("<KAThread::createExecString> Environment Parameters","Parameter",arg,"=",env));
 		environment = environment + " export "+ arg+"="+env+" && ";
 	}
+	logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Full Environment List: ","Environments:",environment));
 	if(environment.empty())
 	{
 		exec = command->getProgram() + " " + argument ;		//arguments added execution string
-		logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Execution command has been created","Command:",exec));
+		logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Execution command has been created without environment","Command:",exec));
 	}
 	else
 	{
 		exec = environment + command->getProgram() + " " + argument ;
-		logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Execution command has been created","Command:",exec));
+		logger.writeLog(7,logger.setLogData("<KAThread::createExecString> " "Execution command has been created with environment","Command:",exec));
 	}
-	logger.writeLog(6,logger.setLogData("<KAThread::createExecString>""Method finished....","pid",toString(getpid())));
+	logger.writeLog(6,logger.setLogData("<KAThread::createExecString>""CreateExecString Method finished....","pid",toString(getpid())));
 	return exec;
 }
 
@@ -486,7 +490,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
 		string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
 				"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
 		while(!messageQueue->try_send(message.data(), message.size(), 0));
-		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "USer id not found on system..","RunAs:",command->getRunAs()));
+		this->getLogger().writeLog(6,this->getLogger().setLogData("<KAThread::optionReadSend> " "User id not found on system..","RunAs:",command->getRunAs()));
 		//problem about UID
 	}
 
@@ -706,7 +710,7 @@ int KAThread::optionReadSend(message_queue* messageQueue,KACommand* command,int 
  *  		   if the execution successfully done, it returns true.
  *  		   Otherwise it returns false.
  */
-bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,char* argv[])
+int KAThread::threadFunction(message_queue* messageQueue,KACommand *command,char* argv[])
 {
 	signal(SIGCHLD, SIG_IGN);		//when the child process done it will be raped by kernel. We do not allowed zombie processes.
 	pid=fork();						//creating a child process
@@ -732,88 +736,135 @@ bool KAThread::threadFunction(message_queue* messageQueue,KACommand *command,cha
 			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Error opening pipes!!"));
 		}
 
-		int ret[2];
-		int val = 0; //for system return value
-		pipe(ret);
-		signal(SIGCHLD, SIG_DFL);
-		int newpid=fork();
-		if(newpid==0)
-		{	// Child execute the command
-			string pidchldnumstr = toString(getpid());
-			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
+		string executecmd = createExecString(command).c_str();
+		string latest = executecmd.substr(executecmd.length()-3);
+		if(latest.find("&") != std::string::npos)
+		{
+			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Process will be executed as a Daemon process!!"));
+			int myval = daemon(0,0);
 
-			this->getOutputStream().PreparePipe();
-			this->getErrorStream().PreparePipe();
-
-			this->getErrorStream().closePipe(0);
-			this->getOutputStream().closePipe(0);
-
-			if(!checkCWD(command))
+			if(!checkCWD(command)) //if the CWD does not exist
 			{
-				logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
-				kill(getpid(),SIGKILL);		//killing child
+
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+						"Working Directory Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+				while(!messageQueue->try_send(message.data(), message.size(), 0));
+				myval = 1 ;
+				message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+				while(!messageQueue->try_send(message.data(), message.size(), 0));
+				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
 				exit(1);
 				//problem about absolute path
 			}
-			if(!checkUID(command))
+			if(!checkUID(command)) //if the User does not exist
 			{
-				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
-				kill(getpid(),SIGKILL);		//killing child
+				string message = this->getResponse().createResponseMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),1,
+						"User Does Not Exist on System","",command->getSource(),command->getTaskUuid());
+				while(!messageQueue->try_send(message.data(), message.size(), 0));
+				myval = 1 ;
+				message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+						this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+				while(!messageQueue->try_send(message.data(), message.size(), 0));
+				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "User id not found on system..","RunAs:",command->getRunAs()));
 				exit(1);
-				//problem about UID
 			}
+			logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getProgram()));
+			//executing the process on background
+			system(createExecString(command).c_str());
+			//parent returns with success if the daemon successfully send to process to background
+			string message = this->getResponse().createExitMessage(command->getUuid(),this->getPpid(),command->getRequestSequenceNumber(),
+					this->getResponsecount(),command->getSource(),command->getTaskUuid(),myval);
+			while(!messageQueue->try_send(message.data(), message.size(), 0));
 
-			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is starting!!","pid",pidchldnumstr));
-			val = system(createExecString(command).c_str());	//execution of command is starting now..
-
-			close(ret[0]);
-			write(ret[1], &val, sizeof(val));
-			close(ret[1]);
-
-			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
-			exit(EXIT_SUCCESS);
-		}
-		else if (newpid==-1)
-		{
-			cout << "ERROR!!" << endl;
-			return false;
+			exit(1);
 		}
 		else
 		{
-			//Parent read the result and send back
-			try
-			{
-				signal(SIGCHLD, SIG_IGN);
-				this->getErrorStream().closePipe(1);
-				this->getOutputStream().closePipe(1);
-				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
-				optionReadSend(messageQueue,command,newpid,ret);
-				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
+			logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Process will not be executed as a Daemon process!!"));
+			int ret[2];
+			int val = 0; //for system return value
+			pipe(ret);
+			signal(SIGCHLD, SIG_DFL);
+			int newpid=fork();
+			if(newpid==0)
+			{	// Child execute the command
+				string pidchldnumstr = toString(getpid());
+				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Child Process is starting for pipes","Parentpid",pidparnumstr,"pid",pidchldnumstr));
+
+				this->getOutputStream().preparePipe();
+				this->getErrorStream().preparePipe();
+
 				this->getErrorStream().closePipe(0);
 				this->getOutputStream().closePipe(0);
-				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
-				logger.closeLogFile();
-				kill(getpid(),SIGKILL);		//killing child
-				return true; //thread successfully done its work.
+
+				if(!checkCWD(command))
+				{
+					logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "CWD id not found on system..","CWD:",command->getWorkingDirectory()));
+					kill(getpid(),SIGKILL);		//killing child
+					exit(1);
+					//problem about absolute path
+				}
+				if(!checkUID(command))
+				{
+					logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "USer id not found on system..","RunAs:",command->getRunAs()));
+					kill(getpid(),SIGKILL);		//killing child
+					exit(1);
+					//problem about UID
+				}
+
+				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is starting!!","pid",pidchldnumstr));
+				val = system(createExecString(command).c_str());	//execution of command is starting now..
+
+				close(ret[0]);
+				write(ret[1], &val, sizeof(val));
+				close(ret[1]);
+
+				logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "Execution is done!!","pid",pidchldnumstr));
+				exit(EXIT_SUCCESS);
 			}
-			catch(const std::exception& error)
+			else if (newpid==-1)
 			{
-				logger.writeLog(3,logger.setLogData("<KAThread::threadFunction> " "Problem TF:",error.what()));
-				cout<<error.what()<<endl;
+				cout << "ERROR!!" << endl;
+				return false;
+			}
+			else
+			{
+				//Parent read the result and send back
+				try
+				{
+					signal(SIGCHLD, SIG_IGN);
+					this->getErrorStream().closePipe(1);
+					this->getOutputStream().closePipe(1);
+					logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend is starting!!","pid",toString(getpid())));
+					optionReadSend(messageQueue,command,newpid,ret);
+					logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "optionReadSend has finished!!","pid",toString(getpid())));
+					this->getErrorStream().closePipe(0);
+					this->getOutputStream().closePipe(0);
+					logger.writeLog(6,logger.setLogData("<KAThread::threadFunction> " "New Main Thread is Stopping!!","pid",toString(getpid())));
+					logger.closeLogFile();
+					kill(getpid(),SIGKILL);		//killing child
+					return true; //thread successfully done its work.
+				}
+				catch(const std::exception& error)
+				{
+					logger.writeLog(3,logger.setLogData("<KAThread::threadFunction> " "Problem TF:",error.what()));
+					cout<<error.what()<<endl;
+				}
 			}
 		}
 	}
 	else if (pid == -1)
 	{
 		//log.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "ERROR DURING MAIN FORK!!","pid",toString(getpid())));
-		return false;
+		return pid;
 	}
 	else if( pid > 0 )	//parent continue its process and return back
 	{
 		//logger.writeLog(7,logger.setLogData("<KAThread::threadFunction> " "Parent Process continue!!","pid",toString(getpid())));
-		return true;	//parent successfully done
+		return pid;	//parent successfully done
 	}
-	return true; //child successfully done
+	return pid;
 }
 
 /**

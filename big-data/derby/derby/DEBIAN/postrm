@@ -4,9 +4,12 @@
 set -e
 . /etc/profile
 
-derbyHomeEcho="/opt/db-derby-10.4.2.0-bin"
-FilePath="/etc/profile"
-derbyHome="\/opt\/db-derby-10.4.2.0-bin"
+name="derby"
+folderName="db-derby-10.4.2.0-bin"
+derbyHomeEcho="/opt/$folderName"
+derbyServiceFile="/etc/init.d/$name"
+derbyHomeScript="/etc/profile.d/$name-home.sh"
+derbyHome="\/opt\/$folderName"
 
 #Remove derby directory if exists
 if [ -d "$derbyHomeEcho" ]; then
@@ -15,14 +18,21 @@ if [ -d "$derbyHomeEcho" ]; then
 else
         echo "$derbyHomeEcho does not exist!"
 fi
-#Remove DERBY_HOME from file
-if grep -q "DERBY_HOME=" $FilePath
-then
-        echo "DERBY HOME is being deleted!"
-        sed -i "/export DERBY_HOME=$derbyHome/d" $FilePath
+
+if [ -f "$derbyServiceFile" ]; then
+        echo "$derbyServiceFile exists!"
+        rm -r "$derbyServiceFile"
 else
-        echo "DERBY HOME does not exist"
+        echo "$derbyServiceFile does not exist!"
 fi
+
+if [ -f "$derbyHomeScript" ]; then
+        echo "$derbyHomeScript exists!"
+        rm -r "$derbyHomeScript"
+else
+        echo "$derbyHomeScript does not exist!"
+fi
+
 if [ -f $HIVE_HOME/lib/derbyclient.jar ]; then
 	rm $HIVE_HOME/lib/derbyclient.jar
 fi

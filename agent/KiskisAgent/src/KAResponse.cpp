@@ -32,8 +32,8 @@ KAResponse::KAResponse()
 	setSource("");
 	setTaskUuid("");
 	setMacAddress("");
-	setIsLxc(-1);
 	setHostname("");
+	setParentHostname("");
 	getIps().clear();
 }
 
@@ -60,8 +60,8 @@ void KAResponse::clear()
 	setSource("");
 	setTaskUuid("");
 	setMacAddress("");
-	setIsLxc(-1);
 	setHostname("");
+	setParentHostname("");
 	getIps().clear();
 }
 
@@ -121,6 +121,10 @@ void KAResponse::serialize(string& output)
 	{
 		root["response"]["hostname"] = this->getHostname();
 	}
+	if(!(this->getParentHostname().empty()))											//check the parenthostname is assigned or not
+	{
+		root["response"]["parentHostName"] = this->getParentHostname();
+	}
 	if(!(this->getMacAddress().empty()))											//check the macAddress is assigned or not
 	{
 		root["response"]["macAddress"] = this->getMacAddress();
@@ -128,10 +132,6 @@ void KAResponse::serialize(string& output)
 	if(!(this->getSource().empty()))											//check the macAddress is assigned or not
 	{
 		root["response"]["source"] = this->getSource();
-	}
-	if(this->getIsLxc() >= 0 )											//check the macAddress is assigned or not
-	{
-		root["response"]["isLxc"] = bool (this->getIsLxc());
 	}
 
 	output = writer.write(root);
@@ -314,6 +314,23 @@ void KAResponse::setStandardOutput(const string& mystdout)
 }
 
 /**
+ *  \details   getting "parenthostname" private variable of KAResponse instance.
+ */
+string& KAResponse::getParentHostname()
+{
+	return this->parentHostname;
+}
+
+/**
+ *  \details   setting "parenthostname" private variable of KAResponse instance.
+ *  		   This holds the parenthostname of the agent machine
+ */
+void KAResponse::setParentHostname(const string& parenthostname)
+{
+	this->parentHostname = parenthostname;
+}
+
+/**
  *  \details   getting "hostname" private variable of KAResponse instance.
  */
 string& KAResponse::getHostname()
@@ -362,25 +379,6 @@ string& KAResponse::getTaskUuid()
 void KAResponse::setTaskUuid(const string& taskuuid)
 {
 	this->taskUuid = taskuuid;
-}
-
-/**
- *  \details   getting "isLxc" private variable of KAResponse instance.
- */
-int& KAResponse::getIsLxc()
-{
-	return this->isLxc;
-}
-
-/**
- *  \details   setting "isLxc" private variable of KAResponse instance.
- *  		   This contains the information that the agent runs on Physical machine or lxc container.
- *  		   true: this machine is lxc container.
- *  		   false: this machine is physical.
- */
-void KAResponse::setIsLxc(int isLxc)
-{
-	this->isLxc = isLxc;
 }
 
 /**

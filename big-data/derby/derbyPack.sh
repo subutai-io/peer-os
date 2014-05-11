@@ -6,7 +6,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-derby*/*
-cp -r  ~/jobs/master.bigdata.derby/workspace/big-data/derby/derby/* ksks-derby*/
+cp -r  ../workspace/big-data/derby/derby/* ksks-derby*/
 cd ksks-derby*
 mkdir opt
 wget -P opt http://archive.apache.org/dist/db/derby/db-derby-10.4.2.0/db-derby-10.4.2.0-bin.tar.gz

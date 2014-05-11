@@ -1,10 +1,17 @@
 #!/bin/bash
 set -e
-BASE="/var/lib/jenkins/jobs/master.bigdata.cassandra-mgmt/Cassandra-mgmt"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.cassandra-mgmt/workspace/big-data/cassandra-mgmt/cassandra-mgmt"
-TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
-kskssql="/var/lib/jenkins/jobs/master.bigdata.cassandra-mgmt/workspace/keyspace"
+
+BASE=$(pwd)
+sh -c 'cd $BASE'
 echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/cassandra-mgmt/cassandra-mgmt"
+TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
+kskssql=$(pwd)"/keyspace"
+echo $SOURCE
+echo $TARGET
+echo $kskssql
+cd $BASE
 
 LXCSOURCE="/var/lib/lxc"
 pattern="cassandra"
@@ -67,7 +74,7 @@ mv $pattern/rootfs/etc/network/interfaces.org $pattern/rootfs/etc/network/interf
 
 cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a -p $LXCSOURCE/$pattern/rootfs/var/lib/cassandra $BASE/$fileName/var/lib/
 
@@ -113,6 +120,14 @@ fi
 find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
 rm $packageName/DEBIAN/md5sums
 md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
+
+chmod -R 755 $packageName/DEBIAN/
 dpkg-deb -z8 -Zgzip --build $packageName/
 
+chown jenkins:jenkins $packageName/DEBIAN/md5sums
+chmod -R 755 $packageName/DEBIAN/md5sums
+chown jenkins:jenkins $BASE/*.deb
+chmod -R 755 $BASE/*.deb
+
+sudo rm -rf $packageName/var/lib/*
 cp $packageName".deb" $TARGET/

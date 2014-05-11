@@ -46,19 +46,19 @@ jobtracker=$2
 dfs_replication=$3
 
 #Patterns to matched and replaced with
-pattern1="<name>fs.default.name<\/name>\n(.*?)<value>(.*?)<\/value>"
+pattern1="<name>([\s]*?)fs.default.name([\s]*?)<\/name>\n(.*?)<value>(.*?)<\/value>"
 pattern2="<name>fs.default.name<\/name>\n\t<value>${namenode}<\/value>"
 #Edit namenode in core-site.xml file
 perl -0777 -i.original -pe "s/${pattern1}/${pattern2}/is" $core_site
 
 #Patterns to matched and replaced with
-pattern1="<name>mapred.job.tracker<\/name>\n(.*?)<value>(.*?)<\/value>"
+pattern1="<name>([\s]*?)mapred.job.tracker([\s]*?)<\/name>\n(.*?)<value>(.*?)<\/value>"
 pattern2="<name>mapred.job.tracker<\/name>\n\t<value>${jobtracker}<\/value>"
 #Edit jobtracker in mapred-site.xml
 perl -0777 -i.original -pe "s/${pattern1}/${pattern2}/is" $mapred_site
 
 #Patterns to matched and replaced with
-pattern1="<name>dfs.replication<\/name>\n(.*?)<value>(.*?)<\/value>"
+pattern1="<name>([\s]*?)dfs.replication([\s]*?)<\/name>\n(.*?)<value>(.*?)<\/value>"
 pattern2="<name>dfs.replication<\/name>\n\t<value>${dfs_replication}<\/value>"
 #Edit dfs replication in hdfs-site.xml
 perl -0777 -i.original -pe "s/${pattern1}/${pattern2}/is" $hdfs_site
