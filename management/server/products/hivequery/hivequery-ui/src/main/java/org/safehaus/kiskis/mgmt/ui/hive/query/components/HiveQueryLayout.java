@@ -1,9 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.ui.*;
 
 /**
  * Created by daralbaev on 12.05.14.
@@ -32,6 +30,14 @@ public class HiveQueryLayout extends GridLayout {
         addComponent(searchTextField, 6, 0, 11, 0);
         setComponentAlignment(searchTextField, Alignment.MIDDLE_CENTER);
         searchTextField.setSizeFull();
+        searchTextField.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
+        searchTextField.setTextChangeTimeout(200);
+        searchTextField.addListener(new FieldEvents.TextChangeListener() {
+
+            public void textChange(FieldEvents.TextChangeEvent event) {
+                list.refreshDataSource(event.getText());
+            }
+        });
 
         list = new QueryList();
         addComponent(list, 6, 1, 11, 3);
