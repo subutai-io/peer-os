@@ -26,7 +26,7 @@ public class QueryList extends ListSelect {
         refreshDataSource(null);
     }
 
-    public void refreshDataSource(Object filter) {
+    public void refreshDataSource(String filter) {
         List<Config> list = HiveQueryUI.getManager().load();
 
         BeanItemContainer<Config> beans =
@@ -35,7 +35,7 @@ public class QueryList extends ListSelect {
         for (Config item : list) {
             if (filter == null) {
                 beans.addBean(item);
-            } else if (item.getName().contains(filter.toString()) || item.getDescription().contains(filter.toString())) {
+            } else if (item.getName().contains(filter) || item.getDescription().contains(filter)) {
                 beans.addBean(item);
             }
         }

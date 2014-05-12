@@ -67,7 +67,6 @@ public class HiveQueryLayout extends GridLayout {
 
         buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
-        buttonLayout.setSizeFull();
 
         saveButton = new Button("Save");
         saveButton.addListener(new Button.ClickListener() {
@@ -78,7 +77,8 @@ public class HiveQueryLayout extends GridLayout {
                         queryTextArea.getValue().toString(),
                         descriptionTextArea.getValue().toString());
 
-                list.refreshDataSource(searchTextField.getValue());
+                searchTextField.setValue("");
+                list.refreshDataSource(null);
             }
         });
 
