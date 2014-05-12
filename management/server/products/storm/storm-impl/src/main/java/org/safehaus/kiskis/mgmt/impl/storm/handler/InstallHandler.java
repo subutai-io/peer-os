@@ -115,44 +115,10 @@ public class InstallHandler extends AbstractHandler {
         }
         po.addLog("Cluster info successfully saved");
 
-        if(configure())
+        if(configure(config))
             po.addLogDone("Storm cluster successfully configures");
         else
             po.addLogFailed("Failed to configure Storm cluster");
     }
 
-    private boolean configure() {
-        String zk_servers = makeZookeeperServersList();
-        if(zk_servers == null) return false;
-
-        Map<String, String> paramValues = new HashMap<String, String>();
-        paramValues.put("storm.zookeeper.servers", zk_servers);
-        paramValues.put("nimbus.host", config.getNimbus().getListIP().get(0));
-        paramValues.put("storm.local.dir", "/var/lib/storm");
-
-        Set<Agent> allNodes = new HashSet<Agent>(config.getSupervisors());
-        allNodes.add(config.getNimbus());
-
-        for(Map.Entry<String, String> e : paramValues.entrySet()) {
-            String s = Commands.configure("add", "storm.xml", e.getKey(), e.getValue());
-            Command cmd = manager.getCommandRunner().createCommand(
-                    new RequestBuilder(s), allNodes);
-            manager.getCommandRunner().runCommand(cmd);
-            if(!cmd.hasSucceeded()) return false;
-        }
-        return true;
-    }
-
-    private String makeZookeeperServersList() {
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig
-                = manager.getZookeeperManager().getCluster(clusterName);
-        if(zkConfig == null) return null;
-
-        StringBuilder sb = new StringBuilder();
-        for(Agent a : zkConfig.getNodes()) {
-            if(sb.length() > 0) sb.append(",");
-            sb.append(a.getListIP().get(0));
-        }
-        return sb.toString();
-    }
 }

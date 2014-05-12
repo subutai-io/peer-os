@@ -45,11 +45,15 @@ public class StormImpl extends StormBase {
     }
 
     public UUID addNode(String clusterName, String hostname) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        AbstractOperationHandler h = new AddNodeHandler(this, clusterName, hostname);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     public UUID destroyNode(String clusterName, String hostname) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        AbstractOperationHandler h = new DestroyNodeHandler(this, clusterName, hostname);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     public List<Config> getClusters() {
