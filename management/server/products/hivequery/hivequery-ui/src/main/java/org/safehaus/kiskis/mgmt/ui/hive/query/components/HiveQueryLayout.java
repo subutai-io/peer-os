@@ -46,8 +46,9 @@ public class HiveQueryLayout extends GridLayout {
         list.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                getWindow().showNotification(valueChangeEvent.getProperty().toString());
-
+                if (valueChangeEvent.getProperty() != null) {
+                    getWindow().showNotification(valueChangeEvent.getProperty().toString());
+                }
             }
         });
 
