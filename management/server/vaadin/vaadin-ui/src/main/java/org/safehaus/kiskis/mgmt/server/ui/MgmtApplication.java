@@ -27,15 +27,15 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     private static final Logger LOG = Logger.getLogger(MgmtApplication.class.getName());
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
+    private static AgentManager agentManager;
     private final ModuleNotifier moduleNotifier;
-    private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final Tracker tracker;
     private final String title;
     private TabSheet tabs;
 
     public MgmtApplication(String title, AgentManager agentManager, CommandRunner commandRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
-        this.agentManager = agentManager;
+        MgmtApplication.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.tracker = tracker;
         this.moduleNotifier = moduleNotifier;
@@ -94,15 +94,13 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     }
 
     public static MgmtAgentManager createAgentTree() {
-        if (getInstance() != null) {
-            return new MgmtAgentManager(getInstance().agentManager);
-        }
-        return null;
+        return new MgmtAgentManager(agentManager);
     }
 
     public static Window createTerminalWindow(final Set<Agent> agents) {
         if (getInstance() != null) {
-            return new TerminalWindow(agents, getInstance().commandRunner, getInstance().agentManager);
+            getInstance();
+            return new TerminalWindow(agents, getInstance().commandRunner, agentManager);
         }
         return null;
     }
@@ -198,6 +196,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void close() {
+        MgmtApplication.agentManager = null;
         try {
             super.close();
             Iterator<Component> it = tabs.getComponentIterator();
