@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.*;
+import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 
 /**
  * Created by daralbaev on 12.05.14.
@@ -47,7 +48,10 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if (valueChangeEvent.getProperty() != null) {
-                    getWindow().showNotification(valueChangeEvent.getProperty().toString());
+                    Config item = (Config) valueChangeEvent.getProperty();
+                    nameTextField.setValue(item.getName());
+                    queryTextArea.setValue(item.getQuery());
+                    descriptionTextArea.setValue(item.getDescription());
                 }
             }
         });
