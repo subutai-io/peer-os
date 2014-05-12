@@ -5,19 +5,26 @@
  */
 package org.safehaus.kiskis.mgmt.server.ui.services.impl;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleServiceListener;
 
+import java.util.Comparator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 /**
- *
  * @author dilshat
  */
 public class ModuleNotifierImpl implements ModuleNotifier {
 
-    private final Queue<Module> modules = new ConcurrentLinkedQueue<Module>();
+    private final Queue<Module> modules = new PriorityBlockingQueue<Module>(32, new Comparator<Module>() {
+        @Override
+        public int compare(Module o1, Module o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    });
     private final Queue<ModuleServiceListener> moduleListeners = new ConcurrentLinkedQueue<ModuleServiceListener>();
 
     @Override

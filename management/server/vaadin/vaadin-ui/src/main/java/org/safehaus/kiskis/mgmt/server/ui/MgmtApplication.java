@@ -27,13 +27,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     private static final Logger LOG = Logger.getLogger(MgmtApplication.class.getName());
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
-    private static String APP_URL;
     private final ModuleNotifier moduleNotifier;
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final Tracker tracker;
     private final String title;
-    private Set<Agent> selectedAgents = new HashSet<Agent>();
     private TabSheet tabs;
 
     public MgmtApplication(String title, AgentManager agentManager, CommandRunner commandRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
@@ -44,9 +42,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         this.title = title;
     }
 
-    public static String getAPP_URL() {
-        return APP_URL;
-    }
 
     private static MgmtApplication getInstance() {
         return threadLocal.get();
@@ -54,25 +49,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     private static void setInstance(MgmtApplication application) {
         threadLocal.set(application);
-    }
-
-    public static Set<Agent> getSelectedAgents() {
-        if (getInstance() != null) {
-            return Collections.unmodifiableSet(getInstance().selectedAgents);
-        }
-        return new HashSet<Agent>();
-    }
-
-    static void setSelectedAgents(Set<Agent> agents) {
-        if (getInstance() != null && agents != null) {
-            getInstance().selectedAgents = agents;
-        }
-    }
-
-    static void clearSelectedAgents() {
-        if (getInstance() != null) {
-            getInstance().selectedAgents.clear();
-        }
     }
 
     public static void showConfirmationDialog(final String caption, final String question,
@@ -119,7 +95,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     public static MgmtAgentManager createAgentTree() {
         if (getInstance() != null) {
-            return new MgmtAgentManager(getInstance().agentManager, false);
+            return new MgmtAgentManager(getInstance().agentManager);
         }
         return null;
     }
@@ -154,7 +130,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void init() {
-        APP_URL = getURL().getHost();
         setInstance(this);
         try {
             setTheme(Runo.themeName());
@@ -247,7 +222,9 @@ public class MgmtApplication extends Application implements ModuleServiceListene
         try {
             LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Module registered, adding tab");
             Component component = module.createComponent();
-            tabs.addTab(component, module.getName(), null);
+            Tab tab = tabs.addTab(component, module.getName(), null);
+            List<Module> modules = new ArrayList<Module>(moduleNotifier.getModules());
+            tabs.setTabPosition(tab, modules.indexOf(module));
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error registering module{0}", e);
         }
