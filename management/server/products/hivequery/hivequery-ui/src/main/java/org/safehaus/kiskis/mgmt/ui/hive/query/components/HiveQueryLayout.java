@@ -19,7 +19,7 @@ public class HiveQueryLayout extends GridLayout {
     private TextArea resultTextArea;
 
     public HiveQueryLayout() {
-        super(12, 12);
+        super(12, 15);
 
         setSpacing(true);
         setSizeFull();
@@ -28,9 +28,13 @@ public class HiveQueryLayout extends GridLayout {
         addComponent(table, 0, 0, 5, 3);
         setComponentAlignment(table, Alignment.MIDDLE_CENTER);
 
+        searchTextField = new TextField("Search");
+        addComponent(searchTextField, 6, 0, 11, 1);
+        setComponentAlignment(searchTextField, Alignment.MIDDLE_CENTER);
+
         list = new QueryList();
-        addComponent(list, 6, 2, 11, 3);
-        setComponentAlignment(list, Alignment.TOP_CENTER);
+        addComponent(list, 6, 1, 11, 3);
+        setComponentAlignment(list, Alignment.MIDDLE_CENTER);
 
         nameTextField = new TextField("Query Name");
         addComponent(nameTextField, 0, 4, 5, 4);
@@ -46,5 +50,10 @@ public class HiveQueryLayout extends GridLayout {
         addComponent(descriptionTextArea, 6, 5, 11, 7);
         setComponentAlignment(descriptionTextArea, Alignment.MIDDLE_CENTER);
         descriptionTextArea.setSizeFull();
+
+        resultTextArea = new TextArea("Result");
+        addComponent(resultTextArea, 0, 12, 11, 14);
+        setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
+        resultTextArea.setSizeFull();
     }
 }
