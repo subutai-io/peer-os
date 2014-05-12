@@ -462,18 +462,6 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- Task Runner -->
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
-                                    <artifactId>task-runner-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
                                 <!-- Agent Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
