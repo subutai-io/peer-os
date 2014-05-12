@@ -8,7 +8,7 @@ import com.vaadin.ui.TextField;
 /**
  * Created by daralbaev on 12.05.14.
  */
-public class MainForm extends GridLayout {
+public class HiveQueryLayout extends GridLayout {
 
     private HadoopTreeTable table;
     private QueryList list;
@@ -16,7 +16,7 @@ public class MainForm extends GridLayout {
     private TextArea queryTextArea;
     private TextArea descriptionTextArea;
 
-    public MainForm() {
+    public HiveQueryLayout() {
         super(3, 3);
 
         setSpacing(true);
@@ -34,6 +34,11 @@ public class MainForm extends GridLayout {
         addComponent(nameTextField, 0, 1, 2, 1);
         setComponentAlignment(nameTextField, Alignment.MIDDLE_CENTER);
 
+        queryTextArea = new TextArea("Query");
+        addComponent(queryTextArea, 0, 2, 1, 2);
+        setComponentAlignment(queryTextArea, Alignment.MIDDLE_CENTER);
 
+        descriptionTextArea = new TextArea("Description");
+        addComponent(descriptionTextArea, 2, 2);
     }
 }
