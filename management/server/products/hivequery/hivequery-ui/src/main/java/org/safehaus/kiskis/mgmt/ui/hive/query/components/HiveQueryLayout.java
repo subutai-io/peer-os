@@ -30,7 +30,7 @@ public class HiveQueryLayout extends GridLayout {
 
         list = new QueryList();
         addComponent(list, 6, 2, 11, 3);
-        setComponentAlignment(list, Alignment.MIDDLE_CENTER);
+        setComponentAlignment(list, Alignment.TOP_CENTER);
 
         nameTextField = new TextField("Query Name");
         addComponent(nameTextField, 0, 4, 5, 4);

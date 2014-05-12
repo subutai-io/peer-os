@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class QueryList extends ListSelect {
 
-    public static final int ROW_SIZE = 10;
+    public static final int ROW_SIZE = 20;
 
     public QueryList() {
 
