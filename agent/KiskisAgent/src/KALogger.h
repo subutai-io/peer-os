@@ -19,15 +19,15 @@
  *  @details   KALogger class is designed for log facilities.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.3
+ *  @date      May 02, 2014
  */
 
 #ifndef KALOGGER_H_
 #define KALOGGER_H_
 #include<stdio.h>
 #include<string>
-#include<boost/thread.hpp>
+#include<boost/date_time/posix_time/posix_time_types.hpp>
 using namespace std;
 class KALogger {
 public:

@@ -41,4 +41,7 @@ else
         echo "PATH is being inserted for the first time"
         echo "export PATH=$PATH:$zookeeperPathEcho" >> "${FilePath}"
 fi
+
+# edit zkServer.sh script to clean warning "[: /var/zookeeper/: unexpected operator"
+sed -i "s/if \[ \-f \$ZOOPIDFILE \]; then/    if [ -f \"\$ZOOPIDFILE\" ]; then/g" $zookeeperHomeEcho/bin/zkServer.sh
 . $FilePath

@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-zookeeper*/*
-cp -r  ~/jobs/master.bigdata.zookeeper/workspace/big-data/zookeeper/zookeeper/* ksks-zookeeper*/
+cp -r  ../workspace/big-data/zookeeper/zookeeper/* ksks-zookeeper*/
 
 cd ksks-zookeeper*
 wget -P opt http://apache.bilkent.edu.tr/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz

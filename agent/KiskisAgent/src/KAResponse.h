@@ -19,8 +19,8 @@
  *  @details   KAResponse class is designed for marshaling and unmarshalling response messages.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.0.3
+ *  @date      Apr 24, 2014
  */
 #ifndef KARESPONSE_H_
 #define KARESPONSE_H_
@@ -48,16 +48,16 @@ public:
 	string& getStandardOutput();
 	int getPid();
 	string& getHostname();
+	string& getParentHostname();
 	string& getMacAddress();
 	string& getTaskUuid();
-	int& 	getIsLxc();
 	vector<string>& getIps();
 	string& getSource();
 	void setSource(const string&);
 	void setHostname(const string&);
+	void setParentHostname(const string&);
 	void setMacAddress(const string&);
 	void setTaskUuid(const string&);
-	void setIsLxc(int);
 	void setIps(vector<string>);
 	void setPid(int);
 	void setType(const string&);
@@ -80,9 +80,9 @@ private:
 	string       	stdOut;
 	string        	stdErr;
 	string			taskUuid;
-	int				isLxc;
 	string			macAddress;
 	string			hostname;
+	string			parentHostname;
 	vector<string>  ips;
 	string			source;
 };

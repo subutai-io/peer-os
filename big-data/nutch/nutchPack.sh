@@ -7,7 +7,7 @@ if ls | grep .deb ; then
 fi
 
 rm -rf ksks-nutch*/*
-cp -r ~/jobs/master.bigdata.nutch/workspace/big-data/nutch/nutch/* ksks-nutch*/
+cp -r ../workspace/big-data/nutch/nutch/* ksks-nutch*/
 cd ksks-nutch*
 mkdir opt
 wget -P opt http://archive.apache.org/dist/nutch/1.5/apache-nutch-1.5-bin.tar.gz

@@ -9,7 +9,7 @@ fi
 versionOfPig="0.12.0"
 
 rm -rf ksks-pig*/*
-cp -r ~/jobs/master.bigdata.pig/workspace/big-data/pig/pig/* ksks-pig*/
+cp -r ../workspace/big-data/pig/pig/* ksks-pig*/
 cd ksks-pig*
 mkdir opt
 wget -P opt http://archive.apache.org/dist/pig/pig-0.12.0/pig-0.12.0.tar.gz

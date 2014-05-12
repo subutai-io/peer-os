@@ -45,7 +45,6 @@ string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqN
 	this->setStandardOutput(output);
 	this->setStandardError(error);
 	this->setPid(pid);
-	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -64,7 +63,6 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(responseSeqNum);
 	this->setExitCode(exitcode);
-	this->setIsLxc(-100);
 	this->serializeDone(sendout);
 	return sendout;
 }
@@ -72,12 +70,12 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
 /**
  *  \details   This method creates Registration message.
  */
-string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,int islxc)
+string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,string parenthostname)
 {	//Creating Registration Message
 	this->setType("REGISTRATION_REQUEST");
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);
-	this->setIsLxc(islxc);
+	this->setParentHostname(parenthostname);
 	this->setUuid(uuid);
 	this->serialize(sendout);
 	return sendout;
@@ -87,14 +85,14 @@ string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,s
  *  \details   This method creates HeartBeat message.
  */
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,
-		string hostname,int islxc,string source,string taskuuid)	//Creating HeartBeat Message
+		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
 {
 	this->setType("HEARTBEAT_RESPONSE");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);
-	this->setIsLxc(islxc);
+	this->setParentHostname(parenthostname);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
@@ -105,7 +103,7 @@ string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,stri
 /**
  *  \details   This method creates  SuccessTermination message.
  */
-string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source)	//Creating Terminate Message
+string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
 {
 	this->setType("TERMINATE_RESPONSE_DONE");
 	this->setSource(source);
@@ -113,7 +111,7 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,stri
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setIsLxc(-100);
+	this->setTaskUuid(taskuuid);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -121,7 +119,7 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,stri
 /**
  *  \details   This method creates Fail Termination message.
  */
-string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source)	//Creating Failed Terminate Message
+string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Failed Terminate Message
 {
 	this->setType("TERMINATE_RESPONSE_FAILED");
 	this->setSource(source);
@@ -129,7 +127,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
-	this->setIsLxc(-100);
+	this->setTaskUuid(taskuuid);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -140,7 +138,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
 {
-	this->setType("EXECUTE_TIMEOUTED");
+	this->setType("EXECUTE_TIMEOUT");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
 	this->setPid(pid);
@@ -149,7 +147,6 @@ string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNu
 	this->setResponseSequenceNumber(responseSeqNum);
 	this->setStandardOutput(stdOut);
 	this->setStandardError(stdErr);
-	this->setIsLxc(-100);
 	this->serialize(sendout);
 	return sendout;
 }

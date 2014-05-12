@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e
-BASE="/var/lib/jenkins/jobs/master.bigdata.lxc/Lxc"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.lxc/workspace/big-data/lxc/lxc"
-TARGET="/var/lib/jenkins/Automation/Bigdata/lxc"
+
+BASE=$(pwd)
+sh -c 'cd $BASE'
 echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/lxc/lxc"
+TARGET="/var/lib/jenkins/Automation/Bigdata/lxc"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 LXCSOURCE="/var/lib/lxc"
 pattern="base-container"
@@ -47,6 +53,8 @@ sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
 #Copying logstash&jmxtrans deb files.
 cp $BASE/repo/ksks-logstash-1.0.1-amd64.deb $LXCSOURCE/$pattern/rootfs/root/
 cp $BASE/repo/jmxtrans-1.0.1-amd64.deb $LXCSOURCE/$pattern/rootfs/root/
+cp $BASE/repo/collectd-conf.sh $LXCSOURCE/$pattern/rootfs/root/
+cp $BASE/repo/deleter.py $LXCSOURCE/$pattern/rootfs/root/
 
 #start base-container
 sudo lxc-start -n $pattern -d
@@ -58,6 +66,8 @@ sleep 30
 #removing logstash and jmxtrans deb
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-logstash-1.0.1-amd64.deb
 rm $LXCSOURCE/$pattern/rootfs/root/jmxtrans-1.0.1-amd64.deb
+rm $LXCSOURCE/$pattern/rootfs/root/collectd-conf.sh
+rm $LXCSOURCE/$pattern/rootfs/root/deleter.py
 
 #closing base container
 sudo lxc-stop -n $pattern
@@ -65,10 +75,9 @@ sudo lxc-stop -n $pattern
 mv $pattern/rootfs/etc/network/interfaces.org $pattern/rootfs/etc/network/interfaces
 #updating gmond.conf file
 mv $BASE/repo/gmond.conf $pattern/rootfs/etc/ganglia/
-
 cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/
 cp $SOURCE/var/lib/lxc/check.sh $BASE/$fileName/var/lib/lxc/

@@ -1,20 +1,23 @@
 #!/bin/sh
 set -e
 # Check if any deb file exists!!!
-echo $BASE
 
+BASE=$(pwd)
 sh -c 'cd $BASE'
+echo $BASE
+cd ../workspace
+SOURCE=$(pwd)"/big-data/hadoop/hadoop"
+TARGET="/var/lib/jenkins/Automation/Bigdata/hadoop"
+echo $SOURCE
+echo $TARGET
+cd $BASE
 
 if ls *.deb ; then
 	rm  *.deb
 fi
 
-BASE="/var/lib/jenkins/jobs/master.bigdata.hadoop/Hadoop"
-SOURCE="/var/lib/jenkins/jobs/master.bigdata.hadoop/workspace/big-data/hadoop/hadoop"
-TARGET="/var/lib/jenkins/Automation/Bigdata/hadoop"
-
 fileName=`ls | awk '{print $1}' | head -1`
-echo $fileName
+echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 cp -a $SOURCE/etc/ $BASE/$fileName/ 
