@@ -35,13 +35,16 @@ public class HiveQueryLayout extends GridLayout {
         nameTextField = new TextField("Query Name");
         addComponent(nameTextField, 0, 4, 5, 4);
         setComponentAlignment(nameTextField, Alignment.MIDDLE_CENTER);
+        nameTextField.setSizeFull();
 
         queryTextArea = new TextArea("Query");
         addComponent(queryTextArea, 0, 5, 5, 7);
         setComponentAlignment(queryTextArea, Alignment.MIDDLE_CENTER);
+        queryTextArea.setSizeFull();
 
         descriptionTextArea = new TextArea("Description");
         addComponent(descriptionTextArea, 6, 5, 11, 7);
         setComponentAlignment(descriptionTextArea, Alignment.MIDDLE_CENTER);
+        descriptionTextArea.setSizeFull();
     }
 }

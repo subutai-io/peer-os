@@ -22,6 +22,8 @@ public class QueryList extends ListSelect {
         setImmediate(true);
         setRows(QueryList.ROW_SIZE);
 
+        setSizeFull();
+
         refreshDataSource(null);
     }
 
