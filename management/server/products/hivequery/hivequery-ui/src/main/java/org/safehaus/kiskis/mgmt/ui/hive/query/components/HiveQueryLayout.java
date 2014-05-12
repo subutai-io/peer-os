@@ -4,6 +4,7 @@ import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
+import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
 /**
  * Created by daralbaev on 12.05.14.
@@ -17,6 +18,8 @@ public class HiveQueryLayout extends GridLayout {
     private TextArea queryTextArea;
     private TextArea descriptionTextArea;
     private TextArea resultTextArea;
+    private HorizontalLayout buttonLayout;
+    private Button saveButton, runButton;
 
     public HiveQueryLayout() {
         super(12, 12);
@@ -61,6 +64,24 @@ public class HiveQueryLayout extends GridLayout {
         addComponent(nameTextField, 0, 4, 5, 4);
         setComponentAlignment(nameTextField, Alignment.MIDDLE_CENTER);
         nameTextField.setSizeFull();
+
+        buttonLayout = new HorizontalLayout();
+        buttonLayout.setSpacing(true);
+
+        saveButton = new Button("Save");
+        saveButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                HiveQueryUI.getManager().save(
+                        nameTextField.getValue().toString(),
+                        queryTextArea.getValue().toString(),
+                        descriptionTextArea.getValue().toString());
+
+                list.refreshDataSource(searchTextField.getValue());
+            }
+        });
+
+        runButton = new Button("Run");
 
         queryTextArea = new TextArea("Query");
         addComponent(queryTextArea, 0, 5, 5, 7);
