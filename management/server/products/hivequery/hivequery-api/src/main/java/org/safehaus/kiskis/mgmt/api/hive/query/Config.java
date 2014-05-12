@@ -4,7 +4,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "HiveQuery";
+    public static final String PRODUCT_KEY = "Hive Query";
 
     private String name;
     private String query;

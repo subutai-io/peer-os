@@ -17,8 +17,6 @@ public class QueryList extends ListSelect {
 
     public QueryList() {
 
-        //setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_CONTAINS);
-        setNullSelectionAllowed(false);
         setImmediate(true);
         setRows(QueryList.ROW_SIZE);
 
