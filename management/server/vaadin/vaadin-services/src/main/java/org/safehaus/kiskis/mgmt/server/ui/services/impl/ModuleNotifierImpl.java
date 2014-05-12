@@ -22,7 +22,7 @@ public class ModuleNotifierImpl implements ModuleNotifier {
     private final Queue<Module> modules = new PriorityBlockingQueue<Module>(32, new Comparator<Module>() {
         @Override
         public int compare(Module o1, Module o2) {
-            return o1.getName().compareTo(o2.getName());
+            return o1.getName().compareToIgnoreCase(o2.getName());
         }
     });
     private final Queue<ModuleServiceListener> moduleListeners = new ConcurrentLinkedQueue<ModuleServiceListener>();
