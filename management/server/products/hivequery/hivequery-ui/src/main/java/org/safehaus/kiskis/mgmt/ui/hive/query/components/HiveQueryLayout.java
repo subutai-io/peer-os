@@ -48,7 +48,8 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if (valueChangeEvent.getProperty() != null) {
-                    Config item = (Config) valueChangeEvent.getProperty();
+                    Config item = (Config) list.getValue();
+
                     nameTextField.setValue(item.getName());
                     queryTextArea.setValue(item.getQuery());
                     descriptionTextArea.setValue(item.getDescription());
