@@ -17,6 +17,7 @@ public class QueryList extends ListSelect {
 
     public QueryList() {
 
+        setNullSelectionAllowed(false);
         setImmediate(true);
         setRows(QueryList.ROW_SIZE);
 
