@@ -17,63 +17,51 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${com.google.code.gson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.doomdark</groupId>
             <artifactId>com.springsource.org.doomdark.uuid</artifactId>
-            <version>${org.doomdark.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>${com.datastax.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
             <artifactId>lz4</artifactId>
-            <version>${net.jpountz.lz4.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>${io.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${com.codahale.metrics.metrics-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>${org.xerial.snappy.version}</version>
         </dependency>
     </dependencies>
 
@@ -82,21 +70,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${org.apache.maven.plugins.version}</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${org.apache.felix.version}</version>
-                <inherited>true</inherited>
-                <extensions>true</extensions>
+
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.shared.protocol</Bundle-SymbolicName>
                         <Export-Package>
