@@ -7,6 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.zookeeper;
 
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
@@ -23,12 +24,18 @@ public class ZookeeperUI implements Module {
     private static Zookeeper manager;
     private static AgentManager agentManager;
     private static Tracker tracker;
+    private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager) {
+    public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager) {
         ZookeeperUI.agentManager = agentManager;
         ZookeeperUI.tracker = tracker;
         ZookeeperUI.manager = manager;
+        ZookeeperUI.hadoopManager = hadoopManager;
+    }
+
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
     public static Tracker getTracker() {
@@ -55,6 +62,7 @@ public class ZookeeperUI implements Module {
         manager = null;
         agentManager = null;
         tracker = null;
+        hadoopManager = null;
         executor.shutdown();
     }
 
