@@ -224,6 +224,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             Component component = module.createComponent();
             Tab tab = tabs.addTab(component, module.getName(), null);
             List<Module> modules = new ArrayList<Module>(moduleNotifier.getModules());
+            LOG.info(moduleNotifier.getModules().toString());
             tabs.setTabPosition(tab, modules.indexOf(module));
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error registering module{0}", e);
