@@ -19,7 +19,7 @@ public class HiveQueryLayout extends GridLayout {
     private TextArea resultTextArea;
 
     public HiveQueryLayout() {
-        super(12, 15);
+        super(12, 12);
 
         setSpacing(true);
         setSizeFull();
@@ -52,7 +52,7 @@ public class HiveQueryLayout extends GridLayout {
         descriptionTextArea.setSizeFull();
 
         resultTextArea = new TextArea("Result");
-        addComponent(resultTextArea, 0, 12, 11, 14);
+        addComponent(resultTextArea, 0, 8, 11, 11);
         setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
         resultTextArea.setSizeFull();
     }
