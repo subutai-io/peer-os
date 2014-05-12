@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 
+import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.*;
 
@@ -42,14 +43,14 @@ public class HiveQueryLayout extends GridLayout {
         list = new QueryList();
         addComponent(list, 6, 1, 11, 3);
         setComponentAlignment(list, Alignment.MIDDLE_CENTER);
-        /*list.addListener(new Property.ValueChangeListener() {
+        list.addListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if (valueChangeEvent.getProperty() != null) {
                     getWindow().showNotification(valueChangeEvent.getProperty().toString());
                 }
             }
-        });*/
+        });
 
         nameTextField = new TextField("Query Name");
         addComponent(nameTextField, 0, 4, 5, 4);
