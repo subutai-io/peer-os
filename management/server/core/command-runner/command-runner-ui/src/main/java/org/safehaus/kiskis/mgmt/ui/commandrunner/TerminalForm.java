@@ -86,7 +86,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
         requestTypeCombo.setTextInputAllowed(false);
         requestTypeCombo.setNullSelectionAllowed(false);
         requestTypeCombo.setValue(RequestType.EXECUTE_REQUEST);
-        requestTypeCombo.setWidth(120, UNITS_PIXELS);
+        requestTypeCombo.setWidth(150, UNITS_PIXELS);
         controls.addComponent(requestTypeCombo);
         Button clearBtn = new Button("Clear");
         controls.addComponent(clearBtn);
