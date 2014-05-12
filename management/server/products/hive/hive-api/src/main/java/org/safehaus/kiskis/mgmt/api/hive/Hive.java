@@ -6,7 +6,6 @@ import java.util.UUID;
 
 public interface Hive extends ApiBase<Config> {
 
-
     public UUID statusCheck(String clusterName, String hostname);
 
     public UUID startNode(String clusterName, String hostname);
@@ -18,5 +17,4 @@ public interface Hive extends ApiBase<Config> {
     public UUID addNode(String clusterName, String hostname);
 
     public UUID destroyNode(String clusterName, String hostname);
-
 }

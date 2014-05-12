@@ -1,13 +1,17 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class StartHandler extends AbstractHandler {
 
@@ -20,14 +24,14 @@ public class StartHandler extends AbstractHandler {
 
     public void run() {
         Config config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
                     clusterName));
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) {
+        if (agent == null) {
             po.addLogFailed(String.format("Node '%s' is not connected", hostname));
             return;
         }
@@ -35,7 +39,7 @@ public class StartHandler extends AbstractHandler {
         boolean ok = true;
 
         // if server node, start Derby first
-        if(agent.equals(config.getServer())) {
+        if (agent.equals(config.getServer())) {
             String s = Commands.make(CommandType.START, Product.DERBY);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60),
@@ -48,7 +52,7 @@ public class StartHandler extends AbstractHandler {
 
             ok = cmd.hasSucceeded();
         }
-        if(ok) {
+        if (ok) {
 
             String s = Commands.make(CommandType.START, Product.HIVE);
             Command cmd = manager.getCommandRunner().createCommand(
@@ -63,7 +67,7 @@ public class StartHandler extends AbstractHandler {
             ok = cmd.hasSucceeded();
         }
 
-        if(ok) po.addLogDone("Done");
+        if (ok) po.addLogDone("Done");
         else po.addLogFailed(null);
     }
 

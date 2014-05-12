@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.hive.services;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+
 //Maps for the `say` in the URL
 @Path("say")
 public interface RestService {
