@@ -5,7 +5,8 @@
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>mgmt-shared-parent</artifactId>
-        <version>2.0.0</version>
+        <relativePath>..</relativePath>
+        <version>${global.version}</version>
     </parent>
     <artifactId>mgmt-shared-protocol</artifactId>
     <name>Kiskis Management Shared Protocol</name>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.safehaus.kiskis.mgmt</groupId>
     <artifactId>mgmt-parent</artifactId>
-    <version>2.0.0</version>
+    <version>${global.version}</version>
 
     <name>Kiskis Management Server Project Parent</name>
 
@@ -57,6 +57,7 @@
 
     <properties>
 
+        <global.version>2.0.0</global.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <com.codahale.metrics.metrics-core.version>3.0.2</com.codahale.metrics.metrics-core.version>
@@ -945,6 +946,19 @@
                 <version>1.9.5</version>
             </dependency>
             <!--agent-manager-impl-->
+
+            <!--command-runner-impl-->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <!--command-runner-impl-->
         </dependencies>
     </dependencyManagement>
 
