@@ -972,6 +972,19 @@
                 <version>${javax.annotation.version}</version>
             </dependency>
             <!--command-runner-ui-->
+
+            <!--communication-manager-impl-->
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <!--communication-manager-impl-->
         </dependencies>
     </dependencyManagement>
 

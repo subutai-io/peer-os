@@ -63,8 +63,6 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.impl.agentmanager</Bundle-SymbolicName>
                         <Export-Package>
