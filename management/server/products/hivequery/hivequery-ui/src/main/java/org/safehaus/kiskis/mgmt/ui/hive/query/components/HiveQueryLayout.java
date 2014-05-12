@@ -51,9 +51,9 @@ public class HiveQueryLayout extends GridLayout {
         setComponentAlignment(descriptionTextArea, Alignment.MIDDLE_CENTER);
         descriptionTextArea.setSizeFull();
 
-        resultTextArea = new TextArea("Result");
+        /*resultTextArea = new TextArea("Result");
         addComponent(resultTextArea, 0, 8, 11, 11);
         setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
-        resultTextArea.setSizeFull();
+        resultTextArea.setSizeFull();*/
     }
 }
