@@ -29,8 +29,9 @@ public class HiveQueryLayout extends GridLayout {
         setComponentAlignment(table, Alignment.MIDDLE_CENTER);
 
         searchTextField = new TextField("Search");
-        addComponent(searchTextField, 6, 0, 11, 1);
+        addComponent(searchTextField, 6, 0, 11, 0);
         setComponentAlignment(searchTextField, Alignment.MIDDLE_CENTER);
+        searchTextField.setSizeFull();
 
         list = new QueryList();
         addComponent(list, 6, 1, 11, 3);
