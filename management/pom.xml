@@ -959,6 +959,19 @@
                 <version>1.5.0</version>
             </dependency>
             <!--command-runner-impl-->
+
+            <!--command-runner-ui-->
+            <dependency>
+                <groupId>org.eclipse.jetty.orbit</groupId>
+                <artifactId>javax.servlet</artifactId>
+                <version>${org.eclipse.jetty.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation.version}</version>
+            </dependency>
+            <!--command-runner-ui-->
         </dependencies>
     </dependencyManagement>
 

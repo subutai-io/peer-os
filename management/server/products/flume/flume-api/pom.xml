@@ -6,7 +6,8 @@
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>flume-parent</artifactId>
-        <version>2.0.0</version>
+        <relativePath>..</relativePath>
+        <version>${global.version}</version>
     </parent>
 
     <artifactId>flume-api</artifactId>
