@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.safehaus.kiskis.mgmt</groupId>
     <artifactId>mgmt-parent</artifactId>
-    <version>${global.version}</version>
+    <version>2.0.0</version>
 
     <name>Kiskis Management Server Project Parent</name>
 
@@ -61,8 +61,6 @@
     </repositories>
 
     <properties>
-
-        <global.version>2.0.0</global.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <com.codahale.metrics.metrics-core.version>3.0.2</com.codahale.metrics.metrics-core.version>
