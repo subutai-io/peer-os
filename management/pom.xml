@@ -247,11 +247,6 @@
                 <version>${xalan.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>${com.google.code.gson.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>net.jpountz.lz4</groupId>
                 <artifactId>lz4</artifactId>
                 <version>${net.jpountz.lz4.version}</version>
@@ -265,11 +260,6 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty</artifactId>
                 <version>${io.netty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.codahale.metrics</groupId>
-                <artifactId>metrics-core</artifactId>
-                <version>${com.codahale.metrics.metrics-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -295,11 +285,6 @@
                 <groupId>com.eaio.uuid</groupId>
                 <artifactId>uuid</artifactId>
                 <version>3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.datastax.cassandra</groupId>
-                <artifactId>cassandra-driver-core</artifactId>
-                <version>${com.datastax.cassandra.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cassandra</groupId>
