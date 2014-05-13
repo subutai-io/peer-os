@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "list-clusters", description = "Command to uninstall HBase cluster")
+@Command(scope = "hbase", name = "uninstall-cluster", description = "Command to uninstall HBase cluster")
 public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
 
     private HBase hbaseManager;

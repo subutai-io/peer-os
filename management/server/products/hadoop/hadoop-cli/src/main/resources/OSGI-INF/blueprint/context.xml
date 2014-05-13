@@ -21,5 +21,13 @@
         </command>
     </command-bundle>
 
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="hadoop/describe-cluster">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.DescribeClusterCommand">
+                <property name="hadoopManager" ref="hadoopManager"/>
+            </action>
+        </command>
+    </command-bundle>
+
 
 </blueprint>
