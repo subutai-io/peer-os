@@ -26,6 +26,6 @@
     <!-- 4 -->
     <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
     <!--<reference id="helloServiceBean"-->
-               <!--interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">-->
+    <!--interface="org.safehaus.kiskis.mgmt.rest.services.HelloService">-->
     <!--</reference>-->
 </blueprint>

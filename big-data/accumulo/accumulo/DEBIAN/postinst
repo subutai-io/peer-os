@@ -2,30 +2,6 @@
 set -e
 FilePath="/etc/profile"
 accumuloHomeEcho="/opt/accumulo-1.4.2"
-accumuloPath="\/opt\/accumulo-1.4.2\/bin"
-accumuloPathEcho=$accumuloHomeEcho"/bin"
-accumuloConf=$accumuloHomeEcho"/conf"
-
-if grep -q "ACCUMULO_HOME=" $FilePath
-then
-        echo "ACCUMULO_HOME is already added!"
-else
-        echo "ACCUMULO_HOME is being inserted"
-        echo "export ACCUMULO_HOME="$accumuloHomeEcho >> $FilePath
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        if grep -q "${accumuloPath}" $FilePath
-        then
-                echo "ACCUMULO is already inserted to PATH!!!"
-        else
-                echo "ACCUMULO is being insterted to PATH!"
-                sed -i "s/export PATH=/export PATH=$accumuloPath:/1" $FilePath
-        fi
-else
-        echo "export PATH=$PATH:$accumuloPathEcho" >> "${FilePath}"
-fi
 
 if [ "x$JAVA_HOME" = "x" ];
 then

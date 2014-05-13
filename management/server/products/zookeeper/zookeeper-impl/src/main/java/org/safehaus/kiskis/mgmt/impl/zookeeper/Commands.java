@@ -21,6 +21,12 @@ import java.util.Set;
  */
 public class Commands extends CommandsSingleton {
 
+    public static Command getCheckInstalledCommand(Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder("dpkg -l | grep '^ii' | grep ksks"),
+                agents);
+    }
+
     public static Command getInstallCommand(Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder("sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper")

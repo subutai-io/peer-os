@@ -5,17 +5,28 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
     private final Config config;
+    private final ProductOperation po;
 
     public InstallHandler(HiveImpl manager, Config config) {
-        super(manager, config.getClusterName(),
-                "Installing cluster " + config.getClusterName());
+        super(manager, config.getClusterName());
         this.config = config;
+        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                "Installing cluster " + config.getClusterName());
+    }
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     public void run() {
@@ -130,9 +141,8 @@ public class InstallHandler extends AbstractHandler {
                     if(isZero(res.getExitCode())) {
                         readyClients.add(a);
                         po.addLog("Hive successfully installed on " + a.getHostname());
-                    } else {
+                    } else
                         po.addLog("Failed to install Hive on " + a.getHostname());
-                    }
                 }
                 if(readyClients.size() > 0) {
                     s = Commands.configureClient(config.getServer());
@@ -151,13 +161,11 @@ public class InstallHandler extends AbstractHandler {
                     }
                     po.addLogDone("Done");
                 }
-            } else {
+            } else
                 po.addLogFailed("Failed to install client(s): "
                         + cmd.getAllErrors());
-            }
-        } else {
+        } else
             po.addLogFailed("Failed to save cluster info.\nInstallation aborted");
-        }
     }
 
 }

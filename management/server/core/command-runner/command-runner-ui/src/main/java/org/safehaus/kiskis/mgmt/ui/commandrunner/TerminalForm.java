@@ -75,9 +75,10 @@ public class TerminalForm extends CustomComponent implements Disposable {
         Label timeoutLbl = new Label("Timeout");
         final TextField timeoutTxtFld = new TextField();
         timeoutTxtFld.setValue("30");
+        timeoutTxtFld.setWidth(30, UNITS_PIXELS);
         controls.addComponent(timeoutLbl);
         controls.addComponent(timeoutTxtFld);
-        Label requestTypeLabel = new Label("Request Type");
+        Label requestTypeLabel = new Label("Req Type");
         controls.addComponent(requestTypeLabel);
         final ComboBox requestTypeCombo = new ComboBox(null, Arrays.asList(RequestType.EXECUTE_REQUEST, RequestType.TERMINATE_REQUEST, RequestType.PS_REQUEST));
         requestTypeCombo.setMultiSelect(false);
@@ -85,6 +86,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
         requestTypeCombo.setTextInputAllowed(false);
         requestTypeCombo.setNullSelectionAllowed(false);
         requestTypeCombo.setValue(RequestType.EXECUTE_REQUEST);
+        requestTypeCombo.setWidth(150, UNITS_PIXELS);
         controls.addComponent(requestTypeCombo);
         Button clearBtn = new Button("Clear");
         controls.addComponent(clearBtn);

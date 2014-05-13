@@ -2,20 +2,33 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StopHandler extends AbstractHandler {
 
     private final String hostname;
+    private final ProductOperation po;
 
     public StopHandler(HiveImpl manager, String clusterName, String hostname) {
-        super(manager, clusterName, "Stop node " + hostname);
+        super(manager, clusterName);
         this.hostname = hostname;
+        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                "Stop node " + hostname);
+    }
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     public void run() {

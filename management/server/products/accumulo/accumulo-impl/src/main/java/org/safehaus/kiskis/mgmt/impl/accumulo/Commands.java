@@ -67,13 +67,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getAddMasterCommand(Set<Agent> nodes, Agent masterNode) {
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh masters add %s", masterNode.getHostname())),
-                nodes);
-    }
-
-    public static Command getClearMasterCommand(Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(". /etc/profile && accumuloMastersConf.sh masters clear"),
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh masters clear && accumuloMastersConf.sh masters add %s", masterNode.getHostname())),
                 nodes);
     }
 
@@ -83,7 +77,7 @@ public class Commands extends CommandsSingleton {
             tracersSpaceSeparated.append(tracer.getHostname()).append(" ");
         }
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh tracers add %s", tracersSpaceSeparated)),
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh tracers clear && accumuloMastersConf.sh tracers add %s", tracersSpaceSeparated)),
                 nodes);
     }
 
@@ -93,34 +87,15 @@ public class Commands extends CommandsSingleton {
                 nodes);
     }
 
-    public static Command getClearTracersCommand(Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(". /etc/profile && accumuloMastersConf.sh tracers clear"),
-                nodes);
-    }
-
     public static Command getAddGCCommand(Set<Agent> nodes, Agent gcNode) {
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh gc add %s", gcNode.getHostname())),
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh gc clear && accumuloMastersConf.sh gc add %s", gcNode.getHostname())),
                 nodes);
     }
-
-    public static Command getClearGCCommand(Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(". /etc/profile && accumuloMastersConf.sh gc clear"),
-                nodes);
-    }
-
 
     public static Command getAddMonitorCommand(Set<Agent> nodes, Agent monitor) {
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh monitor add %s", monitor.getHostname())),
-                nodes);
-    }
-
-    public static Command getClearMonitorCommand(Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(". /etc/profile && accumuloMastersConf.sh monitor clear"),
+                new RequestBuilder(String.format(". /etc/profile && accumuloMastersConf.sh monitor clear && accumuloMastersConf.sh monitor add %s", monitor.getHostname())),
                 nodes);
     }
 
@@ -130,19 +105,13 @@ public class Commands extends CommandsSingleton {
             slavesSpaceSeparated.append(tracer.getHostname()).append(" ");
         }
         return createCommand(
-                new RequestBuilder(String.format(". /etc/profile && accumuloSlavesConf.sh slaves add %s", slavesSpaceSeparated)),
+                new RequestBuilder(String.format(". /etc/profile && accumuloSlavesConf.sh slaves clear && accumuloSlavesConf.sh slaves add %s", slavesSpaceSeparated)),
                 nodes);
     }
 
     public static Command getClearSlaveCommand(Set<Agent> nodes, Agent slaveNode) {
         return createCommand(
                 new RequestBuilder(String.format(". /etc/profile && accumuloSlavesConf.sh slaves clear %s", slaveNode.getHostname())),
-                nodes);
-    }
-
-    public static Command getClearSlavesCommand(Set<Agent> nodes) {
-        return createCommand(
-                new RequestBuilder(". /etc/profile && accumuloSlavesConf.sh slaves clear"),
                 nodes);
     }
 
@@ -155,7 +124,8 @@ public class Commands extends CommandsSingleton {
         zkNodesCommaSeparated.delete(zkNodesCommaSeparated.length() - 1, zkNodesCommaSeparated.length());
         return createCommand(
                 new RequestBuilder(
-                        String.format(". /etc/profile && accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host %s",
+                        String.format(
+                                ". /etc/profile && accumulo-conf.sh remove accumulo-site.xml instance.zookeeper.host && accumulo-conf.sh add accumulo-site.xml instance.zookeeper.host %s",
                                 zkNodesCommaSeparated)
                 ),
                 nodes

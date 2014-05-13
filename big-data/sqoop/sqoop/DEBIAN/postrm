@@ -7,25 +7,8 @@ fi
 
 #Remove paths and exports from relevant files
 FilePath="/etc/profile"
-sqoopHome="\/opt\/sqoop-1.4.3"
-hadoopHome="\/opt\/hadoop-1.2.1"
-sqoopPath="\/opt\/sqoop-1.4.3\/bin"
 
-if grep -q "SQOOP_HOME=" $FilePath
-then
-        echo "SQOOP_HOME is being deleted!"
-        sed -i "/export SQOOP_HOME=$sqoopHome/d" $FilePath
-	sed -i "/export HADOOP_COMMON_HOME=$hadoopHome/d" $FilePath
-	sed -i "/export HADOOP_MAPRED_HOME=$hadoopHome/d" $FilePath
+if [ -f "/etc/profile.d/sqoop-home.sh" ]; then
+	rm /etc/profile.d/sqoop-home.sh
 fi
-
-if grep -q "export PATH=" $FilePath
-then
-        if grep -q "${sqoopPath}" $FilePath
-        then
-                sed -i "s/$sqoopPath://g" $FilePath
-                sed -i "s/:$sqoopPath//g" $FilePath
-        fi
-fi
-
 . $FilePath

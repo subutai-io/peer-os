@@ -21,6 +21,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -159,25 +160,48 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Confirm adding node",
-                            String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
+                    if (config.isStandalone()) {
+                        MgmtApplication.showConfirmationDialog(
+                                "Confirm adding node",
+                                String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
+                                "Yes", "No", new ConfirmationDialogCallback() {
 
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+                                    @Override
+                                    public void response(boolean ok) {
+                                        if (ok) {
+                                            UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
+                                            MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
+                                                public void windowClose(Window.CloseEvent e) {
+                                                    refreshClustersInfo();
+                                                }
+                                            });
+                                        }
                                     }
                                 }
+                        );
+                    } else {
+                        org.safehaus.kiskis.mgmt.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
+
+                        if (info != null) {
+                            Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
+                            nodes.removeAll(config.getNodes());
+                            if (!nodes.isEmpty()) {
+                                AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                                MgmtApplication.addCustomWindow(addNodeWindow);
+                                addNodeWindow.addListener(new Window.CloseListener() {
+
+                                    public void windowClose(Window.CloseEvent e) {
+                                        refreshClustersInfo();
+                                    }
+                                });
+                            } else {
+                                show("All nodes in corresponding Hadoop cluster have Zookeeper installed");
                             }
-                    );
+                        } else {
+                            show("Hadoop cluster info not found");
+                        }
+                    }
                 } else {
                     show("Please, select cluster");
                 }

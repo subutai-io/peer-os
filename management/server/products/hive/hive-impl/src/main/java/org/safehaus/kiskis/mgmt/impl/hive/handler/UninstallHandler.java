@@ -2,17 +2,31 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractHandler {
 
+    private final ProductOperation po;
+
     public UninstallHandler(HiveImpl manager, String clusterName) {
-        super(manager, clusterName, "Uninstalling cluster " + clusterName);
+        super(manager, clusterName);
+        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                "Uninstalling cluster " + clusterName);
+    }
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     public void run() {
@@ -41,7 +55,7 @@ public class UninstallHandler extends AbstractHandler {
                 config.getClients());
         manager.getCommandRunner().runCommand(cmd);
 
-        if(cmd.hasCompleted()) {
+        if(cmd.hasCompleted())
             for(Agent agent : config.getClients()) {
                 AgentResult res = cmd.getResults().get(agent.getUuid());
                 if(isZero(res.getExitCode()))
@@ -50,8 +64,7 @@ public class UninstallHandler extends AbstractHandler {
                     po.addLogFailed(String.format("Failed to remove Hive on '%s': %s",
                             agent.getHostname(), res.getStdErr()));
             }
-
-        } else {
+        else {
             po.addLogFailed("Failed to remove client(s): " + cmd.getAllErrors());
             return;
         }
@@ -63,9 +76,9 @@ public class UninstallHandler extends AbstractHandler {
                     new HashSet<Agent>(Arrays.asList(config.getServer())));
             manager.getCommandRunner().runCommand(cmd);
 
-            if(cmd.hasSucceeded()) {
+            if(cmd.hasSucceeded())
                 po.addLog(p + " removed from server node");
-            } else {
+            else {
                 po.addLogFailed("Failed to remove Hive from server");
                 return;
             }

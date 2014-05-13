@@ -7,22 +7,9 @@ fi
 
 #Remove paths and exports from relevant files
 FilePath="/etc/profile"
-nutchHome="\/opt\/nutch-1.5"
-nutchPath="\/opt\/nutch-1.5\/bin"
 
-if grep -q "NUTCH_HOME=" $FilePath
-then
-        echo "NUTCH_HOME is being deleted!"
-        sed -i "/export NUTCH_HOME=$nutchHome/d" $FilePath
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        if grep -q "${nutchPath}" $FilePath
-        then
-                sed -i "s/$nutchPath://g" $FilePath
-                sed -i "s/:$nutchPath//g" $FilePath
-        fi
+if [ -f "/etc/profile.d/nutch-home.sh" ]; then
+        rm -r /etc/profile.d/nutch-home.sh
 fi
 
 . $FilePath

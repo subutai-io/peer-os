@@ -2,13 +2,11 @@
 
 # Exit on error
 set -e
-temp=$JAVA_HOME
-JAVA_HOME=$JAVA_HOME
-export JAVA_HOME=$temp
+. /etc/profile
+export JAVA_HOME=$JAVA_HOME
 
 #Install ZeroMQ(Storm Native Dependency)
 tar -xpzf /opt/zeromq-2.1.7.tar.gz -C /opt
-#rm -rf /opt/zeromq-2.1.7.tar.gz
 cd /opt/zeromq-2.1.7
 ./configure
 make
@@ -16,7 +14,6 @@ make install
 
 # Install JZMQ(Storm Native Dependency)
 tar -xpzf /opt/jzmq.tar.gz -C /opt
-#rm -rf /opt/jzmq.tar.gz
 cd /opt/jzmq
 ./autogen.sh
 ./configure
@@ -29,7 +26,6 @@ make install
 
 #Install Storm
 tar -xpzf /opt/storm-0.8.2.tar.gz -C /opt
-#rm -rf /opt/storm-0.8.2.tar.gz
 # Create Storm related folders into "/var" directory
 if [ -d "/var/stormtmp" ]; then
         echo "/var/stormtmp exists!"
@@ -38,38 +34,6 @@ else
 	mkdir /var/stormtmp
 fi
 
-FilePath="/etc/profile"
-stormHomeEcho="/opt/storm-0.8.2"
-stormPath="\/opt\/storm-0.8.2\/bin"
-stormPathEcho=$stormHomeEcho"/bin"
-
-# Add storm home       
-if grep -q "STORM_HOME" $FilePath
-then
-    echo "STORM_HOME is already added!"
-else
-        echo "Storm path is being inserted"
-        # Add Storm Install Path to the /etc/profile file
-	echo "STORM_HOME="$stormHomeEcho >> $FilePath
-fi
-
-# Add storm bin directory to the path
-if grep -q "export PATH=" $FilePath
-then
-        echo "Path is previously insterted to" $FilePath
-        if grep -q "${stormPath}" $FilePath
-        then
-                echo "Storm path is already inserted!!!"
-        else
-                echo "Storm path is being insterted!"
-                sed -i "s/export PATH=/export PATH=$stormPath:/1" $FilePath
-        fi
-else
-        echo "PATH is being inserted for the first time"
-        echo "export PATH=$PATH:$stormPathEcho" >> "${FilePath}"
-fi
-
 rm -rf /opt/zeromq-2.1.7.tar.gz
 rm -rf /opt/jzmq.tar.gz
 rm -rf /opt/storm-0.8.2.tar.gz
-. $FilePath

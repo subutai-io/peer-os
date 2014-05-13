@@ -3,6 +3,8 @@
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
@@ -16,6 +18,7 @@
         <property name="tracker" ref="tracker"/>
         <property name="dbManager" ref="dbManager"/>
         <property name="commandRunner" ref="commandRunner"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
     <service ref="hbase-impl" interface="org.safehaus.kiskis.mgmt.api.hbase.HBase"/>

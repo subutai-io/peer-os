@@ -6,14 +6,14 @@
 package org.safehaus.kiskis.mgmt.server.ui.services;
 
 import java.util.Queue;
+import java.util.SortedSet;
 
 /**
- *
  * @author dilshat
  */
 public interface ModuleNotifier {
 
-    public Queue<Module> getModules();
+    public SortedSet<Module> getModules();
 
     public Queue<ModuleServiceListener> getListeners();
 

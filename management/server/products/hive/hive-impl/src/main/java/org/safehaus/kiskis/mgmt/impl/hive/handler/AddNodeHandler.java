@@ -3,20 +3,33 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
+import org.safehaus.kiskis.mgmt.impl.hive.Commands;
+import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
+import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class AddNodeHandler extends AbstractHandler {
 
     private final String hostname;
+    private final ProductOperation po;
 
     public AddNodeHandler(HiveImpl manager, String clusterName, String hostname) {
-        super(manager, clusterName, "Add node to cluster: " + hostname);
+        super(manager, clusterName);
         this.hostname = hostname;
+        this.po = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Add node to cluster: " + hostname);
+    }
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     public void run() {
@@ -43,9 +56,8 @@ public class AddNodeHandler extends AbstractHandler {
         }
         AgentResult res = cmd.getResults().get(agent.getUuid());
         boolean skipInstall;
-        if(skipInstall = res.getStdOut().contains(Product.HIVE.getPackageName())) {
+        if(skipInstall = res.getStdOut().contains(Product.HIVE.getPackageName()))
             po.addLog("Hive already installed on " + hostname);
-        }
 
         config.getClients().add(agent);
 
@@ -63,12 +75,11 @@ public class AddNodeHandler extends AbstractHandler {
                         new RequestBuilder(s), set);
                 manager.getCommandRunner().runCommand(cmd);
                 installed = cmd.hasSucceeded();
-                if(installed) {
+                if(installed)
                     po.addLog(String.format("Hive successfully installed on '%s'",
                             hostname));
-                } else {
+                else
                     po.addLog("Failed to add node: " + cmd.getAllErrors());
-                }
             }
 
             if(skipInstall || installed) {
@@ -91,9 +102,8 @@ public class AddNodeHandler extends AbstractHandler {
             if(installed) po.addLogDone("Done");
             else po.addLogFailed(null);
 
-        } else {
+        } else
             po.addLogFailed("Failed to update cluster info");
-        }
 
     }
 

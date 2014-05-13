@@ -11,31 +11,6 @@ hiveHomeEcho="/opt/hive-0.11.0-bin"
 hivePath="\/opt\/hive-0.11.0-bin\/bin"
 hivePathEcho=$hiveHomeEcho"/bin"
 
-# Add hive home       
-if grep -q "HIVE_HOME" $FilePath
-then
-    echo "HIVE_HOME is already added!"
-else
-        echo "Hive path is being inserted"
-        # Add Hive Install Path to the /etc/profile file
-	echo "HIVE_HOME="$hiveHomeEcho >> $FilePath
-fi
-
-# Add hive bin directory to the path
-if grep -q "export PATH=" $FilePath
-then
-        echo "Path is previously insterted to" $FilePath
-        if grep -q "${hivePath}" $FilePath
-        then
-                echo "Hive path is already inserted!!!"
-        else
-                echo "Hive path is being insterted!"
-                sed -i "s/export PATH=/export PATH=$hivePath:/1" $FilePath
-        fi
-else
-        echo "PATH is being inserted for the first time"
-        echo "export PATH=$PATH:$hivePathEcho" >> "${FilePath}"
-fi
 . $FilePath
 
 #hadoop dfsadmin -safemode leave        
