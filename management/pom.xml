@@ -4,11 +4,18 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.safehaus.kiskis.mgmt</groupId>
     <artifactId>mgmt-parent</artifactId>
-    <version>2.0.0</version>
+    <version>${global.version}</version>
 
     <name>Kiskis Management Server Project Parent</name>
 
     <packaging>pom</packaging>
+
+    <modules>
+        <module>shared</module>
+        <module>server</module>
+    </modules>
+
+    <description>Parent project for the Kiskis Management Project Artifacts</description>
 
     <repositories>
         <repository>
@@ -50,6 +57,7 @@
 
     <properties>
 
+        <global.version>2.0.0</global.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <com.codahale.metrics.metrics-core.version>3.0.2</com.codahale.metrics.metrics-core.version>
@@ -92,11 +100,927 @@
         <xalan.version>2.7.1</xalan.version>
     </properties>
 
-    <modules>
-        <module>shared</module>
-        <module>server</module>
-    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <!--Shared-->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${org.osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${com.google.code.gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.doomdark</groupId>
+                <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+                <version>${org.doomdark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.datastax.cassandra</groupId>
+                <artifactId>cassandra-driver-core</artifactId>
+                <version>${com.datastax.cassandra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cassandra</groupId>
+                <artifactId>cassandra-all</artifactId>
+                <version>${org.apache.cassandra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.jpountz.lz4</groupId>
+                <artifactId>lz4</artifactId>
+                <version>${net.jpountz.lz4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>${io.netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.codahale.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${com.codahale.metrics.metrics-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xerial.snappy</groupId>
+                <artifactId>snappy-java</artifactId>
+                <version>${org.xerial.snappy.version}</version>
+            </dependency>
+            <!--shared-->
 
-    <description>Parent project for the Kiskis Management Project Artifacts</description>
+            <!--karaf-->
+            <dependency>
+                <groupId>org.doomdark</groupId>
+                <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+                <version>${org.doomdark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.orbit</groupId>
+                <artifactId>javax.servlet</artifactId>
+                <version>${org.eclipse.jetty.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${org.elasticsearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin</artifactId>
+                <version>${com.vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-all</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-pool</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-jms-pool</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>${commons-pool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-jaas</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons-net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jms_1.1_spec</artifactId>
+                <version>${org.apache.geronimo.specs.jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-ejb_3.0_spec</artifactId>
+                <version>${org.apache.geronimo.specs.ejb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jpa_2.0_spec</artifactId>
+                <version>${org.apache.geronimo.specs.jpa.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jmdns</groupId>
+                <artifactId>jmdns</artifactId>
+                <version>${javax.jmdns.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xalan</groupId>
+                <artifactId>xalan</artifactId>
+                <version>${xalan.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${com.google.code.gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.jpountz.lz4</groupId>
+                <artifactId>lz4</artifactId>
+                <version>${net.jpountz.lz4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${com.google.guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>${io.netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.codahale.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${com.codahale.metrics.metrics-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${org.codehaus.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${org.apache.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.eaio.uuid</groupId>
+                <artifactId>uuid</artifactId>
+                <version>3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.datastax.cassandra</groupId>
+                <artifactId>cassandra-driver-core</artifactId>
+                <version>${com.datastax.cassandra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cassandra</groupId>
+                <artifactId>cassandra-all</artifactId>
+                <version>${org.apache.cassandra.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cassandra</groupId>
+                <artifactId>cassandra-thrift</artifactId>
+                <version>${org.apache.cassandra.version}</version>
+            </dependency>
+
+            <!-- Vaadin - START -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>ui-vaadin-bridge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>ui-vaadin-services</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>ui-vaadin-theme</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>ui-vaadin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Vaadin - END -->
+
+            <!-- Core Modules - START -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mgmt-shared-protocol</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Tracker -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>tracker-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>tracker-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>tracker-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Command Runner -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>command-runner-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>command-runner-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>command-runner-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Agent Manager -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>agent-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>agent-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- DB Manager -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>db-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>db-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Communication Manager -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>communication-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>communication-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- LXC Manager -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lxc-manager-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lxc-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lxc-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!--Network Manager -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>network-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>network-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Monitor -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>monitor-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>monitor-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>monitor-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Core Modules - END -->
+
+            <!-- Products Modules - START -->
+
+            <!-- Accumulo -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>accumulo-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>accumulo-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>accumulo-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>accumulo-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>accumulo-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Presto -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>presto-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>presto-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>presto-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>presto-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>presto-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Shark -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>shark-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>shark-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>shark-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>shark-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>shark-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Spark -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>spark-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>spark-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>spark-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>spark-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>spark-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- MongoDB -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mongodb-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mongodb-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mongodb-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mongodb-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mongodb-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Lucene -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lucene-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lucene-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lucene-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lucene-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>lucene-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Pig -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>pig-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>pig-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>pig-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>pig-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>pig-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Mahout -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mahout-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mahout-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mahout-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mahout-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>mahout-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Solr -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>solr-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>solr-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>solr-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>solr-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>solr-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Zookeeper -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>zookeeper-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>zookeeper-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>zookeeper-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>zookeeper-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>zookeeper-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- HBase -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hbase-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hbase-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hbase-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hbase-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hbase-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Cassandra -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>cassandra-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>cassandra-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>cassandra-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>cassandra-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>cassandra-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Oozie -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>oozie-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>oozie-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>oozie-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>oozie-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>oozie-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Flume -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>flume-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>flume-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>flume-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>flume-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>flume-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Hive -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hive-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hive-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hive-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hive-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hive-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Hive Query-->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hivequery-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hivequery-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hivequery-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hivequery-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Sqoop -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>sqoop-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>sqoop-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>sqoop-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>sqoop-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>sqoop-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Hadoop -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hadoop-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hadoop-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hadoop-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hadoop-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>hadoop-rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- Products Modules - END -->
+            <!--karaf-->
+
+            <!--agent-manager-impl-->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+            </dependency>
+            <!--agent-manager-impl-->
+
+            <!--command-runner-impl-->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>1.5.0</version>
+            </dependency>
+            <!--command-runner-impl-->
+
+            <!--command-runner-ui-->
+            <dependency>
+                <groupId>org.eclipse.jetty.orbit</groupId>
+                <artifactId>javax.servlet</artifactId>
+                <version>${org.eclipse.jetty.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation.version}</version>
+            </dependency>
+            <!--command-runner-ui-->
+
+            <!--communication-manager-impl-->
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <!--communication-manager-impl-->
+
+            <!--db-manager-impl-->
+            <dependency>
+                <groupId>org.cassandraunit</groupId>
+                <artifactId>cassandra-unit</artifactId>
+                <version>2.0.2.1</version>
+            </dependency>
+            <!--db-manager-impl-->
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${org.apache.maven.plugins.version}</version>
+                    <configuration>
+                        <source>${maven-antrun-plugin.version}</source>
+                        <target>${maven-antrun-plugin.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>${org.apache.felix.version}</version>
+                    <inherited>true</inherited>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <manifestLocation>META-INF</manifestLocation>
+                        <unpackBundle>true</unpackBundle>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
 

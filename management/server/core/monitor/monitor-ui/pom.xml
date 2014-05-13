@@ -7,7 +7,8 @@
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>monitor-parent</artifactId>
-        <version>2.0.0</version>
+        <relativePath>..</relativePath>
+        <version>${global.version}</version>
     </parent>
 
     <artifactId>monitor-ui</artifactId>
