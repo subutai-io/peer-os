@@ -19,8 +19,16 @@ public class Config implements ConfigBase {
     private String clusterName = "";
     private String zkName = "";
     private int numberOfNodes = 3;
-
     private Set<Agent> nodes;
+    private boolean isStandalone;
+
+    public boolean isStandalone() {
+        return isStandalone;
+    }
+
+    public void setStandalone(boolean isStandalone) {
+        this.isStandalone = isStandalone;
+    }
 
     public String getZkName() {
         return zkName;
@@ -61,7 +69,12 @@ public class Config implements ConfigBase {
 
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", zkName=" + zkName + ", numberOfNodes=" + numberOfNodes + ", nodes=" + nodes + '}';
+        return "Config{" +
+                "clusterName='" + clusterName + '\'' +
+                ", zkName='" + zkName + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", nodes=" + nodes +
+                ", isStandalone=" + isStandalone +
+                '}';
     }
-
 }

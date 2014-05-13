@@ -8,12 +8,15 @@
                interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="tracker"/>
         <argument ref="manager"/>
+        <argument ref="hadoopManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>

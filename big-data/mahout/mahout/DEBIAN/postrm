@@ -7,31 +7,3 @@ set -e
 if [ -d "/opt/mahout" ]; then
 	rm -r /opt/mahout
 fi
-
-#Remove paths and exports from relevant files
-FilePath="/etc/profile"
-mahoutHome="\/opt\/mahout"
-mahoutPath="\/opt\/mahout\/bin"
-
-if grep -q "MAHOUT_HOME=" $FilePath
-then
-        echo "mahout home is being deleted!"
-        sed -i "/MAHOUT_HOME=$mahoutHome/d" $FilePath
-else
-        echo "mahout home does not exist"
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        echo "Path is previously insterted to" $FilePath
-        if grep -q "${mahoutPath}" $FilePath
-        then
-                echo "Mahout path is being deleted from path!"
-                sed -i "s/$mahoutPath://g" $FilePath
-                sed -i "s/:$mahoutPath//g" $FilePath
-        else
-                echo "Mahout path does not exist on path"
-        fi
-else
-        echo "PATH does not exist"
-fi

@@ -22,6 +22,8 @@ public interface Zookeeper extends ApiBase<Config> {
 
     public UUID addNode(String clusterName);
 
+    public UUID addNode(String clusterName, String lxcHostname);
+
     public UUID destroyNode(String clusterName, String lxcHostname);
 
     public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue);

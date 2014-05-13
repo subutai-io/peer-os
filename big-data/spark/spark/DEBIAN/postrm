@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+sparkVer="spark-0.9.1"
+
+FilePath="/etc/profile"
+
+# Remove Spark Files and Folders
+if [ -d "/opt/$sparkVer" ]; then
+	rm -r /opt/$sparkVer
+fi
+
+if [ -f "/etc/profile.d/spark-home.sh" ]; then
+	rm /etc/profile.d/spark-home.sh
+fi
+
+if [ -f "/etc/init.d/spark" ]; 
+then 
+	rm /etc/init.d/spark
+fi
+
+# Delete spark.pid file from /var/run/spark/spark.pid
+sudo rm -rf /var/run/spark
+
+. $FilePath

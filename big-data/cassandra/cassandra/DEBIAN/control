@@ -1,0 +1,8 @@
+Package: ksks-cassandra
+Priority: optional
+Section: devel
+Installed-Size: 100
+Maintainer: kiskis
+Architecture: amd64 
+Version: 1.2.8
+Description: This is a cassandra package of kiskis distribution.

@@ -474,6 +474,11 @@
                                     <artifactId>agent-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>agent-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- DB Manager -->
                                 <artifactItem>

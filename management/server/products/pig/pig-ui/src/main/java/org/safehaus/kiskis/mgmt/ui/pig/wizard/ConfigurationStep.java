@@ -28,7 +28,7 @@ public class ConfigurationStep extends Panel {
 
         setSizeFull();
 
-        GridLayout content = new GridLayout(1, 2);
+        GridLayout content = new GridLayout(1, 3);
         content.setSizeFull();
         content.setSpacing(true);
         content.setMargin(true);

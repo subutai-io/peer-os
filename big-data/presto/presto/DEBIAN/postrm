@@ -7,3 +7,7 @@ presto="presto-server-$prestoVer"
 if [ -d "/opt/$presto/" ]; then
 	rm -r /opt/$presto/
 fi
+
+if [ -f "/etc/profile.d/presto-home.sh" ]; then
+	rm /etc/profile/presto-home.sh
+fi

@@ -1,0 +1,8 @@
+Package: ksks-shark
+Priority: optional
+Section: devel
+Installed-Size: 100
+Maintainer: kiskis
+Architecture: amd64 
+Version: 1.0.1
+Description: This is a shark package of kiskis distribution.

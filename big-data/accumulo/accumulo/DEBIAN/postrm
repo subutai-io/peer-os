@@ -7,22 +7,9 @@ fi
 
 #Remove paths and exports from relevant files
 FilePath="/etc/profile"
-accumuloHome="\/opt\/accumulo-1.4.2"
-accumuloPath="\/opt\/accumulo-1.4.2\/bin"
 
-if grep -q "ACCUMULO_HOME=" $FilePath
-then
-        echo "ACCUMULO_HOME is being deleted!"
-        sed -i "/export ACCUMULO_HOME=$accumuloHome/d" $FilePath
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-	if grep -q "${accumuloPath}" $FilePath
-	then
-		sed -i "s/$accumuloPath://g" $FilePath
-		sed -i "s/:$accumuloPath//g" $FilePath
-	fi
+if [ -f "/etc/profile.d/accumulo-home.sh" ]; then
+	rm /etc/profile.d/accumulo-home.sh
 fi
 
 . $FilePath

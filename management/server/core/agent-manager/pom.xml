@@ -18,5 +18,6 @@
     <modules>
         <module>agent-manager-api</module>
         <module>agent-manager-impl</module>
+        <module>agent-manager-cli</module>
     </modules>
 </project>
