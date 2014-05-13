@@ -6,7 +6,7 @@
     <parent>
         <artifactId>storm-parent</artifactId>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <version>2.0.0</version>
+        <version>${global.version}</version>
     </parent>
 
     <artifactId>storm-ui</artifactId>
