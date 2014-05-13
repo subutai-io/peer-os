@@ -94,10 +94,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = manager.getZkManager().getCluster(config.getZkClusterName());
+        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = manager.getZkManager().getCluster(config.getClusterName());
 
         if (zkConfig == null) {
-            po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getZkClusterName()));
+            po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getClusterName()));
             return;
         }
 
