@@ -39,7 +39,6 @@ public class GetAgentByHostnameCommand extends OsgiCommandSupport {
         sb.append("Transport ID: ").append(agent.getTransportId()).append("\n");
         sb.append("UUID: ").append(agent.getUuid()).append("\n");
         System.out.println(sb.toString());
-        System.out.println("get-agent-by-hostname command executed");
         return null;
     }
 }
