@@ -5,18 +5,15 @@
  */
 package org.safehaus.kiskis.mgmt.ui.zookeeper.wizard;
 
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import java.util.UUID;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;
 
+import java.util.UUID;
+
 /**
- *
  * @author dilshat
  */
 public class VerificationStep extends Panel {
@@ -37,7 +34,13 @@ public class VerificationStep extends Panel {
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
         cfgView.addStringCfg("ZK Name", wizard.getConfig().getZkName());
-        cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
+        if (wizard.getConfig().isStandalone()) {
+            cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
+        } else {
+            for (Agent node : wizard.getConfig().getNodes()) {
+                cfgView.addStringCfg("Nodes to install", node.getHostname());
+            }
+        }
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
