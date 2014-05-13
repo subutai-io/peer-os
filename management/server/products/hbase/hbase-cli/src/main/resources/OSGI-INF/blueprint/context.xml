@@ -29,7 +29,7 @@
     </command-bundle>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="hbase/delete-cluster">
+        <command name="hbase/uninstall-cluster">
             <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallHBaseClusterCommand">
                 <property name="hbaseManager" ref="hbaseManager"/>
             </action>
