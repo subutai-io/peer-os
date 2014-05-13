@@ -1,10 +1,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="shark/list-clusters">
-        <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
-        </action>
-    </command>
-</command-bundle>
+    <reference id="sharkManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.shark.Shark"/>
+
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="shark/list-clusters">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+                <property name="sharkManager" ref="sharkManager"/>
+            </action>
+        </command>
+    </command-bundle>
+
 </blueprint>

@@ -2,6 +2,10 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.kiskis.mgmt.api.mongodb.Config;
+import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
+
+import java.util.List;
 
 
 /**
@@ -10,8 +14,24 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "mongodb", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
+    private Mongo mongoManager;
+
+    public Mongo getMongoManager() {
+        return mongoManager;
+    }
+
+    public void setMongoManager(Mongo mongoManager) {
+        this.mongoManager = mongoManager;
+    }
+
     protected Object doExecute() {
-        System.out.println("list clusters command executed");
+        List<Config> configList = mongoManager.getClusters();
+        if (!configList.isEmpty())
+            for (Config config : configList) {
+                System.out.println(config.getClusterName());
+            }
+        else System.out.println("No Mongo cluster");
+
         return null;
     }
 }

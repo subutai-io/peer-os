@@ -3,24 +3,23 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
-import org.safehaus.kiskis.mgmt.api.cassandra.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
-import java.util.List;
 import java.util.UUID;
 
 
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
-public class UninstallClusterCommand extends OsgiCommandSupport {
+@Command(scope = "hbase", name = "list-clusters", description = "mydescription")
+public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
 
-    private  Cassandra cassandraManager;
-    private  Tracker tracker;
+    private HBase hbaseManager;
+    private Tracker tracker;
 
     public Tracker getTracker() {
         return tracker;
@@ -30,20 +29,21 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         this.tracker = tracker;
     }
 
-    public void setCassandraManager(Cassandra cassandraManager) {
-        this.cassandraManager = cassandraManager;
+    public HBase getHbaseManager() {
+        return hbaseManager;
     }
 
-    public  Cassandra getCassandraManager() {
-        return cassandraManager;
+    public void setHbaseManager(HBase hbaseManager) {
+        this.hbaseManager = hbaseManager;
     }
 
-
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
-    String clusterName= null;
+    @Argument(index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster")
+    String clusterName;
 
     protected Object doExecute() {
-        UUID uuid = cassandraManager.uninstallCluster(clusterName);
+
+        UUID uuid = hbaseManager.uninstallCluster(clusterName);
+
         int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
@@ -67,5 +67,6 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
             }
         }
         return null;
+
     }
 }

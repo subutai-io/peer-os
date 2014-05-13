@@ -6,7 +6,8 @@
     <parent>
         <artifactId>network-manager-parent</artifactId>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <version>2.0.0</version>
+        <relativePath>..</relativePath>
+        <version>${global.version}</version>
     </parent>
 
     <artifactId>network-manager-api</artifactId>
