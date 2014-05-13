@@ -1,10 +1,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="flume/list-clusters">
-        <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
-        </action>
-    </command>
-</command-bundle>
+    <reference id="flumeManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.flume.Flume"/>
+
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="flume/list-clusters">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+                <property name="flumeManager" ref="flumeManager"/>
+            </action>
+        </command>
+    </command-bundle>
+
 </blueprint>

@@ -12,7 +12,7 @@ import java.util.List;
  * Created by bahadyr on 5/8/14.
  */
 @Command(scope = "hbase", name = "list-hadoop-clusters", description = "Shows the list of installed Hadoop clusters")
-public class ListHadoopClusters extends OsgiCommandSupport {
+public class ListHadoopClustersCommand extends OsgiCommandSupport {
 
     private HBase hbaseManager;
 
