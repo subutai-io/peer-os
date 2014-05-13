@@ -1,42 +1,49 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.*;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
+import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
 import org.safehaus.kiskis.mgmt.impl.hive.Commands;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.Product;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.*;
-
 public class InstallHandler extends AbstractHandler {
 
     private final Config config;
+    private final ProductOperation po;
 
     public InstallHandler(HiveImpl manager, Config config) {
-        super(manager, config.getClusterName(),
-                "Installing cluster " + config.getClusterName());
+        super(manager, config.getClusterName());
         this.config = config;
+        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+                "Installing cluster " + config.getClusterName());
+    }
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
     public void run() {
-        if (manager.getCluster(clusterName) != null) {
+        if(manager.getCluster(clusterName) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     clusterName));
             return;
         }
 
         // check server node
-        if (!isNodeConnected(config.getServer().getHostname())) {
+        if(!isNodeConnected(config.getServer().getHostname())) {
             po.addLogFailed(String.format("Server node '%s' is not connected",
                     config.getServer().getHostname()));
             return;
         }
         // check client nodes
-        if (checkClientNodes(config, true) == 0) {
+        if(checkClientNodes(config, true) == 0) {
             po.addLogFailed("No nodes eligible for installation. Operation aborted");
             return;
         }
@@ -49,7 +56,7 @@ public class InstallHandler extends AbstractHandler {
                 new HashSet<Agent>(Arrays.asList(config.getServer())));
         manager.getCommandRunner().runCommand(cmd);
 
-        if (!cmd.hasCompleted()) {
+        if(!cmd.hasCompleted()) {
             po.addLogFailed("Failed to check installed packages for server node");
             return;
         }
@@ -63,49 +70,49 @@ public class InstallHandler extends AbstractHandler {
                 config.getClients());
         manager.getCommandRunner().runCommand(cmd);
 
-        if (!cmd.hasCompleted()) {
+        if(!cmd.hasCompleted()) {
             po.addLogFailed("Failed to check installed packages");
             return;
         }
         Iterator<Agent> it = config.getClients().iterator();
-        while (it.hasNext()) {
+        while(it.hasNext()) {
             Agent a = it.next();
             res = cmd.getResults().get(a.getUuid());
-            if (res.getStdOut().contains(Product.HIVE.getPackageName())) {
+            if(res.getStdOut().contains(Product.HIVE.getPackageName())) {
                 po.addLog(String.format("Node '%s' has already Hive installed.\nOmitting from installation",
                         a.getHostname()));
                 it.remove();
             }
         }
-        if (config.getClients().isEmpty()) {
+        if(config.getClients().isEmpty()) {
             po.addLogFailed("No client nodes eligible for installation. Operation aborted");
             return;
         }
 
         // save cluster info and install
         po.addLog("Save cluster info");
-        if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+        if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
             po.addLog("Cluster info saved");
 
             po.addLog("Installing server...");
-            if (!skipHive) {
+            if(!skipHive) {
                 s = Commands.make(CommandType.INSTALL, Product.HIVE);
                 cmd = manager.getCommandRunner().createCommand(
                         new RequestBuilder(s).withTimeout(120),
                         new HashSet<Agent>(Arrays.asList(config.getServer())));
                 manager.getCommandRunner().runCommand(cmd);
-                if (!cmd.hasSucceeded()) {
+                if(!cmd.hasSucceeded()) {
                     po.addLogFailed(cmd.getAllErrors());
                     return;
                 }
             }
-            if (!skipDerby) {
+            if(!skipDerby) {
                 s = Commands.make(CommandType.INSTALL, Product.DERBY);
                 cmd = manager.getCommandRunner().createCommand(
                         new RequestBuilder(s).withTimeout(120),
                         new HashSet<Agent>(Arrays.asList(config.getServer())));
                 manager.getCommandRunner().runCommand(cmd);
-                if (!cmd.hasSucceeded()) {
+                if(!cmd.hasSucceeded()) {
                     po.addLogFailed(cmd.getAllErrors());
                     return;
                 }
@@ -115,7 +122,7 @@ public class InstallHandler extends AbstractHandler {
             cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
                     new HashSet<Agent>(Arrays.asList(config.getServer())));
             manager.getCommandRunner().runCommand(cmd);
-            if (!cmd.hasSucceeded()) {
+            if(!cmd.hasSucceeded()) {
                 po.addLogFailed("Failed to configure Hive server");
                 return;
             }
@@ -127,26 +134,25 @@ public class InstallHandler extends AbstractHandler {
                     new RequestBuilder(s).withTimeout(120), config.getClients());
             manager.getCommandRunner().runCommand(cmd);
 
-            if (cmd.hasCompleted()) {
+            if(cmd.hasCompleted()) {
                 List<Agent> readyClients = new ArrayList<Agent>();
-                for (Agent a : config.getClients()) {
+                for(Agent a : config.getClients()) {
                     res = cmd.getResults().get(a.getUuid());
-                    if (isZero(res.getExitCode())) {
+                    if(isZero(res.getExitCode())) {
                         readyClients.add(a);
                         po.addLog("Hive successfully installed on " + a.getHostname());
-                    } else {
+                    } else
                         po.addLog("Failed to install Hive on " + a.getHostname());
-                    }
                 }
-                if (readyClients.size() > 0) {
+                if(readyClients.size() > 0) {
                     s = Commands.configureClient(config.getServer());
                     cmd = manager.getCommandRunner().createCommand(
                             new RequestBuilder(s),
                             new HashSet<Agent>(readyClients));
                     manager.getCommandRunner().runCommand(cmd);
-                    for (Agent a : readyClients) {
+                    for(Agent a : readyClients) {
                         res = cmd.getResults().get(a.getUuid());
-                        if (isZero(res.getExitCode()))
+                        if(isZero(res.getExitCode()))
                             po.addLog(String.format("Client node '%s' successfully configured",
                                     a.getHostname()));
                         else
@@ -155,13 +161,11 @@ public class InstallHandler extends AbstractHandler {
                     }
                     po.addLogDone("Done");
                 }
-            } else {
+            } else
                 po.addLogFailed("Failed to install client(s): "
                         + cmd.getAllErrors());
-            }
-        } else {
+        } else
             po.addLogFailed("Failed to save cluster info.\nInstallation aborted");
-        }
     }
 
 }
