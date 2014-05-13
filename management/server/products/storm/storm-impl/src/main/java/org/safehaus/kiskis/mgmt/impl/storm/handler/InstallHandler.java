@@ -24,6 +24,7 @@ public class InstallHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         if(manager.getCluster(config.getClusterName()) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
@@ -42,10 +43,10 @@ public class InstallHandler extends AbstractHandler {
         }
 
         po.addLog("Check installed packages");
-        Set<Agent> allNodes = new HashSet<Agent>(config.getSupervisors());
+        Set<Agent> allNodes = new HashSet<>(config.getSupervisors());
         allNodes.add(config.getNimbus());
 
-        Set<Agent> skipped = new HashSet<Agent>();
+        Set<Agent> skipped = new HashSet<>();
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.LIST)),
                 allNodes);

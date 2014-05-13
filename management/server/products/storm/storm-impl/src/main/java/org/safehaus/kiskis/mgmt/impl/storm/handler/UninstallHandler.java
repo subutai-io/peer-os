@@ -26,6 +26,7 @@ public class UninstallHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -43,7 +44,7 @@ public class UninstallHandler extends AbstractHandler {
             return;
         }
 
-        Set<Agent> allNodes = new HashSet<Agent>(config.getSupervisors());
+        Set<Agent> allNodes = new HashSet<>(config.getSupervisors());
         allNodes.add(config.getNimbus());
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.PURGE)),

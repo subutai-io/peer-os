@@ -30,6 +30,7 @@ public class StopHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -43,7 +44,7 @@ public class StopHandler extends AbstractHandler {
             po.addLogFailed(hostname + " is not connected");
             return;
         }
-        Set<Agent> set = new HashSet<Agent>(2);
+        Set<Agent> set = new HashSet<>(2);
         set.add(agent);
 
         StormService[] services = isNimbusNode(config, hostname)

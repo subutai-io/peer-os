@@ -49,12 +49,12 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
         String zk_servers = makeZookeeperServersList();
         if(zk_servers == null) return false;
 
-        Map<String, String> paramValues = new HashMap<String, String>();
+        Map<String, String> paramValues = new HashMap<>();
         paramValues.put("storm.zookeeper.servers", zk_servers);
         paramValues.put("nimbus.host", config.getNimbus().getListIP().get(0));
         paramValues.put("storm.local.dir", "/var/lib/storm");
 
-        Set<Agent> allNodes = new HashSet<Agent>(config.getSupervisors());
+        Set<Agent> allNodes = new HashSet<>(config.getSupervisors());
         allNodes.add(config.getNimbus());
 
         for(Map.Entry<String, String> e : paramValues.entrySet()) {

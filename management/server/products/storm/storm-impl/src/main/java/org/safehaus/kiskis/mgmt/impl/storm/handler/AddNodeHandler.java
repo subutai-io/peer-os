@@ -30,6 +30,7 @@ public class AddNodeHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -43,7 +44,7 @@ public class AddNodeHandler extends AbstractHandler {
             return;
         }
 
-        Set<Agent> set = new HashSet<Agent>();
+        Set<Agent> set = new HashSet<>();
         set.add(agent);
 
         // check if Storm is already installed
