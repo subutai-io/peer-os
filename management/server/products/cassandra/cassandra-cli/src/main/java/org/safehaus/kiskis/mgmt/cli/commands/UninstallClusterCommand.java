@@ -9,7 +9,6 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -19,8 +18,8 @@ import java.util.UUID;
 @Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
-    private  Cassandra cassandraManager;
-    private  Tracker tracker;
+    private Cassandra cassandraManager;
+    private Tracker tracker;
 
     public Tracker getTracker() {
         return tracker;
@@ -34,13 +33,13 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         this.cassandraManager = cassandraManager;
     }
 
-    public  Cassandra getCassandraManager() {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
     @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
-    String clusterName= null;
+    String clusterName = null;
 
     protected Object doExecute() {
         UUID uuid = cassandraManager.uninstallCluster(clusterName);
@@ -48,7 +47,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
             if (po != null) {
-                if( logSize !=  po.getLog().length()) {
+                if (logSize != po.getLog().length()) {
                     System.out.print(po.getLog().substring(logSize, po.getLog().length()));
                     System.out.flush();
                     logSize = po.getLog().length();

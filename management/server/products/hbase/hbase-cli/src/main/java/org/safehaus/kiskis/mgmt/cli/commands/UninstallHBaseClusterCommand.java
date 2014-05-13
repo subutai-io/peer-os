@@ -48,7 +48,7 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
             if (po != null) {
-                if( logSize !=  po.getLog().length()) {
+                if (logSize != po.getLog().length()) {
                     System.out.print(po.getLog().substring(logSize, po.getLog().length()));
                     System.out.flush();
                     logSize = po.getLog().length();
