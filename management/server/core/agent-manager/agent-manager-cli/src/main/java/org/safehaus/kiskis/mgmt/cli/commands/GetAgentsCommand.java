@@ -27,9 +27,13 @@ public class GetAgentsCommand extends OsgiCommandSupport {
     protected Object doExecute() {
         Set<Agent> agentList = agentManager.getAgents();
         StringBuilder sb = new StringBuilder();
-
-        for(Agent agent : agentList) {
-            sb.append(agent.getHostname());
+        for (Agent agent : agentList) {
+            sb.append("Hostname: ").append(agent.getHostname()).append(" ")
+                    .append("UUID: ").append(agent.getUuid()).append(" ")
+                    .append("Parent hostname: ").append(agent.getParentHostName()).append(" ")
+                    .append("MAC address: ").append(agent.getMacAddress()).append(" ")
+                    .append("IPs: ").append(agent.getListIP()).append(" ")
+                    .append("\n");
         }
 
         System.out.println(sb.toString());

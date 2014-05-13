@@ -30,14 +30,14 @@ public class GetAgentByHostnameCommand extends OsgiCommandSupport {
 
         Agent agent = agentManager.getAgentByHostname(hostname);
         StringBuilder sb = new StringBuilder();
-        sb.append("Hostname: ").append(agent.getHostname());
+        sb.append("Hostname: ").append(agent.getHostname()).append("\n");
         for (String ip : agent.getListIP()) {
-            sb.append("IP: ").append(ip);
+            sb.append("IP: ").append(ip).append("\n");
         }
-        sb.append("MAC address: ").append(agent.getMacAddress());
-        sb.append("Parent hostname: ").append(agent.getParentHostName());
-        sb.append("Transport ID: ").append(agent.getTransportId());
-        sb.append("UUID: ").append(agent.getUuid());
+        sb.append("MAC address: ").append(agent.getMacAddress()).append("\n");
+        sb.append("Parent hostname: ").append(agent.getParentHostName()).append("\n");
+        sb.append("Transport ID: ").append(agent.getTransportId()).append("\n");
+        sb.append("UUID: ").append(agent.getUuid()).append("\n");
         System.out.println(sb.toString());
         System.out.println("get-agent-by-hostname command executed");
         return null;
