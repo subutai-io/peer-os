@@ -15,7 +15,6 @@ import java.util.UUID;
 @Command(scope = "agent", name = "get-agent-by-uuid", description = "get agent by uuid")
 public class GetAgentByUUIDCommand extends OsgiCommandSupport {
 
-
     private AgentManager agentManager;
 
     public AgentManager getAgentManager() {
