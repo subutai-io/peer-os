@@ -2,6 +2,10 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.kiskis.mgmt.api.sqoop.Config;
+import org.safehaus.kiskis.mgmt.api.sqoop.Sqoop;
+
+import java.util.List;
 
 
 /**
@@ -10,8 +14,24 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "sqoop", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
+    private Sqoop sqoopManager;
+
+    public Sqoop getSqoopManager() {
+        return sqoopManager;
+    }
+
+    public void setSqoopManager(Sqoop sqoopManager) {
+        this.sqoopManager = sqoopManager;
+    }
+
     protected Object doExecute() {
-        System.out.println("list clusters command executed");
+        List<Config> configList = sqoopManager.getClusters();
+        if (!configList.isEmpty())
+            for (Config config : configList) {
+                System.out.println(config.getClusterName());
+            }
+        else System.out.println("No Sqoop cluster");
+
         return null;
     }
 }
