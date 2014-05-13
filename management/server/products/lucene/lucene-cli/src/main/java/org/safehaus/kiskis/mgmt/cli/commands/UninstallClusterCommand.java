@@ -3,8 +3,8 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
-import org.safehaus.kiskis.mgmt.api.hbase.HBase;
+import org.safehaus.kiskis.mgmt.api.lucene.Config;
+import org.safehaus.kiskis.mgmt.api.lucene.Lucene;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -15,10 +15,10 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "list-clusters", description = "Command to uninstall HBase cluster")
-public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
+@Command(scope = "lucene", name = "uninstall-cluster", description = "Command to uninstall Lucene cluster")
+public class UninstallClusterCommand extends OsgiCommandSupport {
 
-    private HBase hbaseManager;
+    private Lucene luceneManager;
     private Tracker tracker;
 
     public Tracker getTracker() {
@@ -29,21 +29,20 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
         this.tracker = tracker;
     }
 
-    public HBase getHbaseManager() {
-        return hbaseManager;
+    public void setLuceneManager(Lucene luceneManager) {
+        this.luceneManager = luceneManager;
     }
 
-    public void setHbaseManager(HBase hbaseManager) {
-        this.hbaseManager = hbaseManager;
+    public Lucene getLuceneManager() {
+        return luceneManager;
     }
 
-    @Argument(index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster")
-    String clusterName;
+
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
+    String clusterName = null;
 
     protected Object doExecute() {
-
-        UUID uuid = hbaseManager.uninstallCluster(clusterName);
-
+        UUID uuid = luceneManager.uninstallCluster(clusterName);
         int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
@@ -67,6 +66,5 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
             }
         }
         return null;
-
     }
 }
