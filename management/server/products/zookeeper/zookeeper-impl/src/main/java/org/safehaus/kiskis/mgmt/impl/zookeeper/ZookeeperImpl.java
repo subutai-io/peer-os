@@ -63,7 +63,7 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public UUID installCluster(final Config config) {
+    public UUID installCluster(Config config) {
 
         AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
@@ -72,7 +72,7 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID uninstallCluster(final String clusterName) {
+    public UUID uninstallCluster(String clusterName) {
 
         AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
@@ -81,7 +81,7 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID startNode(final String clusterName, final String lxcHostName) {
+    public UUID startNode(String clusterName, String lxcHostName) {
 
         AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostName);
 
@@ -90,7 +90,7 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID stopNode(final String clusterName, final String lxcHostName) {
+    public UUID stopNode(String clusterName, String lxcHostName) {
 
         AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostName);
 
@@ -99,7 +99,7 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID checkNode(final String clusterName, final String lxcHostName) {
+    public UUID checkNode(String clusterName, String lxcHostName) {
 
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostName);
 
@@ -108,7 +108,7 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID destroyNode(final String clusterName, final String lxcHostName) {
+    public UUID destroyNode(String clusterName, String lxcHostName) {
 
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostName);
 
@@ -118,7 +118,7 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
     @Override
-    public UUID addProperty(final String clusterName, final String fileName, final String propertyName, final String propertyValue) {
+    public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue) {
 
         AbstractOperationHandler operationHandler = new AddPropertyOperationHandler(this, clusterName, fileName, propertyName, propertyValue);
 
@@ -128,7 +128,7 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
     @Override
-    public UUID removeProperty(final String clusterName, final String fileName, final String propertyName) {
+    public UUID removeProperty(String clusterName, String fileName, String propertyName) {
 
         AbstractOperationHandler operationHandler = new RemovePropertyOperationHandler(this, clusterName, fileName, propertyName);
 
@@ -137,9 +137,18 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public UUID addNode(final String clusterName) {
+    public UUID addNode(String clusterName) {
 
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+    public UUID addNode(String clusterName, String lxcHostname) {
+
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
 
         executor.execute(operationHandler);
 

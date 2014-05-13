@@ -33,7 +33,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
     private Set<Agent> currentAgents = new HashSet<Agent>();
     private Set<Agent> selectedAgents = new HashSet<Agent>();
 
-    public MgmtAgentManager(AgentManager agentManager, final boolean global) {
+    public MgmtAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
 
         setSizeFull();
@@ -54,7 +54,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
                     Agent agent = (Agent) item.getItemProperty("value").getValue();
                     if (agent != null) {
                         description = "Hostname: " + agent.getHostname() + "<br>"
-                                + "Is LXC: " + agent.isIsLXC() + "<br>"
+                                + "MAC: " + agent.getMacAddress() + "<br>"
                                 + "UUID: " + agent.getUuid() + "<br>"
                                 + "IP: " + agent.getListIP();
                     }
@@ -81,11 +81,7 @@ public final class MgmtAgentManager extends ConcurrentComponent
                         }
                     }
 
-                    if (global) {
-                        MgmtApplication.setSelectedAgents(selectedList);
-                    } else {
-                        selectedAgents = selectedList;
-                    }
+                    selectedAgents = selectedList;
 
                 }
             }

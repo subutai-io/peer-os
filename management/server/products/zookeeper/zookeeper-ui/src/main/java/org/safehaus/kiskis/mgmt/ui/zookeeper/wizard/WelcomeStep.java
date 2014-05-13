@@ -7,15 +7,10 @@ package org.safehaus.kiskis.mgmt.ui.zookeeper.wizard;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 
 /**
- *
  * @author dilshat
  */
 public class WelcomeStep extends Panel {
@@ -40,12 +35,24 @@ public class WelcomeStep extends Panel {
         logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Start");
-        next.setWidth(100, Sizeable.UNITS_PIXELS);
-        grid.addComponent(next, 6, 4, 6, 4);
-        grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
+        Button startStandalone = new Button("Start standalone installation");
+//        startStandalone.setWidth(100, Sizeable.UNITS_PIXELS);
+        grid.addComponent(startStandalone, 6, 4, 6, 4);
+        grid.setComponentAlignment(startStandalone, Alignment.BOTTOM_RIGHT);
+        Button startOverHadoop = new Button("Start over-Hadoop installation");
+//        startOverHadoop.setWidth(100, Sizeable.UNITS_PIXELS);
+        grid.addComponent(startOverHadoop, 7, 4, 7, 4);
+        grid.setComponentAlignment(startOverHadoop, Alignment.BOTTOM_RIGHT);
 
-        next.addListener(new Button.ClickListener() {
+        startStandalone.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                wizard.init();
+                wizard.getConfig().setStandalone(true);
+                wizard.next();
+            }
+        });
+        startOverHadoop.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.init();

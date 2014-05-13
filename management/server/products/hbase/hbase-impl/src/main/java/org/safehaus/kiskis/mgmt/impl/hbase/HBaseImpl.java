@@ -4,6 +4,7 @@ import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.hbase.Config;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
 public class HBaseImpl implements HBase {
 
     private AgentManager agentManager;
+    private Hadoop hadoopManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
@@ -32,6 +34,14 @@ public class HBaseImpl implements HBase {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager) {
+        this.hadoopManager = hadoopManager;
     }
 
     public void setDbManager(DbManager dbManager) {
@@ -50,7 +60,7 @@ public class HBaseImpl implements HBase {
         this.commandRunner = commandRunner;
     }
 
-    public UUID installCluster(final Config config) {
+    public UUID installCluster(final org.safehaus.kiskis.mgmt.api.hbase.Config config) {
         final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing HBase");
 
         final Set<Agent> allNodes = new HashSet<Agent>();
@@ -156,13 +166,14 @@ public class HBaseImpl implements HBase {
 
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                = tracker.createProductOperation(org.safehaus.kiskis.mgmt.api.hbase.Config.PRODUCT_KEY,
                 String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+                org.safehaus.kiskis.mgmt.api.hbase.Config config =
+                        dbManager.getInfo(org.safehaus.kiskis.mgmt.api.hbase.Config.PRODUCT_KEY, clusterName, org.safehaus.kiskis.mgmt.api.hbase.Config.class);
                 if (config == null) {
                     po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
                     return;
@@ -207,6 +218,11 @@ public class HBaseImpl implements HBase {
     @Override
     public Config getCluster(String clusterName) {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    }
+
+    @Override
+    public org.safehaus.kiskis.mgmt.api.hadoop.Config getHadoopCluster(String clusterName) {
+        return dbManager.getInfo(org.safehaus.kiskis.mgmt.api.hadoop.Config.PRODUCT_KEY, clusterName, org.safehaus.kiskis.mgmt.api.hadoop.Config.class);
     }
 
     @Override
@@ -316,6 +332,13 @@ public class HBaseImpl implements HBase {
         });
 
         return po.getId();
+    }
+
+    @Override
+    public List<org.safehaus.kiskis.mgmt.api.hadoop.Config> getHadoopClusters() {
+        List<org.safehaus.kiskis.mgmt.api.hadoop.Config> hadoopClusters =
+                hadoopManager.getClusters();
+        return hadoopClusters;
     }
 
 }
