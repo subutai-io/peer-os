@@ -19,12 +19,10 @@
         <dependency>
             <groupId>org.safehaus.kiskis.mgmt</groupId>
             <artifactId>ui-vaadin</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
-            <version>${com.vaadin.version}</version>
         </dependency>
     </dependencies>
 
@@ -33,13 +31,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${org.apache.maven.plugins.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${org.apache.felix.version}</version>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Fragment-Host>com.vaadin</Fragment-Host>
