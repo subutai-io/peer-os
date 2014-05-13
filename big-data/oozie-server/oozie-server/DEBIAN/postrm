@@ -5,41 +5,5 @@ set -e
 
 # Remove Oozie Files and Folders
 if [ -f "/opt/oozie.sql" ]; then
-rm /opt/oozie.sql
+    rm /opt/oozie.sql
 fi
-if [ -d "/opt/oozie-3.3.2" ]; then
-rm -r /opt/oozie-3.3.2
-fi
-
-#Remove paths and exports from relevant files
-FilePath="/etc/profile"
-oozieHome="\/opt\/oozie-3.3.2"
-ooziePath="\/opt\/oozie-3.3.2\/bin"
-
-if grep -q "OOZIE_HOME=" $FilePath
-then
-        echo "oozie home is being deleted!"
-        sed -i "/OOZIE_HOME=$oozieHome/d" $FilePath
-else
-        echo "oozie home does not exist"
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        echo "Path is previously insterted to" $FilePath
-        if grep -q "${ooziePath}" $FilePath
-        then
-                echo "Oozie path is being deleted from path!"
-                sed -i "s/$ooziePath://g" $FilePath
-                sed -i "s/:$ooziePath//g" $FilePath
-        else
-                echo "Oozie path does not exist on path"
-        fi
-else
-        echo "PATH does not exist"
-fi
-
-if [ -f "/etc/init.d/oozie-server" ]; then
-        rm  /etc/init.d/oozie-server
-fi
-. $FilePath

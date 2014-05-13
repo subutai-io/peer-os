@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+sharkVer="shark-0.9.1"
+
+FilePath="/etc/profile"
+. $FilePath

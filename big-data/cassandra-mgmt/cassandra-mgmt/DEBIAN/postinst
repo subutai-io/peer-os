@@ -3,34 +3,6 @@ set -e
 cassVer="cassandra-2.0.4"
 
 FilePath="/etc/profile"
-cassandraHomeEcho="/opt/$cassVer"
-cassandraPath="\/opt\/$cassVer\/bin"
-cassandraPathEcho=$cassandraHomeEcho"/bin"
-cassandraConf=$cassandraHomeEcho"/conf"
-
-
-# add CASSANDRA_HOME andd Cassandra PATH to "/etc/profile"
-
-if grep -q "CASSANDRA_HOME=" $FilePath
-then
-        echo "CASSANDRA_HOME is already present in your environment variables"
-else
-        echo "CASSANDRA_HOME is added to environment variables."
-        echo "export CASSANDRA_HOME="$cassandraHomeEcho >> $FilePath
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        if grep -q "${cassandraPath}" $FilePath
-        then
-                echo "Cassandra path is already present in your path!!!"
-        else
-                echo "Cassandra is inserted to PATH!"
-                sed -i "s/export PATH=/export PATH=$cassandraPath:/1" $FilePath
-        fi
-else
-        echo "export PATH=$PATH:$cassandraPathEcho" >> "${FilePath}"
-fi
 
 # change listen_address, rpc_adress and seeds parameters
 # listen_address

@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+sparkVer="spark-0.9.1"
+
+FilePath="/etc/profile"
+. $FilePath
+
+# insert pid_dir to spark-env.sh
+file="/opt/spark-0.9.1/conf/spark-env.sh"
+PIDDIR=/var/run/spark
+echo "SPARK_PID_DIR=$PIDDIR" >> $file
