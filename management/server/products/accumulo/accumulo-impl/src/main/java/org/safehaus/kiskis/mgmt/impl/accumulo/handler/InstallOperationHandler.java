@@ -37,7 +37,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                 || config.getGcNode() == null
                 || config.getMonitor() == null
                 || Strings.isNullOrEmpty(config.getClusterName())
-                || Strings.isNullOrEmpty(config.getZkClusterName())
                 || Util.isCollectionEmpty(config.getTracers())
                 || Util.isCollectionEmpty(config.getSlaves())
                 ) {
@@ -63,10 +62,10 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
 
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = manager.getZkManager().getCluster(config.getZkClusterName());
+        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = manager.getZkManager().getCluster(config.getClusterName());
 
         if (zkConfig == null) {
-            po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getZkClusterName()));
+            po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getClusterName()));
             return;
         }
 
