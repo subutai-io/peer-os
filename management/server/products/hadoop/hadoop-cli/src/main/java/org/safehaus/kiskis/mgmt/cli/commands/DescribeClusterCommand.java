@@ -37,21 +37,26 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
             sb.append("Domain name: ").append(config.getDomainName()).append("\n");
             sb.append("All nodes:").append("\n");
             for (Agent agent : config.getAllNodes()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname()).append("\n");
             }
             sb.append("Slave nodes:").append("\n");
             for (Agent agent : config.getAllSlaveNodes()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname()).append("\n");
             }
             sb.append("Data nodes:").append("\n");
             for (Agent agent : config.getDataNodes()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname()).append("\n");
             }
             sb.append("Task trackers:").append("\n");
             for (Agent agent : config.getTaskTrackers()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname()).append("\n");
             }
-            sb.append("Job tracker:").append(config.getJobTracker()).append("\n");
+            Agent jt = config.getJobTracker();
+            sb.append("Job tracker hostname:").append(jt.getHostname()).append("\n");
+            sb.append("Job tracker IPs:").append(jt.getListIP()).append("\n");
+            sb.append("Job tracker MAC address:").append(jt.getMacAddress()).append("\n");
+            sb.append("Job tracker parent hostname:").append(jt.getParentHostName()).append("\n");
+            sb.append("Job tracker UUID:").append(jt.getUuid()).append("\n");
             System.out.println(sb.toString());
         } else System.out.println("No clusters found...");
 
