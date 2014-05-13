@@ -42,7 +42,7 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setRequired(true);
         hadoopClusters.setNullSelectionAllowed(false);
 
-        List<Config> clusters = HBaseUI.getHadoopManager().getClusters(); 
+        List<Config> clusters = HBaseUI.getHbaseManager().getHadoopClusters();
         if (clusters.size() > 0) {
             for (Config Config : clusters) {
                 hadoopClusters.addItem(Config);
@@ -51,7 +51,7 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        Config info = HBaseUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
+        Config info = HBaseUI.getHbaseManager().getHadoopCluster(wizard.getConfig().getClusterName());
 
         if (info != null) {
             hadoopClusters.setValue(info);

@@ -17,7 +17,7 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
+@Command(scope = "cassandra", name = "install-cluster", description = "Command to install Cassandra cluster")
 public class InstallClusterCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
@@ -73,6 +73,8 @@ public class InstallClusterCommand extends OsgiCommandSupport {
                 if (po.getState() != ProductOperationState.RUNNING) {
                     break;
                 }
+                System.out.print(".");
+                System.out.flush();
             } else {
                 System.out.println("Product operation not found. Check logs");
                 break;
@@ -83,6 +85,7 @@ public class InstallClusterCommand extends OsgiCommandSupport {
                 break;
             }
         }
+        System.out.println();
         return null;
     }
 }
