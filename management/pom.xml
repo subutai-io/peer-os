@@ -1001,6 +1001,14 @@
                 <version>2.0.2.1</version>
             </dependency>
             <!--db-manager-impl-->
+
+            <!--CXF-->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                <version>2.7.11</version>
+            </dependency>
+            <!--CXF-->
         </dependencies>
     </dependencyManagement>
 
