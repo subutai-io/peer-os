@@ -1,26 +1,15 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
+import java.util.Iterator;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
-import java.util.Iterator;
-import java.util.UUID;
-
 abstract class AbstractHandler extends AbstractOperationHandler<HiveImpl> {
 
-    final ProductOperation po;
-
-    public AbstractHandler(HiveImpl manager, String clusterName, String desc) {
+    public AbstractHandler(HiveImpl manager, String clusterName) {
         super(manager, clusterName);
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY, desc);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
     }
 
     boolean isServerNode(Config config, String hostname) {
@@ -41,18 +30,9 @@ abstract class AbstractHandler extends AbstractOperationHandler<HiveImpl> {
     int checkClientNodes(Config config, boolean removeDisconnected) {
         int connected = 0;
         Iterator<Agent> it = config.getClients().iterator();
-        while (it.hasNext()) {
-            Agent a = it.next();
-            if (manager.getAgentManager().getAgentByHostname(a.getHostname()) != null) {
-                connected++;
-                continue;
-            }
-            String m = String.format("Node '%s' is not connected.", a.getHostname());
-            if (removeDisconnected) {
-                it.remove();
-                m += " Omitting from clients list";
-            }
-            po.addLog(m);
+        while(it.hasNext()) {
+            if(isNodeConnected(it.next().getHostname())) connected++;
+            else if(removeDisconnected) it.remove();
         }
         return connected;
     }
