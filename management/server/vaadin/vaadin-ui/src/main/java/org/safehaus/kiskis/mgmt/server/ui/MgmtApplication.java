@@ -28,17 +28,17 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     private static final Logger LOG = Logger.getLogger(MgmtApplication.class.getName());
     private static final ThreadLocal<MgmtApplication> threadLocal = new ThreadLocal<MgmtApplication>();
     private static AgentManager agentManager;
-    private final ModuleNotifier moduleNotifier;
-    private final CommandRunner commandRunner;
-    private final Tracker tracker;
+    private static ModuleNotifier moduleNotifier;
+    private static CommandRunner commandRunner;
+    private static Tracker tracker;
     private final String title;
     private TabSheet tabs;
 
     public MgmtApplication(String title, AgentManager agentManager, CommandRunner commandRunner, Tracker tracker, ModuleNotifier moduleNotifier) {
         MgmtApplication.agentManager = agentManager;
-        this.commandRunner = commandRunner;
-        this.tracker = tracker;
-        this.moduleNotifier = moduleNotifier;
+        MgmtApplication.commandRunner = commandRunner;
+        MgmtApplication.tracker = tracker;
+        MgmtApplication.moduleNotifier = moduleNotifier;
         this.title = title;
     }
 
@@ -98,18 +98,11 @@ public class MgmtApplication extends Application implements ModuleServiceListene
     }
 
     public static Window createTerminalWindow(final Set<Agent> agents) {
-        if (getInstance() != null) {
-            getInstance();
-            return new TerminalWindow(agents, getInstance().commandRunner, agentManager);
-        }
-        return null;
+        return new TerminalWindow(agents, commandRunner, agentManager);
     }
 
     public static Window createProgressWindow(String source, UUID trackID) {
-        if (getInstance() != null) {
-            return new ProgressWindow(getInstance().tracker, trackID, source);
-        }
-        return null;
+        return new ProgressWindow(tracker, trackID, source);
     }
 
     public static void showProgressWindow(String source, UUID trackID, final Window.CloseListener closeCallback) {
@@ -196,7 +189,6 @@ public class MgmtApplication extends Application implements ModuleServiceListene
 
     @Override
     public void close() {
-        MgmtApplication.agentManager = null;
         try {
             super.close();
             Iterator<Component> it = tabs.getComponentIterator();
