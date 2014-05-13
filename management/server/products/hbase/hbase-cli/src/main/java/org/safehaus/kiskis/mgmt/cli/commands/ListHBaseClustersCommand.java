@@ -29,7 +29,7 @@ public class ListHBaseClustersCommand extends OsgiCommandSupport {
         List<Config> configs = hbaseManager.getClusters();
         StringBuilder sb = new StringBuilder();
 
-        for(Config config : configs) {
+        for (Config config : configs) {
             sb.append(config.getClusterName()).append("\n");
         }
 

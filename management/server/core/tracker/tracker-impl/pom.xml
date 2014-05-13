@@ -6,8 +6,7 @@
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>tracker-parent</artifactId>
-        <relativePath>..</relativePath>
-        <version>${global.version}</version>
+        <version>2.0.0</version>
     </parent>
 
     <artifactId>tracker-impl</artifactId>
@@ -21,59 +20,48 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>${com.datastax.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
-            <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
             <groupId>net.jpountz.lz4</groupId>
             <artifactId>lz4</artifactId>
-            <version>${net.jpountz.lz4.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>${io.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>${org.codehaus.jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>${org.codehaus.jackson.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.codahale.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>${com.codahale.metrics.metrics-core.version}</version>
         </dependency>
         <!-- Compression libraries for the protocol. -->
         <!-- Each of them is only a mandatory runtime dependency if you want to use the compression it offers -->
@@ -81,45 +69,37 @@
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
-            <version>${org.xerial.snappy.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>db-manager-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.eaio.uuid</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.2</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>tracker-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.cassandraunit</groupId>
             <artifactId>cassandra-unit</artifactId>
-            <version>2.0.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>db-manager-impl</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${com.google.guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -129,12 +109,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${org.apache.felix.version}</version>
-                <inherited>true</inherited>
-                <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.impl.tracker</Bundle-SymbolicName>
                         <Export-Package>
