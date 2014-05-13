@@ -9,7 +9,6 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
@@ -19,6 +18,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+//import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
 /**
  * @author dilshat
@@ -49,7 +50,7 @@ public class ConfigurationStep extends Panel {
         //get hadoop clusters from db
         List<org.safehaus.kiskis.mgmt.api.hadoop.Config> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
         List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters = AccumuloUI.getZookeeperManager().getClusters();
-        Set<org.safehaus.kiskis.mgmt.api.hadoop.Config> filteredHadoopClusters = new HashSet<Config>();
+        Set<org.safehaus.kiskis.mgmt.api.hadoop.Config> filteredHadoopClusters = new HashSet<>();
 
         //filter out those hadoop clusters which have zk clusters installed on top
         for (org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopClusterInfo : hadoopClusters) {
@@ -278,7 +279,7 @@ public class ConfigurationStep extends Panel {
     private void setTwinSelectDS(TwinColSelect target, List<Agent> hadoopNodes) {
         target.setValue(null);
         target.setContainerDataSource(
-                new BeanItemContainer<Agent>(
+                new BeanItemContainer<>(
                         Agent.class, hadoopNodes)
         );
 
