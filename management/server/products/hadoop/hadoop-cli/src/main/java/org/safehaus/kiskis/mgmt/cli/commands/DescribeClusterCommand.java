@@ -29,6 +29,7 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
     @Argument(index = 0, name = "clusterName", required = true, multiValued = false, description = "The name of the Hadoop cluster")
     String clusterName;
 
+
     protected Object doExecute() {
         Config config = hadoopManager.getCluster(clusterName);
         if (config != null) {
@@ -52,11 +53,12 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
                 sb.append("Hostname: ").append(agent.getHostname()).append("\n");
             }
             Agent jt = config.getJobTracker();
-            sb.append("Job tracker hostname:").append(jt.getHostname()).append("\n");
-            sb.append("Job tracker IPs:").append(jt.getListIP()).append("\n");
-            sb.append("Job tracker MAC address:").append(jt.getMacAddress()).append("\n");
-            sb.append("Job tracker parent hostname:").append(jt.getParentHostName()).append("\n");
-            sb.append("Job tracker UUID:").append(jt.getUuid()).append("\n");
+            sb.append("Job tracker").append("\n");
+            sb.append("Hostname:").append(jt.getHostname()).append("\n");
+            sb.append("IPs:").append(jt.getListIP()).append("\n");
+            sb.append("MAC address:").append(jt.getMacAddress()).append("\n");
+            sb.append("Parent hostname:").append(jt.getParentHostName()).append("\n");
+            sb.append("UUID:").append(jt.getUuid()).append("\n");
             System.out.println(sb.toString());
         } else System.out.println("No clusters found...");
 
