@@ -15,7 +15,7 @@
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="sqoop/uninstall-cluster">
             <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallClusterCommand">
-                <property name="sqoopManager" ref="sqoopkManager"/>
+                <property name="sqoopManager" ref="sqoopManager"/>
             </action>
         </command>
     </command-bundle>
