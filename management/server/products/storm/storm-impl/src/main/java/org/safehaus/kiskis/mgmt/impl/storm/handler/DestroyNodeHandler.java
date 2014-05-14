@@ -47,7 +47,7 @@ public class DestroyNodeHandler extends AbstractHandler {
             return;
         }
         if(config.getSupervisors().size() == 1) {
-            po.addLog("This is the last node in cluster. Destroy cluster instead");
+            po.addLogFailed("This is the last node in cluster. Destroy cluster instead");
             return;
         }
 
