@@ -6,7 +6,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ExportSetting;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.CommandFactory;
 import org.safehaus.kiskis.mgmt.impl.sqoop.CommandType;
 import org.safehaus.kiskis.mgmt.impl.sqoop.SqoopImpl;

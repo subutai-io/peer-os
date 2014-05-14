@@ -7,11 +7,11 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 

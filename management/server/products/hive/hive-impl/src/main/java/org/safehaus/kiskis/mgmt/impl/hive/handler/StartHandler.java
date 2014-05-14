@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 

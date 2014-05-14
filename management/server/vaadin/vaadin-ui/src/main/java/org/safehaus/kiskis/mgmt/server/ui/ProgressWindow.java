@@ -9,8 +9,8 @@ import com.google.common.base.Strings;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 import java.util.UUID;

@@ -2,9 +2,9 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 
 import java.util.UUID;
 

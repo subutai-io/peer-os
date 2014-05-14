@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 import org.safehaus.kiskis.mgmt.impl.mongodb.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

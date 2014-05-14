@@ -7,8 +7,8 @@ package org.safehaus.kiskis.mgmt.ui.solr.manager;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.solr.SolrUI;

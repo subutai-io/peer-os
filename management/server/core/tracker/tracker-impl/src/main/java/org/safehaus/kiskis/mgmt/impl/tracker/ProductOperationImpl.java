@@ -7,8 +7,8 @@ package org.safehaus.kiskis.mgmt.impl.tracker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
 
 import java.util.Date;
 import java.util.UUID;

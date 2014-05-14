@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 

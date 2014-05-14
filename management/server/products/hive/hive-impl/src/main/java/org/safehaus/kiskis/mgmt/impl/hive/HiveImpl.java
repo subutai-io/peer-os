@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.impl.hive;
 
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.impl.mahout.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.DestroyNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.InstallOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

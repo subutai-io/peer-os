@@ -9,8 +9,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
