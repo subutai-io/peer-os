@@ -79,7 +79,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         if (!result.getStdOut().contains("ksks-hadoop")) {
             po.addLogFailed(String.format("Node %s has no Hadoop installation. Installation aborted", lxcAgent.getHostname()));
             return;
+        } else if (!result.getStdOut().contains("ksks-zookeeper")) {
+            po.addLogFailed(String.format("Node %s has no Zookeeper installation. Installation aborted", lxcAgent.getHostname()));
+            return;
         }
+
         boolean install = !result.getStdOut().contains("ksks-accumulo");
 
         org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = manager.getHadoopManager().getCluster(config.getClusterName());
@@ -98,6 +102,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
         if (zkConfig == null) {
             po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted", config.getClusterName()));
+            return;
+        }
+
+        if (!zkConfig.getNodes().contains(lxcAgent)) {
+            po.addLogFailed(String.format("Node '%s' does not belong to Zookeeper cluster %s\nInstallation aborted", lxcAgent.getHostname(), config.getClusterName()));
             return;
         }
 
