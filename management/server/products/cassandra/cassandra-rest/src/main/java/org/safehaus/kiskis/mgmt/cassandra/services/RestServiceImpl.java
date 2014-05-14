@@ -30,7 +30,7 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public String handleGet(String clusterName, String domainName, String numberOfNodes, String numberOfSeeds) {
+    public String install(String clusterName, String domainName, String numberOfNodes, String numberOfSeeds) {
         Config config = new Config();
         config.setClusterName(clusterName);
         config.setDomainName(domainName);
@@ -38,6 +38,12 @@ public class RestServiceImpl implements RestService {
         config.setNumberOfSeeds(Integer.parseInt(numberOfSeeds));
 
         UUID uuid = cassandraManager.installCluster(config);
+        return uuid.toString();
+    }
+
+    @Override
+    public String uninstall(String clusterName) {
+        UUID uuid = cassandraManager.uninstallCluster(clusterName);
         return uuid.toString();
     }
 

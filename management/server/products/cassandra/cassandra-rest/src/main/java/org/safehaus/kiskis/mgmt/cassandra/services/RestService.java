@@ -4,12 +4,17 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Path("install")
+@Path("cassadra")
 public interface RestService {
+
     @GET
-    @Path("cluster/{clusterName}/{domainName}/{numberOfNodes}/{numberOfSeeds}")
-    public String handleGet(@PathParam("clusterName") String clusterName,
+    @Path("install/{clusterName}/{domainName}/{numberOfNodes}/{numberOfSeeds}")
+    public String install(@PathParam("clusterName") String clusterName,
                             @PathParam("domainName") String domainName,
                             @PathParam("numberOfNodes") String numberOfNodes,
                             @PathParam("numberOfSeeds") String numberOfSeeds);
+
+    @GET
+    @Path("uninstall/{clusterName}")
+    public String uninstall(@PathParam("clusterName") String clusterName);
 }
