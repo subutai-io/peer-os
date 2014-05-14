@@ -12,7 +12,8 @@ public class Commands {
                 return "dpkg -l | grep '^ii' | grep ksks";
             case INSTALL:
             case PURGE:
-                sb = new StringBuilder("apt-get --force-yes --assume-yes ");
+                sb = new StringBuilder(EXEC_PROFILE);
+                sb.append(" && apt-get --force-yes --assume-yes ");
                 sb.append(type.toString().toLowerCase()).append(" ");
                 sb.append(PACKAGE_NAME);
                 break;

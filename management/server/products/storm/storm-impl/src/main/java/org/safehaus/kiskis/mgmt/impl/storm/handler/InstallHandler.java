@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.storm.handler;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.storm.Config;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
@@ -78,8 +79,9 @@ public class InstallHandler extends AbstractHandler {
         allNodes.removeAll(skipped);
         if(allNodes.size() > 0) {
             String s = Commands.make(CommandType.INSTALL);
+            int t = (int)TimeUnit.MINUTES.toSeconds(6);
             cmd = manager.getCommandRunner().createCommand(
-                    new RequestBuilder(s).withTimeout(60), allNodes);
+                    new RequestBuilder(s).withTimeout(t), allNodes);
             manager.getCommandRunner().runCommand(cmd);
             if(cmd.hasCompleted()) {
                 boolean masterFailed = false;
