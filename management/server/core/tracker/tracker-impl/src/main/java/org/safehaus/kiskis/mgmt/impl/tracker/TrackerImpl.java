@@ -185,22 +185,23 @@ public class TrackerImpl implements Tracker {
                 }
                 //return if operation is completed
                 if (po.getState() != ProductOperationState.RUNNING) {
-                    return;
+                    break;
                 }
                 //return if time limit is reached
                 if (System.currentTimeMillis() - startedTs > maxOperationDurationMs) {
-                    return;
+                    break;
                 }
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    return;
+                    break;
                 }
             } else {
                 System.out.println("Product operation not found");
-                return;
+                break;
             }
         }
+        System.out.println();
     }
 
 }
