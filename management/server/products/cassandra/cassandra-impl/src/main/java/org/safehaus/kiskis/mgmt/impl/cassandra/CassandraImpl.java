@@ -1,23 +1,20 @@
 package org.safehaus.kiskis.mgmt.impl.cassandra;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CassandraImpl implements Cassandra {
 
@@ -70,7 +67,8 @@ public class CassandraImpl implements Cassandra {
 
                 try {
                     po.addLog(String.format("Creating %d lxc containers for Cassandra cluster...", config.getNumberOfNodes()));
-                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
+                    Map<Agent, Set<Agent>> lxcAgentsMap = CustomPlacementStrategy.createNodes(
+                            lxcManager, config.getNumberOfNodes());
                     config.setNodes(new HashSet<Agent>());
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
@@ -214,7 +212,7 @@ public class CassandraImpl implements Cassandra {
                         }
                         po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
                     }
-                } catch (LxcCreateException ex) {
+                } catch(LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
                 }
 
