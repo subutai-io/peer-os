@@ -18,7 +18,6 @@ public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Accumulo";
     private String clusterName = "";
-    private String zkClusterName = "";
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;
@@ -90,17 +89,9 @@ public class Config implements ConfigBase {
         return PRODUCT_KEY;
     }
 
-    public String getZkClusterName() {
-        return zkClusterName;
-    }
-
-    public void setZkClusterName(String zkClusterName) {
-        this.zkClusterName = zkClusterName;
-    }
 
     public void reset() {
         clusterName = "";
-        zkClusterName = "";
         masterNode = null;
         gcNode = null;
         monitor = null;
@@ -112,7 +103,6 @@ public class Config implements ConfigBase {
     public String toString() {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
-                "zkClusterName='" + zkClusterName + '\'' +
                 ", masterNode=" + masterNode +
                 ", gcNode=" + gcNode +
                 ", monitor=" + monitor +

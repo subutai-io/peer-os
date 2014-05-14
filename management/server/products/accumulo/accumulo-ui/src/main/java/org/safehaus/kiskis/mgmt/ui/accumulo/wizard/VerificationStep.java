@@ -33,7 +33,6 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Zookeeper cluster Name", wizard.getConfig().getZkClusterName());
         cfgView.addStringCfg("Master node", wizard.getConfig().getMasterNode().getHostname());
         cfgView.addStringCfg("GC node", wizard.getConfig().getGcNode().getHostname());
         cfgView.addStringCfg("Monitor node", wizard.getConfig().getMonitor().getHostname());
