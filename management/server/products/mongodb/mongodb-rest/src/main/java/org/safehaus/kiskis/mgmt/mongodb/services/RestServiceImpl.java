@@ -8,14 +8,14 @@ import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 
 public class RestServiceImpl implements RestService {
 
-    private Mongo mongoManager;
+    private Mongo mongodbManager;
 
-    public Mongo getMongoManager() {
-        return mongoManager;
+    public Mongo getMongodbManager() {
+        return mongodbManager;
     }
 
-    public void setMongoManager(Mongo mongoManager) {
-        this.mongoManager = mongoManager;
+    public void setMongodbManager(Mongo mongodbManager) {
+        this.mongodbManager = mongodbManager;
     }
 
     @Override
