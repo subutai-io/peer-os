@@ -37,11 +37,15 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
             sb.append("Cluster name: ").append(config.getClusterName()).append("\n");
             sb.append("Nodes:").append("\n");
             for (Agent agent : config.getNodes()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname())
+                        .append(", Agent UUID: ").append(agent.getUuid())
+                        .append("\n");
             }
             sb.append("Seeds:").append("\n");
             for (Agent agent : config.getSeedNodes()) {
-                sb.append(agent.getHostname()).append("\n");
+                sb.append("Hostname: ").append(agent.getHostname())
+                        .append(", Agent UUID: ").append(agent.getUuid())
+                        .append("\n");
             }
             sb.append("Data directory: ").append(config.getDataDirectory()).append("\n");
             sb.append("Commit log directory: ").append(config.getCommitLogDirectory()).append("\n");

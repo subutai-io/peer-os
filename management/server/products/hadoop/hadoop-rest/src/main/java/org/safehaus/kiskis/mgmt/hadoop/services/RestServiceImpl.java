@@ -5,28 +5,13 @@ package org.safehaus.kiskis.mgmt.hadoop.services;
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
-
-    public String handleGet(String name) {
-//        return helloService.sayHello(name);
-        return "Hadoop " + name;
+    @Override
+    public String installCluster(String clusterName) {
+        return null;
     }
 
-    /*
-        Constructor
-     */
-    public RestServiceImpl() {
+    @Override
+    public String uninstallCluster(String clusterName) {
+        return null;
     }
-
-    /*
-        Getters and Setters
-     */
-//    public HelloService getHelloService() {
-//        return helloService;
-//    }
-//
-//    public void setHelloService(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
 }
