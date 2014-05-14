@@ -11,8 +11,8 @@
 
     <artifactId>presto-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Presto</name>
-    <description>Kiskis Management Presto</description>
+    <name>Subutai Presto</name>
+    <description>Subutai Presto</description>
 
     <dependencies>
         <dependency>

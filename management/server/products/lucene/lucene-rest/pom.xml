@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>lucene-rest</artifactId>
-    <name>Kiskis Management Lucene REST</name>
-    <description>Kiskis Management Lucene REST</description>
+    <name>Subutai Lucene REST</name>
+    <description>Subutai Lucene REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

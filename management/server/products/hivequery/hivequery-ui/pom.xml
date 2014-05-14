@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hivequery-ui</artifactId>
-    <name>Kiskis Management Hive Query UI</name>
-    <description>Kiskis Management Hive Query UI</description>
+    <name>Subutai Hive Query UI</name>
+    <description>Subutai Hive Query UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

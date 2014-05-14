@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>pig-ui</artifactId>
-    <name>Kiskis Management Pig UI</name>
-    <description>Kiskis Management Pig UI</description>
+    <name>Subutai Pig UI</name>
+    <description>Subutai Pig UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

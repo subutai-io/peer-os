@@ -11,8 +11,8 @@
 
     <artifactId>zookeeper-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Zookeeper Api</name>
-    <description>Kiskis Management Zookeeper Api</description>
+    <name>Subutai Zookeeper Api</name>
+    <description>Subutai Zookeeper Api</description>
 
     <dependencies>
         <dependency>

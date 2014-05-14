@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>zookeeper-ui</artifactId>
-    <name>Kiskis Management Zookeeper UI</name>
-    <description>Kiskis Management Zookeeper UI</description>
+    <name>Subutai Zookeeper UI</name>
+    <description>Subutai Zookeeper UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>oozie-cli</artifactId>
-    <name>Kiskis Management Oozie CLI</name>
-    <description>Kiskis Management Oozie CLI</description>
+    <name>Subutai Oozie CLI</name>
+    <description>Subutai Oozie CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

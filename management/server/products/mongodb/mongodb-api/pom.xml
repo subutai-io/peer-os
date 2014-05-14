@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mongodb-api</artifactId>
-    <name>Kiskis Management MongoDB Api</name>
-    <description>Kiskis Management MongoDB Api</description>
+    <name>Subutai MongoDB Api</name>
+    <description>Subutai MongoDB Api</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>presto-rest</artifactId>
-    <name>Kiskis Management Presto REST</name>
-    <description>Kiskis Management Presto REST</description>
+    <name>Subutai Presto REST</name>
+    <description>Subutai Presto REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

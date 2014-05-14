@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>sqoop-ui</artifactId>
-    <name>Kiskis Management Sqoop UI</name>
-    <description>Kiskis Management Sqoop UI</description>
+    <name>Subutai Sqoop UI</name>
+    <description>Subutai Sqoop UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

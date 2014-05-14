@@ -11,8 +11,8 @@
 
     <artifactId>lucene-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Lucene Api</name>
-    <description>Kiskis Management Lucene Api</description>
+    <name>Subutai Lucene Api</name>
+    <description>Subutai Lucene Api</description>
 
     <dependencies>
         <dependency>

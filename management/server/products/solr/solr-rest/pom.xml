@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>solr-rest</artifactId>
-    <name>Kiskis Management Solr REST</name>
-    <description>Kiskis Management Solr REST</description>
+    <name>Subutai Solr REST</name>
+    <description>Subutai Solr REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

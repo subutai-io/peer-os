@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mongodb-rest</artifactId>
-    <name>Kiskis Management Mongodb REST</name>
-    <description>Kiskis Management Mongodb REST</description>
+    <name>Subutai Mongodb REST</name>
+    <description>Subutai Mongodb REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

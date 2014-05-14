@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>agent-manager-impl</artifactId>
-    <name>Kiskis Management Agent Manager</name>
+    <name>Subutai Agent Manager</name>
     <description>agent manager impl</description>
 
     <packaging>bundle</packaging>

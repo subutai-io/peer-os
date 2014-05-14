@@ -6,7 +6,7 @@
     <artifactId>mgmt-parent</artifactId>
     <version>2.0.0</version>
 
-    <name>Kiskis Management Server Project Parent</name>
+    <name>Subutai Server Project Parent</name>
 
     <packaging>pom</packaging>
 
@@ -15,7 +15,7 @@
         <module>server</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Project Artifacts</description>
+    <description>Parent project for the Subutai Project Artifacts</description>
 
     <repositories>
         <repository>
@@ -174,7 +174,7 @@
             <dependency>
                 <groupId>org.cassandraunit</groupId>
                 <artifactId>cassandra-unit</artifactId>
-                <version>${org.cassandraunit.version}}</version>
+                <version>${org.cassandraunit.version}</version>
             </dependency>
             <!--db-manager-impl-->
 

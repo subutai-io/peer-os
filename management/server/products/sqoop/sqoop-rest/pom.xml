@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>sqoop-rest</artifactId>
-    <name>Kiskis Management Sqoop REST</name>
-    <description>Kiskis Management Sqoop REST</description>
+    <name>Subutai Sqoop REST</name>
+    <description>Subutai Sqoop REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>pig-cli</artifactId>
-    <name>Kiskis Management Pig CLI</name>
-    <description>Kiskis Management Pig CLI</description>
+    <name>Subutai Pig CLI</name>
+    <description>Subutai Pig CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

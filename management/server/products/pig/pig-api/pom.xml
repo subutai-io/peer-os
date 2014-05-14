@@ -11,8 +11,8 @@
 
     <artifactId>pig-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Pig Api</name>
-    <description>Kiskis Management Pig Api</description>
+    <name>Subutai Pig Api</name>
+    <description>Subutai Pig Api</description>
 
     <dependencies>
         <dependency>

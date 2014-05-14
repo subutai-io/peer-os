@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mahout-rest</artifactId>
-    <name>Kiskis Management Mahout REST</name>
-    <description>Kiskis Management Mahout REST</description>
+    <name>Subutai Mahout REST</name>
+    <description>Subutai Mahout REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -11,8 +11,8 @@
 
     <artifactId>shark-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Shark</name>
-    <description>Kiskis Management Shark</description>
+    <name>Subutai Shark</name>
+    <description>Subutai Shark</description>
 
     <dependencies>
         <dependency>

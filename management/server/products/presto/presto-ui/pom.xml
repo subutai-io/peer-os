@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>presto-ui</artifactId>
-    <name>Kiskis Management Presto UI</name>
-    <description>Kiskis Management Presto UI</description>
+    <name>Subutai Presto UI</name>
+    <description>Subutai Presto UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

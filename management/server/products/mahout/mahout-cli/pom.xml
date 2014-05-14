@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mahout-cli</artifactId>
-    <name>Kiskis Management Mahout CLI</name>
-    <description>Kiskis Management Mahout CLI</description>
+    <name>Subutai Mahout CLI</name>
+    <description>Subutai Mahout CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

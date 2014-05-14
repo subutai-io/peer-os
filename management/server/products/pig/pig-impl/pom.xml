@@ -11,8 +11,8 @@
 
     <artifactId>pig-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Pig</name>
-    <description>Kiskis Management Pig</description>
+    <name>Subutai Pig</name>
+    <description>Subutai Pig</description>
 
     <dependencies>
         <dependency>

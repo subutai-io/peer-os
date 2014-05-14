@@ -11,8 +11,8 @@
 
     <artifactId>presto-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Presto Api</name>
-    <description>Kiskis Management Presto Api</description>
+    <name>Subutai Presto Api</name>
+    <description>Subutai Presto Api</description>
 
     <dependencies>
         <dependency>

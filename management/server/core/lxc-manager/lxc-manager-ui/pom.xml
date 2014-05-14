@@ -11,8 +11,8 @@
 
     <artifactId>lxc-manager-ui</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Lxc Manager UI</name>
-    <description>Kiskis Management Lxc Manager UI</description>
+    <name>Subutai Lxc Manager UI</name>
+    <description>Subutai Lxc Manager UI</description>
 
     <dependencies>
         <dependency>

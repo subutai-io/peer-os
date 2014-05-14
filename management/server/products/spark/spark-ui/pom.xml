@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>spark-ui</artifactId>
-    <name>Kiskis Management Spark UI</name>
-    <description>Kiskis Management Spark UI</description>
+    <name>Subutai Spark UI</name>
+    <description>Subutai Spark UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

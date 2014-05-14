@@ -11,8 +11,8 @@
 
     <artifactId>sqoop-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Sqoop Api</name>
-    <description>Kiskis Management Sqoop Api</description>
+    <name>Subutai Sqoop Api</name>
+    <description>Subutai Sqoop Api</description>
 
     <dependencies>
         <dependency>

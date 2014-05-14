@@ -11,8 +11,8 @@
 
     <artifactId>spark-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Spark</name>
-    <description>Kiskis Management Spark</description>
+    <name>Subutai Spark</name>
+    <description>Subutai Spark</description>
 
     <dependencies>
         <dependency>

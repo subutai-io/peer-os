@@ -11,8 +11,8 @@
 
     <artifactId>mongodb-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management MongoDB</name>
-    <description>Kiskis Management MongoDB</description>
+    <name>Subutai MongoDB</name>
+    <description>Subutai MongoDB</description>
 
     <dependencies>
         <dependency>

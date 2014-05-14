@@ -11,8 +11,8 @@
 
     <artifactId>spark-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Spark Api</name>
-    <description>Kiskis Management Spark Api</description>
+    <name>Subutai Spark Api</name>
+    <description>Subutai Spark Api</description>
 
     <dependencies>
         <dependency>

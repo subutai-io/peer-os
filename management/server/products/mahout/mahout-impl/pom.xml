@@ -11,8 +11,8 @@
 
     <artifactId>mahout-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Mahout</name>
-    <description>Kiskis Management Mahout</description>
+    <name>Subutai Mahout</name>
+    <description>Subutai Mahout</description>
 
     <dependencies>
         <dependency>

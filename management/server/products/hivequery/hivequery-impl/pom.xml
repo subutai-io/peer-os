@@ -11,8 +11,8 @@
 
     <artifactId>hivequery-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Hive Query</name>
-    <description>Kiskis Management Hive Query</description>
+    <name>Subutai Hive Query</name>
+    <description>Subutai Hive Query</description>
 
     <dependencies>
         <dependency>

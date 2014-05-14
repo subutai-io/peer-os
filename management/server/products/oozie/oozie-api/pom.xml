@@ -11,8 +11,8 @@
 
     <artifactId>oozie-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Oozie Api</name>
-    <description>Kiskis Management Oozie Api</description>
+    <name>Subutai Oozie Api</name>
+    <description>Subutai Oozie Api</description>
 
     <dependencies>
         <dependency>

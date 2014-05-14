@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mongodb-cli</artifactId>
-    <name>Kiskis Management Mongodb CLI</name>
-    <description>Kiskis Management Mongodb CLI</description>
+    <name>Subutai Mongodb CLI</name>
+    <description>Subutai Mongodb CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

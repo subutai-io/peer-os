@@ -11,8 +11,8 @@
 
     <artifactId>solr-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Solr Api</name>
-    <description>Kiskis Management Solr Api</description>
+    <name>Subutai Solr Api</name>
+    <description>Subutai Solr Api</description>
 
     <dependencies>
         <dependency>

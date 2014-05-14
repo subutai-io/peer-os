@@ -11,8 +11,8 @@
 
     <artifactId>mahout-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Mahout Api</name>
-    <description>Kiskis Management Mahout Api</description>
+    <name>Subutai Mahout Api</name>
+    <description>Subutai Mahout Api</description>
 
     <dependencies>
         <dependency>

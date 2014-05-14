@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>shark-ui</artifactId>
-    <name>Kiskis Management Shark UI</name>
-    <description>Kiskis Management Shark UI</description>
+    <name>Subutai Shark UI</name>
+    <description>Subutai Shark UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

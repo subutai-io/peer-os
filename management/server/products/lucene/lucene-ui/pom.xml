@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>lucene-ui</artifactId>
-    <name>Kiskis Management Lucene UI</name>
-    <description>Kiskis Management Lucene UI</description>
+    <name>Subutai Lucene UI</name>
+    <description>Subutai Lucene UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

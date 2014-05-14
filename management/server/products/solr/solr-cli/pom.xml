@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>solr-cli</artifactId>
-    <name>Kiskis Management Solr CLI</name>
-    <description>Kiskis Management Solr CLI</description>
+    <name>Subutai Solr CLI</name>
+    <description>Subutai Solr CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

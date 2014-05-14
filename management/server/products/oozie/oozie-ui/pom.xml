@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>oozie-ui</artifactId>
-    <name>Kiskis Management Oozie UI</name>
-    <description>Kiskis Management Oozie UI</description>
+    <name>Subutai Oozie UI</name>
+    <description>Subutai Oozie UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

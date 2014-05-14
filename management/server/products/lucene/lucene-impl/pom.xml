@@ -11,8 +11,8 @@
 
     <artifactId>lucene-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Lucene</name>
-    <description>Kiskis Management Lucene</description>
+    <name>Subutai Lucene</name>
+    <description>Subutai Lucene</description>
 
     <dependencies>
         <dependency>

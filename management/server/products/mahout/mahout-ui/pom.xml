@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>mahout-ui</artifactId>
-    <name>Kiskis Management Mahout UI</name>
-    <description>Kiskis Management Mahout UI</description>
+    <name>Subutai Mahout UI</name>
+    <description>Subutai Mahout UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

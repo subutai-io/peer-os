@@ -11,8 +11,8 @@
 
     <artifactId>solr-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Solr</name>
-    <description>Kiskis Management Solr</description>
+    <name>Subutai Solr</name>
+    <description>Subutai Solr</description>
 
     <dependencies>
         <dependency>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>zookeeper-cli</artifactId>
-    <name>Kiskis Management Zookeeper CLI</name>
-    <description>Kiskis Management Zookeeper CLI</description>
+    <name>Subutai Zookeeper CLI</name>
+    <description>Subutai Zookeeper CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

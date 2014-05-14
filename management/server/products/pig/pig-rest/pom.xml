@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>pig-rest</artifactId>
-    <name>Kiskis Management Pig REST</name>
-    <description>Kiskis Management Pig REST</description>
+    <name>Subutai Pig REST</name>
+    <description>Subutai Pig REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

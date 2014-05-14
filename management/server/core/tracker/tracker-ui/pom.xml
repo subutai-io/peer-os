@@ -11,8 +11,8 @@
 
     <artifactId>tracker-ui</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Tracker UI</name>
-    <description>Kiskis Management Tracker UI</description>
+    <name>Subutai Tracker UI</name>
+    <description>Subutai Tracker UI</description>
 
     <dependencies>
         <dependency>

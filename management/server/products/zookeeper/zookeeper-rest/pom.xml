@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>zookeeper-rest</artifactId>
-    <name>Kiskis Management Zookeeper REST</name>
-    <description>Kiskis Management Zookeeper REST</description>
+    <name>Subutai Zookeeper REST</name>
+    <description>Subutai Zookeeper REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

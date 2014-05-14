@@ -11,8 +11,8 @@
 
     <artifactId>shark-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Shark Api</name>
-    <description>Kiskis Management Shark Api</description>
+    <name>Subutai Shark Api</name>
+    <description>Subutai Shark Api</description>
 
     <dependencies>
         <dependency>

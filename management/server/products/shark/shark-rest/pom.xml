@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>shark-rest</artifactId>
-    <name>Kiskis Management Shark REST</name>
-    <description>Kiskis Management Shark REST</description>
+    <name>Subutai Shark REST</name>
+    <description>Subutai Shark REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>
