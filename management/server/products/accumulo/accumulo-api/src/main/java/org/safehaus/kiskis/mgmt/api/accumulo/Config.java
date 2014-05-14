@@ -18,6 +18,8 @@ public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Accumulo";
     private String clusterName = "";
+    private String instanceName = "";
+    private String password = "";
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;
@@ -25,7 +27,7 @@ public class Config implements ConfigBase {
     private Set<Agent> slaves;
 
     public Set<Agent> getAllNodes() {
-        Set<Agent> allNodes = new HashSet<Agent>();
+        Set<Agent> allNodes = new HashSet<>();
 
         allNodes.add(masterNode);
         allNodes.add(gcNode);
@@ -89,9 +91,26 @@ public class Config implements ConfigBase {
         return PRODUCT_KEY;
     }
 
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public void reset() {
         clusterName = "";
+        instanceName = "";
+        password = "";
         masterNode = null;
         gcNode = null;
         monitor = null;
@@ -103,6 +122,8 @@ public class Config implements ConfigBase {
     public String toString() {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
+                ", instanceName='" + instanceName + '\'' +
+                ", password='" + password + '\'' +
                 ", masterNode=" + masterNode +
                 ", gcNode=" + gcNode +
                 ", monitor=" + monitor +

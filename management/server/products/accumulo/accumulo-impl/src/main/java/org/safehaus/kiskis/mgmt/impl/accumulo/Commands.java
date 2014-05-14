@@ -143,4 +143,10 @@ public class Commands extends CommandsSingleton {
                 new RequestBuilder(String.format(". /etc/profile && accumulo-property.sh clear %s", propertyName)),
                 agents);
     }
+
+    public static Command getInitCommand(String instanceName, String password, Set<Agent> agents) {
+        return createCommand(
+                new RequestBuilder(String.format(". /etc/profile && accumulo-init.sh %s %s", instanceName, password)),
+                agents);
+    }
 }

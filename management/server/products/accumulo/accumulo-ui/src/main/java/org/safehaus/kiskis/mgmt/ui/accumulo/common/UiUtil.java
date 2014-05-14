@@ -77,6 +77,14 @@ public class UiUtil {
         return table;
     }
 
+    public static TextField getTextField(String prompt, int maxLength) {
+        TextField textField = new TextField();
+        textField.setInputPrompt(prompt);
+        textField.setMaxLength(maxLength);
+        textField.setRequired(true);
+        return textField;
+    }
+
     public static void showMsg(String msg, Window window) {
         if (window != null && !Strings.isNullOrEmpty(msg)) {
             window.showNotification(msg);

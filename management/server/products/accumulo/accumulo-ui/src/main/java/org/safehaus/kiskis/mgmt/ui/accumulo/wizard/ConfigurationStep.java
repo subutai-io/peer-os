@@ -25,19 +25,18 @@ public class ConfigurationStep extends Panel {
 
     public ConfigurationStep(final Wizard wizard) {
 
-        setSizeFull();
-
-        GridLayout content = new GridLayout(4, 4);
-        content.setSizeFull();
-        content.setSpacing(true);
-        content.setMargin(true);
-
         //hadoop combo
         final ComboBox hadoopClustersCombo = UiUtil.getCombo("Hadoop cluster");
         //master nodes
         final ComboBox masterNodeCombo = UiUtil.getCombo("Master node");
         final ComboBox gcNodeCombo = UiUtil.getCombo("GC node");
         final ComboBox monitorNodeCombo = UiUtil.getCombo("Monitor node");
+        //accumulo init controls
+        Label instanceNameLbl = new Label("Instance name");
+        TextField instanceNameTxtFld = UiUtil.getTextField("Instance name", 20);
+        Label passwordLabel = new Label("Password");
+        TextField passwordTxtFld = UiUtil.getTextField("Password", 20);
+        //tracers
         final TwinColSelect tracersSelect = UiUtil.getTwinSelect("Tracers", "hostname", "Available Nodes", "Selected Nodes", 4);
         //slave nodes
         final TwinColSelect slavesSelect = UiUtil.getTwinSelect("Slaves", "hostname", "Available Nodes", "Selected Nodes", 4);
@@ -187,6 +186,24 @@ public class ConfigurationStep extends Panel {
             slavesSelect.setValue(wizard.getConfig().getSlaves());
         }
 
+
+        instanceNameTxtFld.setValue(wizard.getConfig().getInstanceName());
+        instanceNameTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setInstanceName(event.getProperty().getValue().toString().trim());
+            }
+        });
+
+        passwordTxtFld.setValue(wizard.getConfig().getPassword());
+        passwordTxtFld.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setPassword(event.getProperty().getValue().toString().trim());
+            }
+        });
+
+
         //add value change handler
         tracersSelect.addListener(new Property.ValueChangeListener() {
 
@@ -219,6 +236,10 @@ public class ConfigurationStep extends Panel {
                     show("Please, select Hadoop cluster");
                 } else if (wizard.getConfig().getMasterNode() == null) {
                     show("Please, select master node");
+                } else if (Strings.isNullOrEmpty(wizard.getConfig().getInstanceName())) {
+                    show("Please, specify instance name");
+                } else if (Strings.isNullOrEmpty(wizard.getConfig().getPassword())) {
+                    show("Please, specify password");
                 } else if (wizard.getConfig().getGcNode() == null) {
                     show("Please, select gc node");
                 } else if (wizard.getConfig().getMonitor() == null) {
@@ -241,22 +262,40 @@ public class ConfigurationStep extends Panel {
             }
         });
 
+
+        setSizeFull();
+
+        VerticalLayout content = new VerticalLayout();
+        content.setSizeFull();
+        content.setSpacing(true);
+        content.setMargin(true);
+
         VerticalLayout layout = new VerticalLayout();
         layout.setSpacing(true);
         layout.addComponent(new Label("Please, specify installation settings"));
         layout.addComponent(content);
 
+        HorizontalLayout masters = new HorizontalLayout();
+        masters.addComponent(hadoopClustersCombo);
+        masters.addComponent(masterNodeCombo);
+        masters.addComponent(gcNodeCombo);
+        masters.addComponent(monitorNodeCombo);
+
+        HorizontalLayout credentials = new HorizontalLayout();
+        credentials.addComponent(instanceNameLbl);
+        credentials.addComponent(instanceNameTxtFld);
+        credentials.addComponent(passwordLabel);
+        credentials.addComponent(passwordTxtFld);
+
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(back);
         buttons.addComponent(next);
 
-        content.addComponent(hadoopClustersCombo, 0, 0);
-        content.addComponent(masterNodeCombo, 1, 0);
-        content.addComponent(gcNodeCombo, 2, 0);
-        content.addComponent(monitorNodeCombo, 3, 0);
-        content.addComponent(tracersSelect, 0, 1, 3, 1);
-        content.addComponent(slavesSelect, 0, 2, 3, 2);
-        content.addComponent(buttons, 0, 3, 3, 3);
+        content.addComponent(masters);
+        content.addComponent(credentials);
+        content.addComponent(tracersSelect);
+        content.addComponent(slavesSelect);
+        content.addComponent(buttons);
 
         addComponent(layout);
 
