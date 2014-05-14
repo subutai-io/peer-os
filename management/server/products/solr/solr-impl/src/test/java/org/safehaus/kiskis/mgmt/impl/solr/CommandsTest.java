@@ -1,13 +1,61 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
-import org.junit.Test;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import java.util.Set;
 
-public class CommandsTest {
+import com.google.common.collect.Sets;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.kiskis.mgmt.impl.solr.util.CommandRunnerMock;
+import org.safehaus.kiskis.mgmt.impl.solr.util.TestUtil;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotSame;
+
+public class CommandsTest
+{
+    @BeforeClass
+    public static void setUp()
+    {
+        Commands.init( new CommandRunnerMock() );
+    }
 
     @Test
-    public void test() {
-        assertEquals( 1, 2 );
+    public void getInstallCommand()
+    {
+        Set<Agent> agents = Sets.newHashSet( TestUtil.getAgent() );
+        Command command = Commands.getInstallCommand( agents );
+
+        assertNotNull( command );
+        assertEquals( Commands.INSTALL, command.getDescription() );
+    }
+
+    @Test
+    public void getStartCommand()
+    {
+        Command command = Commands.getStartCommand( TestUtil.getAgent() );
+
+        assertNotNull( command );
+        assertEquals( Commands.START, command.getDescription() );
+    }
+
+    @Test
+    public void getStopCommand()
+    {
+        Command command = Commands.getStopCommand( TestUtil.getAgent() );
+
+        assertNotNull( command );
+        assertEquals( Commands.STOP, command.getDescription() );
+    }
+
+    @Test
+    public void getStatusCommand()
+    {
+        Command command = Commands.getStatusCommand( TestUtil.getAgent() );
+
+        assertNotNull( command );
+        assertEquals( Commands.STATUS, command.getDescription() );
     }
 }

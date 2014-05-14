@@ -1,8 +1,15 @@
 package org.safehaus.kiskis.mgmt.impl.solr.util;
 
+import java.util.Arrays;
+import java.util.UUID;
 
-/**
- * Created with IntelliJ IDEA. User: dev Date: 14.05.14 Time: 22:35 To change this template use File | Settings | File
- * Templates.
- */
-public class TestUtil {}
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+public class TestUtil
+{
+    public static Agent getAgent()
+    {
+        return new Agent( UUID.randomUUID(), "hostname", "parenthost", "MAC-addr", Arrays.asList( "127.0.0.1" ), true,
+                "transportId" );
+    }
+}
