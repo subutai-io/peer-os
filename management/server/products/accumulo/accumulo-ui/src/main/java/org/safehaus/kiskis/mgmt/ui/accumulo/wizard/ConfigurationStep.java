@@ -32,10 +32,8 @@ public class ConfigurationStep extends Panel {
         final ComboBox gcNodeCombo = UiUtil.getCombo("GC node");
         final ComboBox monitorNodeCombo = UiUtil.getCombo("Monitor node");
         //accumulo init controls
-        Label instanceNameLbl = new Label("Instance name");
-        TextField instanceNameTxtFld = UiUtil.getTextField("Instance name", 20);
-        Label passwordLabel = new Label("Password");
-        TextField passwordTxtFld = UiUtil.getTextField("Password", 20);
+        TextField instanceNameTxtFld = UiUtil.getTextField("Instance name", "Instance name", 20);
+        TextField passwordTxtFld = UiUtil.getTextField("Password", "Password", 20);
         //tracers
         final TwinColSelect tracersSelect = UiUtil.getTwinSelect("Tracers", "hostname", "Available Nodes", "Selected Nodes", 4);
         //slave nodes
@@ -286,9 +284,7 @@ public class ConfigurationStep extends Panel {
         HorizontalLayout credentials = new HorizontalLayout();
         credentials.setMargin(new Layout.MarginInfo(true, false, false, false));
         credentials.setSpacing(true);
-        credentials.addComponent(instanceNameLbl);
         credentials.addComponent(instanceNameTxtFld);
-        credentials.addComponent(passwordLabel);
         credentials.addComponent(passwordTxtFld);
 
         HorizontalLayout buttons = new HorizontalLayout();

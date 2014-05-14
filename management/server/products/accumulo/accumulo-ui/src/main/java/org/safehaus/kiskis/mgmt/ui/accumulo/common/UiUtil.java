@@ -77,8 +77,8 @@ public class UiUtil {
         return table;
     }
 
-    public static TextField getTextField(String prompt, int maxLength) {
-        TextField textField = new TextField();
+    public static TextField getTextField(String caption, String prompt, int maxLength) {
+        TextField textField = new TextField(caption);
         textField.setInputPrompt(prompt);
         textField.setMaxLength(maxLength);
         textField.setRequired(true);
