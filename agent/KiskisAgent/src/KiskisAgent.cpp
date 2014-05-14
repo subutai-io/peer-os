@@ -21,8 +21,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.5
- *  @date      May 8 , 2014
+ *  @version   1.0.6
+ *  @date      May 12 , 2014
  */
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
@@ -590,7 +590,7 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						fstream file;	//opening uuid.txt
 						file.open("/etc/ksks-agent/config/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-						file << input << endl ;
+						file << input;
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Received Message to internal currentProcess!"));
 						file.close();
 					}
@@ -659,18 +659,8 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						ofstream file3("/etc/ksks-agent/config/commandQueue2.txt");
 						input = "";
-						int count=0;
-						do
-						{
-							getline(file2,str2);
-							if(str2.find("{") != string::npos)
-								count++;
-							input=input + str2 + "\n";
-							str+=str2;
-							if(str2.find("}") != string::npos)
-								count--;
-						}while(count>0);
-						//					file3.open",fstream::in | fstream::out | fstream::app);
+						getline(file2,str2);
+						input = str2;
 						while(getline(file2,str2))
 						{
 							file3 << str2 << endl;
