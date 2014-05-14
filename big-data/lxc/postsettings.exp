@@ -44,6 +44,8 @@ expect "# " { send "apt-get --assume-yes --force-yes install openjdk-7-jre\r" }
 sleep 1
 expect "# " { send "dpkg -i jmxtrans-1.0.1-amd64.deb\r"}
 sleep 1
+expect "# " { send "apt-get --assume-yes --force-yes install expect\r"}
+sleep 1
 expect "JVM Min/Max Heap size (MB): " { send "\r"}
 sleep 1
 #Editin collectd conf file using collectd-conf.sh
