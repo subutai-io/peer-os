@@ -144,16 +144,26 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                                     manager.getCommandRunner().runCommand(setZkClusterCommand);
 
                                     if (setZkClusterCommand.hasSucceeded()) {
-                                        po.addLog("Setting ZK cluster succeeded\nStarting cluster...");
+                                        po.addLog("Setting ZK cluster succeeded\nInitializing cluster with HDFS...");
 
-                                        Command startClusterCommand = Commands.getStartCommand(config.getMasterNode());
-                                        manager.getCommandRunner().runCommand(startClusterCommand);
+                                        Command initCommand = Commands.getInitCommand(config.getInstanceName(), config.getPassword(), config.getMasterNode());
+                                        manager.getCommandRunner().runCommand(initCommand);
 
-                                        if (startClusterCommand.hasSucceeded()) {
-                                            po.addLogDone("Cluster started successfully\nDone");
+                                        if (initCommand.hasSucceeded()) {
+                                            po.addLog("Initialization succeeded\nStarting cluster...");
+
+                                            Command startClusterCommand = Commands.getStartCommand(config.getMasterNode());
+                                            manager.getCommandRunner().runCommand(startClusterCommand);
+
+                                            if (startClusterCommand.hasSucceeded()) {
+                                                po.addLogDone("Cluster started successfully\nDone");
+                                            } else {
+                                                po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
+                                            }
                                         } else {
-                                            po.addLogFailed(String.format("Starting cluster failed, %s", startClusterCommand.getAllErrors()));
+                                            po.addLogFailed(String.format("Initialization failed, %s", initCommand.getAllErrors()));
                                         }
+
                                     } else {
                                         po.addLogFailed(String.format("Setting ZK cluster failed, %s", setZkClusterCommand.getAllErrors()));
                                     }

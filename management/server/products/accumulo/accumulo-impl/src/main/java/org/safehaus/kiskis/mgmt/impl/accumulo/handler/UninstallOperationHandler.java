@@ -45,6 +45,18 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
             } else {
                 po.addLog(String.format("Uninstallation failed, %s, skipping...", uninstallCommand.getAllErrors()));
             }
+
+            po.addLog("Removing Accumulo from HDFS...");
+
+            Command removeAccumuloFromHDFSCommand = Commands.getRemoveAccumuloFromHFDSCommand(config.getMasterNode());
+            manager.getCommandRunner().runCommand(removeAccumuloFromHDFSCommand);
+
+            if (removeAccumuloFromHDFSCommand.hasSucceeded()) {
+                po.addLog("Accumulo successfully removed from HDFS");
+            } else {
+                po.addLog(String.format("Removing Accumulo from HDFS failed, %s, skipping...", removeAccumuloFromHDFSCommand.getAllErrors()));
+            }
+
             po.addLog("Updating db...");
             if (manager.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
                 po.addLogDone("Cluster info deleted from DB\nDone");

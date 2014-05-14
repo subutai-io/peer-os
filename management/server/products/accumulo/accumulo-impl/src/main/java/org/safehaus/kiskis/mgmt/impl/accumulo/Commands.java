@@ -144,9 +144,15 @@ public class Commands extends CommandsSingleton {
                 agents);
     }
 
-    public static Command getInitCommand(String instanceName, String password, Set<Agent> agents) {
+    public static Command getInitCommand(String instanceName, String password, Agent agent) {
         return createCommand(
                 new RequestBuilder(String.format(". /etc/profile && accumulo-init.sh %s %s", instanceName, password)),
-                agents);
+                Util.wrapAgentToSet(agent));
+    }
+
+    public static Command getRemoveAccumuloFromHFDSCommand(Agent agent) {
+        return createCommand(
+                new RequestBuilder(". /etc/profile && hadoop dfs -rmr /accumulo"),
+                Util.wrapAgentToSet(agent));
     }
 }
