@@ -119,7 +119,7 @@ public class InstallHandler extends AbstractHandler {
         po.addLog("Cluster info successfully saved");
 
         if(configure(config))
-            po.addLogDone("Storm cluster successfully configures");
+            po.addLogDone("Storm cluster successfully configured");
         else
             po.addLogFailed("Failed to configure Storm cluster");
     }

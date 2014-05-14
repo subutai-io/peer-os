@@ -3,6 +3,7 @@ package org.safehaus.kiskis.mgmt.impl.storm.handler;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
@@ -48,6 +49,7 @@ public class AddNodeHandler extends AbstractHandler {
         set.add(agent);
 
         // check if Storm is already installed
+        po.addLog("Checking installed packages");
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.LIST)), set);
         manager.getCommandRunner().runCommand(cmd);
@@ -64,8 +66,11 @@ public class AddNodeHandler extends AbstractHandler {
         }
 
         if(!skipInstall) {
+            po.addLog("Installing Storm...");
+            String s = Commands.make(CommandType.INSTALL);
+            int t = (int)TimeUnit.MINUTES.toSeconds(15);
             cmd = manager.getCommandRunner().createCommand(
-                    new RequestBuilder(Commands.make(CommandType.INSTALL)), set);
+                    new RequestBuilder(s).withTimeout(t), set);
             manager.getCommandRunner().runCommand(cmd);
             if(cmd.hasSucceeded())
                 po.addLog("Storm successfully installed on " + hostname);

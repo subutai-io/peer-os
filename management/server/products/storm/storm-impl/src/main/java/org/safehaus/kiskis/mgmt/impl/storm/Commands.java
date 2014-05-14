@@ -23,8 +23,6 @@ public class Commands {
             case RESTART:
                 if(service != null) {
                     sb = new StringBuilder();
-                    // TODO:
-                    //sb.append(EXEC_PROFILE).append(" && ");
                     sb.append("service ").append(service.getService());
                     sb.append(" ").append(type.toString().toLowerCase());
                 }
