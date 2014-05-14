@@ -6,8 +6,7 @@
     <parent>
         <groupId>org.safehaus.kiskis.mgmt</groupId>
         <artifactId>mgmt-server-products-parent</artifactId>
-        <version>${global.version}</version>
-        <relativePath>..</relativePath>
+        <version>2.0.0</version>
     </parent>
     
     <artifactId>storm-parent</artifactId>
