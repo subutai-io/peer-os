@@ -1,10 +1,24 @@
 package org.safehaus.kiskis.mgmt.hbase.services;
 
+import org.safehaus.kiskis.mgmt.api.hbase.HBase;
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
+
+    private HBase hbaseManager;
+
+
+    public HBase getHbaseManager() {
+        return hbaseManager;
+    }
+
+    public void setHbaseManager(HBase hbaseManager) {
+        this.hbaseManager = hbaseManager;
+    }
+
     @Override
     public String installCluster(String clusterName) {
         return null;

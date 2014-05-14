@@ -20,7 +20,6 @@
     </jaxrs:server>
 
     <bean id="cassandraRestServiceImpl" class="org.safehaus.kiskis.mgmt.cassandra.services.RestServiceImpl">
-        <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
         <property name="cassandraManager" ref="cassandraManager"/>
     </bean>
 
