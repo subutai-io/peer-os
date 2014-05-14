@@ -276,18 +276,21 @@ public class ConfigurationStep extends Panel {
         layout.addComponent(content);
 
         HorizontalLayout masters = new HorizontalLayout();
+        masters.setMargin(true);
         masters.addComponent(hadoopClustersCombo);
         masters.addComponent(masterNodeCombo);
         masters.addComponent(gcNodeCombo);
         masters.addComponent(monitorNodeCombo);
 
         HorizontalLayout credentials = new HorizontalLayout();
+        credentials.setMargin(true);
         credentials.addComponent(instanceNameLbl);
         credentials.addComponent(instanceNameTxtFld);
         credentials.addComponent(passwordLabel);
         credentials.addComponent(passwordTxtFld);
 
         HorizontalLayout buttons = new HorizontalLayout();
+        buttons.setMargin(true);
         buttons.addComponent(back);
         buttons.addComponent(next);
 
