@@ -4,10 +4,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-//Maps for the `say` in the URL
-@Path("say")
+@Path("install")
 public interface RestService {
     @GET
-    @Path("hello/{name}") //Maps for the `hello/John` in the URL
-    public String handleGet(@PathParam("name") String name);
+    @Path("cluster/{clusterName}/{domainName}/{numberOfNodes}/{numberOfSeeds}")
+    public String handleGet(@PathParam("clusterName") String clusterName,
+                            @PathParam("domainName") String domainName,
+                            @PathParam("numberOfNodes") String numberOfNodes,
+                            @PathParam("numberOfSeeds") String numberOfSeeds);
 }
