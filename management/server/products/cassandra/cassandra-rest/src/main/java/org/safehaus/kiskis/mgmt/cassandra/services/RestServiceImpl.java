@@ -11,8 +11,7 @@ import java.util.UUID;
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
+
     private Cassandra cassandraManager;
 
     public void setCassandraManager(Cassandra cassandraManager) {
@@ -23,9 +22,6 @@ public class RestServiceImpl implements RestService {
         return cassandraManager;
     }
 
-    /*
-        Constructor
-     */
     public RestServiceImpl() {
     }
 
