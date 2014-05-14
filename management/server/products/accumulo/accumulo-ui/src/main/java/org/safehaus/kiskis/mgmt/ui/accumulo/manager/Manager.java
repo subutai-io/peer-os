@@ -170,23 +170,28 @@ public class Manager {
                 if (config != null) {
 
                     org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = AccumuloUI.getHadoopManager().getCluster(config.getClusterName());
+                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = AccumuloUI.getZookeeperManager().getCluster(config.getClusterName());
                     if (hadoopConfig != null) {
-
-                        Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
-                        availableNodes.removeAll(config.getTracers());
-                        if (availableNodes.isEmpty()) {
-                            UiUtil.showMsg("All Hadoop nodes already have tracers installed", contentRoot.getWindow());
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.TRACER);
-                        MgmtApplication.addCustomWindow(addNodeWindow);
-                        addNodeWindow.addListener(new Window.CloseListener() {
-
-                            public void windowClose(Window.CloseEvent e) {
-                                refreshClustersInfo();
+                        if (zkConfig != null) {
+                            Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
+                            availableNodes.retainAll(zkConfig.getNodes());
+                            availableNodes.removeAll(config.getTracers());
+                            if (availableNodes.isEmpty()) {
+                                UiUtil.showMsg("All Hadoop nodes already have tracers installed", contentRoot.getWindow());
+                                return;
                             }
-                        });
+
+                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.TRACER);
+                            MgmtApplication.addCustomWindow(addNodeWindow);
+                            addNodeWindow.addListener(new Window.CloseListener() {
+
+                                public void windowClose(Window.CloseEvent e) {
+                                    refreshClustersInfo();
+                                }
+                            });
+                        } else {
+                            UiUtil.showMsg(String.format("Zookeeper cluster %s not found", config.getClusterName()), contentRoot.getWindow());
+                        }
                     } else {
                         UiUtil.showMsg(String.format("Hadoop cluster %s not found", config.getClusterName()), contentRoot.getWindow());
                     }
@@ -205,23 +210,28 @@ public class Manager {
                 if (config != null) {
 
                     org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = AccumuloUI.getHadoopManager().getCluster(config.getClusterName());
+                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = AccumuloUI.getZookeeperManager().getCluster(config.getClusterName());
                     if (hadoopConfig != null) {
-
-                        Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
-                        availableNodes.removeAll(config.getSlaves());
-                        if (availableNodes.isEmpty()) {
-                            UiUtil.showMsg("All Hadoop nodes already have slaves installed", contentRoot.getWindow());
-                            return;
-                        }
-
-                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.LOGGER);
-                        MgmtApplication.addCustomWindow(addNodeWindow);
-                        addNodeWindow.addListener(new Window.CloseListener() {
-
-                            public void windowClose(Window.CloseEvent e) {
-                                refreshClustersInfo();
+                        if (zkConfig != null) {
+                            Set<Agent> availableNodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
+                            availableNodes.retainAll(zkConfig.getNodes());
+                            availableNodes.removeAll(config.getSlaves());
+                            if (availableNodes.isEmpty()) {
+                                UiUtil.showMsg("All Hadoop nodes already have slaves installed", contentRoot.getWindow());
+                                return;
                             }
-                        });
+
+                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, availableNodes, NodeType.LOGGER);
+                            MgmtApplication.addCustomWindow(addNodeWindow);
+                            addNodeWindow.addListener(new Window.CloseListener() {
+
+                                public void windowClose(Window.CloseEvent e) {
+                                    refreshClustersInfo();
+                                }
+                            });
+                        } else {
+                            UiUtil.showMsg(String.format("Zookeeper cluster %s not found", config.getClusterName()), contentRoot.getWindow());
+                        }
                     } else {
                         UiUtil.showMsg(String.format("Hadoop cluster %s not found", config.getClusterName()), contentRoot.getWindow());
                     }
