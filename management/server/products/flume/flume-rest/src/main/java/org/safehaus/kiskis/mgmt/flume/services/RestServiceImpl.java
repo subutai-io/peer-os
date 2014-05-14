@@ -1,10 +1,22 @@
 package org.safehaus.kiskis.mgmt.flume.services;
 
+import org.safehaus.kiskis.mgmt.api.flume.Flume;
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
+
+    private Flume flumeManager;
+
+    public Flume getFlumeManager() {
+        return flumeManager;
+    }
+
+    public void setFlumeManager(Flume flumeManager) {
+        this.flumeManager = flumeManager;
+    }
 
     @Override
     public String installCluster(String clusterName) {
