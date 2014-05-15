@@ -11,8 +11,8 @@
     
     <artifactId>storm-parent</artifactId>
     <packaging>pom</packaging>
-    <name>Kiskis Management Storm Parent</name>
-    <description>Kiskis Management Storm Parent</description>
+    <name>Subutai Storm Parent</name>
+    <description>Subutai Storm Parent</description>
     
     <modules>
         <module>storm-api</module>

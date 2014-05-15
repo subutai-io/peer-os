@@ -11,8 +11,8 @@
     
     <artifactId>storm-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Storm Api</name>
-    <description>Kiskis Management Storm Api</description>
+    <name>Subutai Storm Api</name>
+    <description>Subutai Storm Api</description>
     
     <build>
         <plugins>
@@ -24,7 +24,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>${org.apache.felix.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -39,7 +38,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
