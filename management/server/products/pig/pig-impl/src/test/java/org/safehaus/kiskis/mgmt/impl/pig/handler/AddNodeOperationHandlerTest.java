@@ -4,6 +4,7 @@ package org.safehaus.kiskis.mgmt.impl.pig.handler;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.impl.pig.PigImpl;
+import org.safehaus.kiskis.mgmt.impl.pig.mock.PigImplMock;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
 
@@ -11,12 +12,12 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
-public class DestroyOperationHandlerTest {
+public class AddNodeOperationHandlerTest {
 
 
     @Test
     public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( new PigImplMock(), "test-cluster",
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( new PigImplMock(), "test-cluster",
                 "lxc-host" );
 
         operationHandler.run();
@@ -29,7 +30,7 @@ public class DestroyOperationHandlerTest {
     @Test
     public void testWithExistingCluster() {
         PigImpl pigImpl = new PigImplMock().setClusterConfig( new Config() );
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( pigImpl, "test-cluster", "lxc-host" );
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( pigImpl, "test-cluster", "lxc-host" );
 
         operationHandler.run();
 

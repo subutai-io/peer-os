@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.pig.handler;
+package org.safehaus.kiskis.mgmt.impl.pig.mock;
 
 
 import org.safehaus.kiskis.mgmt.api.pig.Config;

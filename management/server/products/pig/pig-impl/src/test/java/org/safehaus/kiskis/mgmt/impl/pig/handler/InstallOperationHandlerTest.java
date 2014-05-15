@@ -4,6 +4,7 @@ package org.safehaus.kiskis.mgmt.impl.pig.handler;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.impl.pig.PigImpl;
+import org.safehaus.kiskis.mgmt.impl.pig.mock.PigImplMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
