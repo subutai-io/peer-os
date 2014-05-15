@@ -10,8 +10,8 @@
 
     <artifactId>ui-vaadin-bridge</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Vaadin Bridge</name>
-    <description>Kiskis Management Vaadin Bridge</description>
+    <name>Subutai Vaadin Bridge</name>
+    <description>Subutai Vaadin Bridge</description>
 
     <dependencies>
         <dependency>

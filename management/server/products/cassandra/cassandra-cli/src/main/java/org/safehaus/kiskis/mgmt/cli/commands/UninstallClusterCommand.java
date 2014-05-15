@@ -43,28 +43,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
         UUID uuid = cassandraManager.uninstallCluster(clusterName);
-        int logSize = 0;
-        while (!Thread.interrupted()) {
-            ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
-            if (po != null) {
-                if (logSize != po.getLog().length()) {
-                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
-                    System.out.flush();
-                    logSize = po.getLog().length();
-                }
-                if (po.getState() != ProductOperationState.RUNNING) {
-                    break;
-                }
-            } else {
-                System.out.println("Product operation not found. Check logs");
-                break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                break;
-            }
-        }
+        tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
         return null;
     }
 }

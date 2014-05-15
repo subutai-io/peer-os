@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>command-runner-parent</artifactId>
-    <name>Kiskis Management Command Runner Parent</name>
-    <description>Kiskis Management Command Runner Parent</description>
+    <name>Subutai Command Runner Parent</name>
+    <description>Subutai Command Runner Parent</description>
     <packaging>pom</packaging>
 
     <modules>

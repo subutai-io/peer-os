@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>zookeeper-parent</artifactId>
-    <name>Kiskis Management Zookeeper Parent</name>
-    <description>Kiskis Management Zookeeper Parent</description>
+    <name>Subutai Zookeeper Parent</name>
+    <description>Subutai Zookeeper Parent</description>
     <packaging>pom</packaging>
 
     <modules>

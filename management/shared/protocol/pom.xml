@@ -8,7 +8,7 @@
         <version>2.0.0</version>
     </parent>
     <artifactId>mgmt-shared-protocol</artifactId>
-    <name>Kiskis Management Shared Protocol</name>
+    <name>Subutai Shared Protocol</name>
     <description>Shared Protocol Bundle</description>
 
     <packaging>bundle</packaging>

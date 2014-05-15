@@ -11,8 +11,8 @@
 
     <artifactId>hbase-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management HBase</name>
-    <description>Kiskis Management HBase</description>
+    <name>Subutai HBase</name>
+    <description>Subutai HBase</description>
 
     <dependencies>
         <dependency>

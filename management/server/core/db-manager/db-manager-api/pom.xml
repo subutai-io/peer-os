@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>db-manager-api</artifactId>
-    <name>Kiskis Management DB Manager Api</name>
+    <name>Subutai DB Manager Api</name>
     <description>DB Manager Api</description>
 
     <packaging>bundle</packaging>

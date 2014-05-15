@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hive-rest</artifactId>
-    <name>Kiskis Management Hive REST</name>
-    <description>Kiskis Management Hive REST</description>
+    <name>Subutai Hive REST</name>
+    <description>Subutai Hive REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

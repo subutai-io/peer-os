@@ -11,8 +11,8 @@
 
     <artifactId>accumulo-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Accumulo</name>
-    <description>Kiskis Management Accumulo</description>
+    <name>Subutai Accumulo</name>
+    <description>Subutai Accumulo</description>
 
     <dependencies>
         <dependency>

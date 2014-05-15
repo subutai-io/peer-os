@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>agent-manager-cli</artifactId>
-    <name>Kiskis Management Agent Manager CLI</name>
-    <description>Kiskis Management Agent Manager CLI</description>
+    <name>Subutai Agent Manager CLI</name>
+    <description>Subutai Agent Manager CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

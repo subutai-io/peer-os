@@ -9,10 +9,10 @@
     </parent>
 
     <artifactId>mgmt-server-karaf</artifactId>
-    <name>Kiskis Management Server Karaf</name>
+    <name>Subutai Server Karaf</name>
     <packaging>jar</packaging>
 
-    <description>Kiskis Management Server Custom Karaf Distribution</description>
+    <description>Subutai Server Custom Karaf Distribution</description>
 
     <dependencies>
         <dependency>

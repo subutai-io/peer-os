@@ -1,32 +1,30 @@
 package org.safehaus.kiskis.mgmt.oozie.services;
 
+import org.safehaus.kiskis.mgmt.api.oozie.Oozie;
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
 
-    public String handleGet(String name) {
-//        return helloService.sayHello(name);
-        return "Oozie " + name;
+    private Oozie oozieManager;
+
+    public Oozie getOozieManager() {
+        return oozieManager;
     }
 
-    /*
-        Constructor
-     */
-    public RestServiceImpl() {
+    public void setOozieManager(Oozie oozieManager) {
+        this.oozieManager = oozieManager;
     }
 
-    /*
-        Getters and Setters
-     */
-//    public HelloService getHelloService() {
-//        return helloService;
-//    }
-//
-//    public void setHelloService(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
+    @Override
+    public String installCluster(String clusterName) {
+        return null;
+    }
+
+    @Override
+    public String uninstallCluster(String clusterName) {
+        return null;
+    }
 }
