@@ -9,6 +9,7 @@ package org.safehaus.kiskis.mgmt.api.solr;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -20,7 +21,7 @@ public class Config implements ConfigBase {
     public static final String PRODUCT_KEY = "Solr";
     private String clusterName = "";
     private int numberOfNodes = 3;
-    private Set<Agent> nodes;
+    private Set<Agent> nodes = new HashSet<>();
 
 
     public String getClusterName() {

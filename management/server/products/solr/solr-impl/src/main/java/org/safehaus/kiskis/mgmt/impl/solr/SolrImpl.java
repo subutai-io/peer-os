@@ -23,7 +23,7 @@ public class SolrImpl implements Solr {
     private AgentManager agentManager;
     protected DbManager dbManager;
     private Tracker tracker;
-    private LxcManager lxcManager;
+    protected LxcManager lxcManager;
     private ExecutorService executor;
 
 

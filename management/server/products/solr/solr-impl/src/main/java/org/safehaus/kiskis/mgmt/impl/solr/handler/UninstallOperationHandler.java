@@ -6,8 +6,6 @@ import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
-import java.util.UUID;
-
 
 public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl> {
 

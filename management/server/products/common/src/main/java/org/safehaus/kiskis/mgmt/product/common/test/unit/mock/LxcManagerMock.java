@@ -17,6 +17,22 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 
 public class LxcManagerMock implements LxcManager {
+
+    private Map<Agent, Set<Agent>> mockLxcMap = new HashMap<Agent, Set<Agent>>();
+
+
+    public LxcManagerMock setMockLxcMap( Map<Agent, Set<Agent>> mockLxcMap ) {
+        this.mockLxcMap = mockLxcMap;
+        return this;
+    }
+
+
+    @Override
+    public Map<Agent, Set<Agent>> createLxcs( int count ) throws LxcCreateException {
+        return mockLxcMap;
+    }
+
+
     @Override
     public Map<Agent, Integer> getPhysicalServersWithLxcSlots() {
         return null;
@@ -62,12 +78,6 @@ public class LxcManagerMock implements LxcManager {
     @Override
     public boolean cloneNStartLxcOnHost( Agent physicalAgent, String lxcHostname ) {
         return false;
-    }
-
-
-    @Override
-    public Map<Agent, Set<Agent>> createLxcs( int count ) throws LxcCreateException {
-        return new HashMap<Agent, Set<Agent>>();
     }
 
 

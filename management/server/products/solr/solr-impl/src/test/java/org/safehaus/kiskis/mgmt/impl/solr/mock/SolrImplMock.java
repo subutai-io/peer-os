@@ -2,6 +2,7 @@ package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
@@ -44,5 +45,12 @@ public class SolrImplMock extends SolrImpl {
         this.dbManager = dbManager;
         return this;
     }
+
+
+    public SolrImplMock setLxcManager( LxcManager lxcManager ) {
+        this.lxcManager = lxcManager;
+        return this;
+    }
+
 
 }
