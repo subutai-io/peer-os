@@ -34,7 +34,7 @@ public class InstallOperationHandlerTest {
 
     @Test
     public void testWithClusterExists() {
-        SolrImpl solrImpl = MockBuilder.getSorlImplWithExistingCluster();
+        SolrImpl solrImpl = new SolrImplMock().setClusterConfig( new Config() );
         Config config = new Config().setClusterName( "test-cluster" );
         AbstractOperationHandler operationHandler = new InstallOperationHandler( solrImpl, config );
 

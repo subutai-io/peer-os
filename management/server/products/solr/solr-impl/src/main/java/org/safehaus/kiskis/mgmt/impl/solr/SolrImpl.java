@@ -21,7 +21,7 @@ public class SolrImpl implements Solr {
     protected Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
+    protected DbManager dbManager;
     private Tracker tracker;
     private LxcManager lxcManager;
     private ExecutorService executor;

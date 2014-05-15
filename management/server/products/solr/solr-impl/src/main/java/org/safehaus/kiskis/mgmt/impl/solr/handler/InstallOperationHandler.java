@@ -14,7 +14,6 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> {
@@ -26,12 +25,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
         this.config = config;
         productOperation = manager.getTracker()
                     .createProductOperation( Config.PRODUCT_KEY, String.format( "Installing %s", Config.PRODUCT_KEY ) );
-    }
-
-
-    @Override
-    public UUID getTrackerId() {
-        return productOperation.getId();
     }
 
 

@@ -1,51 +1,49 @@
 package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
+
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl> {
-    private final ProductOperation po;
 
-    public UninstallOperationHandler(SolrImpl manager, String clusterName) {
-        super(manager, clusterName);
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+    public UninstallOperationHandler( SolrImpl manager, String clusterName ) {
+        super( manager, clusterName );
+        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Destroying cluster %s", clusterName ) );
     }
 
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
 
     @Override
     public void run() {
-        Config config = manager.getCluster(clusterName);
-        if (config == null) {
-            po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+        Config config = manager.getCluster( clusterName );
+
+        if ( config == null ) {
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
-        po.addLog("Destroying lxc containers...");
+        productOperation.addLog( "Destroying lxc containers..." );
 
         try {
-            manager.getLxcManager().destroyLxcs(config.getNodes());
-            po.addLog("Lxc containers successfully destroyed");
-        } catch (LxcDestroyException ex) {
-            po.addLog(String.format("%s, skipping...", ex.getMessage()));
+            manager.getLxcManager().destroyLxcs( config.getNodes() );
+            productOperation.addLog( "Lxc containers successfully destroyed" );
         }
-        po.addLog("Updating db...");
-        if (manager.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-            po.addLogDone("Cluster info deleted from DB\nDone");
-        } else {
-            po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+        catch ( LxcDestroyException ex ) {
+            productOperation.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+        }
+
+        productOperation.addLog( "Updating db..." );
+
+        if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
+            productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+        }
+        else {
+            productOperation.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
         }
     }
 }

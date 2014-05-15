@@ -18,7 +18,9 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
     }
 
 
-    public abstract UUID getTrackerId();
+    public UUID getTrackerId() {
+        return productOperation.getId();
+    }
 
 
     public String getClusterName() {

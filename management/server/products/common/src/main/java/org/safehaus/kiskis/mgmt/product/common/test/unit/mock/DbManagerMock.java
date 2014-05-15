@@ -9,6 +9,9 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 
 
 public class DbManagerMock implements DbManager {
+
+    private boolean deleteInfoResult;
+
     @Override
     public ResultSet executeQuery( String cql, Object... values ) {
         return null;
@@ -41,6 +44,12 @@ public class DbManagerMock implements DbManager {
 
     @Override
     public boolean deleteInfo( String source, String key ) {
-        return false;
+        return deleteInfoResult;
+    }
+
+
+    public DbManagerMock setDeleteInfoResult( boolean result ) {
+        deleteInfoResult = result;
+        return this;
     }
 }
