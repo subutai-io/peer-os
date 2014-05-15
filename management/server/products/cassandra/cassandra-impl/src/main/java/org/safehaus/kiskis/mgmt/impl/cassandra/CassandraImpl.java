@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;

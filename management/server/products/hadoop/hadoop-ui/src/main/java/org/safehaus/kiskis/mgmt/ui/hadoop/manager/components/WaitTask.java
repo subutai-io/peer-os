@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;

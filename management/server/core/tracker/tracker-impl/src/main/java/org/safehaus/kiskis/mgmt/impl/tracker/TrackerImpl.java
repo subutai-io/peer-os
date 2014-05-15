@@ -12,9 +12,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 import java.util.ArrayList;

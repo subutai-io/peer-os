@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.storm.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.*;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.storm.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 

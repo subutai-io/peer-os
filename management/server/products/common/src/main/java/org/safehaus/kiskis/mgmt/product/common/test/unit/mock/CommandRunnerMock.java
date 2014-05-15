@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.solr.util;
+package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 
 
 import java.util.Set;
@@ -9,6 +9,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 

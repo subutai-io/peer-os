@@ -5,8 +5,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.shared.protocol.operation;
+package org.safehaus.kiskis.mgmt.shared.operation;
 
 
 import java.util.UUID;

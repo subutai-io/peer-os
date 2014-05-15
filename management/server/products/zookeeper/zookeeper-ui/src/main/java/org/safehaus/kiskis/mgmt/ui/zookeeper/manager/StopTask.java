@@ -7,8 +7,8 @@ package org.safehaus.kiskis.mgmt.ui.zookeeper.manager;
 
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI;

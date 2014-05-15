@@ -1,9 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.UUID;

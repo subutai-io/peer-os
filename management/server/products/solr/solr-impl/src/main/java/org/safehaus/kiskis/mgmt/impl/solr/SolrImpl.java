@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.solr.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

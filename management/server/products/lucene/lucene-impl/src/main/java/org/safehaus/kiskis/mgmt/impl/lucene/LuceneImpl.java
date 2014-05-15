@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.impl.lucene.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.DestroyNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.InstallOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

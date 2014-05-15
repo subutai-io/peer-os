@@ -2,10 +2,10 @@ package org.safehaus.kiskis.mgmt.impl.shark.handler;
 
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.shark.Commands;
 import org.safehaus.kiskis.mgmt.impl.shark.SharkImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.UUID;

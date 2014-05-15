@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.solr.util;
+package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 
 
 import java.util.EnumMap;

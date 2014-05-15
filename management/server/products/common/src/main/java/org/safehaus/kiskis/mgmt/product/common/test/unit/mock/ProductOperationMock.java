@@ -1,12 +1,11 @@
-package org.safehaus.kiskis.mgmt.impl.solr.util;
+package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
 
 
 public class ProductOperationMock implements ProductOperation {

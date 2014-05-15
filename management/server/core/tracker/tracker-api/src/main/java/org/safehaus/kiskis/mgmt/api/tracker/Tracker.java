@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 
 
 /**

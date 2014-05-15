@@ -13,7 +13,7 @@ import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.api.presto.Presto;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.presto.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

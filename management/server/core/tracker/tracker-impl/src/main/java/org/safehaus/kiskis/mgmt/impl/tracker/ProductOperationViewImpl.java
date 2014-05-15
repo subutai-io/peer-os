@@ -8,9 +8,9 @@ package org.safehaus.kiskis.mgmt.impl.tracker;
 import com.google.common.base.Preconditions;
 import java.util.Date;
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 
 /**
  * This is an implementation of ProductOperationView

@@ -4,11 +4,11 @@ import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.impl.zookeeper.Commands;
 import org.safehaus.kiskis.mgmt.impl.zookeeper.ZookeeperImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
 import java.util.UUID;

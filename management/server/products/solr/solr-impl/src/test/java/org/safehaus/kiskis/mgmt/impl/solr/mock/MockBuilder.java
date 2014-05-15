@@ -1,18 +1,16 @@
-package org.safehaus.kiskis.mgmt.impl.solr.handler;
+package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.impl.solr.util.CommandMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.CommandsMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.SolrImplMock;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.solr.handler.InstallOperationHandler;
+import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 
-class MockBuilder {
+public class MockBuilder {
 
-    static AbstractOperationHandler getInstallOperationWithResult( boolean succeeded ) {
+    public static AbstractOperationHandler getInstallOperationWithResult( boolean succeeded ) {
         CommandMock installCommand = new CommandMock().setSucceeded( succeeded );
         CommandsMock commands = new CommandsMock().setInstallCommand( installCommand );
         SolrImpl solrImpl = new SolrImplMock().setCommands( commands );
@@ -22,14 +20,13 @@ class MockBuilder {
     }
 
 
-    static SolrImpl getSorlImplWithClusterExists() {
+    public static SolrImpl getSorlImplWithExistingCluster() {
         return new SolrImplMock() {
             @Override
             public Config getCluster( String clusterName ) {
                 return new Config();
             }
         };
-
     }
 
 }

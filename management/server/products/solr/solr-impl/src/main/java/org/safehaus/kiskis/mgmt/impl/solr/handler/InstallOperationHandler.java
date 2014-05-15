@@ -7,9 +7,8 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.HashSet;

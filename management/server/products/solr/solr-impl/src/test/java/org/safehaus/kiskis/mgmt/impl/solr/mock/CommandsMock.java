@@ -1,19 +1,21 @@
-package org.safehaus.kiskis.mgmt.impl.solr.util;
+package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 
 import java.util.Set;
 
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
+import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
+import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 
 public class CommandsMock extends Commands {
 
-    private Command installCommand = new CommandMock().setDescription( INSTALL );
-    private Command startCommand = new CommandMock().setDescription( START );
-    private Command stopCommand = new CommandMock().setDescription( STOP );
-    private Command statusCommand = new CommandMock().setDescription( STATUS );
+    private Command installCommand = null;
+    private Command startCommand;
+    private Command stopCommand;
+    private Command statusCommand;
 
 
     public CommandsMock() {

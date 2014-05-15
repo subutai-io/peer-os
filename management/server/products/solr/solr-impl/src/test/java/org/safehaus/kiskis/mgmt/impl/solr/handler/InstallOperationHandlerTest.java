@@ -3,11 +3,11 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.impl.solr.util.SolrImplMock;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.impl.solr.mock.MockBuilder;
+import org.safehaus.kiskis.mgmt.impl.solr.mock.SolrImplMock;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -34,7 +34,7 @@ public class InstallOperationHandlerTest {
 
     @Test
     public void testWithClusterExists() {
-        SolrImpl solrImpl = MockBuilder.getSorlImplWithClusterExists();
+        SolrImpl solrImpl = MockBuilder.getSorlImplWithExistingCluster();
         Config config = new Config().setClusterName( "test-cluster" );
         AbstractOperationHandler operationHandler = new InstallOperationHandler( solrImpl, config );
 
@@ -66,5 +66,4 @@ public class InstallOperationHandlerTest {
         assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation failed" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
-
 }

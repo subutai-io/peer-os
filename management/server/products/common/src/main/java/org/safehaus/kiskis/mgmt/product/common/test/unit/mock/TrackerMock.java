@@ -1,12 +1,12 @@
-package org.safehaus.kiskis.mgmt.impl.solr.util;
+package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
 
