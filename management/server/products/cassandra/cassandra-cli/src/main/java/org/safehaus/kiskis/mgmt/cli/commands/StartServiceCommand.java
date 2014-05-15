@@ -9,41 +9,45 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 
+import java.io.IOException;
 import java.util.UUID;
 
 
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
-public class UninstallClusterCommand extends OsgiCommandSupport {
+@Command(scope = "cassandra", name = "service-cassandra-start", description = "Command to start Cassandra service")
+public class StartServiceCommand extends OsgiCommandSupport {
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
+    private static Cassandra cassandraManager;
+    private static Tracker tracker;
 
     public Tracker getTracker() {
         return tracker;
     }
 
     public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
+        StartServiceCommand.tracker = tracker;
     }
 
     public void setCassandraManager(Cassandra cassandraManager) {
-        this.cassandraManager = cassandraManager;
+        StartServiceCommand.cassandraManager = cassandraManager;
     }
 
-    public Cassandra getCassandraManager() {
+    public static Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
-    String clusterName = null;
+    @Argument(index = 0, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
+    String agentUUID = null;
 
-    protected Object doExecute() {
-        UUID uuid = cassandraManager.uninstallCluster(clusterName);
+
+    protected Object doExecute() throws IOException {
+
+        UUID uuid = cassandraManager.startCassandraService(agentUUID);
         tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
+
         return null;
     }
 }

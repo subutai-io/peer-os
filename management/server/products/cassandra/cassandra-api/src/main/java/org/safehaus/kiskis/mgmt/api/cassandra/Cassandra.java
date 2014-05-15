@@ -21,4 +21,9 @@ public interface Cassandra extends ApiBase<Config> {
 
     UUID stopAllNodes(String clusterName);
 
+    UUID startCassandraService(String agentUUID);
+
+    UUID stopCassandraService(String agentUUID);
+
+    UUID statusCassandraService(String agentUUID);
 }

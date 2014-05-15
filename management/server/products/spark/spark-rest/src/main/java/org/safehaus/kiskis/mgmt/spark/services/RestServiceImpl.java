@@ -1,32 +1,30 @@
 package org.safehaus.kiskis.mgmt.spark.services;
 
+import org.safehaus.kiskis.mgmt.api.spark.Spark;
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
 
-    public String handleGet(String name) {
-//        return helloService.sayHello(name);
-        return "Spark " + name;
+    private Spark sparkManager;
+
+    public Spark getSparkManager() {
+        return sparkManager;
     }
 
-    /*
-        Constructor
-     */
-    public RestServiceImpl() {
+    public void setSparkManager(Spark sparkManager) {
+        this.sparkManager = sparkManager;
     }
 
-    /*
-        Getters and Setters
-     */
-//    public HelloService getHelloService() {
-//        return helloService;
-//    }
-//
-//    public void setHelloService(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
+    @Override
+    public String installCluster(String clusterName) {
+        return null;
+    }
+
+    @Override
+    public String uninstallCluster(String clusterName) {
+        return null;
+    }
 }
