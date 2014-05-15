@@ -11,6 +11,8 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
     private final float HDD_IN_RESERVE_MB = 1024 * 10;
     private final float RAM_PER_NODE_MB = 1024 * 2;
     private final float RAM_IN_RESERVE_MB = 1024;
+    private final float CPU_PER_NODE_PERCENTAGE = 20;
+    private final float CPU_IN_RESERVE_PERCENTAGE = 10;
 
     private final int nodesCount;
 
@@ -41,10 +43,19 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
         for(Map.Entry<Agent, ServerMetric> e : metrics.entrySet()) {
             ServerMetric m = e.getValue();
-            int byRam = Math.round((m.getFreeRamMb() - RAM_IN_RESERVE_MB) / RAM_PER_NODE_MB);
-            int byHdd = Math.round((m.getFreeHddMb() - HDD_IN_RESERVE_MB) / HDD_PER_NODE_MB);
-            if(byHdd > 0 && byRam > 0)
-                slots.put(e.getKey(), Math.min(byHdd, byRam));
+            int min = Integer.MAX_VALUE;
+
+            int n = Math.round((m.getFreeRamMb() - RAM_IN_RESERVE_MB) / RAM_PER_NODE_MB);
+            if((min = Math.min(n, min)) <= 0) continue;
+
+            n = Math.round((m.getFreeHddMb() - HDD_IN_RESERVE_MB) / HDD_PER_NODE_MB);
+            if((min = Math.min(n, min)) <= 0) continue;
+
+            int unusedCpu = 100 - m.getCpuLoadPercent();
+            n = Math.round(unusedCpu - CPU_IN_RESERVE_PERCENTAGE / CPU_PER_NODE_PERCENTAGE);
+            if((min = Math.min(n, min)) <= 0) continue;
+
+            slots.put(e.getKey(), min);
         }
         return slots;
     }
