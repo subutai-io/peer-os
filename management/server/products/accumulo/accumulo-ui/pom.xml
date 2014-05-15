@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>accumulo-ui</artifactId>
-    <name>Kiskis Management Accumulo UI</name>
-    <description>Kiskis Management Accumulo UI</description>
+    <name>Subutai Accumulo UI</name>
+    <description>Subutai Accumulo UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

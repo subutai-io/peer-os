@@ -11,8 +11,8 @@
 
     <artifactId>hive-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Hive</name>
-    <description>Kiskis Management Hive</description>
+    <name>Subutai Hive</name>
+    <description>Subutai Hive</description>
 
     <dependencies>
         <dependency>

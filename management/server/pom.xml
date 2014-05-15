@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>mgmt-server-parent</artifactId>
-    <name>Kiskis Management Server Parent</name>
+    <name>Subutai Server Parent</name>
     <packaging>pom</packaging>
 
     <modules>
@@ -21,6 +21,6 @@
         <module>server-karaf</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Server Artifacts</description>
+    <description>Parent project for the Subutai Server Artifacts</description>
 
 </project>

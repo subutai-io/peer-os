@@ -9,7 +9,7 @@
         <version>2.0.0</version>
     </parent>
     <artifactId>communication-manager-impl</artifactId>
-    <name>Kiskis Management Communication Manager</name>
+    <name>Subutai Communication Manager</name>
     <description>Communication Manager Impl</description>
 
     <packaging>bundle</packaging>

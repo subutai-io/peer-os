@@ -10,13 +10,13 @@
     </parent>
 
     <artifactId>mgmt-shared-parent</artifactId>
-    <name>Kiskis Management Shared Parent</name>
+    <name>Subutai Shared Parent</name>
     <packaging>pom</packaging>
 
     <modules>
         <module>protocol</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Shared Artifacts</description>
+    <description>Parent project for the Subutai Shared Artifacts</description>
 
 </project>

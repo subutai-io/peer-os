@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>agent-manager-parent</artifactId>
-    <name>Kiskis Management Agent Manager Parent</name>
-    <description>Kiskis Management Agent Manager Parent</description>
+    <name>Subutai Agent Manager Parent</name>
+    <description>Subutai Agent Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>

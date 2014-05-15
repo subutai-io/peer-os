@@ -11,6 +11,8 @@
                interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner" />
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager" />
 
     <bean id="cassandra-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.cassandra.CassandraImpl"
           init-method="init" destroy-method="destroy">
@@ -19,6 +21,7 @@
         <property name="lxcManager" ref="lxcManager"/>
         <property name="networkManager" ref="networkManager"/>
         <property name="commandRunner" ref="commandRunner"/>
+        <property name="agentManager" ref="agentManager"/>
     </bean>
 
     <service ref="cassandra-impl" interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>

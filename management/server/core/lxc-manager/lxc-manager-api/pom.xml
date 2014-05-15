@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>lxc-manager-api</artifactId>
-    <name>Kiskis Management Lxc Manager Api</name>
+    <name>Subutai Lxc Manager Api</name>
     <description>Lxc Manager Api</description>
 
     <packaging>bundle</packaging>

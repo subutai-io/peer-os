@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>cassandra-cli</artifactId>
-    <name>Kiskis Management Cassandra CLI</name>
-    <description>Kiskis Management Cassandra CLI</description>
+    <name>Subutai Cassandra CLI</name>
+    <description>Subutai Cassandra CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -11,8 +11,8 @@
 
     <artifactId>lxc-manager-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Lxc Manager</name>
-    <description>Kiskis Management Lxc Manager Impl</description>
+    <name>Subutai Lxc Manager</name>
+    <description>Subutai Lxc Manager Impl</description>
 
     <dependencies>
         <dependency>
@@ -50,17 +50,14 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>${javax.annotation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.orbit</groupId>
             <artifactId>javax.servlet</artifactId>
-            <version>${org.eclipse.jetty.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin</artifactId>
-            <version>${com.vaadin.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

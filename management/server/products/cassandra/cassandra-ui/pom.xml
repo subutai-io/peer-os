@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>cassandra-ui</artifactId>
-    <name>Kiskis Management Cassandra UI</name>
-    <description>Kiskis Management Cassandra UI</description>
+    <name>Subutai Cassandra UI</name>
+    <description>Subutai Cassandra UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>flume-ui</artifactId>
-    <name>Kiskis Management Flume UI</name>
-    <description>Kiskis Management Flume UI</description>
+    <name>Subutai Flume UI</name>
+    <description>Subutai Flume UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
