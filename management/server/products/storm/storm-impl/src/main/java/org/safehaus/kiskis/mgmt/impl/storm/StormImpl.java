@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.storm.Config;
 import org.safehaus.kiskis.mgmt.impl.storm.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+
 
 public class StormImpl extends StormBase {
 

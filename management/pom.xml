@@ -490,6 +490,13 @@
 
             <!-- Products Modules - START -->
 
+            <!-- Common -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>product-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Accumulo -->
             <dependency>
                 <groupId>org.safehaus.kiskis.mgmt</groupId>

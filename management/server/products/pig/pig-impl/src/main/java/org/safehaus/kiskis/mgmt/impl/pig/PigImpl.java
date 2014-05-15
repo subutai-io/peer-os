@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.impl.pig.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.pig.handler.DestroyNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.pig.handler.InstallOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.pig.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

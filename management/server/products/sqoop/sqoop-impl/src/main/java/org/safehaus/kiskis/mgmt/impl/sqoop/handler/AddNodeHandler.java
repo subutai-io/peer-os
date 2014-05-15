@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
