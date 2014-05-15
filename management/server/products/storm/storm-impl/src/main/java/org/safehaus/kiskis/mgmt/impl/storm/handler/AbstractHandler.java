@@ -6,7 +6,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.storm.Config;
 import org.safehaus.kiskis.mgmt.impl.storm.Commands;
 import org.safehaus.kiskis.mgmt.impl.storm.StormImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.*;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
