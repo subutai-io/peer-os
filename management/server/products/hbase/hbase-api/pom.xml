@@ -11,8 +11,8 @@
 
     <artifactId>hbase-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management HBase Api</name>
-    <description>Kiskis Management HBase Api</description>
+    <name>Subutai HBase Api</name>
+    <description>Subutai HBase Api</description>
 
     <dependencies>
         <dependency>

@@ -11,8 +11,8 @@
 
     <artifactId>cassandra-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Cassandra</name>
-    <description>Kiskis Management Cassandra</description>
+    <name>Subutai Cassandra</name>
+    <description>Subutai Cassandra</description>
 
     <dependencies>
         <dependency>

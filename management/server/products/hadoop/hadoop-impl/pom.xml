@@ -11,8 +11,8 @@
 
     <artifactId>hadoop-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Hadoop</name>
-    <description>Kiskis Management Hadoop</description>
+    <name>Subutai Hadoop</name>
+    <description>Subutai Hadoop</description>
 
     <dependencies>
         <dependency>

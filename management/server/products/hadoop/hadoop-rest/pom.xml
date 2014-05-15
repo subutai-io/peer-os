@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hadoop-rest</artifactId>
-    <name>Kiskis Management Hadoop REST</name>
-    <description>Kiskis Management Hadoop REST</description>
+    <name>Subutai Hadoop REST</name>
+    <description>Subutai Hadoop REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

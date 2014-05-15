@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hbase-ui</artifactId>
-    <name>Kiskis Management HBase UI</name>
-    <description>Kiskis Management HBase UI</description>
+    <name>Subutai HBase UI</name>
+    <description>Subutai HBase UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

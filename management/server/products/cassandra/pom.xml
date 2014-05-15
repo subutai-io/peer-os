@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cassandra-parent</artifactId>
-    <name>Kiskis Management Cassandra Parent</name>
-    <description>Kiskis Management Cassandra Parent</description>
+    <name>Subutai Cassandra Parent</name>
+    <description>Subutai Cassandra Parent</description>
     <packaging>pom</packaging>
 
     <modules>

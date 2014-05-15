@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hbase-rest</artifactId>
-    <name>Kiskis Management HBase REST</name>
-    <description>Kiskis Management HBase REST</description>
+    <name>Subutai HBase REST</name>
+    <description>Subutai HBase REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

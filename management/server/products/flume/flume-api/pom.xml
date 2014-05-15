@@ -11,8 +11,8 @@
 
     <artifactId>flume-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Flume Api</name>
-    <description>Kiskis Management Flume Api</description>
+    <name>Subutai Flume Api</name>
+    <description>Subutai Flume Api</description>
 
     <dependencies>
         <dependency>

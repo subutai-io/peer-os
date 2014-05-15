@@ -11,8 +11,8 @@
 
     <artifactId>ui-vaadin-services</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Vaadin Services</name>
-    <description>Kiskis Management Vaadin Services</description>
+    <name>Subutai Vaadin Services</name>
+    <description>Subutai Vaadin Services</description>
 
     <dependencies>
         <dependency>

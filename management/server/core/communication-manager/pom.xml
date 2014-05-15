@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>communication-manager-parent</artifactId>
-    <name>Kiskis Management Communication Manager Parent</name>
-    <description>Kiskis Management Communication Manager Parent</description>
+    <name>Subutai Communication Manager Parent</name>
+    <description>Subutai Communication Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>

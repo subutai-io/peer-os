@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hadoop-parent</artifactId>
-    <name>Kiskis Management Hadoop Parent</name>
-    <description>Kiskis Management Hadoop Parent</description>
+    <name>Subutai Hadoop Parent</name>
+    <description>Subutai Hadoop Parent</description>
     <packaging>pom</packaging>
 
     <modules>

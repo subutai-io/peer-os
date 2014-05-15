@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hadoop-ui</artifactId>
-    <name>Kiskis Management Hadoop UI</name>
-    <description>Kiskis Management Hadoop UI</description>
+    <name>Subutai Hadoop UI</name>
+    <description>Subutai Hadoop UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

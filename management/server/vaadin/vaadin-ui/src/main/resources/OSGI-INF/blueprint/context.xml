@@ -8,7 +8,7 @@
 	 ">
     <cm:property-placeholder persistent-id="org.safehaus.kiskis.mgmt.server.ui" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="title" value="Kiskis Management Administration"/>
+            <cm:property name="title" value="Subutai Administration"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
