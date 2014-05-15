@@ -1,6 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
@@ -52,5 +53,10 @@ public class SolrImplMock extends SolrImpl {
         return this;
     }
 
+
+    public SolrImplMock setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+        return this;
+    }
 
 }
