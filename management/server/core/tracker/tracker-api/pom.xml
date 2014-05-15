@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>tracker-api</artifactId>
-    <name>Kiskis Management Tracker Api</name>
+    <name>Subutai Tracker Api</name>
     <description>Tracker Api</description>
 
     <packaging>bundle</packaging>

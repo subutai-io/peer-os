@@ -11,8 +11,8 @@
 
     <artifactId>network-manager-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Network Manager</name>
-    <description>Kiskis Management Network Manager Impl</description>
+    <name>Subutai Network Manager</name>
+    <description>Subutai Network Manager Impl</description>
 
     <dependencies>
         <dependency>

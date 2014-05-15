@@ -11,8 +11,8 @@
 
     <artifactId>hadoop-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Hadoop Api</name>
-    <description>Kiskis Management Hadoop Api</description>
+    <name>Subutai Hadoop Api</name>
+    <description>Subutai Hadoop Api</description>
 
     <dependencies>
         <dependency>

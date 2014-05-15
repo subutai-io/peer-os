@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>communication-manager-api</artifactId>
-    <name>Kiskis Management Communication Manager Api</name>
+    <name>Subutai Communication Manager Api</name>
     <description>Communication Manager Api</description>
 
     <packaging>bundle</packaging>

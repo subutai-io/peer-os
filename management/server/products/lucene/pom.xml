@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>lucene-parent</artifactId>
-    <name>Kiskis Management Lucene Parent</name>
-    <description>Kiskis Management Lucene Parent</description>
+    <name>Subutai Lucene Parent</name>
+    <description>Subutai Lucene Parent</description>
     <packaging>pom</packaging>
 
     <modules>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>accumulo-cli</artifactId>
-    <name>Kiskis Management Accumulo CLI</name>
-    <description>Kiskis Management Accumulo CLI</description>
+    <name>Subutai Accumulo CLI</name>
+    <description>Subutai Accumulo CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
