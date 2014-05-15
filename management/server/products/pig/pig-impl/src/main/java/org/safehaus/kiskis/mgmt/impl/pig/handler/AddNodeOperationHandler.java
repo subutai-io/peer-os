@@ -54,7 +54,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl> {
         po.addLog("Checking prerequisites...");
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand(Util.wrapAgentToSet(agent));
         manager.getCommandRunner().runCommand(checkInstalledCommand);
 
         if (!checkInstalledCommand.hasCompleted()) {
@@ -79,7 +79,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<PigImpl> {
             po.addLog("Cluster info updated in DB\nInstalling Pig...");
             //install pig
 
-            Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
+            Command installCommand = manager.getCommands().getInstallCommand(Util.wrapAgentToSet(agent));
             manager.getCommandRunner().runCommand(installCommand);
 
             if (installCommand.hasSucceeded()) {

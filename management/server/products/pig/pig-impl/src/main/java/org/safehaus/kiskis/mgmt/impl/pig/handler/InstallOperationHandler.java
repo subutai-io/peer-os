@@ -14,9 +14,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import java.util.Iterator;
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/6/14.
- */
+
 public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
     private final ProductOperation po;
     private final Config config;
@@ -62,7 +60,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
         po.addLog("Checking prerequisites...");
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand(config.getNodes());
+        Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand(config.getNodes());
         manager.getCommandRunner().runCommand(checkInstalledCommand);
 
         if (!checkInstalledCommand.hasCompleted()) {
@@ -94,7 +92,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
             po.addLog("Cluster info saved to DB\nInstalling Pig...");
 
             //install pig
-            Command installCommand = Commands.getInstallCommand(config.getNodes());
+            Command installCommand = manager.getCommands().getInstallCommand(config.getNodes());
             manager.getCommandRunner().runCommand(installCommand);
 
             if (installCommand.hasSucceeded()) {

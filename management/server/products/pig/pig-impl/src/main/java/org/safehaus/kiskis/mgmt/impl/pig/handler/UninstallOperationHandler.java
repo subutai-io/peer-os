@@ -45,7 +45,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PigImpl>
 
         po.addLog("Uninstalling Pig...");
 
-        Command uninstallCommand = Commands.getUninstallCommand(config.getNodes());
+        Command uninstallCommand = manager.getCommands().getUninstallCommand(config.getNodes());
         manager.getCommandRunner().runCommand(uninstallCommand);
 
         if (uninstallCommand.hasCompleted()) {
