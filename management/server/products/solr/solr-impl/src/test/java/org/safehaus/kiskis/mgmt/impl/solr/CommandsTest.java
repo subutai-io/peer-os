@@ -1,32 +1,28 @@
 package org.safehaus.kiskis.mgmt.impl.solr;
 
 
-import java.util.Set;
-
-import com.google.common.collect.Sets;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.impl.solr.util.CommandRunnerMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.TestUtil;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
 
 public class CommandsTest {
+
+    private static Commands commands;
+
     @BeforeClass
     public static void setUp() {
-        Commands.init( new CommandRunnerMock() );
+        commands = new Commands( new CommandRunnerMock() );
     }
 
 
     @Test
     public void getInstallCommand() {
-        Set<Agent> agents = Sets.newHashSet( TestUtil.getAgent() );
-        Command command = Commands.getInstallCommand( agents );
+        Command command = commands.getInstallCommand( null );
 
         assertNotNull( command );
         assertEquals( Commands.INSTALL, command.getDescription() );
@@ -35,7 +31,7 @@ public class CommandsTest {
 
     @Test
     public void getStartCommand() {
-        Command command = Commands.getStartCommand( TestUtil.getAgent() );
+        Command command = commands.getStartCommand( null );
 
         assertNotNull( command );
         assertEquals( Commands.START, command.getDescription() );
@@ -44,7 +40,7 @@ public class CommandsTest {
 
     @Test
     public void getStopCommand() {
-        Command command = Commands.getStopCommand( TestUtil.getAgent() );
+        Command command = commands.getStopCommand( null );
 
         assertNotNull( command );
         assertEquals( Commands.STOP, command.getDescription() );
@@ -53,7 +49,7 @@ public class CommandsTest {
 
     @Test
     public void getStatusCommand() {
-        Command command = Commands.getStatusCommand( TestUtil.getAgent() );
+        Command command = commands.getStatusCommand( null );
 
         assertNotNull( command );
         assertEquals( Commands.STATUS, command.getDescription() );

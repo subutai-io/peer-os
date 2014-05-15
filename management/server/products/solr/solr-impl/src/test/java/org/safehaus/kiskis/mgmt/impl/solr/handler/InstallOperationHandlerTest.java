@@ -1,16 +1,12 @@
 package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.api.solr.Solr;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.impl.solr.util.AgentManagerMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.CommandRunnerMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.DbManagerMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.LxcManagerMock;
-import org.safehaus.kiskis.mgmt.impl.solr.util.TrackerMock;
+import org.safehaus.kiskis.mgmt.impl.solr.util.SolrImplMock;
+import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
@@ -18,30 +14,56 @@ import static junit.framework.Assert.assertTrue;
 
 
 public class InstallOperationHandlerTest {
-    private static SolrImpl solrImpl;
-
-
-    @BeforeClass
-    public static void setUp() {
-        solrImpl = new SolrImpl( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
-                        new LxcManagerMock() );
-    }
-
 
     @Test( expected = NullPointerException.class )
     public void testWithNullConfig() {
-        solrImpl.installCluster( null );
+        new SolrImplMock().installCluster( null );
     }
 
 
     @Test
     public void testWithMalformedConfiguration() {
-        Config config = new Config();
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( solrImpl, config );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( new SolrImplMock(), new Config() );
 
         operationHandler.run();
 
         assertTrue( operationHandler.getProductOperation().getLog().contains( "Malformed configuration" ) );
+        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+    }
+
+
+    @Test
+    public void testWithClusterExists() {
+        SolrImpl solrImpl = MockBuilder.getSorlImplWithClusterExists();
+        Config config = new Config().setClusterName( "test-cluster" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( solrImpl, config );
+
+        operationHandler.run();
+
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "test-cluster" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "already exists" ) );
+        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+    }
+
+
+    @Test
+    public void testSuccess() {
+        AbstractOperationHandler operationHandler = MockBuilder.getInstallOperationWithResult( true );
+
+        operationHandler.run();
+
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation succeeded" ) );
+        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED );
+    }
+
+
+    @Test
+    public void testFail() {
+        AbstractOperationHandler operationHandler = MockBuilder.getInstallOperationWithResult( false );
+
+        operationHandler.run();
+
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation failed" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
 

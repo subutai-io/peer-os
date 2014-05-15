@@ -12,9 +12,7 @@ import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {
     private final ProductOperation po;
     private final String lxcHostname;
@@ -50,7 +48,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
         }
         po.addLog("Checking node...");
 
-        Command checkNodeCommand = Commands.getStatusCommand(node);
+        Command checkNodeCommand = manager.getCommands().getStatusCommand(node);
         manager.getCommandRunner().runCommand(checkNodeCommand);
 
         NodeState nodeState = NodeState.UNKNOWN;

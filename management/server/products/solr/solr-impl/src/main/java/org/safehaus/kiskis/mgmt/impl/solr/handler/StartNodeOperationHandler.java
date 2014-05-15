@@ -52,9 +52,9 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         po.addLog("Starting node...");
 
-        Command startCommand = Commands.getStartCommand(node);
+        Command startCommand = manager.getCommands().getStartCommand(node);
         manager.getCommandRunner().runCommand(startCommand);
-        Command statusCommand = Commands.getStatusCommand(node);
+        Command statusCommand = manager.getCommands().getStatusCommand(node);
         manager.getCommandRunner().runCommand(statusCommand);
         AgentResult result = statusCommand.getResults().get(node.getUuid());
         NodeState nodeState = NodeState.UNKNOWN;

@@ -50,9 +50,9 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
         }
         po.addLog("Stopping node...");
 
-        Command stopCommand = Commands.getStopCommand(node);
+        Command stopCommand = manager.getCommands().getStopCommand(node);
         manager.getCommandRunner().runCommand(stopCommand);
-        Command statusCommand = Commands.getStatusCommand(node);
+        Command statusCommand = manager.getCommands().getStatusCommand(node);
         manager.getCommandRunner().runCommand(statusCommand);
         AgentResult result = statusCommand.getResults().get(node.getUuid());
         NodeState nodeState = NodeState.UNKNOWN;

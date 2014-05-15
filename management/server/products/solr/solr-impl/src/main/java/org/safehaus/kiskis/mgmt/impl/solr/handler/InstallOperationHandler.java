@@ -7,7 +7,6 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.shared.protocol.operation.AbstractOperationHandler;
@@ -64,7 +63,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
 
             if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
                 productOperation.addLog( "Cluster info saved to DB\nInstalling Solr..." );
-                Command installCommand = Commands.getInstallCommand( config.getNodes() );
+                Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
                 manager.getCommandRunner().runCommand( installCommand );
 
                 if ( installCommand.hasSucceeded() ) {

@@ -52,7 +52,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
             if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
                 po.addLog("Cluster info updated in DB\nInstalling Solr...");
 
-                Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+                Command installCommand = manager.getCommands().getInstallCommand(Util.wrapAgentToSet(lxcAgent));
                 manager.getCommandRunner().runCommand(installCommand);
 
                 if (installCommand.hasSucceeded()) {
