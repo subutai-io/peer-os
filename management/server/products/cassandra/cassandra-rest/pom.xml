@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>cassandra-rest</artifactId>
-    <name>Kiskis Management Cassandra REST</name>
-    <description>Kiskis Management Cassandra REST</description>
+    <name>Subutai Cassandra REST</name>
+    <description>Subutai Cassandra REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

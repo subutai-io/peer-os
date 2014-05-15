@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>db-manager-parent</artifactId>
-    <name>Kiskis Management Db Manager Parent</name>
-    <description>Kiskis Management Db Manager Parent</description>
+    <name>Subutai Db Manager Parent</name>
+    <description>Subutai Db Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>

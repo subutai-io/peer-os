@@ -56,6 +56,27 @@
             </action>
         </command>
 
+        <command name="cassandra/service-cassandra-start">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.StartServiceCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/service-cassandra-stop">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.StopServiceCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
+        <command name="cassandra/service-cassandra-status">
+            <action class="org.safehaus.kiskis.mgmt.cli.commands.StatusServiceCommand">
+                <property name="cassandraManager" ref="cassandraManager"/>
+                <property name="tracker" ref="tracker"/>
+            </action>
+        </command>
+
     </command-bundle>
 
 </blueprint>

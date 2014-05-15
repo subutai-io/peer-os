@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hbase-cli</artifactId>
-    <name>Kiskis Management HBase CLI</name>
-    <description>Kiskis Management HBase CLI</description>
+    <name>Subutai HBase CLI</name>
+    <description>Subutai HBase CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

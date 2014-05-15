@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hivequery-parent</artifactId>
-    <name>Kiskis Management Hive Query Parent</name>
-    <description>Kiskis Management Hive Query Parent</description>
+    <name>Subutai Hive Query Parent</name>
+    <description>Subutai Hive Query Parent</description>
     <packaging>pom</packaging>
 
     <modules>

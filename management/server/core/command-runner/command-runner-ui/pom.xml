@@ -13,8 +13,8 @@
 
     <artifactId>command-runner-ui</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Command Runner UI</name>
-    <description>Kiskis Management Command Runner UI</description>
+    <name>Subutai Command Runner UI</name>
+    <description>Subutai Command Runner UI</description>
 
     <dependencies>
         <dependency>

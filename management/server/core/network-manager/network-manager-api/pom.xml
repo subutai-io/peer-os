@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>network-manager-api</artifactId>
-    <name>Kiskis Management Network Manager Api</name>
+    <name>Subutai Network Manager Api</name>
     <description>Network Manager Api</description>
 
     <packaging>bundle</packaging>

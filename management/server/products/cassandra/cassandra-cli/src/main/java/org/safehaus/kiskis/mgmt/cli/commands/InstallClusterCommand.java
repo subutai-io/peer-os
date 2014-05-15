@@ -60,32 +60,7 @@ public class InstallClusterCommand extends OsgiCommandSupport {
         config.setNumberOfSeeds(Integer.parseInt(numberOfSeeds));
 
         UUID uuid = cassandraManager.installCluster(config);
-
-        int logSize = 0;
-        while (!Thread.interrupted()) {
-            ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
-            if (po != null) {
-                if( logSize !=  po.getLog().length()) {
-                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
-                    System.out.flush();
-                    logSize = po.getLog().length();
-                }
-                if (po.getState() != ProductOperationState.RUNNING) {
-                    break;
-                }
-                System.out.print(".");
-                System.out.flush();
-            } else {
-                System.out.println("Product operation not found. Check logs");
-                break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                break;
-            }
-        }
-        System.out.println();
+        tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
         return null;
     }
 }
