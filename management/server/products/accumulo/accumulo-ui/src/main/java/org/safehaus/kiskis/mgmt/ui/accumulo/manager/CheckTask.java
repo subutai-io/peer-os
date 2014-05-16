@@ -9,8 +9,8 @@ package org.safehaus.kiskis.mgmt.ui.accumulo.manager;
 import java.util.UUID;
 
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 
 

@@ -3,7 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.tracker;
+package org.safehaus.kiskis.mgmt.shared.operation;
+
 
 
 /**

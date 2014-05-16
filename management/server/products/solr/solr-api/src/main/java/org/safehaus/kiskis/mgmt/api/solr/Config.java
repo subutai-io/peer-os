@@ -5,54 +5,68 @@
  */
 package org.safehaus.kiskis.mgmt.api.solr;
 
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
+import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author dilshat
- */
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Solr";
     private String clusterName = "";
     private int numberOfNodes = 3;
+    private Set<Agent> nodes = new HashSet<>();
 
-    private Set<Agent> nodes;
 
     public String getClusterName() {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public Config setClusterName( String clusterName ) {
         this.clusterName = clusterName;
+        return this;
     }
+
 
     @Override
     public String getProductName() {
         return PRODUCT_KEY;
     }
 
+
     public int getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+
+    public void setNumberOfNodes( int numberOfNodes ) {
         this.numberOfNodes = numberOfNodes;
     }
+
 
     public Set<Agent> getNodes() {
         return nodes;
     }
 
-    public void setNodes(Set<Agent> nodes) {
+
+    public void setNodes( Set<Agent> nodes ) {
         this.nodes = nodes;
     }
 
+
     @Override
     public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", numberOfNodes=" + numberOfNodes + ", nodes=" + nodes + '}';
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append( "clusterName", clusterName )
+                .append( "numberOfNodes", numberOfNodes )
+                .append( "nodes", nodes )
+                .toString();
     }
-
 }
