@@ -66,9 +66,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
             po.addLog(String.format("Creating %d lxc containers...", numberOfLxcsNeeded));
             Map<NodeType, Set<Agent>> nodes = CustomPlacementStrategy.getNodes(
                     manager.getLxcManager(),
-                    config.getConfigServers().size(),
-                    config.getRouterServers().size(),
-                    config.getDataNodes().size());
+                    config.getNumberOfConfigServers(),
+                    config.getNumberOfRouters(),
+                    config.getNumberOfDataNodes());
 
             config.setConfigServers(nodes.get(NodeType.CONFIG_NODE));
             config.setDataNodes(nodes.get(NodeType.DATA_NODE));
