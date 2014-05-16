@@ -90,7 +90,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
     public void setCriteria(NodeType type) {
         switch(type) {
             case CONFIG_NODE:
-                hddPerNodeMb = GB2MB(10);
+                hddPerNodeMb = GB2MB(5);
                 hddReservedMb = GB2MB(10);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
@@ -106,7 +106,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
                 cpuReservedPercentage = 10;
                 break;
             case DATA_NODE:
-                hddPerNodeMb = GB2MB(100);
+                hddPerNodeMb = GB2MB(50);
                 hddReservedMb = GB2MB(20);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
@@ -128,7 +128,9 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
             serverSlots.put(physicalNode, slotsCount - 1);
 
             Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
-            int cnt = info != null ? info.get(type.toString()) + 1 : 1;
+            int cnt = 1;
+            if(info != null && info.get(type.toString()) != null)
+                cnt = info.get(type.toString()).intValue() + 1;
             addPlacementInfo(physicalNode, type.toString(), cnt);
         }
     }
