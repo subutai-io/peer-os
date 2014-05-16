@@ -1,22 +1,23 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb.handler;
 
 import com.google.common.base.Strings;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.kiskis.mgmt.impl.mongodb.CustomPlacementStrategy;
 import org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.CommandType;
 import org.safehaus.kiskis.mgmt.impl.mongodb.common.Commands;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by dilshat on 5/6/14.
@@ -63,39 +64,24 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
             int numberOfLxcsNeeded = config.getNumberOfConfigServers() + config.getNumberOfRouters() + config.getNumberOfDataNodes();
             //clone lxc containers
             po.addLog(String.format("Creating %d lxc containers...", numberOfLxcsNeeded));
-            Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs(numberOfLxcsNeeded);
+            Map<NodeType, Set<Agent>> nodes = CustomPlacementStrategy.getNodes(
+                    manager.getLxcManager(),
+                    config.getNumberOfConfigServers(),
+                    config.getNumberOfRouters(),
+                    config.getNumberOfDataNodes());
 
-            Set<Agent> cfgServers = new HashSet<Agent>();
-            Set<Agent> routers = new HashSet<Agent>();
-            Set<Agent> dataNodes = new HashSet<Agent>();
-
-            Set<Agent> availableAgents = new HashSet<Agent>();
-
-            for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
-                availableAgents.addAll(entry.getValue());
-            }
-            for (Agent lxcAgent : availableAgents) {
-                if (cfgServers.size() < config.getNumberOfConfigServers()) {
-                    cfgServers.add(lxcAgent);
-                } else if (routers.size() < config.getNumberOfRouters()) {
-                    routers.add(lxcAgent);
-                } else if (dataNodes.size() < config.getNumberOfDataNodes()) {
-                    dataNodes.add(lxcAgent);
-                } else {
-                    break;
-                }
-            }
-            config.setConfigServers(cfgServers);
-            config.setDataNodes(dataNodes);
-            config.setRouterServers(routers);
+            config.setConfigServers(nodes.get(NodeType.CONFIG_NODE));
+            config.setDataNodes(nodes.get(NodeType.DATA_NODE));
+            config.setRouterServers(nodes.get(NodeType.ROUTER_NODE));
             po.addLog("Lxc containers created successfully\nUpdating db...");
+
             if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                 po.addLog("Cluster info saved to DB\nInstalling Mongo...");
                 installMongoCluster(config, po);
             } else {
                 //destroy all lxcs also
                 try {
-                    manager.getLxcManager().destroyLxcs(lxcAgentsMap);
+                    manager.getLxcManager().destroyLxcs(config.getAllNodes());
                 } catch (LxcDestroyException ex) {
                     po.addLogFailed("Could not save cluster info to DB! Please see logs. Use LXC module to cleanup\nInstallation aborted");
                 }
