@@ -20,8 +20,8 @@
                 <property name="manager" ref="manager"/>
             </action>
         </command>
-        <command name="hivequery/load-run">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.RunQueryCommand">
+        <command name="hivequery/run-query">
+        <action class="org.safehaus.kiskis.mgmt.cli.commands.RunQueryCommand">
                 <property name="manager" ref="manager"/>
                 <property name="tracker" ref="tracker"/>
             </action>
