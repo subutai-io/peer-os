@@ -5,15 +5,7 @@
                interface="org.safehaus.kiskis.mgmt.api.hbase.HBase"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="hbase/list-hadoop-clusters">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListHadoopClustersCommand">
-                <property name="hbaseManager" ref="hbaseManager"/>
-            </action>
-        </command>
-    </command-bundle>
-
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="hbase/describe-hadoop-cluster">
+        <command name="hbase/describe-cluster">
             <action class="org.safehaus.kiskis.mgmt.cli.commands.DescribeClusterCommand">
                 <property name="hbaseManager" ref="hbaseManager"/>
             </action>

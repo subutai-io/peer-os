@@ -11,7 +11,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBaseType;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
@@ -35,7 +35,7 @@ public class Manager {
     private final Table regionTable;
     private final Table quorumTable;
     private final Table bmasterTable;
-    private Config config;
+    private HBaseConfig config;
 
     public Manager() {
 
@@ -74,7 +74,7 @@ public class Manager {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config) event.getProperty().getValue();
+                config = (HBaseConfig) event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -99,7 +99,7 @@ public class Manager {
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().startCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                         public void windowClose(Window.CloseEvent e) {
                             refreshClustersInfo();
@@ -121,7 +121,7 @@ public class Manager {
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().stopCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                         public void windowClose(Window.CloseEvent e) {
                             refreshClustersInfo();
@@ -143,7 +143,7 @@ public class Manager {
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().checkCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                         public void windowClose(Window.CloseEvent e) {
                             refreshClustersInfo();
@@ -173,7 +173,7 @@ public class Manager {
                                 public void response(boolean ok) {
                                     if (ok) {
                                         UUID trackID = HBaseUI.getHbaseManager().uninstallCluster(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
+                                        MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
 
                                             public void windowClose(Window.CloseEvent e) {
                                                 refreshClustersInfo();
@@ -216,16 +216,16 @@ public class Manager {
         contentRoot.getWindow().showNotification(notification);
     }
 
-    private void populateMasterTable(final Table table, Set<Agent> agents, final HBaseType type) {
+    private void populateMasterTable(final Table table, Set<UUID> agents, final HBaseType type) {
 
         table.removeAllItems();
 
-        for (final Agent agent : agents) {
+        for (final UUID uuid : agents) {
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                            agent.getHostname(),
+                            uuid,
                             type,
                             progressIcon},
                     null
@@ -233,16 +233,16 @@ public class Manager {
         }
     }
 
-    private void populateTable(final Table table, Set<Agent> agents, final HBaseType type) {
+    private void populateTable(final Table table, Set<UUID> agents, final HBaseType type) {
 
         table.removeAllItems();
 
-        for (final Agent agent : agents) {
+        for (final UUID uuid : agents) {
             final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                            agent.getHostname(),
+                            uuid,
                             type,
                             progressIcon},
                     null
@@ -255,11 +255,11 @@ public class Manager {
             populateTable(quorumTable, config.getQuorum(), HBaseType.HQuorumPeer);
             populateTable(regionTable, config.getRegion(), HBaseType.HRegionServer);
 
-            Set<Agent> masterSet = new HashSet<Agent>();
+            Set<UUID> masterSet = new HashSet<UUID>();
             masterSet.add(config.getMaster());
             populateMasterTable(masterTable, masterSet, HBaseType.HMaster);
 
-            Set<Agent> bmasterSet = new HashSet<Agent>();
+            Set<UUID> bmasterSet = new HashSet<UUID>();
             bmasterSet.add(config.getBackupMasters());
             populateTable(bmasterTable, bmasterSet, HBaseType.BackupMaster);
 
@@ -272,19 +272,19 @@ public class Manager {
     }
 
     public void refreshClustersInfo() {
-        List<Config> clusters = HBaseUI.getHbaseManager().getClusters();
-        Config clusterInfo = (Config) clusterCombo.getValue();
+        List<HBaseConfig> clusters = HBaseUI.getHbaseManager().getClusters();
+        HBaseConfig clusterInfo = (HBaseConfig) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if (clusters != null && clusters.size() > 0) {
-            for (Config info : clusters) {
+            for (HBaseConfig info : clusters) {
                 clusterCombo.addItem(info);
                 clusterCombo.setItemCaption(info,
                         info.getClusterName());
             }
             if (clusterInfo != null) {
-                for (Config Config : clusters) {
-                    if (Config.getClusterName().equals(clusterInfo)) {
-                        clusterCombo.setValue(Config);
+                for (HBaseConfig config : clusters) {
+                    if (config.getClusterName().equals(clusterInfo)) {
+                        clusterCombo.setValue(config);
                         return;
                     }
                 }
