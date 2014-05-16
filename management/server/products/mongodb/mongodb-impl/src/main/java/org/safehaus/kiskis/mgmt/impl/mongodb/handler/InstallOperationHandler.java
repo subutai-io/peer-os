@@ -70,9 +70,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
                     config.getRouterServers().size(),
                     config.getDataNodes().size());
 
-            config.setConfigServers(new HashSet<>(nodes.get(NodeType.CONFIG_NODE)));
-            config.setDataNodes(new HashSet<>(nodes.get(NodeType.DATA_NODE)));
-            config.setRouterServers(new HashSet<>(nodes.get(NodeType.ROUTER_NODE)));
+            config.setConfigServers(nodes.get(NodeType.CONFIG_NODE));
+            config.setDataNodes(nodes.get(NodeType.DATA_NODE));
+            config.setRouterServers(nodes.get(NodeType.ROUTER_NODE));
             po.addLog("Lxc containers created successfully\nUpdating db...");
 
             if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {

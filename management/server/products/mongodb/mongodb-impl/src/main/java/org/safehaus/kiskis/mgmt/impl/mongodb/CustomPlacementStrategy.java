@@ -7,30 +7,31 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {
 
-    private float hdd_per_node_mb;
-    private float hdd_in_reserve_mb;
-    private float ram_per_node_mb;
-    private float ram_in_reserve_mb;
-    private float cpu_per_node_percentage;
-    private float cpu_in_reserve_percentage;
+    private float hddPerNodeMb;
+    private float hddReservedMb;
+    private float ramPerNodeMb;
+    private float ramReservedMb;
+    private float cpuPerNodePercentage;
+    private float cpuReservedPercentage;
 
     private final Map<NodeType, Integer> nodesCount;
 
-    public CustomPlacementStrategy(int configServersCount, int routersCount, int dataNodesCount) {
+    public CustomPlacementStrategy(int configServers, int routers, int dataNodes) {
         this.nodesCount = new EnumMap<>(NodeType.class);
-        this.nodesCount.put(NodeType.CONFIG_NODE, configServersCount);
-        this.nodesCount.put(NodeType.ROUTER_NODE, routersCount);
-        this.nodesCount.put(NodeType.DATA_NODE, dataNodesCount);
+        this.nodesCount.put(NodeType.CONFIG_NODE, configServers);
+        this.nodesCount.put(NodeType.ROUTER_NODE, routers);
+        this.nodesCount.put(NodeType.DATA_NODE, dataNodes);
     }
 
     public static Map<NodeType, Set<Agent>> getNodes(LxcManager lxcManager,
-            int configServersCount, int routersCount, int dataNodesCount) throws LxcCreateException {
+            int configServers, int routers, int dataNodes) throws LxcCreateException {
 
         LxcPlacementStrategy strategy = new CustomPlacementStrategy(
-                configServersCount, routersCount, dataNodesCount);
+                configServers, routers, dataNodes);
         Map<String, Map<Agent, Set<Agent>>> nodes
                 = lxcManager.createLxcsByStrategy(strategy);
 
+        // collect nodes by types regardless of parent nodes
         Map<NodeType, Set<Agent>> res = new EnumMap<>(NodeType.class);
         for(NodeType type : NodeType.values()) {
             Map<Agent, Set<Agent>> map = nodes.get(type.toString());
@@ -55,14 +56,14 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
             ServerMetric m = e.getValue();
             int min = Integer.MAX_VALUE;
 
-            int n = Math.round((m.getFreeRamMb() - ram_in_reserve_mb) / ram_per_node_mb);
+            int n = Math.round((m.getFreeRamMb() - ramReservedMb) / ramPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
 
-            n = Math.round((m.getFreeHddMb() - hdd_in_reserve_mb) / hdd_per_node_mb);
+            n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
 
             int unusedCpu = 100 - m.getCpuLoadPercent();
-            n = Math.round(unusedCpu - cpu_in_reserve_percentage / cpu_per_node_percentage);
+            n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
             if((min = Math.min(n, min)) <= 0) continue;
 
             slots.put(e.getKey(), min);
@@ -73,8 +74,8 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
     @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
         for(NodeType type : NodeType.values()) {
-            setCriteria(type);
 
+            setCriteria(type);
             Map<Agent, Integer> serverSlots = calculateSlots(serverMetrics);
             if(serverSlots == null || serverSlots.isEmpty()) return;
 
@@ -86,31 +87,31 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
         }
     }
 
-    private void setCriteria(NodeType type) {
+    public void setCriteria(NodeType type) {
         switch(type) {
             case CONFIG_NODE:
-                hdd_per_node_mb = GB2MB(3);
-                hdd_in_reserve_mb = GB2MB(5);
-                ram_per_node_mb = GB2MB(0.5f);
-                ram_in_reserve_mb = GB2MB(1);
-                cpu_per_node_percentage = 5;
-                cpu_in_reserve_percentage = 10;
+                hddPerNodeMb = GB2MB(10);
+                hddReservedMb = GB2MB(10);
+                ramPerNodeMb = GB2MB(1);
+                ramReservedMb = GB2MB(1);
+                cpuPerNodePercentage = 10;
+                cpuReservedPercentage = 10;
                 break;
             case ROUTER_NODE:
-                hdd_per_node_mb = GB2MB(3);
-                hdd_in_reserve_mb = GB2MB(5);
-                ram_per_node_mb = GB2MB(0.5f);
-                ram_in_reserve_mb = GB2MB(1);
-                cpu_per_node_percentage = 5;
-                cpu_in_reserve_percentage = 10;
+                hddPerNodeMb = GB2MB(3);
+                hddReservedMb = GB2MB(5);
+                ramPerNodeMb = GB2MB(0.5f);
+                ramReservedMb = GB2MB(1);
+                cpuPerNodePercentage = 5;
+                cpuReservedPercentage = 10;
                 break;
             case DATA_NODE:
-                hdd_per_node_mb = GB2MB(100);
-                hdd_in_reserve_mb = GB2MB(10);
-                ram_per_node_mb = GB2MB(1);
-                ram_in_reserve_mb = GB2MB(1);
-                cpu_per_node_percentage = 5;
-                cpu_in_reserve_percentage = 10;
+                hddPerNodeMb = GB2MB(100);
+                hddReservedMb = GB2MB(20);
+                ramPerNodeMb = GB2MB(1);
+                ramReservedMb = GB2MB(1);
+                cpuPerNodePercentage = 10;
+                cpuReservedPercentage = 10;
                 break;
             default:
                 throw new AssertionError(type.name());
