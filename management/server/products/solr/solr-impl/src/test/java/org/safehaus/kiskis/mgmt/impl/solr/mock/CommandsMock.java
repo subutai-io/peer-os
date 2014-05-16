@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
@@ -29,12 +28,6 @@ public class CommandsMock extends Commands {
     }
 
 
-    public CommandsMock setInstallCommand( Command command ) {
-        this.installCommand = command;
-        return this;
-    }
-
-
     @Override
     public Command getStartCommand( Agent agent ) {
         return startCommand;
@@ -52,4 +45,9 @@ public class CommandsMock extends Commands {
         return statusCommand;
     }
 
+
+    public CommandsMock setInstallCommand( Command command ) {
+        this.installCommand = command;
+        return this;
+    }
 }

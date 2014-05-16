@@ -1,18 +1,16 @@
 package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 
+import java.util.Map;
+import java.util.Set;
+
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {

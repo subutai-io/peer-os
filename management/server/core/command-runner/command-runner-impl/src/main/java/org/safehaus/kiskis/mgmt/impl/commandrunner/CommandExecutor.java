@@ -5,14 +5,16 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
-import com.google.common.base.Preconditions;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+
 import java.util.concurrent.ExecutorService;
+
+import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
+
+import com.google.common.base.Preconditions;
+
 
 /**
  * This class holds command together with associated executor and callback
- *
- * @author dilshat
  */
 public class CommandExecutor {
 
@@ -20,27 +22,30 @@ public class CommandExecutor {
     final private ExecutorService executor;
     final private CommandCallback callback;
 
-    public CommandExecutor(CommandImpl command, ExecutorService executor, CommandCallback callback) {
 
-        Preconditions.checkNotNull(command, "Command is null");
-        Preconditions.checkNotNull(executor, "Executor is null");
-        Preconditions.checkNotNull(callback, "Callback is null");
+    public CommandExecutor( CommandImpl command, ExecutorService executor, CommandCallback callback ) {
+
+        Preconditions.checkNotNull( command, "Command is null" );
+        Preconditions.checkNotNull( executor, "Executor is null" );
+        Preconditions.checkNotNull( callback, "Callback is null" );
 
         this.command = command;
         this.executor = executor;
         this.callback = callback;
     }
 
+
     public CommandImpl getCommand() {
         return command;
     }
+
 
     public ExecutorService getExecutor() {
         return executor;
     }
 
+
     public CommandCallback getCallback() {
         return callback;
     }
-
 }

@@ -5,15 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+
 /**
  * Exception which can be thrown while destroying lxcs
- *
- * @author dilshat
  */
 public class LxcDestroyException extends Exception {
 
-    public LxcDestroyException(String message) {
-        super(message);
+    public LxcDestroyException( String message ) {
+        super( message );
     }
-
 }

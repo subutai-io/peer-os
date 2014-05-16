@@ -5,9 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
+
 /**
  *
- * @author dilshat
  */
 public enum LxcAction {
 

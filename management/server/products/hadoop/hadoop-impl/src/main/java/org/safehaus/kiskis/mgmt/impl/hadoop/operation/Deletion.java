@@ -44,7 +44,7 @@ public class Deletion {
                 po.addLog("Destroying lxc containers...");
 
                 try {
-                    parent.getLxcManager().destroyLxcs(new HashSet<Agent>(config.getAllNodes()));
+                    parent.getLxcManager().destroyLxcs(new HashSet<>(config.getAllNodes()));
                     po.addLog("Lxc containers successfully destroyed");
                 } catch (LxcDestroyException ex) {
                     po.addLog(String.format("%s, skipping...", ex.getMessage()));

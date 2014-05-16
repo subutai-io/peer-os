@@ -5,12 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
+
 import java.util.UUID;
+
 
 /**
  * Represents result of command execution on agent
- *
- * @author dilshat
  */
 public interface AgentResult {
 
@@ -41,5 +41,4 @@ public interface AgentResult {
      * @return - agent UUID
      */
     public UUID getAgentUUID();
-
 }

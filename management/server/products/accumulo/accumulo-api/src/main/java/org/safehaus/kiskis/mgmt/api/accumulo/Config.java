@@ -5,11 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.api.accumulo;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+
 
 /**
  * @author dilshat
@@ -18,71 +20,87 @@ public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Accumulo";
     private String clusterName = "";
+    private String instanceName = "";
+    private String password = "";
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;
     private Set<Agent> tracers;
     private Set<Agent> slaves;
 
-    public Set<Agent> getAllNodes() {
-        Set<Agent> allNodes = new HashSet<Agent>();
 
-        allNodes.add(masterNode);
-        allNodes.add(gcNode);
-        allNodes.add(monitor);
-        allNodes.addAll(tracers);
-        allNodes.addAll(slaves);
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<>();
+
+        allNodes.add( masterNode );
+        allNodes.add( gcNode );
+        allNodes.add( monitor );
+        allNodes.addAll( tracers );
+        allNodes.addAll( slaves );
 
         return allNodes;
     }
+
 
     public Agent getMasterNode() {
         return masterNode;
     }
 
-    public void setMasterNode(Agent masterNode) {
+
+    public void setMasterNode( Agent masterNode ) {
         this.masterNode = masterNode;
     }
+
 
     public Agent getGcNode() {
         return gcNode;
     }
 
-    public void setGcNode(Agent gcNode) {
+
+    public void setGcNode( Agent gcNode ) {
         this.gcNode = gcNode;
     }
+
 
     public Agent getMonitor() {
         return monitor;
     }
 
-    public void setMonitor(Agent monitor) {
+
+    public void setMonitor( Agent monitor ) {
         this.monitor = monitor;
     }
+
 
     public Set<Agent> getTracers() {
         return tracers;
     }
 
-    public void setTracers(Set<Agent> tracers) {
+
+    public void setTracers( Set<Agent> tracers ) {
         this.tracers = tracers;
     }
+
 
     public Set<Agent> getSlaves() {
         return slaves;
     }
 
-    public void setSlaves(Set<Agent> slaves) {
+
+    public void setSlaves( Set<Agent> slaves ) {
         this.slaves = slaves;
     }
+
 
     public String getClusterName() {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public void setClusterName( String clusterName ) {
         this.clusterName = clusterName;
     }
+
 
     @Override
     public String getProductName() {
@@ -90,8 +108,30 @@ public class Config implements ConfigBase {
     }
 
 
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+
+    public void setInstanceName( String instanceName ) {
+        this.instanceName = instanceName;
+    }
+
+
+    public String getPassword() {
+        return password;
+    }
+
+
+    public void setPassword( String password ) {
+        this.password = password;
+    }
+
+
     public void reset() {
         clusterName = "";
+        instanceName = "";
+        password = "";
         masterNode = null;
         gcNode = null;
         monitor = null;
@@ -99,10 +139,13 @@ public class Config implements ConfigBase {
         slaves = null;
     }
 
+
     @Override
     public String toString() {
         return "Config{" +
                 "clusterName='" + clusterName + '\'' +
+                ", instanceName='" + instanceName + '\'' +
+                ", password='" + password + '\'' +
                 ", masterNode=" + masterNode +
                 ", gcNode=" + gcNode +
                 ", monitor=" + monitor +

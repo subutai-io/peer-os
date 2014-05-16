@@ -5,19 +5,21 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
-import com.google.common.base.Preconditions;
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
+import com.google.common.base.Preconditions;
+
+
 /**
- * Represents command to agent. This class is used when for each agent there is
- * a specific custom command, not common to all agents
- *
- * @author dilshat
+ * Represents command to agent. This class is used when for each agent there is a specific custom command, not common to
+ * all agents
  */
 public class AgentRequestBuilder extends RequestBuilder {
 
     //target agent
     private final Agent agent;
+
 
     /**
      * Constructor
@@ -25,15 +27,15 @@ public class AgentRequestBuilder extends RequestBuilder {
      * @param agent - target agent
      * @param command - command to run
      */
-    public AgentRequestBuilder(Agent agent, String command) {
-        super(command);
-        Preconditions.checkNotNull(agent, "Agent is null");
+    public AgentRequestBuilder( Agent agent, String command ) {
+        super( command );
+        Preconditions.checkNotNull( agent, "Agent is null" );
 
         this.agent = agent;
     }
 
+
     public Agent getAgent() {
         return agent;
     }
-
 }
