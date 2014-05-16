@@ -32,8 +32,6 @@ import com.google.common.base.Preconditions;
 /**
  * This class is implementation of CommandRunner interface. Runs commands on agents and routes received responses to
  * corresponding callbacks.
- *
- * @author dilshat
  */
 public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 

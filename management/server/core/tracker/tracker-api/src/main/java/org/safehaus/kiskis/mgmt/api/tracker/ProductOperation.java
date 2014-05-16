@@ -5,14 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.tracker;
 
+
 import java.util.Date;
 import java.util.UUID;
 
+
 /**
- * This is an interface for product operation entity which is used to log
- * actions done during product operation such as installation, start, stop etc
- *
- * @author dilshat
+ * This is an interface for product operation entity which is used to log actions done during product operation such as
+ * installation, start, stop etc
  */
 public interface ProductOperation {
 
@@ -56,19 +56,19 @@ public interface ProductOperation {
      *
      * @param logString - log to add to product operation
      */
-    public void addLog(String logString);
+    public void addLog( String logString );
 
     /**
      * Adds log to operation and marks operation as succeeded
      *
      * @param logString - log to add to product operation
      */
-    public void addLogDone(String logString);
+    public void addLogDone( String logString );
 
     /**
      * Adds log to operation and marks operation as failed
      *
      * @param logString - log to add to product operation
      */
-    public void addLogFailed(String logString);
+    public void addLogFailed( String logString );
 }

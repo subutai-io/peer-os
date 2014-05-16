@@ -5,17 +5,19 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
-import com.google.common.base.Preconditions;
+
 import java.util.Date;
 import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
 
+import com.google.common.base.Preconditions;
+
+
 /**
  * This is an implementation of ProductOperationView
- *
- * @author dilshat
  */
 public class ProductOperationViewImpl implements ProductOperationView {
 
@@ -40,8 +42,9 @@ public class ProductOperationViewImpl implements ProductOperationView {
      */
     private final Date createDate;
 
-    public ProductOperationViewImpl(ProductOperation po) {
-        Preconditions.checkNotNull(po, "Product operation is null");
+
+    public ProductOperationViewImpl( ProductOperation po ) {
+        Preconditions.checkNotNull( po, "Product operation is null" );
 
         id = po.getId();
         description = po.getDescription();
@@ -50,41 +53,47 @@ public class ProductOperationViewImpl implements ProductOperationView {
         createDate = po.createDate();
     }
 
-    public UUID getId() {
-        return id;
-    }
 
     public String getDescription() {
         return description;
     }
 
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+
+    public UUID getId() {
+        return id;
+    }
+
+
     public String getLog() {
         return log;
     }
 
+
     public ProductOperationState getState() {
         return state;
     }
+
 
     @Override
     public int hashCode() {
         return 3;
     }
 
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals( Object obj ) {
+        if ( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( getClass() != obj.getClass() ) {
             return false;
         }
-        final ProductOperationViewImpl other = (ProductOperationViewImpl) obj;
-        return !(this.id != other.id && (this.id == null || !this.id.equals(other.id)));
+        final ProductOperationViewImpl other = ( ProductOperationViewImpl ) obj;
+        return !( this.id != other.id && ( this.id == null || !this.id.equals( other.id ) ) );
     }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
 }

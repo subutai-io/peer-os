@@ -5,45 +5,47 @@
  */
 package org.safehaus.kiskis.mgmt.impl.dbmanager;
 
+
 /**
- *
- * @author dilshat
+ * Test pojo
  */
 public class MyPojo {
 
     private final String content;
 
-    public MyPojo(String test) {
+
+    public MyPojo( String test ) {
         this.content = test;
     }
 
-    public String getContent() {
-        return content;
-    }
 
     @Override
     public int hashCode() {
         return 5;
     }
 
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals( Object obj ) {
+        if ( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( getClass() != obj.getClass() ) {
             return false;
         }
-        final MyPojo other = (MyPojo) obj;
-        if ((this.content == null) ? (other.getContent() != null) : !this.content.equals(other.getContent())) {
-            return false;
-        }
-        return true;
+        final MyPojo other = ( MyPojo ) obj;
+        return !( ( this.content == null ) ? ( other.getContent() != null ) :
+                  !this.content.equals( other.getContent() ) );
     }
+
+
+    public String getContent() {
+        return content;
+    }
+
 
     @Override
     public String toString() {
         return "MyPojo{" + "content=" + content + '}';
     }
-
 }

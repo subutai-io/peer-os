@@ -5,10 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
+
 /**
  * Status of command
- *
- * @author dilshat
  */
 public enum CommandStatus {
 
@@ -29,8 +28,7 @@ public enum CommandStatus {
      */
     SUCCEEDED,
     /**
-     * command failed, exit code was not 0 or agent interrupted command because
-     * of timeout
+     * command failed, exit code was not 0 or agent interrupted command because of timeout
      */
     FAILED
 }

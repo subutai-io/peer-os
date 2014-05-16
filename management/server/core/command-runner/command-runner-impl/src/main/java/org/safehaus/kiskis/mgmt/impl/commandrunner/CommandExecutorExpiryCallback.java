@@ -5,7 +5,7 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 
 
 /**
- * Created by dilshat on 5/16/14.
+ * Callback for command expiry event
  */
 public class CommandExecutorExpiryCallback implements EntryExpiryCallback<CommandExecutor> {
 

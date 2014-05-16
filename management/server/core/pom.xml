@@ -2,26 +2,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.kiskis.mgmt</groupId>
+    <artifactId>mgmt-server-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-core-parent</artifactId>
-    <name>Subutai Core Parent</name>
-    <description>Subutai Core Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>mgmt-server-core-parent</artifactId>
+  <name>Subutai Core Parent</name>
+  <description>Subutai Core Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>agent-manager</module>
-        <module>db-manager</module>
-        <module>communication-manager</module>
-        <module>lxc-manager</module>
-        <module>network-manager</module>
-        <module>tracker</module>
-        <module>monitor</module>
-        <module>command-runner</module>
-    </modules>
+  <modules>
+    <module>agent-manager</module>
+    <module>db-manager</module>
+    <module>communication-manager</module>
+    <module>lxc-manager</module>
+    <module>network-manager</module>
+    <module>tracker</module>
+    <module>monitor</module>
+    <module>command-runner</module>
+  </modules>
 </project>

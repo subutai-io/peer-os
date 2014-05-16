@@ -5,6 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.impl.tracker;
 
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
+
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
 import org.junit.After;
@@ -16,15 +21,12 @@ import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.dbmanager.DbManagerImpl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.Date;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+
 /**
- * @author dilshat
+ * Test for TrackerImpl class
  */
 public class TrackerImplIT {
 
@@ -34,63 +36,66 @@ public class TrackerImplIT {
     private final String description = "description";
     private final String testLog = "test";
     @Rule
-    public CassandraCQLUnit cassandraCQLUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("po.sql", true, true, "test"));
+    public CassandraCQLUnit cassandraCQLUnit =
+            new CassandraCQLUnit( new ClassPathCQLDataSet( "po.sql", true, true, "test" ) );
+
 
     @Before
     public void setUp() {
-        ((DbManagerImpl) dbManager).setSession(cassandraCQLUnit.session);
-        ((TrackerImpl) tracker).setDbManager(dbManager);
+        ( ( DbManagerImpl ) dbManager ).setSession( cassandraCQLUnit.session );
+        ( ( TrackerImpl ) tracker ).setDbManager( dbManager );
     }
+
 
     @After
     public void tearDown() {
-        dbManager.executeUpdate("truncate product_operation;");
+        dbManager.executeUpdate( "truncate product_operation;" );
     }
+
 
     @Test
     public void testCreateNGetProductOperation() {
 
-        ProductOperation po = tracker.createProductOperation(source, description);
+        ProductOperation po = tracker.createProductOperation( source, description );
 
-        assertNotNull(tracker.getProductOperation(source, po.getId()));
+        assertNotNull( tracker.getProductOperation( source, po.getId() ) );
     }
+
 
     @Test
     public void testGetProductOperations() {
 
-        tracker.createProductOperation(source, description);
-        tracker.createProductOperation(source, description);
+        tracker.createProductOperation( source, description );
+        tracker.createProductOperation( source, description );
 
         Date endDate = new Date();
-        Date startDate = new Date(endDate.getTime() - 5 * 1000);
-        assertEquals(tracker.getProductOperations(source, startDate, endDate, 100).size(), 2);
+        Date startDate = new Date( endDate.getTime() - 5 * 1000 );
+        assertEquals( tracker.getProductOperations( source, startDate, endDate, 100 ).size(), 2 );
     }
+
 
     @Test
     public void testGetProductOperationSources() {
 
-        tracker.createProductOperation("source1", description);
+        tracker.createProductOperation( "source1", description );
 
-        tracker.createProductOperation("source2", description);
-        tracker.createProductOperation("source3", description);
+        tracker.createProductOperation( "source2", description );
+        tracker.createProductOperation( "source3", description );
 
-        assertEquals(3, tracker.getProductOperationSources().size());
-
+        assertEquals( 3, tracker.getProductOperationSources().size() );
     }
 
 
     @Test
     public void testPrintOperationLog() {
         final ByteArrayOutputStream myOut = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(myOut));
-        ProductOperation po = tracker.createProductOperation(source, description);
+        System.setOut( new PrintStream( myOut ) );
+        ProductOperation po = tracker.createProductOperation( source, description );
 
-        po.addLogDone(testLog);
+        po.addLogDone( testLog );
 
-        tracker.printOperationLog(source, po.getId(), 5 * 1000);
+        tracker.printOperationLog( source, po.getId(), 5 * 1000 );
 
-        assertEquals(testLog, myOut.toString());
-
+        assertEquals( testLog, myOut.toString() );
     }
-
 }

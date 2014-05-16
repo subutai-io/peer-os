@@ -5,24 +5,29 @@
  */
 package org.safehaus.kiskis.mgmt.impl.agentmanager;
 
+
 import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
 import org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.ResponseType;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
 /**
- *
- * @author dilshat
+ * Test for Agent Manager class
  */
 public class AgentManagerImplUT {
 
@@ -32,155 +37,163 @@ public class AgentManagerImplUT {
     private AgentManagerImpl agentManager;
     private CommunicationManager communicationManager;
 
+
     @Before
     public void setUp() {
         agentManager = new AgentManagerImpl();
-        communicationManager = mock(CommunicationManager.class);
-        agentManager.setCommunicationService(communicationManager);
+        communicationManager = mock( CommunicationManager.class );
+        agentManager.setCommunicationService( communicationManager );
         agentManager.init();
     }
+
 
     @After
     public void tearDown() {
         agentManager.destroy();
     }
 
+
     @Test
     public void shouldRegisterWithCommManager() {
 
-        verify(communicationManager).addListener(agentManager);
-
+        verify( communicationManager ).addListener( agentManager );
     }
+
 
     @Test
     public void shouldUnregisterFromCommManager() {
 
         agentManager.destroy();
 
-        verify(communicationManager).removeListener(agentManager);
-
+        verify( communicationManager ).removeListener( agentManager );
     }
+
 
     @Test
     public void shouldReturnRegisteredLxcAgent() {
-        agentManager.onResponse(MockUtils.getRegistrationRequestFromLxcAgent());
+        agentManager.onResponse( MockUtils.getRegistrationRequestFromLxcAgent() );
 
-        assertFalse(agentManager.getLxcAgents().isEmpty());
-        assertTrue(agentManager.getPhysicalAgents().isEmpty());
+        assertFalse( agentManager.getLxcAgents().isEmpty() );
+        assertTrue( agentManager.getPhysicalAgents().isEmpty() );
     }
+
 
     @Test
     public void shouldReturnRegisteredPhysicalAgent() {
 
-        agentManager.onResponse(MockUtils.getRegistrationRequestFromPhysicalAgent());
+        agentManager.onResponse( MockUtils.getRegistrationRequestFromPhysicalAgent() );
 
-        assertFalse(agentManager.getPhysicalAgents().isEmpty());
-        assertTrue(agentManager.getLxcAgents().isEmpty());
+        assertFalse( agentManager.getPhysicalAgents().isEmpty() );
+        assertTrue( agentManager.getLxcAgents().isEmpty() );
     }
+
 
     @Test
     public void shouldReturnAgentWithMissingHostnameByUUID() {
 
         UUID agentUUID = UUID.randomUUID();
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
-        when(response.getUuid()).thenReturn(agentUUID);
-        when(response.getHostname()).thenReturn(null);
+        when( response.getUuid() ).thenReturn( agentUUID );
+        when( response.getHostname() ).thenReturn( null );
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertNotNull(agentManager.getAgentByHostname(agentUUID.toString()));
-        assertNotNull(agentManager.getAgentByUUID(agentUUID));
+        assertNotNull( agentManager.getAgentByHostname( agentUUID.toString() ) );
+        assertNotNull( agentManager.getAgentByUUID( agentUUID ) );
     }
+
 
     @Test
     public void shouldReturnAgentByHostname() {
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
-        when(response.getHostname()).thenReturn(LXC_HOSTNAME);
+        when( response.getHostname() ).thenReturn( LXC_HOSTNAME );
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertNotNull(agentManager.getAgentByHostname(LXC_HOSTNAME));
+        assertNotNull( agentManager.getAgentByHostname( LXC_HOSTNAME ) );
     }
+
 
     @Test
     public void shouldNotReturnAgentsWithMissingUUID() {
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
-        when(response.getUuid()).thenReturn(null);
+        when( response.getUuid() ).thenReturn( null );
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertTrue(agentManager.getAgents().isEmpty());
-
+        assertTrue( agentManager.getAgents().isEmpty() );
     }
+
 
     @Test
     public void shouldReturnAgentByUUID() {
         UUID agentUUID = UUID.randomUUID();
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
-        when(response.getUuid()).thenReturn(agentUUID);
+        when( response.getUuid() ).thenReturn( agentUUID );
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertNotNull(agentManager.getAgentByUUID(agentUUID));
-
+        assertNotNull( agentManager.getAgentByUUID( agentUUID ) );
     }
+
 
     @Test
     public void shouldReturnAgentsByParentHostname() {
 
         Response response = MockUtils.getRegistrationRequestFromPhysicalAgent();
-        when(response.getHostname()).thenReturn(LXC_HOSTNAME);
+        when( response.getHostname() ).thenReturn( LXC_HOSTNAME );
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertNotNull(agentManager.getLxcAgentsByParentHostname(PARENT_HOSTNAME));
-
+        assertNotNull( agentManager.getLxcAgentsByParentHostname( PARENT_HOSTNAME ) );
     }
+
 
     @Test
     public void shouldSendRegistrationAckToAgent() {
 
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
 
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        verify(communicationManager).sendRequest(Matchers.any(Request.class));
-
+        verify( communicationManager ).sendRequest( Matchers.any( Request.class ) );
     }
+
 
     @Test
     public void shouldDeleteAgentOnDisconnect() {
 
         Response response = MockUtils.getRegistrationRequestFromLxcAgent();
-        when(response.getTransportId()).thenReturn(TRANSPORT_ID);
+        when( response.getTransportId() ).thenReturn( TRANSPORT_ID );
         //registering agent
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertFalse(agentManager.getAgents().isEmpty());
+        assertFalse( agentManager.getAgents().isEmpty() );
 
-        when(response.getType()).thenReturn(ResponseType.AGENT_DISCONNECT);
+        when( response.getType() ).thenReturn( ResponseType.AGENT_DISCONNECT );
         //disconnecting agent
-        agentManager.onResponse(response);
+        agentManager.onResponse( response );
 
-        assertTrue(agentManager.getAgents().isEmpty());
+        assertTrue( agentManager.getAgents().isEmpty() );
     }
+
 
     @Test
     public void shouldAddAgentListener() {
-        agentManager.addListener(mock(AgentListener.class));
+        agentManager.addListener( mock( AgentListener.class ) );
 
-        assertFalse(agentManager.getListeners().isEmpty());
+        assertFalse( agentManager.getListeners().isEmpty() );
     }
+
 
     @Test
     public void shouldRemoveAgentListener() {
 
-        AgentListener listener = mock(AgentListener.class);
+        AgentListener listener = mock( AgentListener.class );
 
-        agentManager.addListener(listener);
-        agentManager.removeListener(listener);
+        agentManager.addListener( listener );
+        agentManager.removeListener( listener );
 
-        assertTrue(agentManager.getListeners().isEmpty());
+        assertTrue( agentManager.getListeners().isEmpty() );
     }
-
 }

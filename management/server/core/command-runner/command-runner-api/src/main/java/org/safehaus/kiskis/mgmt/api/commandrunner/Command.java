@@ -5,19 +5,18 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
+
 import java.util.Map;
 import java.util.UUID;
 
+
 /**
  * Command to execute on agent(s)
- *
- * @author dilshat
  */
 public interface Command {
 
     /**
-     * Shows if command has completed. The same as checking
-     * command.getCommandStatus == CommandStatus.SUCCEEDED ||
+     * Shows if command has completed. The same as checking command.getCommandStatus == CommandStatus.SUCCEEDED ||
      * command.getCommandStatus == CommandStatus.FAILED
      *
      * @return - true if completed, false otherwise
@@ -25,8 +24,7 @@ public interface Command {
     public boolean hasCompleted();
 
     /**
-     * Shows if command has succeeded. The same as checking
-     * command.getCommandStatus == CommandStatus.SUCCEEDED
+     * Shows if command has succeeded. The same as checking command.getCommandStatus == CommandStatus.SUCCEEDED
      *
      * @return - true if succeeded, false otherwise
      */
@@ -40,8 +38,7 @@ public interface Command {
     public CommandStatus getCommandStatus();
 
     /**
-     * Returns map of results from agents where key is agent's UUID and value is
-     * instance of AgentResult
+     * Returns map of results from agents where key is agent's UUID and value is instance of AgentResult
      *
      * @return - map of agents' results
      */
@@ -66,7 +63,7 @@ public interface Command {
      *
      * @param data - custom object
      */
-    public void setData(Object data);
+    public void setData( Object data );
 
     /**
      * Returns all std err outputs from agents joined in one string
@@ -81,5 +78,4 @@ public interface Command {
      * @return - description of command or null
      */
     public String getDescription();
-
 }
