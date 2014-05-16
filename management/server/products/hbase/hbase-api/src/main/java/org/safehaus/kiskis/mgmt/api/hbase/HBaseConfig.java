@@ -5,55 +5,71 @@
  */
 package org.safehaus.kiskis.mgmt.api.hbase;
 
+
 import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
 
 import java.util.Set;
 import java.util.UUID;
 
+
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class HBaseConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "HBase";
     private int numberOfNodes = 4;
     private UUID uuid;
-    private Agent master;
-    private Set<Agent> region;
-    private Set<Agent> quorum;
-    private Agent backupMasters;
+    private UUID master;
+    private Set<UUID> region;
+    private Set<UUID> quorum;
+    private UUID backupMasters;
     private String domainInfo;
-    private Set<Agent> nodes;
+    private Set<UUID> nodes;
     private String clusterName = "";
-    private Agent hadoopNameNode;
+    private UUID hadoopNameNode;
 
-    public Config() {
-        this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
+
+    public HBaseConfig()
+    {
+        this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 
-    public static String getProductKey() {
+
+    public static String getProductKey()
+    {
         return PRODUCT_KEY;
     }
 
-    public Agent getHadoopNameNode() {
+
+    public UUID getHadoopNameNode()
+    {
         return hadoopNameNode;
     }
 
-    public void setHadoopNameNode(Agent hadoopNameNode) {
+
+    public void setHadoopNameNode( UUID hadoopNameNode )
+    {
         this.hadoopNameNode = hadoopNameNode;
     }
 
-    public UUID getUuid() {
+
+    public UUID getUuid()
+    {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+
+    public void setUuid( UUID uuid )
+    {
         this.uuid = uuid;
     }
 
-    public void reset() {
+
+    public void reset()
+    {
         this.master = null;
         this.region = null;
         this.quorum = null;
@@ -62,72 +78,106 @@ public class Config implements ConfigBase {
         this.clusterName = "";
     }
 
-    public Agent getMaster() {
+
+    public UUID getMaster()
+    {
         return master;
     }
 
-    public void setMaster(Agent master) {
+
+    public void setMaster( UUID master )
+    {
         this.master = master;
     }
 
-    public Set<Agent> getRegion() {
+
+    public Set<UUID> getRegion()
+    {
         return region;
     }
 
-    public void setRegion(Set<Agent> region) {
+
+    public void setRegion( Set<UUID> region )
+    {
         this.region = region;
     }
 
-    public Set<Agent> getQuorum() {
+
+    public Set<UUID> getQuorum()
+    {
         return quorum;
     }
 
-    public void setQuorum(Set<Agent> quorum) {
+
+    public void setQuorum( Set<UUID> quorum )
+    {
         this.quorum = quorum;
     }
 
-    public Agent getBackupMasters() {
+
+    public UUID getBackupMasters()
+    {
         return backupMasters;
     }
 
-    public void setBackupMasters(Agent backupMasters) {
+
+    public void setBackupMasters( UUID backupMasters )
+    {
         this.backupMasters = backupMasters;
     }
 
-    public String getDomainInfo() {
+
+    public String getDomainInfo()
+    {
         return domainInfo;
     }
 
-    public void setDomainInfo(String domainInfo) {
+
+    public void setDomainInfo( String domainInfo )
+    {
         this.domainInfo = domainInfo;
     }
 
-    public Set<Agent> getNodes() {
+
+    public Set<UUID> getNodes()
+    {
         return nodes;
     }
 
-    public void setNodes(Set<Agent> nodes) {
+
+    public void setNodes( Set<UUID> nodes )
+    {
         this.nodes = nodes;
     }
 
-    public int getNumberOfNodes() {
+
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+
+    public void setNumberOfNodes( int numberOfNodes )
+    {
         this.numberOfNodes = numberOfNodes;
     }
 
-    public String getClusterName() {
+
+    public String getClusterName()
+    {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public void setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
     }
 
+
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 }

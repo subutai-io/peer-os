@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "list-clusters", description = "mydescription")
+@Command(scope = "hbase", name = "install-cluster", description = "Command to install HBase cluster")
 public class InstallHBaseClusterCommand extends OsgiCommandSupport {
 
     private Tracker tracker;

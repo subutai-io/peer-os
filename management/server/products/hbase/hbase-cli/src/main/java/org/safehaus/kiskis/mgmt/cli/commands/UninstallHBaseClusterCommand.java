@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
 import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
@@ -43,29 +43,7 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
     protected Object doExecute() {
 
         UUID uuid = hbaseManager.uninstallCluster(clusterName);
-
-        int logSize = 0;
-        while (!Thread.interrupted()) {
-            ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
-            if (po != null) {
-                if (logSize != po.getLog().length()) {
-                    System.out.print(po.getLog().substring(logSize, po.getLog().length()));
-                    System.out.flush();
-                    logSize = po.getLog().length();
-                }
-                if (po.getState() != ProductOperationState.RUNNING) {
-                    break;
-                }
-            } else {
-                System.out.println("Product operation not found. Check logs");
-                break;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                break;
-            }
-        }
+        tracker.printOperationLog(HBaseConfig.PRODUCT_KEY, uuid, 30000);
         return null;
 
     }

@@ -73,10 +73,6 @@
             <artifactId>org.apache.servicemix.bundles.junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>hadoop-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

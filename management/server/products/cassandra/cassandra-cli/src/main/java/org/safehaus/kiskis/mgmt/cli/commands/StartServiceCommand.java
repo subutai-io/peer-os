@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.cli.commands;
 
+
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -17,24 +18,33 @@ import java.util.UUID;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "service-cassandra-start", description = "Command to start Cassandra service")
-public class StartServiceCommand extends OsgiCommandSupport {
+public class StartServiceCommand extends OsgiCommandSupport
+{
 
     private static Cassandra cassandraManager;
     private static Tracker tracker;
 
-    public Tracker getTracker() {
+
+    public Tracker getTracker()
+    {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
+
+    public void setTracker( Tracker tracker )
+    {
         StartServiceCommand.tracker = tracker;
     }
 
-    public void setCassandraManager(Cassandra cassandraManager) {
+
+    public void setCassandraManager( Cassandra cassandraManager )
+    {
         StartServiceCommand.cassandraManager = cassandraManager;
     }
 
-    public static Cassandra getCassandraManager() {
+
+    public static Cassandra getCassandraManager()
+    {
         return cassandraManager;
     }
 
@@ -43,10 +53,11 @@ public class StartServiceCommand extends OsgiCommandSupport {
     String agentUUID = null;
 
 
-    protected Object doExecute() throws IOException {
+    protected Object doExecute() throws IOException
+    {
 
-        UUID uuid = cassandraManager.startCassandraService(agentUUID);
-        tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
+        UUID uuid = cassandraManager.startCassandraService( agentUUID );
+        tracker.printOperationLog( Config.PRODUCT_KEY, uuid, 30000 );
 
         return null;
     }
