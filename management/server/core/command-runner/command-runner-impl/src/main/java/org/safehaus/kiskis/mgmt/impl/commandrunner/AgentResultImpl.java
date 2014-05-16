@@ -17,7 +17,6 @@ import com.google.common.base.Strings;
 
 /**
  * Implementation of AgentResult interface
- *
  */
 public class AgentResultImpl implements AgentResult {
 
