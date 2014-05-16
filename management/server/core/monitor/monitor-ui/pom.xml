@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>monitor-ui</artifactId>
-    <name>Monitor UI</name>
+    <name>Subutai Monitor UI</name>
     <packaging>bundle</packaging>
 
     <dependencies>

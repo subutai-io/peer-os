@@ -62,7 +62,7 @@ public class ConfigurationStep extends Panel {
         if (hadoopClusters.getValue() != null) {
             Config hadoopInfo = (Config) hadoopClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-            wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode());
+            wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getUuid());
             select.setContainerDataSource(
                     new BeanItemContainer<Agent>(
                             Agent.class, hadoopInfo.getAllNodes())
@@ -80,8 +80,8 @@ public class ConfigurationStep extends Panel {
                                     Agent.class, hadoopInfo.getAllNodes())
                     );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    wizard.getConfig().setNodes(new HashSet<Agent>());
-                    wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode());
+                    wizard.getConfig().setNodes(new HashSet<UUID>());
+                    wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getUuid());
                 }
             }
         });
@@ -102,7 +102,7 @@ public class ConfigurationStep extends Panel {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
+                    Set<UUID> agentList = new HashSet((Collection) event.getProperty().getValue());
                     wizard.getConfig().setNodes(agentList);
                 }
             }
@@ -113,7 +113,7 @@ public class ConfigurationStep extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setNodes((Set<Agent>) select.getValue());
+                wizard.getConfig().setNodes((Set<UUID>) select.getValue());
 
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");

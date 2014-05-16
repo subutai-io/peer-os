@@ -13,6 +13,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
+
 
 /**
  * @author dilshat
@@ -66,7 +68,7 @@ public class StepSetRegion extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setRegion((Set<Agent>) select.getValue());
+                wizard.getConfig().setRegion((Set<UUID>) select.getValue());
                 if (Util.isCollectionEmpty(wizard.getConfig().getRegion())) {
                     show("Please add region servers");
                 } else {
@@ -91,7 +93,7 @@ public class StepSetRegion extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
-        select.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getNodes()));
+        select.setContainerDataSource(new BeanItemContainer<UUID>(UUID.class, wizard.getConfig().getNodes()));
         select.setValue(wizard.getConfig().getRegion());
     }
 

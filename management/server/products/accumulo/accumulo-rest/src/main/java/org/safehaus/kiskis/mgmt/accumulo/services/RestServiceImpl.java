@@ -1,17 +1,14 @@
 package org.safehaus.kiskis.mgmt.accumulo.services;
 
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
     //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
+    //    private HelloService helloService;
 
-    public String handleGet(String name) {
-//        return helloService.sayHello(name);
-        return "Accumulo " + name;
-    }
 
     /*
         Constructor
@@ -19,14 +16,20 @@ public class RestServiceImpl implements RestService {
     public RestServiceImpl() {
     }
 
+
+    public String handleGet( String name ) {
+        //        return helloService.sayHello(name);
+        return "Accumulo " + name;
+    }
+
     /*
         Getters and Setters
      */
-//    public HelloService getHelloService() {
-//        return helloService;
-//    }
-//
-//    public void setHelloService(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
+    //    public HelloService getHelloService() {
+    //        return helloService;
+    //    }
+    //
+    //    public void setHelloService(HelloService helloService) {
+    //        this.helloService = helloService;
+    //    }
 }

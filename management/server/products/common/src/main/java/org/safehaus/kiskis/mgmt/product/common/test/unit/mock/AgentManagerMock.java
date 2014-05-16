@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

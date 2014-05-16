@@ -1,9 +1,12 @@
 package org.safehaus.kiskis.mgmt.ui.commandrunner;
 
-import com.vaadin.ui.*;
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+
+import com.vaadin.ui.Component;
+
 
 public class CommandRunnerUI implements Module {
 
@@ -11,28 +14,33 @@ public class CommandRunnerUI implements Module {
     private CommandRunner commandRunner;
     private AgentManager agentManager;
 
-    public void setCommandRunner(CommandRunner commandRunner) {
+
+    public void setCommandRunner( CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
+
+    public void setAgentManager( AgentManager agentManager ) {
         this.agentManager = agentManager;
     }
+
 
     public void init() {
     }
 
+
     public void destroy() {
     }
+
 
     @Override
     public String getName() {
         return CommandRunnerUI.MODULE_NAME;
     }
 
+
     @Override
     public Component createComponent() {
-        return new TerminalForm(commandRunner, agentManager);
+        return new TerminalForm( commandRunner, agentManager );
     }
-
 }

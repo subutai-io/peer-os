@@ -5,23 +5,27 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+
 /**
- *
- * @author dilshat
+ * Test for CommandImpl class
  */
 public class CommandImplUT {
 
@@ -30,85 +34,95 @@ public class CommandImplUT {
     private final UUID agentUUID = UUID.randomUUID();
     private CommandImpl command;
 
+
     @Before
     public void beforeMethod() {
-        Set<Agent> agents = MockUtils.getAgents(agentUUID);
-        RequestBuilder requestBuilder = MockUtils.getRequestBuilder("pwd", 1, agents);
-        command = new CommandImpl(null, requestBuilder, agents);
+        Set<Agent> agents = MockUtils.getAgents( agentUUID );
+        RequestBuilder requestBuilder = MockUtils.getRequestBuilder( "pwd", 1, agents );
+        command = new CommandImpl( null, requestBuilder, agents );
     }
+
 
     @Test(expected = NullPointerException.class)
     public void constructorShouldFailNullBuilder() {
-        new CommandImpl(null, mock(Set.class));
+        new CommandImpl( null, mock( Set.class ) );
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullAgentBuilder() {
-        new CommandImpl(null, null);
+        new CommandImpl( null, null );
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailEmptyAgentBuilder() {
-        Set<AgentRequestBuilder> ag = new HashSet<AgentRequestBuilder>();
-        new CommandImpl(null, ag);
+        Set<AgentRequestBuilder> ag = new HashSet<>();
+        new CommandImpl( null, ag );
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorShouldFailNullAgents() {
-        new CommandImpl(null, mock(RequestBuilder.class), null);
+        new CommandImpl( null, mock( RequestBuilder.class ), null );
     }
+
 
     @Test
     public void shouldReturnSameNumberOfRequestAsAgents() {
 
-        assertEquals(1, command.getRequests().size());
+        assertEquals( 1, command.getRequests().size() );
     }
+
 
     @Test
     public void shouldCompleteCommand() {
 
-        command.appendResult(MockUtils.getTimedOutResponse(agentUUID, command.getCommandUUID()));
+        command.appendResult( MockUtils.getTimedOutResponse( agentUUID, command.getCommandUUID() ) );
 
-        assertTrue(command.hasCompleted());
+        assertTrue( command.hasCompleted() );
     }
+
 
     @Test
     public void shouldSucceedCommandStatus() {
 
-        command.appendResult(MockUtils.getSucceededResponse(agentUUID, command.getCommandUUID()));
+        command.appendResult( MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() ) );
 
-        assertEquals(CommandStatus.SUCCEEDED, command.getCommandStatus());
+        assertEquals( CommandStatus.SUCCEEDED, command.getCommandStatus() );
     }
+
 
     @Test
     public void shouldFailCommandStatus() {
 
-        command.appendResult(MockUtils.getFailedResponse(agentUUID, command.getCommandUUID()));
+        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() ) );
 
-        assertEquals(CommandStatus.FAILED, command.getCommandStatus());
+        assertEquals( CommandStatus.FAILED, command.getCommandStatus() );
     }
+
 
     @Test
     public void shouldCollectCommandOutput() {
 
-        Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
-        when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
+        Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
+        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
 
-        command.appendResult(response);
+        command.appendResult( response );
 
-        assertEquals(SOME_DUMMY_OUTPUT, command.getResults().get(agentUUID).getStdOut());
+        assertEquals( SOME_DUMMY_OUTPUT, command.getResults().get( agentUUID ).getStdOut() );
     }
+
 
     @Test
     public void shouldCollectAllCommandOutput() {
 
-        Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
-        when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
+        Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
+        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
 
-        command.appendResult(response);
-        command.appendResult(response);
+        command.appendResult( response );
+        command.appendResult( response );
 
-        assertEquals(SOME_DUMMY_OUTPUT + SOME_DUMMY_OUTPUT, command.getResults().get(agentUUID).getStdOut());
+        assertEquals( SOME_DUMMY_OUTPUT + SOME_DUMMY_OUTPUT, command.getResults().get( agentUUID ).getStdOut() );
     }
-
 }

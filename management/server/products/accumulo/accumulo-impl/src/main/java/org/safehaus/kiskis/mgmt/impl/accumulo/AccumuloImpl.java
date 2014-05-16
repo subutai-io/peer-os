@@ -1,6 +1,11 @@
 package org.safehaus.kiskis.mgmt.impl.accumulo;
 
-import com.google.common.base.Preconditions;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
@@ -10,13 +15,19 @@ import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
-import org.safehaus.kiskis.mgmt.impl.accumulo.handler.*;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.AddNodeOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.AddPropertyOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.CheckNodeOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.DestroyNodeOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.InstallOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.RemovePropertyOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StartClusterOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StopClusterOperationHandler;
+import org.safehaus.kiskis.mgmt.impl.accumulo.handler.UninstallOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+
 
 public class AccumuloImpl implements Accumulo {
 
@@ -28,7 +39,9 @@ public class AccumuloImpl implements Accumulo {
     private Zookeeper zkManager;
     private ExecutorService executor;
 
-    public AccumuloImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Hadoop hadoopManager, Zookeeper zkManager) {
+
+    public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+                         Hadoop hadoopManager, Zookeeper zkManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
@@ -36,134 +49,155 @@ public class AccumuloImpl implements Accumulo {
         this.hadoopManager = hadoopManager;
         this.zkManager = zkManager;
 
-        Commands.init(commandRunner);
+        Commands.init( commandRunner );
     }
+
 
     public CommandRunner getCommandRunner() {
         return commandRunner;
     }
 
+
     public AgentManager getAgentManager() {
         return agentManager;
     }
+
 
     public DbManager getDbManager() {
         return dbManager;
     }
 
+
     public Tracker getTracker() {
         return tracker;
     }
+
 
     public Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
+
     public Zookeeper getZkManager() {
         return zkManager;
     }
+
 
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
 
+
     public void destroy() {
         executor.shutdown();
     }
 
-    public UUID installCluster(final Config config) {
 
-        Preconditions.checkNotNull(config, "Configuration is null");
+    public UUID installCluster( final Config config ) {
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+        Preconditions.checkNotNull( config, "Configuration is null" );
 
-        executor.execute(operationHandler);
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
 
-        return operationHandler.getTrackerId();
-    }
-
-    public UUID uninstallCluster(final String clusterName) {
-
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
-
-        executor.execute(operationHandler);
+        executor.execute( operationHandler );
 
         return operationHandler.getTrackerId();
     }
 
-    public UUID startCluster(final String clusterName) {
 
-        AbstractOperationHandler operationHandler = new StartClusterOperationHandler(this, clusterName);
+    public UUID uninstallCluster( final String clusterName ) {
 
-        executor.execute(operationHandler);
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
-        return operationHandler.getTrackerId();
-    }
-
-    public UUID stopCluster(final String clusterName) {
-
-        AbstractOperationHandler operationHandler = new StopClusterOperationHandler(this, clusterName);
-
-        executor.execute(operationHandler);
+        executor.execute( operationHandler );
 
         return operationHandler.getTrackerId();
     }
 
-    public UUID checkNode(final String clusterName, final String lxcHostName) {
-
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostName);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
-
-    public UUID destroyNode(final String clusterName, final String lxcHostName, final NodeType nodeType) {
-
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostName, nodeType);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
-
-    @Override
-    public UUID addProperty(final String clusterName, final String propertyName, final String propertyValue) {
-
-        AbstractOperationHandler operationHandler = new AddPropertyOperationHandler(this, clusterName, propertyName, propertyValue);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
-
-    @Override
-    public UUID removeProperty(final String clusterName, final String propertyName) {
-
-        AbstractOperationHandler operationHandler = new RemovePropertyOperationHandler(this, clusterName, propertyName);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
-
-    public UUID addNode(final String clusterName, final String lxcHostname, final NodeType nodeType) {
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname, nodeType);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
 
     public List<Config> getClusters() {
 
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-
+        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
     }
 
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+
+    public Config getCluster( String clusterName ) {
+        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
     }
 
+
+    public UUID startCluster( final String clusterName ) {
+
+        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID stopCluster( final String clusterName ) {
+
+        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID checkNode( final String clusterName, final String lxcHostName ) {
+
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID addNode( final String clusterName, final String lxcHostname, final NodeType nodeType ) {
+
+        AbstractOperationHandler operationHandler =
+                new AddNodeOperationHandler( this, clusterName, lxcHostname, nodeType );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID destroyNode( final String clusterName, final String lxcHostName, final NodeType nodeType ) {
+
+        AbstractOperationHandler operationHandler =
+                new DestroyNodeOperationHandler( this, clusterName, lxcHostName, nodeType );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID addProperty( final String clusterName, final String propertyName, final String propertyValue ) {
+
+        AbstractOperationHandler operationHandler =
+                new AddPropertyOperationHandler( this, clusterName, propertyName, propertyValue );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID removeProperty( final String clusterName, final String propertyName ) {
+
+        AbstractOperationHandler operationHandler =
+                new RemovePropertyOperationHandler( this, clusterName, propertyName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
 }

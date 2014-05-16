@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "list-clusters", description = "mydescription")
+@Command(scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
 public class ListClustersCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;

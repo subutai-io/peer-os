@@ -5,91 +5,91 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.Set;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
+
 /**
- * @author dilshat
+ * Command Runner i used to send requests to agents and obtain responses from them using either Command.getResults() or
+ * by parsing AgetnResult inside command callbacks.
  */
 public interface CommandRunner {
 
     /**
-     * Runs command on agents. Runs asynchronously for calling party. The
-     * supplied callback is triggered every time a response is received from
-     * agent. Calling party may examine the command to see its status and
-     * results of each agent.
-     *
-     * @param command         - command to run
-     * @param commandCallback - callback to trigger on every response
-     */
-    public void runCommandAsync(Command command, CommandCallback commandCallback);
-
-    /**
-     * Runs command on agents. Runs asynchronously for calling party. Calling
-     * party may examine the command to see its status and results of each
+     * Runs command on agents. Runs asynchronously for calling party. The supplied callback is triggered every time a
+     * response is received from agent. Calling party may examine the command to see its status and results of each
      * agent.
      *
      * @param command - command to run
+     * @param commandCallback - callback to trigger on every response
      */
-    public void runCommandAsync(Command command);
+    public void runCommandAsync( Command command, CommandCallback commandCallback );
 
     /**
-     * Runs command on agents. Runs synchronously for calling party. Calling
-     * party may examine the command to see its status and results of each agent
-     * after this call returns.
+     * Runs command on agents. Runs asynchronously for calling party. Calling party may examine the command to see its
+     * status and results of each agent.
      *
      * @param command - command to run
      */
-    public void runCommand(Command command);
+    public void runCommandAsync( Command command );
 
     /**
-     * Runs command on agents. Runs synchronously for calling party. The
-     * supplied callback is triggered every time a response is received from
-     * agent. Calling party may examine the command to see its status and
-     * results of each agent after this call returns.
+     * Runs command on agents. Runs synchronously for calling party. Calling party may examine the command to see its
+     * status and results of each agent after this call returns.
      *
-     * @param command         - command to run
+     * @param command - command to run
+     */
+    public void runCommand( Command command );
+
+    /**
+     * Runs command on agents. Runs synchronously for calling party. The supplied callback is triggered every time a
+     * response is received from agent. Calling party may examine the command to see its status and results of each
+     * agent after this call returns.
+     *
+     * @param command - command to run
      * @param commandCallback - - callback to trigger on every response
      */
-    public void runCommand(Command command, CommandCallback commandCallback);
+    public void runCommand( Command command, CommandCallback commandCallback );
 
     /**
-     * Creates command based on supplied RequestBuilder and target agents on
-     * which to run the command.
+     * Creates command based on supplied RequestBuilder and target agents on which to run the command.
      *
      * @param requestBuilder - request builder
-     * @param agents         - target agents
+     * @param agents - target agents
+     *
      * @return - command
      */
-    public Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents);
+    public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents );
 
     /**
-     * Creates command based on supplied RequestBuilder and target agents on
-     * which to run the command.
+     * Creates command based on supplied RequestBuilder and target agents on which to run the command.
      *
-     * @param description    - description of command
+     * @param description - description of command
      * @param requestBuilder - request builder
-     * @param agents         - target agents
+     * @param agents - target agents
+     *
      * @return - command
      */
-    public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents);
+    public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents );
 
     /**
      * Creates command based on supplied set of AgentRequestBuilders.
      *
      * @param agentRequestBuilders - agent request builders
+     *
      * @return - command
      */
-    public Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders);
+    public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders );
 
     /**
      * Creates command based on supplied set of AgentRequestBuilders.
      *
-     * @param description          - description of command
+     * @param description - description of command
      * @param agentRequestBuilders - agent request builders
+     *
      * @return - command
      */
-    public Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders);
-
+    public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders );
 }

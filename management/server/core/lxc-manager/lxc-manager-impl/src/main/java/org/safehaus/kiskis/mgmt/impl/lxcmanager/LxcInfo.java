@@ -5,12 +5,12 @@
  */
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+
 
 /**
  * Contains lxc info for LxcActor
- *
- * @author dilshat
  */
 public class LxcInfo {
 
@@ -19,30 +19,35 @@ public class LxcInfo {
     private final String nodeType;
     private boolean result;
 
-    public LxcInfo(Agent physicalAgent, String lxcHostname, String nodeType) {
+
+    public LxcInfo( Agent physicalAgent, String lxcHostname, String nodeType ) {
         this.physicalAgent = physicalAgent;
         this.lxcHostname = lxcHostname;
         this.nodeType = nodeType;
     }
 
+
     public String getNodeType() {
         return nodeType;
     }
+
 
     public boolean isResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+
+    public void setResult( boolean result ) {
         this.result = result;
     }
+
 
     public Agent getPhysicalAgent() {
         return physicalAgent;
     }
 
+
     public String getLxcHostname() {
         return lxcHostname;
     }
-
 }
