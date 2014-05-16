@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.cli.commands;
+package org.safehaus.kiskis.mgmt.cli.cassandra;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
