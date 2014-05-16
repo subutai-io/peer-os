@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>sqoop-cli</artifactId>
-    <name>Kiskis Management Sqoop CLI</name>
-    <description>Kiskis Management Sqoop CLI</description>
+    <name>Subutai Sqoop CLI</name>
+    <description>Subutai Sqoop CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

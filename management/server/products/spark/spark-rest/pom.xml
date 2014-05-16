@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>spark-rest</artifactId>
-    <name>Kiskis Management Spark REST</name>
-    <description>Kiskis Management Spark REST</description>
+    <name>Subutai Spark REST</name>
+    <description>Subutai Spark REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

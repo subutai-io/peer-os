@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>oozie-rest</artifactId>
-    <name>Kiskis Management Oozie REST</name>
-    <description>Kiskis Management Oozie REST</description>
+    <name>Subutai Oozie REST</name>
+    <description>Subutai Oozie REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -65,12 +65,6 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.3.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
             <version>4.3.1</version>
             <scope>provided</scope>
@@ -81,30 +75,6 @@
             <version>4.10_1</version>
             <scope>test</scope>
         </dependency>
-        <!-- Jersey -->
-        <!--<dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>1.12</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.12</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.12</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>-->
 
         <!--CXF-->
         <dependency>

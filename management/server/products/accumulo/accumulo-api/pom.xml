@@ -11,8 +11,8 @@
 
   <artifactId>accumulo-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Kiskis Management Accumulo Api</name>
-  <description>Kiskis Management Accumulo Api</description>
+  <name>Subutai Accumulo Api</name>
+  <description>Subutai Accumulo Api</description>
 
   <dependencies>
     <dependency>

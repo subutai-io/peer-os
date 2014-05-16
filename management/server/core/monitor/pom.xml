@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>monitor-parent</artifactId>
-    <name>Monitor Parent</name>
+    <name>Subutai Monitor Parent</name>
     <packaging>pom</packaging>
 
     <modules>
