@@ -1,6 +1,8 @@
 package org.safehaus.kiskis.mgmt.solr.services;
 
+
 import org.safehaus.kiskis.mgmt.api.solr.Solr;
+
 
 /**
  * Created by bahadyr on 5/6/14.

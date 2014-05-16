@@ -9,6 +9,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+
+
 /**
  * This is an interface for Tracker
  *

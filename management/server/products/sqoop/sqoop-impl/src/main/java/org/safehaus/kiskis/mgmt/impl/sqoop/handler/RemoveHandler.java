@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.CommandFactory;
 import org.safehaus.kiskis.mgmt.impl.sqoop.CommandType;
 import org.safehaus.kiskis.mgmt.impl.sqoop.SqoopImpl;
