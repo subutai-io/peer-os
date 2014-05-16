@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
 import org.safehaus.kiskis.mgmt.impl.hadoop.operation.common.AddNodeOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;

@@ -10,8 +10,8 @@
 
     <artifactId>ui-vaadin</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Vaadin UI</name>
-    <description>Kiskis Management Vaadin UI</description>
+    <name>Subutai Vaadin UI</name>
+    <description>Subutai Vaadin UI</description>
 
     <dependencies>
         <dependency>

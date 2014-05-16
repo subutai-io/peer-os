@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>accumulo-parent</artifactId>
-    <name>Kiskis Management Accumulo Parent</name>
-    <description>Kiskis Management Accumulo Parent</description>
+    <name>Subutai Accumulo Parent</name>
+    <description>Subutai Accumulo Parent</description>
     <packaging>pom</packaging>
 
     <modules>

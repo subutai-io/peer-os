@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hadoop-cli</artifactId>
-    <name>Kiskis Management Hadoop CLI</name>
-    <description>Kiskis Management Hadoop CLI</description>
+    <name>Subutai Hadoop CLI</name>
+    <description>Subutai Hadoop CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

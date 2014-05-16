@@ -6,7 +6,7 @@
     <artifactId>mgmt-parent</artifactId>
     <version>2.0.0</version>
 
-    <name>Kiskis Management Server Project Parent</name>
+    <name>Subutai Server Project Parent</name>
 
     <packaging>pom</packaging>
 
@@ -15,7 +15,7 @@
         <module>server</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Project Artifacts</description>
+    <description>Parent project for the Subutai Project Artifacts</description>
 
     <repositories>
         <repository>
@@ -65,8 +65,10 @@
 
         <com.codahale.metrics.metrics-core.version>3.0.2</com.codahale.metrics.metrics-core.version>
         <com.datastax.cassandra.version>2.0.1</com.datastax.cassandra.version>
+        <com.eaio.uuid.version>3.2</com.eaio.uuid.version>
         <com.google.code.gson.version>2.2.4</com.google.code.gson.version>
         <com.google.guava.version>16.0.1</com.google.guava.version>
+        <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
         <com.sun.jersey.version>1.18.1</com.sun.jersey.version>
         <com.vaadin.version>6.8.14</com.vaadin.version>
         <commons-net.version>3.3</commons-net.version>
@@ -84,7 +86,7 @@
         <org.apache.cassandra.version>2.0.5</org.apache.cassandra.version>
         <org.apache.commons.version>3.2.1</org.apache.commons.version>
         <commons.io.version>2.4</commons.io.version>
-        <org.apache.cxf.version>2.7.10</org.apache.cxf.version>
+        <org.apache.cxf.version>2.7.11</org.apache.cxf.version>
         <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
         <org.apache.felix.version>2.4.0</org.apache.felix.version>
         <org.apache.geronimo.specs.ejb.version>1.0.1</org.apache.geronimo.specs.ejb.version>
@@ -92,10 +94,13 @@
         <org.apache.geronimo.specs.jpa.version>1.1</org.apache.geronimo.specs.jpa.version>
         <org.apache.lucene.version>4.7.0</org.apache.lucene.version>
         <org.apache.maven.plugins.version>3.1</org.apache.maven.plugins.version>
+        <org.apache.servicemix.bundles.version>4.10_1</org.apache.servicemix.bundles.version>
+        <org.cassandraunit.version>2.0.2.1</org.cassandraunit.version>
         <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
         <org.doomdark.version>1.1.2</org.doomdark.version>
         <org.eclipse.jetty.orbit.version>2.5.0.v201103041518</org.eclipse.jetty.orbit.version>
         <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
+        <org.mockito.version>1.9.5</org.mockito.version>
         <org.osgi.version>4.3.1</org.osgi.version>
         <org.slf4j.version>1.7.6</org.slf4j.version>
         <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
@@ -105,6 +110,82 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--agent-manager-impl-->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${org.mockito.version}</version>
+            </dependency>
+            <!--agent-manager-impl-->
+
+            <!--agent-manager-cli-->
+            <dependency>
+                <groupId>org.apache.karaf.shell</groupId>
+                <artifactId>org.apache.karaf.shell.console</artifactId>
+                <version>${karaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${org.osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+                <version>${org.apache.servicemix.bundles.version}</version>
+            </dependency>
+            <!--agent-manager-cli-->
+
+            <!--command-runner-impl-->
+            <dependency>
+                <groupId>com.jayway.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${com.jayway.awaitility.version}</version>
+            </dependency>
+            <!--command-runner-impl-->
+
+            <!--command-runner-ui-->
+            <dependency>
+                <groupId>org.eclipse.jetty.orbit</groupId>
+                <artifactId>javax.servlet</artifactId>
+                <version>${org.eclipse.jetty.orbit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation.version}</version>
+            </dependency>
+            <!--command-runner-ui-->
+
+            <!--communication-manager-impl-->
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-broker</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-kahadb-store</artifactId>
+                <version>${org.apache.activemq.version}</version>
+            </dependency>
+            <!--communication-manager-impl-->
+
+            <!--db-manager-impl-->
+            <dependency>
+                <groupId>org.cassandraunit</groupId>
+                <artifactId>cassandra-unit</artifactId>
+                <version>${org.cassandraunit.version}</version>
+            </dependency>
+            <!--db-manager-impl-->
+
+            <!--CXF-->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                <version>${org.apache.cxf.version}</version>
+            </dependency>
+            <!--CXF-->
+
             <!--Shared-->
             <dependency>
                 <groupId>org.osgi</groupId>
@@ -117,11 +198,6 @@
                 <version>${com.google.code.gson.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.doomdark</groupId>
-                <artifactId>com.springsource.org.doomdark.uuid</artifactId>
-                <version>${org.doomdark.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
@@ -130,11 +206,6 @@
                 <groupId>com.datastax.cassandra</groupId>
                 <artifactId>cassandra-driver-core</artifactId>
                 <version>${com.datastax.cassandra.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cassandra</groupId>
-                <artifactId>cassandra-all</artifactId>
-                <version>${org.apache.cassandra.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.jpountz.lz4</groupId>
@@ -173,11 +244,6 @@
                 <groupId>org.doomdark</groupId>
                 <artifactId>com.springsource.org.doomdark.uuid</artifactId>
                 <version>${org.doomdark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty.orbit</groupId>
-                <artifactId>javax.servlet</artifactId>
-                <version>${org.eclipse.jetty.orbit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.elasticsearch</groupId>
@@ -245,29 +311,9 @@
                 <version>${xalan.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.jpountz.lz4</groupId>
-                <artifactId>lz4</artifactId>
-                <version>${net.jpountz.lz4.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${com.google.guava.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty</artifactId>
-                <version>${io.netty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${org.codehaus.jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${org.codehaus.jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -282,7 +328,7 @@
             <dependency>
                 <groupId>com.eaio.uuid</groupId>
                 <artifactId>uuid</artifactId>
-                <version>3.2</version>
+                <version>${com.eaio.uuid.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cassandra</groupId>
@@ -443,6 +489,13 @@
             <!-- Core Modules - END -->
 
             <!-- Products Modules - START -->
+
+            <!-- Common -->
+            <dependency>
+                <groupId>org.safehaus.kiskis.mgmt</groupId>
+                <artifactId>product-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Accumulo -->
             <dependency>
@@ -926,87 +979,6 @@
             </dependency>
             <!-- Products Modules - END -->
             <!--karaf-->
-
-            <!--agent-manager-impl-->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.9.5</version>
-            </dependency>
-            <!--agent-manager-impl-->
-
-            <!--agent-manager-cli-->
-            <dependency>
-                <groupId>org.apache.karaf.shell</groupId>
-                <artifactId>org.apache.karaf.shell.console</artifactId>
-                <version>2.3.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>4.3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.servicemix.bundles</groupId>
-                <artifactId>org.apache.servicemix.bundles.junit</artifactId>
-                <version>4.10_1</version>
-            </dependency>
-            <!--agent-manager-cli-->
-
-            <!--command-runner-impl-->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.9.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>1.5.0</version>
-            </dependency>
-            <!--command-runner-impl-->
-
-            <!--command-runner-ui-->
-            <dependency>
-                <groupId>org.eclipse.jetty.orbit</groupId>
-                <artifactId>javax.servlet</artifactId>
-                <version>${org.eclipse.jetty.orbit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>${javax.annotation.version}</version>
-            </dependency>
-            <!--command-runner-ui-->
-
-            <!--communication-manager-impl-->
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-broker</artifactId>
-                <version>${org.apache.activemq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-kahadb-store</artifactId>
-                <version>${org.apache.activemq.version}</version>
-            </dependency>
-            <!--communication-manager-impl-->
-
-            <!--db-manager-impl-->
-            <dependency>
-                <groupId>org.cassandraunit</groupId>
-                <artifactId>cassandra-unit</artifactId>
-                <version>2.0.2.1</version>
-            </dependency>
-            <!--db-manager-impl-->
-
-            <!--CXF-->
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-                <version>2.7.11</version>
-            </dependency>
-            <!--CXF-->
         </dependencies>
     </dependencyManagement>
 

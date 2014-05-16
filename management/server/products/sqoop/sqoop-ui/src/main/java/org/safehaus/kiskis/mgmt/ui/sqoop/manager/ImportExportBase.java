@@ -4,8 +4,8 @@ import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.CommonSetting;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
 

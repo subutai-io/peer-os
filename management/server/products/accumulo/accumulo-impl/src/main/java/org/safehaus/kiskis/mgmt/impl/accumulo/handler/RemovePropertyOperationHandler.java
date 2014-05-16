@@ -3,10 +3,10 @@ package org.safehaus.kiskis.mgmt.impl.accumulo.handler;
 import com.google.common.base.Strings;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.accumulo.AccumuloImpl;
 import org.safehaus.kiskis.mgmt.impl.accumulo.Commands;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import java.util.UUID;
 

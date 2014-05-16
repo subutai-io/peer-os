@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>flume-cli</artifactId>
-    <name>Kiskis Management Flume CLI</name>
-    <description>Kiskis Management Flume CLI</description>
+    <name>Subutai Flume CLI</name>
+    <description>Subutai Flume CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

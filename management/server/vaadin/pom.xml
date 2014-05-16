@@ -9,8 +9,8 @@
     </parent>
 
     <artifactId>mgmt-ui</artifactId>
-    <name>Kiskis Management UI</name>
-    <description>Kiskis Management User Interface</description>
+    <name>Subutai UI</name>
+    <description>Subutai User Interface</description>
     <packaging>pom</packaging>
 
     <modules>

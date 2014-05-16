@@ -13,7 +13,7 @@
 
     <artifactId>command-runner-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Command Runner</name>
+    <name>Subutai Command Runner</name>
     <description>command runner impl</description>
 
     <dependencies>

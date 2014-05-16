@@ -11,8 +11,8 @@
 
     <artifactId>flume-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Flume</name>
-    <description>Kiskis Management Flume</description>
+    <name>Subutai Flume</name>
+    <description>Subutai Flume</description>
 
     <dependencies>
         <dependency>

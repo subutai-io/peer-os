@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>flume-rest</artifactId>
-    <name>Kiskis Management Flume REST</name>
-    <description>Kiskis Management Flume REST</description>
+    <name>Subutai Flume REST</name>
+    <description>Subutai Flume REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hive-cli</artifactId>
-    <name>Kiskis Management Hive CLI</name>
-    <description>Kiskis Management Hive CLI</description>
+    <name>Subutai Hive CLI</name>
+    <description>Subutai Hive CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
