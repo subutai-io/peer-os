@@ -9,12 +9,35 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandCallback;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 
 
 public class CommandRunnerMock implements CommandRunner {
+
+    @Override
+    public void runCommandAsync( Command command, CommandCallback commandCallback ) {
+
+    }
+
+
+    @Override
+    public void runCommandAsync( Command command ) {
+
+    }
+
+
+    @Override
+    public void runCommand( Command command ) {
+
+    }
+
+
+    @Override
+    public void runCommand( Command command, CommandCallback commandCallback ) {
+
+    }
+
 
     @Override
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
@@ -38,29 +61,5 @@ public class CommandRunnerMock implements CommandRunner {
     @Override
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
         return null;
-    }
-
-
-    @Override
-    public void runCommandAsync( Command command, CommandCallback commandCallback ) {
-
-    }
-
-
-    @Override
-    public void runCommandAsync( Command command ) {
-
-    }
-
-
-    @Override
-    public void runCommand( Command command ) {
-
-    }
-
-
-    @Override
-    public void runCommand( Command command, CommandCallback commandCallback ) {
-
     }
 }

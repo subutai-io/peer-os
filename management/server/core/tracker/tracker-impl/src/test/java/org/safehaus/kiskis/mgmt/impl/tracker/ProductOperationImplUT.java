@@ -9,7 +9,7 @@ package org.safehaus.kiskis.mgmt.impl.tracker;
 import java.util.UUID;
 
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

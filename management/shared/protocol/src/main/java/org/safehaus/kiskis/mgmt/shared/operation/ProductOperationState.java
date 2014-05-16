@@ -6,7 +6,6 @@
 package org.safehaus.kiskis.mgmt.shared.operation;
 
 
-
 /**
  * State of operation
  */

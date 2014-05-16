@@ -65,11 +65,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
             po.addLog(String.format("Creating %d lxc containers...", numberOfLxcsNeeded));
             Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs(numberOfLxcsNeeded);
 
-            Set<Agent> cfgServers = new HashSet<Agent>();
-            Set<Agent> routers = new HashSet<Agent>();
-            Set<Agent> dataNodes = new HashSet<Agent>();
+            Set<Agent> cfgServers = new HashSet<>();
+            Set<Agent> routers = new HashSet<>();
+            Set<Agent> dataNodes = new HashSet<>();
 
-            Set<Agent> availableAgents = new HashSet<Agent>();
+            Set<Agent> availableAgents = new HashSet<>();
 
             for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
                 availableAgents.addAll(entry.getValue());

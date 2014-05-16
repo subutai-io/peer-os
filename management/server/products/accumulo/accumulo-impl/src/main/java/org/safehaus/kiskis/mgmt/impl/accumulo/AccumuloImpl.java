@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.impl.accumulo.handler.RemovePropertyOperationHan
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StartClusterOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StopClusterOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.AbstractOperationHandler;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 import com.google.common.base.Preconditions;
 
