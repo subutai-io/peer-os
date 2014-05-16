@@ -10,70 +10,107 @@
     </parent>
 
     <artifactId>oozie-rest</artifactId>
-    <name>Subutai Oozie REST</name>
-    <description>Subutai Oozie REST</description>
+    <name>Kiskis Management Oozie REST</name>
+    <description>Kiskis Management Oozie REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <version>${org.osgi.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>oozie-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>agent-manager-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>tracker-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <version>${com.google.guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+            <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
+            <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
+            <version>4.3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+            <version>4.10_1</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jersey -->
+        <!--<dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>-->
 
         <!--CXF-->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>2.5.1</version>
         </dependency>
 
     </dependencies>
@@ -83,7 +120,12 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <inherited>true</inherited>
+                <extensions>true</extensions>
                 <configuration>
+                    <manifestLocation>META-INF</manifestLocation>
+                    <unpackBundle>true</unpackBundle>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.rest.oozie</Bundle-SymbolicName>
                         <Export-Package>

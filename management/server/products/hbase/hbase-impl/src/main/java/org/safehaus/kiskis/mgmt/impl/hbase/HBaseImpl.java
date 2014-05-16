@@ -1,11 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.hbase;
 
+
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -18,7 +20,9 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HBaseImpl implements HBase {
+
+public class HBaseImpl implements HBase
+{
 
     private AgentManager agentManager;
     private Hadoop hadoopManager;
@@ -27,318 +31,433 @@ public class HBaseImpl implements HBase {
     private ExecutorService executor;
     private CommandRunner commandRunner;
 
-    public void init() {
-        Commands.init(commandRunner);
+
+    public void init()
+    {
+        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
-    public void destroy() {
+
+    public void destroy()
+    {
         executor.shutdown();
     }
 
-    public Hadoop getHadoopManager() {
+
+    public Hadoop getHadoopManager()
+    {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
+
+    public void setHadoopManager( Hadoop hadoopManager )
+    {
         this.hadoopManager = hadoopManager;
     }
 
-    public void setDbManager(DbManager dbManager) {
+
+    public void setDbManager( DbManager dbManager )
+    {
         this.dbManager = dbManager;
     }
 
-    public void setTracker(Tracker tracker) {
+
+    public void setTracker( Tracker tracker )
+    {
         this.tracker = tracker;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
+
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
+
+    public void setCommandRunner( CommandRunner commandRunner )
+    {
         this.commandRunner = commandRunner;
     }
 
-    public UUID installCluster(final org.safehaus.kiskis.mgmt.api.hbase.Config config) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing HBase");
+
+    public UUID installCluster( final HBaseConfig config )
+    {
+        final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY, "Installing HBase" );
 
         final Set<Agent> allNodes = new HashSet<Agent>();
-        allNodes.add(config.getMaster());
-        allNodes.addAll(config.getRegion());
-        allNodes.addAll(config.getQuorum());
-        allNodes.add(config.getBackupMasters());
 
-        executor.execute(new Runnable() {
+        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
+        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
 
-            public void run() {
-                if (dbManager.getInfo(Config.PRODUCT_KEY, config.getClusterName(), Config.class) != null) {
-                    po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName()));
+        for ( UUID uuid : config.getRegion() )
+        {
+            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+        }
+
+        for ( UUID uuid : config.getQuorum() )
+        {
+            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+        }
+
+        //        allNodes.addAll( config.getQuorum() );
+
+        executor.execute( new Runnable()
+        {
+
+            public void run()
+            {
+                if ( dbManager.getInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), HBaseConfig.class ) != null )
+                {
+                    po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                        config.getClusterName() ) );
                     return;
                 }
 
-                if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+                if ( dbManager.saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+                {
 
-                    po.addLog("Cluster info saved to DB\nInstalling HBase...");
+                    po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
 
                     // Installing HBase
-                    po.addLog("Installing...");
-                    Command installCommand = Commands.getInstallCommand(allNodes);
-                    commandRunner.runCommand(installCommand);
+                    po.addLog( "Installing..." );
+                    Command installCommand = Commands.getInstallCommand( allNodes );
+                    commandRunner.runCommand( installCommand );
 
-                    if (installCommand.hasSucceeded()) {
-                        po.addLog("Installation success..");
-                    } else {
-                        po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
+                    if ( installCommand.hasSucceeded() )
+                    {
+                        po.addLog( "Installation success.." );
+                    }
+                    else
+                    {
+                        po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
                         return;
                     }
 
-                    po.addLog("Installation succeeded\nConfiguring master...");
+                    po.addLog( "Installation succeeded\nConfiguring master..." );
 
                     // Configuring master
-                    Command configureMasterCommand = Commands.getConfigMasterTask(allNodes, config.getHadoopNameNode().getHostname(), config.getMaster().getHostname());
-                    commandRunner.runCommand(configureMasterCommand);
+                    Command configureMasterCommand = Commands
+                        .getConfigMasterTask( allNodes,
+                            agentManager.getAgentByUUID( config.getHadoopNameNode() ).getHostname(),
+                            agentManager.getAgentByUUID( config.getMaster() ).getHostname() );
+                    commandRunner.runCommand( configureMasterCommand );
 
-                    if (configureMasterCommand.hasSucceeded()) {
-                        po.addLog("Configure master success...");
-                    } else {
-                        po.addLogFailed(String.format("Configuration failed, %s", configureMasterCommand));
+                    if ( configureMasterCommand.hasSucceeded() )
+                    {
+                        po.addLog( "Configure master success..." );
+                    }
+                    else
+                    {
+                        po.addLogFailed( String.format( "Configuration failed, %s", configureMasterCommand ) );
                         return;
                     }
-                    po.addLog("Configuring master succeeded\nConfiguring region...");
+                    po.addLog( "Configuring master succeeded\nConfiguring region..." );
 
                     // Configuring region
                     StringBuilder sbRegion = new StringBuilder();
-                    for (Agent agent : config.getRegion()) {
-                        sbRegion.append(agent.getHostname());
-                        sbRegion.append(" ");
+                    for ( UUID uuid : config.getRegion() )
+                    {
+                        Agent agent = agentManager.getAgentByUUID( uuid );
+                        sbRegion.append( agent.getHostname() );
+                        sbRegion.append( " " );
                     }
-                    Command configureRegionCommand = Commands.getConfigRegionCommand(allNodes, sbRegion.toString().trim());
-                    commandRunner.runCommand(configureRegionCommand);
+                    Command configureRegionCommand = Commands
+                        .getConfigRegionCommand( allNodes, sbRegion.toString().trim() );
+                    commandRunner.runCommand( configureRegionCommand );
 
-                    if (configureRegionCommand.hasSucceeded()) {
-                        po.addLog("Configuring region success...");
-                    } else {
-                        po.addLogFailed(String.format("Configuring failed, %s", configureRegionCommand.getAllErrors()));
+                    if ( configureRegionCommand.hasSucceeded() )
+                    {
+                        po.addLog( "Configuring region success..." );
+                    }
+                    else
+                    {
+                        po.addLogFailed(
+                            String.format( "Configuring failed, %s", configureRegionCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLog("Configuring region succeeded\nSetting quorum...");
+                    po.addLog( "Configuring region succeeded\nSetting quorum..." );
 
                     // Configuring quorum
                     StringBuilder sbQuorum = new StringBuilder();
-                    for (Agent agent : config.getQuorum()) {
-                        sbQuorum.append(agent.getHostname());
-                        sbQuorum.append(" ");
+                    for ( UUID uuid : config.getQuorum() )
+                    {
+                        Agent agent = agentManager.getAgentByUUID( uuid );
+                        sbQuorum.append( agent.getHostname() );
+                        sbQuorum.append( " " );
                     }
-                    Command configureQuorumCommand = Commands.getConfigQuorumCommand(allNodes, sbQuorum.toString().trim());
-                    commandRunner.runCommand(configureQuorumCommand);
+                    Command configureQuorumCommand = Commands
+                        .getConfigQuorumCommand( allNodes, sbQuorum.toString().trim() );
+                    commandRunner.runCommand( configureQuorumCommand );
 
-                    if (configureQuorumCommand.hasSucceeded()) {
-                        po.addLog("Configuring quorum success...");
-                    } else {
-                        po.addLogFailed(String.format("Installation failed, %s", configureQuorumCommand.getAllErrors()));
+                    if ( configureQuorumCommand.hasSucceeded() )
+                    {
+                        po.addLog( "Configuring quorum success..." );
+                    }
+                    else
+                    {
+                        po.addLogFailed(
+                            String.format( "Installation failed, %s", configureQuorumCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLog("Setting quorum succeeded\nSetting backup masters...");
+                    po.addLog( "Setting quorum succeeded\nSetting backup masters..." );
 
                     // Configuring backup master
-                    Command configureBackupMasterCommand = Commands.getConfigBackupMastersCommand(allNodes, config.getBackupMasters().getHostname());
-                    commandRunner.runCommand(configureBackupMasterCommand);
+                    Command configureBackupMasterCommand = Commands
+                        .getConfigBackupMastersCommand( allNodes,
+                            agentManager.getAgentByUUID( config.getBackupMasters() ).getHostname() );
+                    commandRunner.runCommand( configureBackupMasterCommand );
 
-                    if (configureBackupMasterCommand.hasSucceeded()) {
-                        po.addLogDone("Configuring backup master success...");
-                    } else {
-                        po.addLogFailed(String.format("Installation failed, %s", configureBackupMasterCommand.getAllErrors()));
+                    if ( configureBackupMasterCommand.hasSucceeded() )
+                    {
+                        po.addLogDone( "Configuring backup master success..." );
+                    }
+                    else
+                    {
+                        po.addLogFailed(
+                            String.format( "Installation failed, %s", configureBackupMasterCommand.getAllErrors() ) );
                         return;
                     }
-                    po.addLogDone("Cluster installation succeeded\n");
+                    po.addLogDone( "Cluster installation succeeded\n" );
 
-
-                } else {
-                    po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
+                }
+                else
+                {
+                    po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
                 }
 
             }
-        });
+        } );
 
         return po.getId();
     }
 
-    public UUID uninstallCluster(final String clusterName) {
+
+    public UUID uninstallCluster( final String clusterName )
+    {
         final ProductOperation po
-                = tracker.createProductOperation(org.safehaus.kiskis.mgmt.api.hbase.Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+            = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
+            String.format( "Destroying cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
-                org.safehaus.kiskis.mgmt.api.hbase.Config config =
-                        dbManager.getInfo(org.safehaus.kiskis.mgmt.api.hbase.Config.PRODUCT_KEY, clusterName, org.safehaus.kiskis.mgmt.api.hbase.Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
-                    return;
-                }
-                final Set<Agent> allNodes = new HashSet<Agent>();
-                allNodes.add(config.getMaster());
-                allNodes.addAll(config.getRegion());
-                allNodes.addAll(config.getQuorum());
-                allNodes.add(config.getBackupMasters());
-
-                po.addLog("Uninstalling...");
-                Command installCommand = Commands.getUninstallCommand(config.getNodes());
-                commandRunner.runCommand(installCommand);
-
-                if (installCommand.hasSucceeded()) {
-                    po.addLog("Uninstallation success..");
-                } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", installCommand.getAllErrors()));
+            public void run()
+            {
+                HBaseConfig config =
+                    dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName,
+                        HBaseConfig.class );
+                if ( config == null )
+                {
+                    po.addLogFailed(
+                        String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
+                final Set<Agent> allNodes = getAllNodes( config );
 
-                po.addLog("Updating db...");
-                if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-                    po.addLogDone("Cluster info deleted from DB\nDone");
-                } else {
-                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                po.addLog( "Uninstalling..." );
+
+                Command installCommand = Commands.getUninstallCommand( allNodes );
+                commandRunner.runCommand( installCommand );
+
+                if ( installCommand.hasSucceeded() )
+                {
+                    po.addLog( "Uninstallation success.." );
+                }
+                else
+                {
+                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
+                    return;
+                }
+
+                po.addLog( "Updating db..." );
+                if ( dbManager.deleteInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName() ) )
+                {
+                    po.addLogDone( "Cluster info deleted from DB\nDone" );
+                }
+                else
+                {
+                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
                 }
 
             }
-        });
+        } );
 
         return po.getId();
     }
 
-    public List<Config> getClusters() {
 
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    public List<HBaseConfig> getClusters()
+    {
+
+        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
 
     }
 
-    @Override
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-    }
 
     @Override
-    public org.safehaus.kiskis.mgmt.api.hadoop.Config getHadoopCluster(String clusterName) {
-        return dbManager.getInfo(org.safehaus.kiskis.mgmt.api.hadoop.Config.PRODUCT_KEY, clusterName, org.safehaus.kiskis.mgmt.api.hadoop.Config.class);
+    public List<Config> getHadoopClusters()
+    {
+        return hadoopManager.getClusters();
     }
 
+
     @Override
-    public UUID startCluster(final String clusterName) {
+    public Config getHadoopCluster( String clusterName )
+    {
+        return hadoopManager.getCluster( clusterName );
+    }
+
+
+    @Override
+    public HBaseConfig getCluster( String clusterName )
+    {
+        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+    }
+
+
+    @Override
+    public UUID startCluster( final String clusterName )
+    {
         final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting cluster %s", clusterName));
-        executor.execute(new Runnable() {
+            = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
+            String.format( "Starting cluster %s", clusterName ) );
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+            public void run()
+            {
+                HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+                if ( config == null )
+                {
+                    po.addLogFailed( String
+                        .format( "Cluster with name %s does not exist\nOperation aborted", config.getClusterName() ) );
                     return;
                 }
 
-                Set<Agent> nodes = new HashSet<Agent>();
-                nodes.addAll(config.getQuorum());
-                nodes.addAll(config.getRegion());
-                nodes.add(config.getBackupMasters());
-                nodes.add(config.getMaster());
+                final Set<Agent> allNodes = getAllNodes( config );
 
-                Command startCommand = Commands.getStartCommand(nodes);
-                commandRunner.runCommand(startCommand);
+                Command startCommand = Commands.getStartCommand( allNodes );
+                commandRunner.runCommand( startCommand );
 
-                if (startCommand.hasSucceeded()) {
-                    po.addLogDone("Start success..");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", startCommand.getAllErrors()));
+                if ( startCommand.hasSucceeded() )
+                {
+                    po.addLogDone( "Start success.." );
+                }
+                else
+                {
+                    po.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
                     return;
                 }
-
 
             }
-        });
+        } );
 
         return po.getId();
     }
 
+
     @Override
-    public UUID stopCluster(final String clusterName) {
+    public UUID stopCluster( final String clusterName )
+    {
         final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping cluster %s", clusterName));
-        executor.execute(new Runnable() {
+            = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
+            String.format( "Stopping cluster %s", clusterName ) );
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+            public void run()
+            {
+                HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+                if ( config == null )
+                {
+                    po.addLogFailed( String
+                        .format( "Cluster with name %s does not exist\nOperation aborted", config.getClusterName() ) );
                     return;
                 }
 
-                Set<Agent> nodes = new HashSet<Agent>();
-                nodes.addAll(config.getQuorum());
-                nodes.addAll(config.getRegion());
-                nodes.add(config.getBackupMasters());
-                nodes.add(config.getMaster());
+                final Set<Agent> allNodes = getAllNodes( config );
 
-                Command stopCommand = Commands.getStopCommand(nodes);
-                commandRunner.runCommand(stopCommand);
+                Command stopCommand = Commands.getStopCommand( allNodes );
+                commandRunner.runCommand( stopCommand );
 
-                if (stopCommand.hasSucceeded()) {
-                    po.addLogDone("Start success..");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", stopCommand.getAllErrors()));
+                if ( stopCommand.hasSucceeded() )
+                {
+                    po.addLogDone( "Start success.." );
+                }
+                else
+                {
+                    po.addLogFailed( String.format( "Start failed, %s", stopCommand.getAllErrors() ) );
                     return;
                 }
 
             }
-        });
+        } );
 
         return po.getId();
     }
 
+
     @Override
-    public UUID checkCluster(final String clusterName) {
+    public UUID checkCluster( final String clusterName )
+    {
         final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking cluster %s", clusterName));
-        executor.execute(new Runnable() {
+            = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
+            String.format( "Checking cluster %s", clusterName ) );
+        executor.execute( new Runnable()
+        {
 
-            public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+            public void run()
+            {
+                HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+                if ( config == null )
+                {
+                    po.addLogFailed( String
+                        .format( "Cluster with name %s does not exist\nOperation aborted", config.getClusterName() ) );
                     return;
                 }
 
-                Set<Agent> nodes = new HashSet<Agent>();
-                nodes.addAll(config.getQuorum());
-                nodes.addAll(config.getRegion());
-                nodes.add(config.getBackupMasters());
-                nodes.add(config.getMaster());
+                final Set<Agent> allNodes = getAllNodes( config );
 
-                Command checkCommand = Commands.getStatusCommand(nodes);
-                commandRunner.runCommand(checkCommand);
+                Command checkCommand = Commands.getStatusCommand( allNodes );
+                commandRunner.runCommand( checkCommand );
 
-                if (checkCommand.hasSucceeded()) {
-                    po.addLogDone("All nodes are running..");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", checkCommand.getAllErrors()));
+                if ( checkCommand.hasSucceeded() )
+                {
+                    po.addLogDone( "All nodes are running.." );
+                }
+                else
+                {
+                    po.addLogFailed( String.format( "Start failed, %s", checkCommand.getAllErrors() ) );
                     return;
                 }
 
             }
-        });
+        } );
 
         return po.getId();
     }
 
-    @Override
-    public List<org.safehaus.kiskis.mgmt.api.hadoop.Config> getHadoopClusters() {
-        List<org.safehaus.kiskis.mgmt.api.hadoop.Config> hadoopClusters =
-                hadoopManager.getClusters();
-        return hadoopClusters;
+
+    private Set<Agent> getAllNodes( HBaseConfig config )
+    {
+        final Set<Agent> allNodes = new HashSet<Agent>();
+
+        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
+        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
+
+        for ( UUID uuid : config.getRegion() )
+        {
+            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+        }
+
+        for ( UUID uuid : config.getQuorum() )
+        {
+            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+        }
+
+        return allNodes;
     }
 
 }

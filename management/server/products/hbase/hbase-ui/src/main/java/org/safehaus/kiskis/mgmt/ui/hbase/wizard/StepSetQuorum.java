@@ -13,6 +13,8 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
+
 
 /**
  * @author dilshat
@@ -66,7 +68,7 @@ public class StepSetQuorum extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setQuorum((Set<Agent>) select.getValue());
+                wizard.getConfig().setQuorum((Set<UUID>) select.getValue());
                 if (Util.isCollectionEmpty(wizard.getConfig().getQuorum())) {
                     show("Please add quorum servers");
                 } else {
@@ -91,7 +93,7 @@ public class StepSetQuorum extends Panel {
         verticalLayout.addComponent(horizontalLayout);
 
         addComponent(verticalLayout);
-        select.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getNodes()));
+        select.setContainerDataSource(new BeanItemContainer<UUID>(UUID.class, wizard.getConfig().getNodes()));
         select.setValue(wizard.getConfig().getQuorum());
     }
 
