@@ -38,7 +38,7 @@ public abstract class HiveQueryBase implements HiveQuery {
         return dbManager;
     }
 
-    public static void setDbManager(DbManager dbManager) {
+    public void setDbManager(DbManager dbManager) {
         HiveQueryBase.dbManager = dbManager;
     }
 
