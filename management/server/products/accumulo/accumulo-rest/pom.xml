@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>accumulo-rest</artifactId>
-  <name>Kiskis Management Accumulo REST</name>
-  <description>Kiskis Management Accumulo REST</description>
+  <name>Subutai Accumulo REST</name>
+  <description>Subutai Accumulo REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>

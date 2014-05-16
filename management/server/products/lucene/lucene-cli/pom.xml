@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>lucene-cli</artifactId>
-    <name>Kiskis Management Lucene CLI</name>
-    <description>Kiskis Management Lucene CLI</description>
+    <name>Subutai Lucene CLI</name>
+    <description>Subutai Lucene CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

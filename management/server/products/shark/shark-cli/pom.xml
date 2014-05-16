@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>shark-cli</artifactId>
-    <name>Kiskis Management Shark CLI</name>
-    <description>Kiskis Management Shark CLI</description>
+    <name>Subutai Shark CLI</name>
+    <description>Subutai Shark CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
