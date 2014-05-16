@@ -31,6 +31,7 @@ public class HiveQueryImpl extends HiveQueryBase {
         getExecutor().execute(new Runnable() {
 
             public void run() {
+                long start = System.currentTimeMillis();
                 if (Strings.isNullOrEmpty(query)) {
                     po.addLogFailed("Query does not exist\nOperation aborted");
                     return;
@@ -50,11 +51,14 @@ public class HiveQueryImpl extends HiveQueryBase {
                     if (result.getStdOut() != null) {
                         po.addLogDone(result.getStdOut());
                     }
+
                 } else if (command.hasCompleted()) {
                     po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
                 } else {
                     po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
                 }
+                long end = System.currentTimeMillis();
+                System.out.println(String.format("Execute query finished in %f", end - start));
             }
         });
 
