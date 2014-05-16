@@ -5,22 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.impl.communicationmanager;
 
+
+import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
 import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
 
-import java.util.UUID;
 
 /**
- * @author dilshat
+ * Test utilities
  */
 public class TestUtils {
 
-    public static Request getRequestTemplate(UUID uuid) {
-        return new Request("SOURCE",
-                RequestType.EXECUTE_REQUEST, // type
+    public static Request getRequestTemplate( UUID uuid ) {
+        return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
                 uuid, //                        !! agent uuid
                 UUID.randomUUID(), //                        !! task uuid
                 1, //                           !! request sequence number
@@ -33,15 +34,15 @@ public class TestUtils {
                 "root", //                      runas
                 null, //                        arg
                 null, //                        env vars
-                null,
-                30); //  
+                null, 30 ); //
     }
+
 
     public static ResponseListener getResponseListener() {
 
         return new ResponseListener() {
 
-            public void onResponse(Response response) {
+            public void onResponse( Response response ) {
 
             }
         };

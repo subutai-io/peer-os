@@ -2,12 +2,9 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 
 import org.safehaus.kiskis.mgmt.api.solr.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
-import java.util.UUID;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {
@@ -59,7 +56,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         if ( physicalAgent == null ) {
             productOperation.addLog(
                     String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                            agent.getHostname() ) );
+                            agent.getHostname() )
+                                   );
         }
         else {
             if ( !manager.getLxcManager().destroyLxcOnHost( physicalAgent, agent.getHostname() ) ) {
@@ -77,7 +75,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         if ( !manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
             productOperation.addLogFailed(
                     String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                            config.getClusterName() ) );
+                            config.getClusterName() )
+                                         );
         }
         else {
             productOperation.addLogDone( "Done" );

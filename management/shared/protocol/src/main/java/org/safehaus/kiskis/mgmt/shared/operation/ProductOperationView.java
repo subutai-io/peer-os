@@ -5,13 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.shared.operation;
 
+
 import java.util.Date;
 import java.util.UUID;
 
+
 /**
  * This is an interface for product operation view
- *
- * @author dilshat
  */
 public interface ProductOperationView {
 

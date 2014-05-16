@@ -5,19 +5,22 @@
  */
 package org.safehaus.kiskis.mgmt.ui.lxcmanager.common;
 
+
 /**
  *
- * @author dilshat
  */
 public enum Buttons {
 
-    INFO("Info"), START("Start"), STOP("Stop"), DESTROY("Destroy"), START_ALL("Start All"), STOP_ALL("Stop All"), DESTROY_ALL("Destroy All");
+    INFO( "Info" ), START( "Start" ), STOP( "Stop" ), DESTROY( "Destroy" ), START_ALL( "Start All" ),
+    STOP_ALL( "Stop All" ), DESTROY_ALL( "Destroy All" );
 
     private final String buttonLabel;
 
-    private Buttons(String buttonLabel) {
+
+    private Buttons( String buttonLabel ) {
         this.buttonLabel = buttonLabel;
     }
+
 
     public String getButtonLabel() {
         return buttonLabel;

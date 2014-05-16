@@ -5,11 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+
 /**
- * This interface should be implemented for supplying expiry callbacks for
- * entries to {@code ExpiringCache}
- *
- * @author dilshat
+ * This interface should be implemented for supplying expiry callbacks for entries to {@code ExpiringCache}
  */
 public interface EntryExpiryCallback<ValueType> {
 
@@ -18,5 +16,5 @@ public interface EntryExpiryCallback<ValueType> {
      *
      * @param entry - cache entry being expired
      */
-    public void onEntryExpiry(ValueType entry);
+    public void onEntryExpiry( ValueType entry );
 }

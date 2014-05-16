@@ -5,9 +5,9 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+
 /**
- *
- * @author dilshat
+ * Possible states of lxc
  */
 public enum LxcState {
 
