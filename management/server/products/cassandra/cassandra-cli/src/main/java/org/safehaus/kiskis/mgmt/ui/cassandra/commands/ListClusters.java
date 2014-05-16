@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.cli.commands;
+package org.safehaus.kiskis.mgmt.ui.cassandra.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -13,7 +13,7 @@ import java.util.List;
  * Displays the last log entries
  */
 @Command(scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
-public class ListClustersCommand extends OsgiCommandSupport {
+public class ListClusters extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
     private static Tracker tracker;
@@ -23,11 +23,11 @@ public class ListClustersCommand extends OsgiCommandSupport {
     }
 
     public void setTracker(Tracker tracker) {
-        ListClustersCommand.tracker = tracker;
+        ListClusters.tracker = tracker;
     }
 
     public void setCassandraManager(Cassandra cassandraManager) {
-        ListClustersCommand.cassandraManager = cassandraManager;
+        ListClusters.cassandraManager = cassandraManager;
     }
 
     public static Cassandra getCassandraManager() {

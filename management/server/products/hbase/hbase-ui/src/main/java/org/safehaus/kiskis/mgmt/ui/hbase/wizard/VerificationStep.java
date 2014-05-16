@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
@@ -33,15 +33,15 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        cfgView.addStringCfg("Master", wizard.getConfig().getMaster().getHostname() + "\n");
-        for (Agent agent : wizard.getConfig().getRegion()) {
-            cfgView.addStringCfg("Region", agent.getHostname() + "\n");
+        cfgView.addStringCfg("Master", wizard.getConfig().getMaster() + "\n");
+        for (UUID uuid : wizard.getConfig().getRegion()) {
+            cfgView.addStringCfg("Region", uuid + "\n");
         }
-        for (Agent agent : wizard.getConfig().getQuorum()) {
-            cfgView.addStringCfg("Quorum", agent.getHostname() + "\n");
+        for (UUID uuid : wizard.getConfig().getQuorum()) {
+            cfgView.addStringCfg("Quorum", uuid + "\n");
         }
-        cfgView.addStringCfg("Backup master", wizard.getConfig().getBackupMasters().getHostname() + "\n");
-        cfgView.addStringCfg("Hadoop name node", wizard.getConfig().getHadoopNameNode().getHostname() + "\n");
+        cfgView.addStringCfg("Backup master", wizard.getConfig().getBackupMasters() + "\n");
+        cfgView.addStringCfg("Hadoop name node", wizard.getConfig().getHadoopNameNode() + "\n");
 
         Button install = new Button("Install");
         install.addListener(new Button.ClickListener() {
@@ -50,7 +50,7 @@ public class VerificationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 UUID trackID = HBaseUI.getHbaseManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
         });

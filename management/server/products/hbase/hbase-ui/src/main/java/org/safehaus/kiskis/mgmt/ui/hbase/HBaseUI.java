@@ -5,10 +5,11 @@
  */
 package org.safehaus.kiskis.mgmt.ui.hbase;
 
+
 import com.vaadin.ui.Component;
 import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 //import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
@@ -16,70 +17,94 @@ import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 /**
  * @author dilshat
  */
-public class HBaseUI implements Module {
+public class HBaseUI implements Module
+{
 
     private static HBase hbaseManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static ExecutorService executor;
-//    private static Hadoop hadoopManager;
+    //    private static Hadoop hadoopManager;
 
-    public static Tracker getTracker() {
+
+    public static Tracker getTracker()
+    {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
+
+    public void setTracker( Tracker tracker )
+    {
         HBaseUI.tracker = tracker;
     }
 
-    public static HBase getHbaseManager() {
+
+    public static HBase getHbaseManager()
+    {
         return hbaseManager;
     }
 
-    public void setHbaseManager(HBase hbaseManager) {
+
+    public void setHbaseManager( HBase hbaseManager )
+    {
         HBaseUI.hbaseManager = hbaseManager;
     }
 
-    public static ExecutorService getExecutor() {
+
+    public static ExecutorService getExecutor()
+    {
         return executor;
     }
 
-    public static AgentManager getAgentManager() {
+
+    public static AgentManager getAgentManager()
+    {
         return agentManager;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
+
+    public void setAgentManager( AgentManager agentManager )
+    {
         HBaseUI.agentManager = agentManager;
     }
 
-//    public static Hadoop getHadoopManager() {
-//        return hadoopManager;
-//    }
-//
-//    public void setHadoopManager(Hadoop hadoopManager) {
-//        HBaseUI.hadoopManager = hadoopManager;
-//    }
+    //    public static Hadoop getHadoopManager() {
+    //        return hadoopManager;
+    //    }
+    //
+    //    public void setHadoopManager(Hadoop hadoopManager) {
+    //        HBaseUI.hadoopManager = hadoopManager;
+    //    }
 
-    public void init() {
+
+    public void init()
+    {
         executor = Executors.newCachedThreadPool();
     }
 
-    public void destroy() {
+
+    public void destroy()
+    {
         hbaseManager = null;
         agentManager = null;
         tracker = null;
-//        hadoopManager = null;
+        //        hadoopManager = null;
         executor.shutdown();
     }
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
+
+    public String getName()
+    {
+        return HBaseConfig.PRODUCT_KEY;
     }
 
-    public Component createComponent() {
+
+    public Component createComponent()
+    {
         return new HBaseForm();
     }
 
