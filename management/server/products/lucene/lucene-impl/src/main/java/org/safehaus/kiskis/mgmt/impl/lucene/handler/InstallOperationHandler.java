@@ -95,7 +95,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
             po.addLog("Cluster info saved to DB\nInstalling Lucene...");
 
             //install lucene
-            Command installCommand = Commands.getInstallCommand(config.getNodes());
+            Command installCommand = manager.getCommands().getInstallCommand(config.getNodes());
             manager.getCommandRunner().runCommand(installCommand);
 
             if (installCommand.hasSucceeded()) {

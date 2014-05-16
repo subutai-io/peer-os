@@ -80,7 +80,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl
             po.addLog("Cluster info updated in DB\nInstalling Lucene...");
             //install lucene
 
-            Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(agent));
+            Command installCommand = manager.getCommands().getInstallCommand(Util.wrapAgentToSet(agent));
             manager.getCommandRunner().runCommand(installCommand);
 
             if (installCommand.hasSucceeded()) {
