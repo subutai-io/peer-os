@@ -23,7 +23,7 @@ public enum CommandStatus {
     /**
      * command had timed out before agent sent response
      */
-    TIMEDOUT,
+    TIMEOUT,
     /**
      * command succeeded, exit code was 0
      */

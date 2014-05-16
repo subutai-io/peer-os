@@ -111,7 +111,7 @@ public class CommandRunnerImplUT {
 
         commandRunner.runCommand(command);
 
-        assertEquals(CommandStatus.TIMEDOUT, command.getCommandStatus());
+        assertEquals(CommandStatus.TIMEOUT, command.getCommandStatus());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class CommandRunnerImplUT {
         commandRunner.runCommandAsync(command);
 
         Awaitility.await().atMost(3050, TimeUnit.MILLISECONDS).with().pollInterval(10, TimeUnit.MILLISECONDS)
-                .untilCall(to(command).getCommandStatus(), is(CommandStatus.TIMEDOUT));
+                .untilCall(to(command).getCommandStatus(), is(CommandStatus.TIMEOUT ));
 
     }
 
