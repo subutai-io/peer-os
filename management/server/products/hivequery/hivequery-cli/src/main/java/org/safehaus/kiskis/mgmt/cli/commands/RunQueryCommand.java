@@ -41,6 +41,7 @@ public class RunQueryCommand extends OsgiCommandSupport {
                     if (po != null) {
                         if (po.getState() != ProductOperationState.RUNNING) {
                             System.out.println(po.getLog());
+                            System.out.println("Query finished.");
                             break;
                         }
                     }
