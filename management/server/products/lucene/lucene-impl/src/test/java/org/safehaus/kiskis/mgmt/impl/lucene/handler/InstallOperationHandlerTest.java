@@ -37,8 +37,8 @@ public class InstallOperationHandlerTest {
         Config config = new Config().setClusterName( "test-cluster" );
         config.getNodes().add( CommonMockBuilder.createAgent() );
 
-        LuceneImpl pigImpl = new LuceneImplMock().setClusterConfig( new Config() );
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( pigImpl, config );
+        LuceneImpl impl = new LuceneImplMock().setClusterConfig( new Config() );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( impl, config );
 
         operationHandler.run();
 

@@ -12,12 +12,13 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
 
-public class UninstallOperationHandlerTest {
+public class AddNodeOperationHandlerTest {
 
 
     @Test
     public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( new LuceneImplMock(), "test-cluster" );
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( new LuceneImplMock(), "test-cluster",
+                "lxc-host" );
 
         operationHandler.run();
 
@@ -29,11 +30,11 @@ public class UninstallOperationHandlerTest {
     @Test
     public void testWithExistingCluster() {
         LuceneImpl impl = new LuceneImplMock().setClusterConfig( new Config() );
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( impl, "test-cluster" );
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( impl, "test-cluster", "lxc-host" );
 
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Uninstallation failed" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
 
