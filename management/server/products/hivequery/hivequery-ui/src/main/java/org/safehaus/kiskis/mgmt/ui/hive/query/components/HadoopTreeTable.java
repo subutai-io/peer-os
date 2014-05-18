@@ -22,6 +22,7 @@ public class HadoopTreeTable extends TreeTable {
         this.setPageLength(10);
         this.setSelectable(true);
         this.setImmediate(true);
+        this.setMultiSelect(true);
 
         addContainerProperty(NODE_NAME_PROPERTY, AgentContainer.class, null);
         refreshDataSource();

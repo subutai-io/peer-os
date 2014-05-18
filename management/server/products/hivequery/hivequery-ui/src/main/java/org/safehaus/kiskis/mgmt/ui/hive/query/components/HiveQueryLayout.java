@@ -32,12 +32,6 @@ public class HiveQueryLayout extends GridLayout {
         table = new HadoopTreeTable();
         addComponent(table, 0, 0, 5, 3);
         setComponentAlignment(table, Alignment.MIDDLE_CENTER);
-        table.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                selected = valueChangeEvent.getProperty();
-            }
-        });
 
         searchTextField = new TextField("Search");
         addComponent(searchTextField, 6, 0, 11, 0);
@@ -95,7 +89,8 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                resultTextArea.setValue(selected);
+                Object rowId = table.getValue(); // get the selected rows id
+                resultTextArea.setValue(rowId);
 
                 searchTextField.setValue("");
                 list.refreshDataSource(null);
