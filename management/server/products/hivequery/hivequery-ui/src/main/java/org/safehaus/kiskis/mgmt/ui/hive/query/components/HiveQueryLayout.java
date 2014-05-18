@@ -4,9 +4,12 @@ import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Created by daralbaev on 12.05.14.
@@ -90,12 +93,12 @@ public class HiveQueryLayout extends GridLayout {
         runButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-
+                resultTextArea.setValue("");
 
                 Collection<?> items = ((Collection<?>) table.getValue());
                 for (Object item : items) {
                     AgentContainer agentContainer = (AgentContainer) table.getContainerProperty(item, HadoopTreeTable.NODE_NAME_PROPERTY).getValue();
-                    resultTextArea.setValue(resultTextArea.getValue() + "\n" + agentContainer.getAgent().getHostname());
+                    runQuery(agentContainer.getAgent().getHostname());
                 }
 
                 searchTextField.setValue("");
@@ -123,5 +126,34 @@ public class HiveQueryLayout extends GridLayout {
         addComponent(resultTextArea, 0, 8, 11, 11);
         setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
         resultTextArea.setSizeFull();
+    }
+
+    private void runQuery(String hostname) {
+        final UUID trackID = HiveQueryUI.getManager().run(hostname, queryTextArea.getValue().toString());
+
+        HiveQueryUI.getExecutor().execute(new Runnable() {
+
+            public void run() {
+                long start = System.currentTimeMillis();
+                while (!Thread.interrupted()) {
+                    ProductOperationView po = HiveQueryUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+                    if (po != null) {
+                        if (po.getState() != ProductOperationState.RUNNING) {
+                            resultTextArea.setValue(String.format("%s\n%s", resultTextArea.getValue(), po.getLog()));
+                            break;
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+                    if (System.currentTimeMillis() - start > (30 + 3) * 1000) {
+                        break;
+                    }
+                }
+            }
+        });
     }
 }
