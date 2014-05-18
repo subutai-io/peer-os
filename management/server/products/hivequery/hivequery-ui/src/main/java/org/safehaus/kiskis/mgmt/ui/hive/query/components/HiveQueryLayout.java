@@ -91,12 +91,12 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                String value = "";
-                Collection<?> items = table.getItemIds();
+
+                Collection<?> items = ((Collection<?>) table.getValue());
                 for (Object item : items) {
-                    value += item + "\n";
+                    AgentContainer agentContainer = (AgentContainer) table.getContainerProperty(item, HadoopTreeTable.NODE_NAME_PROPERTY).getValue();
+                    resultTextArea.setValue(resultTextArea.getValue() + "\n" + agentContainer.getAgent().getHostname());
                 }
-                resultTextArea.setValue(value);
 
                 searchTextField.setValue("");
                 list.refreshDataSource(null);

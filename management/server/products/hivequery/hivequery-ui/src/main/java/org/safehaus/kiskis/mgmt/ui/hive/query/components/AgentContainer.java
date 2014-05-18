@@ -20,4 +20,8 @@ public class AgentContainer extends HorizontalLayout {
         labelNode = new Label(caption);
         addComponent(labelNode);
     }
+
+    public Agent getAgent() {
+        return agent;
+    }
 }
