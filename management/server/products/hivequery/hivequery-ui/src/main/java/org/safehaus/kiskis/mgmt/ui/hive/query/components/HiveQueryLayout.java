@@ -35,61 +35,51 @@ public class HiveQueryLayout extends GridLayout {
         setSpacing(true);
         setSizeFull();
 
-        table = new HadoopTreeTable();
-        addComponent(table, 0, 0, 5, 3);
-        setComponentAlignment(table, Alignment.MIDDLE_CENTER);
+        getHadoopTable();
+        getSearchField();
+        getQueryList();
+        getQueryNameField();
+        getButtonLayout();
+        getQueryField();
+        getDescriptionField();
+        getResultField();
+    }
 
-        searchTextField = new TextField("Search");
-        addComponent(searchTextField, 6, 0, 11, 0);
-        setComponentAlignment(searchTextField, Alignment.MIDDLE_CENTER);
-        searchTextField.setSizeFull();
-        searchTextField.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
-        searchTextField.setTextChangeTimeout(200);
-        searchTextField.addListener(new FieldEvents.TextChangeListener() {
+    private void getResultField() {
+        resultTextArea = new TextArea("Result");
+        addComponent(resultTextArea, 0, 8, 11, 11);
+        setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
+        resultTextArea.setSizeFull();
+    }
 
-            public void textChange(FieldEvents.TextChangeEvent event) {
-                list.refreshDataSource(event.getText());
-            }
-        });
+    private void getDescriptionField() {
+        descriptionTextArea = new TextArea("Description");
+        addComponent(descriptionTextArea, 6, 5, 11, 7);
+        setComponentAlignment(descriptionTextArea, Alignment.MIDDLE_CENTER);
+        descriptionTextArea.setSizeFull();
+    }
 
-        list = new QueryList();
-        addComponent(list, 6, 1, 11, 3);
-        setComponentAlignment(list, Alignment.MIDDLE_CENTER);
-        list.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if (list.getValue() != null) {
-                    Config item = (Config) list.getValue();
+    private void getQueryField() {
+        queryTextArea = new TextArea("Query");
+        addComponent(queryTextArea, 0, 5, 5, 7);
+        setComponentAlignment(queryTextArea, Alignment.MIDDLE_CENTER);
+        queryTextArea.setSizeFull();
+    }
 
-                    nameTextField.setValue(item.getName());
-                    queryTextArea.setValue(item.getQuery());
-                    descriptionTextArea.setValue(item.getDescription());
-                }
-            }
-        });
-
-        nameTextField = new TextField("Query Name");
-        addComponent(nameTextField, 0, 4, 5, 4);
-        setComponentAlignment(nameTextField, Alignment.MIDDLE_CENTER);
-        nameTextField.setSizeFull();
-
+    private void getButtonLayout() {
         buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
+        getSaveButton();
+        getRunButton();
 
-        saveButton = new Button("Save");
-        saveButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                HiveQueryUI.getManager().save(
-                        nameTextField.getValue().toString(),
-                        queryTextArea.getValue().toString(),
-                        descriptionTextArea.getValue().toString());
+        buttonLayout.addComponent(runButton);
+        buttonLayout.addComponent(saveButton);
+        buttonLayout.addComponent(getIndicator());
+        addComponent(buttonLayout, 6, 4, 11, 4);
+        setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
+    }
 
-                searchTextField.setValue("");
-                list.refreshDataSource(null);
-            }
-        });
-
+    private void getRunButton() {
         runButton = new Button("Run");
         runButton.addListener(new Button.ClickListener() {
             @Override
@@ -107,28 +97,68 @@ public class HiveQueryLayout extends GridLayout {
                 list.refreshDataSource(null);
             }
         });
+    }
 
-        buttonLayout.addComponent(runButton);
-        buttonLayout.addComponent(saveButton);
-        buttonLayout.addComponent(getIndicator());
-        addComponent(buttonLayout, 6, 4, 11, 4);
-        setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
+    private void getSaveButton() {
+        saveButton = new Button("Save");
+        saveButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                HiveQueryUI.getManager().save(
+                        nameTextField.getValue().toString(),
+                        queryTextArea.getValue().toString(),
+                        descriptionTextArea.getValue().toString());
 
+                searchTextField.setValue("");
+                list.refreshDataSource(null);
+            }
+        });
+    }
 
-        queryTextArea = new TextArea("Query");
-        addComponent(queryTextArea, 0, 5, 5, 7);
-        setComponentAlignment(queryTextArea, Alignment.MIDDLE_CENTER);
-        queryTextArea.setSizeFull();
+    private void getQueryNameField() {
+        nameTextField = new TextField("Query Name");
+        addComponent(nameTextField, 0, 4, 5, 4);
+        setComponentAlignment(nameTextField, Alignment.MIDDLE_CENTER);
+        nameTextField.setSizeFull();
+    }
 
-        descriptionTextArea = new TextArea("Description");
-        addComponent(descriptionTextArea, 6, 5, 11, 7);
-        setComponentAlignment(descriptionTextArea, Alignment.MIDDLE_CENTER);
-        descriptionTextArea.setSizeFull();
+    private void getQueryList() {
+        list = new QueryList();
+        addComponent(list, 6, 1, 11, 3);
+        setComponentAlignment(list, Alignment.MIDDLE_CENTER);
+        list.addListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if (list.getValue() != null) {
+                    Config item = (Config) list.getValue();
 
-        resultTextArea = new TextArea("Result");
-        addComponent(resultTextArea, 0, 8, 11, 11);
-        setComponentAlignment(resultTextArea, Alignment.MIDDLE_CENTER);
-        resultTextArea.setSizeFull();
+                    nameTextField.setValue(item.getName());
+                    queryTextArea.setValue(item.getQuery());
+                    descriptionTextArea.setValue(item.getDescription());
+                }
+            }
+        });
+    }
+
+    private void getSearchField() {
+        searchTextField = new TextField("Search");
+        addComponent(searchTextField, 6, 0, 11, 0);
+        setComponentAlignment(searchTextField, Alignment.MIDDLE_CENTER);
+        searchTextField.setSizeFull();
+        searchTextField.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
+        searchTextField.setTextChangeTimeout(200);
+        searchTextField.addListener(new FieldEvents.TextChangeListener() {
+
+            public void textChange(FieldEvents.TextChangeEvent event) {
+                list.refreshDataSource(event.getText());
+            }
+        });
+    }
+
+    private void getHadoopTable() {
+        table = new HadoopTreeTable();
+        addComponent(table, 0, 0, 5, 3);
+        setComponentAlignment(table, Alignment.MIDDLE_CENTER);
     }
 
     private Embedded getIndicator() {
