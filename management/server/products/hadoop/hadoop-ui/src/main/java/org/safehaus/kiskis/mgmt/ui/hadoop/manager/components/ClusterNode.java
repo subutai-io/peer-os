@@ -30,6 +30,8 @@ public class ClusterNode extends HorizontalLayout {
         setMargin(true);
         setSpacing(true);
 
+        addComponent(getHostnameLabel());
+        setComponentAlignment(hostname, Alignment.MIDDLE_CENTER);
         addComponent(getProgressButton());
         setComponentAlignment(progressButton, Alignment.TOP_CENTER);
         addComponent(getStartButton());
@@ -38,8 +40,6 @@ public class ClusterNode extends HorizontalLayout {
         setComponentAlignment(stopButton, Alignment.TOP_CENTER);
         addComponent(getRestartButton());
         setComponentAlignment(restartButton, Alignment.TOP_CENTER);
-        addComponent(getHostnameLabel());
-        setComponentAlignment(hostname, Alignment.TOP_CENTER);
     }
 
     private Label getHostnameLabel() {
