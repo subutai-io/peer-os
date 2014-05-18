@@ -14,6 +14,7 @@ public class SecondaryNameNode extends ClusterNode {
 
     public SecondaryNameNode(Config cluster) {
         super(cluster);
+        setHostname(cluster.getSecondaryNameNode().getHostname());
 
         restartButton.setVisible(false);
         startButton.setEnabled(false);

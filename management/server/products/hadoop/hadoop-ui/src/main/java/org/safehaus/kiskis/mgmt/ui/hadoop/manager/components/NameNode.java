@@ -15,6 +15,7 @@ public class NameNode extends ClusterNode {
 
     public NameNode(final Config cluster) {
         super(cluster);
+        setHostname(cluster.getNameNode().getHostname());
 
         startButton.addListener(new MouseEvents.ClickListener() {
             @Override

@@ -15,6 +15,7 @@ public class JobTracker extends ClusterNode {
 
     public JobTracker(final Config cluster) {
         super(cluster);
+        setHostname(cluster.getJobTracker().getHostname());
 
         startButton.addListener(new MouseEvents.ClickListener() {
             @Override

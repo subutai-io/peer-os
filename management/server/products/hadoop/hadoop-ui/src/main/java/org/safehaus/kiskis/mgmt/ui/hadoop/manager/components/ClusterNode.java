@@ -4,6 +4,7 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class ClusterNode extends HorizontalLayout {
     protected Config cluster;
     protected Embedded progressButton, startButton, stopButton, restartButton;
     protected List<ClusterNode> slaveNodes;
+    protected Label hostname;
 
     public ClusterNode(Config cluster) {
         this.cluster = cluster;
@@ -28,6 +30,8 @@ public class ClusterNode extends HorizontalLayout {
         setMargin(true);
         setSpacing(true);
 
+        addComponent(getHostnameLabel());
+        setComponentAlignment(hostname, Alignment.BOTTOM_CENTER);
         addComponent(getProgressButton());
         setComponentAlignment(progressButton, Alignment.TOP_CENTER);
         addComponent(getStartButton());
@@ -36,6 +40,15 @@ public class ClusterNode extends HorizontalLayout {
         setComponentAlignment(stopButton, Alignment.TOP_CENTER);
         addComponent(getRestartButton());
         setComponentAlignment(restartButton, Alignment.TOP_CENTER);
+    }
+
+    private Label getHostnameLabel() {
+        hostname = new Label("");
+        return hostname;
+    }
+
+    public void setHostname(String value) {
+        hostname.setValue(value);
     }
 
     private Embedded getProgressButton() {
