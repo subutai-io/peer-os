@@ -2,6 +2,8 @@ package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
@@ -25,8 +27,7 @@ public class HiveQueryLayout extends GridLayout {
     private TextArea resultTextArea;
     private HorizontalLayout buttonLayout;
     private Button saveButton, runButton;
-    //
-    private Object selected;
+    private Embedded indicator;
 
     public HiveQueryLayout() {
         super(12, 12);
@@ -94,6 +95,7 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 resultTextArea.setValue("");
+                indicator.setVisible(true);
 
                 Collection<?> items = ((Collection<?>) table.getValue());
                 for (Object item : items) {
@@ -108,6 +110,7 @@ public class HiveQueryLayout extends GridLayout {
 
         buttonLayout.addComponent(runButton);
         buttonLayout.addComponent(saveButton);
+        buttonLayout.addComponent(getIndicator());
         addComponent(buttonLayout, 6, 4, 11, 4);
         setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
 
@@ -128,6 +131,15 @@ public class HiveQueryLayout extends GridLayout {
         resultTextArea.setSizeFull();
     }
 
+    private Embedded getIndicator() {
+        indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
+        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
+        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setVisible(false);
+
+        return indicator;
+    }
+
     private void runQuery(String hostname) {
         final UUID trackID = HiveQueryUI.getManager().run(hostname, queryTextArea.getValue().toString());
 
@@ -140,6 +152,7 @@ public class HiveQueryLayout extends GridLayout {
                     if (po != null) {
                         if (po.getState() != ProductOperationState.RUNNING) {
                             resultTextArea.setValue(String.format("%s\n%s", resultTextArea.getValue(), po.getLog()));
+                            indicator.setVisible(false);
                             break;
                         }
                     }
