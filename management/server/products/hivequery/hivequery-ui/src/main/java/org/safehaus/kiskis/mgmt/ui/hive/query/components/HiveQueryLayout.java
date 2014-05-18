@@ -4,6 +4,7 @@ import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
+import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
 /**
@@ -83,6 +84,16 @@ public class HiveQueryLayout extends GridLayout {
         });
 
         runButton = new Button("Run");
+        runButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                Agent agent = (Agent) table.getValue();
+                resultTextArea.setValue(agent.toString());
+
+                searchTextField.setValue("");
+                list.refreshDataSource(null);
+            }
+        });
 
         buttonLayout.addComponent(runButton);
         buttonLayout.addComponent(saveButton);
