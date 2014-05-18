@@ -48,7 +48,7 @@ public class HiveQueryImpl extends HiveQueryBase {
                 if (command.hasSucceeded()) {
                     AgentResult result = command.getResults().get(node.getUuid());
                     if (result.getStdOut() != null) {
-                        po.addLogDone(result.getStdOut());
+                        po.addLogDone(String.format("%s\n\n%s", result.getStdOut(), result.getStdErr()));
                     }
                 } else if (command.hasCompleted()) {
                     po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
