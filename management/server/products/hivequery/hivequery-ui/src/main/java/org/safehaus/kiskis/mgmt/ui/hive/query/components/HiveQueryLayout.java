@@ -6,6 +6,8 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
+import java.util.Collection;
+
 /**
  * Created by daralbaev on 12.05.14.
  */
@@ -89,8 +91,12 @@ public class HiveQueryLayout extends GridLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                Object rowId = table.getValue(); // get the selected rows id
-                resultTextArea.setValue(rowId);
+                String value = "";
+                Collection<?> items = table.getItemIds();
+                for (Object item : items) {
+                    value += item + "\n";
+                }
+                resultTextArea.setValue(value);
 
                 searchTextField.setValue("");
                 list.refreshDataSource(null);
