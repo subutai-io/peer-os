@@ -22,7 +22,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
     @Override
     public void run() {
         ProductOperation po = productOperation;
-        if(config == null) {
+        if(clusterName == null || clusterName.isEmpty() || config.getNodes() == null || config.getNodes().isEmpty()) {
             po.addLogFailed("Invalid configuration");
             return;
         }
