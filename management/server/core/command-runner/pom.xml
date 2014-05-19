@@ -2,21 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.kiskis.mgmt</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>command-runner-parent</artifactId>
-    <name>Kiskis Management Command Runner Parent</name>
-    <description>Kiskis Management Command Runner Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>command-runner-parent</artifactId>
+  <name>Subutai Command Runner Parent</name>
+  <description>Subutai Command Runner Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>command-runner-api</module>
-        <module>command-runner-impl</module>
-        <module>command-runner-ui</module>
-    </modules>
+  <modules>
+    <module>command-runner-api</module>
+    <module>command-runner-impl</module>
+    <module>command-runner-ui</module>
+  </modules>
 </project>

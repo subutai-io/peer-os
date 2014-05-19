@@ -9,10 +9,10 @@
     </parent>
 
     <artifactId>mgmt-server-karaf</artifactId>
-    <name>Kiskis Management Server Karaf</name>
+    <name>Subutai Server Karaf</name>
     <packaging>jar</packaging>
 
-    <description>Kiskis Management Server Custom Karaf Distribution</description>
+    <description>Subutai Server Custom Karaf Distribution</description>
 
     <dependencies>
         <dependency>
@@ -471,6 +471,11 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>
                                     <artifactId>agent-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>agent-manager-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -1001,6 +1006,23 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Storm -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <artifactId>storm-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
                                 <!-- Hadoop -->
                                 <artifactItem>
                                     <groupId>org.safehaus.kiskis.mgmt</groupId>

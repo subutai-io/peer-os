@@ -11,7 +11,7 @@ mkdir opt
 cd opt
 svn co http://svn.apache.org/repos/asf/mahout/trunk
 cd trunk
-/var/lib/jenkins/apache-maven-3.1.1/bin//mvn install
+/var/lib/jenkins/apache-maven-3.1.1/bin/mvn install -DskipTests
 cd ..
 mv trunk mahout
 tar -cvpzf mahout.tar.gz mahout/

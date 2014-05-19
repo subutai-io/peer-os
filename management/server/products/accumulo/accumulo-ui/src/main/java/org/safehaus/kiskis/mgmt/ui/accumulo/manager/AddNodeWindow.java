@@ -5,20 +5,30 @@
  */
 package org.safehaus.kiskis.mgmt.ui.accumulo.manager;
 
-import com.google.common.base.Strings;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.*;
+
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationState;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperationView;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 
-import java.util.Set;
-import java.util.UUID;
+import com.google.common.base.Strings;
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
+
 
 /**
  * @author dilshat
@@ -29,131 +39,140 @@ public class AddNodeWindow extends Window {
     private final Label indicator;
     private volatile boolean track = true;
 
-    public AddNodeWindow(final Config config, Set<Agent> nodes, final NodeType nodeType) {
-        super("Add New Node");
-        setModal(true);
 
-        setWidth(600, AddNodeWindow.UNITS_PIXELS);
+    public AddNodeWindow( final Config config, Set<Agent> nodes, final NodeType nodeType ) {
+        super( "Add New Node" );
+        setModal( true );
 
-        GridLayout content = new GridLayout(1, 3);
+        setWidth( 600, AddNodeWindow.UNITS_PIXELS );
+
+        GridLayout content = new GridLayout( 1, 3 );
         content.setSizeFull();
-        content.setMargin(true);
-        content.setSpacing(true);
+        content.setMargin( true );
+        content.setSpacing( true );
 
         HorizontalLayout topContent = new HorizontalLayout();
-        topContent.setSpacing(true);
+        topContent.setSpacing( true );
 
-        content.addComponent(topContent);
-        topContent.addComponent(new Label("Nodes:"));
+        content.addComponent( topContent );
+        topContent.addComponent( new Label( "Nodes:" ) );
 
         final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setMultiSelect(false);
-        hadoopNodes.setImmediate(true);
-        hadoopNodes.setTextInputAllowed(false);
-        hadoopNodes.setNullSelectionAllowed(false);
-        hadoopNodes.setRequired(true);
-        hadoopNodes.setWidth(200, Sizeable.UNITS_PIXELS);
-        for (Agent node : nodes) {
-            hadoopNodes.addItem(node);
-            hadoopNodes.setItemCaption(node, node.getHostname());
+        hadoopNodes.setMultiSelect( false );
+        hadoopNodes.setImmediate( true );
+        hadoopNodes.setTextInputAllowed( false );
+        hadoopNodes.setNullSelectionAllowed( false );
+        hadoopNodes.setRequired( true );
+        hadoopNodes.setWidth( 200, Sizeable.UNITS_PIXELS );
+        for ( Agent node : nodes ) {
+            hadoopNodes.addItem( node );
+            hadoopNodes.setItemCaption( node, node.getHostname() );
         }
-        hadoopNodes.setValue(nodes.iterator().next());
+        hadoopNodes.setValue( nodes.iterator().next() );
 
-        topContent.addComponent(hadoopNodes);
+        topContent.addComponent( hadoopNodes );
 
-        final Button addNodeBtn = new Button("Add");
-        topContent.addComponent(addNodeBtn);
+        final Button addNodeBtn = new Button( "Add" );
+        topContent.addComponent( addNodeBtn );
 
-        addNodeBtn.addListener(new Button.ClickListener() {
+        addNodeBtn.addListener( new Button.ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-                addNodeBtn.setEnabled(false);
+            public void buttonClick( Button.ClickEvent event ) {
+                addNodeBtn.setEnabled( false );
                 showProgress();
-                Agent agent = (Agent) hadoopNodes.getValue();
-                final UUID trackID = AccumuloUI.getAccumuloManager().addNode(config.getClusterName(), agent.getHostname(), nodeType);
-                AccumuloUI.getExecutor().execute(new Runnable() {
+                Agent agent = ( Agent ) hadoopNodes.getValue();
+                final UUID trackID = AccumuloUI.getAccumuloManager()
+                                               .addNode( config.getClusterName(), agent.getHostname(), nodeType );
+                AccumuloUI.getExecutor().execute( new Runnable() {
 
                     public void run() {
-                        while (track) {
-                            ProductOperationView po = AccumuloUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-                            if (po != null) {
-                                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                                if (po.getState() != ProductOperationState.RUNNING) {
+                        while ( track ) {
+                            ProductOperationView po =
+                                    AccumuloUI.getTracker().getProductOperation( Config.PRODUCT_KEY, trackID );
+                            if ( po != null ) {
+                                setOutput(
+                                        po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
+                                if ( po.getState() != ProductOperationState.RUNNING ) {
                                     hideProgress();
                                     break;
                                 }
-                            } else {
-                                setOutput("Product operation not found. Check logs");
+                            }
+                            else {
+                                setOutput( "Product operation not found. Check logs" );
                                 break;
                             }
                             try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
+                                Thread.sleep( 1000 );
+                            }
+                            catch ( InterruptedException ex ) {
                                 break;
                             }
                         }
                     }
-                });
+                } );
             }
-        });
+        } );
 
-        outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(13);
-        outputTxtArea.setColumns(43);
-        outputTxtArea.setImmediate(true);
-        outputTxtArea.setWordwrap(true);
+        outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setRows( 13 );
+        outputTxtArea.setColumns( 43 );
+        outputTxtArea.setImmediate( true );
+        outputTxtArea.setWordwrap( true );
 
-        content.addComponent(outputTxtArea);
+        content.addComponent( outputTxtArea );
 
         indicator = new Label();
-        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
-        indicator.setContentMode(Label.CONTENT_XHTML);
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
-        indicator.setVisible(false);
+        indicator.setIcon( new ThemeResource( "icons/indicator.gif" ) );
+        indicator.setContentMode( Label.CONTENT_XHTML );
+        indicator.setHeight( 11, Sizeable.UNITS_PIXELS );
+        indicator.setWidth( 50, Sizeable.UNITS_PIXELS );
+        indicator.setVisible( false );
 
-        Button ok = new Button("Ok");
-        ok.addListener(new Button.ClickListener() {
+        Button ok = new Button( "Ok" );
+        ok.addListener( new Button.ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick( Button.ClickEvent event ) {
                 //close window   
                 track = false;
-                MgmtApplication.removeCustomWindow(getWindow());
+                MgmtApplication.removeCustomWindow( getWindow() );
             }
-        });
+        } );
 
         HorizontalLayout bottomContent = new HorizontalLayout();
-        bottomContent.addComponent(indicator);
-        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        bottomContent.addComponent(ok);
+        bottomContent.addComponent( indicator );
+        bottomContent.setComponentAlignment( indicator, Alignment.MIDDLE_RIGHT );
+        bottomContent.addComponent( ok );
 
-        content.addComponent(bottomContent);
-        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
+        content.addComponent( bottomContent );
+        content.setComponentAlignment( bottomContent, Alignment.MIDDLE_RIGHT );
 
-        addComponent(content);
+        addComponent( content );
     }
+
+
+    private void showProgress() {
+        indicator.setVisible( true );
+    }
+
+
+    private void hideProgress() {
+        indicator.setVisible( false );
+    }
+
+
+    private void setOutput( String output ) {
+        if ( !Strings.isNullOrEmpty( output ) ) {
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
+        }
+    }
+
 
     @Override
     protected void close() {
         super.close();
         track = false;
     }
-
-    private void showProgress() {
-        indicator.setVisible(true);
-    }
-
-    private void hideProgress() {
-        indicator.setVisible(false);
-    }
-
-    private void setOutput(String output) {
-        if (!Strings.isNullOrEmpty(output)) {
-            outputTxtArea.setValue(output);
-            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-        }
-    }
-
 }

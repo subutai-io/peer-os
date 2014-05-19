@@ -10,11 +10,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mgmt-server-products-parent</artifactId>
-    <name>Kiskis Management Products Parent</name>
-    <description>Kiskis Management Products Parent</description>
+    <name>Subutai Products Parent</name>
+    <description>Subutai Products Parent</description>
     <packaging>pom</packaging>
 
     <modules>
+        <module>common</module>
         <module>accumulo</module>
         <module>mongodb</module>
         <module>solr</module>
@@ -33,6 +34,7 @@
         <module>sqoop</module>
         <module>oozie</module>
         <module>cassandra</module>
+        <module>storm</module>
     </modules>
 
 </project>

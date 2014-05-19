@@ -2,6 +2,8 @@
 
     <reference id="manager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery"/>
+    <reference id="tracker" availability="mandatory"
+               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hivequery/list-clusters">
@@ -16,6 +18,12 @@
         <command name="hivequery/load-query">
             <action class="org.safehaus.kiskis.mgmt.cli.commands.LoadQueriesCommand">
                 <property name="manager" ref="manager"/>
+            </action>
+        </command>
+        <command name="hivequery/run-query">
+        <action class="org.safehaus.kiskis.mgmt.cli.commands.RunQueryCommand">
+                <property name="manager" ref="manager"/>
+                <property name="tracker" ref="tracker"/>
             </action>
         </command>
     </command-bundle>

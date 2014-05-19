@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>network-manager-parent</artifactId>
-    <name>Kiskis Management Network Manager Parent</name>
-    <description>Kiskis Management Network Manager Parent</description>
+    <name>Subutai Network Manager Parent</name>
+    <description>Subutai Network Manager Parent</description>
     <packaging>pom</packaging>
 
     <modules>

@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mongodb-parent</artifactId>
-    <name>Kiskis Management MongoDB Parent</name>
-    <description>Kiskis Management MongoDB Parent</description>
+    <name>Subutai MongoDB Parent</name>
+    <description>Subutai MongoDB Parent</description>
     <packaging>pom</packaging>
 
     <modules>

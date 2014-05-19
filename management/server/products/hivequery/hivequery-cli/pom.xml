@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>hivequery-cli</artifactId>
-    <name>Kiskis Management Hive Query CLI</name>
-    <description>Kiskis Management Hive Query CLI</description>
+    <name>Subutai Hive Query CLI</name>
+    <description>Subutai Hive Query CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -34,6 +34,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>agent-manager-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>db-manager-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>spark-cli</artifactId>
-    <name>Kiskis Management Spark CLI</name>
-    <description>Kiskis Management Spark CLI</description>
+    <name>Subutai Spark CLI</name>
+    <description>Subutai Spark CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

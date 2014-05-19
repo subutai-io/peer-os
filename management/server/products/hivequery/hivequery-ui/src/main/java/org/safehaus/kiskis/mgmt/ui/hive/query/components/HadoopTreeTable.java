@@ -22,6 +22,7 @@ public class HadoopTreeTable extends TreeTable {
         this.setPageLength(10);
         this.setSelectable(true);
         this.setImmediate(true);
+        this.setMultiSelect(true);
 
         addContainerProperty(NODE_NAME_PROPERTY, AgentContainer.class, null);
         refreshDataSource();
@@ -45,7 +46,8 @@ public class HadoopTreeTable extends TreeTable {
         for (Config cluster : list) {
 
             Object rowId = addItem(new Object[]{
-                            new AgentContainer(cluster.getNameNode(), "NameNode")},
+                            new AgentContainer(cluster.getNameNode(),
+                                    String.format("NameNode - %s", cluster.getNameNode().getHostname()))},
                     null
             );
 
@@ -55,7 +57,8 @@ public class HadoopTreeTable extends TreeTable {
 
                 if (!cluster.getBlockedAgents().contains(agent)) {
                     childID = addItem(new Object[]{
-                                    new AgentContainer(agent, "DataNode " + index++)},
+                                    new AgentContainer(agent,
+                                            String.format("DataNode %d - %s", index++, agent.getHostname()))},
                             null
                     );
                 }

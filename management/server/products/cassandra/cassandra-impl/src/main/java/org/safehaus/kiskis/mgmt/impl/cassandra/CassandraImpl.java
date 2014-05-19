@@ -1,23 +1,22 @@
 package org.safehaus.kiskis.mgmt.impl.cassandra;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
+import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
-import org.safehaus.kiskis.mgmt.api.tracker.ProductOperation;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
-
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CassandraImpl implements Cassandra {
 
@@ -27,6 +26,15 @@ public class CassandraImpl implements Cassandra {
     private ExecutorService executor;
     private NetworkManager networkManager;
     private CommandRunner commandRunner;
+    private AgentManager agentManager;
+
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+    public void setAgentManager(AgentManager agentManager) {
+        this.agentManager = agentManager;
+    }
 
     public void init() {
         Commands.init(commandRunner);
@@ -70,7 +78,8 @@ public class CassandraImpl implements Cassandra {
 
                 try {
                     po.addLog(String.format("Creating %d lxc containers for Cassandra cluster...", config.getNumberOfNodes()));
-                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
+                    Map<Agent, Set<Agent>> lxcAgentsMap = CustomPlacementStrategy.createNodes(
+                            lxcManager, config.getNumberOfNodes());
                     config.setNodes(new HashSet<Agent>());
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
@@ -214,7 +223,7 @@ public class CassandraImpl implements Cassandra {
                         }
                         po.addLogFailed("Could not save cluster info to DB! Please see logs\nInstallation aborted");
                     }
-                } catch (LxcCreateException ex) {
+                } catch(LxcCreateException ex) {
                     po.addLogFailed(ex.getMessage());
                 }
 
@@ -315,6 +324,82 @@ public class CassandraImpl implements Cassandra {
             }
         });
 
+        return po.getId();
+    }
+
+    @Override
+    public UUID startCassandraService(final String agentUUID) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Starting Cassandra service on %s", agentUUID));
+        executor.execute(new Runnable() {
+            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
+
+            public void run() {
+                Command startServiceCommand = Commands.getStartCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(startServiceCommand);
+                if (startServiceCommand.hasSucceeded()) {
+                    AgentResult ar = startServiceCommand.getResults().get(agent.getUuid());
+                    if (ar.getStdOut().contains("starting Cassandra ...") ||
+                            ar.getStdOut().contains("is already running...")) {
+                        po.addLog(ar.getStdOut());
+                        po.addLogDone("Start succeeded");
+                    }
+                } else {
+                    po.addLogFailed(String.format("Start failed, %s", startServiceCommand.getAllErrors()));
+                }
+            }
+        });
+        return po.getId();
+    }
+
+    @Override
+    public UUID stopCassandraService(final String agentUUID) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Stopping Cassandra service on %s", agentUUID));
+        executor.execute(new Runnable() {
+            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
+
+            public void run() {
+                Command stopServiceCommand = Commands.getStopCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(stopServiceCommand);
+                if (stopServiceCommand.hasSucceeded()) {
+                    AgentResult ar = stopServiceCommand.getResults().get(agent.getUuid());
+                    po.addLog(ar.getStdOut());
+                    po.addLogDone("Stop succeeded");
+                } else {
+                    po.addLogFailed(String.format("Stop failed, %s", stopServiceCommand.getAllErrors()));
+                }
+            }
+        });
+        return po.getId();
+    }
+
+    @Override
+    public UUID statusCassandraService(final String agentUUID) {
+        final ProductOperation po
+                = tracker.createProductOperation(Config.PRODUCT_KEY,
+                String.format("Checking status of Cassandra service on %s", agentUUID));
+        executor.execute(new Runnable() {
+            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
+
+            public void run() {
+                Command statusServiceCommand = Commands.getStatusCommand(Util.wrapAgentToSet(agent));
+                commandRunner.runCommand(statusServiceCommand);
+                if (statusServiceCommand.hasSucceeded()) {
+                    AgentResult ar = statusServiceCommand.getResults().get(agent.getUuid());
+                    if (ar.getStdOut().contains("is running")) {
+                        po.addLogDone("Cassandra is running");
+                    } else {
+                        po.addLogFailed("Cassandra is not running");
+                    }
+                } else {
+                    po.addLogFailed("Cassandra is not running");
+//                    po.addLogFailed(String.format("Status check failed, %s", statusServiceCommand.getAllErrors()));
+                }
+            }
+        });
         return po.getId();
     }
 

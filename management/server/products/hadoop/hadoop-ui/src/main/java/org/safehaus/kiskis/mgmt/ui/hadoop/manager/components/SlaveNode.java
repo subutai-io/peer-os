@@ -21,6 +21,8 @@ public class SlaveNode extends ClusterNode {
         this.agent = agent;
         this.isDataNode = isDataNode;
 
+        setHostname(agent.getHostname());
+
         restartButton.setVisible(false);
         startButton.setEnabled(false);
         stopButton.setEnabled(false);

@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>presto-cli</artifactId>
-    <name>Kiskis Management Presto CLI</name>
-    <description>Kiskis Management Presto CLI</description>
+    <name>Subutai Presto CLI</name>
+    <description>Subutai Presto CLI</description>
     <packaging>bundle</packaging>
 
     <dependencies>

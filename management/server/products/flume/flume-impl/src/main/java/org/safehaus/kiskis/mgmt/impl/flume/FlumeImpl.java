@@ -9,7 +9,7 @@ import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.api.flume.Flume;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.flume.handler.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.*;
+import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 
 public class FlumeImpl implements Flume {
 

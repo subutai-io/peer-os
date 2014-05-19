@@ -87,6 +87,7 @@ bool KACommand::deserialize(string& input)
 	Json::Reader reader;								//return true Deserialize operation is successfully done
 	Json::Value root;
 	pair <string,string> dummy;
+	Json::FastWriter writer;
 
 	clear(); //clear all arguments firstly..
 	bool parsedSuccess = reader.parse(input,root,false);		//parsing Json String
@@ -182,6 +183,7 @@ bool KACommand::deserialize(string& input)
 	{
 		setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
 	}
+	input = writer.write(root);
 	return true;
 }
 

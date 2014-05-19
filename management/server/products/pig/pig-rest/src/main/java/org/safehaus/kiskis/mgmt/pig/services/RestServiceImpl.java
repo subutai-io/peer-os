@@ -1,32 +1,30 @@
 package org.safehaus.kiskis.mgmt.pig.services;
 
+import org.safehaus.kiskis.mgmt.api.pig.Pig;
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-//    private HelloService helloService;
 
-    public String handleGet(String name) {
-//        return helloService.sayHello(name);
-        return "Pig " + name;
+    private Pig pigManager;
+
+    public Pig getPigManager() {
+        return pigManager;
     }
 
-    /*
-        Constructor
-     */
-    public RestServiceImpl() {
+    public void setPigManager(Pig pigManager) {
+        this.pigManager = pigManager;
     }
 
-    /*
-        Getters and Setters
-     */
-//    public HelloService getHelloService() {
-//        return helloService;
-//    }
-//
-//    public void setHelloService(HelloService helloService) {
-//        this.helloService = helloService;
-//    }
+    @Override
+    public String installCluster(String clusterName) {
+        return null;
+    }
+
+    @Override
+    public String uninstallCluster(String clusterName) {
+        return null;
+    }
 }

@@ -5,22 +5,23 @@
  */
 package org.safehaus.kiskis.mgmt.api.commandrunner;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.shared.protocol.Request;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.safehaus.kiskis.mgmt.shared.protocol.Request;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.OutputRedirection;
+import org.safehaus.kiskis.mgmt.shared.protocol.enums.RequestType;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+
 /**
- * Represents command to agent. This class is used when the same command should
- * be run on a set of agents simultaneously
- *
- * @author dilshat
+ * Represents command to agent. This class is used when the same command should be run on a set of agents
+ * simultaneously
  */
 public class RequestBuilder {
 
@@ -53,133 +54,124 @@ public class RequestBuilder {
     //PID for terminate_request
     private int pid;
 
+
     /**
      * Constructor
      *
      * @param command - command to run
      */
-    public RequestBuilder(String command) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(command),
-                "Command is null or empty");
+    public RequestBuilder( String command ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( command ), "Command is null or empty" );
 
         this.command = command;
     }
+
 
     public Integer getTimeout() {
         return timeout;
     }
 
-    public RequestBuilder withCwd(String cwd) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(cwd),
-                "Current working directory is null or empty");
+
+    public RequestBuilder withCwd( String cwd ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( cwd ), "Current working directory is null or empty" );
 
         this.cwd = cwd;
 
         return this;
     }
 
-    public RequestBuilder withType(RequestType type) {
-        Preconditions.checkNotNull(type, "Request Type is null");
+
+    public RequestBuilder withType( RequestType type ) {
+        Preconditions.checkNotNull( type, "Request Type is null" );
 
         this.type = type;
 
         return this;
     }
 
-    public RequestBuilder withStdOutRedirection(OutputRedirection outputRedirection) {
-        Preconditions.checkNotNull(outputRedirection,
-                "Std Out Redirection is null");
+
+    public RequestBuilder withStdOutRedirection( OutputRedirection outputRedirection ) {
+        Preconditions.checkNotNull( outputRedirection, "Std Out Redirection is null" );
 
         this.outputRedirection = outputRedirection;
 
         return this;
     }
 
-    public RequestBuilder withStdErrRedirection(OutputRedirection errRedirection) {
-        Preconditions.checkNotNull(errRedirection,
-                "Std Err Redirection is null");
+
+    public RequestBuilder withStdErrRedirection( OutputRedirection errRedirection ) {
+        Preconditions.checkNotNull( errRedirection, "Std Err Redirection is null" );
 
         this.errRedirection = errRedirection;
 
         return this;
     }
 
-    public RequestBuilder withTimeout(int timeout) {
-        Preconditions.checkArgument(
-                timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC,
-                String.format("Timeout is not in range 1 to %s", Common.MAX_COMMAND_TIMEOUT_SEC));
+
+    public RequestBuilder withTimeout( int timeout ) {
+        Preconditions.checkArgument( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC,
+                String.format( "Timeout is not in range 1 to %s", Common.MAX_COMMAND_TIMEOUT_SEC ) );
 
         this.timeout = timeout;
 
         return this;
     }
 
-    public RequestBuilder withStdOutPath(String stdOutPath) {
+
+    public RequestBuilder withStdOutPath( String stdOutPath ) {
 
         this.stdOutPath = stdOutPath;
 
         return this;
     }
 
-    public RequestBuilder withErrPath(String stdErrPath) {
+
+    public RequestBuilder withErrPath( String stdErrPath ) {
 
         this.stdErrPath = stdErrPath;
 
         return this;
     }
 
-    public RequestBuilder withRunAs(String runAs) {
 
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(runAs),
-                "Run As is null or empty");
+    public RequestBuilder withRunAs( String runAs ) {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( runAs ), "Run As is null or empty" );
 
         this.runAs = runAs;
 
         return this;
     }
 
-    public RequestBuilder withCmdArgs(List<String> cmdArgs) {
+
+    public RequestBuilder withCmdArgs( List<String> cmdArgs ) {
 
         this.cmdArgs = cmdArgs;
 
         return this;
     }
 
-    public RequestBuilder withEnvVars(Map<String, String> envVars) {
+
+    public RequestBuilder withEnvVars( Map<String, String> envVars ) {
 
         this.envVars = envVars;
 
         return this;
     }
 
-    public RequestBuilder withPid(int pid) {
-        Preconditions.checkArgument(pid > 0,
-                "PID is less then or equal to 0");
+
+    public RequestBuilder withPid( int pid ) {
+        Preconditions.checkArgument( pid > 0, "PID is less then or equal to 0" );
 
         this.pid = pid;
 
         return this;
     }
 
-    public Request build(UUID agentUUID, UUID taskUUID) {
 
-        return new Request(
-                source,
-                type,
-                agentUUID,
-                taskUUID,
-                requestSequenceNumber,
-                cwd,
-                command,
-                outputRedirection,
-                errRedirection,
-                stdOutPath,
-                stdErrPath,
-                runAs,
-                cmdArgs,
-                envVars,
-                pid,
-                timeout);
+    public Request build( UUID agentUUID, UUID taskUUID ) {
+
+        return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,
+                errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout );
     }
-
 }

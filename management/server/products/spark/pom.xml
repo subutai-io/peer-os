@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spark-parent</artifactId>
-    <name>Kiskis Management Spark Parent</name>
-    <description>Kiskis Management Spark Parent</description>
+    <name>Subutai Spark Parent</name>
+    <description>Subutai Spark Parent</description>
     <packaging>pom</packaging>
 
     <modules>

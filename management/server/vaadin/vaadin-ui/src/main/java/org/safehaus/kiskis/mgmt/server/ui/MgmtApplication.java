@@ -202,30 +202,30 @@ public class MgmtApplication extends Application implements ModuleServiceListene
                 }
             }
             moduleNotifier.removeListener(this);
-            LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Application closing, removing module service listener");
+            LOG.log(Level.INFO, "Subutai Vaadin UI: Application closing, removing module service listener");
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error closing", e);
+            LOG.log(Level.SEVERE, "Subutai Vaadin UI: Error closing", e);
         }
     }
 
     @Override
     public void moduleRegistered(Module module) {
         try {
-            LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Module registered, adding tab");
+            LOG.log(Level.INFO, "Subutai Vaadin UI: Module registered, adding tab");
             Component component = module.createComponent();
             Tab tab = tabs.addTab(component, module.getName(), null);
             List<Module> modules = new ArrayList<Module>(moduleNotifier.getModules());
             LOG.info(moduleNotifier.getModules().toString());
             tabs.setTabPosition(tab, modules.indexOf(module));
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error registering module{0}", e);
+            LOG.log(Level.SEVERE, "Subutai Vaadin UI: Error registering module{0}", e);
         }
     }
 
     @Override
     public void moduleUnregistered(Module module) {
         try {
-            LOG.log(Level.INFO, "Kiskis Management Vaadin UI: Module unregistered, removing tab");
+            LOG.log(Level.INFO, "Subutai Vaadin UI: Module unregistered, removing tab");
             Iterator<Component> it = tabs.getComponentIterator();
             while (it.hasNext()) {
                 Component component = it.next();
@@ -242,7 +242,7 @@ public class MgmtApplication extends Application implements ModuleServiceListene
             }
 
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Kiskis Management Vaadin UI: Error unregistering module{0}", e);
+            LOG.log(Level.SEVERE, "Subutai Vaadin UI: Error unregistering module{0}", e);
         }
     }
 

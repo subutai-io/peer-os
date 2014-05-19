@@ -1,33 +1,5 @@
 #!/bin/sh
 set -e 
 FilePath="/etc/profile"
-sqoopHomeEcho="/opt/sqoop-1.4.3"
-hadoopHome="/opt/hadoop-1.2.1"
-sqoopPath="\/opt\/sqoop-1.4.3\/bin"
-sqoopPathEcho=$sqoopHomeEcho"/bin"
-sqoopConf=$sqoopHomeEcho"/conf"
-
-if grep -q "SQOOP_HOME=" $FilePath
-then
-        echo "SQOOP_HOME is already added!"
-else
-        echo "SQOOP_HOME is being inserted"
-        echo "export SQOOP_HOME="$sqoopHomeEcho >> $FilePath
-	echo "export HADOOP_COMMON_HOME="$hadoopHome >> $FilePath
-	echo "export HADOOP_MAPRED_HOME="$hadoopHome >> $FilePath
-fi
-
-if grep -q "export PATH=" $FilePath
-then
-        if grep -q "${sqoopPath}" $FilePath
-        then
-                echo "SQOOP is already inserted to PATH!!!"
-        else
-                echo "SQOOP is being insterted to PATH!"
-                sed -i "s/export PATH=/export PATH=$sqoopPath:/1" $FilePath
-        fi
-else
-        echo "export PATH=$PATH:$sqoopPathEcho" >> "${FilePath}"
-fi
 
 . $FilePath

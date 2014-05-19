@@ -5,14 +5,13 @@
  */
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
+
 import com.google.common.base.Preconditions;
 
+
 /**
- * This class represents entry for {@code ExpiringCache}. Holds generic value
- * for the specified ttl. When entry is expired the supplied ExpiryCallback is
- * called.
- *
- * @author dilshat
+ * This class represents entry for {@code ExpiringCache}. Holds generic value for the specified ttl. When entry is
+ * expired the supplied ExpiryCallback is called.
  */
 public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueType> {
 
@@ -21,6 +20,7 @@ public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueTyp
      */
     private final EntryExpiryCallback<ValueType> expiryCallback;
 
+
     /**
      * Initialized the {@code CacheEntryWithExpiryCallback}
      *
@@ -28,17 +28,17 @@ public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueTyp
      * @param ttlMs - entry ttl in milliseconds
      * @param expiryCallback -- callback to trigger when entry expires
      */
-    public CacheEntryWithExpiryCallback(ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback) {
-        super(value, ttlMs);
-        Preconditions.checkNotNull(expiryCallback, "Callback is null");
+    public CacheEntryWithExpiryCallback( ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback ) {
+        super( value, ttlMs );
+        Preconditions.checkNotNull( expiryCallback, "Callback is null" );
         this.expiryCallback = expiryCallback;
     }
+
 
     /**
      * triggers the entry expiry callback
      */
     public void callExpiryCallback() {
-        expiryCallback.onEntryExpiry(super.getValue());
+        expiryCallback.onEntryExpiry( super.getValue() );
     }
-
 }

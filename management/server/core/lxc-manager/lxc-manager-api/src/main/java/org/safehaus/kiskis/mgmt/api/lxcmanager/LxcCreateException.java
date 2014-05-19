@@ -5,15 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.lxcmanager;
 
+
 /**
  * Exception which can be thrown while creating lxcs
  *
- * @author dilshat
  */
 public class LxcCreateException extends Exception {
 
-    public LxcCreateException(String message) {
-        super(message);
+    public LxcCreateException( String message ) {
+        super( message );
     }
-
 }

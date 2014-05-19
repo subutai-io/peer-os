@@ -4,15 +4,14 @@
  */
 package org.safehaus.kiskis.mgmt.api.communicationmanager;
 
+
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
 
+
 /**
- * Implementations of this interface are wrappers for Request and Response
- * objects. Used for serializing POJOs to json commands for sending via
- * communication manager.
- *
- * @author dilshat
+ * Implementations of this interface are wrappers for Request and Response objects. Used for serializing POJOs to json
+ * commands for sending via communication manager.
  */
 public interface Command {
 

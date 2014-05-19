@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>shark-parent</artifactId>
-    <name>Kiskis Management Shark Parent</name>
-    <description>Kiskis Management Shark Parent</description>
+    <name>Subutai Shark Parent</name>
+    <description>Subutai Shark Parent</description>
     <packaging>pom</packaging>
 
     <modules>

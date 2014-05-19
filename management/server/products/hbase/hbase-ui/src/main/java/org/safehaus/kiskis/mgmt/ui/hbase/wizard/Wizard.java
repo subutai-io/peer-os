@@ -7,7 +7,8 @@ package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.api.hbase.Config;
+import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
+
 
 /**
  * @author dilshat
@@ -17,7 +18,7 @@ public class Wizard {
     private static final int MAX_STEPS = 3;
     private final VerticalLayout vlayout;
     private int step = 1;
-    private Config config = new Config();
+    private HBaseConfig config = new HBaseConfig();
     private StepFinish stepFinish;
 
     public Wizard() {
@@ -48,11 +49,11 @@ public class Wizard {
 
     public void init() {
         step = 1;
-        config = new Config();
+        config = new HBaseConfig();
         putForm();
     }
 
-    public Config getConfig() {
+    public HBaseConfig getConfig() {
         return config;
     }
 
