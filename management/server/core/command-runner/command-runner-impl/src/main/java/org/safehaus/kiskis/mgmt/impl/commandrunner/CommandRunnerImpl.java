@@ -25,6 +25,7 @@ import org.safehaus.kiskis.mgmt.api.communicationmanager.ResponseListener;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.shared.protocol.Request;
 import org.safehaus.kiskis.mgmt.shared.protocol.Response;
+import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 
@@ -147,9 +148,9 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         CommandExecutor commandExecutor = new CommandExecutor( commandImpl, executor, commandCallback );
 
         //put command to cache
-        boolean queued = commandExecutors
-                .put( commandImpl.getCommandUUID(), commandExecutor, commandImpl.getTimeout() * 1000 + 2000,
-                        new CommandExecutorExpiryCallback() );
+        boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
+                //                        commandImpl.getTimeout() * 1000 + 2000,
+                Common.MAX_COMMAND_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
 
         if ( queued ) {
             //set command status to RUNNING
