@@ -31,6 +31,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -51,7 +52,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         po.addLog("Uninstalling Flume...");
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.UNINSTALL)),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasCompleted()) {

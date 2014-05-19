@@ -32,6 +32,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -45,7 +46,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             return;
         }
 
-        Set<Agent> set = new HashSet<Agent>(Arrays.asList(agent));
+        Set<Agent> set = new HashSet<>(Arrays.asList(agent));
 
         po.addLog("Checking prerequisites...");
         Command cmd = manager.getCommandRunner().createCommand(

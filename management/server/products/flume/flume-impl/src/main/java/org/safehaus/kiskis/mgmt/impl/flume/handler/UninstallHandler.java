@@ -27,6 +27,7 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {

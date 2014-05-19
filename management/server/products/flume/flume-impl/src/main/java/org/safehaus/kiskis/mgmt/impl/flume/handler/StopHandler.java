@@ -30,6 +30,7 @@ public class StopHandler extends AbstractOperationHandler<FlumeImpl> {
         return po.getId();
     }
 
+    @Override
     public void run() {
         if(manager.getCluster(clusterName) == null) {
             po.addLogFailed("Cluster does not exist: " + clusterName);
@@ -45,7 +46,7 @@ public class StopHandler extends AbstractOperationHandler<FlumeImpl> {
         po.addLog("Stopping node...");
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.STOP)),
-                new HashSet<Agent>(Arrays.asList(node)));
+                new HashSet<>(Arrays.asList(node)));
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded())

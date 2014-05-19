@@ -60,48 +60,56 @@ public class FlumeImpl implements Flume {
         this.dbManager = dbManager;
     }
 
+    @Override
     public UUID installCluster(final Config config) {
         AbstractOperationHandler h = new InstallHandler(this, config);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID uninstallCluster(final String clusterName) {
         AbstractOperationHandler h = new UninstallHandler(this, clusterName);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID startNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new StartHandler(this, clusterName, hostname);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID stopNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new StopHandler(this, clusterName, hostname);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID checkNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new StatusHandler(this, clusterName, hostname);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID addNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new AddNodeHandler(this, clusterName, hostname);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public UUID destroyNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new DestroyNodeHandler(this, clusterName, hostname);
         executor.execute(h);
         return h.getTrackerId();
     }
 
+    @Override
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
