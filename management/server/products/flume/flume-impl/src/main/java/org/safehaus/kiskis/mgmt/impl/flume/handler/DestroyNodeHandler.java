@@ -1,15 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.flume.handler;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.UUID;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
+import java.util.*;
+import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
-import org.safehaus.kiskis.mgmt.impl.flume.CommandType;
-import org.safehaus.kiskis.mgmt.impl.flume.Commands;
-import org.safehaus.kiskis.mgmt.impl.flume.FlumeImpl;
+import org.safehaus.kiskis.mgmt.impl.flume.*;
 import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
 import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
@@ -17,22 +11,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final String hostname;
-    private final ProductOperation po;
 
     public DestroyNodeHandler(FlumeImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
         this.hostname = hostname;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Remove node from cluster: " + hostname);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Remove node from cluster: " + hostname);
     }
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed("Cluster does not exist: " + clusterName);

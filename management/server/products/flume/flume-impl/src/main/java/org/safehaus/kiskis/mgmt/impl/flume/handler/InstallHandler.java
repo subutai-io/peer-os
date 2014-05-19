@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.flume.handler;
 
 import java.util.Iterator;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.impl.flume.*;
@@ -12,22 +11,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final Config config;
-    private final ProductOperation po;
 
     public InstallHandler(FlumeImpl manager, Config config) {
         super(manager, config.getClusterName());
         this.config = config;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Install Flume cluster " + config.getClusterName());
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Install Flume cluster " + config.getClusterName());
     }
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         if(config == null) {
             po.addLogFailed("Invalid configuration");
             return;

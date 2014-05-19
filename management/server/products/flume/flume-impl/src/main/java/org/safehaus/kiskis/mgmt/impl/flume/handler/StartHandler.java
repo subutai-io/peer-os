@@ -2,7 +2,6 @@ package org.safehaus.kiskis.mgmt.impl.flume.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
@@ -17,22 +16,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class StartHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final String hostname;
-    private final ProductOperation po;
 
     public StartHandler(FlumeImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
         this.hostname = hostname;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Start node " + hostname);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Start node " + hostname);
     }
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         if(manager.getCluster(clusterName) == null) {
             po.addLogFailed("Cluster does not exist: " + clusterName);
             return;

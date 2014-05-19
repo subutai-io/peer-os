@@ -3,7 +3,6 @@ package org.safehaus.kiskis.mgmt.impl.flume.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
@@ -18,22 +17,17 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final String hostname;
-    private final ProductOperation po;
 
     public AddNodeHandler(FlumeImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
         this.hostname = hostname;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Add node to cluster: " + clusterName);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Add node to cluster: " + clusterName);
     }
 
     @Override
     public void run() {
+        ProductOperation po = this.productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed("Cluster does not exist: " + clusterName);

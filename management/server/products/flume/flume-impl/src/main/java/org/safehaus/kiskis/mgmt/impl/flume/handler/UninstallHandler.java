@@ -1,6 +1,5 @@
 package org.safehaus.kiskis.mgmt.impl.flume.handler;
 
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
@@ -14,21 +13,15 @@ import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
-    private final ProductOperation po;
-
     public UninstallHandler(FlumeImpl manager, String clusterName) {
         super(manager, clusterName);
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Destroy cluster " + clusterName);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Destroy cluster " + clusterName);
     }
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed("Cluster does not exist: " + clusterName);
