@@ -51,7 +51,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
         po.addLog("Uninstalling Flume...");
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(Commands.make(CommandType.UNINSTALL)),
+                new RequestBuilder(Commands.make(CommandType.PURGE)),
                 new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
