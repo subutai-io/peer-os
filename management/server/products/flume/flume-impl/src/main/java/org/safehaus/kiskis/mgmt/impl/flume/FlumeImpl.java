@@ -20,6 +20,13 @@ public class FlumeImpl implements Flume {
 
     private ExecutorService executor;
 
+    public FlumeImpl(CommandRunner commandRunner, AgentManager agentManager, Tracker tracker, DbManager dbManager) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.tracker = tracker;
+        this.dbManager = dbManager;
+    }
+
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
@@ -32,32 +39,16 @@ public class FlumeImpl implements Flume {
         return commandRunner;
     }
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        this.commandRunner = commandRunner;
-    }
-
     public AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
     }
 
     public Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
-
     public DbManager getDbManager() {
         return dbManager;
-    }
-
-    public void setDbManager(DbManager dbManager) {
-        this.dbManager = dbManager;
     }
 
     @Override

@@ -72,6 +72,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>lxc-manager-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.kiskis.mgmt</groupId>
+            <artifactId>product-common</artifactId>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
