@@ -40,20 +40,11 @@ public class Installation {
     }
 
     private void setMasterNodes(Set<Agent> agents) {
-        if (!agents.isEmpty() && agents.size() > 3) {
-            Iterator<Agent> it = agents.iterator();
-            int index = 0;
-            while (it.hasNext()) {
-                Agent agent = it.next();
-                if (index == 0)
-                    config.setNameNode(agent);
-                else if (index == 1)
-                    config.setJobTracker(agent);
-                else if (index == 2)
-                    config.setSecondaryNameNode(agent);
-                else break;
-                ++index;
-            }
+        if (agents != null && agents.size() >= 3) {
+            Agent[] arr = agents.toArray(new Agent[agents.size()]);
+            config.setNameNode(arr[0]);
+            config.setJobTracker(arr[1]);
+            config.setSecondaryNameNode(arr[2]);
         }
     }
 

@@ -35,7 +35,8 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
         Map<String, Set<Agent>> res = new HashMap<>();
         for(String type : new String[]{MASTER_NODE_TYPE, SLAVE_NODE_TYPE}) {
             Map<Agent, Set<Agent>> map = nodes.get(type);
-            if(map == null) continue;
+            if(map == null)
+                throw new LxcCreateException("No nodes for type " + type);
 
             Set<Agent> all = new HashSet<>();
             for(Set<Agent> children : map.values()) all.addAll(children);
