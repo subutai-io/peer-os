@@ -21,7 +21,7 @@ cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
-wget https://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop1.tgz -P $fileName/opt/
+wget http://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop1.tgz -P $fileName/opt/
 tar -xvzf $fileName/opt/*.tgz -C $fileName/opt
 cp -a -r $fileName/opt/shark-0.9.1-bin-hadoop1/* $fileName/opt/shark-0.9.1/
 rm -rf $fileName/opt/shark-0.9.1-bin-hadoop1
