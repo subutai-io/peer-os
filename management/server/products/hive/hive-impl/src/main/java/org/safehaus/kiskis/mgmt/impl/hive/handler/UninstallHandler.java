@@ -29,6 +29,7 @@ public class UninstallHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -73,7 +74,7 @@ public class UninstallHandler extends AbstractHandler {
         for(Product p : new Product[]{Product.HIVE, Product.DERBY}) {
             s = Commands.make(CommandType.PURGE, p);
             cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
-                    new HashSet<Agent>(Arrays.asList(config.getServer())));
+                    new HashSet<>(Arrays.asList(config.getServer())));
             manager.getCommandRunner().runCommand(cmd);
 
             if(cmd.hasSucceeded())

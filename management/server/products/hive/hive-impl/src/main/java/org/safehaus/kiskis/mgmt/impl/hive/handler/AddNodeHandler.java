@@ -32,6 +32,7 @@ public class AddNodeHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -47,7 +48,7 @@ public class AddNodeHandler extends AbstractHandler {
 
         String s = Commands.make(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
+                new RequestBuilder(s), new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
         if(!cmd.hasSucceeded()) {
@@ -65,7 +66,7 @@ public class AddNodeHandler extends AbstractHandler {
         if(manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
             po.addLog("Cluster info updated");
 
-            Set<Agent> set = new HashSet<Agent>(2);
+            Set<Agent> set = new HashSet<>(2);
             set.add(agent);
             boolean installed = false;
 

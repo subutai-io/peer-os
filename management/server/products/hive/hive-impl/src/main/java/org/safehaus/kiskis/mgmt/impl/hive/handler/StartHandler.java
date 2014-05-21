@@ -26,6 +26,7 @@ public class StartHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -47,7 +48,7 @@ public class StartHandler extends AbstractHandler {
             String s = Commands.make(CommandType.START, Product.DERBY);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             AgentResult res = cmd.getResults().get(agent.getUuid());
@@ -61,7 +62,7 @@ public class StartHandler extends AbstractHandler {
             String s = Commands.make(CommandType.START, Product.HIVE);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             AgentResult res = cmd.getResults().get(agent.getUuid());

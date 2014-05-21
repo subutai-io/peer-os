@@ -31,6 +31,7 @@ public class StatusHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -52,7 +53,7 @@ public class StatusHandler extends AbstractHandler {
             String s = Commands.make(CommandType.STATUS, Product.DERBY);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             AgentResult res = cmd.getResults().get(agent.getUuid());

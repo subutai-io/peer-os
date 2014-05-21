@@ -31,6 +31,7 @@ public class StopHandler extends AbstractHandler {
         return po.getId();
     }
 
+    @Override
     public void run() {
         Config config = manager.getCluster(clusterName);
         if(config == null) {
@@ -47,7 +48,7 @@ public class StopHandler extends AbstractHandler {
 
         String s = Commands.make(CommandType.STOP, Product.HIVE);
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(s), new HashSet<Agent>(Arrays.asList(agent)));
+                new RequestBuilder(s), new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
@@ -61,7 +62,7 @@ public class StopHandler extends AbstractHandler {
 
             s = Commands.make(CommandType.STOP, Product.DERBY);
             cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             res = cmd.getResults().get(agent.getUuid());
