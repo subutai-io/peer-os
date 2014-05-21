@@ -2,35 +2,28 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
 import org.safehaus.kiskis.mgmt.impl.hive.Commands;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.Product;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractHandler {
 
-    private final ProductOperation po;
-
     public UninstallHandler(HiveImpl manager, String clusterName) {
         super(manager, clusterName);
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Uninstalling cluster " + clusterName);
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Uninstalling cluster " + clusterName);
     }
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",

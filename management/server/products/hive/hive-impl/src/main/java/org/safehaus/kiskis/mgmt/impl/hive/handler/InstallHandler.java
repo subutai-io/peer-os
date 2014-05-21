@@ -5,32 +5,28 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
 import org.safehaus.kiskis.mgmt.impl.hive.Commands;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.Product;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
     private final Config config;
-    private final ProductOperation po;
 
     public InstallHandler(HiveImpl manager, Config config) {
         super(manager, config.getClusterName());
         this.config = config;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY,
                 "Installing cluster " + config.getClusterName());
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
-    @Override
     public void run() {
+        ProductOperation po = productOperation;
         if(manager.getCluster(clusterName) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     clusterName));
