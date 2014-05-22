@@ -19,13 +19,13 @@ public class CacheEntry<ValueType> {
      */
     private final ValueType value;
     /**
-     * creation timestamp
-     */
-    private final long createTimestamp;
-    /**
      * time-to-live for this value
      */
     private final long ttlMs;
+    /**
+     * creation timestamp
+     */
+    private long createTimestamp;
 
 
     /**
@@ -51,6 +51,14 @@ public class CacheEntry<ValueType> {
      */
     public ValueType getValue() {
         return value;
+    }
+
+
+    /**
+     * Resets creation timestamp to the current timestamp to prolong entry's lifespan
+     */
+    public void resetCreationTimestamp() {
+        createTimestamp = System.currentTimeMillis();
     }
 
 

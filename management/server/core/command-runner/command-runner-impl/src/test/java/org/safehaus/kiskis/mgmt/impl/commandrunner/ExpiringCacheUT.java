@@ -6,16 +6,10 @@
 package org.safehaus.kiskis.mgmt.impl.commandrunner;
 
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.awaitility.Awaitility;
-
-import static com.jayway.awaitility.Awaitility.to;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -90,13 +84,13 @@ public class ExpiringCacheUT {
 
 
     @Test
-    public void shouldExpireEntry() {
+    public void shouldExpireEntry() throws InterruptedException {
 
         cache.put( KEY, VALUE, TIME_TO_LIVE_MS );
 
-        Awaitility.await().atMost( 200, TimeUnit.MILLISECONDS ).
-                with().pollInterval( 10, TimeUnit.MILLISECONDS ).
-                          untilCall( to( cache ).get( KEY ), equalTo( null ) );
+        Thread.sleep( TIME_TO_LIVE_MS + 1 );
+
+        assertNull( cache.get( KEY ) );
     }
 
 

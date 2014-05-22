@@ -71,7 +71,7 @@ public class ExpiringCache<KeyType, ValueType> {
 
 
     /**
-     * Returns entry or null if missing or expired
+     * Returns entry or null if missing or expired. Resets lifespan of entry
      *
      * @param key - key for the entry
      *
@@ -81,6 +81,7 @@ public class ExpiringCache<KeyType, ValueType> {
         if ( key != null ) {
             CacheEntry<ValueType> entry = entries.get( key );
             if ( entry != null && !entry.isExpired() ) {
+                entry.resetCreationTimestamp();
                 return entry.getValue();
             }
         }

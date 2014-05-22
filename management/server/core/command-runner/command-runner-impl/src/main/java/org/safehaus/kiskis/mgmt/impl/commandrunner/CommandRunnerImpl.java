@@ -96,7 +96,6 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
                         commandExecutor.getCommand().getUpdateLock();
                         try {
                             if ( commandExecutors.get( response.getTaskUuid() ) != null ) {
-                                //reset ttl of CommandExecutor
 
                                 //append results to command
                                 commandExecutor.getCommand().appendResult( response );
@@ -149,8 +148,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 
         //put command to cache
         boolean queued = commandExecutors.put( commandImpl.getCommandUUID(), commandExecutor,
-                //                        commandImpl.getTimeout() * 1000 + 2000,
-                Common.MAX_COMMAND_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
+                Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 + 2000, new CommandExecutorExpiryCallback() );
 
         if ( queued ) {
             //set command status to RUNNING
