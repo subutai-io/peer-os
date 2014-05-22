@@ -83,7 +83,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
      * @param response - received response
      */
     public void onResponse( final Response response ) {
-        if ( response != null && response.getUuid() != null ) {
+        if ( response != null && response.getUuid() != null && response.getTaskUuid() != null ) {
             final CommandExecutor commandExecutor = commandExecutors.get( response.getTaskUuid() );
 
             if ( commandExecutor != null ) {

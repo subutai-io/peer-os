@@ -267,21 +267,23 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
      * Communication manager event when response from agent arrives
      */
     public void onResponse( Response response ) {
-        switch ( response.getType() ) {
-            case REGISTRATION_REQUEST: {
-                addAgent( response );
-                break;
-            }
-            case HEARTBEAT_RESPONSE: {
-                addAgent( response );
-                break;
-            }
-            case AGENT_DISCONNECT: {
-                removeAgent( response );
-                break;
-            }
-            default: {
-                break;
+        if ( response != null && response.getType() != null ) {
+            switch ( response.getType() ) {
+                case REGISTRATION_REQUEST: {
+                    addAgent( response );
+                    break;
+                }
+                case HEARTBEAT_RESPONSE: {
+                    addAgent( response );
+                    break;
+                }
+                case AGENT_DISCONNECT: {
+                    removeAgent( response );
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
         }
     }
@@ -304,7 +306,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId() );
+                        response.getTransportId()
+                );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
