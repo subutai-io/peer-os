@@ -26,7 +26,7 @@ cp -a $SOURCE/etc/ $BASE/$fileName/
 
 #getting storm packages
 wget http://download.zeromq.org/zeromq-2.1.7.tar.gz  -P $fileName/opt/
-wget https://dl.dropboxusercontent.com/s/fl4kr7w0oc8ihdw/storm-0.8.2.zip -P $fileName/opt/
+wget http://dl.dropboxusercontent.com/s/fl4kr7w0oc8ihdw/storm-0.8.2.zip -P $fileName/opt/
 mv $fileName/opt/storm-0.8.2.zip .
 unzip storm-0.8.2.zip
 tar -cvpzf storm-0.8.2.tar.gz storm-0.8.2/

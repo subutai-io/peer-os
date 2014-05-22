@@ -23,7 +23,7 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 cp -a $SOURCE/etc/* $BASE/$fileName/etc
 
-wget https://archive.apache.org/dist/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz -P $fileName/opt/
+wget http://archive.apache.org/dist/accumulo/1.4.2/accumulo-1.4.2-dist.tar.gz -P $fileName/opt/
 tar xzvf $BASE/$fileName/opt/accumulo-1.4.2-dist.tar.gz
 cp -a accumulo-1.4.2 $fileName/opt/
 cp -a $fileName/opt/accumulo-1.4.2/conf/examples/1GB/standalone/* $fileName/opt/accumulo-1.4.2/conf/

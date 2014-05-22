@@ -24,8 +24,8 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
 #getting hadoop and oozie packages
-wget https://www.apache.org/dist/hadoop/core/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz -P $fileName/opt/
-wget https://archive.apache.org/dist/oozie/3.3.2/oozie-3.3.2.tar.gz -P $fileName/opt/
+wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz -P $fileName/opt/
+wget http://archive.apache.org/dist/oozie/3.3.2/oozie-3.3.2.tar.gz -P $fileName/opt/
 wget extjs.com/deploy/ext-2.2.zip -P $fileName/opt/
 
 cd $fileName/opt/

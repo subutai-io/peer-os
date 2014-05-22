@@ -11,7 +11,7 @@ versionOfSpark="0.9.1"
 rm -rf ksks-spark*/*
 cp -r ../workspace/big-data/spark/spark/* ksks-spark*/
 cd ksks-spark*
-wget -P opt https://archive.apache.org/dist/spark/spark-0.9.1/spark-0.9.1-bin-hadoop1.tgz
+wget -P opt http://archive.apache.org/dist/spark/spark-0.9.1/spark-0.9.1-bin-hadoop1.tgz
 tar -xvpf opt/*.tgz -C opt/
 cp -a opt/spark-0.9.1-bin-hadoop1/* opt/spark-0.9.1/
 rm -rf opt/spark-0.9.1-bin-hadoop1

@@ -39,24 +39,19 @@ public class Installation {
         po.addLogFailed(log);
     }
 
-    private void setNodes(HashSet<Agent> agents) {
-        if (!agents.isEmpty() && agents.size() > 3) {
-            Iterator<Agent> it = agents.iterator();
-            int index = 0;
-            while (it.hasNext()) {
-                Agent agent = it.next();
-                if (index == 0) {
-                    config.setNameNode(agent);
-                } else if (index == 1) {
-                    config.setJobTracker(agent);
-                } else if (index == 2) {
-                    config.setSecondaryNameNode(agent);
-                } else {
-                    config.getDataNodes().add(agent);
-                    config.getTaskTrackers().add(agent);
-                }
-                ++index;
-            }
+    private void setMasterNodes(Set<Agent> agents) {
+        if (agents != null && agents.size() >= 3) {
+            Agent[] arr = agents.toArray(new Agent[agents.size()]);
+            config.setNameNode(arr[0]);
+            config.setJobTracker(arr[1]);
+            config.setSecondaryNameNode(arr[2]);
+        }
+    }
+
+    private void setSlaveNodes(Set<Agent> agents) {
+        if(agents != null) {
+            config.getDataNodes().addAll(agents);
+            config.getTaskTrackers().addAll(agents);
         }
     }
 
@@ -76,13 +71,11 @@ public class Installation {
 
                 try {
                     po.addLog(String.format("Creating %d lxc containers...", config.getCountOfSlaveNodes() + 3));
-                    Map<Agent, Set<Agent>> lxcAgentsMap = parent.getLxcManager().createLxcs(config.getCountOfSlaveNodes() + 3);
-                    HashSet<Agent> agents = new HashSet<Agent>();
+                    Map<String, Set<Agent>> nodes = CustomPlacementStrategy.getNodes(
+                            parent.getLxcManager(), 3, config.getCountOfSlaveNodes());
 
-                    for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
-                        agents.addAll(entry.getValue());
-                    }
-                    setNodes(agents);
+                    setMasterNodes(nodes.get(CustomPlacementStrategy.MASTER_NODE_TYPE));
+                    setSlaveNodes(nodes.get(CustomPlacementStrategy.SLAVE_NODE_TYPE));
                     po.addLog("Lxc containers created successfully\nConfiguring network...");
 
                     if (parent.getNetworkManager().configHostsOnAgents(config.getAllNodes(), config.getDomainName()) &&

@@ -1,11 +1,7 @@
 #!/bin/sh
 set -e
 cassVer="cassandra-2.0.4"
-
-#Remove paths and exports from relevant files
 FilePath="/etc/profile"
-cassandraHome="\/opt\/$cassVer"
-cassandraPath="\/opt\/$cassVer\/bin"
 
 # Remove Cassandra Files and Folders
 if [ -d "/opt/$cassVer" ]; 
@@ -13,11 +9,9 @@ then
 	rm -r /opt/$cassVer
 fi
 
-if [ -f "/etc/profile.d/cassandra-home.sh" ];
-then
-        rm /etc/profile.d/cassandra-home.sh
+if [ -f "/etc/profile.c/cassandra-home.sh" ]; then
+	rm /etc/profile.d/cassandra-home.sh
 fi
-
 
 if [ -f "/etc/init.d/cassandra" ]; 
 then 
