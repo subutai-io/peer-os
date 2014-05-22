@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
@@ -25,8 +24,8 @@ public class StopHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("not exist"));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
     @Test
@@ -35,8 +34,8 @@ public class StopHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
 }

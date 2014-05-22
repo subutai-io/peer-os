@@ -1,8 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import org.junit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.mock.HiveImplMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
@@ -25,8 +23,8 @@ public class UninstallHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("not exist"));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
     @Test
@@ -37,9 +35,9 @@ public class UninstallHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        assertTrue(po.getLog().contains(config.getServer().getHostname()));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
+        Assert.assertTrue(po.getLog().contains(config.getServer().getHostname()));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
 }

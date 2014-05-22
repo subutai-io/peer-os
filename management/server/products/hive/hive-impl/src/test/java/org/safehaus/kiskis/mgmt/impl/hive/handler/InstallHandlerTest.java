@@ -1,7 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
@@ -36,9 +35,9 @@ public class InstallHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("exists"));
-        assertTrue(po.getLog().toLowerCase().contains(config.getClusterName()));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("exists"));
+        Assert.assertTrue(po.getLog().contains(config.getClusterName()));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
     @Test
@@ -51,9 +50,9 @@ public class InstallHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        assertTrue(po.getLog().contains(config.getServer().getHostname()));
-        assertEquals(po.getState(), ProductOperationState.FAILED);
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
+        Assert.assertTrue(po.getLog().contains(config.getServer().getHostname()));
+        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
 }
