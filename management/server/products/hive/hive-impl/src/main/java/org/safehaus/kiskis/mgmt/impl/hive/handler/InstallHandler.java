@@ -5,31 +5,28 @@ import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.CommandType;
 import org.safehaus.kiskis.mgmt.impl.hive.Commands;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.impl.hive.Product;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
     private final Config config;
-    private final ProductOperation po;
 
     public InstallHandler(HiveImpl manager, Config config) {
         super(manager, config.getClusterName());
         this.config = config;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY,
                 "Installing cluster " + config.getClusterName());
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
     public void run() {
+        ProductOperation po = productOperation;
         if(manager.getCluster(clusterName) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     clusterName));
@@ -53,7 +50,7 @@ public class InstallHandler extends AbstractHandler {
         String s = Commands.make(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s),
-                new HashSet<Agent>(Arrays.asList(config.getServer())));
+                new HashSet<>(Arrays.asList(config.getServer())));
         manager.getCommandRunner().runCommand(cmd);
 
         if(!cmd.hasCompleted()) {
@@ -99,7 +96,7 @@ public class InstallHandler extends AbstractHandler {
                 s = Commands.make(CommandType.INSTALL, Product.HIVE);
                 cmd = manager.getCommandRunner().createCommand(
                         new RequestBuilder(s).withTimeout(120),
-                        new HashSet<Agent>(Arrays.asList(config.getServer())));
+                        new HashSet<>(Arrays.asList(config.getServer())));
                 manager.getCommandRunner().runCommand(cmd);
                 if(!cmd.hasSucceeded()) {
                     po.addLogFailed(cmd.getAllErrors());
@@ -110,7 +107,7 @@ public class InstallHandler extends AbstractHandler {
                 s = Commands.make(CommandType.INSTALL, Product.DERBY);
                 cmd = manager.getCommandRunner().createCommand(
                         new RequestBuilder(s).withTimeout(120),
-                        new HashSet<Agent>(Arrays.asList(config.getServer())));
+                        new HashSet<>(Arrays.asList(config.getServer())));
                 manager.getCommandRunner().runCommand(cmd);
                 if(!cmd.hasSucceeded()) {
                     po.addLogFailed(cmd.getAllErrors());
@@ -120,7 +117,7 @@ public class InstallHandler extends AbstractHandler {
             // configure Hive server
             s = Commands.configureHiveServer(config.getServer().getListIP().get(0));
             cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
-                    new HashSet<Agent>(Arrays.asList(config.getServer())));
+                    new HashSet<>(Arrays.asList(config.getServer())));
             manager.getCommandRunner().runCommand(cmd);
             if(!cmd.hasSucceeded()) {
                 po.addLogFailed("Failed to configure Hive server");
@@ -135,7 +132,7 @@ public class InstallHandler extends AbstractHandler {
             manager.getCommandRunner().runCommand(cmd);
 
             if(cmd.hasCompleted()) {
-                List<Agent> readyClients = new ArrayList<Agent>();
+                List<Agent> readyClients = new ArrayList<>();
                 for(Agent a : config.getClients()) {
                     res = cmd.getResults().get(a.getUuid());
                     if(isZero(res.getExitCode())) {
@@ -148,7 +145,7 @@ public class InstallHandler extends AbstractHandler {
                     s = Commands.configureClient(config.getServer());
                     cmd = manager.getCommandRunner().createCommand(
                             new RequestBuilder(s),
-                            new HashSet<Agent>(readyClients));
+                            new HashSet<>(readyClients));
                     manager.getCommandRunner().runCommand(cmd);
                     for(Agent a : readyClients) {
                         res = cmd.getResults().get(a.getUuid());

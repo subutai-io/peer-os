@@ -2,31 +2,26 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.commandrunner.*;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hive.*;
+import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 public class StartHandler extends AbstractHandler {
 
     private final String hostname;
-    private final ProductOperation po;
 
     public StartHandler(HiveImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
         this.hostname = hostname;
-        this.po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-                "Start node " + hostname);
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_KEY, "Start node " + hostname);
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist",
@@ -47,7 +42,7 @@ public class StartHandler extends AbstractHandler {
             String s = Commands.make(CommandType.START, Product.DERBY);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             AgentResult res = cmd.getResults().get(agent.getUuid());
@@ -61,7 +56,7 @@ public class StartHandler extends AbstractHandler {
             String s = Commands.make(CommandType.START, Product.HIVE);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60),
-                    new HashSet<Agent>(Arrays.asList(agent)));
+                    new HashSet<>(Arrays.asList(agent)));
             manager.getCommandRunner().runCommand(cmd);
 
             AgentResult res = cmd.getResults().get(agent.getUuid());
