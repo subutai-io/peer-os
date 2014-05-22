@@ -67,7 +67,7 @@ public class AddNodeHandler extends AbstractHandler {
             if(!skipInstall) {
                 s = Commands.make(CommandType.INSTALL, Product.HIVE);
                 cmd = manager.getCommandRunner().createCommand(
-                        new RequestBuilder(s), set);
+                        new RequestBuilder(s).withTimeout(120), set);
                 manager.getCommandRunner().runCommand(cmd);
                 installed = cmd.hasSucceeded();
                 if(installed)
