@@ -1,5 +1,6 @@
 package org.safehaus.kiskis.mgmt.shared.protocol.settings;
 
+
 public class Common {
 
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
@@ -8,6 +9,9 @@ public class Common {
     public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 90;
     public static final int AGENT_FRESHNESS_MIN = 5;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
+    public static final int INACTIVE_COMMAND_DROP_TIMEOUT_SEC = 24 * 60 * 60; // 24 hours
     public static final String IP_MASK = "^10\\.10\\.10\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$";
-    public static final String HOSTNAME_REGEX = "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9]))*$";
+    public static final String HOSTNAME_REGEX =
+            "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0," +
+                    "61}[a-zA-Z0-9]))*$";
 }

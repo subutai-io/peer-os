@@ -18,6 +18,7 @@ import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
 import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
@@ -114,13 +115,14 @@ public class CommandRunnerImplUT {
 
         Command command = MockUtils.getCommand( "ls", commandRunner, UUID.randomUUID(), 1 );
 
-        commandRunner.runCommand( command );
+        commandRunner.runCommandAsync( command );
 
         verify( communicationManager ).sendRequest( any( Request.class ) );
     }
 
 
     @Test
+    @Ignore
     public void commandShouldTimeout() {
         Assume.assumeTrue( allTests );
 
@@ -133,6 +135,7 @@ public class CommandRunnerImplUT {
 
 
     @Test
+    @Ignore
     public void commandShouldTimeoutAsync() {
         Assume.assumeTrue( allTests );
 
