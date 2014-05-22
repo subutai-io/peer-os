@@ -13,11 +13,19 @@ then
 	rm -r /opt/$cassVer
 fi
 
-if [ -f "/etc/profile.d/cassandra-home.sh" ];
+if grep -q "CASSANDRA_HOME=" $FilePath
 then
-        rm /etc/profile.d/cassandra-home.sh
+        sed -i "/export CASSANDRA_HOME=$cassandraHome/d" $FilePath
 fi
 
+if grep -q "export PATH=" $FilePath
+then
+        if grep -q "${cassandraPath}" $FilePath
+        then
+                sed -i "s/$cassandraPath://g" $FilePath
+                sed -i "s/:$cassandraPath//g" $FilePath
+        fi
+fi
 
 if [ -f "/etc/init.d/cassandra" ]; 
 then 
