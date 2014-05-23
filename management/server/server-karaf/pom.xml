@@ -1085,6 +1085,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <finalName>subutai</finalName>
                             <descriptors>
                                 <descriptor>src/main/descriptors/bin.xml</descriptor>
                             </descriptors>
