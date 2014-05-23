@@ -507,10 +507,15 @@ int main(int argc,char *argv[],char *envp[])
 	umask(0);
 
 	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
+	boost::posix_time::ptime startQueue = boost::posix_time::second_clock::local_time();
 	unsigned int exectimeout = 175; //180 seconds for HeartBeat Default Timeout
+	unsigned int queuetimeout = 30; //30 seconds for In Queue Default Timeout
 	unsigned int startsec  =  start.time_of_day().seconds();
+	unsigned int startsecQueue  =  start.time_of_day().seconds();
 	bool overflag = false;
+	bool overflagQueue = false;
 	unsigned int count = 1;
+	unsigned int countQueue = 1;
 	list<int> pidList;
 	int ncores = -1;
 	ncores = sysconf(_SC_NPROCESSORS_CONF);
@@ -540,6 +545,29 @@ int main(int argc,char *argv[],char *envp[])
 				exectimeout = 175;
 				count = 1;
 			}
+			if(checkExecutionTimeout(&startsecQueue,&overflagQueue,&queuetimeout,&countQueue)) //checking IN_QUEUE Default Timeout
+			{
+				//timeout occured!!
+				response.clear();
+				ifstream queueFile("/etc/ksks-agent/config/commandQueue.txt");
+				string queueElement;
+				if(queueFile.peek()!=ifstream::traits_type::eof())
+				{
+					while(getline(queueFile,queueElement))
+					{
+						command.deserialize(queueElement);
+						string resp = response.createInQueueMessage(Uuid,command.getTaskUuid());
+						connection.sendMessage(resp);
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","IN_QUEUE Response:", resp));
+					}
+				}
+				queueFile.close();
+				startQueue = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Default Timeout values
+				startsecQueue  =  startQueue.time_of_day().seconds();
+				overflagQueue = false;
+				queuetimeout = 30;
+				countQueue = 1;
+			}
 			usleep(20000);//20 ms delay for the main loop
 			command.clear();
 			for(list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
@@ -548,13 +576,8 @@ int main(int argc,char *argv[],char *envp[])
 				{
 					int status;
 					pid_t result = waitpid(*iter,&status,WNOHANG);
-					if(result == 0)
+					if(result != 0)
 					{
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Process continue! PID:",toString(*iter),"total running:",toString(currentProcess)));
-					}
-					else
-					{
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Process finished! PID:",toString(*iter),"total running:",toString(currentProcess)));
 						iter = pidList.erase(iter);
 						currentProcess--;
 					}
@@ -562,6 +585,7 @@ int main(int argc,char *argv[],char *envp[])
 			}
 			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
 			{
+				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","total running process:",toString(currentProcess)));
 				if(command.deserialize(input))
 				{
 					logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
