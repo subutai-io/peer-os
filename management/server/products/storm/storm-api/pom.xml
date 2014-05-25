@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>storm-parent</artifactId>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <version>2.0.0</version>
     </parent>
     

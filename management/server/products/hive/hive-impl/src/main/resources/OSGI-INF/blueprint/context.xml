@@ -2,15 +2,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>    
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>    
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>    
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/> 
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     
-    <bean id="hive-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.hive.HiveImpl"
+    <bean id="hive-impl" scope="singleton" class="org.safehaus.subutai.impl.hive.HiveImpl"
           init-method="init" destroy-method="destroy">
         <property name="commandRunner" ref="commandRunner"/>
         <property name="agentManager" ref="agentManager"/>
@@ -18,6 +18,6 @@
         <property name="dbManager" ref="dbManager" />
     </bean>    
        
-    <service ref="hive-impl" interface="org.safehaus.kiskis.mgmt.api.hive.Hive"/>
+    <service ref="hive-impl" interface="org.safehaus.subutai.api.hive.Hive"/>
     
 </blueprint>

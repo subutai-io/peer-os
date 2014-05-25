@@ -2,11 +2,11 @@
     >
 
   <reference id="accumuloManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.accumulo.Accumulo" />
+             interface="org.safehaus.subutai.api.accumulo.Accumulo" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="accumulo/list-clusters">
-      <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+      <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
         <property name="accumuloManager" ref="accumuloManager" />
       </action>
     </command>

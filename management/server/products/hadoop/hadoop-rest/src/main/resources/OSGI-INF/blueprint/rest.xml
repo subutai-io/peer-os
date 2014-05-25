@@ -16,9 +16,9 @@
             <ref component-id="hadoopRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="hadoopRestServiceImpl" class="org.safehaus.kiskis.mgmt.hadoop.services.RestServiceImpl">
+    <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.hadoop.services.RestServiceImpl">
         <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
 </blueprint>

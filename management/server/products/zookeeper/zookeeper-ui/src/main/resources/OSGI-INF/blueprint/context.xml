@@ -3,15 +3,15 @@
 
 
     <reference id="manager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.zookeeper.ZookeeperUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.zookeeper.ZookeeperUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="tracker"/>
@@ -19,6 +19,6 @@
         <argument ref="hadoopManager"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
 
 </blueprint>

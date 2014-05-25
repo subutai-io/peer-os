@@ -6,23 +6,23 @@
 	 	http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 	 	http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0 http://svn.apache.org/repos/asf/aries/trunk/blueprint/blueprint-cm/src/main/resources/org/apache/aries/blueprint/compendium/cm/blueprint-cm-1.1.0.xsd
 	 ">
-    <cm:property-placeholder persistent-id="org.safehaus.kiskis.mgmt.server.ui" update-strategy="reload">
+    <cm:property-placeholder persistent-id="org.safehaus.subutai.server.ui" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="title" value="Subutai Administration"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="moduleNotifier" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier"/>
+               interface="org.safehaus.subutai.server.ui.services.ModuleNotifier"/>
 
     <bean id="appFactory" scope="singleton" init-method="init" destroy-method="destroy"
-          class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
+          class="org.safehaus.subutai.server.ui.MgmtAppFactory">
         <argument value="${title}"/>
         <argument ref="agentManager"/>
         <argument ref="commandRunner"/>
@@ -30,7 +30,7 @@
         <argument ref="moduleNotifier"/>
     </bean>
 
-    <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
+    <service ref="appFactory" interface="org.safehaus.subutai.server.ui.bridge.ApplicationFactory">
         <service-properties>
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>

@@ -16,9 +16,9 @@
             <ref component-id="sparkRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="sparkRestServiceImpl" class="org.safehaus.kiskis.mgmt.spark.services.RestServiceImpl">
+    <bean id="sparkRestServiceImpl" class="org.safehaus.subutai.spark.services.RestServiceImpl">
         <property name="sparkManager" ref="sparkManager"/>
     </bean>
     <reference id="sparkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.spark.Spark"/>
+               interface="org.safehaus.subutai.api.spark.Spark"/>
 </blueprint>

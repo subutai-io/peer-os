@@ -16,9 +16,9 @@
             <ref component-id="solrRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="solrRestServiceImpl" class="org.safehaus.kiskis.mgmt.solr.services.RestServiceImpl">
+    <bean id="solrRestServiceImpl" class="org.safehaus.subutai.solr.services.RestServiceImpl">
         <property name="solrManager" ref="solrManager"/>
     </bean>
     <reference id="solrManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.solr.Solr"/>
+               interface="org.safehaus.subutai.api.solr.Solr"/>
 </blueprint>

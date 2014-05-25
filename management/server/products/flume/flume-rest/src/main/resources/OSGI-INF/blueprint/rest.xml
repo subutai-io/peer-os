@@ -16,10 +16,10 @@
             <ref component-id="flumeRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="flumeRestServiceImpl" class="org.safehaus.kiskis.mgmt.flume.services.RestServiceImpl">
+    <bean id="flumeRestServiceImpl" class="org.safehaus.subutai.flume.services.RestServiceImpl">
         <property name="flumeManager" ref="flumeManager"/>
     </bean>
 
     <reference id="flumeManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.flume.Flume"/>
+               interface="org.safehaus.subutai.api.flume.Flume"/>
 </blueprint>

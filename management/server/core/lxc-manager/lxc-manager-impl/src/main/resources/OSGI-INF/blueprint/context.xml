@@ -2,19 +2,19 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner" />
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager" />
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="monitor" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.monitor.Monitor" />
+             interface="org.safehaus.subutai.api.monitor.Monitor" />
 
-  <bean id="lxcmanager" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.lxcmanager.LxcManagerImpl"
+  <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.lxcmanager.LxcManagerImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="agentManager" />
     <argument ref="commandRunner" />
     <argument ref="monitor" />
   </bean>
 
-  <service ref="lxcmanager" interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager" />
+  <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
 
 </blueprint>

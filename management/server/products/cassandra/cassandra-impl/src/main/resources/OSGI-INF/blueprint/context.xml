@@ -2,19 +2,19 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
+               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
     <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
+               interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner" />
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager" />
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
-    <bean id="cassandra-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.cassandra.CassandraImpl"
+    <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.impl.cassandra.CassandraImpl"
           init-method="init" destroy-method="destroy">
         <property name="tracker" ref="tracker"/>
         <property name="dbManager" ref="dbManager"/>
@@ -24,6 +24,6 @@
         <property name="agentManager" ref="agentManager"/>
     </bean>
 
-    <service ref="cassandra-impl" interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>
+    <service ref="cassandra-impl" interface="org.safehaus.subutai.api.cassandra.Cassandra"/>
 
 </blueprint>
