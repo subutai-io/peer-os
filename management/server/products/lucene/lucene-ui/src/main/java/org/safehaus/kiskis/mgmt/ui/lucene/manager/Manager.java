@@ -125,7 +125,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig = LuceneUI.getHadoopManager().getCluster(config.getClusterName());
+                    org.safehaus.subutai.api.hadoop.Config hadoopConfig = LuceneUI.getHadoopManager().getCluster(config.getClusterName());
                     if (hadoopConfig != null) {
                         Set<Agent> nodes = new HashSet<Agent>(hadoopConfig.getAllNodes());
                         nodes.removeAll(config.getNodes());

@@ -181,7 +181,7 @@ public class Manager {
                                 }
                         );
                     } else {
-                        org.safehaus.kiskis.mgmt.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
+                        org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
                         if (info != null) {
                             Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());

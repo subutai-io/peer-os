@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.oozie;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.oozie.Config;
 import org.safehaus.kiskis.mgmt.api.oozie.Oozie;
 import org.safehaus.subutai.api.tracker.Tracker;

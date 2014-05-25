@@ -10,7 +10,7 @@
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.api.tracker.Tracker" />
   <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop" />
+             interface="org.safehaus.subutai.api.hadoop.Hadoop" />
   <reference id="zookeeperManager" availability="mandatory"
              interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper" />
 

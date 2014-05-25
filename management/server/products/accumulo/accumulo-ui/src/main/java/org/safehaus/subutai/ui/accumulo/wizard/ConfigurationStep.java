@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.accumulo.AccumuloUI;
@@ -58,13 +59,13 @@ public class ConfigurationStep extends Panel {
                 UiUtil.getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
 
         //get hadoop clusters from db
-        List<org.safehaus.kiskis.mgmt.api.hadoop.Config> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
+        List<Config> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
         final List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters =
                 AccumuloUI.getZookeeperManager().getClusters();
-        Set<org.safehaus.kiskis.mgmt.api.hadoop.Config> filteredHadoopClusters = new HashSet<>();
+        Set<Config> filteredHadoopClusters = new HashSet<>();
 
         //filter out those hadoop clusters which have zk clusters installed on top
-        for ( org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopClusterInfo : hadoopClusters ) {
+        for ( Config hadoopClusterInfo : hadoopClusters ) {
             for ( org.safehaus.kiskis.mgmt.api.zookeeper.Config zkClusterInfo : zkClusters ) {
                 if ( hadoopClusterInfo.getClusterName().equals( zkClusterInfo.getClusterName() ) && !zkClusterInfo
                         .isStandalone() ) {
@@ -76,14 +77,14 @@ public class ConfigurationStep extends Panel {
 
         //fill hadoopClustersCombo with hadoop cluster infos
         if ( filteredHadoopClusters.size() > 0 ) {
-            for ( org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopClusterInfo : filteredHadoopClusters ) {
+            for ( Config hadoopClusterInfo : filteredHadoopClusters ) {
                 hadoopClustersCombo.addItem( hadoopClusterInfo );
                 hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
         //try to find hadoop cluster info based on one saved in the configuration
-        org.safehaus.kiskis.mgmt.api.hadoop.Config info =
+        Config info =
                 AccumuloUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         //select if saved found
@@ -99,8 +100,8 @@ public class ConfigurationStep extends Panel {
 
         //fill selection controls with hadoop nodes
         if ( hadoopClustersCombo.getValue() != null ) {
-            org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo =
-                    ( org.safehaus.kiskis.mgmt.api.hadoop.Config ) hadoopClustersCombo.getValue();
+            Config hadoopInfo =
+                    (Config) hadoopClustersCombo.getValue();
 
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
 
@@ -116,8 +117,8 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo =
-                            ( org.safehaus.kiskis.mgmt.api.hadoop.Config ) event.getProperty().getValue();
+                    Config hadoopInfo =
+                            (Config) event.getProperty().getValue();
                     setComboDS( masterNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
                     setComboDS( gcNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
                     setComboDS( monitorNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
@@ -149,8 +150,8 @@ public class ConfigurationStep extends Panel {
                 if ( event.getProperty().getValue() != null ) {
                     Agent masterNode = ( Agent ) event.getProperty().getValue();
                     wizard.getConfig().setMasterNode( masterNode );
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo =
-                            ( org.safehaus.kiskis.mgmt.api.hadoop.Config ) hadoopClustersCombo.getValue();
+                    Config hadoopInfo =
+                            (Config) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( masterNode );
                     gcNodeCombo.removeListener( gcNodeComboChangeListener );
@@ -173,8 +174,8 @@ public class ConfigurationStep extends Panel {
                 if ( event.getProperty().getValue() != null ) {
                     Agent gcNode = ( Agent ) event.getProperty().getValue();
                     wizard.getConfig().setGcNode( gcNode );
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo =
-                            ( org.safehaus.kiskis.mgmt.api.hadoop.Config ) hadoopClustersCombo.getValue();
+                    Config hadoopInfo =
+                            (Config) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( gcNode );
                     masterNodeCombo.removeListener( masterNodeComboChangeListener );
@@ -337,7 +338,7 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private List<Agent> filterAgents( org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopInfo,
+    private List<Agent> filterAgents( Config hadoopInfo,
                                       List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters ) {
 
         List<Agent> filteredAgents = new ArrayList<>();

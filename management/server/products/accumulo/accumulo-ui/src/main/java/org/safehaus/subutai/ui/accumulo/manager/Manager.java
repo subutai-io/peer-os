@@ -186,7 +186,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( config != null ) {
 
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig =
+                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
                     org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
@@ -234,7 +234,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( config != null ) {
 
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig =
+                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
                     org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );

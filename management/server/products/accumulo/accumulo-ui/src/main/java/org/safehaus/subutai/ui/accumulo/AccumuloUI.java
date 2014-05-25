@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.accumulo.Accumulo;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.services.Module;

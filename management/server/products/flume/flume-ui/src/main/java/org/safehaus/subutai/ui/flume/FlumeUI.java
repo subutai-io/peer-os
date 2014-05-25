@@ -4,7 +4,7 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.api.flume.Flume;
-import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
+import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.services.Module;
 

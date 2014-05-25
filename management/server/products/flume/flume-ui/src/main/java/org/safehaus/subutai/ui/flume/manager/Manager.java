@@ -115,7 +115,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    org.safehaus.kiskis.mgmt.api.hadoop.Config info = FlumeUI.getHadoopManager().getCluster(config.getClusterName());
+                    org.safehaus.subutai.api.hadoop.Config info = FlumeUI.getHadoopManager().getCluster(config.getClusterName());
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());

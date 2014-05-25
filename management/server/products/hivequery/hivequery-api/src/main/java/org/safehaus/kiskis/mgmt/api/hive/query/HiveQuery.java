@@ -14,5 +14,5 @@ public interface HiveQuery extends ApiBase<Config> {
 
     public List<Config> load();
 
-    public List<org.safehaus.kiskis.mgmt.api.hadoop.Config> getHadoopClusters();
+    public List<org.safehaus.subutai.api.hadoop.Config> getHadoopClusters();
 }

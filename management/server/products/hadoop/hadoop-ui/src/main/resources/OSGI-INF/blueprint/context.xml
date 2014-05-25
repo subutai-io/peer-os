@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.hadoop.HadoopUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
         <property name="hadoopManager" ref="hadoopManager"/>

@@ -121,7 +121,7 @@ public class Manager {
                     return;
                 }
 
-                org.safehaus.kiskis.mgmt.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
+                org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
                         config.getClusterName());
                 if (hci == null) {
                     show("Hadoop cluster info not found");

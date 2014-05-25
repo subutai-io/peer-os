@@ -53,7 +53,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        org.safehaus.kiskis.mgmt.api.hadoop.Config hadoopConfig =
+        org.safehaus.subutai.api.hadoop.Config hadoopConfig =
                 manager.getHadoopManager().getCluster( config.getClusterName() );
 
         if ( hadoopConfig == null ) {

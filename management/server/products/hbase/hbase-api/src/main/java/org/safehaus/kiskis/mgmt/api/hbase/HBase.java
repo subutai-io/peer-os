@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.api.hbase;
 
 
-import org.safehaus.kiskis.mgmt.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public interface HBase extends ApiBase<HBaseConfig>
 
     public List<HBaseConfig> getClusters();
 
-    List<org.safehaus.kiskis.mgmt.api.hadoop.Config> getHadoopClusters();
+    List<Config> getHadoopClusters();
 
     Config getHadoopCluster( String clusterName );
 }
