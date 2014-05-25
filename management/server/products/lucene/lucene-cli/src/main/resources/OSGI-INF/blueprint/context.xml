@@ -2,7 +2,7 @@
         >
 
     <reference id="luceneManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lucene.Lucene"/>
+               interface="org.safehaus.subutai.api.lucene.Lucene"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="lucene/list-clusters">

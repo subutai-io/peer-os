@@ -16,9 +16,9 @@
             <ref component-id="luceneRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="luceneRestServiceImpl" class="org.safehaus.kiskis.mgmt.lucene.services.RestServiceImpl">
+    <bean id="luceneRestServiceImpl" class="org.safehaus.subutai.lucene.services.RestServiceImpl">
         <property name="luceneManager" ref="luceneManager"/>
     </bean>
     <reference id="luceneManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lucene.Lucene"/>
+               interface="org.safehaus.subutai.api.lucene.Lucene"/>
 </blueprint>
