@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.hbase;
+package org.safehaus.subutai.impl.hbase;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;

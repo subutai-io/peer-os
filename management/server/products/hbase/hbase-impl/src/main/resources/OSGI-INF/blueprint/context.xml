@@ -12,7 +12,7 @@
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
-    <bean id="hbase-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.hbase.HBaseImpl"
+    <bean id="hbase-impl" scope="singleton" class="org.safehaus.subutai.impl.hbase.HBaseImpl"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>
