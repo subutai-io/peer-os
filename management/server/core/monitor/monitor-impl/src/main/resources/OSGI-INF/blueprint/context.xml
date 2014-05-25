@@ -3,6 +3,6 @@
 
     <bean id="monitor-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.monitor.MonitorImpl"/>
 
-    <service ref="monitor-impl" interface="org.safehaus.kiskis.mgmt.api.monitor.Monitor"/>
+    <service ref="monitor-impl" interface="org.safehaus.subutai.api.monitor.Monitor"/>
 
 </blueprint>

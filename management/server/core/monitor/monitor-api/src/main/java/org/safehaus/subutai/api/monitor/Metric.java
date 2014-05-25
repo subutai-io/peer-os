@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.api.monitor;
+package org.safehaus.subutai.api.monitor;
 
 public enum Metric {
 

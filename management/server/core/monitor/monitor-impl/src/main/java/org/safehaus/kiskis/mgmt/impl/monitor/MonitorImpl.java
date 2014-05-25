@@ -2,8 +2,8 @@ package org.safehaus.kiskis.mgmt.impl.monitor;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.safehaus.kiskis.mgmt.api.monitor.Metric;
-import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
+import org.safehaus.subutai.api.monitor.Metric;
+import org.safehaus.subutai.api.monitor.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

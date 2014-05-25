@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
+import org.safehaus.subutai.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 public class MonitorModule implements Module {

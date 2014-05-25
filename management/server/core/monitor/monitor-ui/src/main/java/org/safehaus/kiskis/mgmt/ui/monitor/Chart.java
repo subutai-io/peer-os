@@ -2,7 +2,7 @@
 package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.ui.Window;
-import org.safehaus.kiskis.mgmt.api.monitor.Metric;
+import org.safehaus.subutai.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.ui.monitor.util.FileUtil;
 import org.safehaus.kiskis.mgmt.ui.monitor.util.JavaScript;
 

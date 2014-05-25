@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="monitor" availability="mandatory" interface="org.safehaus.kiskis.mgmt.api.monitor.Monitor"/>
+    <reference id="monitor" availability="mandatory" interface="org.safehaus.subutai.api.monitor.Monitor"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.monitor.MonitorModule">
         <property name="monitor" ref="monitor"/>
