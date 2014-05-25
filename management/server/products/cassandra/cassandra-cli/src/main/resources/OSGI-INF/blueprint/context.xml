@@ -4,7 +4,7 @@
     <reference id="cassandraManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.cassandra.Cassandra"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
 

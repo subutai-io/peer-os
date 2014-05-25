@@ -7,7 +7,7 @@ import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 
 import java.io.IOException;
 import java.util.UUID;

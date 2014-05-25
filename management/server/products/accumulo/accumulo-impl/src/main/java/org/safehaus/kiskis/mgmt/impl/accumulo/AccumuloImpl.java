@@ -13,7 +13,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.AddPropertyOperationHandler;

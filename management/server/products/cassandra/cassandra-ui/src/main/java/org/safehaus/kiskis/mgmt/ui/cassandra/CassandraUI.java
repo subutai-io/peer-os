@@ -9,7 +9,7 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.cassandra.Cassandra;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;

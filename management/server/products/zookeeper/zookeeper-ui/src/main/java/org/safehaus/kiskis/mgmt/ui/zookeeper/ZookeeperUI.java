@@ -8,7 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.zookeeper;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;

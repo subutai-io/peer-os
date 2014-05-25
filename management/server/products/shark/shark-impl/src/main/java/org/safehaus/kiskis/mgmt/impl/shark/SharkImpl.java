@@ -12,7 +12,7 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.shark.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 

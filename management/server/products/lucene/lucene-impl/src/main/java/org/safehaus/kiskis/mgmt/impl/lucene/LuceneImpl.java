@@ -8,7 +8,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.api.lucene.Lucene;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.DestroyNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.lucene.handler.InstallOperationHandler;

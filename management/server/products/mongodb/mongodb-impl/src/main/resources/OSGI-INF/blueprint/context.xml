@@ -10,7 +10,7 @@
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
 
     <bean id="mongo-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl"
           init-method="init" destroy-method="destroy">

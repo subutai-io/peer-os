@@ -6,7 +6,7 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>                   
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
         
     <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI"
           init-method="init" destroy-method="destroy">

@@ -4,7 +4,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

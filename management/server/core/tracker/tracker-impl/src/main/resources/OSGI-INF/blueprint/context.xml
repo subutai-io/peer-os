@@ -9,6 +9,6 @@
     <property name="dbManager" ref="dbManager" />
   </bean>
 
-  <service ref="tracker" interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker" />
+  <service ref="tracker" interface="org.safehaus.subutai.api.tracker.Tracker" />
 
 </blueprint>

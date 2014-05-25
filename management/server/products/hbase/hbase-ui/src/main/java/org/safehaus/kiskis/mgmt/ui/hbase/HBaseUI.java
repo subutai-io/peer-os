@@ -11,7 +11,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 //import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;

@@ -10,7 +10,7 @@ import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
 import org.safehaus.kiskis.mgmt.api.hbase.HBase;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.HashSet;
