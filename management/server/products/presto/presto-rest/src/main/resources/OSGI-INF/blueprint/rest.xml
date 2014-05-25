@@ -16,9 +16,9 @@
             <ref component-id="prestoRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="prestoRestServiceImpl" class="org.safehaus.kiskis.mgmt.presto.services.RestServiceImpl">
+    <bean id="prestoRestServiceImpl" class="org.safehaus.subutai.presto.services.RestServiceImpl">
         <property name="prestoManager" ref="prestoManager"/>
     </bean>
     <reference id="prestoManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.presto.Presto"/>
+               interface="org.safehaus.subutai.api.presto.Presto"/>
 </blueprint>
