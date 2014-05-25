@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.services.Module;
 
 import com.vaadin.ui.Component;
 

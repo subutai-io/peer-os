@@ -14,7 +14,7 @@ import com.vaadin.ui.Panel;
 import java.util.UUID;
 
 import org.safehaus.kiskis.mgmt.api.presto.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 

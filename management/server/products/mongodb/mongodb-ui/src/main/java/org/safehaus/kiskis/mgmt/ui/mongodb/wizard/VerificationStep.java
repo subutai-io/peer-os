@@ -12,7 +12,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**

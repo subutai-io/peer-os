@@ -8,8 +8,8 @@ package org.safehaus.subutai.u.lxcmanager;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtAgentManager;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.u.lxcmanager.clone.Cloner;
 import org.safehaus.subutai.u.lxcmanager.manage.Manager;

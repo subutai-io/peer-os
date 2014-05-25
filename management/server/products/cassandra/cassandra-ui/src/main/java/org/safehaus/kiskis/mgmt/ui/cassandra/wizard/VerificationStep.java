@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.cassandra.wizard;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.cassandra.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.ui.cassandra.CassandraUI;
 
 import java.util.UUID;

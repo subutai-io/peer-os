@@ -44,7 +44,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}.server.ui.bridge</Bundle-SymbolicName>
-                        <Bundle-Activator>org.safehaus.kiskis.mgmt.server.ui.bridge.internal.VaadinBridgeActivator
+                        <Bundle-Activator>org.safehaus.subutai.server.ui.bridge.internal.VaadinBridgeActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

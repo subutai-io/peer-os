@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.wizard;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 
 import java.util.UUID;

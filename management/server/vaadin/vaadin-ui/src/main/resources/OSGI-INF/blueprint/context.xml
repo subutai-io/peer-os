@@ -19,10 +19,10 @@
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="moduleNotifier" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier"/>
+               interface="org.safehaus.subutai.server.ui.services.ModuleNotifier"/>
 
     <bean id="appFactory" scope="singleton" init-method="init" destroy-method="destroy"
-          class="org.safehaus.kiskis.mgmt.server.ui.MgmtAppFactory">
+          class="org.safehaus.subutai.server.ui.MgmtAppFactory">
         <argument value="${title}"/>
         <argument ref="agentManager"/>
         <argument ref="commandRunner"/>
@@ -30,7 +30,7 @@
         <argument ref="moduleNotifier"/>
     </bean>
 
-    <service ref="appFactory" interface="org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory">
+    <service ref="appFactory" interface="org.safehaus.subutai.server.ui.bridge.ApplicationFactory">
         <service-properties>
             <entry key="alias" value="/mgmt-ui"/>
         </service-properties>

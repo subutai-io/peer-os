@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.safehaus.kiskis.mgmt.server.ui.services.MainUISelectedTabChangeListener;
+import org.safehaus.subutai.server.ui.services.MainUISelectedTabChangeListener;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 

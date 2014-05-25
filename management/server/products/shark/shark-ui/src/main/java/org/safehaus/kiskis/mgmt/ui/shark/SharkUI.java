@@ -11,7 +11,7 @@ import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.services.Module;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

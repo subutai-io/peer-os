@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
 
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
-import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.ConfirmationDialogCallback;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;

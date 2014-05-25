@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.spark.wizard;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.spark.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.spark.SparkUI;
 

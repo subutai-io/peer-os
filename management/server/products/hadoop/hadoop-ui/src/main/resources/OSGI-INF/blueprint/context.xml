@@ -15,6 +15,6 @@
         <property name="tracker" ref="tracker"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
 
 </blueprint>

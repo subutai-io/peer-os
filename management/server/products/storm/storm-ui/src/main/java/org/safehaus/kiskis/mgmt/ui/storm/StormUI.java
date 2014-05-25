@@ -8,7 +8,7 @@ import org.safehaus.kiskis.mgmt.api.storm.Config;
 import org.safehaus.kiskis.mgmt.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.services.Module;
 
 public class StormUI implements Module {
 

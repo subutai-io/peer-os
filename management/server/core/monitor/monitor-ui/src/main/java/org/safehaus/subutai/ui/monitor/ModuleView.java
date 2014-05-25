@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.safehaus.subutai.api.monitor.Metric;
 import org.safehaus.subutai.api.monitor.Monitor;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtAgentManager;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.monitor.util.UIUtil;
 

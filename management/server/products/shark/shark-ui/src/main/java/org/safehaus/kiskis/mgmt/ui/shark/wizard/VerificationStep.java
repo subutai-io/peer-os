@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.shark.wizard;
 
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
-import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.shark.SharkUI;
 
