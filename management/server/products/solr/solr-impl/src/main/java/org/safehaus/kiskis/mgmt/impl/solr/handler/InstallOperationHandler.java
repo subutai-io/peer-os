@@ -4,8 +4,8 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 import com.google.common.base.Strings;
 
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;

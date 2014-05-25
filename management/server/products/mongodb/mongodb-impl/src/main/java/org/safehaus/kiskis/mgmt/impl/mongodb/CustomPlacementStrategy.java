@@ -1,8 +1,12 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb;
 
 import java.util.*;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
+
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {

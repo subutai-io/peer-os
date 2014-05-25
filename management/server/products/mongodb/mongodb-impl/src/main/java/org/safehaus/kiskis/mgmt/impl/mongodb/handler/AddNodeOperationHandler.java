@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.subutai.shared.operation.ProductOperation;

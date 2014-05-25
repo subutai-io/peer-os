@@ -10,7 +10,7 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
+               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
     <reference id="networkManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
 

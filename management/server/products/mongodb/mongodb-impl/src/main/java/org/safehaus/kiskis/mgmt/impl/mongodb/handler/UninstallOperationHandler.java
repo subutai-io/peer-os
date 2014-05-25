@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.mongodb.handler;
 
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.mongodb.MongoImpl;

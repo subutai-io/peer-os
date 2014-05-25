@@ -4,7 +4,7 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="lxcManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager" />
+             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI"
         init-method="init" destroy-method="destroy">

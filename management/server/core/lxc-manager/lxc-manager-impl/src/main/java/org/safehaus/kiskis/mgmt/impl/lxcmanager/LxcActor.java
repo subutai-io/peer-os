@@ -8,7 +8,7 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 import java.util.concurrent.Callable;
 
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
 
 
 /**

@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.lxcmanager;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Disposable;

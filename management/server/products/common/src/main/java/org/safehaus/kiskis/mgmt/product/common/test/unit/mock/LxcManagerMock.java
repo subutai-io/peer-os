@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.api.lxcmanager.LxcState;
+import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 

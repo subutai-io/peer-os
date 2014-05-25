@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;

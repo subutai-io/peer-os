@@ -15,6 +15,6 @@
     <argument ref="monitor" />
   </bean>
 
-  <service ref="lxcmanager" interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager" />
+  <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
 
 </blueprint>

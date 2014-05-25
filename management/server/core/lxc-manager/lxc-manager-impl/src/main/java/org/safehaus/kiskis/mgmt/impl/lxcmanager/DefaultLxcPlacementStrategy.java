@@ -9,9 +9,9 @@ package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcCreateException;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
