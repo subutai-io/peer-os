@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.tracker;
+package org.safehaus.subutai.impl.tracker;
 
 
 import java.util.Date;
@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.impl.tracker.ProductOperationImpl;
+import org.safehaus.subutai.impl.tracker.TrackerImpl;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;

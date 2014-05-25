@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.tracker;
+package org.safehaus.subutai.impl.tracker;
 
 
 import java.io.ByteArrayOutputStream;
@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.impl.tracker.TrackerImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.dbmanager.DbManagerImpl;
