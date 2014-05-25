@@ -3,7 +3,7 @@
 
 
     <reference id="pigManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.pig.Pig"/>
+               interface="org.safehaus.subutai.api.pig.Pig"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="pig/list-clusters">

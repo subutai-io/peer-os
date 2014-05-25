@@ -16,9 +16,9 @@
             <ref component-id="pigRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="pigRestServiceImpl" class="org.safehaus.kiskis.mgmt.pig.services.RestServiceImpl">
+    <bean id="pigRestServiceImpl" class="org.safehaus.subutai.pig.services.RestServiceImpl">
         <property name="pigManager" ref="pigManager"/>
     </bean>
     <reference id="pigManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.pig.Pig"/>
+               interface="org.safehaus.subutai.api.pig.Pig"/>
 </blueprint>
