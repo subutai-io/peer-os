@@ -2,7 +2,7 @@
         >
 
     <reference id="hiveManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hive.Hive"/>
+               interface="org.safehaus.subutai.api.hive.Hive"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hive/list-clusters">
