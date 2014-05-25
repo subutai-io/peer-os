@@ -16,7 +16,7 @@
             <ref component-id="hbaseRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="hbaseRestServiceImpl" class="org.safehaus.kiskis.mgmt.hbase.services.RestServiceImpl">
+    <bean id="hbaseRestServiceImpl" class="org.safehaus.subutai.hbase.services.RestServiceImpl">
         <property name="hbaseManager" ref="hbaseManager"/>
     </bean>
     <reference id="hbaseManager" availability="mandatory"

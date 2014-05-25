@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.hbase.services;
+package org.safehaus.subutai.hbase.services;
 
 import org.safehaus.subutai.api.hbase.HBase;
 
