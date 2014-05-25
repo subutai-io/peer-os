@@ -16,9 +16,9 @@
             <ref component-id="zookeeperRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="zookeeperRestServiceImpl" class="org.safehaus.kiskis.mgmt.zookeeper.services.RestServiceImpl">
+    <bean id="zookeeperRestServiceImpl" class="org.safehaus.subutai.zookeeper.services.RestServiceImpl">
         <property name="zookeeperManager" ref="zookeeperManager"/>
     </bean>
     <reference id="zookeeperManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
 </blueprint>

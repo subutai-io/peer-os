@@ -188,7 +188,7 @@ public class Manager {
 
                     org.safehaus.subutai.api.hadoop.Config hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
-                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig =
+                    org.safehaus.subutai.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
                     if ( hadoopConfig != null ) {
                         if ( zkConfig != null ) {
@@ -236,7 +236,7 @@ public class Manager {
 
                     org.safehaus.subutai.api.hadoop.Config hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
-                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig =
+                    org.safehaus.subutai.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
                     if ( hadoopConfig != null ) {
                         if ( zkConfig != null ) {

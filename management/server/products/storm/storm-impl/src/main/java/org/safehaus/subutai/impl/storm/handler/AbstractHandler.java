@@ -68,7 +68,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
     }
 
     private String makeZookeeperServersList() {
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig
+        org.safehaus.subutai.api.zookeeper.Config zkConfig
                 = manager.getZookeeperManager().getCluster(clusterName);
         if(zkConfig == null) return null;
 

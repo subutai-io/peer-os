@@ -12,7 +12,7 @@
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
     
-    <bean id="impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.zookeeper.ZookeeperImpl"
+    <bean id="impl" scope="singleton" class="org.safehaus.subutai.impl.zookeeper.ZookeeperImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
         <argument ref="agentManager"/>
@@ -21,6 +21,6 @@
         <argument ref="lxcManager"/>
     </bean>    
        
-    <service ref="impl" interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+    <service ref="impl" interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
     
 </blueprint>

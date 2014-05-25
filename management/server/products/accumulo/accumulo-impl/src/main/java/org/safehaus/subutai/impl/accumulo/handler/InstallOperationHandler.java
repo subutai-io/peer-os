@@ -68,7 +68,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig =
+        org.safehaus.subutai.api.zookeeper.Config zkConfig =
                 manager.getZkManager().getCluster( config.getClusterName() );
 
         if ( zkConfig == null ) {

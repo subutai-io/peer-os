@@ -5,6 +5,8 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import java.util.*;
+
+import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.storm.StormUI;
@@ -39,8 +41,8 @@ public class NodeSelectionStep extends Panel {
                 masterNodeCombo.removeAllItems();
                 select.setValue(null);
                 if(e.getProperty().getValue() != null) {
-                    org.safehaus.kiskis.mgmt.api.zookeeper.Config zk;
-                    zk = (org.safehaus.kiskis.mgmt.api.zookeeper.Config)e.getProperty().getValue();
+                    Config zk;
+                    zk = (Config)e.getProperty().getValue();
                     for(Agent a : zk.getNodes()) {
                         masterNodeCombo.addItem(a);
                         masterNodeCombo.setItemCaption(a, a.getHostname());
@@ -59,10 +61,10 @@ public class NodeSelectionStep extends Panel {
             }
         });
 
-        List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zk_list
+        List<Config> zk_list
                 = StormUI.getZookeeper().getClusters();
         if(zk_list.size() > 0)
-            for(org.safehaus.kiskis.mgmt.api.zookeeper.Config zkc : zk_list) {
+            for(Config zkc : zk_list) {
                 zkClustersCombo.addItem(zkc);
                 zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
                 if(zkc.getClusterName().equals(wizard.getConfig().getClusterName()))
@@ -156,8 +158,8 @@ public class NodeSelectionStep extends Panel {
                 Agent serverNode = (Agent)event.getProperty().getValue();
                 wizard.getConfig().setNimbus(serverNode);
 
-                org.safehaus.kiskis.mgmt.api.zookeeper.Config zk;
-                zk = (org.safehaus.kiskis.mgmt.api.zookeeper.Config)zkClustersCombo.getValue();
+                Config zk;
+                zk = (Config)zkClustersCombo.getValue();
                 select.removeAllItems();
                 for(Agent a : zk.getNodes()) {
                     if(a.equals(serverNode)) continue;

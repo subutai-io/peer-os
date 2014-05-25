@@ -10,7 +10,7 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="zookeeperManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
     
     <bean id="storm-impl" scope="singleton" class="org.safehaus.subutai.impl.storm.StormImpl"
           init-method="init" destroy-method="destroy">

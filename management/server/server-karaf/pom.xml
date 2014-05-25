@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>mgmt-server-parent</artifactId>
         <version>2.0.0</version>
     </parent>
@@ -400,22 +400,22 @@
 
                                 <!-- Vaadin - START -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>ui-vaadin-bridge</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>ui-vaadin-services</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>ui-vaadin-theme</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>ui-vaadin</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -423,128 +423,128 @@
 
                                 <!-- Core Modules - START -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Tracker -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Command Runner -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Agent Manager -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>agent-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>agent-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>agent-manager-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- DB Manager -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>db-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>db-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Communication Manager -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>communication-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>communication-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- LXC Manager -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!--Network Manager -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>network-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>network-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Monitor -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -554,108 +554,108 @@
 
                                 <!-- Accumulo -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Presto -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Shark -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Spark -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
@@ -689,363 +689,363 @@
 
                                 <!-- Lucene -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Pig -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>pig-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>pig-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>pig-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>pig-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>pig-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Mahout -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Solr -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>solr-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>solr-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>solr-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>solr-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>solr-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Zookeeper -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- HBase -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Cassandra -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Oozie -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Flume -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Hive -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Hive Query-->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hivequery-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hivequery-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hivequery-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hivequery-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Sqoop -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Storm -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>storm-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>storm-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>storm-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 
                                 <!-- Hadoop -->
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.safehaus.kiskis.mgmt</groupId>
+                                    <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>

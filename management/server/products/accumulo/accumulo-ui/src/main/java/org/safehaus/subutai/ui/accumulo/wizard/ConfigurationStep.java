@@ -60,13 +60,13 @@ public class ConfigurationStep extends Panel {
 
         //get hadoop clusters from db
         List<Config> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
-        final List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters =
+        final List<org.safehaus.subutai.api.zookeeper.Config> zkClusters =
                 AccumuloUI.getZookeeperManager().getClusters();
         Set<Config> filteredHadoopClusters = new HashSet<>();
 
         //filter out those hadoop clusters which have zk clusters installed on top
         for ( Config hadoopClusterInfo : hadoopClusters ) {
-            for ( org.safehaus.kiskis.mgmt.api.zookeeper.Config zkClusterInfo : zkClusters ) {
+            for ( org.safehaus.subutai.api.zookeeper.Config zkClusterInfo : zkClusters ) {
                 if ( hadoopClusterInfo.getClusterName().equals( zkClusterInfo.getClusterName() ) && !zkClusterInfo
                         .isStandalone() ) {
                     filteredHadoopClusters.add( hadoopClusterInfo );
@@ -339,12 +339,12 @@ public class ConfigurationStep extends Panel {
 
 
     private List<Agent> filterAgents( Config hadoopInfo,
-                                      List<org.safehaus.kiskis.mgmt.api.zookeeper.Config> zkClusters ) {
+                                      List<org.safehaus.subutai.api.zookeeper.Config> zkClusters ) {
 
         List<Agent> filteredAgents = new ArrayList<>();
-        org.safehaus.kiskis.mgmt.api.zookeeper.Config zkConfig = null;
+        org.safehaus.subutai.api.zookeeper.Config zkConfig = null;
 
-        for ( org.safehaus.kiskis.mgmt.api.zookeeper.Config zkInfo : zkClusters ) {
+        for ( org.safehaus.subutai.api.zookeeper.Config zkInfo : zkClusters ) {
             if ( zkInfo.getClusterName().equals( hadoopInfo.getClusterName() ) ) {
                 zkConfig = zkInfo;
                 break;

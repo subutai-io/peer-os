@@ -2,7 +2,7 @@
         >
 
     <reference id="zookeeperManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="zookeeper/list-clusters">

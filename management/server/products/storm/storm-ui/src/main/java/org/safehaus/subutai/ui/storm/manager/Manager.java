@@ -105,7 +105,7 @@ public class Manager {
                     return;
                 }
 
-                org.safehaus.kiskis.mgmt.api.zookeeper.Config zkc;
+                org.safehaus.subutai.api.zookeeper.Config zkc;
                 zkc = StormUI.getZookeeper().getCluster(config.getClusterName());
                 if(zkc == null) {
                     show("Zookeeper cluster info not found");

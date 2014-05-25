@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
+import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.services.Module;
 
 public class StormUI implements Module {

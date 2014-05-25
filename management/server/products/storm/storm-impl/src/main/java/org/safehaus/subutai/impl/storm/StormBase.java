@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
+import org.safehaus.subutai.api.zookeeper.Zookeeper;
 
 public abstract class StormBase implements Storm {
 
