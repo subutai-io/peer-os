@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hbase/list-clusters">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListHBaseClustersCommand">
+            <action class="org.safehaus.subutai.cli.commands.ListHBaseClustersCommand">
                 <property name="hbaseManager" ref="hbaseManager"/>
             </action>
         </command>
@@ -22,7 +22,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hbase/uninstall-cluster">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallHBaseClusterCommand">
+            <action class="org.safehaus.subutai.cli.commands.UninstallHBaseClusterCommand">
                 <property name="hbaseManager" ref="hbaseManager"/>
             </action>
         </command>
@@ -30,7 +30,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hbase/install-cluster">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.InstallHBaseClusterCommand">
+            <action class="org.safehaus.subutai.cli.commands.InstallHBaseClusterCommand">
                 <property name="hbaseManager" ref="hbaseManager"/>
             </action>
         </command>

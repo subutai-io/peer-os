@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.cli.commands;
+package org.safehaus.subutai.cli.commands;
 
 
 import org.apache.felix.gogo.commands.Argument;
