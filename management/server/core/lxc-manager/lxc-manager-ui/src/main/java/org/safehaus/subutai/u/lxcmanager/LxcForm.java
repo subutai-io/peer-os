@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.lxcmanager;
+package org.safehaus.subutai.u.lxcmanager;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
@@ -11,8 +11,8 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Disposable;
-import org.safehaus.kiskis.mgmt.ui.lxcmanager.clone.Cloner;
-import org.safehaus.kiskis.mgmt.ui.lxcmanager.manage.Manager;
+import org.safehaus.subutai.u.lxcmanager.clone.Cloner;
+import org.safehaus.subutai.u.lxcmanager.manage.Manager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;

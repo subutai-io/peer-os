@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.lxcmanager;
+package org.safehaus.subutai.u.lxcmanager;
 
 
 import java.util.concurrent.ExecutorService;

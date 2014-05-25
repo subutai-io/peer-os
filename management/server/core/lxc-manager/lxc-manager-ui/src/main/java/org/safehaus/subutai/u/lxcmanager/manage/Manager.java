@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.lxcmanager.manage;
+package org.safehaus.subutai.u.lxcmanager.manage;
 
 
 import java.util.Collection;
@@ -12,8 +12,8 @@ import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
-import org.safehaus.kiskis.mgmt.ui.lxcmanager.common.Buttons;
+import org.safehaus.subutai.u.lxcmanager.LxcUI;
+import org.safehaus.subutai.u.lxcmanager.common.Buttons;
 
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;

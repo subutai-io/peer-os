@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.lxcmanager.clone;
+package org.safehaus.subutai.u.lxcmanager.clone;
 
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.lxcmanager.LxcUI;
+import org.safehaus.subutai.u.lxcmanager.LxcUI;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;

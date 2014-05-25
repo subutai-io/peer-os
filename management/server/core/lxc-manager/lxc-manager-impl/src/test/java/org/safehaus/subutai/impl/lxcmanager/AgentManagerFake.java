@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.impl.lxcmanager;
+package org.safehaus.subutai.impl.lxcmanager;
 
 
 import java.util.Collections;
