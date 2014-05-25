@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.shark;
+package org.safehaus.subutai.ui.spark;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.shark.Config;
-import org.safehaus.subutai.api.shark.Shark;
+import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.api.spark.Config;
 import org.safehaus.subutai.api.spark.Spark;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.services.Module;
@@ -19,31 +19,31 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class SharkUI implements Module {
+public class SparkUI implements Module {
 
-    private static Shark sharkManager;
+    private static Spark sparkManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
-    private static Spark sparkManager;
+    private static Hadoop hadoopManager;
     private static ExecutorService executor;
 
-    public SharkUI(AgentManager agentManager, Tracker tracker, Spark sparkManager, Shark sharkManager) {
-        SharkUI.agentManager = agentManager;
-        SharkUI.tracker = tracker;
-        SharkUI.sparkManager = sparkManager;
-        SharkUI.sharkManager = sharkManager;
+    public SparkUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Spark sparkManager) {
+        SparkUI.agentManager = agentManager;
+        SparkUI.tracker = tracker;
+        SparkUI.hadoopManager = hadoopManager;
+        SparkUI.sparkManager = sparkManager;
     }
 
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public static Shark getSharkManager() {
-        return sharkManager;
-    }
-
     public static Spark getSparkManager() {
         return sparkManager;
+    }
+
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -59,9 +59,9 @@ public class SharkUI implements Module {
     }
 
     public void destroy() {
-        sharkManager = null;
-        agentManager = null;
         sparkManager = null;
+        agentManager = null;
+        hadoopManager = null;
         tracker = null;
         executor.shutdown();
     }
@@ -71,7 +71,7 @@ public class SharkUI implements Module {
     }
 
     public Component createComponent() {
-        return new SharkForm();
+        return new SparkForm();
     }
 
 }

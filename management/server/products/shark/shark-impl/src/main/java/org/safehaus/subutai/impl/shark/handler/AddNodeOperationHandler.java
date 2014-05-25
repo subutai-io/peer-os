@@ -51,7 +51,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SharkImpl>
             return;
         }
 
-        org.safehaus.kiskis.mgmt.api.spark.Config sparkConfig
+        org.safehaus.subutai.api.spark.Config sparkConfig
                 = manager.getSparkManager().getCluster(clusterName);
         if (sparkConfig == null) {
             po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));

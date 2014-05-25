@@ -124,7 +124,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    org.safehaus.kiskis.mgmt.api.spark.Config info = SharkUI.getSparkManager().
+                    org.safehaus.subutai.api.spark.Config info = SharkUI.getSparkManager().
                             getCluster(config.getClusterName());
                     if (info != null) {
                         Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());

@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.impl.shark;
+package org.safehaus.subutai.impl.spark;
 
 import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.shark.Config;
-import org.safehaus.subutai.api.shark.Shark;
+import org.safehaus.subutai.api.spark.Config;
 import org.safehaus.subutai.api.spark.Spark;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.impl.shark.handler.*;
+import org.safehaus.subutai.impl.spark.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
@@ -24,21 +23,19 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class SharkImpl implements Shark {
+public class SparkImpl implements Spark {
 
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private Spark sparkManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
 
-    public SharkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Spark sparkManager) {
+    public SparkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
-        this.sparkManager = sparkManager;
 
         Commands.init(commandRunner);
     }
@@ -49,10 +46,6 @@ public class SharkImpl implements Shark {
 
     public AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public Spark getSparkManager() {
-        return sparkManager;
     }
 
     public DbManager getDbManager() {
@@ -69,6 +62,15 @@ public class SharkImpl implements Shark {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+    public List<Config> getClusters() {
+        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    }
+
+    @Override
+    public Config getCluster(String clusterName) {
+        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
     public UUID installCluster(final Config config) {
@@ -91,36 +93,55 @@ public class SharkImpl implements Shark {
         return operationHandler.getTrackerId();
     }
 
-    public UUID destroyNode(final String clusterName, final String lxcHostname) {
+    public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
-
-        executor.execute(operationHandler);
-
-        return operationHandler.getTrackerId();
-    }
-
-    public UUID addNode(final String clusterName, final String lxcHostname) {
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
+        AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler(this, clusterName, lxcHostname);
 
         executor.execute(operationHandler);
 
         return operationHandler.getTrackerId();
     }
 
-    public List<Config> getClusters() {
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+    public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
+
+        AbstractOperationHandler operationHandler = new DestroySlaveNodeOperationHandler(this, clusterName, lxcHostname);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
     }
 
-    @Override
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
+
+        AbstractOperationHandler operationHandler = new ChangeMasterNodeOperationHandler(this, clusterName, newMasterHostname, keepSlave);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
     }
 
-    public UUID actualizeMasterIP(final String clusterName) {
+    public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
 
-        AbstractOperationHandler operationHandler = new ActualizeMasterIpOperationHandler(this, clusterName);
+        AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname, master);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+
+    }
+
+    public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
+
+        AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname, master);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
+
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
 
         executor.execute(operationHandler);
 

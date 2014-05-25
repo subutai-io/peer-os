@@ -8,7 +8,7 @@ package org.safehaus.subutai.ui.shark.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.spark.Config;
+import org.safehaus.subutai.api.spark.Config;
 import org.safehaus.subutai.ui.shark.SharkUI;
 
 import java.util.List;
