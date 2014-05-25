@@ -16,9 +16,9 @@
             <ref component-id="sqoopRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="sqoopRestServiceImpl" class="org.safehaus.kiskis.mgmt.sqoop.services.RestServiceImpl">
+    <bean id="sqoopRestServiceImpl" class="org.safehaus.subutai.sqoop.services.RestServiceImpl">
         <property name="sqoopManager" ref="sqoopManager"/>
     </bean>
     <reference id="sqoopManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.sqoop.Sqoop"/>
+               interface="org.safehaus.subutai.api.sqoop.Sqoop"/>
 </blueprint>
