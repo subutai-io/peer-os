@@ -10,7 +10,7 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
 
-    <bean id="oozie-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.oozie.OozieImpl"
+    <bean id="oozie-impl" scope="singleton" class="org.safehaus.subutai.impl.oozie.OozieImpl"
           init-method="init" destroy-method="destroy">
         <property name="commandRunner" ref="commandRunner"/>
         <property name="agentManager" ref="agentManager"/>
@@ -18,6 +18,6 @@
         <property name="dbManager" ref="dbManager" />
     </bean>
        
-    <service ref="oozie-impl" interface="org.safehaus.kiskis.mgmt.api.oozie.Oozie"/>
+    <service ref="oozie-impl" interface="org.safehaus.subutai.api.oozie.Oozie"/>
     
 </blueprint>

@@ -2,7 +2,7 @@
         >
 
     <reference id="oozieManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.oozie.Oozie"/>
+               interface="org.safehaus.subutai.api.oozie.Oozie"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="oozie/list-clusters">

@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="oozieManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.oozie.Oozie"/>
+               interface="org.safehaus.subutai.api.oozie.Oozie"/>
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
@@ -10,7 +10,7 @@
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.oozie.OozieUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.oozie.OozieUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>
