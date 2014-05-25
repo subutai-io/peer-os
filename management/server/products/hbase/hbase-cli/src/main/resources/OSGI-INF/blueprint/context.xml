@@ -2,7 +2,7 @@
         >
 
     <reference id="hbaseManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hbase.HBase"/>
+               interface="org.safehaus.subutai.api.hbase.HBase"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="hbase/describe-cluster">

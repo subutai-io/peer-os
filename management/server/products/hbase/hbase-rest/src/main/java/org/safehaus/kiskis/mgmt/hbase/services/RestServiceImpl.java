@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.hbase.services;
 
-import org.safehaus.kiskis.mgmt.api.hbase.HBase;
+import org.safehaus.subutai.api.hbase.HBase;
 
 /**
  * Created by bahadyr on 5/6/14.

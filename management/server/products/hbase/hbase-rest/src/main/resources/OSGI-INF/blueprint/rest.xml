@@ -20,5 +20,5 @@
         <property name="hbaseManager" ref="hbaseManager"/>
     </bean>
     <reference id="hbaseManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.hbase.HBase"/>
+               interface="org.safehaus.subutai.api.hbase.HBase"/>
 </blueprint>

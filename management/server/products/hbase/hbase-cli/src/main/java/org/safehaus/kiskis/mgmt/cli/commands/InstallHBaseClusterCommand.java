@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.cli.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.kiskis.mgmt.api.hbase.HBase;
+import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.tracker.Tracker;
 
 

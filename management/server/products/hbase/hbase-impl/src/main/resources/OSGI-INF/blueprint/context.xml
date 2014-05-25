@@ -21,6 +21,6 @@
         <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
-    <service ref="hbase-impl" interface="org.safehaus.kiskis.mgmt.api.hbase.HBase"/>
+    <service ref="hbase-impl" interface="org.safehaus.subutai.api.hbase.HBase"/>
 
 </blueprint>

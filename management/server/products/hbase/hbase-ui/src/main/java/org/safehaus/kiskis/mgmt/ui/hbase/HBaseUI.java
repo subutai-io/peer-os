@@ -9,8 +9,8 @@ package org.safehaus.kiskis.mgmt.ui.hbase;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 //import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
-import org.safehaus.kiskis.mgmt.api.hbase.HBase;
+import org.safehaus.subutai.api.hbase.HBaseConfig;
+import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.services.Module;
 

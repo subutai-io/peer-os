@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.api.hbase;
+package org.safehaus.subutai.api.hbase;
 
 /**
  * Created by bahadyr on 4/10/14.

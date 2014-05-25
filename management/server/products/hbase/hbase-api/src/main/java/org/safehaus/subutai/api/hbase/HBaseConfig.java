@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.api.hbase;
+package org.safehaus.subutai.api.hbase;
 
 
 import org.doomdark.uuid.UUIDGenerator;

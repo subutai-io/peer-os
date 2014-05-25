@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
+import org.safehaus.subutai.api.hbase.HBaseConfig;
 
 
 /**

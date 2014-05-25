@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.api.hbase.HBaseConfig;
+import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
 
