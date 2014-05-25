@@ -3,14 +3,14 @@
     >
 
   <reference id="communicationManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.communicationmanager.CommunicationManager" />
+             interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
 
   <bean id="module" scope="singleton"
-        class="org.safehaus.kiskis.mgmt.impl.commandrunner.CommandRunnerImpl"
+        class="org.safehaus.subutai.impl.commandrunner.CommandRunnerImpl"
         init-method="init" destroy-method="destroy" activation="eager">
     <argument ref="communicationManager" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner" />
+  <service ref="module" interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
 </blueprint>

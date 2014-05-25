@@ -13,9 +13,9 @@
     </cm:property-placeholder>
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="moduleNotifier" availability="mandatory"

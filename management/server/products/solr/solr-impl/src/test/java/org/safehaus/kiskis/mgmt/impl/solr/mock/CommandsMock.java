@@ -3,10 +3,10 @@ package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 import java.util.Set;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class CommandsMock extends Commands {

@@ -4,11 +4,11 @@ package org.safehaus.kiskis.mgmt.impl.accumulo.handler;
 import java.util.UUID;
 
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.accumulo.AccumuloImpl;
 import org.safehaus.kiskis.mgmt.impl.accumulo.Commands;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
 /**

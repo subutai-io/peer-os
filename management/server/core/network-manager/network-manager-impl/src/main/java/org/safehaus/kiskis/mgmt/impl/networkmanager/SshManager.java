@@ -1,9 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.networkmanager;
 
 import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.List;

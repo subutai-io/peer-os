@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.ui.hive.query;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;

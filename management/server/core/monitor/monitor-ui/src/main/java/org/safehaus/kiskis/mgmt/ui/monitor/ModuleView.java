@@ -2,14 +2,13 @@ package org.safehaus.kiskis.mgmt.ui.monitor;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.Runo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.monitor.util.UIUtil;
 
 import java.util.Date;

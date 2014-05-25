@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.datastax.driver.core.ResultSet;
 
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 
 
 public class DbManagerMock implements DbManager {

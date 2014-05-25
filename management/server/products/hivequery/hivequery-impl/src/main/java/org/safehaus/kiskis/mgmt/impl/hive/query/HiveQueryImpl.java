@@ -1,11 +1,11 @@
 package org.safehaus.kiskis.mgmt.impl.hive.query;
 
 import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.List;
 import java.util.UUID;

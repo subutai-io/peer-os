@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;

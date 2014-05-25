@@ -1,12 +1,15 @@
 package org.safehaus.kiskis.mgmt.impl.flume.handler;
 
 import java.util.Iterator;
-import org.safehaus.kiskis.mgmt.api.commandrunner.*;
+
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.impl.flume.*;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 

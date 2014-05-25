@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class HiveImplMock extends HiveImpl {
 

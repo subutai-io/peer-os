@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.api.hive.query;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 public class Config implements ConfigBase {
 

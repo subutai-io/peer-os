@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.presto;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.api.presto.Presto;

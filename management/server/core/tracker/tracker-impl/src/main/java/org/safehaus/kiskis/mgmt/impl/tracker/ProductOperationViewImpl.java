@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.UUID;
 
 
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 import com.google.common.base.Preconditions;
 

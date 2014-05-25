@@ -4,8 +4,8 @@ import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.mock.HiveImplMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 public class UninstallHandlerTest {
 

@@ -1,9 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.hive.query;
 
 import com.google.common.collect.Sets;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class Commands {
 

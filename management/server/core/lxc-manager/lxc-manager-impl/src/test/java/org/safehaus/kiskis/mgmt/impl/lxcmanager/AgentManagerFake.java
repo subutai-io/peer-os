@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.api.agentmanager.AgentListener;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
 
 
 /**

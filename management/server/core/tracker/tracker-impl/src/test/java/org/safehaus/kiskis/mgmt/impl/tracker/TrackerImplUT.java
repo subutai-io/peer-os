@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyVararg;

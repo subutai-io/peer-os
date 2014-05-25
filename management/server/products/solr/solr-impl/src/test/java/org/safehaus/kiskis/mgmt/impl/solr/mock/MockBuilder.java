@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.solr.mock;
 
 
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
@@ -12,7 +12,7 @@ import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.LxcManagerMock;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
 public class MockBuilder {

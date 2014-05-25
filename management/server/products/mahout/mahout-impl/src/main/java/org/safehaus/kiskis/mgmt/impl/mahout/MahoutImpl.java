@@ -6,9 +6,9 @@
 package org.safehaus.kiskis.mgmt.impl.mahout;
 
 import com.google.common.base.Preconditions;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.api.mahout.Mahout;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
@@ -16,7 +16,7 @@ import org.safehaus.kiskis.mgmt.impl.mahout.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.DestroyNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.InstallOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.mahout.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

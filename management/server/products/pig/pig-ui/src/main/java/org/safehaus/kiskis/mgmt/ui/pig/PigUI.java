@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.pig;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.api.pig.Pig;

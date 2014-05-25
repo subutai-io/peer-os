@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI;
 import org.safehaus.kiskis.mgmt.ui.accumulo.common.UiUtil;
 

@@ -6,11 +6,11 @@ import com.vaadin.ui.*;
 import java.util.Set;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.hive.HiveUI;
 
 class AddNodeWindow extends Window {

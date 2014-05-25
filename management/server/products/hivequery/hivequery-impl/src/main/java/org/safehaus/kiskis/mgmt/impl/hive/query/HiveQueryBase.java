@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.hive.query;
 
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 

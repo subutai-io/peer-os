@@ -5,14 +5,14 @@
  */
 package org.safehaus.kiskis.mgmt.ui.mongodb.manager;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
+import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
 import org.safehaus.kiskis.mgmt.api.mongodb.Timeouts;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI;
 
 /**

@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.mongodb;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.mongodb.Config;
 import org.safehaus.kiskis.mgmt.api.mongodb.Mongo;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;

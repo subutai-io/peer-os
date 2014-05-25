@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.mahout;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.api.mahout.Mahout;

@@ -16,7 +16,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Arrays;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Util;
 
 /**
  *

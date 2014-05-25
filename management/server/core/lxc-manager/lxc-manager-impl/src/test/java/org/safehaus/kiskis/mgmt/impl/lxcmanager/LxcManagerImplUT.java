@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
 import org.safehaus.kiskis.mgmt.api.monitor.Metric;
 import org.safehaus.kiskis.mgmt.api.monitor.Monitor;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

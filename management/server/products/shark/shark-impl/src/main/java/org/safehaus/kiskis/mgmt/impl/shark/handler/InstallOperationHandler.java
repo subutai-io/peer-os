@@ -1,14 +1,14 @@
 package org.safehaus.kiskis.mgmt.impl.shark.handler;
 
 import com.google.common.base.Strings;
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.shark.Commands;
 import org.safehaus.kiskis.mgmt.impl.shark.SharkImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.UUID;
 

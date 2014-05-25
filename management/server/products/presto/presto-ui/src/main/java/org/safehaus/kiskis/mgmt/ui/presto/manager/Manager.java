@@ -14,10 +14,10 @@ import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.presto.Config;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.CompleteEvent;
+import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.presto.PrestoUI;
 
 import java.util.HashSet;

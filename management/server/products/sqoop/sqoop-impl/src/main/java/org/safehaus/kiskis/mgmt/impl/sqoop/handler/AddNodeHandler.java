@@ -2,11 +2,14 @@ package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import org.safehaus.kiskis.mgmt.api.commandrunner.*;
+
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class AddNodeHandler extends AbstractHandler {
 

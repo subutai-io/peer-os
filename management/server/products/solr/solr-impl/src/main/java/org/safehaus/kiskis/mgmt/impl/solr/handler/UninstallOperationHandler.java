@@ -4,7 +4,7 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
 public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl> {

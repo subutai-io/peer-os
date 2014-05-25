@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.impl.cassandra;
 
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 class CustomPlacementStrategy extends LxcPlacementStrategy {
 

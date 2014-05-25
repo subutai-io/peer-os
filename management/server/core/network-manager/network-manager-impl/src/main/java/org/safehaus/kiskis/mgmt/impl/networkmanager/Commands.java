@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.impl.networkmanager;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.RequestBuilder;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.HashSet;
 import java.util.List;

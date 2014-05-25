@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.ui.hive.query.components;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
 import java.util.List;

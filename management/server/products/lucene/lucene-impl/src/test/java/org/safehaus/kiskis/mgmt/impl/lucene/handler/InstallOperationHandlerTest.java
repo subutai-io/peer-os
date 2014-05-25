@@ -6,8 +6,8 @@ import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.impl.lucene.LuceneImpl;
 import org.safehaus.kiskis.mgmt.impl.lucene.mock.LuceneImplMock;
 import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

@@ -5,12 +5,12 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.server.ui.ConfirmationDialogCallback;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.kiskis.mgmt.ui.flume.FlumeUI;
 
 import java.util.*;

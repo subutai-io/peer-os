@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.sqoop;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 import java.util.Set;
 

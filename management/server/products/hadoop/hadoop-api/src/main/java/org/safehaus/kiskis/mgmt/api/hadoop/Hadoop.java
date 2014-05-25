@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.hadoop;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
 

@@ -4,7 +4,7 @@ import com.vaadin.ui.*;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
 
 public class VerificationStep extends Panel {

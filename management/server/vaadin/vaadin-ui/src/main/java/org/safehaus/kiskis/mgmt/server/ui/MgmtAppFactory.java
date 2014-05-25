@@ -2,8 +2,8 @@ package org.safehaus.kiskis.mgmt.server.ui;
 
 import com.vaadin.Application;
 import com.vaadin.Application.SystemMessages;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.server.ui.bridge.ApplicationFactory;
 import org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier;

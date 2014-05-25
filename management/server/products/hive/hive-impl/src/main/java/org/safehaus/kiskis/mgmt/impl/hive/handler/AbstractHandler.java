@@ -3,8 +3,8 @@ package org.safehaus.kiskis.mgmt.impl.hive.handler;
 import java.util.Iterator;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 abstract class AbstractHandler extends AbstractOperationHandler<HiveImpl> {
 

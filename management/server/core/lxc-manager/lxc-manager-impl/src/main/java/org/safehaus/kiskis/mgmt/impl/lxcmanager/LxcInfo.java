@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.impl.lxcmanager;
 
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**

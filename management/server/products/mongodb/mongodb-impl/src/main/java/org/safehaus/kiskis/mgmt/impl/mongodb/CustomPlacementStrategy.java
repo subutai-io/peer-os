@@ -3,7 +3,7 @@ package org.safehaus.kiskis.mgmt.impl.mongodb;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.*;
 import org.safehaus.kiskis.mgmt.api.mongodb.NodeType;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {
 

@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.ui.hadoop.manager.components;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
-import org.safehaus.kiskis.mgmt.shared.protocol.CompleteEvent;
-import org.safehaus.kiskis.mgmt.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.shared.protocol.CompleteEvent;
+import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.kiskis.mgmt.ui.hadoop.HadoopUI;
 
 import java.util.UUID;

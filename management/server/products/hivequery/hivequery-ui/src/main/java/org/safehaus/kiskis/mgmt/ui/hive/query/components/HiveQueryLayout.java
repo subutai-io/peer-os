@@ -6,8 +6,8 @@ import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.kiskis.mgmt.ui.hive.query.HiveQueryUI;
 
 import java.util.Collection;

@@ -3,8 +3,8 @@ package org.safehaus.kiskis.mgmt.impl.solr.handler;
 
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {

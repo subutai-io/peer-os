@@ -13,7 +13,7 @@ import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcState;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.ServerMetric;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class LxcManagerMock implements LxcManager {

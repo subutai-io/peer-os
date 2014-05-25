@@ -4,9 +4,9 @@ package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandStatus;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandStatus;
 
 
 public class CommandMock implements Command {

@@ -1,10 +1,10 @@
 package org.safehaus.kiskis.mgmt.impl.zookeeper.handler;
 
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Config;
 import org.safehaus.kiskis.mgmt.impl.zookeeper.ZookeeperImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.UUID;
 

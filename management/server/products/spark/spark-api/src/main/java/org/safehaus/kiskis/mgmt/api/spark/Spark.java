@@ -5,7 +5,7 @@
  */
 package org.safehaus.kiskis.mgmt.api.spark;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
 

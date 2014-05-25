@@ -4,9 +4,9 @@ import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.CommonSetting;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
 
 public abstract class ImportExportBase extends Panel {

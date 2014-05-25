@@ -13,7 +13,7 @@ import com.vaadin.ui.Panel;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.mahout.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.mahout.MahoutUI;
 
 /**

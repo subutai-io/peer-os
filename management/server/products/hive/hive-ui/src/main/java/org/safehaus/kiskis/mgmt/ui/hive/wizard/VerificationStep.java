@@ -4,7 +4,7 @@ import com.vaadin.ui.*;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.hive.HiveUI;
 
 public class VerificationStep extends Panel {

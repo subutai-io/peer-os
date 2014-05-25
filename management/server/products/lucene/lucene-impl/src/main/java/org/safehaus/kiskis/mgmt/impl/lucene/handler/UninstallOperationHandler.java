@@ -1,16 +1,13 @@
 package org.safehaus.kiskis.mgmt.impl.lucene.handler;
 
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.AgentResult;
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.lucene.Commands;
 import org.safehaus.kiskis.mgmt.impl.lucene.LuceneImpl;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-
-import java.util.UUID;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class UninstallOperationHandler extends AbstractOperationHandler<LuceneImpl> {

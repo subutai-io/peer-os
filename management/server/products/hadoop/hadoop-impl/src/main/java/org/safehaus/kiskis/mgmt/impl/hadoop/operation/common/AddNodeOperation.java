@@ -1,9 +1,9 @@
 package org.safehaus.kiskis.mgmt.impl.hadoop.operation.common;
 
-import org.safehaus.kiskis.mgmt.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.impl.hadoop.Commands;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.ArrayList;
 import java.util.List;

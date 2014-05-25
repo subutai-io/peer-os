@@ -2,9 +2,8 @@ package org.safehaus.kiskis.mgmt.impl.hadoop.operation;
 
 import org.safehaus.kiskis.mgmt.api.hadoop.Config;
 import org.safehaus.kiskis.mgmt.api.lxcmanager.LxcDestroyException;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
 
 import java.util.HashSet;
 import java.util.UUID;

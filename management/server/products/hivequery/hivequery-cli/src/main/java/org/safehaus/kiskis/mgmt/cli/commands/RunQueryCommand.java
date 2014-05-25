@@ -6,8 +6,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.kiskis.mgmt.api.hive.query.Config;
 import org.safehaus.kiskis.mgmt.api.hive.query.HiveQuery;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;

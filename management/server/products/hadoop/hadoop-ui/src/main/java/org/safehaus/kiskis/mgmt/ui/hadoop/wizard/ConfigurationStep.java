@@ -8,7 +8,7 @@ package org.safehaus.kiskis.mgmt.ui.hadoop.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.Arrays;
 

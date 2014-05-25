@@ -3,9 +3,9 @@ package org.safehaus.kiskis.mgmt.impl.flume.handler;
 import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.impl.flume.mock.FlumeImplMock;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 public class DestroyNodeHandlerTest {
 

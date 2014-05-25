@@ -4,7 +4,7 @@ import java.util.*;
 import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.mock.HiveImplMock;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class AbstractHandlerTest {
 

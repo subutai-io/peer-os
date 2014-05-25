@@ -8,11 +8,11 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentListener;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.Disposable;
-import org.safehaus.kiskis.mgmt.shared.protocol.settings.Common;
+import org.safehaus.subutai.api.agentmanager.AgentListener;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.*;
 import java.util.logging.Level;

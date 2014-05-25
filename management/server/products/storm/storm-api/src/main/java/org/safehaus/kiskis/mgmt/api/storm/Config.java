@@ -1,8 +1,8 @@
 package org.safehaus.kiskis.mgmt.api.storm;
 
 import java.util.Set;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 public class Config implements ConfigBase {
 

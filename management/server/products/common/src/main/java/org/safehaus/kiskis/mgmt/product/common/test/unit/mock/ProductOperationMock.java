@@ -4,8 +4,8 @@ package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
 import java.util.Date;
 import java.util.UUID;
 
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 
 public class ProductOperationMock implements ProductOperation {

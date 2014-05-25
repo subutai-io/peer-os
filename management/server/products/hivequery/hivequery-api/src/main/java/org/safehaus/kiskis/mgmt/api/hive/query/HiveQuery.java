@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.api.hive.query;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.List;
 import java.util.UUID;

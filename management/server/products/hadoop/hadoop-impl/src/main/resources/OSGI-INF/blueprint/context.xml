@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
     <reference id="networkManager" availability="mandatory"

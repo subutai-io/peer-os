@@ -2,9 +2,9 @@ package org.safehaus.kiskis.mgmt.impl.sqoop.handler;
 
 import java.util.Iterator;
 import org.safehaus.kiskis.mgmt.api.sqoop.Config;
-import org.safehaus.kiskis.mgmt.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.kiskis.mgmt.impl.sqoop.SqoopImpl;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 abstract class AbstractHandler implements Runnable {
 

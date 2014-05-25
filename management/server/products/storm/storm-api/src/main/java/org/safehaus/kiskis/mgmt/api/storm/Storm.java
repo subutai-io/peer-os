@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.api.storm;
 
 import java.util.UUID;
-import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 public interface Storm extends ApiBase<Config> {
 

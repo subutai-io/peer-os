@@ -7,7 +7,7 @@ package org.safehaus.kiskis.mgmt.ui.cassandra.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.Arrays;
 

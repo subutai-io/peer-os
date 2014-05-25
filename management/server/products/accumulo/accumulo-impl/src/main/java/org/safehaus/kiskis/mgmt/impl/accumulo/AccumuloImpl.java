@@ -9,9 +9,9 @@ import java.util.concurrent.Executors;
 import org.safehaus.kiskis.mgmt.api.accumulo.Accumulo;
 import org.safehaus.kiskis.mgmt.api.accumulo.Config;
 import org.safehaus.kiskis.mgmt.api.accumulo.NodeType;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
-import org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner;
-import org.safehaus.kiskis.mgmt.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.kiskis.mgmt.api.hadoop.Hadoop;
 import org.safehaus.kiskis.mgmt.api.tracker.Tracker;
 import org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper;
@@ -24,7 +24,7 @@ import org.safehaus.kiskis.mgmt.impl.accumulo.handler.RemovePropertyOperationHan
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StartClusterOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.StopClusterOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.accumulo.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import com.google.common.base.Preconditions;
 

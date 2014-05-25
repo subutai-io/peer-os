@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ExportSetting;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.kiskis.mgmt.ui.sqoop.SqoopUI;
 
 public class ExportPanel extends ImportExportBase {

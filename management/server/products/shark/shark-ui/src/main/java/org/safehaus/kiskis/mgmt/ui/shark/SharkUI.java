@@ -6,7 +6,7 @@
 package org.safehaus.kiskis.mgmt.ui.shark;
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.kiskis.mgmt.api.shark.Config;
 import org.safehaus.kiskis.mgmt.api.shark.Shark;
 import org.safehaus.kiskis.mgmt.api.spark.Spark;

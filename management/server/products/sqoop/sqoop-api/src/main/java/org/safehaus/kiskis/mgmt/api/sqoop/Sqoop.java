@@ -2,7 +2,7 @@ package org.safehaus.kiskis.mgmt.api.sqoop;
 
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ExportSetting;
 import org.safehaus.kiskis.mgmt.api.sqoop.setting.ImportSetting;
-import org.safehaus.kiskis.mgmt.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
 

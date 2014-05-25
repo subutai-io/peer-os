@@ -9,7 +9,7 @@ package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.ArrayList;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
-import org.safehaus.kiskis.mgmt.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class Commands {
 
