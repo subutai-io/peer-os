@@ -16,9 +16,9 @@
             <ref component-id="mahoutRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="mahoutRestServiceImpl" class="org.safehaus.kiskis.mgmt.mahout.services.RestServiceImpl">
+    <bean id="mahoutRestServiceImpl" class="org.safehaus.subutai.mahout.services.RestServiceImpl">
         <property name="mahoutManager" ref="mahoutManager"/>
     </bean>
     <reference id="mahoutManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.mahout.Mahout"/>
+               interface="org.safehaus.subutai.api.mahout.Mahout"/>
 </blueprint>
