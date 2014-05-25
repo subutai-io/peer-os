@@ -12,7 +12,7 @@
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
     <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
+               interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
 
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.hadoop.HadoopImpl"
           init-method="init" destroy-method="destroy">

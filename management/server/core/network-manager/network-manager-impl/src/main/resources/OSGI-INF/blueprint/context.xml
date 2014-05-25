@@ -7,6 +7,6 @@
         <property name="commandRunner" ref="commandRunner"/>
     </bean>
 
-    <service ref="networkManager" interface="org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager"/>
+    <service ref="networkManager" interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
 
 </blueprint>

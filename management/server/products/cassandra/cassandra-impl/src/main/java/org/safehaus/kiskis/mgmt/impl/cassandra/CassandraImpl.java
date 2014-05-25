@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.kiskis.mgmt.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.api.networkmanager;
+package org.safehaus.subutai.api.networkmanager;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 
