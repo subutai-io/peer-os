@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.monitor;
+package org.safehaus.subutai.ui.monitor;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
@@ -9,7 +9,7 @@ import org.safehaus.subutai.api.monitor.Monitor;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.kiskis.mgmt.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.kiskis.mgmt.ui.monitor.util.UIUtil;
+import org.safehaus.subutai.ui.monitor.util.UIUtil;
 
 import java.util.Date;
 import java.util.Map;

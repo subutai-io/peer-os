@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.monitor;
+package org.safehaus.subutai.ui.monitor;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.monitor.Monitor;

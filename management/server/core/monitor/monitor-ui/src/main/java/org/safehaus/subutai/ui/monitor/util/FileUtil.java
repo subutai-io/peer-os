@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.util;
+package org.safehaus.subutai.ui.monitor.util;
 
 import java.io.IOException;
 import java.io.InputStream;

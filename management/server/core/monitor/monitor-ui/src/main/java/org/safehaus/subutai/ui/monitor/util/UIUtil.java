@@ -1,6 +1,5 @@
-package org.safehaus.kiskis.mgmt.ui.monitor.util;
+package org.safehaus.subutai.ui.monitor.util;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 
 import java.util.Date;
