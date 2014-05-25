@@ -16,9 +16,9 @@
             <ref component-id="sharkRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="sharkRestServiceImpl" class="org.safehaus.kiskis.mgmt.shark.services.RestServiceImpl">
+    <bean id="sharkRestServiceImpl" class="org.safehaus.subutai.shark.services.RestServiceImpl">
         <property name="sharkManager" ref="sharkManager"/>
     </bean>
     <reference id="sharkManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.shark.Shark"/>
+               interface="org.safehaus.subutai.api.shark.Shark"/>
 </blueprint>
