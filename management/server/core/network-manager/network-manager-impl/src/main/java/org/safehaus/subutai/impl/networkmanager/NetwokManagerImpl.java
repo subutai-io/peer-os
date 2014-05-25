@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.networkmanager;
+package org.safehaus.subutai.impl.networkmanager;
 
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;

@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.networkmanager;
+package org.safehaus.subutai.impl.networkmanager;
 
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
