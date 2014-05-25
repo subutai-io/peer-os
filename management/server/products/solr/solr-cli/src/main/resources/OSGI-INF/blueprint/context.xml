@@ -6,7 +6,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="solr/list-clusters">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
                 <property name="solrManager" ref="solrManager"/>
             </action>
         </command>

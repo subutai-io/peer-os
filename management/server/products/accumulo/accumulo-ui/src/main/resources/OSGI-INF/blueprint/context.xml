@@ -4,7 +4,7 @@
   <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module" />
 
   <reference id="accumuloManager" availability="mandatory"
-             interface="org.safehaus.kiskis.mgmt.api.accumulo.Accumulo" />
+             interface="org.safehaus.subutai.api.accumulo.Accumulo" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="tracker" availability="mandatory"
@@ -14,7 +14,7 @@
   <reference id="zookeeperManager" availability="mandatory"
              interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.accumulo.AccumuloUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.accumulo.AccumuloUI"
         init-method="init" destroy-method="destroy">
     <argument ref="agentManager" />
     <argument ref="tracker" />
