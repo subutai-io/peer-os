@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.product.common.test.unit.mock;
+package org.safehaus.subutai.product.common.test.unit.mock;
 
 
 import java.util.Map;

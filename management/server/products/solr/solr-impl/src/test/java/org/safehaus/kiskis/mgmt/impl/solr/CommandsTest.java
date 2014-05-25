@@ -4,7 +4,7 @@ package org.safehaus.kiskis.mgmt.impl.solr;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;

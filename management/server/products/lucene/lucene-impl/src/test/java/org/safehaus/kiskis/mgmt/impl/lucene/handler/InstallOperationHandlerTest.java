@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.safehaus.kiskis.mgmt.api.lucene.Config;
 import org.safehaus.kiskis.mgmt.impl.lucene.LuceneImpl;
 import org.safehaus.kiskis.mgmt.impl.lucene.mock.LuceneImplMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
+import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 

@@ -1,7 +1,7 @@
 package org.safehaus.kiskis.mgmt.impl.hive;
 
 import org.junit.*;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
+import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CommandsTest {

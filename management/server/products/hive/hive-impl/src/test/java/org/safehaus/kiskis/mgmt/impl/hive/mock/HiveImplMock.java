@@ -4,7 +4,10 @@ import java.util.Arrays;
 import java.util.UUID;
 import org.safehaus.kiskis.mgmt.api.hive.Config;
 import org.safehaus.kiskis.mgmt.impl.hive.HiveImpl;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.*;
+import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class HiveImplMock extends HiveImpl {

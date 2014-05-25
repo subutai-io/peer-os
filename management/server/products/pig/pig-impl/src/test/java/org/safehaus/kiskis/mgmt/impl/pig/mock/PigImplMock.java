@@ -3,10 +3,10 @@ package org.safehaus.kiskis.mgmt.impl.pig.mock;
 
 import org.safehaus.kiskis.mgmt.api.pig.Config;
 import org.safehaus.kiskis.mgmt.impl.pig.PigImpl;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.AgentManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.DbManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.TrackerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
 
 public class PigImplMock extends PigImpl {

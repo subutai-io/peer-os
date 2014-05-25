@@ -8,10 +8,10 @@ import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
 import org.safehaus.kiskis.mgmt.impl.solr.handler.AddNodeOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.solr.handler.InstallOperationHandler;
 import org.safehaus.kiskis.mgmt.impl.solr.handler.UninstallOperationHandler;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.DbManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.LxcManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommandMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
+import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 

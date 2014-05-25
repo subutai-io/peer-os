@@ -5,7 +5,7 @@ import java.util.HashSet;
 import org.junit.*;
 import org.safehaus.kiskis.mgmt.api.flume.Config;
 import org.safehaus.kiskis.mgmt.impl.flume.mock.FlumeImplMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommonMockBuilder;
+import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.operation.ProductOperationState;

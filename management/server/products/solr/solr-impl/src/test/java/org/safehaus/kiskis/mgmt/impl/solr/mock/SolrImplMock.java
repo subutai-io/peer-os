@@ -7,11 +7,11 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.kiskis.mgmt.api.solr.Config;
 import org.safehaus.kiskis.mgmt.impl.solr.Commands;
 import org.safehaus.kiskis.mgmt.impl.solr.SolrImpl;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.AgentManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.DbManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.LxcManagerMock;
-import org.safehaus.kiskis.mgmt.product.common.test.unit.mock.TrackerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
+import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
 
 public class SolrImplMock extends SolrImpl {
