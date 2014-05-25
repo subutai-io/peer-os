@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.impl.monitor;
+package org.safehaus.subutai.impl.monitor;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
