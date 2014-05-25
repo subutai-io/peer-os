@@ -1,4 +1,4 @@
-package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
+package org.safehaus.subutai.ui.hbase.wizard;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;

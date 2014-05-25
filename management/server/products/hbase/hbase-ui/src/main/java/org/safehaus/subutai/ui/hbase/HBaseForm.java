@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase;
+package org.safehaus.subutai.ui.hbase;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
-import org.safehaus.kiskis.mgmt.ui.hbase.manager.Manager;
-import org.safehaus.kiskis.mgmt.ui.hbase.wizard.Wizard;
+import org.safehaus.subutai.ui.hbase.manager.Manager;
+import org.safehaus.subutai.ui.hbase.wizard.Wizard;
 
 /**
  * @author dilshat

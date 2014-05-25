@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
+package org.safehaus.subutai.ui.hbase.wizard;
 
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.server.ui.MgmtApplication;
-import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
+import org.safehaus.subutai.ui.hbase.HBaseUI;
 
 import java.util.UUID;
 

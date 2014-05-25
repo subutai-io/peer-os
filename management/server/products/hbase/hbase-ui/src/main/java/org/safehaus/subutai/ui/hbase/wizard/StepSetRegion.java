@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
+package org.safehaus.subutai.ui.hbase.wizard;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.Sizeable;
@@ -19,9 +19,9 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class StepSetQuorum extends Panel {
+public class StepSetRegion extends Panel {
 
-    public StepSetQuorum(final Wizard wizard) {
+    public StepSetRegion(final Wizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
@@ -43,7 +43,7 @@ public class StepSetQuorum extends Panel {
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as HQuorumPeer");
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as HRegionServer");
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
@@ -54,7 +54,7 @@ public class StepSetQuorum extends Panel {
         select.setMultiSelect(true);
         select.setImmediate(true);
         select.setLeftColumnCaption("Available Nodes");
-        select.setRightColumnCaption("HQuorumPeer");
+        select.setRightColumnCaption("HRegionServer");
         select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
         select.setRequired(true);
 
@@ -68,9 +68,9 @@ public class StepSetQuorum extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                wizard.getConfig().setQuorum((Set<UUID>) select.getValue());
-                if (Util.isCollectionEmpty(wizard.getConfig().getQuorum())) {
-                    show("Please add quorum servers");
+                wizard.getConfig().setRegion((Set<UUID>) select.getValue());
+                if (Util.isCollectionEmpty(wizard.getConfig().getRegion())) {
+                    show("Please add region servers");
                 } else {
                     wizard.next();
                 }
@@ -94,7 +94,7 @@ public class StepSetQuorum extends Panel {
 
         addComponent(verticalLayout);
         select.setContainerDataSource(new BeanItemContainer<UUID>(UUID.class, wizard.getConfig().getNodes()));
-        select.setValue(wizard.getConfig().getQuorum());
+        select.setValue(wizard.getConfig().getRegion());
     }
 
     private void show(String notification) {

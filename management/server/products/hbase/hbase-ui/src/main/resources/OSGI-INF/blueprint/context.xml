@@ -8,7 +8,7 @@
     <!--<reference id="hadoopManager" availability="mandatory"-->
                <!--interface="org.safehaus.subutai.api.hadoop.Hadoop"/>-->
 
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.hbase.HBaseUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
         <property name="tracker" ref="tracker"/>

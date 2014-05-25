@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase.manager;
+package org.safehaus.subutai.ui.hbase.manager;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -17,7 +17,7 @@ import org.safehaus.subutai.server.ui.ConfirmationDialogCallback;
 import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
+import org.safehaus.subutai.ui.hbase.HBaseUI;
 
 import java.util.HashSet;
 import java.util.List;

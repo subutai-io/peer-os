@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
+package org.safehaus.subutai.ui.hbase.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -12,7 +12,7 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.kiskis.mgmt.ui.hbase.HBaseUI;
+import org.safehaus.subutai.ui.hbase.HBaseUI;
 
 import java.util.*;
 

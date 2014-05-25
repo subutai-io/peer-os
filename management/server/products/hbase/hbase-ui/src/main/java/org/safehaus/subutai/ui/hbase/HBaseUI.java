@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase;
+package org.safehaus.subutai.ui.hbase;
 
 
 import com.vaadin.ui.Component;

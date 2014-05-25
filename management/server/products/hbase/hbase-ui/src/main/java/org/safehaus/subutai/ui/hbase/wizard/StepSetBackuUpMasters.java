@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.kiskis.mgmt.ui.hbase.wizard;
+package org.safehaus.subutai.ui.hbase.wizard;
 
 
 import com.vaadin.data.util.BeanItemContainer;
@@ -18,10 +18,10 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class StepSetMaster extends Panel
+public class StepSetBackuUpMasters extends Panel
 {
 
-    public StepSetMaster( final Wizard wizard )
+    public StepSetBackuUpMasters( final Wizard wizard )
     {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
@@ -44,22 +44,22 @@ public class StepSetMaster extends Panel
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing( true );
 
-        Label configServersLabel = new Label( "<strong>Choose hosts that will act as Master" );
+        Label configServersLabel = new Label( "<strong>Choose hosts that will act as BackUpMaster" );
         configServersLabel.setContentMode( Label.CONTENT_XHTML );
         verticalLayoutForm.addComponent( configServersLabel );
 
-        final TwinColSelect selectMaster = new TwinColSelect( "", new ArrayList<Agent>() );
-        selectMaster.setItemCaptionPropertyId( "hostname" );
-        selectMaster.setRows( 7 );
-        selectMaster.setNullSelectionAllowed( true );
-        selectMaster.setMultiSelect( false );
-        selectMaster.setImmediate( true );
-        selectMaster.setLeftColumnCaption( "Available Nodes" );
-        selectMaster.setRightColumnCaption( "Master" );
-        selectMaster.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        selectMaster.setRequired( true );
+        final TwinColSelect select = new TwinColSelect( "", new ArrayList<Agent>() );
+        select.setItemCaptionPropertyId( "hostname" );
+        select.setRows( 7 );
+        select.setNullSelectionAllowed( false );
+        select.setMultiSelect( false );
+        select.setImmediate( true );
+        select.setLeftColumnCaption( "Available Nodes" );
+        select.setRightColumnCaption( "BackUpMaster" );
+        select.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
+        select.setRequired( true );
 
-        verticalLayoutForm.addComponent( selectMaster );
+        verticalLayoutForm.addComponent( select );
 
         grid.addComponent( verticalLayoutForm, 3, 0, 9, 9 );
         grid.setComponentAlignment( verticalLayoutForm, Alignment.TOP_CENTER );
@@ -71,11 +71,10 @@ public class StepSetMaster extends Panel
             @Override
             public void buttonClick( Button.ClickEvent event )
             {
-                wizard.getConfig().setMaster( ( UUID ) selectMaster.getValue() );
-
-                if ( wizard.getConfig().getMaster() == null )
+                wizard.getConfig().setBackupMasters( ( UUID ) select.getValue() );
+                if ( wizard.getConfig().getBackupMasters() == null )
                 {
-                    show( "Please add master servers" );
+                    show( "Please add backup servers" );
                 }
                 else
                 {
@@ -102,10 +101,8 @@ public class StepSetMaster extends Panel
         verticalLayout.addComponent( horizontalLayout );
 
         addComponent( verticalLayout );
-
-        selectMaster
-            .setContainerDataSource( new BeanItemContainer<UUID>( UUID.class, wizard.getConfig().getNodes() ) );
-        selectMaster.setValue( wizard.getConfig().getMaster() );
+        select.setContainerDataSource( new BeanItemContainer<UUID>( UUID.class, wizard.getConfig().getNodes() ) );
+        select.setValue( wizard.getConfig().getBackupMasters() );
     }
 
 
