@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     
     <reference id="mongoManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.mongodb.Mongo"/>   
+               interface="org.safehaus.subutai.api.mongodb.Mongo"/>
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
         
-    <bean id="module" scope="singleton" class="org.safehaus.kiskis.mgmt.ui.mongodb.MongoUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.mongodb.MongoUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager" />
         <argument ref="mongoManager"/>

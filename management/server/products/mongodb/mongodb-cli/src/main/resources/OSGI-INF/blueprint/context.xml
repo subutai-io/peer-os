@@ -2,7 +2,7 @@
         >
 
     <reference id="mongoManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.mongodb.Mongo"/>
+               interface="org.safehaus.subutai.api.mongodb.Mongo"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="mongodb/list-clusters">
