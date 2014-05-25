@@ -12,7 +12,7 @@
     <reference id="zookeeperManager" availability="mandatory"
                interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
     
-    <bean id="storm-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.storm.StormImpl"
+    <bean id="storm-impl" scope="singleton" class="org.safehaus.subutai.impl.storm.StormImpl"
           init-method="init" destroy-method="destroy">
         <property name="commandRunner" ref="commandRunner"/>
         <property name="agentManager" ref="agentManager"/>
@@ -21,6 +21,6 @@
         <property name="zookeeperManager" ref="zookeeperManager" />
     </bean>    
        
-    <service ref="storm-impl" interface="org.safehaus.kiskis.mgmt.api.storm.Storm"/>
+    <service ref="storm-impl" interface="org.safehaus.subutai.api.storm.Storm"/>
     
 </blueprint>
