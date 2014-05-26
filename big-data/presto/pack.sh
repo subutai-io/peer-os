@@ -35,19 +35,20 @@ tar -xvpzf $BASE/$fileName/opt/discovery-server-1.16.tar.gz -C .
 # find diff of discovery and presto-server tar files, copy diff to presto-server lib directory
 # this is required since dependency confliction do not let presto-server start properly
 
-if [ -f "a" ]; then
+if [ -f "$fileName/opt/a" ]; then
         echo "Delete a"
-        rm a;
+        rm $fileName/opt/a;
 fi
-if [ -f "b" ]; then
+
+if [ -f "$fileName/opt/b" ]; then
         echo "Delete b"
-        rm b;
+        rm $fileName/opt/b;
 fi
 
-a=`ls presto-server-0.69/lib | sed 's/-[0-9].*//' >> a`
-b=`ls discovery-server-1.16/lib | sed 's/-[0-9].*//' >> b`
+`ls presto-server-0.69/lib | sed 's/-[0-9].*//' >> $fileName/opt/a`
+`ls discovery-server-1.16/lib | sed 's/-[0-9].*//' >> $fileName/opt/b`
 
-fileNames=$(diff b a  | grep -i -- '<' |  cut -c 3-)
+fileNames=$(diff $fileName/opt/b $fileName/opt/a  | grep -i -- '<' |  cut -c 3-)
 IFS=' ' read -a array <<< "$fileNames"
 for index in $fileNames
 do
@@ -55,8 +56,8 @@ do
         cp discovery-server-1.16/lib/$A* presto-server-0.69/lib
 done
 
-rm a 
-rm b
+rm $fileName/opt/a 
+rm $fileName/opt/b
 
 mv presto-server-0.69/* $fileName/opt/presto-server-0.69/
 rm -rf presto-server-0.69/
