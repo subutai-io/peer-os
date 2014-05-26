@@ -31,9 +31,35 @@ wget http://central.maven.org/maven2/com/facebook/presto/presto-cli/0.69/presto-
 
 tar -xvpzf $BASE/$fileName/opt/presto-server-0.69.tar.gz -C .
 tar -xvpzf $BASE/$fileName/opt/discovery-server-1.16.tar.gz -C .
+
+# find diff of discovery and presto-server tar files, copy diff to presto-server lib directory
+# this is required since dependency confliction do not let presto-server start properly
+
+if [ -f "a" ]; then
+        echo "Delete a"
+        rm a;
+fi
+if [ -f "b" ]; then
+        echo "Delete b"
+        rm b;
+fi
+
+a=`ls presto-server-0.69/lib | sed 's/-[0-9].*//' >> a`
+b=`ls discovery-server-1.16/lib | sed 's/-[0-9].*//' >> b`
+
+fileNames=$(diff b a  | grep -i -- '<' |  cut -c 3-)
+IFS=' ' read -a array <<< "$fileNames"
+for index in $fileNames
+do
+        A=$index
+        cp discovery-server-1.16/lib/$A* presto-server-0.69/lib
+done
+
+rm a 
+rm b
+
 mv presto-server-0.69/* $fileName/opt/presto-server-0.69/
 rm -rf presto-server-0.69/
-mv discovery-server-1.16 $fileName/opt/
 rm $fileName/opt/presto-server-0.69.tar.gz
 rm $fileName/opt/discovery-server-1.16.tar.gz
 mv $fileName/opt/presto-cli-0.69-executable.jar $fileName/opt/presto-server-0.69/
