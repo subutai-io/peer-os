@@ -26,7 +26,7 @@ if [ "x$PRESTO_HOME" = "x" ];
 then
        PRESTO_HOME=$DEFAULT_PRESTO_HOME 
 fi
-fileName="$PRESTO_HOME/conf/$2"
+fileName="$PRESTO_HOME/etc/$2"
 
 do_add()
 {
