@@ -1,7 +1,7 @@
-/opt/presto-server-0.57/etc/config.properties
-/opt/presto-server-0.57/etc/jvm.config
-/opt/presto-server-0.57/etc/log.properties
-/opt/presto-server-0.57/etc/node.properties
-/opt/presto-server-0.57/etc/catalog/cassandra.properties
-/opt/presto-server-0.57/etc/catalog/hive.properties
-/opt/presto-server-0.57/etc/catalog/jmx.properties
+/opt/presto-server-0.69/etc/config.properties
+/opt/presto-server-0.69/etc/jvm.config
+/opt/presto-server-0.69/etc/log.properties
+/opt/presto-server-0.69/etc/node.properties
+/opt/presto-server-0.69/etc/catalog/cassandra.properties
+/opt/presto-server-0.69/etc/catalog/hive.properties
+/opt/presto-server-0.69/etc/catalog/jmx.properties

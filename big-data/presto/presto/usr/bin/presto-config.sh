@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prestoVer="0.61"
+prestoVer="0.69"
 presto="presto-server-$prestoVer"
 
 . /etc/profile
@@ -19,10 +19,8 @@ coordinator)
 	cd /opt/$presto/etc
 	> config.properties
 	echo "coordinator=true" >> config.properties
-	echo "datasources=jmx" >> config.properties
+	echo "node-scheduler.include-coordinator=false" >> config.properties
 	echo "http-server.http.port=8413" >> config.properties
-	echo "presto-metastore.db.type=h2" >> config.properties
-	echo "presto-metastore.db.filename=var/db/MetaStore" >> config.properties
 	echo "task.max-memory=1GB" >> config.properties
 	echo "discovery-server.enabled=true" >> config.properties
 	echo "discovery.uri=http://$ip:8413" >> config.properties
@@ -39,10 +37,7 @@ worker)
 	cd /opt/$presto/etc
 	> config.properties
 	echo "coordinator=false" >> config.properties
-	echo "datasources=jmx,hive" >> config.properties
 	echo "http-server.http.port=8413" >> config.properties
-	echo "presto-metastore.db.type=h2" >> config.properties
-	echo "presto-metastore.db.filename=var/db/MetaStore" >> config.properties
 	echo "task.max-memory=1GB" >> config.properties
 	echo "discovery.uri=http://$ip:8413" >> config.properties
 	if [ -f "/etc/ksks-agent/config/uuid.txt" ]; 
