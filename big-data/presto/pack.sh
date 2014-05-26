@@ -49,11 +49,11 @@ fi
 `ls discovery-server-1.16/lib | sed 's/-[0-9].*//' >> $fileName/opt/b`
 
 fileNames=$(diff $fileName/opt/b $fileName/opt/a  | grep -i -- '<' |  cut -c 3-)
-IFS=' ' read -a array <<< "$fileNames"
 for index in $fileNames
 do
         A=$index
         cp discovery-server-1.16/lib/$A* presto-server-0.69/lib
+	echo "copying $A jar file to presto-server-0.69/lib folder"
 done
 
 rm $fileName/opt/a 
@@ -67,7 +67,6 @@ mv $fileName/opt/presto-cli-0.69-executable.jar $fileName/opt/presto-server-0.69
 rm $fileName/opt/README.md
 
 #Adding jar flies from discovery server
-cp $fileName/opt/discovery-server-1.16/lib/*.jar $fileName/opt/presto-server-0.69/lib/
 rm -rf $fileName/opt/discovery-server-1.16
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
