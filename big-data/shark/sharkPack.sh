@@ -17,7 +17,7 @@ fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
-#cp -a $SOURCE/etc/ $BASE/$fileName/ 
+cp -a $SOURCE/etc/ $BASE/$fileName/ 
 rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
