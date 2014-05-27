@@ -16,5 +16,6 @@
 
     <modules>
         <module>package-manager-api</module>
+        <module>package-manager-impl</module>
     </modules>
 </project>
