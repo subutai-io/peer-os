@@ -86,4 +86,9 @@ public class PackageInfo {
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return "PackageInfo{" + "name=" + name + ", version=" + version + ", state=" + state + ", selectionState=" + selectionState + ", flags=" + flags + ", arch=" + arch + ", description=" + description + '}';
+    }
+
 }

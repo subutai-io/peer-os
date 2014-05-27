@@ -6,6 +6,23 @@ package org.safehaus.subutai.api.packagemanager;
  */
 public enum PackageFlag {
 
-    REINST_REQUIRED;
+    REINST_REQUIRED('R');
+
+    private final char abbrev;
+
+    private PackageFlag(char abbrev) {
+        this.abbrev = abbrev;
+    }
+
+    public char getAbbrev() {
+        return abbrev;
+    }
+
+    public static PackageFlag getByAbbrev(char abbrev) {
+        for(PackageFlag f : values()) {
+            if(f.abbrev == abbrev) return f;
+        }
+        return null;
+    }
 
 }
