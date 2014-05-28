@@ -172,32 +172,11 @@
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet.version}</version>
             </dependency>
-            <!--<dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${commons-cli.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-jexl</groupId>
-                <artifactId>commons-jexl</artifactId>
-                <version>${commons-jexl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cssparser</groupId>
-                <artifactId>cssparser</artifactId>
-                <version>${cssparser.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${org.jsoup.version}</version>
             </dependency>
-            <dependency>
-                <groupId>milyn</groupId>
-                <artifactId>sac</artifactId>
-                <version>${sac.version}</version>
-            </dependency>-->
-
 
             <!--agent-manager-impl-->
             <dependency>
