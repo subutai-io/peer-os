@@ -167,5 +167,11 @@
             <artifactId>org.osgi.core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
