@@ -88,7 +88,13 @@ public class PackageInfo {
 
     @Override
     public String toString() {
-        return "PackageInfo{" + "name=" + name + ", version=" + version + ", state=" + state + ", selectionState=" + selectionState + ", flags=" + flags + ", arch=" + arch + ", description=" + description + '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append(selectionState.getAbbrev());
+        sb.append(state.getAbbrev());
+        for(PackageFlag f : flags) sb.append(f);
+        sb.append("\t").append(name).append("\t").append(version);
+        sb.append("\t").append(description);
+        return sb.toString();
     }
 
 }

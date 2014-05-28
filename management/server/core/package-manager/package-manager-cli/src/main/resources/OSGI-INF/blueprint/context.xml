@@ -4,7 +4,7 @@
                interface="org.safehaus.subutai.api.packagemanager.PackageManager" />
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="package/list">
+        <command name="deb-package/list">
             <action class="org.safehaus.subutai.cli.commands.ListPackages">
                 <property name="packageManager" ref="packageManager" />
             </action>

@@ -7,7 +7,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.api.packagemanager.PackageManager;
 
-@Command(scope = "package", name = "list", description = "list packages")
+@Command(scope = "deb-package", name = "list", description = "list packages")
 public class ListPackages extends OsgiCommandSupport {
 
     private PackageManager packageManager;
