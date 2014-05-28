@@ -548,6 +548,24 @@
                                     <artifactId>monitor-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                
+                                <!-- Package Manager -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>package-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>package-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>package-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                                                
                                 <!-- Core Modules - END -->
 
                                 <!-- Products Modules - START -->
