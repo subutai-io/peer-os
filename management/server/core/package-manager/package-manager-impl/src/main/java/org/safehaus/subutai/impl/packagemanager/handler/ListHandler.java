@@ -11,7 +11,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     private final String hostname;
-    private Pattern lineStartPattern = Pattern.compile("[a-z]{2,3}\\s+");
+    private Pattern lineStartPattern = Pattern.compile("^[a-z]{2,3}\\s+");
 
     public ListHandler(PackageManagerImpl pm, String hostname) {
         super(pm);
@@ -21,7 +21,7 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
     @Override
     public Collection<PackageInfo> performAction() {
         Agent agent = pm.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) return Collections.emptyList();
+        if(agent == null) return null;
 
         AgentRequestBuilder rb = new AgentRequestBuilder(agent, "dpkg -l");
         Command cmd = pm.getCommandRunner().createCommand(new HashSet<>(Arrays.asList(rb)));
@@ -32,8 +32,13 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
             String s = res.getStdOut();
             Pattern delim = Pattern.compile("\\s+");
             try(BufferedReader br = new BufferedReader(new StringReader(s))) {
+                int cols = 0;
                 while((s = br.readLine()) != null) {
-                    PackageInfo pi = parseLine(s, delim);
+                    if(cols == 0 && s.startsWith("+++"))
+                        // http://stackoverflow.com/questions/275944
+                        // count occurences of a seperator minus sign
+                        cols = 1 + s.length() - s.replace("-", "").length();
+                    PackageInfo pi = parseLine(s, cols, delim);
                     if(pi != null) ls.add(pi);
                 }
             } catch(IOException ex) {
@@ -44,14 +49,18 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         return Collections.emptyList();
     }
 
-    PackageInfo parseLine(String s, Pattern delim) {
-        if(!lineStartPattern.matcher(s).matches()) return null;
-        String[] arr = delim.split(s);
+    PackageInfo parseLine(String s, int columns, Pattern delim) {
+        if(!lineStartPattern.matcher(s).find()) return null;
+        String[] arr = delim.split(s, columns);
         PackageInfo p = null;
-        if(arr.length > 3) {
+        if(arr.length > columns - 1) {
             char[] status = arr[0].toCharArray();
             p = new PackageInfo(arr[1], arr[2]);
-            p.setDescription(arr[3]);
+            if(columns == 5) {
+                p.setArch(arr[3]);
+                p.setDescription(arr[4]);
+            } else
+                p.setDescription(arr[3]);
             p.setSelectionState(SelectionState.getByAbbrev(status[0]));
             p.setState(PackageState.getByAbbrev(status[1]));
             if(status.length > 2) {
