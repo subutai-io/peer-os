@@ -218,8 +218,8 @@ public class MainUI extends UI {
                                 logo.setSizeUndefined();
                                 addComponent(logo);
 
-//                                addComponent(new Image(null, new ThemeResource(
-//                                        "img/logo.png")));
+                                addComponent(new Image(null, new ThemeResource(
+                                        "img/subutai.png")));
                             }
                         });
 
@@ -334,7 +334,7 @@ public class MainUI extends UI {
     }
 
     private void clearMenuSelection() {
-        for (Iterator<Component> it = menu.getComponentIterator(); it.hasNext();) {
+        for (Iterator<Component> it = menu.iterator(); it.hasNext();) {
             Component next = it.next();
             if (next instanceof NativeButton) {
                 next.removeStyleName("selected");
