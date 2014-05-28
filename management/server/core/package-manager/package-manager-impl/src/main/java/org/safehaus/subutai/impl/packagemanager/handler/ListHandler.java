@@ -1,20 +1,17 @@
 package org.safehaus.subutai.impl.packagemanager.handler;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.*;
-import org.safehaus.subutai.api.packagemanager.PackageFlag;
-import org.safehaus.subutai.api.packagemanager.PackageInfo;
-import org.safehaus.subutai.api.packagemanager.PackageState;
-import org.safehaus.subutai.api.packagemanager.SelectionState;
+import org.safehaus.subutai.api.packagemanager.*;
 import org.safehaus.subutai.impl.packagemanager.PackageManagerImpl;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     private final String hostname;
+    private Pattern lineStartPattern = Pattern.compile("[a-z]{2,3}\\s+");
 
     public ListHandler(PackageManagerImpl pm, String hostname) {
         super(pm);
@@ -26,18 +23,18 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         Agent agent = pm.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) return Collections.emptyList();
 
-        String s = "dpkg-query -W -f='${db:Status-Abbrev}\t${binary:Package}\t${Version}\t${binary:Summary}\n'";
-        AgentRequestBuilder rb = new AgentRequestBuilder(agent, s);
+        AgentRequestBuilder rb = new AgentRequestBuilder(agent, "dpkg -l");
         Command cmd = pm.getCommandRunner().createCommand(new HashSet<>(Arrays.asList(rb)));
         pm.getCommandRunner().runCommand(cmd);
         if(cmd.hasSucceeded()) {
             Collection<PackageInfo> ls = new ArrayList<>();
             AgentResult res = cmd.getResults().get(agent.getUuid());
-            s = res.getStdOut();
+            String s = res.getStdOut();
+            Pattern delim = Pattern.compile("\\s+");
             try(BufferedReader br = new BufferedReader(new StringReader(s))) {
                 while((s = br.readLine()) != null) {
-                    PackageInfo pi = parseLine(s);
-                    ls.add(pi);
+                    PackageInfo pi = parseLine(s, delim);
+                    if(pi != null) ls.add(pi);
                 }
             } catch(IOException ex) {
                 // TODO:
@@ -47,14 +44,21 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         return Collections.emptyList();
     }
 
-    PackageInfo parseLine(String s) {
-        String[] arr = s.split("\\t");
-        char[] status = arr[0].toCharArray();
-        PackageInfo p = new PackageInfo(arr[1], arr[2]);
-        p.setDescription(arr[3]);
-        p.setSelectionState(SelectionState.getByAbbrev(status[0]));
-        p.setState(PackageState.getByAbbrev(status[1]));
-        if(status.length > 2) p.getFlags().add(PackageFlag.getByAbbrev(status[2]));
+    PackageInfo parseLine(String s, Pattern delim) {
+        if(!lineStartPattern.matcher(s).matches()) return null;
+        String[] arr = delim.split(s);
+        PackageInfo p = null;
+        if(arr.length > 3) {
+            char[] status = arr[0].toCharArray();
+            p = new PackageInfo(arr[1], arr[2]);
+            p.setDescription(arr[3]);
+            p.setSelectionState(SelectionState.getByAbbrev(status[0]));
+            p.setState(PackageState.getByAbbrev(status[1]));
+            if(status.length > 2) {
+                PackageFlag f = PackageFlag.getByAbbrev(status[2]);
+                if(f != null) p.getFlags().add(f);
+            }
+        }
         return p;
     }
 

@@ -1,14 +1,15 @@
-
 package org.safehaus.subutai.impl.packagemanager;
 
 import java.util.Collection;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
+import org.safehaus.subutai.impl.packagemanager.handler.ListHandler;
 
 public class PackageManagerImpl extends PackageManagerBase {
 
     @Override
     public Collection<PackageInfo> listPackages(String hostname) {
-        return null;
+        ListHandler h = new ListHandler(this, hostname);
+        return h.performAction();
     }
 
     @Override
