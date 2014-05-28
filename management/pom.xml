@@ -94,6 +94,7 @@
         <org.osgi.version>4.3.1</org.osgi.version>
         <!-- Vaadin/GWT -->
         <vaadin.version>7.0.7</vaadin.version>
+        <vaadin-shared-deps.version>1.0.2</vaadin-shared-deps.version>
         <gwt.version>2.6.1</gwt.version>
         <vaadin.production>false</vaadin.production>
         <!-- servlet -->
@@ -106,8 +107,11 @@
         <com.google.guava.version>16.0.1</com.google.guava.version>
         <com.jayway.awaitility.version>1.5.0</com.jayway.awaitility.version>
         <com.sun.jersey.version>1.18.1</com.sun.jersey.version>
+        <commons-cli.version>1.2</commons-cli.version>
+        <commons-jexl.version>2.1.1</commons-jexl.version>
         <commons-net.version>3.3</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
+        <cssparser.version>0.9.4</cssparser.version>
         <io.netty.version>3.9.0.Final</io.netty.version>
         <javax.annotation.version>1.2</javax.annotation.version>
         <javax.jmdns.version>3.4.1</javax.jmdns.version>
@@ -129,12 +133,14 @@
         <org.cassandraunit.version>2.0.2.1</org.cassandraunit.version>
         <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
         <org.doomdark.version>1.1.2</org.doomdark.version>
+        <org.jsoup.version>1.6.3</org.jsoup.version>
         <org.eclipse.jetty.orbit.version>2.5.0.v201103041518</org.eclipse.jetty.orbit.version>
         <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
         <org.mockito.version>1.9.5</org.mockito.version>
         <org.slf4j.version>1.7.6</org.slf4j.version>
         <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
         <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
+        <sac.version>1.3</sac.version>
         <xalan.version>2.7.1</xalan.version>
     </properties>
 
@@ -166,6 +172,32 @@
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet.version}</version>
             </dependency>
+            <!--<dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${commons-cli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-jexl</groupId>
+                <artifactId>commons-jexl</artifactId>
+                <version>${commons-jexl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cssparser</groupId>
+                <artifactId>cssparser</artifactId>
+                <version>${cssparser.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${org.jsoup.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>milyn</groupId>
+                <artifactId>sac</artifactId>
+                <version>${sac.version}</version>
+            </dependency>-->
+
 
             <!--agent-manager-impl-->
             <dependency>

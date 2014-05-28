@@ -32,30 +32,24 @@
         <!-- UI -->
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client-compiled</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-themes</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>${servlet.version}</version>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-theme-compiler</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-shared</artifactId>
+            <version>${vaadin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-shared-deps</artifactId>
+            <version>${vaadin-shared-deps.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-all</artifactId>
@@ -298,28 +292,23 @@
                                 <!-- UI -->
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
-                                    <artifactId>vaadin-server</artifactId>
-                                    <version>${vaadin.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.vaadin</groupId>
-                                    <artifactId>vaadin-client-compiled</artifactId>
-                                    <version>${vaadin.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.vaadin</groupId>
-                                    <artifactId>vaadin-client</artifactId>
-                                    <version>${vaadin.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin-themes</artifactId>
                                     <version>${vaadin.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>javax.servlet</groupId>
-                                    <artifactId>servlet-api</artifactId>
-                                    <version>${servlet.version}</version>
+                                    <groupId>com.vaadin</groupId>
+                                    <artifactId>vaadin-theme-compiler</artifactId>
+                                    <version>${vaadin.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.vaadin</groupId>
+                                    <artifactId>vaadin-shared</artifactId>
+                                    <version>${vaadin.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.vaadin</groupId>
+                                    <artifactId>vaadin-shared-deps</artifactId>
+                                    <version>${vaadin-shared-deps.version}</version>
                                 </artifactItem>
 
                                 <artifactItem>
@@ -464,13 +453,13 @@
                                 <!-- Vaadin - END -->
 
                                 <!-- Core Modules - START -->
-                                <artifactItem>
+                               <!-- <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- Tracker -->
+                                &lt;!&ndash; Tracker &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-api</artifactId>
@@ -481,13 +470,13 @@
                                     <artifactId>tracker-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
+                                &lt;!&ndash;<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>&ndash;&gt;
 
-                                <!-- Command Runner -->
+                                &lt;!&ndash; Command Runner &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-api</artifactId>
@@ -498,13 +487,13 @@
                                     <artifactId>command-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
+                                &lt;!&ndash;<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>&ndash;&gt;
 
-                                <!-- Agent Manager -->
+                                &lt;!&ndash; Agent Manager &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>agent-manager-api</artifactId>
@@ -521,7 +510,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- DB Manager -->
+                                &lt;!&ndash; DB Manager &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>db-manager-api</artifactId>
@@ -533,7 +522,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- Communication Manager -->
+                                &lt;!&ndash; Communication Manager &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>communication-manager-api</artifactId>
@@ -545,12 +534,12 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- LXC Manager -->
-                                <!--<artifactItem>
+                                &lt;!&ndash; LXC Manager &ndash;&gt;
+                                &lt;!&ndash;<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>&ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-api</artifactId>
@@ -562,7 +551,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!--Network Manager -->
+                                &lt;!&ndash;Network Manager &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>network-manager-api</artifactId>
@@ -574,7 +563,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!-- Monitor -->
+                                &lt;!&ndash; Monitor &ndash;&gt;
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-api</artifactId>
@@ -584,7 +573,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-impl</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-ui</artifactId>

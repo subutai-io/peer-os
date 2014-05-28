@@ -24,10 +24,12 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
     public synchronized void unregisterModule(PortalModule module) {
-        System.out.println("ModuleServiceImpl: Unregistering module " + module.getId());
-        modules.remove(module);
-        for (PortalModuleListener listener : listeners) {
-            listener.moduleUnregistered(module);
+        if (module != null) {
+            System.out.println("ModuleServiceImpl: Unregistering module " + module.getId());
+            modules.remove(module);
+            for (PortalModuleListener listener : listeners) {
+                listener.moduleUnregistered(module);
+            }
         }
     }
 
@@ -51,8 +53,10 @@ public class PortalModuleServiceImpl implements PortalModuleService {
     }
 
     public synchronized void removeListener(PortalModuleListener listener) {
-        System.out.println("ModuleServiceImpl: Removing listener " + listener);
-        listeners.remove(listener);
+        if(listener != null){
+            System.out.println("ModuleServiceImpl: Removing listener " + listener);
+            listeners.remove(listener);
+        }
     }
 
 }
