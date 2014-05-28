@@ -88,12 +88,13 @@ public class PackageInfo {
 
     @Override
     public String toString() {
+        String sep = "\t";
         StringBuilder sb = new StringBuilder();
         sb.append(selectionState.getAbbrev());
         sb.append(state.getAbbrev());
         for(PackageFlag f : flags) sb.append(f);
-        sb.append("\t").append(name).append("\t").append(version);
-        sb.append("\t").append(description);
+        sb.append(sep).append(name).append(sep).append(version);
+        sb.append(sep).append(arch).append(sep).append(description);
         return sb.toString();
     }
 

@@ -26,6 +26,10 @@ public class ListPackages extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
         if(hostname != null) {
             Collection<PackageInfo> ls = packageManager.listPackages(hostname);
+            if(ls == null) {
+                System.out.println("Invalid hostname or agent is not connected");
+                return null;
+            }
             for(PackageInfo pi : ls) {
                 System.out.println(pi);
             }
