@@ -23,7 +23,7 @@ public class PackageManagerImpl extends PackageManagerBase {
     }
 
     @Override
-    public Collection<PackageInfo> deletePackagesInfo(String hostname) {
+    public boolean deletePackagesInfo(String hostname) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
