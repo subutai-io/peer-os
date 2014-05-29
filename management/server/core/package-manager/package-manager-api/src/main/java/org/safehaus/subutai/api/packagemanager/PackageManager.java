@@ -23,7 +23,7 @@ public interface PackageManager {
      * @return Previously saved collection of package information objects.
      * <code>Null</code> if no information was saved before
      */
-    Collection<PackageInfo> getPackagesInfo(String hostname);
+    Collection<PackageInfo> findPackagesInfo(String hostname);
 
     /**
      * Saves packages information on host.
