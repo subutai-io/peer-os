@@ -24,8 +24,13 @@ cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 wget http://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop1.tgz -P $fileName/opt/
 tar -xvzf $fileName/opt/*.tgz -C $fileName/opt
 cp -a -r $fileName/opt/shark-0.9.1-bin-hadoop1/* $fileName/opt/shark-0.9.1/
+cp $fileName/opt/shark-0.9.1/conf/shark-env.sh.template $fileName/opt/shark-0.9.1/conf/shark-env.sh
 rm -rf $fileName/opt/shark-0.9.1-bin-hadoop1
 rm $fileName/opt/*.tgz
+
+# download derby client jar file
+wget http://repo1.maven.org/maven2/org/apache/derby/derbyclient/10.10.2.0/derbyclient-10.10.2.0.jar -P $fileName/opt/shark-0.9.1/lib/
+
 if [ -f "$fileName/opt/README" ]; then
 	rm $fileName/opt/README
 fi
