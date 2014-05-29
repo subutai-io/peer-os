@@ -20,12 +20,13 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     @Override
     public Collection<PackageInfo> performAction() {
-        Agent agent = pm.getAgentManager().getAgentByHostname(hostname);
+        Agent agent = packageManager.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) return null;
 
         AgentRequestBuilder rb = new AgentRequestBuilder(agent, "dpkg -l");
-        Command cmd = pm.getCommandRunner().createCommand(new HashSet<>(Arrays.asList(rb)));
-        pm.getCommandRunner().runCommand(cmd);
+        Command cmd = packageManager.getCommandRunner().createCommand(
+                new HashSet<>(Arrays.asList(rb)));
+        packageManager.getCommandRunner().runCommand(cmd);
         if(cmd.hasSucceeded()) {
             Collection<PackageInfo> ls = new ArrayList<>();
             AgentResult res = cmd.getResults().get(agent.getUuid());
@@ -34,9 +35,9 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
             try(BufferedReader br = new BufferedReader(new StringReader(s))) {
                 int cols = 0;
                 while((s = br.readLine()) != null) {
+                    // count occurences of a seperator minus sign
+                    // http://stackoverflow.com/questions/275944
                     if(cols == 0 && s.startsWith("+++"))
-                        // http://stackoverflow.com/questions/275944
-                        // count occurences of a seperator minus sign
                         cols = 1 + s.length() - s.replace("-", "").length();
                     PackageInfo pi = parseLine(s, cols, delim);
                     if(pi != null) ls.add(pi);

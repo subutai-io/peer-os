@@ -5,10 +5,10 @@ import org.safehaus.subutai.impl.packagemanager.PackageManagerImpl;
 
 public abstract class AbstractHandler<T> implements Callable<T> {
 
-    protected final PackageManagerImpl pm;
+    protected final PackageManagerImpl packageManager;
 
     public AbstractHandler(PackageManagerImpl pm) {
-        this.pm = pm;
+        this.packageManager = pm;
     }
 
     public abstract T performAction();
