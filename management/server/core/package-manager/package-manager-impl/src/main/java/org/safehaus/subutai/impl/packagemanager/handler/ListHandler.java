@@ -12,10 +12,19 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     private final String hostname;
     private Pattern lineStartPattern = Pattern.compile("^[a-z]{2,3}\\s+");
+    private String namePattern;
 
     public ListHandler(PackageManagerImpl pm, String hostname) {
         super(pm);
         this.hostname = hostname;
+    }
+
+    public String getNamePattern() {
+        return namePattern;
+    }
+
+    public void setNamePattern(String namePattern) {
+        this.namePattern = namePattern;
     }
 
     @Override
@@ -23,7 +32,7 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         Agent agent = packageManager.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) return null;
 
-        AgentRequestBuilder rb = new AgentRequestBuilder(agent, "dpkg -l");
+        AgentRequestBuilder rb = new AgentRequestBuilder(agent, makeCommand());
         Command cmd = packageManager.getCommandRunner().createCommand(
                 new HashSet<>(Arrays.asList(rb)));
         packageManager.getCommandRunner().runCommand(cmd);
@@ -48,6 +57,13 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
             return ls;
         }
         return Collections.emptyList();
+    }
+
+    private String makeCommand() {
+        StringBuilder sb = new StringBuilder("dpkg -l");
+        if(namePattern != null && !namePattern.isEmpty())
+            sb.append(" '").append(namePattern).append("'");
+        return sb.toString();
     }
 
     PackageInfo parseLine(String s, int columns, Pattern delim) {

@@ -10,10 +10,22 @@ public interface PackageManager {
      * @param hostname
      * @return A collection of package information objects. If there are no
      * packages on a host for some reason, an empty collection is returned.
-     * Returns <code>Null</code> if host name is invalid or is not reachable or
+     * Returns <code>null</code> if host name is invalid or is not reachable or
      * any other error occurs
      */
     Collection<PackageInfo> listPackages(String hostname);
+
+    /**
+     * Gets a list of packages matching a given pattern on a given host.
+     *
+     * @param hostname
+     * @param pattern package name pattern; normal shell wildcards are allowed
+     * @return A collection of package information objects matching the given
+     * pattern. If there are no matching packages on a host, an empty collection
+     * is returned. Returns <code>null</code> if host name is invalid or is not
+     * reachable or any other error occurs
+     */
+    Collection<PackageInfo> listPackages(String hostname, String namePattern);
 
     /**
      * Retrieves previously saved packages information. Host name is used as a
@@ -21,7 +33,7 @@ public interface PackageManager {
      *
      * @param hostname
      * @return Previously saved collection of package information objects.
-     * <code>Null</code> if no information was saved before
+     * <code>null</code> if no information was saved before
      */
     Collection<PackageInfo> findPackagesInfo(String hostname);
 
@@ -30,7 +42,7 @@ public interface PackageManager {
      *
      * @param hostname
      * @return A collection of package information objects that is saved by this
-     * method. <code>Null</code> if host name is invalid or is not connected or
+     * method. <code>null</code> if host name is invalid or is not connected or
      * any other error occurs
      */
     Collection<PackageInfo> savePackagesInfo(String hostname);

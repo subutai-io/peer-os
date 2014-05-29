@@ -11,7 +11,13 @@ public class PackageManagerImpl extends PackageManagerBase {
 
     @Override
     public Collection<PackageInfo> listPackages(String hostname) {
+        return listPackages(hostname, null);
+    }
+
+    @Override
+    public Collection<PackageInfo> listPackages(String hostname, String namePattern) {
         ListHandler h = new ListHandler(this, hostname);
+        h.setNamePattern(namePattern);
         return h.performAction();
     }
 

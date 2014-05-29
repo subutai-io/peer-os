@@ -13,6 +13,8 @@ public class ListPackages extends OsgiCommandSupport {
     private PackageManager packageManager;
     @Argument(index = 0, required = true)
     private String hostname;
+    @Argument(index = 1, description = "package name pattern")
+    private String namePattern;
 
     public PackageManager getPackageManager() {
         return packageManager;
@@ -25,7 +27,7 @@ public class ListPackages extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         if(hostname != null) {
-            Collection<PackageInfo> ls = packageManager.listPackages(hostname);
+            Collection<PackageInfo> ls = packageManager.listPackages(hostname, namePattern);
             if(ls == null) {
                 System.out.println("Invalid hostname or agent is not connected");
                 return null;
