@@ -4,8 +4,32 @@
                interface="org.safehaus.subutai.api.packagemanager.PackageManager" />
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="deb-package/delete">
+            <action class="org.safehaus.subutai.cli.commands.DeletePackagesInfo">
+                <property name="packageManager" ref="packageManager" />
+            </action>
+        </command>
+    </command-bundle>
+    
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="deb-package/find">
+            <action class="org.safehaus.subutai.cli.commands.FindPackagesInfo">
+                <property name="packageManager" ref="packageManager" />
+            </action>
+        </command>
+    </command-bundle>
+    
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="deb-package/list">
             <action class="org.safehaus.subutai.cli.commands.ListPackages">
+                <property name="packageManager" ref="packageManager" />
+            </action>
+        </command>
+    </command-bundle>
+    
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="deb-package/save">
+            <action class="org.safehaus.subutai.cli.commands.SavePackagesInfo">
                 <property name="packageManager" ref="packageManager" />
             </action>
         </command>
