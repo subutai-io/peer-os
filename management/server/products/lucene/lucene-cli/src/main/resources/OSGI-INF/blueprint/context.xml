@@ -2,11 +2,11 @@
         >
 
     <reference id="luceneManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lucene.Lucene"/>
+               interface="org.safehaus.subutai.api.lucene.Lucene"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="lucene/list-clusters">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
                 <property name="luceneManager" ref="luceneManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="lucene/uninstall-cluster">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallClusterCommand">
+            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
                 <property name="luceneManager" ref="luceneManager"/>
             </action>
         </command>

@@ -5,12 +5,12 @@
 
     <parent>
         <artifactId>network-manager-parent</artifactId>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>network-manager-api</artifactId>
-    <name>Kiskis Management Network Manager Api</name>
+    <name>Subutai Network Manager Api</name>
     <description>Network Manager Api</description>
 
     <packaging>bundle</packaging>

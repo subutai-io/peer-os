@@ -102,6 +102,7 @@ rm -rf $pattern/
 cd $BASE
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/var $BASE/$fileName/
+cp -a $SOURCE/etc $BASE/$fileName/
 rm $BASE/$fileName/var/lib/lxc/README.md
 rm $BASE/$fileName/var/lib/lxc/check.sh
 

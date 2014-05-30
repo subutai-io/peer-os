@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>spark-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>spark-rest</artifactId>
-    <name>Kiskis Management Spark REST</name>
-    <description>Kiskis Management Spark REST</description>
+    <name>Subutai Spark REST</name>
+    <description>Subutai Spark REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>

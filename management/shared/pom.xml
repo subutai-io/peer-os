@@ -4,19 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>mgmt-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>mgmt-shared-parent</artifactId>
-    <name>Kiskis Management Shared Parent</name>
+    <name>Subutai Shared Parent</name>
     <packaging>pom</packaging>
 
     <modules>
         <module>protocol</module>
     </modules>
 
-    <description>Parent project for the Kiskis Management Shared Artifacts</description>
+    <description>Parent project for the Subutai Shared Artifacts</description>
 
 </project>

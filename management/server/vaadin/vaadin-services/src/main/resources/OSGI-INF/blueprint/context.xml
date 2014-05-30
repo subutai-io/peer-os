@@ -2,15 +2,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
     
     <bean id="moduleNotifier" scope="singleton" activation="eager"
-          class="org.safehaus.kiskis.mgmt.server.ui.services.impl.ModuleNotifierImpl"/>
+          class="org.safehaus.subutai.server.ui.services.impl.ModuleNotifierImpl"/>
     
     <reference-list id="modules"
-                    interface="org.safehaus.kiskis.mgmt.server.ui.services.Module"
+                    interface="org.safehaus.subutai.server.ui.services.Module"
                     availability="optional">
         <reference-listener ref="moduleNotifier"
                             bind-method="setModule" unbind-method="unsetModule">
         </reference-listener>
     </reference-list>    
     
-    <service ref="moduleNotifier" interface="org.safehaus.kiskis.mgmt.server.ui.services.ModuleNotifier"/>
+    <service ref="moduleNotifier" interface="org.safehaus.subutai.server.ui.services.ModuleNotifier"/>
 </blueprint>

@@ -26,6 +26,7 @@ escape_characters()
 	echo $escaped_name
 }
 . /etc/profile
-file="${ACCUMULO_HOME}/conf/accumulo-env.sh"
+ACCUMULO_HOME="/opt/accumulo-1.4.2"
+file="$ACCUMULO_HOME/conf/accumulo-env.sh"
 path=$(escape_characters $2)
 sed -i "s/export $1=.*/export $1=$path/g" $file

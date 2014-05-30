@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>hadoop-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>hadoop-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Hadoop</name>
-    <description>Kiskis Management Hadoop</description>
+    <name>Subutai Hadoop</name>
+    <description>Subutai Hadoop</description>
 
     <dependencies>
         <dependency>

@@ -82,6 +82,18 @@ string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,s
 }
 
 /**
+ *  \details   This method creates IN_QUEUE Message
+ */
+string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
+{
+	this->setType("IN_QUEUE");
+	this->setTaskUuid(taskuuid);
+	this->setUuid(uuid);
+	this->serialize(sendout);
+	return sendout;
+}
+
+/**
  *  \details   This method creates HeartBeat message.
  */
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,

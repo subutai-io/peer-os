@@ -2,17 +2,17 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.dbmanager.DbManager"/>
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.lxcmanager.LxcManager"/>
+               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
 
-    <bean id="solr-impl" scope="singleton" class="org.safehaus.kiskis.mgmt.impl.solr.SolrImpl"
+    <bean id="solr-impl" scope="singleton" class="org.safehaus.subutai.impl.solr.SolrImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
         <argument ref="agentManager"/>
@@ -21,6 +21,6 @@
         <argument ref="lxcManager"/>
     </bean>
 
-    <service ref="solr-impl" interface="org.safehaus.kiskis.mgmt.api.solr.Solr"/>
+    <service ref="solr-impl" interface="org.safehaus.subutai.api.solr.Solr"/>
 
 </blueprint>

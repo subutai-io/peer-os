@@ -25,21 +25,48 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
 #getting presto packages
-wget http://central.maven.org/maven2/com/facebook/presto/presto-server/0.61/presto-server-0.61.tar.gz -P $fileName/opt/
+wget http://central.maven.org/maven2/com/facebook/presto/presto-server/0.69/presto-server-0.69.tar.gz -P $fileName/opt/
 wget http://central.maven.org/maven2/io/airlift/discovery/discovery-server/1.16/discovery-server-1.16.tar.gz -P $fileName/opt/
-wget http://central.maven.org/maven2/com/facebook/presto/presto-cli/0.61/presto-cli-0.61-executable.jar -P $fileName/opt/
-tar -xvpzf $BASE/$fileName/opt/presto-server-0.61.tar.gz -C .
+wget http://central.maven.org/maven2/com/facebook/presto/presto-cli/0.69/presto-cli-0.69-executable.jar -P $fileName/opt/
+
+tar -xvpzf $BASE/$fileName/opt/presto-server-0.69.tar.gz -C .
 tar -xvpzf $BASE/$fileName/opt/discovery-server-1.16.tar.gz -C .
-mv presto-server-0.61/* $fileName/opt/presto-server-0.61/
-rm -rf presto-server-0.61/
-mv discovery-server-1.16 $fileName/opt/
-rm $fileName/opt/presto-server-0.61.tar.gz
+
+# find diff of discovery and presto-server tar files, copy diff to presto-server lib directory
+# this is required since dependency confliction do not let presto-server start properly
+
+if [ -f "$fileName/opt/a" ]; then
+        echo "Delete a"
+        rm $fileName/opt/a;
+fi
+
+if [ -f "$fileName/opt/b" ]; then
+        echo "Delete b"
+        rm $fileName/opt/b;
+fi
+
+`ls presto-server-0.69/lib | sed 's/-[0-9].*//' >> $fileName/opt/a`
+`ls discovery-server-1.16/lib | sed 's/-[0-9].*//' >> $fileName/opt/b`
+
+fileNames=$(diff $fileName/opt/b $fileName/opt/a  | grep -i -- '<' |  cut -c 3-)
+for index in $fileNames
+do
+        A=$index
+        cp discovery-server-1.16/lib/$A* presto-server-0.69/lib
+	echo "copying $A jar file to presto-server-0.69/lib folder"
+done
+
+rm $fileName/opt/a 
+rm $fileName/opt/b
+
+mv presto-server-0.69/* $fileName/opt/presto-server-0.69/
+rm -rf presto-server-0.69/
+rm $fileName/opt/presto-server-0.69.tar.gz
 rm $fileName/opt/discovery-server-1.16.tar.gz
-mv $fileName/opt/presto-cli-0.61-executable.jar $fileName/opt/presto-server-0.61/
+mv $fileName/opt/presto-cli-0.69-executable.jar $fileName/opt/presto-server-0.69/
 rm $fileName/opt/README.md
 
 #Adding jar flies from discovery server
-cp $fileName/opt/discovery-server-1.16/lib/*.jar $fileName/opt/presto-server-0.61/lib/
 rm -rf $fileName/opt/discovery-server-1.16
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
@@ -71,7 +98,7 @@ find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
 rm $packageName/DEBIAN/md5sums
 md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
 
-versionOfPresto=0.61
+versionOfPresto=0.69
 
 sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$versionOfPresto'\/'/g $packageName/DEBIAN/conffile
 sed -i s/prestoVer=\"[0-9]*.[0-9]*\"/prestoVer=\"$versionOfPresto\"/g $packageName/DEBIAN/postrm

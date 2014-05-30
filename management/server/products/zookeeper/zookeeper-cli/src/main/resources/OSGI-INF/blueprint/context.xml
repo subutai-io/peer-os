@@ -2,11 +2,11 @@
         >
 
     <reference id="zookeeperManager" availability="mandatory"
-               interface="org.safehaus.kiskis.mgmt.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="zookeeper/list-clusters">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
                 <property name="zookeeperManager" ref="zookeeperManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="zookeeper/uninstall-cluster">
-            <action class="org.safehaus.kiskis.mgmt.cli.commands.UninstallClusterCommand">
+            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
                 <property name="zookeeperManager" ref="zookeeperManager"/>
             </action>
         </command>

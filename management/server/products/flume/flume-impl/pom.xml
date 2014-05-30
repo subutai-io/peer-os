@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>flume-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>flume-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Flume</name>
-    <description>Kiskis Management Flume</description>
+    <name>Subutai Flume</name>
+    <description>Subutai Flume</description>
 
     <dependencies>
         <dependency>
@@ -71,6 +71,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lxc-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>product-common</artifactId>
+            <scope>test</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

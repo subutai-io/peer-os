@@ -3,15 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>mgmt-ui</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>ui-vaadin-bridge</artifactId>
     <packaging>bundle</packaging>
-    <name>Kiskis Management Vaadin Bridge</name>
-    <description>Kiskis Management Vaadin Bridge</description>
+    <name>Subutai Vaadin Bridge</name>
+    <description>Subutai Vaadin Bridge</description>
 
     <dependencies>
         <dependency>
@@ -44,7 +44,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}.server.ui.bridge</Bundle-SymbolicName>
-                        <Bundle-Activator>org.safehaus.kiskis.mgmt.server.ui.bridge.internal.VaadinBridgeActivator
+                        <Bundle-Activator>org.safehaus.subutai.server.ui.bridge.internal.VaadinBridgeActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

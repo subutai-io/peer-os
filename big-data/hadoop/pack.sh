@@ -24,7 +24,7 @@ cp -a $SOURCE/etc/ $BASE/$fileName/
 rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
-wget https://www.apache.org/dist/hadoop/core/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz -P $fileName/opt/
+wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/hadoop-1.2.1-bin.tar.gz -P $fileName/opt/
 rm $fileName/opt/README
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)

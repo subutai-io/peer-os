@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>cassandra-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>cassandra-rest</artifactId>
-    <name>Kiskis Management Cassandra REST</name>
-    <description>Kiskis Management Cassandra REST</description>
+    <name>Subutai Cassandra REST</name>
+    <description>Subutai Cassandra REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -53,11 +53,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

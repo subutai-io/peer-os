@@ -36,6 +36,7 @@ public:
 	string createRegistrationMessage(string,string,string,string);  								//Creating Registration Message
 	string createTerminateMessage(string,int,string,string); 											//Creating Terminate_DONE Message
 	string createFailTerminateMessage(string,int,string,string);										//Creating Fail Terminate Message
+	string createInQueueMessage(string,string);	//Creating IN_QUEUE Message
 	string createHeartBeatMessage(string,int,string,string,string,string,string);					//Creating HeartBeat Message
 	string createTimeoutMessage(string,int,int,int,string,string,string,string);
 private:

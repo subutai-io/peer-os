@@ -25,7 +25,7 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
 #getting hadoop and oozie packages
-wget https://archive.apache.org/dist/oozie/3.3.2/oozie-3.3.2.tar.gz -P $fileName/opt/
+wget http://archive.apache.org/dist/oozie/3.3.2/oozie-3.3.2.tar.gz -P $fileName/opt/
 tar -xvpzf $BASE/$fileName/opt/oozie-3.3.2.tar.gz -C .
 mv oozie-3.3.2 $fileName/opt/
 rm $fileName/opt/oozie-3.3.2.tar.gz

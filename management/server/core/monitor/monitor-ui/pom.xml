@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.safehaus.kiskis.mgmt</groupId>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>monitor-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
     <artifactId>monitor-ui</artifactId>
-    <name>Monitor UI</name>
+    <name>Subutai Monitor UI</name>
     <packaging>bundle</packaging>
 
     <dependencies>
