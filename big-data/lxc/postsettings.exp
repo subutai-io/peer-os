@@ -15,6 +15,8 @@ sleep 1
 #updating apt-get
 expect "# " { send "apt-get update\r"  }
 sleep 1
+expect "# " { send "apt-get --assume-yes --force-yes install git\r"}
+sleep 1
 expect "# " { send "apt-get --assume-yes --force-yes install openssl\r"}
 sleep 1
 expect "# " { send "apt-get --assume-yes --force-yes upgrade openssl\r"}

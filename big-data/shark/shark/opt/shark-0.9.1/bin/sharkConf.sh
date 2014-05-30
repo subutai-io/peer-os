@@ -34,6 +34,11 @@ master)
 hive)
 	echo "export HIVE_HOME=$2" >> $file 
 	echo "export HIVE_CONF_DIR=$2/conf" >> $file ;;
+hadoop)
+
+	echo "export HADOOP_HOME=$2" >> $file ;;
+spark)
+	echo "export SPARK_HOME=$2" >> $file ;;
 *)
 	echo "Usage: $0 {start|stop|restart|status|kill}"
 	exit 1
