@@ -19,8 +19,9 @@ public class SaveHandler extends AbstractHandler<Collection<PackageInfo>> {
         Collection<PackageInfo> ls = lh.performAction();
         if(ls == null) return null;
 
+        PackageInfoCollection pic = new PackageInfoCollection(ls);
         boolean saved = packageManager.getDbManager().saveInfo(
-                PackageInfo.SOURCE_NAME, hostname, ls);
+                PackageInfo.SOURCE_NAME, hostname, pic);
         return saved ? ls : null;
     }
 

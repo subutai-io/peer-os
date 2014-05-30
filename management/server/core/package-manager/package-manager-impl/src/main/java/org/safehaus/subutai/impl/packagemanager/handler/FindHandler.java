@@ -15,8 +15,9 @@ public class FindHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     @Override
     public Collection<PackageInfo> performAction() {
-        return packageManager.getDbManager().getInfo(PackageInfo.SOURCE_NAME,
-                hostname, Collection.class);
+        PackageInfoCollection pic = packageManager.getDbManager().getInfo(
+                PackageInfo.SOURCE_NAME, hostname, PackageInfoCollection.class);
+        return pic != null ? pic.getItems() : null;
     }
 
 }
