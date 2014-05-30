@@ -9,7 +9,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 /**
  * This class executes git commands on agents.
  *
- * TODO: add wrapper methods using specific default location at mgmt server as repositoryRoot
+ * TODO: add wrapper methods using specific default location at mgmt server as repositoryRoot and git user.
+ *
+ * TODO: add GitConfig to karaf resources with git server URL containing git user and repo path
  */
 public interface GitManager {
 
@@ -21,6 +23,9 @@ public interface GitManager {
 
     public void commit( Agent host, String repositoryRoot, String message ) throws GitException;
 
+    /**
+     * @param src - can be a path to local repo or an URL to remote repo
+     */
     public void clone( Agent host, String repositoryRoot, String src, String targetDir ) throws GitException;
 
     public void clone( Agent host, String repositoryRoot, String src, String targetDir, String newBranchName )
@@ -41,6 +46,8 @@ public interface GitManager {
     public List<GitBranch> listBranches( Agent host, String repositoryRoot ) throws GitException;
 
     public void push( Agent host, String repositoryRoot ) throws GitException;
+
+    public void push( Agent host, String repositoryRoot, String branchName ) throws GitException;
 
     public void revert( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 

@@ -11,7 +11,6 @@
   <artifactId>git-manager-api</artifactId>
   <name>Subutai Git Manager API</name>
   <description>Git Manager API</description>
-
   <packaging>bundle</packaging>
 
   <dependencies>
