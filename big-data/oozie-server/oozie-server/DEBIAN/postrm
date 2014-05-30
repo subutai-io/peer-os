@@ -2,8 +2,18 @@
 
 # Exit on error
 set -e
-
+. /etc/profile
+if [[ "x$OOZIE_SERVER_HOME" == "x" ]];
+then
+	OOZIE_SERVER_HOME=/opt/oozie-3.3.2
+fi
 # Remove Oozie Files and Folders
+if [ -d $OOZIE_SERVER_HOME ]; then
+        echo $OOZIE_SERVER_HOME "exists!"
+        rm -r $OOZIE_SERVER_HOME
+else
+        echo $OOZIE_SERVER_HOME "does not exist!"
+fi
 if [ -f "/opt/oozie.sql" ]; then
     rm /opt/oozie.sql
 fi
