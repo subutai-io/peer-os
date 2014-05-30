@@ -55,7 +55,7 @@ do_add()
 configure()
 {
         # Change the value of property if exists!
-	pattern1="$escaped_name\=.*"
+	pattern1="$escaped_name\=[^\n]*"
         pattern2="$escaped_name\=$escaped_value"
 	#Edit configuration with $name_field in $fileName
         perl -0777 -i.original -pe "s/${pattern1}/${pattern2}/is" $fileName
