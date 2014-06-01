@@ -464,13 +464,13 @@
                                 <!-- Vaadin - END -->
 
                                 <!-- Core Modules - START -->
-                               <!-- <artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mgmt-shared-protocol</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash; Tracker &ndash;&gt;
+                                <!-- Tracker -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-api</artifactId>
@@ -481,13 +481,13 @@
                                     <artifactId>tracker-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                &lt;!&ndash;<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>tracker-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>&ndash;&gt;
+                                </artifactItem>
 
-                                &lt;!&ndash; Command Runner &ndash;&gt;
+                                <!-- Command Runner -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-api</artifactId>
@@ -498,13 +498,13 @@
                                     <artifactId>command-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                &lt;!&ndash;<artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>&ndash;&gt;
+                                </artifactItem>-->
 
-                                &lt;!&ndash; Agent Manager &ndash;&gt;
+                                <!-- Agent Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>agent-manager-api</artifactId>
@@ -521,7 +521,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash; DB Manager &ndash;&gt;
+                                <!-- DB Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>db-manager-api</artifactId>
@@ -533,7 +533,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash; Communication Manager &ndash;&gt;
+                                <!-- Communication Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>communication-manager-api</artifactId>
@@ -545,12 +545,12 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash; LXC Manager &ndash;&gt;
-                                &lt;!&ndash;<artifactItem>
+                                <!-- LXC Manager -->
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>&ndash;&gt;
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-api</artifactId>
@@ -562,7 +562,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash;Network Manager &ndash;&gt;
+                                <!--Network Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>network-manager-api</artifactId>
@@ -574,7 +574,7 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                &lt;!&ndash; Monitor &ndash;&gt;
+                                <!-- Monitor -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-api</artifactId>
@@ -584,7 +584,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-impl</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
                                 <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-ui</artifactId>

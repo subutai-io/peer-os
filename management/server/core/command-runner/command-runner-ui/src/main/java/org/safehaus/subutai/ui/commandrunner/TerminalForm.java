@@ -6,19 +6,14 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.common.base.Strings;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
+import com.vaadin.ui.*;
+import com.vaadin.ui.themes.Runo;
+import org.safehaus.kiskis.mgmt.server.ui.MgmtAgentManager;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.server.ui.MgmtAgentManager;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.shared.protocol.Response;
@@ -27,20 +22,10 @@ import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import com.google.common.base.Strings;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.themes.Runo;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -55,13 +40,13 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 
     public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager ) {
-        setHeight( 100, UNITS_PERCENTAGE );
+        setHeight( 100, Unit.PERCENTAGE );
 
         executor = Executors.newCachedThreadPool();
 
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
-        horizontalSplit.setSplitPosition( 200, UNITS_PIXELS );
+        horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
         agentTree = MgmtApplication.createAgentTree();
         horizontalSplit.setFirstComponent( agentTree );
 

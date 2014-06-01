@@ -1,16 +1,15 @@
 package org.safehaus.subutai.ui.tracker;
 
 
+import com.vaadin.ui.Component;
+import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
 
-import com.vaadin.ui.Component;
-
-
-public class TrackerUI implements Module {
+public class TrackerUI implements PortalModule {
 
     public static final String MODULE_NAME = "Tracker";
     private static Tracker tracker;
@@ -42,6 +41,11 @@ public class TrackerUI implements Module {
         executor.shutdown();
     }
 
+
+    @Override
+    public String getId() {
+        return TrackerUI.MODULE_NAME;
+    }
 
     @Override
     public String getName() {

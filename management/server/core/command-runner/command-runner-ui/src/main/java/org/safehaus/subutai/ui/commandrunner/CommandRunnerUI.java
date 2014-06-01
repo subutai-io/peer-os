@@ -1,11 +1,10 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 
+import com.vaadin.ui.Component;
+import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.server.ui.services.Module;
-
-import com.vaadin.ui.Component;
 
 
 public class CommandRunnerUI implements Module {

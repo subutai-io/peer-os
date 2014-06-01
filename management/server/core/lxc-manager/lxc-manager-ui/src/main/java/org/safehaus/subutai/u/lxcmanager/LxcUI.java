@@ -1,17 +1,14 @@
 package org.safehaus.subutai.u.lxcmanager;
 
+import com.vaadin.ui.Component;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.server.ui.services.Module;
-
-import com.vaadin.ui.Component;
-
-
-public class LxcUI implements Module {
+public class LxcUI implements PortalModule {
 
     public static final String MODULE_NAME = "LXC";
     private static ExecutorService executor;
@@ -43,6 +40,11 @@ public class LxcUI implements Module {
         executor.shutdown();
     }
 
+
+    @Override
+    public String getId() {
+        return MODULE_NAME;
+    }
 
     @Override
     public String getName() {

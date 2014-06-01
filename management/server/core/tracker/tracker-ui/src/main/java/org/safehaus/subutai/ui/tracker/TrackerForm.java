@@ -6,54 +6,37 @@
 package org.safehaus.subutai.ui.tracker;
 
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.safehaus.subutai.server.ui.services.MainUISelectedTabChangeListener;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.PopupDateField;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.ui.*;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.shared.operation.ProductOperationView;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  * Tracker Vaadin UI
  */
-public class TrackerForm extends CustomComponent implements MainUISelectedTabChangeListener {
+public class TrackerForm extends CustomComponent {
 
     private static final Logger LOG = Logger.getLogger( TrackerForm.class.getName() );
 
-    private final VerticalLayout contentRoot;
-    private final Table operationsTable;
-    private final TextArea outputTxtArea;
-    private final String okIconSource = "icons/16/ok.png";
-    private final String errorIconSource = "icons/16/cancel.png";
-    private final String loadIconSource = "../base/common/img/loading-indicator.gif";
-    private final PopupDateField fromDate, toDate;
-    private final ComboBox sourcesCombo;
+    private VerticalLayout contentRoot;
+    private Table operationsTable;
+    private TextArea outputTxtArea;
+    private String okIconSource = "icons/16/ok.png";
+    private String errorIconSource = "icons/16/cancel.png";
+    private String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private PopupDateField fromDate, toDate;
+    private ComboBox sourcesCombo;
     private Date fromDateValue, toDateValue;
     private volatile UUID trackID;
     private volatile boolean track = false;
@@ -65,12 +48,12 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
     public TrackerForm() {
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
-        contentRoot.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        contentRoot.setHeight( 100, Sizeable.UNITS_PERCENTAGE );
+        contentRoot.setWidth( 100, Unit.PERCENTAGE );
+        contentRoot.setHeight( 100, Unit.PERCENTAGE );
         contentRoot.setMargin( true );
 
         VerticalLayout content = new VerticalLayout();
-        content.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
+        content.setWidth( 100, Unit.PERCENTAGE );
         content.setSpacing( true );
 
         contentRoot.addComponent( content );
@@ -80,18 +63,19 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         filterLayout.setSpacing( true );
 
         sourcesCombo = new ComboBox( "Source" );
-        sourcesCombo.setMultiSelect( false );
+//        sourcesCombo.setMultiSelect( false );
         sourcesCombo.setImmediate( true );
-        sourcesCombo.setTextInputAllowed( false );
-        sourcesCombo.setNullSelectionAllowed( false );
-        sourcesCombo.addListener( new Property.ValueChangeListener() {
+        sourcesCombo.setTextInputAllowed(false);
+        sourcesCombo.setNullSelectionAllowed(false);
+        sourcesCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
+            public void valueChange(final Property.ValueChangeEvent event) {
                 source = ( String ) event.getProperty().getValue();
                 trackID = null;
                 outputTxtArea.setValue( "" );
             }
-        } );
+        });
+
         SimpleDateFormat df = new SimpleDateFormat( "ddMMyyyy HH:mm:ss" );
         Calendar cal = Calendar.getInstance();
         try {
@@ -108,9 +92,9 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         toDate = new PopupDateField( "To", toDateValue );
         fromDate.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
         toDate.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        fromDate.setResolution( PopupDateField.RESOLUTION_SEC );
-        toDate.setResolution( PopupDateField.RESOLUTION_SEC );
-        fromDate.addListener( new Property.ValueChangeListener() {
+        fromDate.setResolution(Resolution.SECOND );
+        toDate.setResolution( Resolution.SECOND );
+        fromDate.addValueChangeListener( new Property.ValueChangeListener() {
 
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() instanceof Date ) {
@@ -118,7 +102,7 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
                 }
             }
         } );
-        toDate.addListener( new Property.ValueChangeListener() {
+        toDate.addValueChangeListener( new Property.ValueChangeListener() {
 
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() instanceof Date ) {
@@ -128,12 +112,12 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         } );
 
         ComboBox limitCombo = new ComboBox( "Show last", Arrays.asList( 10, 50, 100 ) );
-        limitCombo.setMultiSelect( false );
+//        limitCombo.setMultiSelect( false );
         limitCombo.setImmediate( true );
         limitCombo.setTextInputAllowed( false );
         limitCombo.setNullSelectionAllowed( false );
         limitCombo.setValue( limit );
-        limitCombo.addListener( new Property.ValueChangeListener() {
+        limitCombo.addValueChangeListener( new Property.ValueChangeListener() {
 
             public void valueChange( Property.ValueChangeEvent event ) {
                 limit = ( Integer ) event.getProperty().getValue();
@@ -170,25 +154,13 @@ public class TrackerForm extends CustomComponent implements MainUISelectedTabCha
         table.addContainerProperty( "Operation", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
-        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        table.setHeight( height, Sizeable.UNITS_PIXELS );
+        table.setWidth( 100, Unit.PERCENTAGE);
+        table.setHeight( height, Unit.PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
         return table;
     }
-
-
-    public void selectedTabChanged( TabSheet.Tab selectedTab ) {
-        if ( TrackerUI.MODULE_NAME.equals( selectedTab.getCaption() ) ) {
-            refreshSources();
-            startTracking();
-        }
-        else {
-            stopTracking();
-        }
-    }
-
 
     private void startTracking() {
         if ( !track ) {
