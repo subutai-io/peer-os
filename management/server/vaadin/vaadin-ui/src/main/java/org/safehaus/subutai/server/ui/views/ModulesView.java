@@ -12,8 +12,6 @@ package org.safehaus.subutai.server.ui.views;
 
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.event.Transferable;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -48,62 +46,12 @@ public class ModulesView extends VerticalLayout implements View {
         editors.addStyleName("borderless");
         editors.addStyleName("editors");
 
-        editors.setCloseHandler(new TabSheet.CloseHandler() {
+        /*editors.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, final Component tabContent) {
-                VerticalLayout l = new VerticalLayout();
-                l.setWidth("400px");
-                l.setMargin(true);
-                l.setSpacing(true);
-                final Window alert = new Window("Unsaved Changes", l);
-                alert.setModal(true);
-                alert.setResizable(false);
-                alert.setDraggable(false);
-                alert.addStyleName("dialog");
-                alert.setClosable(false);
 
-                Label message = new Label(
-                        "You have not saved this report. Do you want to save or discard any changes you've made to this report?");
-                l.addComponent(message);
-
-                HorizontalLayout buttons = new HorizontalLayout();
-                buttons.setWidth("100%");
-                buttons.setSpacing(true);
-                l.addComponent(buttons);
-
-                Button discard = new Button("Don't Save");
-                discard.addStyleName("small");
-                buttons.addComponent(discard);
-                buttons.setExpandRatio(discard, 1);
-
-                Button cancel = new Button("Cancel");
-                cancel.addStyleName("small");
-                cancel.addClickListener(new ClickListener() {
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        alert.close();
-                    }
-                });
-                buttons.addComponent(cancel);
-
-                Button ok = new Button("Save");
-                ok.addStyleName("default");
-                ok.addStyleName("small");
-                ok.addStyleName("wide");
-                buttons.addComponent(ok);
-                ok.focus();
-
-                alert.addShortcutListener(new ShortcutListener("Cancel",
-                        KeyCode.ESCAPE, null) {
-                    @Override
-                    public void handleAction(Object sender, Object target) {
-                        alert.close();
-                    }
-                });
-
-                getUI().addWindow(alert);
             }
-        });
+        });*/
 
         final VerticalLayout center = new VerticalLayout();
         center.setSizeFull();
