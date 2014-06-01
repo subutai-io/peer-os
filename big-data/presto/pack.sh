@@ -68,6 +68,7 @@ rm $fileName/opt/README.md
 
 #Adding jar flies from discovery server
 rm -rf $fileName/opt/discovery-server-1.16
+rm -rf $BASE/discovery-server-1.16
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
