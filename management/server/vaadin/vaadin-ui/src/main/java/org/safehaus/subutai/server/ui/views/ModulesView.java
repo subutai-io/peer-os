@@ -46,15 +46,31 @@ public class ModulesView extends VerticalLayout implements View {
         center.setCaption("Modules");
         editors.addComponent(center);
 
+        VerticalLayout titleAndDrafts = new VerticalLayout();
+        titleAndDrafts.setSizeUndefined();
+        titleAndDrafts.setSpacing(true);
+        titleAndDrafts.addStyleName("drafts");
+        center.addComponent(titleAndDrafts);
+        center.setComponentAlignment(titleAndDrafts, Alignment.MIDDLE_CENTER);
+
+        Label draftsTitle = new Label("Drafts");
+        draftsTitle.addStyleName("h1");
+        draftsTitle.setSizeUndefined();
+        titleAndDrafts.addComponent(draftsTitle);
+        titleAndDrafts.setComponentAlignment(draftsTitle, Alignment.TOP_CENTER);
+
+        HorizontalLayout drafts = new HorizontalLayout();
+        drafts.setSpacing(true);
+        titleAndDrafts.addComponent(drafts);
+
         VerticalLayout createBox = new VerticalLayout();
         createBox.setWidth(null);
         createBox.addStyleName("create");
-
         Button create = new Button("Create New");
         create.addStyleName("default");
         createBox.addComponent(create);
         createBox.setComponentAlignment(create, Alignment.MIDDLE_CENTER);
-
+        drafts.addComponent(createBox);
         create.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
