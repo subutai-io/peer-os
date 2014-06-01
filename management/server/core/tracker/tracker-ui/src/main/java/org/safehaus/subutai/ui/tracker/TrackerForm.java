@@ -70,9 +70,9 @@ public class TrackerForm extends CustomComponent {
         sourcesCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(final Property.ValueChangeEvent event) {
-                source = ( String ) event.getProperty().getValue();
+                source = (String) event.getProperty().getValue();
                 trackID = null;
-                outputTxtArea.setValue( "" );
+                outputTxtArea.setValue("");
             }
         });
 
@@ -94,22 +94,22 @@ public class TrackerForm extends CustomComponent {
         toDate.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
         fromDate.setResolution(Resolution.SECOND );
         toDate.setResolution( Resolution.SECOND );
-        fromDate.addValueChangeListener( new Property.ValueChangeListener() {
+        fromDate.addValueChangeListener(new Property.ValueChangeListener() {
 
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() instanceof Date ) {
-                    fromDateValue = ( Date ) event.getProperty().getValue();
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof Date) {
+                    fromDateValue = (Date) event.getProperty().getValue();
                 }
             }
-        } );
-        toDate.addValueChangeListener( new Property.ValueChangeListener() {
+        });
+        toDate.addValueChangeListener(new Property.ValueChangeListener() {
 
-            public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() instanceof Date ) {
-                    toDateValue = ( Date ) event.getProperty().getValue();
+            public void valueChange(Property.ValueChangeEvent event) {
+                if (event.getProperty().getValue() instanceof Date) {
+                    toDateValue = (Date) event.getProperty().getValue();
                 }
             }
-        } );
+        });
 
         ComboBox limitCombo = new ComboBox( "Show last", Arrays.asList( 10, 50, 100 ) );
 //        limitCombo.setMultiSelect( false );
@@ -117,12 +117,12 @@ public class TrackerForm extends CustomComponent {
         limitCombo.setTextInputAllowed( false );
         limitCombo.setNullSelectionAllowed( false );
         limitCombo.setValue( limit );
-        limitCombo.addValueChangeListener( new Property.ValueChangeListener() {
+        limitCombo.addValueChangeListener(new Property.ValueChangeListener() {
 
-            public void valueChange( Property.ValueChangeEvent event ) {
-                limit = ( Integer ) event.getProperty().getValue();
+            public void valueChange(Property.ValueChangeEvent event) {
+                limit = (Integer) event.getProperty().getValue();
             }
-        } );
+        });
 
         filterLayout.addComponent( sourcesCombo );
         filterLayout.addComponent( fromDate );
