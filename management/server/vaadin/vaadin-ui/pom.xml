@@ -85,7 +85,9 @@
                         </resource>
                     </webResources>
                     <archive>
-                        <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                        <!--<manifestFile>META-INF/MANIFEST.MF</manifestFile>-->
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+
                     </archive>
                 </configuration>
             </plugin>
