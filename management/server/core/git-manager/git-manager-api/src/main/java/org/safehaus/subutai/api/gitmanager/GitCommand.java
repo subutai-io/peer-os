@@ -5,19 +5,19 @@ package org.safehaus.subutai.api.gitmanager;
  * Contains common git commands
  */
 public enum GitCommand {
+    INIT( "init" ),
     ADD( "add" ),
     DELETE( "rm" ),
     COMMIT( "commit" ),
     BRANCH( "branch" ),
     CHECKOUT( "checkout" ),
     CLONE( "clone" ),
-    DIFF( "diff" ),
+    REVERT( "revert" ),
     FETCH( "fetch" ),
     MERGE( "merge" ),
+    STASH( "stash" ),
     PULL( "pull" ),
-    PUSH( "push" ),
-    RESET( "checkout" ),
-    TAG( "tag" );
+    PUSH( "push" );
 
     private String command;
 
