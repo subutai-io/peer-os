@@ -2,9 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.safehaus.subutai</groupId>
     <artifactId>git-manager-parent</artifactId>
@@ -14,6 +12,7 @@
   <artifactId>git-manager-impl</artifactId>
   <name>Subutai Git Manager</name>
   <description>git manager impl</description>
+
   <packaging>bundle</packaging>
 
   <dependencies>
@@ -32,7 +31,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>git-manager-api</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -64,6 +62,7 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
