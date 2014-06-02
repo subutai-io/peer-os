@@ -24,5 +24,6 @@
     <module>monitor</module>
     <module>command-runner</module>
     <module>git-manager</module>
+    <module>package-manager</module>
   </modules>
 </project>
