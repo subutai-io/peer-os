@@ -10,7 +10,6 @@
 
 package org.safehaus.subutai.server.ui.views;
 
-import com.vaadin.event.Transferable;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.*;
@@ -81,20 +80,18 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         return editors;
     }
 
-    private HorizontalLayout createEditorInstance(int which,
-                                                  Transferable items, Table table) {
+    private HorizontalLayout createEditorInstance(PortalModule module) {
         HorizontalLayout editor = new HorizontalLayout();
         editor.setSizeFull();
+        editor.setCaption(module.getName());
 
-        SimpleDateFormat df = new SimpleDateFormat();
-        df.applyPattern("M/dd/yyyy");
-        editor.setCaption((df.format(new Date())));
+        editor.addComponent(module.createComponent());
 
         return editor;
     }
 
-    public void autoCreate(int which, Transferable items, Table table) {
-        editors.addTab(createEditorInstance(which, items, table)).setClosable(
+    public void autoCreate(PortalModule module) {
+        editors.addTab(createEditorInstance(module)).setClosable(
                 true);
         editors.setSelectedTab(editors.getComponentCount() - 1);
     }
@@ -120,7 +117,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         create.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                autoCreate(0, null, null);
+                autoCreate();
             }
         });
 
