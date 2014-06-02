@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class TrackerForm extends CustomComponent {
 
-    private static final Logger LOG = Logger.getLogger( TrackerForm.class.getName() );
+    private static final Logger LOG = Logger.getLogger(TrackerForm.class.getName());
 
     private VerticalLayout contentRoot;
     private Table operationsTable;
@@ -47,24 +47,24 @@ public class TrackerForm extends CustomComponent {
 
     public TrackerForm() {
         contentRoot = new VerticalLayout();
-        contentRoot.setSpacing( true );
-        contentRoot.setWidth( 100, Unit.PERCENTAGE );
-        contentRoot.setHeight( 100, Unit.PERCENTAGE );
-        contentRoot.setMargin( true );
+        contentRoot.setSpacing(true);
+        contentRoot.setWidth(100, Unit.PERCENTAGE);
+        contentRoot.setHeight(100, Unit.PERCENTAGE);
+        contentRoot.setMargin(true);
 
         VerticalLayout content = new VerticalLayout();
-        content.setWidth( 100, Unit.PERCENTAGE );
-        content.setSpacing( true );
+        content.setWidth(100, Unit.PERCENTAGE);
+        content.setSpacing(true);
 
-        contentRoot.addComponent( content );
-        contentRoot.setComponentAlignment( content, Alignment.TOP_CENTER );
+        contentRoot.addComponent(content);
+        contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
 
         HorizontalLayout filterLayout = new HorizontalLayout();
-        filterLayout.setSpacing( true );
+        filterLayout.setSpacing(true);
 
-        sourcesCombo = new ComboBox( "Source" );
+        sourcesCombo = new ComboBox("Source");
 //        sourcesCombo.setMultiSelect( false );
-        sourcesCombo.setImmediate( true );
+        sourcesCombo.setImmediate(true);
         sourcesCombo.setTextInputAllowed(false);
         sourcesCombo.setNullSelectionAllowed(false);
         sourcesCombo.addValueChangeListener(new Property.ValueChangeListener() {
@@ -76,24 +76,22 @@ public class TrackerForm extends CustomComponent {
             }
         });
 
-        SimpleDateFormat df = new SimpleDateFormat( "ddMMyyyy HH:mm:ss" );
+        SimpleDateFormat df = new SimpleDateFormat("ddMMyyyy HH:mm:ss");
         Calendar cal = Calendar.getInstance();
         try {
-            fromDateValue = df.parse( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String
-                    .format( "%02d", ( cal.get( Calendar.MONTH ) + 1 ) ) + cal.get( Calendar.YEAR ) + " 00:00:00" );
-            toDateValue = df.parse( String.format( "%02d", cal.get( Calendar.DAY_OF_MONTH ) ) + String
-                    .format( "%02d", ( cal.get( Calendar.MONTH ) + 1 ) ) + cal.get( Calendar.YEAR ) + " 23:59:59" );
-        }
-        catch ( java.text.ParseException ex ) {
-            Logger.getLogger( TrackerForm.class.getName() ).log( Level.SEVERE, null, ex );
+            fromDateValue = df.parse(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + String
+                    .format("%02d", (cal.get(Calendar.MONTH) + 1)) + cal.get(Calendar.YEAR) + " 00:00:00");
+            toDateValue = df.parse(String.format("%02d", cal.get(Calendar.DAY_OF_MONTH)) + String
+                    .format("%02d", (cal.get(Calendar.MONTH) + 1)) + cal.get(Calendar.YEAR) + " 23:59:59");
+        } catch (java.text.ParseException ex) {
+            Logger.getLogger(TrackerForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        fromDate = new PopupDateField( "From", fromDateValue );
-        toDate = new PopupDateField( "To", toDateValue );
-        fromDate.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        toDate.setDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        fromDate.setResolution(Resolution.SECOND );
-        toDate.setResolution( Resolution.SECOND );
+        fromDate = new PopupDateField();
+        fromDate.setCaption("From");
+        fromDate.setValue(fromDateValue);
+        fromDate.setImmediate(true);
+        fromDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
         fromDate.addValueChangeListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
@@ -102,6 +100,12 @@ public class TrackerForm extends CustomComponent {
                 }
             }
         });
+
+        toDate = new PopupDateField("To", toDateValue);
+        toDate.setImmediate(true);
+        toDate.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        fromDate.setResolution(Resolution.SECOND);
+        toDate.setResolution(Resolution.SECOND);
         toDate.addValueChangeListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
@@ -111,12 +115,12 @@ public class TrackerForm extends CustomComponent {
             }
         });
 
-        ComboBox limitCombo = new ComboBox( "Show last", Arrays.asList( 10, 50, 100 ) );
+        ComboBox limitCombo = new ComboBox("Show last", Arrays.asList(10, 50, 100));
 //        limitCombo.setMultiSelect( false );
-        limitCombo.setImmediate( true );
-        limitCombo.setTextInputAllowed( false );
-        limitCombo.setNullSelectionAllowed( false );
-        limitCombo.setValue( limit );
+        limitCombo.setImmediate(true);
+        limitCombo.setTextInputAllowed(false);
+        limitCombo.setNullSelectionAllowed(false);
+        limitCombo.setValue(limit);
         limitCombo.addValueChangeListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
@@ -124,153 +128,147 @@ public class TrackerForm extends CustomComponent {
             }
         });
 
-        filterLayout.addComponent( sourcesCombo );
-        filterLayout.addComponent( fromDate );
-        filterLayout.addComponent( toDate );
-        filterLayout.addComponent( limitCombo );
+        filterLayout.addComponent(sourcesCombo);
+        filterLayout.addComponent(fromDate);
+        filterLayout.addComponent(toDate);
+        filterLayout.addComponent(limitCombo);
 
-        operationsTable = createTableTemplate( "Operations", 250 );
+        operationsTable = createTableTemplate("Operations", 250);
 
-        outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setSizeFull();
-        outputTxtArea.setRows( 20 );
-        outputTxtArea.setImmediate( true );
-        outputTxtArea.setWordwrap( true );
+        outputTxtArea.setRows(20);
+        outputTxtArea.setImmediate(true);
+        outputTxtArea.setWordwrap(true);
 
-        content.addComponent( filterLayout );
-        content.addComponent( operationsTable );
-        content.addComponent( outputTxtArea );
-        content.setComponentAlignment( operationsTable, Alignment.TOP_CENTER );
-        content.setComponentAlignment( outputTxtArea, Alignment.TOP_CENTER );
+        content.addComponent(filterLayout);
+        content.addComponent(operationsTable);
+        content.addComponent(outputTxtArea);
+        content.setComponentAlignment(operationsTable, Alignment.TOP_CENTER);
+        content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
-        setCompositionRoot( contentRoot );
+        setCompositionRoot(contentRoot);
     }
 
 
-    private Table createTableTemplate( String caption, int height ) {
-        Table table = new Table( caption );
-        table.setContainerDataSource( new IndexedContainer() );
-        table.addContainerProperty( "Date", Date.class, null );
-        table.addContainerProperty( "Operation", String.class, null );
-        table.addContainerProperty( "Check", Button.class, null );
-        table.addContainerProperty( "Status", Embedded.class, null );
-        table.setWidth( 100, Unit.PERCENTAGE);
-        table.setHeight( height, Unit.PIXELS );
-        table.setPageLength( 10 );
-        table.setSelectable( false );
-        table.setImmediate( true );
+    private Table createTableTemplate(String caption, int height) {
+        Table table = new Table(caption);
+        table.setContainerDataSource(new IndexedContainer());
+        table.addContainerProperty("Date", Date.class, null);
+        table.addContainerProperty("Operation", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Unit.PERCENTAGE);
+        table.setHeight(height, Unit.PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
         return table;
     }
 
     private void startTracking() {
-        if ( !track ) {
+        if (!track) {
             track = true;
 
-            TrackerUI.getExecutor().execute( new Runnable() {
+            TrackerUI.getExecutor().execute(new Runnable() {
 
                 public void run() {
-                    while ( track ) {
+                    while (track) {
                         try {
                             populateOperations();
                             populateLogs();
-                        }
-                        catch ( Exception e ) {
-                            LOG.log( Level.SEVERE, "Error in tracker", e );
+                        } catch (Exception e) {
+                            LOG.log(Level.SEVERE, "Error in tracker", e);
                         }
                         try {
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex ) {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
                             break;
                         }
                     }
                 }
-            } );
+            });
         }
     }
 
 
     private void populateLogs() {
-        if ( trackID != null && !Strings.isNullOrEmpty( source ) ) {
-            ProductOperationView po = TrackerUI.getTracker().getProductOperation( source, trackID );
-            if ( po != null ) {
-                setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
-                if ( po.getState() != ProductOperationState.RUNNING ) {
+        if (trackID != null && !Strings.isNullOrEmpty(source)) {
+            ProductOperationView po = TrackerUI.getTracker().getProductOperation(source, trackID);
+            if (po != null) {
+                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                if (po.getState() != ProductOperationState.RUNNING) {
                     trackID = null;
                 }
-            }
-            else {
-                setOutput( "Product operation not found. Check logs" );
+            } else {
+                setOutput("Product operation not found. Check logs");
             }
         }
     }
 
 
-    private void setOutput( String output ) {
-        if ( !Strings.isNullOrEmpty( output ) ) {
-            outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
+    private void setOutput(String output) {
+        if (!Strings.isNullOrEmpty(output)) {
+            outputTxtArea.setValue(output);
+            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }
     }
 
 
     private void populateOperations() {
-        if ( !Strings.isNullOrEmpty( source ) ) {
+        if (!Strings.isNullOrEmpty(source)) {
             List<ProductOperationView> operations =
-                    TrackerUI.getTracker().getProductOperations( source, fromDateValue, toDateValue, limit );
-            if ( operations.isEmpty() ) {
+                    TrackerUI.getTracker().getProductOperations(source, fromDateValue, toDateValue, limit);
+            if (operations.isEmpty()) {
                 trackID = null;
-                outputTxtArea.setValue( "" );
+                outputTxtArea.setValue("");
             }
-            IndexedContainer container = ( IndexedContainer ) operationsTable.getContainerDataSource();
-            currentOperations.removeAll( operations );
+            IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
+            currentOperations.removeAll(operations);
 
-            for ( ProductOperationView po : currentOperations ) {
-                container.removeItem( po.getId() );
+            for (ProductOperationView po : currentOperations) {
+                container.removeItem(po.getId());
             }
             boolean sortNeeded = false;
-            for ( final ProductOperationView po : operations ) {
+            for (final ProductOperationView po : operations) {
                 Embedded progressIcon;
-                if ( po.getState() == ProductOperationState.RUNNING ) {
-                    progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
-                }
-                else if ( po.getState() == ProductOperationState.FAILED ) {
-                    progressIcon = new Embedded( "", new ThemeResource( errorIconSource ) );
-                }
-                else {
-                    progressIcon = new Embedded( "", new ThemeResource( okIconSource ) );
+                if (po.getState() == ProductOperationState.RUNNING) {
+                    progressIcon = new Embedded("", new ThemeResource(loadIconSource));
+                } else if (po.getState() == ProductOperationState.FAILED) {
+                    progressIcon = new Embedded("", new ThemeResource(errorIconSource));
+                } else {
+                    progressIcon = new Embedded("", new ThemeResource(okIconSource));
                 }
 
-                Item item = container.getItem( po.getId() );
-                if ( item == null ) {
-                    final Button trackLogsBtn = new Button( "View logs" );
-                    trackLogsBtn.addListener( new Button.ClickListener() {
+                Item item = container.getItem(po.getId());
+                if (item == null) {
+                    final Button trackLogsBtn = new Button("View logs");
+                    trackLogsBtn.addListener(new Button.ClickListener() {
 
-                        public void buttonClick( Button.ClickEvent event ) {
+                        public void buttonClick(Button.ClickEvent event) {
                             trackID = po.getId();
                         }
-                    } );
+                    });
 
-                    item = container.addItem( po.getId() );
-                    item.getItemProperty( "Date" ).setValue( po.getCreateDate() );
-                    item.getItemProperty( "Operation" ).setValue( po.getDescription() );
-                    item.getItemProperty( "Check" ).setValue( trackLogsBtn );
-                    item.getItemProperty( "Status" ).setValue( progressIcon );
+                    item = container.addItem(po.getId());
+                    item.getItemProperty("Date").setValue(po.getCreateDate());
+                    item.getItemProperty("Operation").setValue(po.getDescription());
+                    item.getItemProperty("Check").setValue(trackLogsBtn);
+                    item.getItemProperty("Status").setValue(progressIcon);
 
                     sortNeeded = true;
-                }
-                else {
-                    if ( !( ( Embedded ) item.getItemProperty( "Status" ).getValue() ).getSource().equals(
-                            progressIcon.getSource() ) ) {
-                        item.getItemProperty( "Status" ).setValue( progressIcon );
+                } else {
+                    if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
+                            progressIcon.getSource())) {
+                        item.getItemProperty("Status").setValue(progressIcon);
                     }
                 }
             }
 
-            if ( sortNeeded ) {
-                Object[] properties = { "Date" };
-                boolean[] ordering = { false };
-                operationsTable.sort( properties, ordering );
+            if (sortNeeded) {
+                Object[] properties = {"Date"};
+                boolean[] ordering = {false};
+                operationsTable.sort(properties, ordering);
             }
 
             currentOperations = operations;
@@ -287,14 +285,13 @@ public class TrackerForm extends CustomComponent {
         String oldSource = source;
         sourcesCombo.removeAllItems();
         List<String> sources = TrackerUI.getTracker().getProductOperationSources();
-        for ( String src : sources ) {
-            sourcesCombo.addItem( src );
+        for (String src : sources) {
+            sourcesCombo.addItem(src);
         }
-        if ( !Strings.isNullOrEmpty( oldSource ) ) {
-            sourcesCombo.setValue( oldSource );
-        }
-        else if ( !sources.isEmpty() ) {
-            sourcesCombo.setValue( sources.iterator().next() );
+        if (!Strings.isNullOrEmpty(oldSource)) {
+            sourcesCombo.setValue(oldSource);
+        } else if (!sources.isEmpty()) {
+            sourcesCombo.setValue(sources.iterator().next());
         }
     }
 
