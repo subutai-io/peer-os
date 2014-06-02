@@ -29,7 +29,7 @@ rm -rf $fileName/opt/shark-0.9.1-bin-hadoop1
 rm $fileName/opt/*.tgz
 
 # download derby client jar file
-wget http://repo1.maven.org/maven2/org/apache/derby/derbyclient/10.10.2.0/derbyclient-10.10.2.0.jar -P $fileName/opt/shark-0.9.1/lib/
+wget http://repo1.maven.org/maven2/org/apache/derby/derbyclient/10.4.2.0/derbyclient-10.4.2.0.jar -P $fileName/opt/shark-0.9.1/lib/
 
 if [ -f "$fileName/opt/README" ]; then
 	rm $fileName/opt/README
