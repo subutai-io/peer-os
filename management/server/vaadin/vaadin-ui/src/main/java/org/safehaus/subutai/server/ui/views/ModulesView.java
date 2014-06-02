@@ -23,9 +23,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -96,14 +94,12 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         editors.setSelectedTab(editors.getComponentCount() - 1);
     }
 
-    ;
-
     @Override
     public void moduleRegistered(PortalModule module) {
         addModule(module);
     }
 
-    private void addModule(PortalModule module) {
+    private void addModule(final PortalModule module) {
         VerticalLayout moduleLayout = new VerticalLayout();
         moduleLayout.setId(module.getId());
         moduleLayout.setWidth(null);
@@ -117,7 +113,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         create.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                autoCreate();
+                autoCreate(module);
             }
         });
 
