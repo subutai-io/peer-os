@@ -2,18 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.safehaus.subutai</groupId>
-    <artifactId>command-runner-parent</artifactId>
+    <artifactId>git-manager-parent</artifactId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>command-runner-impl</artifactId>
-  <name>Subutai Command Runner</name>
-  <description>command runner impl</description>
+  <artifactId>git-manager-impl</artifactId>
+  <name>Subutai Git Manager</name>
+  <description>git manager impl</description>
+
   <packaging>bundle</packaging>
 
   <dependencies>
@@ -31,30 +30,19 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>communication-manager-api</artifactId>
+      <artifactId>git-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>communication-manager-impl</artifactId>
-      <scope>test</scope>
+      <artifactId>agent-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.jayway.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -70,13 +58,15 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.impl.commandrunner</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.impl.gitmanager</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>
