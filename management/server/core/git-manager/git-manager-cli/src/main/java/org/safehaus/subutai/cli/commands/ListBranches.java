@@ -24,7 +24,8 @@ public class ListBranches extends OsgiCommandSupport {
     String hostname;
     @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument( index = 2, name = "remote", required = false, multiValued = false, description = "list remote branches (true/false)" )
+    @Argument( index = 2, name = "remote", required = false, multiValued = false,
+            description = "list remote branches (true/false = default)" )
     boolean remote;
     private AgentManager agentManager;
     private GitManager gitManager;

@@ -110,11 +110,10 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
-                          final String message ) throws GitException {
-        Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
-                                                                                      .withCmdArgs( filePaths ),
-                Sets.newHashSet( host ) );
+                          final String message, boolean afterConflictResolved ) throws GitException {
+        Command addCommand = commandRunner.createCommand( new RequestBuilder(
+                String.format( "git commit -m \"%s\" %s", message, afterConflictResolved ? "-i" : "" ) )
+                .withCwd( repositoryRoot ).withCmdArgs( filePaths ), Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
         //parse output to get commitAll id here
