@@ -138,6 +138,17 @@ public class TrackerForm extends CustomComponent {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 limit = (Integer) event.getProperty().getValue();
+                /*
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                 */
+                System.out.println("Limit has changed");
             }
         });
 
@@ -187,6 +198,17 @@ public class TrackerForm extends CustomComponent {
             TrackerUI.getExecutor().execute(new Runnable() {
 
                 public void run() {
+                    /*
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                 */
+                    System.out.println("Tracking started");
                     while (track) {
                         try {
                             populateOperations();
