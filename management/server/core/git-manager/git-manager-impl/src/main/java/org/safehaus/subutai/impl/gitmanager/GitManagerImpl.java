@@ -102,7 +102,7 @@ public class GitManagerImpl implements GitManager {
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
                           final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commitAll -m \"%s\"", message ) ).withCwd( repositoryRoot )
+                new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
                                                                                          .withCmdArgs( filePaths ),
                 Sets.newHashSet( host ) );
 
@@ -122,7 +122,7 @@ public class GitManagerImpl implements GitManager {
     @Override
     public String commitAll( final Agent host, final String repositoryRoot, final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commitAll -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
+                new RequestBuilder( String.format( "git commit -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
