@@ -12,7 +12,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Checkouts a remote branch (or creates a local branch)
+ * Deletes local branch
  */
 @Command( scope = "git", name = "delete-branch", description = "Delete local branch" )
 public class DeleteBranch extends OsgiCommandSupport {

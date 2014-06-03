@@ -12,18 +12,18 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Commits all files
+ * Clones remote master repo
  */
-@Command( scope = "git", name = "clone", description = "Clone master repo" )
+@Command(scope = "git", name = "clone", description = "Clone master repo")
 public class Clone extends OsgiCommandSupport {
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
-    @Argument( index = 1, name = "new branch name", required = true, multiValued = false,
-            description = "name of branch to create" )
+    @Argument(index = 1, name = "new branch name", required = true, multiValued = false,
+            description = "name of branch to create")
     String newBranchName;
-    @Argument( index = 2, name = "target directory", required = true, multiValued = false,
-            description = "directory to clone to" )
+    @Argument(index = 2, name = "target directory", required = true, multiValued = false,
+            description = "directory to clone to")
     String targetDirectory;
     private AgentManager agentManager;
     private GitManager gitManager;
