@@ -2,7 +2,6 @@ package org.safehaus.subutai.cli.commands;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.gitmanager.GitBranch;
 import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -13,15 +12,18 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Displays the current git branch
+ * Checkouts a remote branch (or creates a local branch)
  */
-@Command(scope = "git", name = "get-current-branch", description = "Get current branch")
-public class GetCurrentBranch extends OsgiCommandSupport {
+@Command( scope = "git", name = "delete-branch", description = "Delete local branch" )
+public class DeleteBranch extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
+    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to delete" )
+    String branchName;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -39,8 +41,7 @@ public class GetCurrentBranch extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            GitBranch gitBranch = gitManager.currentBranch( agent, repoPath );
-            System.out.println( gitBranch );
+            gitManager.deleteBranch( agent, repoPath, branchName );
         }
         catch ( GitException e ) {
             System.out.println( e );

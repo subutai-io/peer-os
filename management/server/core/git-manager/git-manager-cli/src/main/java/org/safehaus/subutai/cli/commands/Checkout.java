@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Checkouts a remote branch (or creates a local branch)
  */
-@Command( scope = "git", name = "checkout", description = "Checkout" )
+@Command( scope = "git", name = "checkout", description = "Checkout remote branch/create local branch" )
 public class Checkout extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

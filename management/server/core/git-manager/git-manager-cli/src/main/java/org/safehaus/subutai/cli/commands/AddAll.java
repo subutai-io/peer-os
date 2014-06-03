@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Adds all files to commit
  */
-@Command( scope = "git", name = "add-all", description = "Add All" )
+@Command( scope = "git", name = "add-all", description = "Add all files to commit" )
 public class AddAll extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

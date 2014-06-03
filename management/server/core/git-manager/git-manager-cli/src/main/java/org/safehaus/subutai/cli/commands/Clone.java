@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Commits all files
  */
-@Command( scope = "git", name = "clone", description = "Clone" )
+@Command( scope = "git", name = "clone", description = "Clone master repo" )
 public class Clone extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

@@ -17,7 +17,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays branches
  */
-@Command( scope = "git", name = "list-branches", description = "List Branches" )
+@Command( scope = "git", name = "list-branches", description = "List local/remote branches" )
 public class ListBranches extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

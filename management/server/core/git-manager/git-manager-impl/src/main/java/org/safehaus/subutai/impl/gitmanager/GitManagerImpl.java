@@ -72,6 +72,10 @@ public class GitManagerImpl implements GitManager {
                         gitCommand.getCommand() ) );
             }
         }
+        else {
+            AgentResult agentResult = command.getResults().get( host.getUuid() );
+            System.out.println( agentResult.getStdOut() );
+        }
     }
 
 
@@ -87,7 +91,7 @@ public class GitManagerImpl implements GitManager {
 
     public void addAll( final Agent host, final String repositoryRoot ) throws GitException {
         Command addCommand = commandRunner
-                .createCommand( new RequestBuilder( "git add *" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+                .createCommand( new RequestBuilder( "git add -A" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.ADD );
     }

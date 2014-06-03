@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Checkouts a remote branch (or creates a local branch)
  */
-@Command( scope = "git", name = "push", description = "Push" )
+@Command( scope = "git", name = "push", description = "Push to repo" )
 public class Push extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

@@ -17,7 +17,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Commits file(s)
  */
-@Command( scope = "git", name = "commit-files", description = "Commit Files" )
+@Command( scope = "git", name = "commit-files", description = "Commit files" )
 public class CommitFiles extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )

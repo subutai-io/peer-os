@@ -17,7 +17,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Deletes file(s) from working directory and index
  */
-@Command( scope = "git", name = "delete-files", description = "Delete Files" )
+@Command( scope = "git", name = "delete-files", description = "Delete files from repo" )
 public class DeleteFiles extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
