@@ -4,12 +4,15 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.packagemanager.PackageManager;
+import org.safehaus.subutai.api.packagemanager.storage.PackageInfoStorage;
 
 public abstract class PackageManagerBase implements PackageManager {
 
     AgentManager agentManager;
     CommandRunner commandRunner;
     DbManager dbManager;
+
+    PackageInfoStorage storage;
 
     public AgentManager getAgentManager() {
         return agentManager;
@@ -33,6 +36,14 @@ public abstract class PackageManagerBase implements PackageManager {
 
     public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
+    }
+
+    public PackageInfoStorage getStorage() {
+        return storage;
+    }
+
+    public void setStorage(PackageInfoStorage storage) {
+        this.storage = storage;
     }
 
 }

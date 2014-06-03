@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.packagemanager.handler;
+package org.safehaus.subutai.impl.packagemanager.storage;
 
 import java.util.ArrayList;
 import java.util.Collection;

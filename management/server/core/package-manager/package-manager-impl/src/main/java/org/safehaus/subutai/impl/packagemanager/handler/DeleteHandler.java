@@ -19,8 +19,7 @@ public class DeleteHandler extends AbstractHandler<Boolean> {
         Collection<PackageInfo> col = h.performAction();
         if(col == null) return Boolean.FALSE;
 
-        return packageManager.getDbManager().deleteInfo(
-                PackageInfo.SOURCE_NAME, hostname);
+        return packageManager.getStorage().delete(hostname);
     }
 
 }
