@@ -148,6 +148,7 @@ public class TrackerForm extends CustomComponent {
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
         setCompositionRoot(contentRoot);
+        startTracking();
     }
 
 
@@ -243,9 +244,9 @@ public class TrackerForm extends CustomComponent {
                 Item item = container.getItem(po.getId());
                 if (item == null) {
                     final Button trackLogsBtn = new Button("View logs");
-                    trackLogsBtn.addListener(new Button.ClickListener() {
-
-                        public void buttonClick(Button.ClickEvent event) {
+                    trackLogsBtn.addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
                             trackID = po.getId();
                         }
                     });

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 public class TrackerUI implements PortalModule {
 
+    public static TrackerForm trackerForm;
     public static final String MODULE_NAME = "Tracker";
     private static Tracker tracker;
     private static ExecutorService executor;
@@ -55,7 +56,9 @@ public class TrackerUI implements PortalModule {
 
     @Override
     public Component createComponent() {
-        TrackerForm trackerForm = new TrackerForm();
+        if(trackerForm == null){
+            trackerForm = new TrackerForm();
+        }
         trackerForm.refreshSources();
         return trackerForm;
     }
