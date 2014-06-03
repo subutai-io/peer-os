@@ -1,10 +1,7 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import java.util.List;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.gitmanager.GitBranch;
 import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -15,17 +12,21 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Displays branches
+ * Checkouts a remote branch (or creates a local branch)
  */
-@Command( scope = "git", name = "list-branches", description = "List Branches" )
-public class ListBranches extends OsgiCommandSupport {
+@Command( scope = "git", name = "checkout", description = "Checkout" )
+public class Checkout extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
     @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument( index = 2, name = "remote", required = false, multiValued = false, description = "list remote branches (true/false)" )
-    boolean remote;
+    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to switch to or create" )
+    String branchName;
+    @Argument( index = 3, name = "create branch", required = false, multiValued = false,
+            description = "create branch (true/false)" )
+    boolean create;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -43,10 +44,7 @@ public class ListBranches extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
-            for ( GitBranch branch : branches ) {
-                System.out.println( branch );
-            }
+            gitManager.checkout( agent, repoPath, branchName, create );
         }
         catch ( GitException e ) {
             System.out.println( e );
