@@ -263,7 +263,7 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
-        Preconditions.checkArgument( Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
 
         if ( branchName.toLowerCase().contains( MASTER_BRANCH ) ) {
             throw new GitException( "Can not perform push to remote master branch" );
