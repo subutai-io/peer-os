@@ -17,11 +17,17 @@ import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
 /**
  * This is an implementation of GitManager interface
+ *
+ * TODO: add argument validation to all methods
+ *
+ * TODO: output std output
  */
 public class GitManagerImpl implements GitManager {
 
@@ -56,15 +62,19 @@ public class GitManagerImpl implements GitManager {
 
         if ( !command.hasSucceeded() ) {
             if ( command.hasCompleted() ) {
-                AgentResult agentResult = command.getResults().get( host );
+                AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new GitException(
-                        String.format( "Error while performing [git %s]: %s, exit code %s", gitCommand.getCommand(),
-                                agentResult.getStdErr(), agentResult.getExitCode() ) );
+                        String.format( "Error while performing [git %s]: %s\n%s, exit code %s", gitCommand.getCommand(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
             }
             else {
                 throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
                         gitCommand.getCommand() ) );
             }
+        }
+        else {
+            AgentResult agentResult = command.getResults().get( host.getUuid() );
+            System.out.println( agentResult.getStdOut() );
         }
     }
 
@@ -74,6 +84,14 @@ public class GitManagerImpl implements GitManager {
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git add" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
                         Sets.newHashSet( host ) );
+
+        runCommand( addCommand, host, GitCommand.ADD );
+    }
+
+
+    public void addAll( final Agent host, final String repositoryRoot ) throws GitException {
+        Command addCommand = commandRunner
+                .createCommand( new RequestBuilder( "git add -A" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.ADD );
     }
@@ -94,14 +112,14 @@ public class GitManagerImpl implements GitManager {
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
                           final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -m %s", message ) ).withCwd( repositoryRoot )
-                                                                                  .withCmdArgs( filePaths ),
+                new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
+                                                                                      .withCmdArgs( filePaths ),
                 Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
-        //parse output to get commit id here
+        //parse output to get commitAll id here
         Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host ).getStdOut() );
+        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
 
         if ( m.find() ) {
             return m.group( 1 );
@@ -112,16 +130,16 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
-    public String commit( final Agent host, final String repositoryRoot, final String message ) throws GitException {
+    public String commitAll( final Agent host, final String repositoryRoot, final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -a -m %s", message ) ).withCwd( repositoryRoot ),
+                new RequestBuilder( String.format( "git commit -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
 
-        //parse output to get commit id here
+        //parse output to get commitAll id here
         Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host ).getStdOut() );
+        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
 
         if ( m.find() ) {
             return m.group( 1 );
@@ -204,10 +222,10 @@ public class GitManagerImpl implements GitManager {
 
         runCommand( branchCommand, host, GitCommand.BRANCH );
 
-        branchCommand.getResults().get( host ).getStdOut();
+        branchCommand.getResults().get( host.getUuid() ).getStdOut();
 
         StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( lines.hasMoreTokens() ) {
             String line = lines.nextToken();
@@ -233,7 +251,7 @@ public class GitManagerImpl implements GitManager {
         runCommand( branchCommand, host, GitCommand.BRANCH );
 
         StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( lines.hasMoreTokens() ) {
             String line = lines.nextToken();
@@ -248,13 +266,13 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
-    public void push( final Agent host, final String repositoryRoot ) throws GitException {
-        push( host, repositoryRoot, MASTER_BRANCH );
-    }
-
-
-    @Override
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
+        if ( branchName.toLowerCase().contains( MASTER_BRANCH ) ) {
+            throw new GitException( "Can not perform push to remote master branch" );
+        }
+
         Command pushCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git push origin %s", branchName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -325,7 +343,8 @@ public class GitManagerImpl implements GitManager {
 
         runCommand( stashCommand, host, GitCommand.STASH );
 
-        StringTokenizer tok = new StringTokenizer( stashCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+        StringTokenizer tok =
+                new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( tok.hasMoreTokens() ) {
             stashes.add( tok.nextToken() );

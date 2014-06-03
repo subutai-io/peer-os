@@ -399,6 +399,11 @@
         <artifactId>git-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>git-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- Command Runner -->
       <dependency>

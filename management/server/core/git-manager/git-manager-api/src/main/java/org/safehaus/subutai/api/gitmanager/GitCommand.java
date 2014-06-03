@@ -8,7 +8,7 @@ public enum GitCommand {
     INIT( "init" ),
     ADD( "add" ),
     DELETE( "rm" ),
-    COMMIT( "commit" ),
+    COMMIT( "commitAll" ),
     BRANCH( "branch" ),
     CHECKOUT( "checkout" ),
     CLONE( "clone" ),

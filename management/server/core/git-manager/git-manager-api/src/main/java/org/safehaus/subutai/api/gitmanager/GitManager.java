@@ -15,12 +15,14 @@ public interface GitManager {
 
     public void add( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 
+    public void addAll( Agent host, String repositoryRoot ) throws GitException;
+
     public void delete( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 
     public String commit( Agent host, String repositoryRoot, List<String> filePaths, String message )
             throws GitException;
 
-    public String commit( Agent host, String repositoryRoot, String message ) throws GitException;
+    public String commitAll( Agent host, String repositoryRoot, String message ) throws GitException;
 
     public void clone( Agent host, String newBranchName, String targetDir ) throws GitException;
 
@@ -39,8 +41,6 @@ public interface GitManager {
     public GitBranch currentBranch( Agent host, String repositoryRoot ) throws GitException;
 
     public List<GitBranch> listBranches( Agent host, String repositoryRoot, boolean remote ) throws GitException;
-
-    public void push( Agent host, String repositoryRoot ) throws GitException;
 
     public void push( Agent host, String repositoryRoot, String branchName ) throws GitException;
 
