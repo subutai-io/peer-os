@@ -176,6 +176,7 @@ public class TrackerForm extends CustomComponent {
                 public void run() {
                     while (track) {
                         try {
+                            System.out.println("Tracking running");
                             populateOperations();
                             populateLogs();
                         } catch (Exception e) {
@@ -241,8 +242,6 @@ public class TrackerForm extends CustomComponent {
                     progressIcon = new Embedded("", new ThemeResource(okIconSource));
                 }
 
-                System.out.println("populate ok");
-
                 Item item = container.getItem(po.getId());
                 if (item == null) {
                     final Button trackLogsBtn = new Button("View logs");
@@ -260,8 +259,6 @@ public class TrackerForm extends CustomComponent {
                     item.getItemProperty("Status").setValue(progressIcon);
 
                     sortNeeded = true;
-
-                    System.out.println("button ok");
                 } else {
                     if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
                             progressIcon.getSource())) {

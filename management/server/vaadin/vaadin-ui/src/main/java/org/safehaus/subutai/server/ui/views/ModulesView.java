@@ -75,7 +75,18 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
             addModule(module);
         }
 
+        addCloseEvent(editors);
+
         return editors;
+    }
+
+    private void addCloseEvent(TabSheet editors){
+        editors.setCloseHandler(new TabSheet.CloseHandler() {
+            @Override
+            public void onTabClose(TabSheet tabsheet, final Component tabContent) {
+                tabContent.detach();
+            }
+        });
     }
 
     private HorizontalLayout createEditorInstance(PortalModule module) {
