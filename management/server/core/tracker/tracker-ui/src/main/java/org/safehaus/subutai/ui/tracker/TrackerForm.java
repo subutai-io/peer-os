@@ -73,6 +73,19 @@ public class TrackerForm extends CustomComponent {
                 source = (String) event.getProperty().getValue();
                 trackID = null;
                 outputTxtArea.setValue("");
+
+
+                /*
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                *
+                 */
+                System.out.println("Source of combo has changed");
             }
         });
 
