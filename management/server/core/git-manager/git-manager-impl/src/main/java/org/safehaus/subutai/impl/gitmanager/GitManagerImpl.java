@@ -56,7 +56,7 @@ public class GitManagerImpl implements GitManager {
 
         if ( !command.hasSucceeded() ) {
             if ( command.hasCompleted() ) {
-                AgentResult agentResult = command.getResults().get( host );
+                AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new GitException(
                         String.format( "Error while performing [git %s]: %s, exit code %s", gitCommand.getCommand(),
                                 agentResult.getStdErr(), agentResult.getExitCode() ) );
@@ -101,7 +101,7 @@ public class GitManagerImpl implements GitManager {
         runCommand( addCommand, host, GitCommand.COMMIT );
         //parse output to get commit id here
         Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host ).getStdOut() );
+        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
 
         if ( m.find() ) {
             return m.group( 1 );
@@ -121,7 +121,7 @@ public class GitManagerImpl implements GitManager {
 
         //parse output to get commit id here
         Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host ).getStdOut() );
+        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
 
         if ( m.find() ) {
             return m.group( 1 );
@@ -204,10 +204,10 @@ public class GitManagerImpl implements GitManager {
 
         runCommand( branchCommand, host, GitCommand.BRANCH );
 
-        branchCommand.getResults().get( host ).getStdOut();
+        branchCommand.getResults().get( host.getUuid() ).getStdOut();
 
         StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( lines.hasMoreTokens() ) {
             String line = lines.nextToken();
@@ -233,7 +233,7 @@ public class GitManagerImpl implements GitManager {
         runCommand( branchCommand, host, GitCommand.BRANCH );
 
         StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( lines.hasMoreTokens() ) {
             String line = lines.nextToken();
@@ -325,7 +325,7 @@ public class GitManagerImpl implements GitManager {
 
         runCommand( stashCommand, host, GitCommand.STASH );
 
-        StringTokenizer tok = new StringTokenizer( stashCommand.getResults().get( host ).getStdOut(), LINE_SEPARATOR );
+        StringTokenizer tok = new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( tok.hasMoreTokens() ) {
             stashes.add( tok.nextToken() );
