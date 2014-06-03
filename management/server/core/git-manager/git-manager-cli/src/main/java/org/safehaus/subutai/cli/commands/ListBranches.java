@@ -1,6 +1,8 @@
 package org.safehaus.subutai.cli.commands;
 
 
+import java.util.List;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.gitmanager.GitBranch;
 import org.safehaus.subutai.api.gitmanager.GitException;
@@ -13,15 +15,17 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Displays the current git branch
+ * Displays branches
  */
-@Command(scope = "git", name = "get-current-branch", description = "Get Current Branch")
-public class GetCurrentBranch extends OsgiCommandSupport {
+@Command( scope = "git", name = "list-branches", description = "List Branches" )
+public class ListBranches extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
+    @Argument( index = 2, name = "remote", required = false, multiValued = false, description = "list remote branches" )
+    boolean remote;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -39,8 +43,10 @@ public class GetCurrentBranch extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            GitBranch gitBranch = gitManager.currentBranch( agent, repoPath );
-            System.out.println( gitBranch );
+            List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
+            for ( GitBranch branch : branches ) {
+                System.out.println( branch );
+            }
         }
         catch ( GitException e ) {
             System.out.println( e );

@@ -14,4 +14,13 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/list-branches">
+      <action class="org.safehaus.subutai.cli.commands.ListBranches">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
