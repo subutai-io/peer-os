@@ -32,7 +32,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
     private TabSheet editors;
     private HorizontalLayout modulesLayout;
-    private List<VerticalLayout> modulesList = new ArrayList<VerticalLayout>();
+    private List<Component> modulesList = new ArrayList<Component>();
 
     @Override
     public void enter(ViewChangeEvent event) {
@@ -84,7 +84,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         editors.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, final Component tabContent) {
-                tabContent.detach();
+                for()
             }
         });
     }
@@ -100,7 +100,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     }
 
     public void autoCreate(PortalModule module) {
-        editors.addTab(createEditorInstance(module)).setClosable(
+        editors.addTab(module.createComponent()).setClosable(
                 true);
         editors.setSelectedTab(editors.getComponentCount() - 1);
     }
