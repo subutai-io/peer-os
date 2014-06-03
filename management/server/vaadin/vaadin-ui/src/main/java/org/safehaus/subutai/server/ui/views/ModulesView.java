@@ -84,7 +84,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         editors.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, final Component tabContent) {
-                for()
+//                for()
             }
         });
     }
