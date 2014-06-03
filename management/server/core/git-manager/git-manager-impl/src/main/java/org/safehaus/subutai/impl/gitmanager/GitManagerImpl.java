@@ -17,11 +17,15 @@ import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
 /**
  * This is an implementation of GitManager interface
+ *
+ * TODO: add argument validation to all methods
  */
 public class GitManagerImpl implements GitManager {
 
@@ -103,7 +107,7 @@ public class GitManagerImpl implements GitManager {
                           final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
-                                                                                         .withCmdArgs( filePaths ),
+                                                                                      .withCmdArgs( filePaths ),
                 Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
@@ -256,13 +260,13 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
-    public void push( final Agent host, final String repositoryRoot ) throws GitException {
-        push( host, repositoryRoot, MASTER_BRANCH );
-    }
-
-
-    @Override
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        Preconditions.checkArgument( Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
+        if ( branchName.toLowerCase().contains( MASTER_BRANCH ) ) {
+            throw new GitException( "Can not perform push to remote master branch" );
+        }
+
         Command pushCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git push origin %s", branchName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );

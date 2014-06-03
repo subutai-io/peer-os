@@ -42,8 +42,6 @@ public interface GitManager {
 
     public List<GitBranch> listBranches( Agent host, String repositoryRoot, boolean remote ) throws GitException;
 
-    public void push( Agent host, String repositoryRoot ) throws GitException;
-
     public void push( Agent host, String repositoryRoot, String branchName ) throws GitException;
 
     public void undoSoft( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
