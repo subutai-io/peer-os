@@ -45,7 +45,7 @@ public class CommitFiles extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            String commitId = gitManager.commit( agent, repoPath, new ArrayList<String>( files ), message );
+            String commitId = gitManager.commit( agent, repoPath, new ArrayList<>( files ), message );
             System.out.println( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e ) {

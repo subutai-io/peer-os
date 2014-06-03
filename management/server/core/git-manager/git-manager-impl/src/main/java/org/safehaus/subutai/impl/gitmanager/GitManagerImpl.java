@@ -58,8 +58,8 @@ public class GitManagerImpl implements GitManager {
             if ( command.hasCompleted() ) {
                 AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new GitException(
-                        String.format( "Error while performing [git %s]: %s, exit code %s", gitCommand.getCommand(),
-                                agentResult.getStdErr(), agentResult.getExitCode() ) );
+                        String.format( "Error while performing [git %s]: %s\n%s, exit code %s", gitCommand.getCommand(),
+                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
             }
             else {
                 throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
@@ -94,7 +94,7 @@ public class GitManagerImpl implements GitManager {
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
                           final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -m %s", message ) ).withCwd( repositoryRoot )
+                new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
                                                                                   .withCmdArgs( filePaths ),
                 Sets.newHashSet( host ) );
 
@@ -114,7 +114,7 @@ public class GitManagerImpl implements GitManager {
     @Override
     public String commit( final Agent host, final String repositoryRoot, final String message ) throws GitException {
         Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -a -m %s", message ) ).withCwd( repositoryRoot ),
+                new RequestBuilder( String.format( "git commit -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
@@ -325,7 +325,8 @@ public class GitManagerImpl implements GitManager {
 
         runCommand( stashCommand, host, GitCommand.STASH );
 
-        StringTokenizer tok = new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
+        StringTokenizer tok =
+                new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( tok.hasMoreTokens() ) {
             stashes.add( tok.nextToken() );
