@@ -26,6 +26,8 @@ import com.google.common.collect.Sets;
  * This is an implementation of GitManager interface
  *
  * TODO: add argument validation to all methods
+ *
+ * TODO: output std output
  */
 public class GitManagerImpl implements GitManager {
 

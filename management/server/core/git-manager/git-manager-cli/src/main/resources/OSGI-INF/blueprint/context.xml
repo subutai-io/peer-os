@@ -86,4 +86,13 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/push">
+      <action class="org.safehaus.subutai.cli.commands.Push">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
