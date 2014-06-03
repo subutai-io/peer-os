@@ -73,19 +73,6 @@ public class TrackerForm extends CustomComponent {
                 source = (String) event.getProperty().getValue();
                 trackID = null;
                 outputTxtArea.setValue("");
-
-
-                /*
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                 */
-                System.out.println("Source of combo has changed");
             }
         });
 
@@ -138,17 +125,6 @@ public class TrackerForm extends CustomComponent {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 limit = (Integer) event.getProperty().getValue();
-                /*
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                 */
-                System.out.println("Limit has changed");
             }
         });
 
@@ -198,17 +174,6 @@ public class TrackerForm extends CustomComponent {
             TrackerUI.getExecutor().execute(new Runnable() {
 
                 public void run() {
-                    /*
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                *
-                 */
-                    System.out.println("Tracking started");
                     while (track) {
                         try {
                             populateOperations();
@@ -257,7 +222,7 @@ public class TrackerForm extends CustomComponent {
                     TrackerUI.getTracker().getProductOperations(source, fromDateValue, toDateValue, limit);
             if (operations.isEmpty()) {
                 trackID = null;
-                outputTxtArea.setValue("");
+//                outputTxtArea.setValue("");
             }
             IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
             currentOperations.removeAll(operations);
@@ -276,6 +241,8 @@ public class TrackerForm extends CustomComponent {
                     progressIcon = new Embedded("", new ThemeResource(okIconSource));
                 }
 
+                System.out.println("populate ok");
+
                 Item item = container.getItem(po.getId());
                 if (item == null) {
                     final Button trackLogsBtn = new Button("View logs");
@@ -293,6 +260,8 @@ public class TrackerForm extends CustomComponent {
                     item.getItemProperty("Status").setValue(progressIcon);
 
                     sortNeeded = true;
+
+                    System.out.println("button ok");
                 } else {
                     if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
                             progressIcon.getSource())) {
