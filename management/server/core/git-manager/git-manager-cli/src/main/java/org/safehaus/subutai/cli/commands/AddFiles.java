@@ -15,18 +15,16 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Commits file(s)
+ * Adds file(s) to commit
  */
-@Command( scope = "git", name = "commit-files", description = "Commit Files" )
-public class CommitFiles extends OsgiCommandSupport {
+@Command( scope = "git", name = "add-files", description = "Add Files" )
+public class AddFiles extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
     @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument( index = 2, name = "message", required = true, multiValued = false, description = "commit message" )
-    String message;
-    @Argument( index = 3, name = "file(s)", required = true, multiValued = true, description = "file(s) to commit" )
+    @Argument( index = 2, name = "file(s)", required = true, multiValued = true, description = "file(s) to add" )
     Collection<String> files;
     private AgentManager agentManager;
     private GitManager gitManager;
@@ -45,8 +43,7 @@ public class CommitFiles extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            String commitId = gitManager.commit( agent, repoPath, new ArrayList<>( files ), message );
-            System.out.println( String.format( "Commit ID : %s", commitId ) );
+            gitManager.add( agent, repoPath, new ArrayList<>( files ) );
         }
         catch ( GitException e ) {
             System.out.println( e );

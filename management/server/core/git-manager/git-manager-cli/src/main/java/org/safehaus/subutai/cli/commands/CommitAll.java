@@ -12,7 +12,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Displays the current git branch
+ * Commits all files
  */
 @Command( scope = "git", name = "commit-all", description = "Commit All" )
 public class CommitAll extends OsgiCommandSupport {
@@ -40,7 +40,7 @@ public class CommitAll extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            String commitId = gitManager.commit( agent, repoPath, message );
+            String commitId = gitManager.commitAll( agent, repoPath, message );
             System.out.println( String.format( "Commit ID : %s", commitId ) );
         }
         catch ( GitException e ) {

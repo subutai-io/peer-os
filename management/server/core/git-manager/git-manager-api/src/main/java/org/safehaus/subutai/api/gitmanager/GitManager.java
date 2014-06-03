@@ -15,12 +15,14 @@ public interface GitManager {
 
     public void add( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 
+    public void addAll( Agent host, String repositoryRoot ) throws GitException;
+
     public void delete( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 
     public String commit( Agent host, String repositoryRoot, List<String> filePaths, String message )
             throws GitException;
 
-    public String commit( Agent host, String repositoryRoot, String message ) throws GitException;
+    public String commitAll( Agent host, String repositoryRoot, String message ) throws GitException;
 
     public void clone( Agent host, String newBranchName, String targetDir ) throws GitException;
 
