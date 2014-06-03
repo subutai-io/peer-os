@@ -3,11 +3,9 @@ package org.safehaus.subutai.ui.hadoop.manager;
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.event.Action;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
@@ -40,7 +38,7 @@ public class HadoopTable extends TreeTable {
         setCaption(caption);
 
         this.setWidth("100%");
-        this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        this.setHeight(100, Unit.PERCENTAGE);
 
         this.setPageLength(10);
         this.setSelectable(true);
@@ -72,7 +70,7 @@ public class HadoopTable extends TreeTable {
 
                     indicator.setVisible(true);
                     UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
-                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+//                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                     refreshDataSource();
                 } else if (action == EXCLUDE_ITEM_ACTION) {
                     Item row = getItem(target);

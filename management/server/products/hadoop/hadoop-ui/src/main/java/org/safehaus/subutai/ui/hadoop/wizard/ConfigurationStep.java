@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -126,7 +126,7 @@ public class ConfigurationStep extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        /*getWindow().showNotification(notification);*/
     }
 
 }

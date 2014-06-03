@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common</module>
+       <!-- <module>common</module>
         <module>accumulo</module>
         <module>mongodb</module>
         <module>solr</module>
@@ -27,14 +27,14 @@
         <module>shark</module>
         <module>presto</module>
         <module>hbase</module>
-        <module>hadoop</module>
         <module>zookeeper</module>
         <module>hive</module>
         <module>hivequery</module>
         <module>sqoop</module>
         <module>oozie</module>
         <module>cassandra</module>
-        <module>storm</module>
+        <module>storm</module>-->
+        <module>hadoop</module>
     </modules>
 
 </project>

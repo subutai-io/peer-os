@@ -1,6 +1,6 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
@@ -53,8 +53,8 @@ public class ClusterNode extends HorizontalLayout {
 
     private Embedded getProgressButton() {
         progressButton = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
-        progressButton.setWidth(ICON_SIZE + 2, UNITS_PIXELS);
-        progressButton.setHeight(ICON_SIZE + 2, UNITS_PIXELS);
+        progressButton.setWidth(ICON_SIZE + 2, Unit.PIXELS);
+        progressButton.setHeight(ICON_SIZE + 2, Unit.PIXELS);
         progressButton.setVisible(false);
 
         return progressButton;
@@ -63,8 +63,8 @@ public class ClusterNode extends HorizontalLayout {
     private Embedded getStartButton() {
         startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
         startButton.setDescription("Start");
-        startButton.setWidth(ICON_SIZE, UNITS_PIXELS);
-        startButton.setHeight(ICON_SIZE, UNITS_PIXELS);
+        startButton.setWidth(ICON_SIZE, Unit.PIXELS);
+        startButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
         return startButton;
     }
@@ -72,8 +72,8 @@ public class ClusterNode extends HorizontalLayout {
     private Embedded getStopButton() {
         stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
         stopButton.setDescription("Stop");
-        stopButton.setWidth(ICON_SIZE, UNITS_PIXELS);
-        stopButton.setHeight(ICON_SIZE, UNITS_PIXELS);
+        stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
+        stopButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
         return stopButton;
     }
@@ -81,8 +81,8 @@ public class ClusterNode extends HorizontalLayout {
     private Embedded getRestartButton() {
         restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
         restartButton.setDescription("Restart");
-        restartButton.setWidth(ICON_SIZE, UNITS_PIXELS);
-        restartButton.setHeight(ICON_SIZE, UNITS_PIXELS);
+        restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
+        restartButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
         return restartButton;
     }

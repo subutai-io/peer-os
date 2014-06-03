@@ -5,9 +5,8 @@
  */
 package org.safehaus.subutai.ui.hadoop.wizard;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
 
 import java.util.UUID;
@@ -15,7 +14,7 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends VerticalLayout {
 
     public VerificationStep(final Wizard wizard) {
 
@@ -28,7 +27,7 @@ public class VerificationStep extends Panel {
 
         Label confirmationLbl = new Label("<strong>Please verify the installation settings "
                 + "(you may change them by clicking on Back button)</strong><br/>");
-        confirmationLbl.setContentMode(Label.CONTENT_XHTML);
+        confirmationLbl.setContentMode(ContentMode.HTML);
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
@@ -43,7 +42,7 @@ public class VerificationStep extends Panel {
             public void buttonClick(Button.ClickEvent event) {
 
                 UUID trackID = HadoopUI.getHadoopManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+//                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 wizard.init();
             }
         });

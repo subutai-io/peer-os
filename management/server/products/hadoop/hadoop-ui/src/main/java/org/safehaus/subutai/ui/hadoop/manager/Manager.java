@@ -1,14 +1,13 @@
 package org.safehaus.subutai.ui.hadoop.manager;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.ui.hadoop.manager.components.ClusterNode;
 
 /**
  * Created by daralbaev on 12.04.14.
  */
-public class Manager extends Panel {
+public class Manager extends VerticalLayout {
     private HorizontalLayout horizontalLayout, buttonsLayout;
     private Embedded indicator;
     private Button refreshButton;
@@ -29,15 +28,15 @@ public class Manager extends Panel {
         buttonsLayout.setSpacing(true);
 
         Embedded startedButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
-        startedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
-        startedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        startedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
+        startedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
         startedButton.setEnabled(false);
         buttonsLayout.addComponent(startedButton);
         buttonsLayout.addComponent(new Label("Started node"));
 
         Embedded stoppedButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
-        stoppedButton.setWidth(ClusterNode.ICON_SIZE, UNITS_PIXELS);
-        stoppedButton.setHeight(ClusterNode.ICON_SIZE, UNITS_PIXELS);
+        stoppedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
+        stoppedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
         stoppedButton.setEnabled(false);
         buttonsLayout.addComponent(stoppedButton);
         buttonsLayout.addComponent(new Label("Stopped node"));
@@ -61,8 +60,8 @@ public class Manager extends Panel {
 
     private Embedded getIndicator() {
         indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setHeight(11, Unit.PIXELS);
+        indicator.setWidth(50, Unit.PIXELS);
         indicator.setVisible(true);
 
         return indicator;

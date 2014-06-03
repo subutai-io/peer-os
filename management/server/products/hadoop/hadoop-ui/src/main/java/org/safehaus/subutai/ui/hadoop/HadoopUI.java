@@ -5,7 +5,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by daralbaev on 08.04.14.
  */
-public class HadoopUI implements Module {
+public class HadoopUI implements PortalModule {
 
     private static Hadoop hadoopManager;
     private static AgentManager agentManager;
@@ -61,6 +61,11 @@ public class HadoopUI implements Module {
         hadoopManager = null;
         agentManager = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     @Override
