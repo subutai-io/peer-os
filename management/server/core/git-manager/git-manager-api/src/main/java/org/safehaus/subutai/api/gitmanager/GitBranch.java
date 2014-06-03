@@ -49,4 +49,13 @@ public class GitBranch {
     public boolean isRemote() {
         return name.contains( "/" );
     }
+
+
+    @Override
+    public String toString() {
+        return "GitBranch{" +
+                "name='" + name + '\'' +
+                ", current=" + current +
+                '}';
+    }
 }
