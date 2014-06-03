@@ -39,6 +39,7 @@ import org.safehaus.subutai.server.ui.views.MonitorView;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 
 @Theme("dashboard")
@@ -46,6 +47,9 @@ import java.util.Locale;
 @Title("Mgmt UI")
 
 public class MainUI extends UI {
+
+    private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
+    private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<MainUI>();
 
     private CssLayout root = new CssLayout();
     private CssLayout menu = new CssLayout();
@@ -64,6 +68,7 @@ public class MainUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
+        setInstance(this);
         helpManager = new HelpManager(this);
 
         setLocale(Locale.US);
@@ -344,5 +349,13 @@ public class MainUI extends UI {
                         .removeStyleName("selected");
             }
         }
+    }
+
+    private static MainUI getInstance() {
+        return threadLocal.get();
+    }
+
+    private static void setInstance(MainUI application) {
+        threadLocal.set(application);
     }
 }
