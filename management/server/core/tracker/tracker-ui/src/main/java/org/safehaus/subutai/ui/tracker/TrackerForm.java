@@ -148,7 +148,6 @@ public class TrackerForm extends CustomComponent {
         content.setComponentAlignment(outputTxtArea, Alignment.TOP_CENTER);
 
         setCompositionRoot(contentRoot);
-        startTracking();
     }
 
 
@@ -167,7 +166,7 @@ public class TrackerForm extends CustomComponent {
         return table;
     }
 
-    private void startTracking() {
+    public void startTracking() {
         if (!track) {
             track = true;
 

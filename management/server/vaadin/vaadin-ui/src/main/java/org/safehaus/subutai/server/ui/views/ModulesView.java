@@ -89,16 +89,6 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         });
     }
 
-    private HorizontalLayout createEditorInstance(PortalModule module) {
-        HorizontalLayout editor = new HorizontalLayout();
-        editor.setSizeFull();
-        editor.setCaption(module.getName());
-
-        editor.addComponent(module.createComponent());
-
-        return editor;
-    }
-
     public void autoCreate(PortalModule module) {
         TabSheet.Tab tab = editors.addTab(module.createComponent());
         tab.setCaption(module.getName());

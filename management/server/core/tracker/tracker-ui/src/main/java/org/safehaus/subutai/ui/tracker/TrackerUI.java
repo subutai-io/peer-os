@@ -60,6 +60,7 @@ public class TrackerUI implements PortalModule {
             trackerForm = new TrackerForm();
         }
         trackerForm.refreshSources();
+        trackerForm.startTracking();
         return trackerForm;
     }
 }
