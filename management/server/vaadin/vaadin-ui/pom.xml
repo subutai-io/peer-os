@@ -173,5 +173,10 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

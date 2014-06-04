@@ -221,7 +221,7 @@ public class TrackerForm extends CustomComponent {
                     TrackerUI.getTracker().getProductOperations(source, fromDateValue, toDateValue, limit);
             if (operations.isEmpty()) {
                 trackID = null;
-//                outputTxtArea.setValue("");
+                outputTxtArea.setValue("");
             }
             IndexedContainer container = (IndexedContainer) operationsTable.getContainerDataSource();
             currentOperations.removeAll(operations);

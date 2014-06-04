@@ -35,6 +35,7 @@ import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,6 +84,13 @@ public class MainUI extends UI {
         bg.setSizeUndefined();
         bg.addStyleName("login-bg");
         root.addComponent(bg);
+
+        // For synchronization issue
+        final ProgressIndicator indicator
+                = new ProgressIndicator(new Float(0.0));
+        indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
+        indicator.setVisible(false);
+        root.addComponent(indicator);
 
         buildLoginView(false);
     }
