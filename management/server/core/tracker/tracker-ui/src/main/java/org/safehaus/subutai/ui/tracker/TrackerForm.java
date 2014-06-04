@@ -175,7 +175,6 @@ public class TrackerForm extends CustomComponent {
                 public void run() {
                     while (track) {
                         try {
-                            System.out.println("Tracking running");
                             populateOperations();
                             populateLogs();
                         } catch (Exception e) {
