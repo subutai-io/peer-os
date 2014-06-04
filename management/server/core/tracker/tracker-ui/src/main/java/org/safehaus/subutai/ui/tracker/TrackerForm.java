@@ -229,6 +229,7 @@ public class TrackerForm extends CustomComponent {
             for (ProductOperationView po : currentOperations) {
                 container.removeItem(po.getId());
             }
+
             boolean sortNeeded = false;
             for (final ProductOperationView po : operations) {
                 Embedded progressIcon;
