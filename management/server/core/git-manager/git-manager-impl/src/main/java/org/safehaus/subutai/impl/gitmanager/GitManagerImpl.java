@@ -302,6 +302,13 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
+    public void undoHard( final Agent host, final String repositoryRoot ) throws GitException {
+
+        undoHard( host, repositoryRoot, MASTER_BRANCH );
+    }
+
+
+    @Override
     public void revertCommit( final Agent host, final String repositoryRoot, String commitId ) throws GitException {
         Command revertCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git revert %s", commitId ) ).withCwd( repositoryRoot ),

@@ -131,4 +131,22 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/undo-soft">
+      <action class="org.safehaus.subutai.cli.commands.UndoSoft">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/undo-hard">
+      <action class="org.safehaus.subutai.cli.commands.UndoHard">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>

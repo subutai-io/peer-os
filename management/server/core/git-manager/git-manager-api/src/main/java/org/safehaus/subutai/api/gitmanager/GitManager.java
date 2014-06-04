@@ -48,6 +48,8 @@ public interface GitManager {
 
     public void undoHard( Agent host, String repositoryRoot, String branchName ) throws GitException;
 
+    public void undoHard( Agent host, String repositoryRoot ) throws GitException;
+
     public void revertCommit( Agent host, String repositoryRoot, String commitId ) throws GitException;
 
     public void stash( Agent host, String repositoryRoot, String stashName ) throws GitException;
