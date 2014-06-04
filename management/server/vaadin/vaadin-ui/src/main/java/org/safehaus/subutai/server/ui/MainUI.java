@@ -89,7 +89,8 @@ public class MainUI extends UI {
         final ProgressIndicator indicator
                 = new ProgressIndicator(new Float(0.0));
         indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
-        indicator.setVisible(false);
+        indicator.setWidth("1px");
+        indicator.setHeight("1px");
         root.addComponent(indicator);
 
         buildLoginView(false);
