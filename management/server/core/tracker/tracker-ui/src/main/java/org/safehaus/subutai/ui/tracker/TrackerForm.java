@@ -32,9 +32,9 @@ public class TrackerForm extends CustomComponent {
     private VerticalLayout contentRoot;
     private Table operationsTable;
     private TextArea outputTxtArea;
-    private String okIconSource = "icons/16/ok.png";
-    private String errorIconSource = "icons/16/cancel.png";
-    private String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private String okIconSource = "img/ok.png";
+    private String errorIconSource = "img/cancel.png";
+    private String loadIconSource = "img/spinner.gif";
     private PopupDateField fromDate, toDate;
     private ComboBox sourcesCombo;
     private Date fromDateValue, toDateValue;
