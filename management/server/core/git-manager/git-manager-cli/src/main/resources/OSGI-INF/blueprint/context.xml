@@ -158,4 +158,31 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/stash">
+      <action class="org.safehaus.subutai.cli.commands.Stash">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/unstash">
+      <action class="org.safehaus.subutai.cli.commands.Unstash">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/list-stashes">
+      <action class="org.safehaus.subutai.cli.commands.ListStashes">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
