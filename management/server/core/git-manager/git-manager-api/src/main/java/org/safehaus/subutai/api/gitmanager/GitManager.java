@@ -52,7 +52,7 @@ public interface GitManager {
 
     public void revertCommit( Agent host, String repositoryRoot, String commitId ) throws GitException;
 
-    public void stash( Agent host, String repositoryRoot, String stashName ) throws GitException;
+    public void stash( Agent host, String repositoryRoot ) throws GitException;
 
     public void unstash( Agent host, String repositoryRoot, String stashName ) throws GitException;
 

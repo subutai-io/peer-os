@@ -319,10 +319,10 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
-    public void stash( final Agent host, final String repositoryRoot, final String stashName ) throws GitException {
-        Command stashCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git stash %s", stashName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+    public void stash( final Agent host, final String repositoryRoot ) throws GitException {
+        Command stashCommand = commandRunner
+                .createCommand( new RequestBuilder( String.format( "git stash" ) ).withCwd( repositoryRoot ),
+                        Sets.newHashSet( host ) );
 
         runCommand( stashCommand, host, GitCommand.STASH );
     }

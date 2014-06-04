@@ -12,18 +12,15 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Stashes all changes in current branch under specified name
+ * Stashes all changes in current branch and reverts it to HEAD commit
  */
-@Command( scope = "git", name = "stash", description = "Stash all changes in current branch under specified name" )
+@Command( scope = "git", name = "stash", description = "Stash all changes in current branch and revert to HEAD commit" )
 public class Stash extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
     @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument( index = 2, name = "stashName", required = true, multiValued = false,
-            description = "stash name to store changes under" )
-    String stashName;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -41,7 +38,7 @@ public class Stash extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            gitManager.stash( agent, repoPath, stashName );
+            gitManager.stash( agent, repoPath );
         }
         catch ( GitException e ) {
             System.out.println( e );
