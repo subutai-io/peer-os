@@ -12,9 +12,9 @@
   </parent>
 
   <artifactId>command-runner-impl</artifactId>
-  <packaging>bundle</packaging>
   <name>Subutai Command Runner</name>
   <description>command runner impl</description>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <dependency>

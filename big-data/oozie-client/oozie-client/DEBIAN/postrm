@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 . /etc/profile
-if [[ "x$OOZIE_CLIENT_HOME" == "x" ]];
+if [ "x$OOZIE_CLIENT_HOME" = "x" ];
 then
         OOZIE_CLIENT_HOME=/opt/oozie-client-3.3.2
 fi
