@@ -1,10 +1,7 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import java.util.List;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.gitmanager.GitBranch;
 import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -15,18 +12,20 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Displays branches
+ * Brings current branch to the state of the specified remote branch, effectively undoing all local changes
  */
-@Command( scope = "git", name = "list-branches", description = "List local/remote branches" )
-public class ListBranches extends OsgiCommandSupport {
+@Command( scope = "git", name = "undo-hard",
+        description = "Bring current branch to the state of the specified remote branch, "
+                + "effectively undoing all local changes" )
+public class UndoHard extends OsgiCommandSupport {
 
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
     @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument( index = 2, name = "remote", required = false, multiValued = false,
-            description = "list remote branches (true/false = default)" )
-    boolean remote;
+    @Argument( index = 2, name = "branch name", required = false, multiValued = false,
+            description = "name of remote branch whose state to restore current branch to (master = default)" )
+    String branchName;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -44,9 +43,12 @@ public class ListBranches extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            List<GitBranch> branches = gitManager.listBranches( agent, repoPath, remote );
-            for ( GitBranch branch : branches ) {
-                System.out.println( branch );
+
+            if ( branchName != null ) {
+                gitManager.undoHard( agent, repoPath, branchName );
+            }
+            else {
+                gitManager.undoHard( agent, repoPath );
             }
         }
         catch ( GitException e ) {

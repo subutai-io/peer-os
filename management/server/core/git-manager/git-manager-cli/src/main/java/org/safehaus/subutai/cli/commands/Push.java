@@ -12,17 +12,17 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Checkouts a remote branch (or creates a local branch)
+ * Pushes to remote branch
  */
-@Command( scope = "git", name = "push", description = "Push to repo" )
+@Command(scope = "git", name = "push", description = "Push to remote branch")
 public class Push extends OsgiCommandSupport {
 
-    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
     String hostname;
-    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
+    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
     String repoPath;
-    @Argument( index = 2, name = "branch name", required = true, multiValued = false,
-            description = "branch name to push to" )
+    @Argument(index = 2, name = "branch name", required = true, multiValued = false,
+            description = "branch name to push to")
     String branchName;
     private AgentManager agentManager;
     private GitManager gitManager;

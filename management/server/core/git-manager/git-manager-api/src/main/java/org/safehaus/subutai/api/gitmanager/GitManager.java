@@ -19,8 +19,8 @@ public interface GitManager {
 
     public void delete( Agent host, String repositoryRoot, List<String> filePaths ) throws GitException;
 
-    public String commit( Agent host, String repositoryRoot, List<String> filePaths, String message )
-            throws GitException;
+    public String commit( Agent host, String repositoryRoot, List<String> filePaths, String message,
+                          boolean afterConflictResolved ) throws GitException;
 
     public String commitAll( Agent host, String repositoryRoot, String message ) throws GitException;
 
@@ -48,9 +48,11 @@ public interface GitManager {
 
     public void undoHard( Agent host, String repositoryRoot, String branchName ) throws GitException;
 
+    public void undoHard( Agent host, String repositoryRoot ) throws GitException;
+
     public void revertCommit( Agent host, String repositoryRoot, String commitId ) throws GitException;
 
-    public void stash( Agent host, String repositoryRoot, String stashName ) throws GitException;
+    public void stash( Agent host, String repositoryRoot ) throws GitException;
 
     public void unstash( Agent host, String repositoryRoot, String stashName ) throws GitException;
 

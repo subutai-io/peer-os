@@ -110,11 +110,10 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
-                          final String message ) throws GitException {
-        Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -m \"%s\"", message ) ).withCwd( repositoryRoot )
-                                                                                      .withCmdArgs( filePaths ),
-                Sets.newHashSet( host ) );
+                          final String message, boolean afterConflictResolved ) throws GitException {
+        Command addCommand = commandRunner.createCommand( new RequestBuilder(
+                String.format( "git commit -m \"%s\" %s", message, afterConflictResolved ? "-i" : "" ) )
+                .withCwd( repositoryRoot ).withCmdArgs( filePaths ), Sets.newHashSet( host ) );
 
         runCommand( addCommand, host, GitCommand.COMMIT );
         //parse output to get commitAll id here
@@ -303,6 +302,13 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
+    public void undoHard( final Agent host, final String repositoryRoot ) throws GitException {
+
+        undoHard( host, repositoryRoot, MASTER_BRANCH );
+    }
+
+
+    @Override
     public void revertCommit( final Agent host, final String repositoryRoot, String commitId ) throws GitException {
         Command revertCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git revert %s", commitId ) ).withCwd( repositoryRoot ),
@@ -313,10 +319,10 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
-    public void stash( final Agent host, final String repositoryRoot, final String stashName ) throws GitException {
-        Command stashCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git stash %s", stashName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+    public void stash( final Agent host, final String repositoryRoot ) throws GitException {
+        Command stashCommand = commandRunner
+                .createCommand( new RequestBuilder( String.format( "git stash" ) ).withCwd( repositoryRoot ),
+                        Sets.newHashSet( host ) );
 
         runCommand( stashCommand, host, GitCommand.STASH );
     }

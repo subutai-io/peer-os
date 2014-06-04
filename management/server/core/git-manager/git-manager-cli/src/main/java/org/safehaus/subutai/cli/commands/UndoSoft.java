@@ -15,22 +15,18 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * Commits file(s)
+ * Undoes all uncommitted changes to specified files
  */
-@Command(scope = "git", name = "commit-files", description = "Commit files")
-public class CommitFiles extends OsgiCommandSupport {
+@Command( scope = "git", name = "undo-soft", description = "Undo all uncommitted changes to specified files" )
+public class UndoSoft extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname")
+    @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "agent hostname" )
     String hostname;
-    @Argument(index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo")
+    @Argument( index = 1, name = "repoPath", required = true, multiValued = false, description = "path to git repo" )
     String repoPath;
-    @Argument(index = 2, name = "message", required = true, multiValued = false, description = "commit message")
-    String message;
-    @Argument(index = 3, name = "file(s)", required = true, multiValued = true, description = "file(s) to commit")
+    @Argument( index = 2, name = "file(s)", required = true, multiValued = true,
+            description = "file(s) to undo changes to" )
     Collection<String> files;
-    @Argument( index = 4, name = "conflict resolution", required = false, multiValued = false,
-            description = "commit after conflict resolution (true/false = default)" )
-    boolean afterConflictResolved;
     private AgentManager agentManager;
     private GitManager gitManager;
 
@@ -48,9 +44,8 @@ public class CommitFiles extends OsgiCommandSupport {
         Agent agent = agentManager.getAgentByHostname( hostname );
 
         try {
-            String commitId =
-                    gitManager.commit( agent, repoPath, new ArrayList<>( files ), message, afterConflictResolved );
-            System.out.println( String.format( "Commit ID : %s", commitId ) );
+
+            gitManager.undoSoft( agent, repoPath, new ArrayList<>( files ) );
         }
         catch ( GitException e ) {
             System.out.println( e );

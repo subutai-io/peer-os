@@ -104,4 +104,85 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/pull">
+      <action class="org.safehaus.subutai.cli.commands.Pull">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/merge">
+      <action class="org.safehaus.subutai.cli.commands.Merge">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/init">
+      <action class="org.safehaus.subutai.cli.commands.Init">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/undo-soft">
+      <action class="org.safehaus.subutai.cli.commands.UndoSoft">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/undo-hard">
+      <action class="org.safehaus.subutai.cli.commands.UndoHard">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/revert-commit">
+      <action class="org.safehaus.subutai.cli.commands.RevertCommit">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/stash">
+      <action class="org.safehaus.subutai.cli.commands.Stash">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/unstash">
+      <action class="org.safehaus.subutai.cli.commands.Unstash">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/list-stashes">
+      <action class="org.safehaus.subutai.cli.commands.ListStashes">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>

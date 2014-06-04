@@ -25,7 +25,7 @@ public class Checkout extends OsgiCommandSupport {
             description = "branch name to switch to or create" )
     String branchName;
     @Argument( index = 3, name = "create branch", required = false, multiValued = false,
-            description = "create branch (true/false)" )
+            description = "create branch (true/false = default)" )
     boolean create;
     private AgentManager agentManager;
     private GitManager gitManager;
