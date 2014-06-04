@@ -75,7 +75,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
             addModule(module);
         }
 
-        addCloseEvent(editors);
+//        addCloseEvent(editors);
 
         return editors;
     }
@@ -100,8 +100,9 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     }
 
     public void autoCreate(PortalModule module) {
-        editors.addTab(module.createComponent()).setClosable(
-                true);
+        TabSheet.Tab tab = editors.addTab(module.createComponent());
+        tab.setCaption(module.getName());
+        tab.setClosable(true);
         editors.setSelectedTab(editors.getComponentCount() - 1);
     }
 
