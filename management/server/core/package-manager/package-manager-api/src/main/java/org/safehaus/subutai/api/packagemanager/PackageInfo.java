@@ -1,12 +1,14 @@
 package org.safehaus.subutai.api.packagemanager;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class PackageInfo {
+public class PackageInfo implements Comparable<PackageInfo>, Serializable {
 
     public static final String SOURCE_NAME = "DebPackageManager";
+    private static final long serialVersionUID = 22L;
     private final String name;
     private final String version;
     private PackageState state;
@@ -96,6 +98,12 @@ public class PackageInfo {
         sb.append(sep).append(name).append(sep).append(version);
         sb.append(sep).append(arch).append(sep).append(description);
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(PackageInfo o) {
+        int c = name.compareTo(o.name);
+        return c != 0 ? c : version.compareTo(o.version);
     }
 
 }
