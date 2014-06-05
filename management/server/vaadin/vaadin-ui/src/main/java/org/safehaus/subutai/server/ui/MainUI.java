@@ -95,7 +95,6 @@ public class MainUI extends UI {
         indicator.setHeight("0px");
         root.addComponent(indicator);*/
         refresher = new Refresher();
-        root.addComponent((Component) refresher);
         refresher.setRefreshInterval(Common.REFRESH_UI_SEC * 1000);
 
         buildLoginView(false);
