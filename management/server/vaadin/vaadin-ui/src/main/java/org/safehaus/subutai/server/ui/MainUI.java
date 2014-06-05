@@ -99,6 +99,7 @@ public class MainUI extends UI {
         refresher.addListener(new Refresher.RefreshListener() {
             @Override
             public void refresh(Refresher refresher) {
+                root.setVisible(!root.isVisible());
             }
         });
 
