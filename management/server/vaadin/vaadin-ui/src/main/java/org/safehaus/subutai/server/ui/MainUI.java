@@ -19,7 +19,6 @@
  */
 package org.safehaus.subutai.server.ui;
 
-import com.github.wolfie.refresher.Refresher;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -53,7 +52,6 @@ public class MainUI extends UI {
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
     private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<MainUI>();
 
-    private Refresher refresher;
     private CssLayout root = new CssLayout();
     private CssLayout menu = new CssLayout();
     private CssLayout content = new CssLayout();
@@ -88,20 +86,12 @@ public class MainUI extends UI {
         root.addComponent(bg);
 
         // For synchronization issue
-       /* final ProgressIndicator indicator
+        final ProgressIndicator indicator
                 = new ProgressIndicator(new Float(0.0));
         indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
         indicator.setWidth("0px");
         indicator.setHeight("0px");
-        root.addComponent(indicator);*/
-        refresher = new Refresher();
-        refresher.setRefreshInterval(Common.REFRESH_UI_SEC * 1000);
-        refresher.addListener(new Refresher.RefreshListener() {
-            @Override
-            public void refresh(Refresher refresher) {
-                root.setVisible(!root.isVisible());
-            }
-        });
+        root.addComponent(indicator);
 
         buildLoginView(false);
     }
@@ -307,7 +297,7 @@ public class MainUI extends UI {
 
         menu.removeAllComponents();
 
-        for (final String view : new String[] { "modules", "monitor"}) {
+        for (final String view : new String[]{"modules", "monitor"}) {
             Button b = new NativeButton(view.substring(0, 1).toUpperCase()
                     + view.substring(1).replace('-', ' '));
             b.addStyleName("icon-" + view);
@@ -358,7 +348,7 @@ public class MainUI extends UI {
     }
 
     private void clearMenuSelection() {
-        for (Iterator<Component> it = menu.iterator(); it.hasNext();) {
+        for (Iterator<Component> it = menu.iterator(); it.hasNext(); ) {
             Component next = it.next();
             if (next instanceof NativeButton) {
                 next.removeStyleName("selected");

@@ -39,5 +39,4 @@
 
 
     <inherits name="com.vaadin.DefaultWidgetSet"/>
-    <inherits name="com.github.wolfie.refresher.RefresherWidgetset" />
 </module>

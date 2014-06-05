@@ -178,10 +178,5 @@
             <artifactId>mgmt-shared-protocol</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>refresher</artifactId>
-            <version>1.2.3.7</version>
-        </dependency>
     </dependencies>
 </project>
