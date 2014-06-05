@@ -48,8 +48,8 @@ public class StepSetMaster extends Panel
         configServersLabel.setContentMode( Label.CONTENT_XHTML );
         verticalLayoutForm.addComponent( configServersLabel );
 
-        final TwinColSelect selectMaster = new TwinColSelect( "", new ArrayList<Agent>() );
-        selectMaster.setItemCaptionPropertyId( "hostname" );
+        final TwinColSelect selectMaster = new TwinColSelect( "", new ArrayList<UUID>() );
+//        selectMaster.setItemCaptionPropertyId( "hostname" );
         selectMaster.setRows( 7 );
         selectMaster.setNullSelectionAllowed( true );
         selectMaster.setMultiSelect( false );

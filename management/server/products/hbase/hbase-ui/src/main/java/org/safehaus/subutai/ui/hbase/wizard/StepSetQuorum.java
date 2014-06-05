@@ -47,8 +47,8 @@ public class StepSetQuorum extends Panel {
         configServersLabel.setContentMode(Label.CONTENT_XHTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
-        final TwinColSelect select = new TwinColSelect("", new ArrayList<Agent>());
-        select.setItemCaptionPropertyId("hostname");
+        final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
+//        select.setItemCaptionPropertyId("hostname");
         select.setRows(7);
         select.setNullSelectionAllowed(false);
         select.setMultiSelect(true);
