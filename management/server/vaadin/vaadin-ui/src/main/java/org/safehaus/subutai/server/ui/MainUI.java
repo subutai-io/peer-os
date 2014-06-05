@@ -96,6 +96,11 @@ public class MainUI extends UI {
         root.addComponent(indicator);*/
         refresher = new Refresher();
         refresher.setRefreshInterval(Common.REFRESH_UI_SEC * 1000);
+        refresher.addListener(new Refresher.RefreshListener() {
+            @Override
+            public void refresh(Refresher refresher) {
+            }
+        });
 
         buildLoginView(false);
     }
