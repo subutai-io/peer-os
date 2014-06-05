@@ -41,7 +41,12 @@ public class ConfigurationStep extends Panel {
         });
 
         //configuration servers number
-        ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", Arrays.asList(1, 2, 3, 4, 5));
+        int[] slaves = new int[50];
+        for (int i = 0; i < slaves.length; i++) {
+            slaves[i] = i + 1;
+        }
+
+        ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", Arrays.asList(slaves));
         slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate(true);
         slaveNodesComboBox.setTextInputAllowed(false);

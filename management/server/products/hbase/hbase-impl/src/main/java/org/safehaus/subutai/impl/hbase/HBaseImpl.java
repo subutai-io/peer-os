@@ -85,20 +85,21 @@ public class HBaseImpl implements HBase
     {
         final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY, "Installing HBase" );
 
-        final Set<Agent> allNodes = new HashSet<Agent>();
-
-        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
-        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
-
-        for ( UUID uuid : config.getRegion() )
-        {
-            allNodes.add( agentManager.getAgentByUUID( uuid ) );
-        }
-
-        for ( UUID uuid : config.getQuorum() )
-        {
-            allNodes.add( agentManager.getAgentByUUID( uuid ) );
-        }
+        final Set<Agent> allNodes = getAllNodes( config );
+//                new HashSet<Agent>();
+//
+//        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
+//        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
+//
+//        for ( UUID uuid : config.getRegion() )
+//        {
+//            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+//        }
+//
+//        for ( UUID uuid : config.getQuorum() )
+//        {
+//            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+//        }
 
         //        allNodes.addAll( config.getQuorum() );
 
