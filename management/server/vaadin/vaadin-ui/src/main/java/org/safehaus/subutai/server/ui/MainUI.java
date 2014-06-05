@@ -19,6 +19,7 @@
  */
 package org.safehaus.subutai.server.ui;
 
+import com.github.wolfie.refresher.Refresher;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -52,6 +53,7 @@ public class MainUI extends UI {
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
     private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<MainUI>();
 
+    private Refresher refresher;
     private CssLayout root = new CssLayout();
     private CssLayout menu = new CssLayout();
     private CssLayout content = new CssLayout();
@@ -86,12 +88,15 @@ public class MainUI extends UI {
         root.addComponent(bg);
 
         // For synchronization issue
-        final ProgressIndicator indicator
+       /* final ProgressIndicator indicator
                 = new ProgressIndicator(new Float(0.0));
         indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
         indicator.setWidth("0px");
         indicator.setHeight("0px");
-        root.addComponent(indicator);
+        root.addComponent(indicator);*/
+        refresher = new Refresher();
+        root.addComponent((Component) refresher);
+        refresher.setRefreshInterval(Common.REFRESH_UI_SEC * 1000);
 
         buildLoginView(false);
     }
