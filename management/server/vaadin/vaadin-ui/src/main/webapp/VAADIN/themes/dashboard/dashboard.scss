@@ -1,4 +1,4 @@
-//@import "../base/base.scss";
+@import "../reindeer/styles.css";
 @import "icons/fontello.scss";
 @import "fonts/open-sans.scss";
 @import "keyframes.scss";
@@ -16,7 +16,6 @@
 @import "components/label.scss";
 @import "components/table.scss";
 @import "components/window.scss";
-@import "components/datefield.scss";
 @import "views/schedule.scss";
 @import "views/sales.scss";
 @import "views/reports.scss";
@@ -37,7 +36,6 @@
   @include dashboard-tabsheet;
   @include dashboard-textfield;
   @include dashboard-window;
-  @include dashboard-datefield;
 
   @include dashboard-schedule-view;
   @include dashboard-sales-view;
