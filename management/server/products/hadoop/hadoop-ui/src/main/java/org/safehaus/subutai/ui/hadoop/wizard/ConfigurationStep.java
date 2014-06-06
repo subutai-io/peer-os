@@ -10,7 +10,10 @@ import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * @author dilshat
@@ -41,12 +44,13 @@ public class ConfigurationStep extends VerticalLayout {
         });
 
         //configuration servers number
-        int[] slaves = new int[50];
-        for (int i = 0; i < slaves.length; i++) {
-            slaves[i] = i + 1;
+//        int[] slaves = new int[50];
+        List<Integer> s = new ArrayList<Integer>();
+        for (int i = 0; i < 50; i++) {
+            s.add( i );
         }
 
-        ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", Arrays.asList(slaves));
+        ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", s);
         slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate(true);
         slaveNodesComboBox.setTextInputAllowed(false);
@@ -61,7 +65,7 @@ public class ConfigurationStep extends VerticalLayout {
         });
 
         //configuration replication factor
-        ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", Arrays.asList(1, 2, 3, 4, 5));
+        ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s);
         replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate(true);
         replicationFactorComboBox.setTextInputAllowed(false);
