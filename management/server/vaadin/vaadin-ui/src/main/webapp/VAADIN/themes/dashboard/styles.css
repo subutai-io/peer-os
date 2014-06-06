@@ -1898,7 +1898,7 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-datefield-button {
     cursor: pointer;
-    vertical-align: top;
+    vertical-align: middle;
 
     width: 24px;
     height: 23px;
@@ -4063,6 +4063,7 @@ body .dashboard.v-app .v-app-loading {
     background-image: url(img/spinner.gif);
     opacity: 0.8;
     filter: alpha(opacity=80);
+    display: none;
 }
 
 .dashboard .v-widget {
