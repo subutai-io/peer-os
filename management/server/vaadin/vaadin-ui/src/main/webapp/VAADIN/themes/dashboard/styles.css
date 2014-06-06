@@ -1899,6 +1899,17 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .v-datefield-button {
     cursor: pointer;
     vertical-align: top;
+
+    width: 24px;
+    height: 23px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    background-image: url(img/datefield/popup-btn.png); /** sprite-ref: verticals */
+    cursor: pointer;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
 }
 
 .dashboard .v-has-width > input.v-datefield-textfield {
