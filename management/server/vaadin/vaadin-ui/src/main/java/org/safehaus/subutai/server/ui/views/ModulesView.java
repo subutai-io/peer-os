@@ -61,7 +61,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         center.addComponent(titleAndDrafts);
         center.setComponentAlignment(titleAndDrafts, Alignment.MIDDLE_CENTER);
 
-        Label draftsTitle = new Label("Drafts");
+        Label draftsTitle = new Label("Modules");
         draftsTitle.addStyleName("h1");
         draftsTitle.setSizeUndefined();
         titleAndDrafts.addComponent(draftsTitle);
