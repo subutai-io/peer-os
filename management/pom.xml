@@ -93,7 +93,7 @@
         <!-- OSGI -->
         <org.osgi.version>4.3.1</org.osgi.version>
         <!-- Vaadin/GWT -->
-        <vaadin.version>7.0.7</vaadin.version>
+        <vaadin.version>7.2.1</vaadin.version>
         <vaadin-shared-deps.version>1.0.2</vaadin-shared-deps.version>
         <gwt.version>2.6.1</gwt.version>
         <vaadin.production>false</vaadin.production>
@@ -165,6 +165,11 @@
             <dependency>
                 <groupId>com.vaadin</groupId>
                 <artifactId>vaadin-themes</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-push</artifactId>
                 <version>${vaadin.version}</version>
             </dependency>
             <dependency>

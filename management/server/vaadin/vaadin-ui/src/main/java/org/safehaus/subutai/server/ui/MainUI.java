@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 @Theme("dashboard")
 @SuppressWarnings("serial")
 @Title("Mgmt UI")
-
+//@Push
 public class MainUI extends UI {
 
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
