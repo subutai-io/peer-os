@@ -30,17 +30,14 @@ public class ConfirmationDialog {
     }
 
     public Window getAlert(){
-        Label message = new Label(
-                "You have not saved this report. Do you want to save or discard any changes you've made to this report?");
-        l.addComponent(message);
 
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.setWidth("100%");
         buttons.setSpacing(true);
         l.addComponent(buttons);
 
-
         cancel.addStyleName("small");
+        cancel.addStyleName("wide");
         cancel.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
