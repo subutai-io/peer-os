@@ -9,9 +9,9 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Tree;
+import com.vaadin.ui.UI;
 import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.server.ui.MainUI;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.shared.protocol.settings.Common;
@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 public final class AgentTree extends ConcurrentComponent
         implements AgentListener, Disposable {
 
-    private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
+    private static final Logger LOG = Logger.getLogger(UI.getCurrent().getClass().getName());
     private final AgentManager agentManager;
     private final Tree tree;
     private HierarchicalContainer container;
