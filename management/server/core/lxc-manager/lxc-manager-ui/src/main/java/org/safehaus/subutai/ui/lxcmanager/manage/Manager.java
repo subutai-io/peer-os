@@ -44,6 +44,7 @@ public class Manager extends VerticalLayout {
         lxcTable = createTableTemplate("Lxc containers", 500);
 
         infoBtn = new Button(Buttons.INFO.getButtonLabel());
+        infoBtn.addStyleName("default");
         infoBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -52,6 +53,7 @@ public class Manager extends VerticalLayout {
         });
 
         stopAllBtn = new Button(Buttons.STOP_ALL.getButtonLabel());
+        stopAllBtn.addStyleName("default");
         stopAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -65,6 +67,7 @@ public class Manager extends VerticalLayout {
             }
         });
         startAllBtn = new Button(Buttons.START_ALL.getButtonLabel());
+        startAllBtn.addStyleName("default");
         startAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -184,6 +187,7 @@ public class Manager extends VerticalLayout {
                             Item row = lxcTable.getItem(aCol);
                             Button startBtn =
                                     (Button) (row.getItemProperty(Buttons.START.getButtonLabel()).getValue());
+                            startBtn.addStyleName("default");
                             if (startBtn != null) {
                                 startBtn.click();
                             }
@@ -201,6 +205,7 @@ public class Manager extends VerticalLayout {
                             Item row = lxcTable.getItem(aCol);
                             Button stopBtn =
                                     (Button) (row.getItemProperty(Buttons.STOP.getButtonLabel()).getValue());
+                            stopBtn.addStyleName("default");
                             if (stopBtn != null) {
                                 stopBtn.click();
                             }
@@ -246,8 +251,11 @@ public class Manager extends VerticalLayout {
 
                 for (final String lxcHostname : lxcs.getValue()) {
                     final Button startBtn = new Button(Buttons.START.getButtonLabel());
+                    startBtn.addStyleName("default");
                     final Button stopBtn = new Button(Buttons.STOP.getButtonLabel());
+                    stopBtn.addStyleName("default");
                     final Button destroyBtn = new Button(Buttons.DESTROY.getButtonLabel());
+                    destroyBtn.addStyleName("default");
                     final Embedded progressIcon =
                             new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
                     progressIcon.setVisible(false);

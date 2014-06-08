@@ -51,6 +51,7 @@ public class Cloner extends VerticalLayout {
         slider.setWidth( 150, Unit.PIXELS );
         slider.setImmediate( true );
         cloneBtn = new Button( "Clone" );
+        cloneBtn.addStyleName("default");
         cloneBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -59,6 +60,7 @@ public class Cloner extends VerticalLayout {
         });
 
         Button clearBtn = new Button( "Clear" );
+        clearBtn.addStyleName("default");
         clearBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
