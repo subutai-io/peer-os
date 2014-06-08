@@ -11,6 +11,7 @@ import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.lxcmanager.LxcUI;
 import org.safehaus.subutai.ui.lxcmanager.common.Buttons;
+import org.safehaus.subutai.ui.lxcmanager.component.ConfirmationDialog;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -26,7 +27,7 @@ public class Manager extends VerticalLayout {
     private final Button infoBtn;
     private final Button startAllBtn;
     private final Button stopAllBtn;
-//    private final Button destroyAllBtn;
+    private final Button destroyAllBtn;
     private final TreeTable lxcTable;
     private final LxcManager lxcManager;
     private final AgentManager agentManager;
@@ -80,8 +81,16 @@ public class Manager extends VerticalLayout {
                 }
             }
         });
-        /*destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
-        destroyAllBtn.addListener( new Button.ClickListener() {
+        destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
+        destroyAllBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                Window alert = new ConfirmationDialog().getAlert();
+                getUI().addWindow(alert);
+            }
+        });
+
+        /*.addListener( new Button.ClickListener() {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
@@ -96,7 +105,7 @@ public class Manager extends VerticalLayout {
                                         Item row = lxcTable.getItem( o );
                                         Button destroyBtn =
                                                 ( Button ) ( row.getItemProperty( Buttons.DESTROY.getButtonLabel() )
-                                                                .getValue() );
+                                                        .getValue() );
                                         if ( destroyBtn != null
                                                 && row.getItemProperty( physicalHostLabel ).getValue() == null ) {
                                             destroyBtn.click();
@@ -106,7 +115,7 @@ public class Manager extends VerticalLayout {
                                 }
                             }
                         }
-                                                      );
+                );
             }
         } );*/
 
@@ -158,7 +167,7 @@ public class Manager extends VerticalLayout {
                 Map<String, EnumMap<LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
                 populateTable(agentFamilies);
                 clearEmptyParents();
-                lxcTable.setEnabled(true);
+//                lxcTable.setEnabled(true);
                 indicator.setVisible(false);
             }
         });
