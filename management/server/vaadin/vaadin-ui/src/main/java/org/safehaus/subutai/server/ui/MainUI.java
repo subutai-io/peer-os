@@ -19,7 +19,6 @@
  */
 package org.safehaus.subutai.server.ui;
 
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -47,7 +46,7 @@ import java.util.logging.Logger;
 @Theme("dashboard")
 @SuppressWarnings("serial")
 @Title("Mgmt UI")
-@Push
+
 public class MainUI extends UI {
 
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
