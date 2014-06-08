@@ -8,7 +8,7 @@
   <reference id="lxcManager" availability="mandatory"
              interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.u.lxcmanager.LxcUI"
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.lxcmanager.LxcUI"
         init-method="init" destroy-method="destroy">
     <property name="agentManager" ref="agentManager" />
     <property name="lxcManager" ref="lxcManager" />

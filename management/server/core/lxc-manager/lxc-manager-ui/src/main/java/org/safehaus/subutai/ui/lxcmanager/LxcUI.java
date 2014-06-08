@@ -1,4 +1,4 @@
-package org.safehaus.subutai.u.lxcmanager;
+package org.safehaus.subutai.ui.lxcmanager;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.u.lxcmanager.clone;
+package org.safehaus.subutai.ui.lxcmanager.clone;
 
 
 import com.google.common.base.Strings;
@@ -7,10 +7,10 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.safehaus.subutai.ui.lxcmanager.component.AgentTree;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.u.lxcmanager.LxcUI;
+import org.safehaus.subutai.ui.lxcmanager.LxcUI;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

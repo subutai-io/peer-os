@@ -54,7 +54,6 @@
                             com.vaadin.data.*;
                             com.vaadin.server.*;
                             com.vaadin.event.*;
-                            {local-packages};version=${project.version};
                         </Export-Package>
 
                         <!-- Package format version - do not change -->

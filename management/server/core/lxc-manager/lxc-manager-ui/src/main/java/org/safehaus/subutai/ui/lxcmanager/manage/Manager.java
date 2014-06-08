@@ -1,4 +1,4 @@
-package org.safehaus.subutai.u.lxcmanager.manage;
+package org.safehaus.subutai.ui.lxcmanager.manage;
 
 
 import com.vaadin.data.Item;
@@ -9,8 +9,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.u.lxcmanager.LxcUI;
-import org.safehaus.subutai.u.lxcmanager.common.Buttons;
+import org.safehaus.subutai.ui.lxcmanager.LxcUI;
+import org.safehaus.subutai.ui.lxcmanager.common.Buttons;
 
 import java.util.Collection;
 import java.util.EnumMap;
