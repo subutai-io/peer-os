@@ -498,11 +498,11 @@
                                     <artifactId>command-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!-- Agent Manager -->
                                 <artifactItem>

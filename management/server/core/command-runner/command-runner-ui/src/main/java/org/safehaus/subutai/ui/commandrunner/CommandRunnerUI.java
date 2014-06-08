@@ -2,12 +2,12 @@ package org.safehaus.subutai.ui.commandrunner;
 
 
 import com.vaadin.ui.Component;
-import org.safehaus.kiskis.mgmt.server.ui.services.Module;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 
-public class CommandRunnerUI implements Module {
+public class CommandRunnerUI implements PortalModule {
 
     public static final String MODULE_NAME = "Terminal";
     private CommandRunner commandRunner;
@@ -31,6 +31,11 @@ public class CommandRunnerUI implements Module {
     public void destroy() {
     }
 
+
+    @Override
+    public String getId() {
+        return CommandRunnerUI.MODULE_NAME;
+    }
 
     @Override
     public String getName() {
