@@ -111,7 +111,7 @@ public class Manager extends VerticalLayout {
         });
 
         indicator = new Label();
-        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setIcon(new ThemeResource("img/spinner.gif"));
         indicator.setContentMode(ContentMode.HTML);
         indicator.setHeight(11, Unit.PIXELS);
         indicator.setWidth(50, Unit.PIXELS);
@@ -260,7 +260,7 @@ public class Manager extends VerticalLayout {
                     final Button destroyBtn = new Button(Buttons.DESTROY.getButtonLabel());
                     destroyBtn.addStyleName("default");
                     final Embedded progressIcon =
-                            new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+                            new Embedded("", new ThemeResource("img/spinner.gif"));
                     progressIcon.setVisible(false);
 
                     if (lxcs.getKey() == LxcState.RUNNING) {
