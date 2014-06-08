@@ -18,7 +18,6 @@ import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.ui.lxcmanager.clone.Cloner;
 import org.safehaus.subutai.ui.lxcmanager.manage.Manager;
 
-
 /**
  *
  */
