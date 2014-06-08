@@ -19,6 +19,7 @@
  */
 package org.safehaus.subutai.server.ui;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
 @Theme("dashboard")
 @SuppressWarnings("serial")
 @Title("Mgmt UI")
-//@Push
+@Push
 public class MainUI extends UI {
 
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
@@ -85,13 +86,14 @@ public class MainUI extends UI {
         bg.addStyleName("login-bg");
         root.addComponent(bg);
 
-        // For synchronization issue
+       /* // For synchronization issue
         final ProgressIndicator indicator
                 = new ProgressIndicator(new Float(0.0));
         indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
         indicator.setWidth("0px");
         indicator.setHeight("0px");
-        root.addComponent(indicator);
+        root.addComponent(indicator);*/
+        setPollInterval(Common.REFRESH_UI_SEC * 1000);
 
         buildLoginView(false);
     }
