@@ -52,11 +52,6 @@
             <artifactId>vaadin-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>vaadin-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
