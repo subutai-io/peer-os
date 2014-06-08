@@ -81,43 +81,34 @@ public class Manager extends VerticalLayout {
                 }
             }
         });
-        destroyAllBtn = new Button( Buttons.DESTROY_ALL.getButtonLabel() );
+        destroyAllBtn = new Button(Buttons.DESTROY_ALL.getButtonLabel());
+        destroyAllBtn.addStyleName("default");
         destroyAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Window alert = new ConfirmationDialog().getAlert();
-                getUI().addWindow(alert);
-            }
-        });
-
-        /*.addListener( new Button.ClickListener() {
-
-            @Override
-            public void buttonClick( Button.ClickEvent event ) {
-                MgmtApplication.showConfirmationDialog( "Lxc destruction confirmation",
-                        "Do you want to destroy all lxc nodes?", "Yes", "No", new ConfirmationDialogCallback() {
-
-                            @Override
-                            public void response( boolean ok ) {
-                                if ( ok ) {
-                                    isDestroyAllButtonClicked = true;
-                                    for ( Object o : lxcTable.getItemIds() ) {
-                                        Item row = lxcTable.getItem( o );
-                                        Button destroyBtn =
-                                                ( Button ) ( row.getItemProperty( Buttons.DESTROY.getButtonLabel() )
-                                                        .getValue() );
-                                        if ( destroyBtn != null
-                                                && row.getItemProperty( physicalHostLabel ).getValue() == null ) {
-                                            destroyBtn.click();
-                                        }
-                                    }
-                                    isDestroyAllButtonClicked = false;
-                                }
+                ConfirmationDialog alert = new ConfirmationDialog("Do you want to destroy all lxc nodes?",
+                        "Yes", "No");
+                alert.getOk().addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        isDestroyAllButtonClicked = true;
+                        for (Object o : lxcTable.getItemIds()) {
+                            Item row = lxcTable.getItem(o);
+                            Button destroyBtn =
+                                    (Button) (row.getItemProperty(Buttons.DESTROY.getButtonLabel())
+                                            .getValue());
+                            if (destroyBtn != null
+                                    && row.getItemProperty(physicalHostLabel).getValue() == null) {
+                                destroyBtn.click();
                             }
                         }
-                );
+                        isDestroyAllButtonClicked = false;
+                    }
+                });
+
+                getUI().addWindow(alert.getAlert());
             }
-        } );*/
+        });
 
         indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
