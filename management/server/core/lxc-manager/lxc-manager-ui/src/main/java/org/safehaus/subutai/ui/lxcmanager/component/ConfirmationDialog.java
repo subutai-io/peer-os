@@ -14,7 +14,7 @@ public class ConfirmationDialog {
 
     public ConfirmationDialog(String caption, String yesLabel, String cancelLabel) {
         l = new VerticalLayout();
-        l.setWidth("400px");
+        l.setWidth("200px");
         l.setMargin(true);
         l.setSpacing(true);
 
