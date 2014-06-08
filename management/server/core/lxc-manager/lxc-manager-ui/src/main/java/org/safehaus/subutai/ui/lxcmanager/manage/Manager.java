@@ -171,8 +171,11 @@ public class Manager extends VerticalLayout {
         for (Map.Entry<String, EnumMap<LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
             final String parentHostname = agentFamily.getKey();
             final Button startAllChildrenBtn = new Button(Buttons.START.getButtonLabel());
+            startAllChildrenBtn.addStyleName("default");
             final Button stopAllChildrenBtn = new Button(Buttons.STOP.getButtonLabel());
+            stopAllChildrenBtn.addStyleName("default");
             final Button destroyAllChildrenBtn = new Button(Buttons.DESTROY.getButtonLabel());
+            destroyAllChildrenBtn.addStyleName("default");
             final Object parentId = lxcTable.addItem(new Object[]{
                     parentHostname, null, startAllChildrenBtn, stopAllChildrenBtn, destroyAllChildrenBtn, null
             }, parentHostname);
