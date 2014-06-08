@@ -132,7 +132,7 @@ public class Manager extends VerticalLayout {
         grid.addComponent(infoBtn);
         grid.addComponent(startAllBtn);
         grid.addComponent(stopAllBtn);
-//        grid.addComponent(destroyAllBtn);
+        grid.addComponent(destroyAllBtn);
         grid.addComponent(indicator);
         grid.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
         addComponent(grid);
@@ -159,7 +159,7 @@ public class Manager extends VerticalLayout {
 
 
     public void getLxcInfo() {
-        lxcTable.setEnabled(false);
+//        lxcTable.setEnabled(false);
         indicator.setVisible(true);
         LxcUI.getExecutor().execute(new Runnable() {
 
