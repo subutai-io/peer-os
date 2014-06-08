@@ -86,13 +86,7 @@ public class MainUI extends UI {
         bg.addStyleName("login-bg");
         root.addComponent(bg);
 
-       /* // For synchronization issue
-        final ProgressIndicator indicator
-                = new ProgressIndicator(new Float(0.0));
-        indicator.setPollingInterval(Common.REFRESH_UI_SEC * 1000);
-        indicator.setWidth("0px");
-        indicator.setHeight("0px");
-        root.addComponent(indicator);*/
+        // For synchronization issue
         setPollInterval(Common.REFRESH_UI_SEC * 1000);
 
         buildLoginView(false);

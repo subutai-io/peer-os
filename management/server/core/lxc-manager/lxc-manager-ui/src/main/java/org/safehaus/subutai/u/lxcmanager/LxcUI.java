@@ -12,7 +12,7 @@ public class LxcUI implements PortalModule {
 
     public static final String MODULE_NAME = "LXC";
     private static ExecutorService executor;
-    private AgentManager agentManager;
+    private static AgentManager agentManager;
     private LxcManager lxcManager;
 
 
@@ -25,6 +25,9 @@ public class LxcUI implements PortalModule {
         this.agentManager = agentManager;
     }
 
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
 
     public void setLxcManager( LxcManager lxcManager ) {
         this.lxcManager = lxcManager;

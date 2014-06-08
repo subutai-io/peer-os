@@ -1,38 +1,25 @@
 package org.safehaus.subutai.u.lxcmanager.clone;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.common.base.Strings;
+import com.vaadin.data.Item;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.server.ui.MgmtAgentManager;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.u.lxcmanager.LxcUI;
 
-import com.google.common.base.Strings;
-import com.vaadin.data.Item;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Slider;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TreeTable;
-import com.vaadin.ui.VerticalLayout;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 @SuppressWarnings("serial")
 public class Cloner extends VerticalLayout {
 
-    private final MgmtAgentManager agentTree;
+    private final AgentTree agentTree;
     private final Button cloneBtn;
     private final TextField textFieldLxcName;
     private final Slider slider;
@@ -49,7 +36,7 @@ public class Cloner extends VerticalLayout {
                     "61}[0-9A-Za-z])?)*\\.?$";
 
 
-    public Cloner( final LxcManager lxcManager, MgmtAgentManager agentTree ) {
+    public Cloner( final LxcManager lxcManager, AgentTree agentTree ) {
         setSpacing( true );
         setMargin( true );
 
@@ -61,22 +48,20 @@ public class Cloner extends VerticalLayout {
         slider = new Slider();
         slider.setMin( 1 );
         slider.setMax( 20 );
-        slider.setWidth( 150, Sizeable.UNITS_PIXELS );
+        slider.setWidth( 150, Unit.PIXELS );
         slider.setImmediate( true );
         cloneBtn = new Button( "Clone" );
-        cloneBtn.addListener( new Button.ClickListener() {
-
+        cloneBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 startCloneTask();
             }
-        } );
+        });
 
         Button clearBtn = new Button( "Clear" );
-        clearBtn.addListener( new Button.ClickListener() {
-
+        clearBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent event ) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 //clear completed
                 for ( Object rowId : lxcTable.getItemIds() ) {
                     Item row = lxcTable.getItem( rowId );
@@ -99,13 +84,13 @@ public class Cloner extends VerticalLayout {
                     }
                 }
             }
-        } );
+        });
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "icons/indicator.gif" ) );
-        indicator.setContentMode( Label.CONTENT_XHTML );
-        indicator.setHeight( 11, Sizeable.UNITS_PIXELS );
-        indicator.setWidth( 50, Sizeable.UNITS_PIXELS );
+        indicator.setContentMode(ContentMode.HTML );
+        indicator.setHeight( 11, Unit.PIXELS );
+        indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
         GridLayout topContent = new GridLayout( 7, 1 );
@@ -131,8 +116,8 @@ public class Cloner extends VerticalLayout {
         table.addContainerProperty( physicalHostLabel, String.class, null );
         table.addContainerProperty( "Lxc Host", String.class, null );
         table.addContainerProperty( statusLabel, Embedded.class, null );
-        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        table.setHeight( size, Sizeable.UNITS_PIXELS );
+        table.setWidth( 100, Unit.PERCENTAGE );
+        table.setHeight( size, Unit.PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
@@ -290,6 +275,6 @@ public class Cloner extends VerticalLayout {
 
 
     private void show( String msg ) {
-        getWindow().showNotification( msg );
+        Notification.show(msg);
     }
 }
