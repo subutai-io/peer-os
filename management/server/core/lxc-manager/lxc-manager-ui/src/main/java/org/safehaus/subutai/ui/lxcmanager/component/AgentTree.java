@@ -110,7 +110,7 @@ public final class AgentTree extends ConcurrentComponent
         container = new HierarchicalContainer();
         container.addContainerProperty("value", Agent.class, null);
         container.addContainerProperty("icon", Resource.class,
-                new ThemeResource("icons/16/folder.png"));
+                new ThemeResource("img/lxc/physical.png"));
         refreshAgents(agentManager.getAgents());
         return container;
     }
@@ -200,7 +200,7 @@ public final class AgentTree extends ConcurrentComponent
                                     if (child != null) {
                                         tree.setItemCaption(childAgent.getUuid(), childAgent.getHostname());
                                         child.getItemProperty("value").setValue(childAgent);
-                                        child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
+                                        child.getItemProperty("icon").setValue(new ThemeResource("img/lxc/virtual.png"));
                                         container.setParent(childAgent.getUuid(), parentAgent.getUuid());
                                         container.setChildrenAllowed(childAgent.getUuid(), false);
                                     }
@@ -229,7 +229,7 @@ public final class AgentTree extends ConcurrentComponent
                             if (child != null) {
                                 tree.setItemCaption(orphanAgent.getUuid(), orphanAgent.getHostname());
                                 child.getItemProperty("value").setValue(orphanAgent);
-                                child.getItemProperty("icon").setValue(new ThemeResource("icons/16/document.png"));
+                                child.getItemProperty("icon").setValue(new ThemeResource("img/lxc/virtual.png"));
                                 container.setParent(orphanAgent.getUuid(), Common.UNKNOWN_LXC_PARENT_NAME);
                                 container.setChildrenAllowed(orphanAgent.getUuid(), false);
                             }
