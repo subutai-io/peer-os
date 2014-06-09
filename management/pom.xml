@@ -168,26 +168,6 @@
         <artifactId>activemq-kahadb-store</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-mqtt</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.fusesource.mqtt-client</groupId>
-        <artifactId>mqtt-client</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-      	<groupId>org.fusesource.hawtbuf</groupId>
-      	<artifactId>hawtbuf</artifactId>
-      	<version>1.10</version>
-      </dependency>
-      <dependency>
-      	<groupId>org.fusesource.hawtdispatch</groupId>
-      	<artifactId>hawtdispatch</artifactId>
-      	<version>1.10</version>
-      </dependency>
       <!--communication-manager-impl-->
 
       <!--db-manager-impl-->

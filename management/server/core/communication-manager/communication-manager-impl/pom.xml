@@ -27,10 +27,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>communication-manager-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-broker</artifactId>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.activemq</groupId>-->
+      <!--<artifactId>activemq-broker</artifactId>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jms_1.1_spec</artifactId>
@@ -55,25 +55,6 @@
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-kahadb-store</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-mqtt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.mqtt-client</groupId>
-      <artifactId>mqtt-client</artifactId>
-      <version>1.7</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.fusesource.hawtbuf</groupId>
-    	<artifactId>hawtbuf</artifactId>
-    	<version>1.10</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.fusesource.hawtdispatch</groupId>
-    	<artifactId>hawtdispatch</artifactId>
-    	<version>1.10</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
