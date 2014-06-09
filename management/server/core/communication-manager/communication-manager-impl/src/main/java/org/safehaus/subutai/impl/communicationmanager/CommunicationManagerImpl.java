@@ -310,6 +310,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             //***policy
             broker.setPersistent( true );
             broker.setUseJmx( false );
+            broker.addConnector( "vm://localhost" );
             broker.addConnector(
                     "mqtt+nio+ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
             broker.start();
