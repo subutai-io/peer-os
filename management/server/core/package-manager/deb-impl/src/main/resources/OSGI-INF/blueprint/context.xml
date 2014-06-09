@@ -18,7 +18,7 @@
         <argument value="/opt/subutai/packages"/>
     </bean>
     
-    <bean id="packageManager" scope="singleton" class="org.safehaus.subutai.impl.packagemanager.PackageManagerImpl">
+    <bean id="packageManager" scope="singleton" class="org.safehaus.subutai.impl.packagemanager.DebPackageManager">
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="storage" ref="packageInfoStorageFile"/>
