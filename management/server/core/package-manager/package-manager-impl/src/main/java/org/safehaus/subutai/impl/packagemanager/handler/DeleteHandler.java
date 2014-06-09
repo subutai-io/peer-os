@@ -2,13 +2,13 @@ package org.safehaus.subutai.impl.packagemanager.handler;
 
 import java.util.Collection;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
-import org.safehaus.subutai.impl.packagemanager.PackageManagerImpl;
+import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 
 public class DeleteHandler extends AbstractHandler<Boolean> {
 
     private final String hostname;
 
-    public DeleteHandler(PackageManagerImpl pm, String hostname) {
+    public DeleteHandler(DebPackageManager pm, String hostname) {
         super(pm);
         this.hostname = hostname;
     }

@@ -5,7 +5,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.packagemanager.PackageManager;
 import org.safehaus.subutai.api.packagemanager.storage.PackageInfoStorage;
 
-public abstract class PackageManagerBase implements PackageManager {
+public abstract class DebPackageManagerBase implements PackageManager {
 
     AgentManager agentManager;
     CommandRunner commandRunner;

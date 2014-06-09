@@ -7,7 +7,7 @@ import org.safehaus.subutai.impl.packagemanager.handler.FindHandler;
 import org.safehaus.subutai.impl.packagemanager.handler.ListHandler;
 import org.safehaus.subutai.impl.packagemanager.handler.SaveHandler;
 
-public class PackageManagerImpl extends PackageManagerBase {
+public class DebPackageManager extends DebPackageManagerBase {
 
     @Override
     public Collection<PackageInfo> listPackages(String hostname) {

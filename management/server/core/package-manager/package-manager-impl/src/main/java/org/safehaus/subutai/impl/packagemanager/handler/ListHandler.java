@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.packagemanager.*;
-import org.safehaus.subutai.impl.packagemanager.PackageManagerImpl;
+import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
@@ -14,7 +14,7 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
     private Pattern lineStartPattern = Pattern.compile("^[a-z]{2,3}\\s+");
     private String namePattern;
 
-    public ListHandler(PackageManagerImpl pm, String hostname) {
+    public ListHandler(DebPackageManager pm, String hostname) {
         super(pm);
         this.hostname = hostname;
     }
