@@ -173,6 +173,11 @@
         <artifactId>activemq-mqtt</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.fusesource.mqtt-client</groupId>
+        <artifactId>mqtt-client</artifactId>
+        <version>1.7</version>
+      </dependency>
       <!--communication-manager-impl-->
 
       <!--db-manager-impl-->
