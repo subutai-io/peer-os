@@ -248,7 +248,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( amqBindAddress ), "Bind address is null or empty" );
         Preconditions.checkArgument( amqBindAddress.matches( Common.HOSTNAME_REGEX ), "Invalid bind address" );
-        Preconditions.checkArgument( amqPort >= 1024 && amqPort <= 65536, "Port must be n range 1024 and 65536" );
+        Preconditions.checkArgument( amqPort >= 1024 && amqPort <= 65536, "Port must be in range 1024 and 65536" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( amqServiceQueue ), "Service queue name is null or empty" );
         Preconditions.checkArgument( amqMaxPooledConnections >= 1, "Max Pool Connections size must be greater than 0" );
         Preconditions.checkArgument( amqMaxSenderPoolSize >= 1, "Max Sender Pool size must be greater than 0" );
@@ -310,7 +310,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
             //***policy
             broker.setPersistent( true );
             broker.setUseJmx( false );
-            broker.addConnector( "nio+ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
+            broker.addConnector(
+                    "mqtt+nio+ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
             broker.start();
             broker.waitUntilStarted();
             //executor service setup
@@ -339,7 +340,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             //don not close this connection otherwise server listener will be closed
             connection.start();
             Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination adminQueue = session.createQueue( this.amqServiceQueue );
+            Destination adminQueue = session.createTopic( this.amqServiceQueue );
             MessageConsumer consumer = session.createConsumer( adminQueue );
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener( communicationMessageListener );
