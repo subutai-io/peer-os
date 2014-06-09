@@ -8,13 +8,14 @@
 
   <cm:property-placeholder persistent-id="AmqConfig" update-strategy="none">
     <cm:default-properties>
+      <cm:property name="amqUrl" value="ssl://localhost:61616?jms.useAsyncSend=true" />
       <cm:property name="amqPort" value="1883" />
       <cm:property name="amqBindAddress" value="0.0.0.0" />
       <cm:property name="amqServiceQueue" value="SERVICE_TOPIC" />
-      <cm:property name="amqBrokerCertificateName" value="broker.ks" />
-      <cm:property name="amqBrokerTrustStoreName" value="broker.ts" />
-      <cm:property name="amqBrokerCertificatePwd" value="broker" />
-      <cm:property name="amqBrokerTrustStorePwd" value="broker" />
+      <cm:property name="amqBrokerCertificateName" value="client.ks" />
+      <cm:property name="amqBrokerTrustStoreName" value="client.ts" />
+      <cm:property name="amqBrokerCertificatePwd" value="client" />
+      <cm:property name="amqBrokerTrustStorePwd" value="client" />
       <cm:property name="amqMaxMessageToAgentTtlSec" value="60" />
       <cm:property name="amqMaxOfflineAgentTtlSec" value="300" />
       <cm:property name="amqMaxSlowAgentConnectionTtlSec" value="3000" />
@@ -27,6 +28,7 @@
   <bean id="communicationService"
         class="org.safehaus.subutai.impl.communicationmanager.CommunicationManagerImpl"
         init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
+    <property name="amqUrl" value="${amqUrl}" />
     <property name="amqPort" value="${amqPort}" />
     <property name="amqBindAddress" value="${amqBindAddress}" />
     <property name="amqServiceQueue" value="${amqServiceQueue}" />

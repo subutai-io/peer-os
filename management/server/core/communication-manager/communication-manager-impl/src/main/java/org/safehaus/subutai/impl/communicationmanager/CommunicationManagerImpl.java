@@ -50,6 +50,10 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     private ExecutorService exec;
     /**
+     * broker URL
+     */
+    private String amqUrl;
+    /**
      * bind address
      */
     private String amqBindAddress;
@@ -180,6 +184,11 @@ public class CommunicationManagerImpl implements CommunicationManager {
     }
 
 
+    public void setAmqUrl( final String amqUrl ) {
+        this.amqUrl = amqUrl;
+    }
+
+
     /**
      * Sends request to agent
      *
@@ -280,7 +289,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
                     System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerTrustStoreName );
             System.setProperty( "javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd );
 
-//            broker = new BrokerService();
+            //            broker = new BrokerService();
             //***policy
             /*
             PolicyMap policy = new PolicyMap();
@@ -305,18 +314,17 @@ public class CommunicationManagerImpl implements CommunicationManager {
             broker.setDestinationPolicy( policy );
             */
             //***policy
-//            broker.setPersistent( true );
-//            broker.setUseJmx( false );
-////            broker.addConnector( "vm://localhost" );
-//            broker.addConnector(
-//                    "mqtt+nio://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
-//            broker.start();
-//            broker.waitUntilStarted();
+            //            broker.setPersistent( true );
+            //            broker.setUseJmx( false );
+            ////            broker.addConnector( "vm://localhost" );
+            //            broker.addConnector(
+            //                    "mqtt+nio://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
+            //            broker.start();
+            //            broker.waitUntilStarted();
             //executor service setup
             exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
             //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "ssl://" + this.amqBindAddress +
-                    ":" + this.amqPort + "?jms.useAsyncSend=true" );
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( amqUrl );
             amqFactory.setCheckForDuplicates( true );
             pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
             pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
