@@ -10,7 +10,7 @@
     <cm:default-properties>
       <cm:property name="amqPort" value="61616" />
       <cm:property name="amqBindAddress" value="0.0.0.0" />
-      <cm:property name="amqServiceQueue" value="SERVICE_QUEUE" />
+      <cm:property name="amqServiceQueue" value="SERVICE_TOPIC" />
       <cm:property name="amqBrokerCertificateName" value="broker.ks" />
       <cm:property name="amqBrokerTrustStoreName" value="broker.ts" />
       <cm:property name="amqBrokerCertificatePwd" value="broker" />

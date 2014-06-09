@@ -66,6 +66,9 @@ class CommunicationMessageListener implements MessageListener {
                     notifyListeners( agentDisconnect );
                 }
             }
+            else {
+                LOG.warning( message.toString() );
+            }
         }
         catch ( JMSException ex ) {
             LOG.log( Level.SEVERE, "Error in onMessage", ex );
