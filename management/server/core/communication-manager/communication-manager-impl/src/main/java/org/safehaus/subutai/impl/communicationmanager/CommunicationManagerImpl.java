@@ -21,11 +21,6 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
-import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
-import org.apache.activemq.broker.region.policy.PolicyEntry;
-import org.apache.activemq.broker.region.policy.PolicyMap;
-import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 
 import com.google.common.base.Preconditions;
@@ -287,6 +282,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
 
             broker = new BrokerService();
             //***policy
+            /*
             PolicyMap policy = new PolicyMap();
             PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
             //abort consumers not acking message within this period of time
@@ -307,6 +303,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             broker.setOfflineDurableSubscriberTimeout( amqMaxOfflineAgentTtlSec * 1000 );
             //
             broker.setDestinationPolicy( policy );
+            */
             //***policy
             broker.setPersistent( true );
             broker.setUseJmx( false );
