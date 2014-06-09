@@ -217,38 +217,36 @@ public class Manager extends VerticalLayout {
                 }
             });
 
-           /* destroyAllChildrenBtn.addListener(new Button.ClickListener() {
-
+            destroyAllChildrenBtn.addClickListener(new Button.ClickListener() {
                 @Override
-                public void buttonClick(Button.ClickEvent event) {
+                public void buttonClick(Button.ClickEvent clickEvent) {
 
-                    MgmtApplication.showConfirmationDialog("Lxc destruction confirmation",
-                            "Do you want to destroy all lxc nodes on this physical node?", "Yes", "No",
-                            new ConfirmationDialogCallback() {
-
-                                @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        Collection col = lxcTable.getChildren(parentId);
-                                        if (col != null) {
-                                            isDestroyAllButtonClicked = true;
-                                            for (Object aCol : col) {
-                                                Item row = lxcTable.getItem(aCol);
-                                                Button destroyBtn = (Button) (row
-                                                        .getItemProperty(Buttons.DESTROY.getButtonLabel())
-                                                        .getValue());
-                                                if (destroyBtn != null) {
-                                                    destroyBtn.click();
-                                                }
-                                            }
-                                            isDestroyAllButtonClicked = false;
-                                        }
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            "Do you want to destroy all lxc nodes on this physical node?",
+                            "Yes", "No");
+                    alert.getOk().addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            Collection col = lxcTable.getChildren(parentId);
+                            if (col != null) {
+                                isDestroyAllButtonClicked = true;
+                                for (Object aCol : col) {
+                                    Item row = lxcTable.getItem(aCol);
+                                    Button destroyBtn = (Button) (row
+                                            .getItemProperty(Buttons.DESTROY.getButtonLabel())
+                                            .getValue());
+                                    if (destroyBtn != null) {
+                                        destroyBtn.click();
                                     }
                                 }
+                                isDestroyAllButtonClicked = false;
                             }
-                    );
+                        }
+                    });
+
+                    getUI().addWindow(alert.getAlert());
                 }
-            });*/
+            });
 
             for (Map.Entry<LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
 
@@ -324,46 +322,44 @@ public class Manager extends VerticalLayout {
                             }
                         }
                     });
-                    /*destroyBtn.addListener(new Button.ClickListener() {
-
+                    destroyBtn.addClickListener(new Button.ClickListener() {
                         @Override
-                        public void buttonClick(Button.ClickEvent event) {
+                        public void buttonClick(Button.ClickEvent clickEvent) {
                             if (!isDestroyAllButtonClicked) {
-                                MgmtApplication.showConfirmationDialog("Lxc destruction confirmation",
-                                        "Do you want to destroy this lxc node?", "Yes", "No",
-                                        new ConfirmationDialogCallback() {
 
-                                            @Override
-                                            public void response(boolean ok) {
-                                                if (ok) {
-                                                    final Agent physicalAgent =
-                                                            agentManager.getAgentByHostname(parentHostname);
-                                                    if (physicalAgent != null) {
-                                                        startBtn.setEnabled(false);
-                                                        stopBtn.setEnabled(false);
-                                                        destroyBtn.setEnabled(false);
-                                                        progressIcon.setVisible(true);
-                                                        LxcUI.getExecutor().execute(new Runnable() {
+                                ConfirmationDialog alert = new ConfirmationDialog(
+                                        "Do you want to destroy this lxc node?", "Yes", "No");
+                                alert.getOk().addClickListener(new Button.ClickListener() {
+                                    @Override
+                                    public void buttonClick(Button.ClickEvent clickEvent) {
+                                        final Agent physicalAgent =
+                                                agentManager.getAgentByHostname(parentHostname);
+                                        if (physicalAgent != null) {
+                                            startBtn.setEnabled(false);
+                                            stopBtn.setEnabled(false);
+                                            destroyBtn.setEnabled(false);
+                                            progressIcon.setVisible(true);
+                                            LxcUI.getExecutor().execute(new Runnable() {
 
-                                                            public void run() {
-                                                                boolean success = lxcManager
-                                                                        .destroyLxcOnHost(physicalAgent, lxcHostname);
-                                                                if (!success) {
-                                                                    stopBtn.setEnabled(true);
-                                                                    destroyBtn.setEnabled(true);
-                                                                    progressIcon.setVisible(false);
-                                                                } else {
-                                                                    //remove row
-                                                                    lxcTable.removeItem(rowId);
-                                                                    clearEmptyParents();
-                                                                }
-                                                            }
-                                                        });
+                                                public void run() {
+                                                    boolean success = lxcManager
+                                                            .destroyLxcOnHost(physicalAgent, lxcHostname);
+                                                    if (!success) {
+                                                        stopBtn.setEnabled(true);
+                                                        destroyBtn.setEnabled(true);
+                                                        progressIcon.setVisible(false);
+                                                    } else {
+                                                        //remove row
+                                                        lxcTable.removeItem(rowId);
+                                                        clearEmptyParents();
                                                     }
                                                 }
-                                            }
+                                            });
                                         }
-                                );
+                                    }
+                                });
+
+                                getUI().addWindow(alert.getAlert());
                             } else {
 
                                 final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
@@ -390,7 +386,7 @@ public class Manager extends VerticalLayout {
                                 }
                             }
                         }
-                    });*/
+                    });
                 }
             }
         }
