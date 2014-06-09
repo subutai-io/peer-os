@@ -15,8 +15,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>package-manager-api</module>
-        <module>package-manager-impl</module>
-        <module>package-manager-cli</module>
+        <module>api</module>
+        <module>deb-impl</module>
+        <module>cli</module>
     </modules>
 </project>
