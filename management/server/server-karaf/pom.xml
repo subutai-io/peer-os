@@ -306,6 +306,11 @@
                 	<artifactId>hawtbuf</artifactId>
                 	<version>1.10</version>
                 </dependency>
+                <dependency>
+                	<groupId>org.fusesource.hawtdispatch</groupId>
+                	<artifactId>hawtdispatch</artifactId>
+                	<version>1.10</version>
+                </dependency>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-jms-pool</artifactId>
