@@ -280,7 +280,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
                     System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerTrustStoreName );
             System.setProperty( "javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd );
 
-            broker = new BrokerService();
+//            broker = new BrokerService();
             //***policy
             /*
             PolicyMap policy = new PolicyMap();
@@ -306,16 +306,17 @@ public class CommunicationManagerImpl implements CommunicationManager {
             */
             //***policy
 //            broker.setPersistent( true );
-            broker.setUseJmx( false );
-//            broker.addConnector( "vm://localhost" );
-            broker.addConnector(
-                    "mqtt+nio://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
-            broker.start();
-            broker.waitUntilStarted();
+//            broker.setUseJmx( false );
+////            broker.addConnector( "vm://localhost" );
+//            broker.addConnector(
+//                    "mqtt+nio://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
+//            broker.start();
+//            broker.waitUntilStarted();
             //executor service setup
             exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
             //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "vm://localhost?create=false" );
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "tcp://" + this.amqBindAddress +
+                    ":" + this.amqPort + "?jms.useAsyncSend=true" );
             amqFactory.setCheckForDuplicates( true );
             pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
             pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
