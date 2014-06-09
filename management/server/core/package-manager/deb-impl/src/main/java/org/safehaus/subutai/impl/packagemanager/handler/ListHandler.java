@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.packagemanager.*;
 import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
+import org.safehaus.subutai.impl.packagemanager.info.*;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
@@ -66,13 +67,13 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         return sb.toString();
     }
 
-    PackageInfo parseLine(String s, int columns, Pattern delim) {
+    DebPackageInfo parseLine(String s, int columns, Pattern delim) {
         if(!lineStartPattern.matcher(s).find()) return null;
         String[] arr = delim.split(s, columns);
-        PackageInfo p = null;
+        DebPackageInfo p = null;
         if(arr.length > columns - 1) {
             char[] status = arr[0].toCharArray();
-            p = new PackageInfo(arr[1], arr[2]);
+            p = new DebPackageInfo(arr[1], arr[2]);
             if(columns == 5) {
                 p.setArch(arr[3]);
                 p.setDescription(arr[4]);

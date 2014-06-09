@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.packagemanager;
+package org.safehaus.subutai.impl.packagemanager.info;
 
 /**
  * Debian package flag. Refer to dpkg man pages for more info.

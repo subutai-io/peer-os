@@ -1,26 +1,20 @@
 package org.safehaus.subutai.api.packagemanager;
 
 import java.io.Serializable;
-import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class PackageInfo implements Comparable<PackageInfo>, Serializable {
 
-    public static final String SOURCE_NAME = "DebPackageManager";
+    public static final String SOURCE_NAME = "PackageManager";
     private static final long serialVersionUID = 22L;
     private final String name;
     private final String version;
-    private PackageState state;
-    private SelectionState selectionState;
-    private Set<PackageFlag> flags;
     private String arch;
     private String description;
 
     public PackageInfo(String name, String version) {
         this.name = name;
         this.version = version;
-        this.flags = EnumSet.noneOf(PackageFlag.class);
     }
 
     public String getName() {
@@ -29,30 +23,6 @@ public class PackageInfo implements Comparable<PackageInfo>, Serializable {
 
     public String getVersion() {
         return version;
-    }
-
-    public PackageState getState() {
-        return state;
-    }
-
-    public void setState(PackageState state) {
-        this.state = state;
-    }
-
-    public SelectionState getSelectionState() {
-        return selectionState;
-    }
-
-    public void setSelectionState(SelectionState selectionState) {
-        this.selectionState = selectionState;
-    }
-
-    public Set<PackageFlag> getFlags() {
-        return flags;
-    }
-
-    public void setFlags(Set<PackageFlag> flags) {
-        this.flags = flags;
     }
 
     public String getArch() {
@@ -92,10 +62,7 @@ public class PackageInfo implements Comparable<PackageInfo>, Serializable {
     public String toString() {
         String sep = "\t";
         StringBuilder sb = new StringBuilder();
-        sb.append(selectionState.getAbbrev());
-        sb.append(state.getAbbrev());
-        for(PackageFlag f : flags) sb.append(f);
-        sb.append(sep).append(name).append(sep).append(version);
+        sb.append(name).append(sep).append(version);
         sb.append(sep).append(arch).append(sep).append(description);
         return sb.toString();
     }
