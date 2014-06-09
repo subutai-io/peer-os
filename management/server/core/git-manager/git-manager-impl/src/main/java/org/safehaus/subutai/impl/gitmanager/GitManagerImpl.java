@@ -24,10 +24,6 @@ import com.google.common.collect.Sets;
 
 /**
  * This is an implementation of GitManager interface
- *
- * TODO: add argument validation to all methods
- *
- * TODO: output std output
  */
 public class GitManagerImpl implements GitManager {
 
@@ -38,6 +34,8 @@ public class GitManagerImpl implements GitManager {
 
 
     public GitManagerImpl( final CommandRunner commandRunner ) {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+
         this.commandRunner = commandRunner;
     }
 
@@ -50,6 +48,8 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void init( final Agent host, final String repositoryRoot ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+
         Command initCommand = commandRunner
                 .createCommand( new RequestBuilder( "git init" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
@@ -57,7 +57,18 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    private void validateHostNRepoRoot( Agent host, String repositoryRoot ) {
+        Preconditions.checkNotNull( host, "Agent is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( repositoryRoot ), "Repository root is null or empty" );
+    }
+
+
     private void runCommand( Command command, Agent host, GitCommand gitCommand ) throws GitException {
+        runCommand( command, host, gitCommand, true );
+    }
+
+
+    private void runCommand( Command command, Agent host, GitCommand gitCommand, boolean output ) throws GitException {
         commandRunner.runCommand( command );
 
         if ( !command.hasSucceeded() ) {
@@ -72,7 +83,7 @@ public class GitManagerImpl implements GitManager {
                         gitCommand.getCommand() ) );
             }
         }
-        else {
+        else if ( output ) {
             AgentResult agentResult = command.getResults().get( host.getUuid() );
             System.out.println( agentResult.getStdOut() );
         }
@@ -81,6 +92,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void add( final Agent host, final String repositoryRoot, final List<String> filePaths ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git add" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
                         Sets.newHashSet( host ) );
@@ -90,6 +104,8 @@ public class GitManagerImpl implements GitManager {
 
 
     public void addAll( final Agent host, final String repositoryRoot ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git add -A" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
@@ -100,6 +116,9 @@ public class GitManagerImpl implements GitManager {
     @Override
     public void delete( final Agent host, final String repositoryRoot, final List<String> filePaths )
             throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+
         Command addCommand = commandRunner
                 .createCommand( new RequestBuilder( "git rm" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
                         Sets.newHashSet( host ) );
@@ -111,11 +130,15 @@ public class GitManagerImpl implements GitManager {
     @Override
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
                           final String message, boolean afterConflictResolved ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
+
         Command addCommand = commandRunner.createCommand( new RequestBuilder(
                 String.format( "git commit -m \"%s\" %s", message, afterConflictResolved ? "-i" : "" ) )
                 .withCwd( repositoryRoot ).withCmdArgs( filePaths ), Sets.newHashSet( host ) );
 
-        runCommand( addCommand, host, GitCommand.COMMIT );
+        runCommand( addCommand, host, GitCommand.COMMIT, false );
         //parse output to get commitAll id here
         Pattern p = Pattern.compile( "(\\w+)]" );
         Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
@@ -130,11 +153,14 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public String commitAll( final Agent host, final String repositoryRoot, final String message ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
+
         Command addCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git commit -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
 
-        runCommand( addCommand, host, GitCommand.COMMIT );
+        runCommand( addCommand, host, GitCommand.COMMIT, false );
 
         //parse output to get commitAll id here
         Pattern p = Pattern.compile( "(\\w+)]" );
@@ -150,6 +176,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void clone( final Agent host, final String newBranchName, final String targetDir ) throws GitException {
+        validateHostNRepoRoot( host, targetDir );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), "Branch name is null or empty" );
+
         Command cloneCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git clone -b %s %s %s", newBranchName, GIT_REPO_URL, targetDir ) )
                         .withTimeout( 180 ), Sets.newHashSet( host ) );
@@ -161,6 +190,8 @@ public class GitManagerImpl implements GitManager {
     @Override
     public void checkout( final Agent host, final String repositoryRoot, final String branchName, final boolean create )
             throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
 
         String command = create ? String.format( "git checkout --track -b %s", branchName ) :
                          String.format( "git checkout %s", branchName );
@@ -174,6 +205,9 @@ public class GitManagerImpl implements GitManager {
     @Override
     public void deleteBranch( final Agent host, final String repositoryRoot, final String branchName )
             throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
         Command checkoutCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git branch -d %s", branchName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -190,6 +224,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void merge( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
         Command mergeCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git merge %s", branchName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -200,6 +237,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void pull( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
         Command pullCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git pull origin %s", branchName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -216,10 +256,12 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public GitBranch currentBranch( final Agent host, final String repositoryRoot ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+
         Command branchCommand = commandRunner
                 .createCommand( new RequestBuilder( "git branch" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
-        runCommand( branchCommand, host, GitCommand.BRANCH );
+        runCommand( branchCommand, host, GitCommand.BRANCH, false );
 
         branchCommand.getResults().get( host.getUuid() ).getStdOut();
 
@@ -241,13 +283,15 @@ public class GitManagerImpl implements GitManager {
     @Override
     public List<GitBranch> listBranches( final Agent host, final String repositoryRoot, boolean remote )
             throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+
         List<GitBranch> branches = new LinkedList<>();
 
         Command branchCommand = commandRunner
                 .createCommand( new RequestBuilder( remote ? "git branch -r" : "git branch" ).withCwd( repositoryRoot ),
                         Sets.newHashSet( host ) );
 
-        runCommand( branchCommand, host, GitCommand.BRANCH );
+        runCommand( branchCommand, host, GitCommand.BRANCH, false );
 
         StringTokenizer lines =
                 new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
@@ -266,6 +310,7 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
 
         if ( branchName.toLowerCase().contains( MASTER_BRANCH ) ) {
@@ -283,6 +328,9 @@ public class GitManagerImpl implements GitManager {
     @Override
     public void undoSoft( final Agent host, final String repositoryRoot, final List<String> filePaths )
             throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( "git checkout --" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
                 Sets.newHashSet( host ) );
@@ -293,6 +341,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void undoHard( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+
         Command undoCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git fetch origin && git reset --hard origin/%s", branchName ) )
                         .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
@@ -310,6 +361,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void revertCommit( final Agent host, final String repositoryRoot, String commitId ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( commitId ), "Commit Id is null or empty" );
+
         Command revertCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git revert %s", commitId ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -320,6 +374,8 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void stash( final Agent host, final String repositoryRoot ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+
         Command stashCommand = commandRunner
                 .createCommand( new RequestBuilder( String.format( "git stash" ) ).withCwd( repositoryRoot ),
                         Sets.newHashSet( host ) );
@@ -330,6 +386,9 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public void unstash( final Agent host, final String repositoryRoot, final String stashName ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( stashName ), "Stash name is null or empty" );
+
         Command stashCommand = commandRunner.createCommand(
                 new RequestBuilder( String.format( "git stash apply %s", stashName ) ).withCwd( repositoryRoot ),
                 Sets.newHashSet( host ) );
@@ -340,6 +399,7 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public List<String> listStashes( final Agent host, final String repositoryRoot ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
 
         List<String> stashes = new LinkedList<>();
 
@@ -347,7 +407,7 @@ public class GitManagerImpl implements GitManager {
                 .createCommand( new RequestBuilder( "git stash list" ).withCwd( repositoryRoot ),
                         Sets.newHashSet( host ) );
 
-        runCommand( stashCommand, host, GitCommand.STASH );
+        runCommand( stashCommand, host, GitCommand.STASH, false );
 
         StringTokenizer tok =
                 new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
