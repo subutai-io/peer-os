@@ -66,6 +66,11 @@
       <version>1.7</version>
     </dependency>
     <dependency>
+    	<groupId>org.fusesource.hawtbuf</groupId>
+    	<artifactId>hawtbuf</artifactId>
+    	<version>1.10</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
