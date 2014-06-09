@@ -40,7 +40,7 @@ class CommunicationMessageListener implements MessageListener {
     @Override
     public void onMessage( Message message ) {
         try {
-            LOG.warning( message.toString() );
+            LOG.warning( "MESSAGE ARRIVED " + message.toString() );
             if ( message instanceof TextMessage ) {
                 TextMessage txtMsg = ( TextMessage ) message;
                 String jsonCmd = txtMsg.getText();
