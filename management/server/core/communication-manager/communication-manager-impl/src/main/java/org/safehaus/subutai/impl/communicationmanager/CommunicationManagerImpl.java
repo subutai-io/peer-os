@@ -315,7 +315,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             //executor service setup
             exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
             //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "tcp://" + this.amqBindAddress +
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "ssl://" + this.amqBindAddress +
                     ":" + this.amqPort + "?jms.useAsyncSend=true" );
             amqFactory.setCheckForDuplicates( true );
             pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
