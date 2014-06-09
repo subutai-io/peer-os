@@ -168,6 +168,11 @@
         <artifactId>activemq-kahadb-store</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-mqtt</artifactId>
+        <version>${org.apache.activemq.version}</version>
+      </dependency>
       <!--communication-manager-impl-->
 
       <!--db-manager-impl-->

@@ -54,6 +54,11 @@
       <version>${org.apache.activemq.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-mqtt</artifactId>
+      <version>${org.apache.activemq.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
