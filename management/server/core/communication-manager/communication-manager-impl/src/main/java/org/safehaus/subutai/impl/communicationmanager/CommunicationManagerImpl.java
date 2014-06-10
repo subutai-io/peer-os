@@ -352,20 +352,20 @@ public class CommunicationManagerImpl implements CommunicationManager {
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener( communicationMessageListener );
 
-            Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic( adminQueue );
+//            Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic( adminQueue );
+//            MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
+//            advConsumer.setMessageListener( communicationMessageListener );
+//
+//            advisoryDestination = AdvisorySupport.getConsumerAdvisoryTopic( adminQueue );
+//            advConsumer = session.createConsumer( advisoryDestination );
+//            advConsumer.setMessageListener( communicationMessageListener );
+//
+//            advisoryDestination = AdvisorySupport.getDestinationAdvisoryTopic( adminQueue );
+//            advConsumer = session.createConsumer( advisoryDestination );
+//            advConsumer.setMessageListener( communicationMessageListener );
+
+            Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
-            advConsumer.setMessageListener( communicationMessageListener );
-
-            advisoryDestination = AdvisorySupport.getConsumerAdvisoryTopic( adminQueue );
-            advConsumer = session.createConsumer( advisoryDestination );
-            advConsumer.setMessageListener( communicationMessageListener );
-
-            advisoryDestination = AdvisorySupport.getDestinationAdvisoryTopic( adminQueue );
-            advConsumer = session.createConsumer( advisoryDestination );
-            advConsumer.setMessageListener( communicationMessageListener );
-
-            advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
-            advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
         }
         catch ( JMSException ex ) {
