@@ -25,5 +25,7 @@
     <module>command-runner</module>
     <module>git-manager</module>
     <module>package-manager</module>
+    <module>delta-image-tracker</module>
+    <module>delta-image-storage-manager</module>
   </modules>
 </project>
