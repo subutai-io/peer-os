@@ -18,7 +18,6 @@ import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import org.apache.activemq.command.ActiveMQMessage;
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
 
 
@@ -50,7 +49,7 @@ class CommunicationMessageListener implements MessageListener {
                         LOG.log( Level.INFO, "\nReceived {0}",
                                 CommandJson.getJson( CommandJson.getCommand( jsonCmd ) ) );
                     }
-                    response.setTransportId( ( ( ActiveMQTextMessage ) message ).getProducerId().toString() );
+                    response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
                 }
                 else {
