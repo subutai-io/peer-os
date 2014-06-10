@@ -1,7 +1,6 @@
 package org.safehaus.subutai.impl.communicationmanager;
 
 
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -10,10 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 
 import org.safehaus.subutai.api.communicationmanager.CommandJson;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
@@ -44,19 +41,9 @@ class CommunicationMessageListener implements MessageListener {
         try {
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
-                byte[] mesg_bytes = new byte[(int)msg.getBodyLength()];
-                int num_read = msg.readBytes(mesg_bytes);
-                try {
-                    String decoded = new String(mesg_bytes, "UTF-8");
-                    LOG.warning( decoded );
-                }
-                catch ( UnsupportedEncodingException e ) {
-                    e.printStackTrace();
-                }
-            }
-            else if ( message instanceof TextMessage ) {
-                TextMessage txtMsg = ( TextMessage ) message;
-                String jsonCmd = txtMsg.getText();
+                byte[] msg_bytes = new byte[( int ) msg.getBodyLength()];
+                msg.readBytes( msg_bytes );
+                String jsonCmd = new String( msg_bytes, "UTF-8" );
                 Response response = CommandJson.getResponse( jsonCmd );
                 if ( response != null ) {
                     if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE ) {
@@ -81,7 +68,7 @@ class CommunicationMessageListener implements MessageListener {
                 }
             }
         }
-        catch ( JMSException ex ) {
+        catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in onMessage", ex );
         }
     }
