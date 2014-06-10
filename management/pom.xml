@@ -157,19 +157,6 @@
       </dependency>
       <!--command-runner-ui-->
 
-      <!--communication-manager-impl-->
-      <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-broker</artifactId>-->
-        <!--<version>${org.apache.activemq.version}</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-kahadb-store</artifactId>-->
-        <!--<version>${org.apache.activemq.version}</version>-->
-      <!--</dependency>-->
-      <!--communication-manager-impl-->
-
       <!--db-manager-impl-->
       <dependency>
         <groupId>org.cassandraunit</groupId>
@@ -275,11 +262,6 @@
         <artifactId>commons-pool</artifactId>
         <version>${commons-pool.version}</version>
       </dependency>
-      <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-jaas</artifactId>-->
-        <!--<version>${org.apache.activemq.version}</version>-->
-      <!--</dependency>-->
       <dependency>
         <groupId>commons-net</groupId>
         <artifactId>commons-net</artifactId>
