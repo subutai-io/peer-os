@@ -15,9 +15,8 @@
     <packaging>pom</packaging>
 
     <modules>
-       <!-- <module>common</module>
-        <module>accumulo</module>
-        <module>mongodb</module>
+       <!--
+       <module>accumulo</module>
         <module>solr</module>
         <module>mahout</module>
         <module>pig</module>
@@ -34,6 +33,8 @@
         <module>oozie</module>
         <module>cassandra</module>
         <module>storm</module>-->
+        <module>common</module>
+        <module>mongodb</module>
         <module>hadoop</module>
     </modules>
 

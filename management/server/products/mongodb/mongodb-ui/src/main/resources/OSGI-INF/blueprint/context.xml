@@ -15,6 +15,6 @@
         <argument ref="tracker"/>
     </bean>
     
-    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
     
 </blueprint>

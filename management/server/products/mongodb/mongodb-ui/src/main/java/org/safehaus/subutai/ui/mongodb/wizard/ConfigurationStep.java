@@ -7,22 +7,15 @@ package org.safehaus.subutai.ui.mongodb.wizard;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
-import java.util.Arrays;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.Util;
 
+import java.util.Arrays;
+
 /**
- *
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -38,7 +31,7 @@ public class ConfigurationStep extends Panel {
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
@@ -47,13 +40,13 @@ public class ConfigurationStep extends Panel {
 
         //configuration servers number
         ComboBox cfgSrvsCombo = new ComboBox("Choose number of configuration servers (Recommended 3 nodes)", Arrays.asList(1, 3));
-        cfgSrvsCombo.setMultiSelect(false);
+//        cfgSrvsCombo.setMultiSelect(false);
         cfgSrvsCombo.setImmediate(true);
         cfgSrvsCombo.setTextInputAllowed(false);
         cfgSrvsCombo.setNullSelectionAllowed(false);
         cfgSrvsCombo.setValue(wizard.getConfig().getNumberOfConfigServers());
 
-        cfgSrvsCombo.addListener(new Property.ValueChangeListener() {
+        cfgSrvsCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
@@ -62,13 +55,13 @@ public class ConfigurationStep extends Panel {
 
         //routers number
         ComboBox routersCombo = new ComboBox("Choose number of routers ( At least 2 recommended)", Arrays.asList(1, 2, 3));
-        routersCombo.setMultiSelect(false);
+//        routersCombo.setMultiSelect(false);
         routersCombo.setImmediate(true);
         routersCombo.setTextInputAllowed(false);
         routersCombo.setNullSelectionAllowed(false);
         routersCombo.setValue(wizard.getConfig().getNumberOfRouters());
 
-        routersCombo.addListener(new Property.ValueChangeListener() {
+        routersCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
@@ -77,13 +70,13 @@ public class ConfigurationStep extends Panel {
 
         //datanodes number
         ComboBox dataNodesCombo = new ComboBox("Choose number of datanodes", Arrays.asList(3, 5, 7));
-        dataNodesCombo.setMultiSelect(false);
+//        dataNodesCombo.setMultiSelect(false);
         dataNodesCombo.setImmediate(true);
         dataNodesCombo.setTextInputAllowed(false);
         dataNodesCombo.setNullSelectionAllowed(false);
         dataNodesCombo.setValue(wizard.getConfig().getNumberOfDataNodes());
 
-        dataNodesCombo.addListener(new Property.ValueChangeListener() {
+        dataNodesCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
@@ -93,7 +86,7 @@ public class ConfigurationStep extends Panel {
         TextField replicaSetName = new TextField("Enter replica set name");
         replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
         replicaSetName.setMaxLength(20);
-        replicaSetName.addListener(new Property.ValueChangeListener() {
+        replicaSetName.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -106,7 +99,7 @@ public class ConfigurationStep extends Panel {
         TextField cfgSrvPort = new TextField("Enter port for configuration servers");
         cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
         cfgSrvPort.setMaxLength(5);
-        cfgSrvPort.addListener(new Property.ValueChangeListener() {
+        cfgSrvPort.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -119,7 +112,7 @@ public class ConfigurationStep extends Panel {
         TextField routerPort = new TextField("Enter port for routers");
         routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
         routerPort.setMaxLength(5);
-        routerPort.addListener(new Property.ValueChangeListener() {
+        routerPort.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -132,7 +125,7 @@ public class ConfigurationStep extends Panel {
         TextField dataNodePort = new TextField("Enter port for data nodes");
         dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
         dataNodePort.setMaxLength(5);
-        dataNodePort.addListener(new Property.ValueChangeListener() {
+        dataNodePort.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -145,7 +138,7 @@ public class ConfigurationStep extends Panel {
         TextField domain = new TextField("Enter domain name");
         domain.setInputPrompt(wizard.getConfig().getDomainName());
         domain.setMaxLength(20);
-        domain.addListener(new Property.ValueChangeListener() {
+        domain.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -156,11 +149,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
 
@@ -171,9 +162,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -207,7 +198,7 @@ public class ConfigurationStep extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

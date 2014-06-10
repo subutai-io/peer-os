@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.Mongo;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class MongoUI implements Module {
+public class MongoUI implements PortalModule {
 
     private static Mongo mongoManager;
     private static AgentManager agentManager;
@@ -56,6 +56,11 @@ public class MongoUI implements Module {
         mongoManager = null;
         agentManager = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {
