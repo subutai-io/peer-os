@@ -38,11 +38,10 @@ class CommunicationMessageListener implements MessageListener {
     @Override
     public void onMessage( Message message ) {
         try {
-            LOG.warning( "MESSAGE " + message.toString() );
 
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
-                LOG.warning( "BYTEMESSAGE " + msg.toString() );
+
                 byte[] msg_bytes = new byte[( int ) msg.getBodyLength()];
                 msg.readBytes( msg_bytes );
                 String jsonCmd = new String( msg_bytes, "UTF-8" );
@@ -61,7 +60,7 @@ class CommunicationMessageListener implements MessageListener {
             }
             else if ( message instanceof ActiveMQMessage ) {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
-                LOG.warning( "AMQMESSAGE " + aMsg.toString() );
+
                 if ( aMsg.getDataStructure() instanceof RemoveInfo ) {
                     Response agentDisconnect = new Response();
                     agentDisconnect.setType( ResponseType.AGENT_DISCONNECT );

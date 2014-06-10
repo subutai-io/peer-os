@@ -158,16 +158,16 @@
       <!--command-runner-ui-->
 
       <!--communication-manager-impl-->
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-broker</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-kahadb-store</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-broker</artifactId>-->
+        <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-kahadb-store</artifactId>-->
+        <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
       <!--communication-manager-impl-->
 
       <!--db-manager-impl-->
@@ -255,31 +255,31 @@
         <artifactId>vaadin</artifactId>
         <version>${com.vaadin.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-all</artifactId>-->
+        <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-pool</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jms-pool</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-jms-pool</artifactId>-->
+        <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
       <dependency>
         <groupId>commons-pool</groupId>
         <artifactId>commons-pool</artifactId>
         <version>${commons-pool.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jaas</artifactId>
-        <version>${org.apache.activemq.version}</version>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.apache.activemq</groupId>-->
+        <!--<artifactId>activemq-jaas</artifactId>-->
+        <!--<version>${org.apache.activemq.version}</version>-->
+      <!--</dependency>-->
       <dependency>
         <groupId>commons-net</groupId>
         <artifactId>commons-net</artifactId>
