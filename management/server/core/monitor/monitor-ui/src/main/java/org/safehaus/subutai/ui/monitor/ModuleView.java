@@ -1,14 +1,13 @@
 package org.safehaus.subutai.ui.monitor;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.monitor.Metric;
 import org.safehaus.subutai.api.monitor.Monitor;
-import org.safehaus.subutai.server.ui.MgmtAgentManager;
-import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.ui.monitor.component.AgentTree;
 import org.safehaus.subutai.ui.monitor.util.UIUtil;
 
 import java.util.Date;
@@ -22,14 +21,16 @@ public class ModuleView extends CustomComponent {
     private Chart chart;
 
     private final Monitor monitor;
+    private final AgentManager agentManager;
 
-    private MgmtAgentManager agentTree;
+    private AgentTree agentTree;
     private PopupDateField startDateField;
     private PopupDateField endDateField;
     private ListSelect metricListSelect;
 
-    public ModuleView(Monitor monitor) {
+    public ModuleView(Monitor monitor, AgentManager agentManager) {
         this.monitor = monitor;
+        this.agentManager = agentManager;
         initContent();
     }
 
@@ -40,9 +41,9 @@ public class ModuleView extends CustomComponent {
         HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
         splitPanel.setSplitPosition(20);
 
-        agentTree = MgmtApplication.createAgentTree();
+        agentTree = new AgentTree(agentManager);
         splitPanel.setFirstComponent(agentTree);
-        splitPanel.setSecondComponent( getMainLayout() );
+        splitPanel.setSecondComponent(getMainLayout());
 
         setCompositionRoot(splitPanel);
     }
@@ -50,8 +51,8 @@ public class ModuleView extends CustomComponent {
     private Layout getMainLayout() {
 
         AbsoluteLayout layout = new AbsoluteLayout();
-        layout.setWidth(1200, Sizeable.UNITS_PIXELS);
-        layout.setHeight(1000, Sizeable.UNITS_PIXELS);
+        layout.setWidth(1200, Unit.PIXELS);
+        layout.setHeight(1000, Unit.PIXELS);
 
         addNote(layout);
         addDateFields(layout);
@@ -79,7 +80,7 @@ public class ModuleView extends CustomComponent {
 
         metricListSelect = UIUtil.addListSelect(layout, "Metric:", "left: 20px; top: 150px;", "200px", "270px");
 
-        for ( Metric metric : Metric.values() ) {
+        for (Metric metric : Metric.values()) {
             metricListSelect.addItem(metric);
         }
     }
@@ -88,8 +89,9 @@ public class ModuleView extends CustomComponent {
 
         Button button = UIUtil.getButton("Submit", "150px");
 
-        button.addListener(new Button.ClickListener() {
-            public void buttonClick(Button.ClickEvent event) {
+        button.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 submitButtonClicked();
             }
         });
@@ -100,8 +102,8 @@ public class ModuleView extends CustomComponent {
     private void addChartLayout(AbsoluteLayout layout) {
 
         AbsoluteLayout chartLayout = new AbsoluteLayout();
-        chartLayout.setWidth(800, Sizeable.UNITS_PIXELS);
-        chartLayout.setHeight(400, Sizeable.UNITS_PIXELS);
+        chartLayout.setWidth(800, Unit.PIXELS);
+        chartLayout.setHeight(400, Unit.PIXELS);
         chartLayout.setDebugId("chart");
 
         layout.addComponent(chartLayout, "left: 250px; top: 50px;");
@@ -120,7 +122,7 @@ public class ModuleView extends CustomComponent {
     private void loadChart(String host, Metric metric) {
 
         if (chart == null) {
-            chart = new Chart(getWindow(), MAX_SIZE);
+//            chart = new Chart(getWindow(), MAX_SIZE);
         }
 
         Date startDate = (Date) startDateField.getValue();
@@ -135,10 +137,10 @@ public class ModuleView extends CustomComponent {
         boolean success = true;
 
         if (StringUtils.isEmpty(host)) {
-            getWindow().showNotification("Please select a node");
+            Notification.show("Please select a node");
             success = false;
         } else if (metric == null) {
-            getWindow().showNotification("Please select a metric");
+            Notification.show("Please select a metric");
             success = false;
         }
 
