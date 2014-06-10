@@ -67,9 +67,24 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     private int amqMaxSenderPoolSize;
 
+    /**
+     * Use persistent or non-persistent delivery mode for outgoing messages
+     */
+    private boolean persistentMessages;
+
 
     public Connection createConnection() throws JMSException {
         return pooledConnectionFactory.createConnection();
+    }
+
+
+    boolean isPersistentMessages() {
+        return persistentMessages;
+    }
+
+
+    public void setPersistentMessages( final boolean persistentMessages ) {
+        this.persistentMessages = persistentMessages;
     }
 
 
