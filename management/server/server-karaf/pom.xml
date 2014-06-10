@@ -33,11 +33,11 @@
       <artifactId>vaadin</artifactId>
       <version>${com.vaadin.version}</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.apache.activemq</groupId>-->
-      <!--<artifactId>activemq-all</artifactId>-->
-      <!--<version>${org.apache.activemq.version}</version>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-client</artifactId>
+      <version>${org.apache.activemq.version}</version>
+    </dependency>
     <!--<dependency>-->
       <!--<groupId>org.apache.activemq</groupId>-->
       <!--<artifactId>activemq-jaas</artifactId>-->
@@ -281,11 +281,11 @@
                   <artifactId>vaadin</artifactId>
                   <version>${com.vaadin.version}</version>
                 </artifactItem>
-                <!--<artifactItem>-->
-                  <!--<groupId>org.apache.activemq</groupId>-->
-                  <!--<artifactId>activemq-all</artifactId>-->
-                  <!--<version>${org.apache.activemq.version}</version>-->
-                <!--</artifactItem>-->
+                <artifactItem>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-client</artifactId>
+                  <version>${org.apache.activemq.version}</version>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
