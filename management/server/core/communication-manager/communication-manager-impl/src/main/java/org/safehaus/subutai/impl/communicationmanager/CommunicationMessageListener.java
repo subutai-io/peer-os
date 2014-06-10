@@ -1,6 +1,7 @@
 package org.safehaus.subutai.impl.communicationmanager;
 
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,7 +44,15 @@ class CommunicationMessageListener implements MessageListener {
         try {
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
-                LOG.warning( msg.readUTF() );
+                byte[] mesg_bytes = new byte[(int)msg.getBodyLength()];
+                int num_read = msg.readBytes(mesg_bytes);
+                try {
+                    String decoded = new String(mesg_bytes, "UTF-8");
+                    LOG.warning( decoded );
+                }
+                catch ( UnsupportedEncodingException e ) {
+                    e.printStackTrace();
+                }
             }
             else if ( message instanceof TextMessage ) {
                 TextMessage txtMsg = ( TextMessage ) message;
