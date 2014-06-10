@@ -265,11 +265,11 @@
         <artifactId>activemq-pool</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
-      <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-jms-pool</artifactId>-->
-        <!--<version>${org.apache.activemq.version}</version>-->
-      <!--</dependency>-->
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-jms-pool</artifactId>
+        <version>${org.apache.activemq.version}</version>
+      </dependency>
       <dependency>
         <groupId>commons-pool</groupId>
         <artifactId>commons-pool</artifactId>
