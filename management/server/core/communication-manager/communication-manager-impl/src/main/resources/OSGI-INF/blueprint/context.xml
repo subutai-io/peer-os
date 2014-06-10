@@ -8,8 +8,8 @@
 
   <cm:property-placeholder persistent-id="AmqConfig" update-strategy="none">
     <cm:default-properties>
-      <cm:property name="amqUrl" value="failover:ssl://localhost:61616?jms.useAsyncSend=true" />
-      <cm:property name="amqPort" value="1883" />
+      <cm:property name="amqUrl" value="failover:tcp://localhost:61616?jms.useAsyncSend=true" />
+      <cm:property name="amqPort" value="61616" />
       <cm:property name="amqBindAddress" value="0.0.0.0" />
       <cm:property name="amqServiceQueue" value="SERVICE_TOPIC" />
       <cm:property name="amqBrokerCertificateName" value="client.ks" />
