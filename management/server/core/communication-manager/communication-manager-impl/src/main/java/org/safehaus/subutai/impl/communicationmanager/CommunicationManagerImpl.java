@@ -355,6 +355,18 @@ public class CommunicationManagerImpl implements CommunicationManager {
             Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic( adminQueue );
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
+
+            advisoryDestination = AdvisorySupport.getConsumerAdvisoryTopic( adminQueue );
+            advConsumer = session.createConsumer( advisoryDestination );
+            advConsumer.setMessageListener( communicationMessageListener );
+
+            advisoryDestination = AdvisorySupport.getDestinationAdvisoryTopic( adminQueue );
+            advConsumer = session.createConsumer( advisoryDestination );
+            advConsumer.setMessageListener( communicationMessageListener );
+
+            advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
+            advConsumer = session.createConsumer( advisoryDestination );
+            advConsumer.setMessageListener( communicationMessageListener );
         }
         catch ( JMSException ex ) {
             LOG.log( Level.SEVERE, "Error in setupListener", ex );
