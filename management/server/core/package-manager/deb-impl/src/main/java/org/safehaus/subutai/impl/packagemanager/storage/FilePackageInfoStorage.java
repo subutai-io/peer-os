@@ -1,18 +1,31 @@
 package org.safehaus.subutai.impl.packagemanager.storage;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.api.packagemanager.storage.PackageInfoStorage;
+import org.safehaus.subutai.impl.packagemanager.info.DebPackageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FilePackageInfoStorage implements PackageInfoStorage {
 
     private static final Logger logger = LoggerFactory.getLogger(FilePackageInfoStorage.class);
+    private static final Gson gson;
     private final Path parent;
+
+    static {
+        // do not use pretty-printing!!!
+        // each item corresponds to one line in a file
+        gson = new GsonBuilder().serializeNulls().create();
+    }
 
     public FilePackageInfoStorage(String parentDir) {
         File f = new File(parentDir);
@@ -50,41 +63,43 @@ public class FilePackageInfoStorage implements PackageInfoStorage {
     }
 
     private void serialize(Collection<PackageInfo> col, String filePath) throws IOException {
-        File f = parent.resolve(filePath).toFile();
-        if(!f.getParentFile().exists()) f.getParentFile().mkdirs();
+        Path path = parent.resolve(filePath);
+        File parentDir = path.toFile().getParentFile();
+        if(!parentDir.exists()) parentDir.mkdirs();
 
-        ObjectOutputStream out = null;
+        BufferedWriter out = null;
         try {
-            FileOutputStream fos = new FileOutputStream(f);
-            out = new ObjectOutputStream(fos);
-            // wrap collection in list to ensure serializable collection
-            ArrayList ls = new ArrayList(col);
-            out.writeObject(ls);
+            out = Files.newBufferedWriter(path, Charset.defaultCharset());
+            for(PackageInfo p : col) {
+                out.write(p.toString());
+                out.newLine();
+            }
         } finally {
             if(out != null) out.close();
         }
     }
 
     private List<PackageInfo> deserialize(String filePath) throws IOException {
-        File f = parent.resolve(filePath).toFile();
-        if(!f.exists()) return null;
+        Path path = parent.resolve(filePath);
+        if(!path.toFile().exists()) return null;
 
-        List<PackageInfo> res = null;
-        ObjectInputStream in = null;
+        BufferedReader in = null;
         try {
-            FileInputStream fis = new FileInputStream(f);
-            in = new ObjectInputStream(fis);
-            res = (List<PackageInfo>)in.readObject();
-        } catch(FileNotFoundException ex) {
-            // failed to open specified file
-            logger.warn("Failed to open file", ex);
-        } catch(ClassNotFoundException ex) {
-            // invalid data
-            logger.warn("Invalid data", ex);
+            in = Files.newBufferedReader(path, Charset.defaultCharset());
+            String line;
+            List<PackageInfo> res = new ArrayList<>();
+            while((line = in.readLine()) != null) {
+                if(line.isEmpty()) continue;
+                DebPackageInfo deb = gson.fromJson(line, DebPackageInfo.class);
+                if(deb != null) res.add(deb);
+            }
+            return res;
+        } catch(JsonParseException ex) {
+            logger.error("Invalid source file", ex);
         } finally {
             if(in != null) in.close();
         }
-        return res;
+        return null;
     }
 
 }
