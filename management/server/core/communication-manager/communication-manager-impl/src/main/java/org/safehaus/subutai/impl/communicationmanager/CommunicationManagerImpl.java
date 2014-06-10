@@ -282,12 +282,12 @@ public class CommunicationManagerImpl implements CommunicationManager {
         }
 
         try {
-            System.setProperty( "javax.net.ssl.keyStore",
-                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerCertificateName );
-            System.setProperty( "javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd );
-            System.setProperty( "javax.net.ssl.trustStore",
-                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerTrustStoreName );
-            System.setProperty( "javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd );
+//            System.setProperty( "javax.net.ssl.keyStore",
+//                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerCertificateName );
+//            System.setProperty( "javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd );
+//            System.setProperty( "javax.net.ssl.trustStore",
+//                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerTrustStoreName );
+//            System.setProperty( "javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd );
 
             //            broker = new BrokerService();
             //***policy
