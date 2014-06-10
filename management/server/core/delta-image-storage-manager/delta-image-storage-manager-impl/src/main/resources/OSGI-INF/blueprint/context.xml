@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+<!--
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+  <reference id="monitor" availability="mandatory"
+             interface="org.safehaus.subutai.api.monitor.Monitor" />
+
+        init-method="init" destroy-method="destroy">
+    <argument ref="agentManager" />
+    <argument ref="commandRunner" />
+    <argument ref="monitor" />
+
+-->
+  <bean id="dismanager" scope="singleton" class="org.safehaus.subutai.impl.manager.DisManagerImpl">
+
+  </bean>
+
+  <service ref="dismanager" interface="org.safehaus.subutai.api.manager.DisManager" />
+
+</blueprint>
