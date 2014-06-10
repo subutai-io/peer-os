@@ -352,7 +352,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener( communicationMessageListener );
 
-            Destination advisoryDestination = AdvisorySupport.getFullAdvisoryTopic( adminQueue );
+            Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic( adminQueue );
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
         }
