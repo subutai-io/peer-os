@@ -38,7 +38,7 @@ class CommunicationMessageListener implements MessageListener {
     @Override
     public void onMessage( Message message ) {
         try {
-            LOG.warning( message.toString() );
+            LOG.warning( "MESSAGE " + message.toString() );
 
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
