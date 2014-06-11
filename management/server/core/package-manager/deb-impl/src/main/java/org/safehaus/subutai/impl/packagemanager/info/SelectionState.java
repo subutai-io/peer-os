@@ -4,7 +4,7 @@ package org.safehaus.subutai.impl.packagemanager.info;
  * Debian package selection states. Refer to dpkg man pages for more info.
  *
  */
-public enum SelectionState {
+public enum SelectionState implements Abbreviation {
 
     UNKNOWN('u'),
     INSTALL('i'),
@@ -18,6 +18,7 @@ public enum SelectionState {
         this.abbrev = abbrev;
     }
 
+    @Override
     public char getAbbrev() {
         return abbrev;
     }

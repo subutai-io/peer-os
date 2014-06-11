@@ -4,7 +4,7 @@ package org.safehaus.subutai.impl.packagemanager.info;
  * Debian package flag. Refer to dpkg man pages for more info.
  *
  */
-public enum PackageFlag {
+public enum PackageFlag implements Abbreviation {
 
     REINST_REQUIRED('R');
 
@@ -14,6 +14,7 @@ public enum PackageFlag {
         this.abbrev = abbrev;
     }
 
+    @Override
     public char getAbbrev() {
         return abbrev;
     }

@@ -4,7 +4,7 @@ package org.safehaus.subutai.impl.packagemanager.info;
  * Debian package states. Refer to dpkg man pages for more info.
  *
  */
-public enum PackageState {
+public enum PackageState implements Abbreviation {
 
     NOT_INSTALLED('n'),
     CONFIG_FILES('c'),
@@ -21,6 +21,7 @@ public enum PackageState {
         this.abbrev = abbrev;
     }
 
+    @Override
     public char getAbbrev() {
         return abbrev;
     }

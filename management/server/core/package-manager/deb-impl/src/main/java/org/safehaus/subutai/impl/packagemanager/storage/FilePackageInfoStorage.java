@@ -7,7 +7,7 @@ import java.nio.file.*;
 import java.util.*;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.api.packagemanager.storage.PackageInfoStorage;
-import org.safehaus.subutai.impl.packagemanager.info.DebPackageInfo;
+import org.safehaus.subutai.impl.packagemanager.info.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +16,15 @@ public class FilePackageInfoStorage implements PackageInfoStorage {
     private static final Logger logger = LoggerFactory.getLogger(FilePackageInfoStorage.class);
     private static final Gson gson;
     private final Path parent;
+    private final Charset charset = Charset.defaultCharset();
 
     static {
-        // do not use pretty-printing!!!
-        // each item corresponds to one line in a file
-        gson = new GsonBuilder().serializeNulls().create();
+        // DO NOT USE PRETTY-PRINTING!!! Elements serialized per line.
+        gson = new GsonBuilder().serializeNulls()
+                .registerTypeAdapter(PackageFlag.class, new PackageFlagAdapter())
+                .registerTypeAdapter(PackageState.class, new PackageStateAdapter())
+                .registerTypeAdapter(SelectionState.class, new SelectionStateAdapter())
+                .create();
     }
 
     public FilePackageInfoStorage(String parentDir) {
@@ -65,7 +69,7 @@ public class FilePackageInfoStorage implements PackageInfoStorage {
 
         BufferedWriter out = null;
         try {
-            out = Files.newBufferedWriter(path, Charset.defaultCharset());
+            out = Files.newBufferedWriter(path, charset);
             for(PackageInfo p : col) {
                 out.write(gson.toJson(p));
                 out.newLine();
@@ -81,7 +85,7 @@ public class FilePackageInfoStorage implements PackageInfoStorage {
 
         BufferedReader in = null;
         try {
-            in = Files.newBufferedReader(path, Charset.defaultCharset());
+            in = Files.newBufferedReader(path, charset);
             String line;
             List<PackageInfo> res = new ArrayList<>();
             while((line = in.readLine()) != null) {
