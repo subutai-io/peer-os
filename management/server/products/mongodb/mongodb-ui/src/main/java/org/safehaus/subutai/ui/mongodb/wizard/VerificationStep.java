@@ -8,8 +8,8 @@ package org.safehaus.subutai.ui.mongodb.wizard;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.mongodb.Config;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.mongodb.MongoUI;
-import org.safehaus.subutai.ui.mongodb.component.ProgressWindow;
 
 import java.util.UUID;
 
@@ -48,7 +48,7 @@ public class VerificationStep extends VerticalLayout {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
 //                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
-                ProgressWindow window = new ProgressWindow(MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
                 getUI().addWindow(window.getWindow());
                 wizard.init();
             }
