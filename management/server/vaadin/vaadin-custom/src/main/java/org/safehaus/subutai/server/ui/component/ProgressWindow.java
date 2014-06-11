@@ -68,7 +68,7 @@ public class ProgressWindow {
                 track = false;
                 executor.shutdown();
                 window.close();
-                window.markAsDirtyRecursive();
+                window.detach();
             }
         });
 
