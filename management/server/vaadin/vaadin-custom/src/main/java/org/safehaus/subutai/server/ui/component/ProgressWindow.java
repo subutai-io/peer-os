@@ -92,20 +92,31 @@ public class ProgressWindow {
     private void start() {
 
         showProgress();
-        /*executor.execute(new Runnable() {
+        executor.execute(new Runnable() {
 
             public void run() {
-
                 while (track) {
                     ProductOperationView po = tracker.getProductOperation(source, trackID);
                     if (po != null) {
-                        setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                        try {
+                            VaadinSession.getCurrent().getLockInstance().lock();
+                            setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                        } finally {
+                            VaadinSession.getCurrent().getLockInstance().unlock();
+                        }
+
                         if (po.getState() != ProductOperationState.RUNNING) {
                             hideProgress();
                             break;
                         }
                     } else {
-                        setOutput("Product operation not found. Check logs");
+                        try {
+                            VaadinSession.getCurrent().getLockInstance().lock();
+                            setOutput("Product operation not found. Check logs");
+                        } finally {
+                            VaadinSession.getCurrent().getLockInstance().unlock();
+                        }
+
                         break;
                     }
                     try {
@@ -115,38 +126,7 @@ public class ProgressWindow {
                     }
                 }
             }
-        });*/
-
-        VaadinSession.getCurrent().access(new Runnable() {
-            @Override
-            public void run() {
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (track) {
-                            ProductOperationView po = tracker.getProductOperation(source, trackID);
-                            if (po != null) {
-                                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                                if (po.getState() != ProductOperationState.RUNNING) {
-                                    hideProgress();
-                                    break;
-                                }
-                            } else {
-                                setOutput("Product operation not found. Check logs");
-                                break;
-                            }
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException ex) {
-                                break;
-                            }
-                        }
-                    }
-                });
-                thread.start();
-            }
         });
-
     }
 
     private void showProgress() {
@@ -160,11 +140,9 @@ public class ProgressWindow {
     }
 
     private void setOutput(String output) {
-        if (outputTxtArea.isConnectorEnabled()) {
-            if (!Strings.isNullOrEmpty(output)) {
-                outputTxtArea.setValue(output);
-                outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-            }
+        if (!Strings.isNullOrEmpty(output)) {
+            outputTxtArea.setValue(output);
+            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
         }
     }
 
