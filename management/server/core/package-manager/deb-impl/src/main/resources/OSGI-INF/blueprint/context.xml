@@ -5,14 +5,7 @@
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
-    <!-- dbManager reference is used for db persistence -->
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
 
-    <bean id="packageInfoStorageDb"
-          class="org.safehaus.subutai.impl.packagemanager.storage.DbPackageInfoStorage" >
-        <argument ref="dbManager"/>
-    </bean>
     <bean id="packageInfoStorageFile"
           class="org.safehaus.subutai.impl.packagemanager.storage.FilePackageInfoStorage" >
         <argument value="/opt/subutai/packages"/>
