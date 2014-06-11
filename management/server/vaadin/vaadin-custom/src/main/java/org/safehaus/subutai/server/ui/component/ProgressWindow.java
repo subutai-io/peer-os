@@ -33,7 +33,7 @@ public class ProgressWindow {
     private volatile boolean track = true;
     private final ExecutorService executor;
 
-    public ProgressWindow(ExecutorService executor, Tracker tracker, UUID trackID, String source) {
+    public ProgressWindow(final ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
         window = new Window("Operation progress", l);
         window.setModal(true);
@@ -52,7 +52,7 @@ public class ProgressWindow {
 
         outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(13);
-        outputTxtArea.setColumns(43);
+        outputTxtArea.setColumns(40);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
@@ -65,6 +65,7 @@ public class ProgressWindow {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 //close window
                 track = false;
+                executor.shutdown();
                 window.close();
             }
         });
