@@ -1599,8 +1599,8 @@ body .dashboard.v-app .v-app-loading {
     top: 0;
     right: 0;
     z-index: 30000;
-    width: 31px;
-    height: 31px;
+    width: 0px;
+    height: 0px;
     background: transparent url(img/spinner.gif);
     margin-right: 5px;
     margin-top: 5px;

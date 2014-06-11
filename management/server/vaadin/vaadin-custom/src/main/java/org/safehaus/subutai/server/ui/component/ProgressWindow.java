@@ -52,7 +52,7 @@ public class ProgressWindow {
 
         outputTxtArea = new TextArea("Operation output");
         outputTxtArea.setRows(13);
-        outputTxtArea.setColumns(40);
+        outputTxtArea.setColumns(42);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 
