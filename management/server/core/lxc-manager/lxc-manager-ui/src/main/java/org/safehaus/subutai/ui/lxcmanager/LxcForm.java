@@ -33,7 +33,7 @@ public class LxcForm extends CustomComponent implements Disposable {
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
         horizontalSplit.setSplitPosition(200, Unit.PIXELS);
-        agentTree = new AgentTree(LxcUI.getAgentManager());
+        agentTree = new AgentTree(agentManager);
         horizontalSplit.setFirstComponent(agentTree);
 
         VerticalLayout verticalLayout = new VerticalLayout();
