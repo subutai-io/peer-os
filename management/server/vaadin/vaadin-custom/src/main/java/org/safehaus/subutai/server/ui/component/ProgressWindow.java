@@ -98,7 +98,6 @@ public class ProgressWindow {
                 while (track) {
                     ProductOperationView po = tracker.getProductOperation(source, trackID);
                     if (po != null) {
-                        System.out.println(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                         setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
                         if (po.getState() != ProductOperationState.RUNNING) {
                             hideProgress();
