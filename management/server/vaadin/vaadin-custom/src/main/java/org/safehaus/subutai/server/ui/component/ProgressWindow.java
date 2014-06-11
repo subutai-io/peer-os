@@ -36,6 +36,7 @@ public class ProgressWindow {
     public ProgressWindow(final ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
         window = new Window("Operation progress", l);
+        window.setImmediate(true);
         window.setModal(true);
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
@@ -67,6 +68,7 @@ public class ProgressWindow {
                 track = false;
                 executor.shutdown();
                 window.close();
+                window.markAsDirtyRecursive();
             }
         });
 
