@@ -39,6 +39,7 @@ public class ProgressWindow {
         window.setModal(true);
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
+        window.setId(System.currentTimeMillis() + "");
 
         this.executor = executor;
         this.trackID = trackID;
@@ -127,7 +128,7 @@ public class ProgressWindow {
         ok.setEnabled(true);
     }
 
-    private synchronized void setOutput(String output) {
+    private void setOutput(String output) {
         if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
