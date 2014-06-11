@@ -13,9 +13,9 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.ui.solr.SolrUI;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @author dilshat
@@ -30,9 +30,8 @@ public class ProgressWindow {
     private String source;
     private VerticalLayout l = new VerticalLayout();
     private volatile boolean track = true;
-    private ExecutorService executor;
 
-    public ProgressWindow(final ExecutorService executor, Tracker tracker, UUID trackID, String source) {
+    public ProgressWindow(Tracker tracker, UUID trackID, String source) {
 
         window = new Window("Operation progress", l);
         window.setImmediate(true);
@@ -40,7 +39,6 @@ public class ProgressWindow {
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
 
-        this.executor = executor;
         this.trackID = trackID;
         this.tracker = tracker;
         this.source = source;
@@ -91,7 +89,7 @@ public class ProgressWindow {
     private void start() {
 
         showProgress();
-        executor.execute(new Runnable() {
+        SolrUI.getExecutor().execute(new Runnable() {
 
             public void run() {
                 while (track) {
