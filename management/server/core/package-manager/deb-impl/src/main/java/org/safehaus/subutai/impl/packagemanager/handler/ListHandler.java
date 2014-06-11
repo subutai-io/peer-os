@@ -14,6 +14,7 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
     private final String hostname;
     private Pattern lineStartPattern = Pattern.compile("^[a-z]{2,3}\\s+");
     private String namePattern;
+    private boolean fromFile;
 
     public ListHandler(DebPackageManager pm, String hostname) {
         super(pm);
@@ -26,6 +27,14 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     public void setNamePattern(String namePattern) {
         this.namePattern = namePattern;
+    }
+
+    public boolean isFromFile() {
+        return fromFile;
+    }
+
+    public void setFromFile(boolean fromFile) {
+        this.fromFile = fromFile;
     }
 
     @Override
@@ -57,13 +66,19 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
             }
             return ls;
         }
-        return Collections.emptyList();
+        return null;
     }
 
     private String makeCommand() {
-        StringBuilder sb = new StringBuilder("dpkg -l");
-        if(namePattern != null && !namePattern.isEmpty())
-            sb.append(" '").append(namePattern).append("'");
+        StringBuilder sb = new StringBuilder();
+        if(fromFile) {
+            sb.append("cd ").append(packageManager.getLocation()).append("; ");
+            sb.append("cat ").append(packageManager.getFilename());
+        } else {
+            sb.append("dpkg -l");
+            if(namePattern != null && !namePattern.isEmpty())
+                sb.append(" '").append(namePattern).append("'");
+        }
         return sb.toString();
     }
 

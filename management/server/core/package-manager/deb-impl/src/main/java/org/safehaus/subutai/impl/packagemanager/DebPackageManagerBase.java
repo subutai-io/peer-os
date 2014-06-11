@@ -11,6 +11,8 @@ public abstract class DebPackageManagerBase implements PackageManager {
     CommandRunner commandRunner;
 
     PackageInfoStorage storage;
+    String location = "/opt/subutai";
+    String filename = "packages";
 
     public AgentManager getAgentManager() {
         return agentManager;
@@ -34,6 +36,22 @@ public abstract class DebPackageManagerBase implements PackageManager {
 
     public void setStorage(PackageInfoStorage storage) {
         this.storage = storage;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
 }

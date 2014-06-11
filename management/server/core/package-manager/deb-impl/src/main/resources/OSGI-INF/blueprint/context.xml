@@ -15,6 +15,7 @@
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="storage" ref="packageInfoStorageFile"/>
+        <property name="location" value="/opt/subutai"/>
     </bean>
 
     <service ref="packageManager" interface="org.safehaus.subutai.api.packagemanager.PackageManager"/>

@@ -15,7 +15,9 @@ public class FindHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     @Override
     public Collection<PackageInfo> performAction() {
-        return packageManager.getStorage().retrieve(hostname);
+        ListHandler ls = new ListHandler(packageManager, hostname);
+        ls.setFromFile(true);
+        return ls.performAction();
     }
 
 }
