@@ -143,6 +143,7 @@ public class ProgressWindow {
                         }
                     }
                 });
+                thread.start();
             }
         });
 
