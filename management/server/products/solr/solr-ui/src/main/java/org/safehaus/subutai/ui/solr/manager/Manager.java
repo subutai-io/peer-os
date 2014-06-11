@@ -166,7 +166,12 @@ public class Manager {
                         }
                     });
 
-                    contentRoot.getUI().addWindow(alert.getAlert());
+                    try {
+                        contentRoot.getUI().getSession().getCurrent().getLockInstance().lock();
+                        contentRoot.getUI().addWindow(alert.getAlert());
+                    } finally {
+                        contentRoot.getUI().getSession().getCurrent().getLockInstance().unlock();
+                    }
                 } else {
                     show("Please, select cluster");
                 }
