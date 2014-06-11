@@ -14,13 +14,13 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.subutai.ui.mongodb.MongoUI;
-import org.safehaus.subutai.ui.mongodb.component.ProgressWindow;
 
 import java.util.List;
 import java.util.Set;

@@ -13,7 +13,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.ui.solr.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
@@ -123,7 +123,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = SolrUI.getSolrManager().uninstallCluster(config.getClusterName());
-                            ProgressWindow window = new ProgressWindow(SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -155,7 +155,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = SolrUI.getSolrManager().addNode(config.getClusterName());
-                            ProgressWindow window = new ProgressWindow(SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -325,7 +325,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = SolrUI.getSolrManager().destroyNode(config.getClusterName(), agent.getHostname());
-                            final ProgressWindow window = new ProgressWindow(SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            final ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {

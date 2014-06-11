@@ -8,8 +8,8 @@ package org.safehaus.subutai.ui.mongodb.wizard;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.mongodb.Config;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.mongodb.MongoUI;
-import org.safehaus.subutai.ui.mongodb.component.ProgressWindow;
 
 import java.util.UUID;
 
