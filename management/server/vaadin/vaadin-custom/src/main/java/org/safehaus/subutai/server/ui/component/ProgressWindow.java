@@ -66,7 +66,6 @@ public class ProgressWindow {
                 //close window
                 track = false;
                 window.close();
-                window.detach();
             }
         });
 
@@ -128,7 +127,7 @@ public class ProgressWindow {
         ok.setEnabled(true);
     }
 
-    private void setOutput(String output) {
+    private synchronized void setOutput(String output) {
         if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
