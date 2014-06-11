@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.mongodb.components;
+package org.safehaus.subutai.ui.mongodb.component;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.Sizeable;
