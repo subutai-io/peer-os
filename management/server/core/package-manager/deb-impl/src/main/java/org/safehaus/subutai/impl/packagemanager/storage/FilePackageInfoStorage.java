@@ -1,13 +1,9 @@
 package org.safehaus.subutai.impl.packagemanager.storage;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.api.packagemanager.storage.PackageInfoStorage;
@@ -71,7 +67,7 @@ public class FilePackageInfoStorage implements PackageInfoStorage {
         try {
             out = Files.newBufferedWriter(path, Charset.defaultCharset());
             for(PackageInfo p : col) {
-                out.write(p.toString());
+                out.write(gson.toJson(p));
                 out.newLine();
             }
         } finally {
