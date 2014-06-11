@@ -14,7 +14,6 @@ import org.safehaus.subutai.ui.solr.SolrUI;
 import java.util.UUID;
 
 /**
- *
  * @author dilshat
  */
 public class VerificationStep extends VerticalLayout {

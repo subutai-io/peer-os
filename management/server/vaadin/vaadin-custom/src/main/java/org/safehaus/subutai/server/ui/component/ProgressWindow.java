@@ -30,7 +30,7 @@ public class ProgressWindow {
     private final String source;
     private final VerticalLayout l = new VerticalLayout();
     private volatile boolean track = true;
-    private ExecutorService executor;
+    private final ExecutorService executor;
 
     public ProgressWindow(ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
@@ -58,6 +58,7 @@ public class ProgressWindow {
         content.addComponent(outputTxtArea);
 
         ok = new Button("Ok");
+        ok.setStyleName("default");
         ok.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -68,7 +69,7 @@ public class ProgressWindow {
         });
 
         indicator = new Label();
-        indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+        indicator.setIcon(new ThemeResource("img/spinner.gif"));
         indicator.setContentMode(ContentMode.HTML);
         indicator.setHeight(11, Sizeable.Unit.PIXELS);
         indicator.setWidth(50, Sizeable.Unit.PIXELS);
