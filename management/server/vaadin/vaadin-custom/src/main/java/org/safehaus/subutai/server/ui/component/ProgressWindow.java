@@ -93,24 +93,28 @@ public class ProgressWindow {
         executor.execute(new Runnable() {
 
             public void run() {
-                window.getUI().getSession().getLockInstance();
-                while (track) {
-                    ProductOperationView po = tracker.getProductOperation(source, trackID);
-                    if (po != null) {
-                        setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                        if (po.getState() != ProductOperationState.RUNNING) {
-                            hideProgress();
+                outputTxtArea.getUI().getSession().getLockInstance().lock();
+                try {
+                    while (track) {
+                        ProductOperationView po = tracker.getProductOperation(source, trackID);
+                        if (po != null) {
+                            setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                            if (po.getState() != ProductOperationState.RUNNING) {
+                                hideProgress();
+                                break;
+                            }
+                        } else {
+                            setOutput("Product operation not found. Check logs");
                             break;
                         }
-                    } else {
-                        setOutput("Product operation not found. Check logs");
-                        break;
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            break;
+                        }
                     }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
+                } finally {
+                    outputTxtArea.getUI().getSession().getLockInstance().unlock();
                 }
             }
         });
