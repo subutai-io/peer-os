@@ -8,6 +8,7 @@ package org.safehaus.subutai.server.ui.component;
 import com.google.common.base.Strings;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -91,9 +92,10 @@ public class ProgressWindow {
     private void start() {
 
         showProgress();
-        executor.execute(new Runnable() {
+        /*executor.execute(new Runnable() {
 
             public void run() {
+
                 while (track) {
                     ProductOperationView po = tracker.getProductOperation(source, trackID);
                     if (po != null) {
@@ -113,6 +115,35 @@ public class ProgressWindow {
                     }
                 }
             }
+        });*/
+
+        VaadinSession.getCurrent().access(new Runnable() {
+            @Override
+            public void run() {
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (track) {
+                            ProductOperationView po = tracker.getProductOperation(source, trackID);
+                            if (po != null) {
+                                setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                                if (po.getState() != ProductOperationState.RUNNING) {
+                                    hideProgress();
+                                    break;
+                                }
+                            } else {
+                                setOutput("Product operation not found. Check logs");
+                                break;
+                            }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
         });
 
     }
@@ -128,7 +159,7 @@ public class ProgressWindow {
     }
 
     private void setOutput(String output) {
-        if(outputTxtArea.isConnectorEnabled()){
+        if (outputTxtArea.isConnectorEnabled()) {
             if (!Strings.isNullOrEmpty(output)) {
                 outputTxtArea.setValue(output);
                 outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
