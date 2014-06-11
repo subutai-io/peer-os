@@ -5,33 +5,32 @@
  */
 package org.safehaus.subutai.ui.cassandra.wizard;
 
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
 /**
  * @author dilshat
  */
-public class StepSetDirectories extends Panel {
+public class StepSetDirectories extends VerticalLayout {
 
 
     public StepSetDirectories(final Wizard wizard) {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        verticalLayout.setHeight(100, Unit.PERCENTAGE);
         verticalLayout.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
         grid.setSpacing(true);
         grid.setSizeFull();
 
-        Panel panel = new Panel();
         Label menu = new Label("Cluster Installation Wizard");
 
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
+        menu.setContentMode(ContentMode.HTML);
+        verticalLayout.addComponent(menu);
         grid.addComponent(menu, 0, 0, 2, 1);
-        grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+        grid.setComponentAlignment(verticalLayout, Alignment.TOP_CENTER);
 
         VerticalLayout verticalLayoutForm = new VerticalLayout();
         verticalLayoutForm.setSizeFull();
@@ -62,10 +61,9 @@ public class StepSetDirectories extends Panel {
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.getConfig().setCommitLogDirectory(commitLogTxtFld.getValue().toString().trim());
                 wizard.getConfig().setDataDirectory(dataDirTxtFld.getValue().toString().trim());
                 wizard.getConfig().setSavedCachesDirectory(savedCachesTxtFld.getValue().toString().trim());
@@ -74,9 +72,9 @@ public class StepSetDirectories extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });

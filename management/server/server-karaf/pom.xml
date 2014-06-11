@@ -35,11 +35,6 @@
             <artifactId>vaadin-themes</artifactId>
             <version>${vaadin.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-theme-compiler</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-shared</artifactId>
@@ -653,6 +648,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--Cassandra-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>cassandra-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>cassandra-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>cassandra-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>cassandra-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>cassandra-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Accumulo -->
                                <!-- <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -893,33 +915,6 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
-                                &lt;!&ndash; Cassandra &ndash;&gt;
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 

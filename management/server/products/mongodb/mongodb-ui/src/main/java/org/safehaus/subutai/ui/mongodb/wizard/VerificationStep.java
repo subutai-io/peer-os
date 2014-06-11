@@ -49,8 +49,13 @@ public class VerificationStep extends VerticalLayout {
                 UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
 //                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
                 ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                window.getWindow().addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        wizard.init();
+                    }
+                });
                 getUI().addWindow(window.getWindow());
-                wizard.init();
             }
         });
 

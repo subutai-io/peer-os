@@ -9,8 +9,9 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,27 +19,27 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class CassandraUI implements Module {
+public class CassandraUI implements PortalModule {
 
     private static Cassandra cassandraManager;
     private static AgentManager agentManager;
+    private static CommandRunner commandRunner;
     private static Tracker tracker;
     private static ExecutorService executor;
+
+    public CassandraUI(AgentManager agentManager, Cassandra cassandraManager, Tracker tracker, CommandRunner commandRunner) {
+        CassandraUI.cassandraManager = cassandraManager;
+        CassandraUI.agentManager = agentManager;
+        CassandraUI.tracker = tracker;
+        CassandraUI.commandRunner = commandRunner;
+    }
 
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        CassandraUI.tracker = tracker;
-    }
-
     public static Cassandra getCassandraManager() {
         return cassandraManager;
-    }
-
-    public void setCassandraManager(Cassandra cassandraManager) {
-        CassandraUI.cassandraManager = cassandraManager;
     }
 
     public static ExecutorService getExecutor() {
@@ -49,8 +50,8 @@ public class CassandraUI implements Module {
         return agentManager;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
-        CassandraUI.agentManager = agentManager;
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void init() {
@@ -62,6 +63,11 @@ public class CassandraUI implements Module {
         agentManager = null;
         tracker = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {

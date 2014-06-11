@@ -12,10 +12,9 @@ import org.safehaus.subutai.shared.protocol.Util;
 import java.util.Arrays;
 
 /**
- *
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -31,7 +30,7 @@ public class ConfigurationStep extends Panel {
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
@@ -43,7 +42,7 @@ public class ConfigurationStep extends Panel {
         domainNameTxtFld.setRequired(true);
         domainNameTxtFld.setMaxLength(20);
         domainNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        domainNameTxtFld.addListener(new Property.ValueChangeListener() {
+        domainNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setDomainName(event.getProperty().getValue().toString().trim());
@@ -55,7 +54,7 @@ public class ConfigurationStep extends Panel {
         dataDirectoryTxtFld.setRequired(true);
         dataDirectoryTxtFld.setMaxLength(20);
         dataDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
-        dataDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+        dataDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setDataDirectory(event.getProperty().getValue().toString().trim());
@@ -67,7 +66,7 @@ public class ConfigurationStep extends Panel {
         commitLogDirectoryTxtFld.setRequired(true);
         commitLogDirectoryTxtFld.setMaxLength(20);
         commitLogDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
-        commitLogDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+        commitLogDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setCommitLogDirectory(event.getProperty().getValue().toString().trim());
@@ -79,7 +78,7 @@ public class ConfigurationStep extends Panel {
         savedCachesDirectoryTxtFld.setRequired(true);
         savedCachesDirectoryTxtFld.setMaxLength(20);
         savedCachesDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
-        savedCachesDirectoryTxtFld.addListener(new Property.ValueChangeListener() {
+        savedCachesDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setSavedCachesDirectory(event.getProperty().getValue().toString().trim());
@@ -88,13 +87,13 @@ public class ConfigurationStep extends Panel {
 
         //configuration servers number
         ComboBox nodesCountCombo = new ComboBox("Choose number of nodes in cluster", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        nodesCountCombo.setMultiSelect(false);
+//        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate(true);
         nodesCountCombo.setTextInputAllowed(false);
         nodesCountCombo.setNullSelectionAllowed(false);
         nodesCountCombo.setValue(wizard.getConfig());
 
-        nodesCountCombo.addListener(new Property.ValueChangeListener() {
+        nodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
@@ -103,13 +102,13 @@ public class ConfigurationStep extends Panel {
 
         //configuration servers number
         ComboBox seedsCountCombo = new ComboBox("Choose number of seeds", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        seedsCountCombo.setMultiSelect(false);
+//        seedsCountCombo.setMultiSelect(false);
         seedsCountCombo.setImmediate(true);
         seedsCountCombo.setTextInputAllowed(false);
         seedsCountCombo.setNullSelectionAllowed(false);
         seedsCountCombo.setValue(wizard.getConfig());
 
-        seedsCountCombo.addListener(new Property.ValueChangeListener() {
+        seedsCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfSeeds((Integer) event.getProperty().getValue());
@@ -117,10 +116,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
                 } else if (Util.isStringEmpty(wizard.getConfig().getDomainName())) {
@@ -132,9 +130,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -162,7 +160,7 @@ public class ConfigurationStep extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

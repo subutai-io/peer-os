@@ -31,11 +31,12 @@
         <module>hivequery</module>
         <module>sqoop</module>
         <module>oozie</module>
-        <module>cassandra</module>-->
+        -->
         <module>common</module>
         <module>mongodb</module>
         <module>hadoop</module>
         <module>solr</module>
+        <module>cassandra</module>
     </modules>
 
 </project>
