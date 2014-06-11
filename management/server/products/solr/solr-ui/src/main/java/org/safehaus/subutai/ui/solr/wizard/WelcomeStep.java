@@ -5,7 +5,6 @@
  */
 package org.safehaus.subutai.ui.solr.wizard;
 
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
@@ -29,7 +28,7 @@ public class WelcomeStep extends VerticalLayout {
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/solr.png"));
+//        logoImg.setIcon(new ThemeResource("icons/modules/solr.png"));
         logoImg.setContentMode(ContentMode.HTML);
         logoImg.setHeight(150, Unit.PIXELS);
         logoImg.setWidth(150, Unit.PIXELS);
