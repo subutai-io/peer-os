@@ -13,7 +13,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.ui.solr.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;

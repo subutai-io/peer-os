@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.server.ui.component;
+package org.safehaus.subutai.ui.solr.component;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.Sizeable;

@@ -8,7 +8,7 @@ package org.safehaus.subutai.ui.solr.wizard;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.solr.Config;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.ui.solr.component.ProgressWindow;
 import org.safehaus.subutai.ui.solr.SolrUI;
 
 import java.util.UUID;
