@@ -21,16 +21,16 @@ import java.util.concurrent.ExecutorService;
  * @author dilshat
  */
 public class ProgressWindow {
-    private final Window window;
-    private final TextArea outputTxtArea;
-    private final Button ok;
-    private final Label indicator;
-    private final UUID trackID;
-    private final Tracker tracker;
-    private final String source;
-    private final VerticalLayout l = new VerticalLayout();
+    private Window window;
+    private TextArea outputTxtArea;
+    private Button ok;
+    private Label indicator;
+    private UUID trackID;
+    private Tracker tracker;
+    private String source;
+    private VerticalLayout l = new VerticalLayout();
     private volatile boolean track = true;
-    private final ExecutorService executor;
+    private ExecutorService executor;
 
     public ProgressWindow(final ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
@@ -39,7 +39,6 @@ public class ProgressWindow {
         window.setModal(true);
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
-        window.setId(System.currentTimeMillis() + "");
 
         this.executor = executor;
         this.trackID = trackID;
@@ -129,9 +128,11 @@ public class ProgressWindow {
     }
 
     private void setOutput(String output) {
-        if (!Strings.isNullOrEmpty(output)) {
-            outputTxtArea.setValue(output);
-            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+        if(outputTxtArea.isConnectorEnabled()){
+            if (!Strings.isNullOrEmpty(output)) {
+                outputTxtArea.setValue(output);
+                outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+            }
         }
     }
 
