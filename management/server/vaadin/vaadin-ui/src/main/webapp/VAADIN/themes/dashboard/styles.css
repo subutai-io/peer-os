@@ -1467,7 +1467,7 @@
 }
 
 body .dashboard.v-app .v-app-loading {
-    background-image: url(../base/common/img/loading-indicator.gif);
+    background-image: url(img/spinner.gif);
     background-repeat: no-repeat;
     background-position: 50%;
     width: 100%;
@@ -1601,7 +1601,7 @@ body .dashboard.v-app .v-app-loading {
     z-index: 30000;
     width: 31px;
     height: 31px;
-    background: transparent url(../base/common/img/loading-indicator.gif);
+    background: transparent url(img/spinner.gif);
     margin-right: 5px;
     margin-top: 5px;
 }

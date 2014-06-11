@@ -233,7 +233,7 @@ public class Manager {
             final Button stopBtn = new Button("Stop");
             final Button setCoordinatorBtn = new Button("Set As Coordinator");
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
@@ -389,7 +389,7 @@ public class Manager {
         final Button checkBtn = new Button("Check");
         final Button startBtn = new Button("Start");
         final Button stopBtn = new Button("Stop");
-        final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+        final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
         stopBtn.setEnabled(false);
         startBtn.setEnabled(false);
         progressIcon.setVisible(false);

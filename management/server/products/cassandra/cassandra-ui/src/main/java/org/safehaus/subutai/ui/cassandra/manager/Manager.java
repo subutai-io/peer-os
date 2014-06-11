@@ -229,7 +229,7 @@ public class Manager
         {
             final Agent agent = ( Agent ) it.next();
             final Embedded progressIcon = new Embedded( "",
-                new ThemeResource( "../base/common/img/loading-indicator.gif" ) );
+                new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
             final Object rowId = table.addItem( new Object[] {
                     agent.getHostname(),

@@ -379,7 +379,7 @@ public class Manager {
             final Button checkBtn = new Button( "Check" );
             final Button destroyBtn = new Button( "Destroy" );
             final Embedded progressIcon =
-                    new Embedded( "", new ThemeResource( "../base/common/img/loading-indicator.gif" ) );
+                    new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             final Label resultHolder = new Label();
             destroyBtn.setEnabled( false );
             progressIcon.setVisible( false );

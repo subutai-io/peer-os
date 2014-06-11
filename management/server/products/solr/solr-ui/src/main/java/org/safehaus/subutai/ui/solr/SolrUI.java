@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class SolrUI implements Module {
+public class SolrUI implements PortalModule {
 
     private static Solr solrManager;
     private static AgentManager agentManager;
@@ -56,6 +56,11 @@ public class SolrUI implements Module {
         agentManager = null;
         tracker = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {

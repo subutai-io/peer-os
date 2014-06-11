@@ -5,21 +5,19 @@
  */
 package org.safehaus.subutai.ui.solr.wizard;
 
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import java.util.UUID;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.solr.Config;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.solr.SolrUI;
+
+import java.util.UUID;
 
 /**
  *
  * @author dilshat
  */
-public class VerificationStep extends Panel {
+public class VerificationStep extends VerticalLayout {
 
     public VerificationStep(final Wizard wizard) {
 
@@ -32,28 +30,27 @@ public class VerificationStep extends Panel {
 
         Label confirmationLbl = new Label("<strong>Please verify the installation settings "
                 + "(you may change them by clicking on Back button)</strong><br/>");
-        confirmationLbl.setContentMode(Label.CONTENT_XHTML);
+        confirmationLbl.setContentMode(ContentMode.HTML);
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
         cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
 
         Button install = new Button("Install");
-        install.addListener(new Button.ClickListener() {
-
+        install.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = SolrUI.getSolrManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                getUI().addWindow(window.getWindow());
                 wizard.init();
             }
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });

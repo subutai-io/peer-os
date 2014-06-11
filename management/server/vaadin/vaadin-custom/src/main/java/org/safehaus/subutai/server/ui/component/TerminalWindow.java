@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.mongodb.component;
+package org.safehaus.subutai.server.ui.component;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
@@ -17,9 +17,9 @@ import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
-import org.safehaus.subutai.ui.mongodb.MongoUI;
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author dilshat
@@ -30,7 +30,11 @@ public class TerminalWindow{
     private final TextArea commandOutputTxtArea;
     private volatile int taskCount = 0;
 
-    public TerminalWindow(final Set<Agent> agents, final CommandRunner commandRunner, final AgentManager agentManager) {
+    public TerminalWindow(
+            final Set<Agent> agents,
+            final ExecutorService executor,
+            final CommandRunner commandRunner,
+            final AgentManager agentManager) {
 
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
@@ -86,7 +90,7 @@ public class TerminalWindow{
                     indicator.setVisible(true);
                     taskCount++;
                     final Command command = commandRunner.createCommand(new RequestBuilder(txtCommand.getValue().toString()), agents);
-                    MongoUI.getExecutor().execute(new Runnable() {
+                    executor.execute(new Runnable() {
                         @Override
                         public void run() {
                             commandRunner.runCommand(command, new CommandCallback() {

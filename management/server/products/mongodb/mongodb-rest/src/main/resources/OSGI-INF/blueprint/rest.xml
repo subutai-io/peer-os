@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/mongodb" id="mongodbRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="mongodbRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="mongodbRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.mongodb.services.RestServiceImpl">

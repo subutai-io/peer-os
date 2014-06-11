@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.mongodb.component;
+package org.safehaus.subutai.server.ui.component;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;

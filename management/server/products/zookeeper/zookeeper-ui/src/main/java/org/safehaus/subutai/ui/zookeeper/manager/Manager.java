@@ -326,7 +326,7 @@ public class Manager {
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);

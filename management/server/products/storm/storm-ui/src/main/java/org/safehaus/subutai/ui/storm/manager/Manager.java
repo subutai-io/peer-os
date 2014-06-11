@@ -165,7 +165,7 @@ public class Manager {
             final Button restartBtn = new Button("Restart");
             final Button destroyBtn = !server ? new Button("Destroy") : null;
             final Embedded icon = new Embedded("", new ThemeResource(
-                    "../base/common/img/loading-indicator.gif"));
+                    "img/spinner.gif"));
 
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);

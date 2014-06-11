@@ -7,7 +7,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.ui.lxcmanager.component.AgentTree;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.lxcmanager.LxcUI;
@@ -30,7 +30,7 @@ public class Cloner extends VerticalLayout {
     private final String statusLabel = "Status";
     private final String okIconSource = "icons/16/ok.png";
     private final String errorIconSource = "icons/16/cancel.png";
-    private final String loadIconSource = "../base/common/img/loading-indicator.gif";
+    private final String loadIconSource = "img/spinner.gif";
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0," +
                     "61}[0-9A-Za-z])?)*\\.?$";

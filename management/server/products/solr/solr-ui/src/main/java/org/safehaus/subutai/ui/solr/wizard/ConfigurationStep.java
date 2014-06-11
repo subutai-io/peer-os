@@ -14,7 +14,7 @@ import java.util.Arrays;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
     public ConfigurationStep(final Wizard wizard) {
 
@@ -30,7 +30,7 @@ public class ConfigurationStep extends Panel {
         clusterNameTxtFld.setRequired(true);
         clusterNameTxtFld.setMaxLength(20);
         clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
@@ -39,13 +39,13 @@ public class ConfigurationStep extends Panel {
 
         //configuration servers number
         ComboBox nodesCountCombo = new ComboBox("Choose number of nodes", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        nodesCountCombo.setMultiSelect(false);
+//        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate(true);
         nodesCountCombo.setTextInputAllowed(false);
         nodesCountCombo.setNullSelectionAllowed(false);
         nodesCountCombo.setValue(wizard.getConfig().getNumberOfNodes());
 
-        nodesCountCombo.addListener(new Property.ValueChangeListener() {
+        nodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
@@ -53,11 +53,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
 
@@ -68,9 +66,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -93,7 +91,7 @@ public class ConfigurationStep extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

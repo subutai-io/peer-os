@@ -13,14 +13,14 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.NodeType;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.subutai.ui.mongodb.MongoUI;
-import org.safehaus.subutai.ui.mongodb.component.ConfirmationDialog;
-import org.safehaus.subutai.ui.mongodb.component.ProgressWindow;
-import org.safehaus.subutai.ui.mongodb.component.TerminalWindow;
 
 import java.util.List;
 import java.util.Set;
@@ -138,7 +138,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
-                            ProgressWindow window = new ProgressWindow(MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -169,7 +169,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
-                            ProgressWindow window = new ProgressWindow(MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -199,7 +199,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
-                            ProgressWindow window = new ProgressWindow(MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -296,7 +296,7 @@ public class Manager {
             final Button startBtn = new Button("Start");
             final Button stopBtn = new Button("Stop");
             final Button destroyBtn = new Button("Destroy");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
@@ -395,7 +395,7 @@ public class Manager {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
                             UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
-                            ProgressWindow window = new ProgressWindow(MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {
@@ -478,7 +478,7 @@ public class Manager {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
-                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MongoUI.getCommandRunner(), MongoUI.getAgentManager());
+                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MongoUI.getExecutor(), MongoUI.getCommandRunner(), MongoUI.getAgentManager());
                         contentRoot.getUI().addWindow(terminal.getWindow());
                     } else {
                         show("Agent is not connected");

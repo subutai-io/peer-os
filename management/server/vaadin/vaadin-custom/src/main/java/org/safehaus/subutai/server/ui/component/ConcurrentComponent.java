@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.commandrunner.component;
+package org.safehaus.subutai.server.ui.component;
 
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;

@@ -50,7 +50,7 @@ public class HelpManager {
         // "timeline-clear");
         // addOverlay(
         // "Browse",
-        // "The Timeline component allows you to browse through and zoom the data sets infinitely.",
+        // "The Timeline org.safehaus.subutai.server.ui.component allows you to browse through and zoom the data sets infinitely.",
         // "timeline-browse").center();
         // } else if (view == TransactionsView.class) {
         // addOverlay(

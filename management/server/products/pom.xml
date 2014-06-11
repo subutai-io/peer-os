@@ -36,6 +36,7 @@
         <module>common</module>
         <module>mongodb</module>
         <module>hadoop</module>
+        <module>solr</module>
     </modules>
 
 </project>

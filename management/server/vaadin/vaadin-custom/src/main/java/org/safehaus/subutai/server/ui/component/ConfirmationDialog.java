@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.mongodb.component;
+package org.safehaus.subutai.server.ui.component;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;

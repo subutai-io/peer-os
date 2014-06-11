@@ -158,7 +158,7 @@ public class Manager {
             final Button exportBtn = new Button("Export");
             final Button destroyBtn = new Button("Destroy");
             final Embedded icon = new Embedded("", new ThemeResource(
-                    "../base/common/img/loading-indicator.gif"));
+                    "img/spinner.gif"));
             icon.setVisible(false);
 
             final List items = new ArrayList();

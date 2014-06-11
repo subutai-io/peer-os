@@ -8,10 +8,10 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.lxcmanager.LxcUI;
 import org.safehaus.subutai.ui.lxcmanager.common.Buttons;
-import org.safehaus.subutai.ui.lxcmanager.component.ConfirmationDialog;
 
 import java.util.Collection;
 import java.util.EnumMap;

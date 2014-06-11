@@ -160,7 +160,7 @@ public class Manager {
         final Button checkBtn = new Button("Check");
         final Button startBtn = new Button("Start");
         final Button stopBtn = new Button("Stop");
-        final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+        final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
 //        stopBtn.setEnabled(false);
 //        startBtn.setEnabled(false);
         progressIcon.setVisible(false);
@@ -280,7 +280,7 @@ public class Manager {
         table.removeAllItems();
 
         for (final Agent agent : agents) {
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{

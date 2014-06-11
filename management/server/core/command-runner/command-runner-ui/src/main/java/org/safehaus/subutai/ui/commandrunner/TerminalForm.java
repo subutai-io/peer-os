@@ -15,6 +15,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.shared.protocol.Response;
@@ -22,7 +23,6 @@ import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
-import org.safehaus.subutai.ui.commandrunner.component.AgentTree;
 
 import java.util.Arrays;
 import java.util.Set;

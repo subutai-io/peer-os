@@ -221,7 +221,7 @@ public class Manager {
         table.removeAllItems();
 
         for (final UUID uuid : agents) {
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
@@ -238,7 +238,7 @@ public class Manager {
         table.removeAllItems();
 
         for (final UUID uuid : agents) {
-            final Embedded progressIcon = new Embedded("", new ThemeResource("../base/common/img/loading-indicator.gif"));
+            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
