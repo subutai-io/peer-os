@@ -40,7 +40,7 @@ public class VerificationStep extends VerticalLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = SolrUI.getSolrManager().installCluster(wizard.getConfig());
-                ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                ProgressWindow window = new ProgressWindow(SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
                 window.getWindow().addCloseListener(new Window.CloseListener() {
                     @Override
                     public void windowClose(Window.CloseEvent closeEvent) {
