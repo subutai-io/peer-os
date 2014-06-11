@@ -16,7 +16,6 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author dilshat
@@ -41,7 +40,7 @@ public class ProgressWindow {
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
 
-        this.executor = Executors.newCachedThreadPool();
+        this.executor = executor;
         this.trackID = trackID;
         this.tracker = tracker;
         this.source = source;
@@ -66,7 +65,6 @@ public class ProgressWindow {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 //close window
                 track = false;
-                executor.shutdown();
                 window.close();
                 window.detach();
             }
