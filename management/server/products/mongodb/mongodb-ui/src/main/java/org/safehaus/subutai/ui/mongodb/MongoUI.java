@@ -7,6 +7,7 @@ package org.safehaus.subutai.ui.mongodb;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.Mongo;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -22,13 +23,15 @@ public class MongoUI implements PortalModule {
 
     private static Mongo mongoManager;
     private static AgentManager agentManager;
+    private static CommandRunner commandRunner;
     private static ExecutorService executor;
     private static Tracker tracker;
 
-    public MongoUI(AgentManager agentManager, Mongo mongoManager, Tracker tracker) {
+    public MongoUI(AgentManager agentManager, Mongo mongoManager, Tracker tracker, CommandRunner commandRunner) {
         MongoUI.agentManager = agentManager;
         MongoUI.mongoManager = mongoManager;
         MongoUI.tracker = tracker;
+        MongoUI.commandRunner = commandRunner;
     }
 
     public static Tracker getTracker() {
@@ -45,6 +48,10 @@ public class MongoUI implements PortalModule {
 
     public static AgentManager getAgentManager() {
         return agentManager;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void init() {

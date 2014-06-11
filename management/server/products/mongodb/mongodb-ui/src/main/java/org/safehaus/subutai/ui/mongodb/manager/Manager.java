@@ -7,6 +7,7 @@ package org.safehaus.subutai.ui.mongodb.manager;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
@@ -14,10 +15,12 @@ import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
+import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import org.safehaus.subutai.ui.mongodb.MongoUI;
 import org.safehaus.subutai.ui.mongodb.component.ConfirmationDialog;
 import org.safehaus.subutai.ui.mongodb.component.ProgressWindow;
+import org.safehaus.subutai.ui.mongodb.component.TerminalWindow;
 
 import java.util.List;
 import java.util.Set;
@@ -468,21 +471,21 @@ public class Manager {
         table.setSelectable(false);
         table.setImmediate(true);
 
-        /*table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
-                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
-                        MgmtApplication.addCustomWindow(terminal);
+                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MongoUI.getCommandRunner(), MongoUI.getAgentManager());
+                        contentRoot.getUI().addWindow(terminal.getWindow());
                     } else {
                         show("Agent is not connected");
                     }
                 }
             }
-        });*/
+        });
         return table;
     }
 
