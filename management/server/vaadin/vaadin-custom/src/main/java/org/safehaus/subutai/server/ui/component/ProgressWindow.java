@@ -16,6 +16,7 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author dilshat
@@ -39,7 +40,7 @@ public class ProgressWindow {
         window.setClosable(false);
         window.setWidth(650, Sizeable.Unit.PIXELS);
 
-        this.executor = executor;
+        this.executor = Executors.newCachedThreadPool();
         this.trackID = trackID;
         this.tracker = tracker;
         this.source = source;
@@ -93,29 +94,24 @@ public class ProgressWindow {
         executor.execute(new Runnable() {
 
             public void run() {
-                outputTxtArea.getUI().getSession().getLockInstance().lock();
-                try {
-                    while (track) {
-                        ProductOperationView po = tracker.getProductOperation(source, trackID);
-                        if (po != null) {
-                            System.out.println(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                            setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                            if (po.getState() != ProductOperationState.RUNNING) {
-                                hideProgress();
-                                break;
-                            }
-                        } else {
-                            setOutput("Product operation not found. Check logs");
+                while (track) {
+                    ProductOperationView po = tracker.getProductOperation(source, trackID);
+                    if (po != null) {
+                        System.out.println(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                        setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+                        if (po.getState() != ProductOperationState.RUNNING) {
+                            hideProgress();
                             break;
                         }
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            break;
-                        }
+                    } else {
+                        setOutput("Product operation not found. Check logs");
+                        break;
                     }
-                } finally {
-                    outputTxtArea.getUI().getSession().getLockInstance().unlock();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
                 }
             }
         });
