@@ -11,7 +11,6 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -36,7 +35,7 @@ public class ConfigurationStep extends VerticalLayout {
         if (!Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
             clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
         }
-        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+        clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
@@ -44,20 +43,19 @@ public class ConfigurationStep extends VerticalLayout {
         });
 
         //configuration servers number
-//        int[] slaves = new int[50];
         List<Integer> s = new ArrayList<Integer>();
         for (int i = 0; i < 50; i++) {
-            s.add( i );
+            s.add(i);
         }
 
         ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", s);
-        slaveNodesComboBox.setMultiSelect(false);
+//        slaveNodesComboBox.setMultiSelect(false);
         slaveNodesComboBox.setImmediate(true);
         slaveNodesComboBox.setTextInputAllowed(false);
         slaveNodesComboBox.setNullSelectionAllowed(false);
         slaveNodesComboBox.setValue(wizard.getConfig().getCountOfSlaveNodes());
 
-        slaveNodesComboBox.addListener(new Property.ValueChangeListener() {
+        slaveNodesComboBox.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setCountOfSlaveNodes((Integer) event.getProperty().getValue());
@@ -66,13 +64,13 @@ public class ConfigurationStep extends VerticalLayout {
 
         //configuration replication factor
         ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s);
-        replicationFactorComboBox.setMultiSelect(false);
+//        replicationFactorComboBox.setMultiSelect(false);
         replicationFactorComboBox.setImmediate(true);
         replicationFactorComboBox.setTextInputAllowed(false);
         replicationFactorComboBox.setNullSelectionAllowed(false);
         replicationFactorComboBox.setValue(wizard.getConfig().getReplicationFactor());
 
-        replicationFactorComboBox.addListener(new Property.ValueChangeListener() {
+        replicationFactorComboBox.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 wizard.getConfig().setReplicationFactor((Integer) event.getProperty().getValue());
@@ -83,7 +81,7 @@ public class ConfigurationStep extends VerticalLayout {
         domain.setInputPrompt(wizard.getConfig().getDomainName());
         domain.setValue(wizard.getConfig().getDomainName());
         domain.setMaxLength(20);
-        domain.addListener(new Property.ValueChangeListener() {
+        domain.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 String value = event.getProperty().getValue().toString().trim();
@@ -94,11 +92,9 @@ public class ConfigurationStep extends VerticalLayout {
         });
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please provide cluster name");
                 } else {
@@ -108,9 +104,9 @@ public class ConfigurationStep extends VerticalLayout {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -135,7 +131,7 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
     private void show(String notification) {
-        /*getWindow().showNotification(notification);*/
+        Notification.show(notification);
     }
 
 }

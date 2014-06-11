@@ -17,8 +17,9 @@
     <modules>
        <!--
        <module>accumulo</module>
-        <module>solr</module>
-        <module>mahout</module>
+       <module>storm</module>
+       <module>zookeeper</module>
+       <module>mahout</module>
         <module>pig</module>
         <module>lucene</module>
         <module>flume</module>
@@ -26,13 +27,11 @@
         <module>shark</module>
         <module>presto</module>
         <module>hbase</module>
-        <module>zookeeper</module>
         <module>hive</module>
         <module>hivequery</module>
         <module>sqoop</module>
         <module>oozie</module>
-        <module>cassandra</module>
-        <module>storm</module>-->
+        <module>cassandra</module>-->
         <module>common</module>
         <module>mongodb</module>
         <module>hadoop</module>

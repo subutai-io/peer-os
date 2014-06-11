@@ -7,6 +7,8 @@ package org.safehaus.subutai.ui.hadoop.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
 
 import java.util.UUID;
@@ -36,21 +38,25 @@ public class VerificationStep extends VerticalLayout {
         cfgView.addStringCfg("Replication factor", wizard.getConfig().getReplicationFactor() + "");
 
         Button install = new Button("Install");
-        install.addListener(new Button.ClickListener() {
-
+        install.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = HadoopUI.getHadoopManager().installCluster(wizard.getConfig());
-//                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
-                wizard.init();
+                ProgressWindow window = new ProgressWindow(HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                window.getWindow().addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        wizard.init();
+                    }
+                });
+                getUI().addWindow(window.getWindow());
             }
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });

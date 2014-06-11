@@ -39,9 +39,9 @@ public class WelcomeStep extends VerticalLayout {
         grid.addComponent(next, 6, 4, 6, 4);
         grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-        next.addListener(new Button.ClickListener() {
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.init();
                 wizard.next();
             }

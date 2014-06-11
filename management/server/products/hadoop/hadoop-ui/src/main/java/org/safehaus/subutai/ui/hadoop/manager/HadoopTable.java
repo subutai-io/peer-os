@@ -5,7 +5,9 @@ import com.vaadin.data.Item;
 import com.vaadin.event.Action;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.Window;
 import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
@@ -69,9 +71,17 @@ public class HadoopTable extends TreeTable {
                     Item row = getItem(target);
 
                     indicator.setVisible(true);
+
                     UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
-//                    MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
-                    refreshDataSource();
+                    ProgressWindow window = new ProgressWindow(HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                    window.getWindow().addCloseListener(new Window.CloseListener() {
+                        @Override
+                        public void windowClose(Window.CloseEvent closeEvent) {
+                            refreshDataSource();
+                        }
+                    });
+                    getUI().addWindow(window.getWindow());
+
                 } else if (action == EXCLUDE_ITEM_ACTION) {
                     Item row = getItem(target);
 
@@ -79,8 +89,8 @@ public class HadoopTable extends TreeTable {
                     SlaveNode taskTracker = (SlaveNode) row.getItemProperty(JOBTRACKER_PROPERTY).getValue();
 
                     indicator.setVisible(true);
-                    HadoopUI.getHadoopManager().blockDataNode(dataNode.getCluster(), dataNode.getAgent());
 
+                    HadoopUI.getHadoopManager().blockDataNode(dataNode.getCluster(), dataNode.getAgent());
                     UUID trackID = HadoopUI.getHadoopManager().blockTaskTracker(taskTracker.getCluster(), taskTracker.getAgent());
                     HadoopUI.getExecutor().execute(new WaitTask(trackID, new CompleteEvent() {
 

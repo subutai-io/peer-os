@@ -48,9 +48,9 @@ public class Manager extends VerticalLayout {
 
     private Button getButtonRefresh() {
         refreshButton = new Button("Refresh");
-        refreshButton.addListener(new Button.ClickListener() {
+        refreshButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 table.refreshDataSource();
             }
         });
