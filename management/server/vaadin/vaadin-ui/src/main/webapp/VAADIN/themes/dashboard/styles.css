@@ -1470,8 +1470,8 @@ body .dashboard.v-app .v-app-loading {
     background-image: url(img/spinner.gif);
     background-repeat: no-repeat;
     background-position: 50%;
-    width: 100%;
-    height: 100%;
+    width: 0px;
+    height: 0px;
 }
 
 .dashboard .v-ui {
@@ -4064,6 +4064,8 @@ body .dashboard.v-app .v-app-loading {
     opacity: 0.8;
     filter: alpha(opacity=80);
     display: none;
+    width: 0px;
+    height: 0px;
 }
 
 .dashboard .v-widget {
