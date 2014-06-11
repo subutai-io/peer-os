@@ -37,7 +37,7 @@ public class ProgressWindow {
         window = new Window("Operation progress", l);
         window.setModal(true);
         window.setClosable(false);
-        window.setWidth(600, Sizeable.Unit.PIXELS);
+        window.setWidth(650, Sizeable.Unit.PIXELS);
 
         this.executor = executor;
         this.trackID = trackID;
@@ -93,6 +93,7 @@ public class ProgressWindow {
         executor.execute(new Runnable() {
 
             public void run() {
+                window.getUI().getSession().getLockInstance();
                 while (track) {
                     ProductOperationView po = tracker.getProductOperation(source, trackID);
                     if (po != null) {
