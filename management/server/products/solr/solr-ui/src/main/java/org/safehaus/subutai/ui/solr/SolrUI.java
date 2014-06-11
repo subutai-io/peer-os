@@ -7,6 +7,7 @@ package org.safehaus.subutai.ui.solr;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -23,12 +24,14 @@ public class SolrUI implements PortalModule {
     private static Solr solrManager;
     private static AgentManager agentManager;
     private static Tracker tracker;
+    private static CommandRunner commandRunner;
     private static ExecutorService executor;
 
-    public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager) {
+    public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager, CommandRunner commandRunner) {
         SolrUI.agentManager = agentManager;
         SolrUI.tracker = tracker;
         SolrUI.solrManager = solrManager;
+        SolrUI.commandRunner = commandRunner;
     }
 
     public static Tracker getTracker() {
@@ -45,6 +48,10 @@ public class SolrUI implements PortalModule {
 
     public static AgentManager getAgentManager() {
         return agentManager;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void init() {
