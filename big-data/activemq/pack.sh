@@ -42,10 +42,10 @@ sed -i '/keyStore=.*/c\          keyStore="/opt/apache-activemq-5.9.1/conf/broke
 sed -i '/trustStore=.*/c\          trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword= "'$passwd'"/>\' activemq.xml
 
 #Deleting and copied files
-mv activemq.xml $fileName/opt/conf/
-rm $fileName/opt/conf/broker*
-rm $fileName/opt/conf/client*
-
+mv $BASE/SSL/activemq.xml $BASE/$fileName/opt/apache-activemq-5.9.1/conf/
+cd $BASE/$fileName/opt/apache-activemq-5.9.1/conf/
+rm broker*
+rm client*
 cd $BASE
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
