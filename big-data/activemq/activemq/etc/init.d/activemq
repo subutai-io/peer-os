@@ -13,7 +13,7 @@ start)
         then
                 echo "Apache Activemq is already running.."
         else
-		$ACTIVEMQ_BIN/activemq start
+		sudo $ACTIVEMQ_BIN/activemq start
                 echo "Apache Activemq is starting.."
         fi
 
@@ -22,25 +22,17 @@ stop)
 
         if [ -f $ACTIVEMQ_PIDFILE ];
         then
-		$ACTIVEMQ_BIN/activemq stop
-                echo "Apache Activemq is stopping now.."
-                rm $ACTIVEMQ_PIDFILE
+		echo "Apache Activemq is stopping now.."
+		sudo $ACTIVEMQ_BIN/activemq stop
         else
                 echo "Apache Activemq is not running now.."
         fi
         ;;
 restart)
-	$ACTIVEMQ_BIN/activemq restart
+	sudo $ACTIVEMQ_BIN/activemq restart
         ;;
 status)
-
-        if [ -f $ACTIVEMQ_PIDFILE ];
-        then
-		$ACTIVEMQ_BIN/activemq status
-        else
-                echo "Apache Activemq is not running now.."
-        fi
+	sudo $ACTIVEMQ_BIN/activemq status
         ;;
-
 esac
 
