@@ -1,75 +1,46 @@
 #!/bin/sh
 # Starts and stops hive thrift server.
 
-NAME=activemq
-PIDFILE=/var/run/$NAME/$NAME.pid
-DESC="Apache Activemq Broker"
-CMD_PATT="activemq-0"
-. /lib/lsb/init-functions
-
-is_running()
-{
-    if [ -f $PIDFILE ]; then
-        pid=`cat $PIDFILE`
-        grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
-        return 1
-    fi
-    return 3
-}
+ACTIVEMQ_HOME="/opt/apache-activemq-5.9.1"
+ACTIVEMQ_BIN=$ACTIVEMQ_HOME"/bin/"
+ACTIVEMQ_DATA="/opt/apache-activemq-5.9.1/data"
+hostname=$(hostname)
+ACTIVEMQ_PIDFILE="$ACTIVEMQ_DATA/activemq-`hostname`.pid"
 
 case "$1" in
 start)
-        is_running
-        stat=$?
-        case "$stat" in
-                0) echo $DESC" is already running..." ;;
-                1) echo "Could not access pidfile for $DESC" ;;
-                *)
-                echo "Starting "$DESC" ... "
-                [ -e `dirname "$PIDFILE"` ] || \
-                        install -d -m755 `dirname $PIDFILE`
-        	DAEMON="/opt/apache-activemq-5.9.1/bin/activemq"
-        	ARGS=" start"
-                start-stop-daemon --start --make-pidfile --background --pidfile  "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
-        ;;
-        esac
-;;
+        if [ -f $ACTIVEMQ_PIDFILE ];
+        then
+                echo "Apache Activemq is already running.."
+        else
+		$ACTIVEMQ_BIN/activemq start
+                echo "Apache Activemq is starting.."
+        fi
 
+;;
 stop)
-        is_running
-        stat=$?
-        case "$stat" in
-        0)
-                echo "Stopping" $DESC
-                echo "PID: " $PIDFILE
-                start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-                rm -f "$PIDFILE";;
-        1) echo "Could not access pidfile for $DESC" ;;
-        *) echo $DESC" is not running..." ;;
-        esac
-;;
 
+        if [ -f $ACTIVEMQ_PIDFILE ];
+        then
+		$ACTIVEMQ_BIN/activemq stop
+                echo "Apache Activemq is stopping now.."
+                rm $ACTIVEMQ_PIDFILE
+        else
+                echo "Apache Activemq is not running now.."
+        fi
+        ;;
 restart)
-        $0 stop
-        $0 start
-;;
-
+	$ACTIVEMQ_BIN/activemq restart
+        ;;
 status)
-        is_running
-        stat=$?
-        case "$stat" in
-                0) log_success_msg "$DESC is running" ;;
-                1) log_failure_msg "could not access pidfile for $DESC" ;;
-                *) log_success_msg "$DESC is not running" ;;
-        esac
-        exit "$stat"
-;;
-kill)
-	start-stop-daemon -K -p "$PIDFILE" -R TERM/30/KILL/5 >/dev/null
-	rm -f "$PIDFILE"
-	echo $DESC "is killed..."
-;;
-*)
-        echo "Usage: $0 {start|stop|restart|status|kill}"
-        exit 1
+
+        if [ -f $ACTIVEMQ_PIDFILE ];
+        then
+		$ACTIVEMQ_BIN/activemq status
+        else
+                echo "Apache Activemq is not running now.."
+        fi
+        ;;
+
 esac
+

@@ -21,11 +21,14 @@ echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 cp -a $SOURCE/etc/ $BASE/$fileName/ 
-rm -rf $BASE/$fileName/opt/*
-cp -a $SOURCE/opt/* $BASE/$fileName/opt/
+cp -a $SOURCE/opt $BASE/$fileName/
 
 wget http://apache.bilkent.edu.tr/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
-rm $fileName/opt/README
+cd $fileName/opt
+tar xzvf apache-activemq-5.9.1-bin.tar.gz
+rm apache-activemq-5.9.1-bin.tar.gz
+rm README
+cd $BASE
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
