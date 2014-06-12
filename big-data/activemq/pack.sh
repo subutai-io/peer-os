@@ -30,9 +30,22 @@ rm apache-activemq-5.9.1-bin.tar.gz
 rm README
 cd $BASE
 
+#Read SSL Passwords for Activemq broker
+passwd=$(cat SSLPassword/password.dat)
+echo "SSL Password is: " $passwd
+sleep 2
+#Change activemq.xml
+sed -i '/keyStore=.*/c\          keyStore="/opt/apache-activemq-5.9.1/conf/broker.ks" keyStorePassword= "'$passwd'"\' activemq.xml
+sed -i '/trustStore=.*/c\          trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword= "'$passwd'"/>\' activemq.xml
+
+#Deleting and copied files
+cp activemq.xml $fileName/opt/conf/
+rm $fileName/opt/conf/broker*
+rm $fileName/opt/conf/client*
+
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
+lineVersion=$(sed d$lineNumberVersion!d $fileName/DEBIAN/control)
 linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
 
 version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
