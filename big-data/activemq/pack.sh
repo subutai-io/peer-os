@@ -39,8 +39,6 @@ sed -i '/trustStore=.*/c\      trustStore="/opt/apache-activemq-5.9.1/conf/broke
 
 #Deleting and copied files
 mv activemq.xml $fileName/opt/apache-activemq-5.9.1/conf/
-rm $fileName/opt/apache-activemq-5.9.1/conf/broker*
-rm $fileName/opt/apache-activemq-5.9.1/conf/client*
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 echo $lineNumberVersion
