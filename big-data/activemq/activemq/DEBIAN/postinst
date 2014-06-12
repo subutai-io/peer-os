@@ -12,3 +12,5 @@ else
         echo "hadoop home is being inserted"
         echo "export ACTIVEMQ_HOME="$activemqHomeEcho >> $FilePath
 fi
+. $FilePath
+sudo service activemq start
