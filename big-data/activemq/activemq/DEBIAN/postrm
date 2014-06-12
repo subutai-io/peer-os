@@ -26,4 +26,8 @@ if [ -f "/etc/init.d/activemq" ]; then
 	rm  /etc/init.d/activemq
 fi
 
+if [ -f "/opt/apache-activemq-5.9.1" ]; then
+        sudo rm -rf /opt/apache-activemq-5.9.1
+fi
+
 . $FilePath
