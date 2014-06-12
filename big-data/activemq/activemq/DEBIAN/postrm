@@ -2,8 +2,6 @@
 
 # Exit on error
 set -e
-#stopping services
-sudo service activemq stop
 
 # Remove Activemq Files and Folders
 if [ -d "/opt/apache-activemq-5.9.1" ]; then
