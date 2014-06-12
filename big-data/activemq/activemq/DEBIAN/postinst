@@ -13,4 +13,4 @@ else
         echo "export ACTIVEMQ_HOME="$activemqHomeEcho >> $FilePath
 fi
 . $FilePath
-sudo service activemq start
+sudo $activemqHomeEcho/bin/activemq start
