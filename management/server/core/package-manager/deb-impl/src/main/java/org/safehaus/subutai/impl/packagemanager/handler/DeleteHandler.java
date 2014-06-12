@@ -11,11 +11,8 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public class DeleteHandler extends AbstractHandler<Boolean> {
 
-    private final String hostname;
-
     public DeleteHandler(DebPackageManager pm, String hostname) {
-        super(pm);
-        this.hostname = hostname;
+        super(pm, hostname);
     }
 
     @Override
@@ -24,7 +21,7 @@ public class DeleteHandler extends AbstractHandler<Boolean> {
         Collection<PackageInfo> col = h.performAction();
         if(col == null) return Boolean.FALSE;
 
-        Agent a = packageManager.getAgentManager().getAgentByHostname(hostname);
+        Agent a = getAgent();
         if(a == null) return false;
 
         RequestBuilder rb = new RequestBuilder("rm " + packageManager.getFilename())

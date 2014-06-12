@@ -6,11 +6,8 @@ import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 
 public class FindHandler extends AbstractHandler<Collection<PackageInfo>> {
 
-    private final String hostname;
-
     public FindHandler(DebPackageManager pm, String hostname) {
-        super(pm);
-        this.hostname = hostname;
+        super(pm, hostname);
     }
 
     @Override

@@ -28,8 +28,7 @@ public interface PackageManager {
     Collection<PackageInfo> listPackages(String hostname, String namePattern);
 
     /**
-     * Retrieves previously saved packages information. Host name is used as a
-     * key for DB querying.
+     * Retrieves previously saved packages information on a given host.
      *
      * @param hostname
      * @return Previously saved collection of package information objects.
@@ -48,8 +47,7 @@ public interface PackageManager {
     Collection<PackageInfo> savePackagesInfo(String hostname);
 
     /**
-     * Deletes previously saved packages information. Host name is used as key
-     * for DB querying.
+     * Deletes previously saved packages information on a given host.
      *
      * @param hostname
      * @return <code>true</code> if package information is successfully deleted,

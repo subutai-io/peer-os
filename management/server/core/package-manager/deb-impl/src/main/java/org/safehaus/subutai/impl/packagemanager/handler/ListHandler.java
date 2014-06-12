@@ -11,14 +11,12 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
-    private final String hostname;
     private Pattern lineStartPattern = Pattern.compile("^[a-z]{2,3}\\s+");
     private String namePattern;
     private boolean fromFile;
 
     public ListHandler(DebPackageManager pm, String hostname) {
-        super(pm);
-        this.hostname = hostname;
+        super(pm, hostname);
     }
 
     public String getNamePattern() {
@@ -39,7 +37,7 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
     @Override
     public Collection<PackageInfo> performAction() {
-        Agent agent = packageManager.getAgentManager().getAgentByHostname(hostname);
+        Agent agent = getAgent();
         if(agent == null) return null;
 
         AgentRequestBuilder rb = new AgentRequestBuilder(agent, makeCommand());

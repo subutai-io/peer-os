@@ -11,16 +11,13 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public class SaveHandler extends AbstractHandler<Collection<PackageInfo>> {
 
-    private final String hostname;
-
     public SaveHandler(DebPackageManager pm, String hostname) {
-        super(pm);
-        this.hostname = hostname;
+        super(pm, hostname);
     }
 
     @Override
     public Collection<PackageInfo> performAction() {
-        Agent a = packageManager.getAgentManager().getAgentByHostname(hostname);
+        Agent a = getAgent();
         if(a != null) {
             RequestBuilder rb = new RequestBuilder(
                     "dpkg -l > " + packageManager.getFilename())
