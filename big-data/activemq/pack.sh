@@ -12,13 +12,9 @@ echo $SOURCE
 echo $TARGET
 cd $BASE
 
-mv activemq.xml SSL/
-
 if ls *.deb ; then
 	rm  *.deb
 fi
-
-
 
 fileName=`ls | grep ksks | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
@@ -35,28 +31,29 @@ rm README
 cd $BASE
 
 #Read SSL Passwords for Activemq broker
-cd $BASE/SSL
 passwd=$(cat password.dat)
-echo "SSL Password is: " $passwd
-sleep 2
+
 #Change activemq.xml
-sed -i '/keyStore=.*/c\          keyStore="/opt/apache-activemq-5.9.1/conf/broker.ks" keyStorePassword= "'$passwd'"\' activemq.xml
-sed -i '/trustStore=.*/c\          trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword= "'$passwd'"/>\' activemq.xml
+sed -i '/keyStore=.*/c\      keyStore="/opt/apache-activemq-5.9.1/conf/broker.ks" keyStorePassword="'$passwd'"' activemq.xml
+sed -i '/trustStore=.*/c\      trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword="'$passwd'"/>' activemq.xml
 
 #Deleting and copied files
-mv $BASE/SSL/activemq.xml $BASE/$fileName/opt/apache-activemq-5.9.1/conf/
-cd $BASE/$fileName/opt/apache-activemq-5.9.1/conf/
-rm broker*
-rm client*
-cd $BASE
+mv activemq.xml $fileName/opt/apache-activemq-5.9.1/conf/
+rm $fileName/opt/apache-activemq-5.9.1/conf/broker*
+rm $fileName/opt/apache-activemq-5.9.1/conf/client*
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
+echo $lineNumberVersion
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-lineVersion=$(sed d$lineNumberVersion!d $fileName/DEBIAN/control)
+echo $lineNumberPackage
+lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
+echo $lineVersion
 linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+echo $inePackage
 
 version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
 package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
+
 echo $version
 echo $package
 
