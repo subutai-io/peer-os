@@ -8,6 +8,8 @@ import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteHandler extends AbstractHandler<Boolean> {
 
@@ -30,6 +32,11 @@ public class DeleteHandler extends AbstractHandler<Boolean> {
                 new HashSet<>(Arrays.asList(a)));
         packageManager.getCommandRunner().runCommand(cmd);
         return cmd.hasSucceeded();
+    }
+
+    @Override
+    Logger getLogger() {
+        return LoggerFactory.getLogger(DeleteHandler.class);
     }
 
 }

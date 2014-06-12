@@ -8,6 +8,8 @@ import org.safehaus.subutai.api.packagemanager.*;
 import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 import org.safehaus.subutai.impl.packagemanager.info.*;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
 
@@ -67,10 +69,15 @@ public class ListHandler extends AbstractHandler<Collection<PackageInfo>> {
         return null;
     }
 
+    @Override
+    Logger getLogger() {
+        return LoggerFactory.getLogger(ListHandler.class);
+    }
+
     private String makeCommand() {
         StringBuilder sb = new StringBuilder();
         if(fromFile) {
-            sb.append("cd ").append(packageManager.getLocation()).append("; ");
+            sb.append("cd ").append(packageManager.getLocation()).append(" && ");
             sb.append("cat ").append(packageManager.getFilename());
         } else {
             sb.append("dpkg -l");

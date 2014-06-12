@@ -3,6 +3,7 @@ package org.safehaus.subutai.impl.packagemanager.handler;
 import java.util.concurrent.Callable;
 import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
 
 public abstract class AbstractHandler<T> implements Callable<T> {
 
@@ -15,6 +16,8 @@ public abstract class AbstractHandler<T> implements Callable<T> {
     }
 
     public abstract T performAction();
+
+    abstract Logger getLogger();
 
     @Override
     public T call() throws Exception {
