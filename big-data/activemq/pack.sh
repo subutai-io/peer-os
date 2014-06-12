@@ -12,6 +12,8 @@ echo $SOURCE
 echo $TARGET
 cd $BASE
 
+mv activemq.xml SSL/
+
 if ls *.deb ; then
 	rm  *.deb
 fi
@@ -31,7 +33,8 @@ rm README
 cd $BASE
 
 #Read SSL Passwords for Activemq broker
-passwd=$(cat SSLPassword/password.dat)
+cd $BASE/SSL
+passwd=$(cat password.dat)
 echo "SSL Password is: " $passwd
 sleep 2
 #Change activemq.xml
@@ -39,9 +42,11 @@ sed -i '/keyStore=.*/c\          keyStore="/opt/apache-activemq-5.9.1/conf/broke
 sed -i '/trustStore=.*/c\          trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword= "'$passwd'"/>\' activemq.xml
 
 #Deleting and copied files
-cp activemq.xml $fileName/opt/conf/
+mv activemq.xml $fileName/opt/conf/
 rm $fileName/opt/conf/broker*
 rm $fileName/opt/conf/client*
+
+cd $BASE
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
