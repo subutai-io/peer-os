@@ -49,9 +49,10 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         editors.addStyleName("borderless");
         editors.addStyleName("editors");
 
-        final VerticalLayout center = new VerticalLayout();
+        final CssLayout center = new CssLayout();
         center.setSizeFull();
         center.setCaption("Modules");
+        center.addStyleName("catalog");
         editors.addComponent(center);
 
         VerticalLayout titleAndDrafts = new VerticalLayout();
@@ -59,7 +60,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         titleAndDrafts.setSpacing(true);
         titleAndDrafts.addStyleName("drafts");
         center.addComponent(titleAndDrafts);
-        center.setComponentAlignment(titleAndDrafts, Alignment.MIDDLE_CENTER);
+//        center.setComponentAlignment(titleAndDrafts, Alignment.MIDDLE_CENTER);
 
         Label draftsTitle = new Label("Modules");
         draftsTitle.addStyleName("h1");
@@ -80,7 +81,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         return editors;
     }
 
-    private void addCloseEvent(TabSheet editors){
+    private void addCloseEvent(TabSheet editors) {
         editors.setCloseHandler(new TabSheet.CloseHandler() {
             @Override
             public void onTabClose(TabSheet tabsheet, final Component tabContent) {
