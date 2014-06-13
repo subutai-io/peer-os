@@ -52,6 +52,7 @@ $hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-$
 $hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-$hadoopVersion/conf/dfs.exclude
 
 # mapred-site.xml
+cp /opt/hadoop-$hadoopVersion/conf/mapred-site.xml.template /opt/hadoop-$hadoopVersion/conf/mapred-site.xml
 $hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapreduce.framework.name yarn
 
 # yarn-site.xml
