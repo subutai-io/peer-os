@@ -49,18 +49,12 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         editors.addStyleName("borderless");
         editors.addStyleName("editors");
 
-        final CssLayout center = new CssLayout();
-        center.setSizeFull();
-        center.setCaption("Modules");
-        center.addStyleName("catalog");
-        editors.addComponent(center);
-
         VerticalLayout titleAndDrafts = new VerticalLayout();
         titleAndDrafts.setSizeUndefined();
+        titleAndDrafts.setCaption("Modules");
         titleAndDrafts.setSpacing(true);
         titleAndDrafts.addStyleName("drafts");
-        center.addComponent(titleAndDrafts);
-//        center.setComponentAlignment(titleAndDrafts, Alignment.MIDDLE_CENTER);
+        editors.addComponent(titleAndDrafts);
 
         Label draftsTitle = new Label("Modules");
         draftsTitle.addStyleName("h1");
@@ -70,24 +64,14 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
         modulesLayout = new HorizontalLayout();
         modulesLayout.setSpacing(true);
+        modulesLayout.addStyleName("catalog");
         titleAndDrafts.addComponent(modulesLayout);
 
         for (PortalModule module : getPortalModuleService().getModules()) {
             addModule(module);
         }
 
-//        addCloseEvent(editors);
-
         return editors;
-    }
-
-    private void addCloseEvent(TabSheet editors) {
-        editors.setCloseHandler(new TabSheet.CloseHandler() {
-            @Override
-            public void onTabClose(TabSheet tabsheet, final Component tabContent) {
-//                for()
-            }
-        });
     }
 
     public void autoCreate(PortalModule module) {
@@ -103,14 +87,13 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
     }
 
     private void addModule(final PortalModule module) {
-        VerticalLayout moduleLayout = new VerticalLayout();
+        CssLayout moduleLayout = new CssLayout();
         moduleLayout.setId(module.getId());
         moduleLayout.setWidth(null);
         moduleLayout.addStyleName("create");
         Button create = new Button(module.getName());
         create.addStyleName("default");
         moduleLayout.addComponent(create);
-        moduleLayout.setComponentAlignment(create, Alignment.MIDDLE_CENTER);
 
         modulesLayout.addComponent(moduleLayout);
         create.addClickListener(new ClickListener() {
