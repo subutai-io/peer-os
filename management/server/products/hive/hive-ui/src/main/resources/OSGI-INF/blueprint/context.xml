@@ -14,7 +14,7 @@
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="tracker"/>
-        <argument ref="hbaseManager"/>
+        <argument ref="manager"/>
         <argument ref="hadoopManager"/>
         <argument ref="commandRunner"/>
     </bean>
