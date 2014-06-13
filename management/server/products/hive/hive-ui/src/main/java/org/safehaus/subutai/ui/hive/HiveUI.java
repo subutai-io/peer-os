@@ -25,8 +25,8 @@ public class HiveUI implements PortalModule {
             AgentManager agentManager,
             Tracker tracker,
             Hive manager,
-            CommandRunner commandRunner,
-            Hadoop hadoopManager
+            Hadoop hadoopManager,
+            CommandRunner commandRunner
     ) {
         HiveUI.agentManager = agentManager;
         HiveUI.tracker = tracker;
