@@ -56,7 +56,6 @@ cp /opt/hadoop-$hadoopVersion/conf/mapred-site.xml.template /opt/hadoop-$hadoopV
 $hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapreduce.framework.name yarn
 
 # yarn-site.xml
-$hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml mapreduce.framework.name yarn
 $hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.resource-tracker.address localhost:8025
 $hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.scheduler.address localhost:8030
 $hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.address localhost:8040
