@@ -306,8 +306,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId()
-                );
+                        response.getTransportId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -341,7 +340,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         try {
             if ( response != null && response.getTransportId() != null ) {
                 for ( Agent agent : agents.asMap().values() ) {
-                    if ( response.getTransportId().equalsIgnoreCase( agent.getTransportId() ) ) {
+                    if ( agent.getTransportId().startsWith( response.getTransportId() ) ) {
                         agents.invalidate( agent.getUuid() );
                         notifyAgentListeners = true;
                         return;

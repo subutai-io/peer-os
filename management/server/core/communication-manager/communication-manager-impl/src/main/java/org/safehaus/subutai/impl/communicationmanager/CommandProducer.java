@@ -49,9 +49,10 @@ class CommandProducer implements Runnable {
             connection = communicationManagerImpl.createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination destination = session.createQueue( command.getUuid().toString() );
+            Destination destination = session.createTopic( command.getUuid().toString() );
             producer = session.createProducer( destination );
-            producer.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
+            producer.setDeliveryMode( communicationManagerImpl.isPersistentMessages() ? DeliveryMode.PERSISTENT :
+                                      DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
             String json = CommandJson.getJson( command );
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) ) {

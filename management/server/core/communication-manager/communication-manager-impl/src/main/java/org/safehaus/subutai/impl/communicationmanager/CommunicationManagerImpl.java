@@ -16,16 +16,9 @@ import javax.jms.Session;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
 import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.region.policy.AbortSlowAckConsumerStrategy;
-import org.apache.activemq.broker.region.policy.DeadLetterStrategy;
-import org.apache.activemq.broker.region.policy.PolicyEntry;
-import org.apache.activemq.broker.region.policy.PolicyMap;
-import org.apache.activemq.broker.region.policy.SharedDeadLetterStrategy;
 import org.apache.activemq.pool.PooledConnectionFactory;
 
 import com.google.common.base.Preconditions;
@@ -41,7 +34,6 @@ public class CommunicationManagerImpl implements CommunicationManager {
     /**
      * broker
      */
-    private BrokerService broker;
     /**
      * pooled connection factory to hold connection to broker
      */
@@ -55,46 +47,17 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     private ExecutorService exec;
     /**
-     * bind address
+     * broker URL
      */
-    private String amqBindAddress;
+    private String amqUrl;
     /**
      * service queue to listen on responses from agents
      */
-    private String amqServiceQueue;
-    /**
-     * ssl certificate name
-     */
-    private String amqBrokerCertificateName;
-    /**
-     * ssl truststore name
-     */
-    private String amqBrokerTrustStoreName;
-
-    /**
-     * ssl certificate password
-     */
-    private String amqBrokerCertificatePwd;
-    /**
-     * ssl truststore password
-     */
-    private String amqBrokerTrustStorePwd;
-    /**
-     * broker port
-     */
-    private int amqPort;
+    private String amqServiceTopic;
     /**
      * ttl of message from server to agent
      */
     private int amqMaxMessageToAgentTtlSec;
-    /**
-     * ttl for offline agents after which they get evicted
-     */
-    private int amqMaxOfflineAgentTtlSec;
-    /**
-     * ttl for slow acking agents after which they get evicted
-     */
-    private int amqMaxSlowAgentConnectionTtlSec;
     /**
      * size of connection pool to broker
      */
@@ -105,13 +68,23 @@ public class CommunicationManagerImpl implements CommunicationManager {
     private int amqMaxSenderPoolSize;
 
     /**
-     * timeout to drop inactive queues
+     * Use persistent or non-persistent delivery mode for outgoing messages
      */
-    private int amqInactiveQueuesDropTimeoutSec;
+    private boolean persistentMessages;
 
 
     public Connection createConnection() throws JMSException {
         return pooledConnectionFactory.createConnection();
+    }
+
+
+    boolean isPersistentMessages() {
+        return persistentMessages;
+    }
+
+
+    public void setPersistentMessages( final boolean persistentMessages ) {
+        this.persistentMessages = persistentMessages;
     }
 
 
@@ -125,48 +98,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
     }
 
 
-    public void setAmqPort( int amqPort ) {
-        this.amqPort = amqPort;
-    }
-
-
-    public void setAmqBindAddress( String amqBindAddress ) {
-        this.amqBindAddress = amqBindAddress;
-    }
-
-
-    public void setAmqServiceQueue( String amqServiceQueue ) {
-        this.amqServiceQueue = amqServiceQueue;
-    }
-
-
-    public void setAmqBrokerCertificateName( String amqBrokerCertificateName ) {
-        this.amqBrokerCertificateName = amqBrokerCertificateName;
-    }
-
-
-    public void setAmqBrokerTrustStoreName( String amqBrokerTrustStoreName ) {
-        this.amqBrokerTrustStoreName = amqBrokerTrustStoreName;
-    }
-
-
-    public void setAmqBrokerCertificatePwd( String amqBrokerCertificatePwd ) {
-        this.amqBrokerCertificatePwd = amqBrokerCertificatePwd;
-    }
-
-
-    public void setAmqBrokerTrustStorePwd( String amqBrokerTrustStorePwd ) {
-        this.amqBrokerTrustStorePwd = amqBrokerTrustStorePwd;
-    }
-
-
-    public void setAmqMaxOfflineAgentTtlSec( int amqMaxOfflineAgentTtlSec ) {
-        this.amqMaxOfflineAgentTtlSec = amqMaxOfflineAgentTtlSec;
-    }
-
-
-    public void setAmqMaxSlowAgentConnectionTtlSec( int amqMaxSlowAgentConnectionTtlSec ) {
-        this.amqMaxSlowAgentConnectionTtlSec = amqMaxSlowAgentConnectionTtlSec;
+    public void setAmqServiceTopic( String amqServiceTopic ) {
+        this.amqServiceTopic = amqServiceTopic;
     }
 
 
@@ -180,8 +113,8 @@ public class CommunicationManagerImpl implements CommunicationManager {
     }
 
 
-    public void setAmqInactiveQueuesDropTimeoutSec( int amqInactiveQueuesDropTimeoutSec ) {
-        this.amqInactiveQueuesDropTimeoutSec = amqInactiveQueuesDropTimeoutSec;
+    public void setAmqUrl( final String amqUrl ) {
+        this.amqUrl = amqUrl;
     }
 
 
@@ -231,25 +164,20 @@ public class CommunicationManagerImpl implements CommunicationManager {
     }
 
 
-    public boolean isBrokerStarted() {
-        return broker.isStarted();
-    }
-
-
     public Collection getListeners() {
         return communicationMessageListener.getListeners();
     }
 
 
     /**
-     * Initialized communication manager
+     * Initializes communication manager
      */
     public void init() {
 
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( amqBindAddress ), "Bind address is null or empty" );
-        Preconditions.checkArgument( amqBindAddress.matches( Common.HOSTNAME_REGEX ), "Invalid bind address" );
-        Preconditions.checkArgument( amqPort >= 1024 && amqPort <= 65536, "Port must be n range 1024 and 65536" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( amqServiceQueue ), "Service queue name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( amqUrl ), "ActiveMQ  URL is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( amqServiceTopic ), "Service queue name is null or empty" );
+        Preconditions.checkArgument( amqMaxMessageToAgentTtlSec >= 1,
+                "Max TTL of message to agents must be greater than 0" );
         Preconditions.checkArgument( amqMaxPooledConnections >= 1, "Max Pool Connections size must be greater than 0" );
         Preconditions.checkArgument( amqMaxSenderPoolSize >= 1, "Max Sender Pool size must be greater than 0" );
 
@@ -261,14 +189,6 @@ public class CommunicationManagerImpl implements CommunicationManager {
             }
         }
 
-        if ( broker != null ) {
-            try {
-                broker.stop();
-                broker.waitUntilStopped();
-            }
-            catch ( Exception e ) {
-            }
-        }
         if ( communicationMessageListener != null ) {
             try {
                 communicationMessageListener.destroy();
@@ -278,51 +198,16 @@ public class CommunicationManagerImpl implements CommunicationManager {
         }
 
         try {
-            System.setProperty( "javax.net.ssl.keyStore",
-                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerCertificateName );
-            System.setProperty( "javax.net.ssl.keyStorePassword", this.amqBrokerCertificatePwd );
-            System.setProperty( "javax.net.ssl.trustStore",
-                    System.getProperty( "karaf.base" ) + "/certs/" + this.amqBrokerTrustStoreName );
-            System.setProperty( "javax.net.ssl.trustStorePassword", this.amqBrokerTrustStorePwd );
-
-            broker = new BrokerService();
-            //***policy
-            PolicyMap policy = new PolicyMap();
-            PolicyEntry allDestinationsPolicyEntry = new PolicyEntry();
-            //abort consumers not acking message within this period of time
-            AbortSlowAckConsumerStrategy slowConsumerStrategy = new AbortSlowAckConsumerStrategy();
-            slowConsumerStrategy.setMaxTimeSinceLastAck( amqMaxSlowAgentConnectionTtlSec * 1000 );
-            allDestinationsPolicyEntry.setSlowConsumerStrategy( slowConsumerStrategy );
-            //drop expired messages instead of sending to DLQ
-            DeadLetterStrategy deadLetterStrategy = new SharedDeadLetterStrategy();
-            deadLetterStrategy.setProcessExpired( false );
-            allDestinationsPolicyEntry.setDeadLetterStrategy( deadLetterStrategy );
-            //drop queues inactive fo this period of time
-            allDestinationsPolicyEntry.setGcInactiveDestinations( true );
-            allDestinationsPolicyEntry.setInactiveTimoutBeforeGC( amqInactiveQueuesDropTimeoutSec * 1000 );
-            broker.setSchedulePeriodForDestinationPurge( 30000 );
-            //
-            policy.setDefaultEntry( allDestinationsPolicyEntry );
-            //unsubscribe durable subscribers that are offline for this amount of time
-            broker.setOfflineDurableSubscriberTimeout( amqMaxOfflineAgentTtlSec * 1000 );
-            //
-            broker.setDestinationPolicy( policy );
-            //***policy
-            broker.setPersistent( true );
-            broker.setUseJmx( false );
-            broker.addConnector( "nio+ssl://" + this.amqBindAddress + ":" + this.amqPort + "?needClientAuth=true" );
-            broker.start();
-            broker.waitUntilStarted();
             //executor service setup
             exec = Executors.newFixedThreadPool( amqMaxSenderPoolSize );
             //pooled connection factory setup
-            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "vm://localhost?create=false" );
+            ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( amqUrl );
             amqFactory.setCheckForDuplicates( true );
             pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
             pooledConnectionFactory.setMaxConnections( amqMaxPooledConnections );
             pooledConnectionFactory.start();
             setupListener();
-            LOG.log( Level.INFO, "ActiveMQ started..." );
+            LOG.log( Level.INFO, "Communication Manager started..." );
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in init", ex );
@@ -336,15 +221,15 @@ public class CommunicationManagerImpl implements CommunicationManager {
     private void setupListener() {
         try {
             Connection connection = pooledConnectionFactory.createConnection();
-            //don not close this connection otherwise server listener will be closed
+            //do not close this connection otherwise server listener will be closed
             connection.start();
             Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination adminQueue = session.createQueue( this.amqServiceQueue );
+            Destination adminQueue = session.createTopic( this.amqServiceTopic );
             MessageConsumer consumer = session.createConsumer( adminQueue );
             communicationMessageListener = new CommunicationMessageListener();
             consumer.setMessageListener( communicationMessageListener );
 
-            Destination advisoryDestination = AdvisorySupport.getProducerAdvisoryTopic( adminQueue );
+            Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
         }
@@ -355,20 +240,13 @@ public class CommunicationManagerImpl implements CommunicationManager {
 
 
     /**
-     * Disposes communcation manager
+     * Disposes communication manager
      */
     public void destroy() {
         try {
             if ( pooledConnectionFactory != null ) {
                 try {
                     pooledConnectionFactory.stop();
-                }
-                catch ( Exception e ) {
-                }
-            }
-            if ( broker != null ) {
-                try {
-                    broker.stop();
                 }
                 catch ( Exception e ) {
                 }
@@ -382,7 +260,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
             }
             exec.shutdown();
 
-            LOG.log( Level.INFO, "ActiveMQ stopped..." );
+            LOG.log( Level.INFO, "Communication Manager stopped..." );
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in destroy", ex );
