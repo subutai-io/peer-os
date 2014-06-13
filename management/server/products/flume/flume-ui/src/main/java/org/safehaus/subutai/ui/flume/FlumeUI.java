@@ -2,57 +2,60 @@ package org.safehaus.subutai.ui.flume;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.api.flume.Flume;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class FlumeUI implements Module {
+public class FlumeUI implements PortalModule {
 
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Flume manager;
     private static Hadoop hadoopManager;
     private static ExecutorService executor;
+    private static CommandRunner commandRunner;
+
+    public FlumeUI(
+            AgentManager agentManager,
+            Tracker tracker,
+            Flume manager,
+            CommandRunner commandRunner,
+            Hadoop hadoopManager) {
+        FlumeUI.agentManager = agentManager;
+        FlumeUI.tracker = tracker;
+        FlumeUI.manager = manager;
+        FlumeUI.commandRunner = commandRunner;
+        FlumeUI.hadoopManager = hadoopManager;
+    }
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        FlumeUI.agentManager = agentManager;
     }
 
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        FlumeUI.tracker = tracker;
-    }
-
     public static Flume getManager() {
         return manager;
-    }
-
-    public void setManager(Flume manager) {
-        FlumeUI.manager = manager;
     }
 
     public static Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        FlumeUI.hadoopManager = hadoopManager;
-    }
-
     public static ExecutorService getExecutor() {
         return executor;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void init() {
@@ -64,7 +67,13 @@ public class FlumeUI implements Module {
         tracker = null;
         manager = null;
         hadoopManager = null;
+        commandRunner = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return org.safehaus.subutai.api.hadoop.Config.PRODUCT_KEY;
     }
 
     public String getName() {

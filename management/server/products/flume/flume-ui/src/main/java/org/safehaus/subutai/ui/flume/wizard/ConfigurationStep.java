@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.flume.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -11,7 +10,7 @@ import org.safehaus.subutai.ui.flume.FlumeUI;
 
 import java.util.*;
 
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
     private final ComboBox hadoopClusters;
     private final TwinColSelect select;
@@ -28,7 +27,6 @@ public class ConfigurationStep extends Panel {
         hadoopClusters = new ComboBox("Hadoop cluster");
         select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
-        hadoopClusters.setMultiSelect(false);
         hadoopClusters.setImmediate(true);
         hadoopClusters.setTextInputAllowed(false);
         hadoopClusters.setRequired(true);
@@ -55,19 +53,19 @@ public class ConfigurationStep extends Panel {
             Config hadoopInfo = (Config) hadoopClusters.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             select.setContainerDataSource(
-                    new BeanItemContainer<Agent>(
+                    new BeanItemContainer<>(
                             Agent.class, hadoopInfo.getAllNodes())
             );
         }
 
-        hadoopClusters.addListener(new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Config hadoopInfo = (Config) event.getProperty().getValue();
                     select.setValue(null);
                     select.setContainerDataSource(
-                            new BeanItemContainer<Agent>(
+                            new BeanItemContainer<>(
                                     Agent.class, hadoopInfo.getAllNodes())
                     );
                     wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
@@ -82,13 +80,13 @@ public class ConfigurationStep extends Panel {
         select.setImmediate(true);
         select.setLeftColumnCaption("Available Nodes");
         select.setRightColumnCaption("Selected Nodes");
-        select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        select.setWidth(100, Unit.PERCENTAGE);
         select.setRequired(true);
         if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
             select.setValue(wizard.getConfig().getNodes());
         }
-        select.addListener(new Property.ValueChangeListener() {
-
+        select.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
@@ -98,11 +96,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
                 } else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
@@ -114,9 +110,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -139,7 +135,7 @@ public class ConfigurationStep extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

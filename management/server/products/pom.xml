@@ -22,7 +22,6 @@
        <module>mahout</module>
         <module>pig</module>
         <module>lucene</module>
-        <module>flume</module>
         <module>spark</module>
         <module>shark</module>
         <module>presto</module>
@@ -37,6 +36,7 @@
         <module>solr</module>
         <module>cassandra</module>
         <module>hbase</module>
+        <module>flume</module>
     </modules>
 
 </project>

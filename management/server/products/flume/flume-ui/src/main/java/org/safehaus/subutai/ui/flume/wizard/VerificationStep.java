@@ -1,15 +1,15 @@
 package org.safehaus.subutai.ui.flume.wizard;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-
-import java.util.UUID;
-
 import org.safehaus.subutai.api.flume.Config;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.flume.FlumeUI;
 
-public class VerificationStep extends Panel {
+import java.util.UUID;
+
+public class VerificationStep extends VerticalLayout {
 
     public VerificationStep(final Wizard wizard) {
 
@@ -22,7 +22,7 @@ public class VerificationStep extends Panel {
 
         Label confirmationLbl = new Label("<strong>Please verify the installation settings "
                 + "(you may change them by clicking on Back button)</strong><br/>");
-        confirmationLbl.setContentMode(Label.CONTENT_XHTML);
+        confirmationLbl.setContentMode(ContentMode.HTML);
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
@@ -31,21 +31,25 @@ public class VerificationStep extends Panel {
         }
 
         Button install = new Button("Install");
-        install.addListener(new Button.ClickListener() {
-
+        install.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = FlumeUI.getManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
-                wizard.init();
+                ProgressWindow window = new ProgressWindow(FlumeUI.getExecutor(), FlumeUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                window.getWindow().addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        wizard.init();
+                    }
+                });
+                getUI().addWindow(window.getWindow());
             }
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });

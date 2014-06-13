@@ -156,10 +156,9 @@ public class Manager {
         controlsContent.addComponent(checkClustersBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addListener(new Button.ClickListener() {
-
+        destroyClusterBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
                     ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
                             "Yes", "No");
@@ -183,7 +182,6 @@ public class Manager {
                     show("Please, select cluster");
                 }
             }
-
         });
 
         controlsContent.addComponent(destroyClusterBtn);
