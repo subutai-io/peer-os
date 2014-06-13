@@ -729,6 +729,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--Hive-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hive-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hive-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hive-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hive-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hive-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Accumulo -->
                                 <!-- <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
@@ -969,33 +996,6 @@
                                  <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
                                      <artifactId>oozie-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-
-                                 &lt;!&ndash; Hive &ndash;&gt;
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hive-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hive-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hive-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hive-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hive-rest</artifactId>
                                      <version>${project.version}</version>
                                  </artifactItem>
 

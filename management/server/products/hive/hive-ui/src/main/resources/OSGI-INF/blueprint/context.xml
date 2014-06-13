@@ -12,12 +12,13 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.hive.HiveUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="manager" ref="manager"/>
-        <property name="hadoopManager" ref="hadoopManager"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="hbaseManager"/>
+        <argument ref="hadoopManager"/>
+        <argument ref="commandRunner"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
 
 </blueprint>

@@ -73,7 +73,7 @@ public class FlumeUI implements PortalModule {
 
     @Override
     public String getId() {
-        return org.safehaus.subutai.api.hadoop.Config.PRODUCT_KEY;
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {

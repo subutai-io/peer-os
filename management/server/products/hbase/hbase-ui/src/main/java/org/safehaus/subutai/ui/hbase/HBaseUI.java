@@ -32,7 +32,11 @@ public class HBaseUI implements PortalModule {
     private static CommandRunner commandRunner;
     private static ExecutorService executor;
 
-    public HBaseUI(AgentManager agentManager, Tracker tracker, HBase hbaseManager, CommandRunner commandRunner) {
+    public HBaseUI(
+            AgentManager agentManager,
+            Tracker tracker,
+            HBase hbaseManager,
+            CommandRunner commandRunner) {
         HBaseUI.agentManager = agentManager;
         HBaseUI.tracker = tracker;
         HBaseUI.hbaseManager = hbaseManager;

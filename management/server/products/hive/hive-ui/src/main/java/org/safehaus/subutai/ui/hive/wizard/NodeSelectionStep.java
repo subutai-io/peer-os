@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.hive.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -33,23 +32,22 @@ public class NodeSelectionStep extends Panel {
         serverNode = makeServerNodeComboBox(wizard);
         select = makeClientNodeSelector(wizard);
 
-        hadoopClusters.setMultiSelect(false);
         hadoopClusters.setImmediate(true);
         hadoopClusters.setTextInputAllowed(false);
         hadoopClusters.setRequired(true);
         hadoopClusters.setNullSelectionAllowed(false);
-        hadoopClusters.addListener(new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent e) {
+            public void valueChange(Property.ValueChangeEvent event) {
                 serverNode.removeAllItems();
                 select.setValue(null);
-                if (e.getProperty().getValue() != null) {
-                    Config hadoopInfo = (Config) e.getProperty().getValue();
+                if (event.getProperty().getValue() != null) {
+                    Config hadoopInfo = (Config) event.getProperty().getValue();
                     for (Agent a : hadoopInfo.getAllNodes()) {
                         serverNode.addItem(a);
                         serverNode.setItemCaption(a, a.getHostname());
                     }
-                    select.setContainerDataSource(new BeanItemContainer<Agent>(
+                    select.setContainerDataSource(new BeanItemContainer<>(
                                     Agent.class, hadoopInfo.getAllNodes())
                     );
                     // do select if values exist
@@ -75,11 +73,9 @@ public class NodeSelectionStep extends Panel {
         if (info != null) hadoopClusters.setValue(info);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
                     show("Select Hadoop cluster");
                 } else if (wizard.getConfig().getServer() == null) {
@@ -93,9 +89,9 @@ public class NodeSelectionStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -114,12 +110,12 @@ public class NodeSelectionStep extends Panel {
         content.addComponent(select);
         content.addComponent(buttons);
 
-        addComponent(layout);
+        setContent(layout);
 
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
     private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
@@ -130,13 +126,13 @@ public class NodeSelectionStep extends Panel {
         tcs.setImmediate(true);
         tcs.setLeftColumnCaption("Available Nodes");
         tcs.setRightColumnCaption("Selected Nodes");
-        tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        tcs.setWidth(100, Unit.PERCENTAGE);
         tcs.setRequired(true);
         if (!Util.isCollectionEmpty(wizard.getConfig().getClients())) {
             tcs.setValue(wizard.getConfig().getClients());
         }
-        tcs.addListener(new Property.ValueChangeListener() {
-
+        tcs.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Set<Agent> clients = new HashSet();
@@ -150,13 +146,12 @@ public class NodeSelectionStep extends Panel {
 
     private ComboBox makeServerNodeComboBox(final Wizard wizard) {
         ComboBox cb = new ComboBox("Server node");
-        cb.setMultiSelect(false);
         cb.setImmediate(true);
         cb.setTextInputAllowed(false);
         cb.setRequired(true);
         cb.setNullSelectionAllowed(false);
-        cb.addListener(new Property.ValueChangeListener() {
-
+        cb.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 Agent serverNode = (Agent) event.getProperty().getValue();
                 wizard.getConfig().setServer(serverNode);

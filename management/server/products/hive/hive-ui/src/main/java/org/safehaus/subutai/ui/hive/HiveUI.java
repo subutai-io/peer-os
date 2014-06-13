@@ -2,57 +2,61 @@ package org.safehaus.subutai.ui.hive;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.api.hive.Hive;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HiveUI implements Module {
+public class HiveUI implements PortalModule {
 
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Hive manager;
     private static Hadoop hadoopManager;
+    private static CommandRunner commandRunner;
     private static ExecutorService executor;
+
+    public HiveUI(
+            AgentManager agentManager,
+            Tracker tracker,
+            Hive manager,
+            CommandRunner commandRunner,
+            Hadoop hadoopManager
+    ) {
+        HiveUI.agentManager = agentManager;
+        HiveUI.tracker = tracker;
+        HiveUI.manager = manager;
+        HiveUI.hadoopManager = hadoopManager;
+        HiveUI.commandRunner = commandRunner;
+    }
 
     public static AgentManager getAgentManager() {
         return agentManager;
-    }
-
-    public void setAgentManager(AgentManager agentManager) {
-        HiveUI.agentManager = agentManager;
     }
 
     public static Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
-        HiveUI.tracker = tracker;
-    }
-
     public static Hive getManager() {
         return manager;
-    }
-
-    public void setManager(Hive manager) {
-        HiveUI.manager = manager;
     }
 
     public static Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        HiveUI.hadoopManager = hadoopManager;
-    }
-
     public static ExecutorService getExecutor() {
         return executor;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public void init() {
@@ -65,6 +69,11 @@ public class HiveUI implements Module {
         manager = null;
         hadoopManager = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {
