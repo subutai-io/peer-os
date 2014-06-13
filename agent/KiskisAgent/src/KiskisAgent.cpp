@@ -17,12 +17,12 @@
  *  @brief     KiskisAgent.cpp
  *  @class     KiskisAgent.cpp
  *  @details   This is KiskisAgent Software main process.
- *  		   It's main responsibility is that send and receive messages from ActiveMQ broker.
+ *  		   It's main responsibility is that send and receive messages from MQTT broker.
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
  *  @version   1.0.6
- *  @date      May 12 , 2014
+ *  @date      Jun 13 , 2014
  */
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
@@ -37,8 +37,8 @@
 #include "KAUserID.h"
 #include "KAResponsePack.h"
 #include "KAThread.h"
-#include "KALogger.h"
 #include "KAConnection.h"
+#include "KALogger.h"
 #include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -58,11 +58,11 @@ string toString(int intcont)
 
 /**
  *  \details   KiskisAgent's settings.xml is read by this function.
- *  		   url: Broker address is fetched. (for instance: url = "failover://(ssl://localhost:61167))
+ *  		   url: Broker address is fetched. (for instance: url = "localhost:8883))
  *  		   connectionOptions: ReconnectDelay and Reconnect feature settings.
  *  		   loglevel: Debugging Loglevel. (0-8)
  */
-int getSettings(string & url, string & connectionOptions, string & loglevel, string & clientpasswd)
+int getSettings(string & url,int & port, string & connectionOptions, string & loglevel, string & clientpasswd)
 {
 	pugi::xml_document doc;
 
@@ -74,11 +74,8 @@ int getSettings(string & url, string & connectionOptions, string & loglevel, str
 	url = doc.child("Settings").child_value("BrokerIP") ;		//reading url
 	loglevel = doc.child("Settings").child_value("log_level") ;		//reading loglevel
 	clientpasswd = doc.child("Settings").child_value("clientpasswd") ;		//reading cleintpassword
-	url = "failover:ssl://" + url +":"+  doc.child("Settings").child_value("Port");		//combine url and port
-	connectionOptions = "{reconnect:" + (string)(doc.child("Settings").child_value("reconnect")) + ", "
-			"reconnect_timeout:" + doc.child("Settings").child_value("reconnect_timeout") +
-			", reconnect_interval_max:" + doc.child("Settings").child_value("reconnect_interval_max") + "}";
-	//combine connectionOptions string
+	port = atoi(doc.child("Settings").child_value("Port"));
+	connectionOptions = doc.child("Settings").child_value("reconnect_timeout");
 	return 0;
 }
 
@@ -266,7 +263,7 @@ bool getIpAddresses(vector<string>& myips)
 }
 
 /**
- *  \details   threadSend function sends string messages in the Shared Memory buffer to ActiveMQ Broker.
+ *  \details   threadSend function sends string messages in the Shared Memory buffer to MQTT Broker.
  *  		   This is a thread with working concurrently with main thread.
  *  		   It is main purpose that checking the Shared Memory Buffer in Blocking mode and sending them to Broker
  */
@@ -283,7 +280,7 @@ void threadSend(message_queue *mq,KAConnection *connection,KALogger* logMain)
 			mq->receive(&str[0],str.size(),recvd_size,priority);
 			logMain->writeLog(7,logMain->setLogData("<KiskisAgent>::<threadsend>",
 					"New message comes to messagequeue to be sent:",str));
-			connection->sendMessage(str);
+			connection->sendMessage(str.c_str());
 			str.clear();
 		}
 		message_queue::remove("message_queue");
@@ -344,18 +341,20 @@ bool checkExecutionTimeout(unsigned int* startsec,bool* overflag,unsigned int* e
 
 /**
  *  \details   This function is the main thread of KiskisAgent.
- *  		   It sends and receives messages from ActiveMQ broker.
+ *  		   It sends and receives messages from MQTT broker.
  *  		   It is also responsible from creation new process.
  */
 int main(int argc,char *argv[],char *envp[])
 {
 	string url,connectionOptions,loglevel;
+	int port;
 	string clientpasswd;
 	string Uuid,macaddress,hostname,parentHostname;
 	int isLxc = -1;
 	vector<string> ipadress;
-	string serveraddress="SERVICE_QUEUE";
-	string clientaddress;
+	string serverAddress="SERVICE_TOPIC";		//Default SERVICE TOPIC
+	string broadcastAddress="BROADCAST_TOPIC";	//DEFAULT BROADCAST TOPIC
+	string clientAddress;
 	KAThread thread;
 	int level;
 
@@ -384,7 +383,7 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.setLogLevel(7);
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is starting.."));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Settings.xml is reading.."));
-	if(!getSettings(url,connectionOptions,loglevel,clientpasswd))
+	if(!getSettings(url,port,connectionOptions,loglevel,clientpasswd))
 	{
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","URL:",url));
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","ConnectionOptions:",connectionOptions));
@@ -457,17 +456,23 @@ int main(int argc,char *argv[],char *envp[])
 		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent IpAddresses:",ipadress[i]));
 	}
 
-	activemq::library::ActiveMQCPP::initializeLibrary();
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStore","/etc/ksks-agent/config/client_ks.pem");
-	decaf::lang::System::setProperty("decaf.net.ssl.keyStorePassword",clientpasswd.c_str());
-	decaf::lang::System::setProperty("decaf.net.ssl.trustStore", "/etc/ksks-agent/config/client_ts.pem" );
+	clientAddress = Uuid;
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Url:",url));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serverAddress));
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientAddress));
 
-	clientaddress = Uuid;
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection url:",url));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serveraddress));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientaddress));
-	KAConnection connection(url,serveraddress,clientaddress);
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with ActiveMQ Broker: ",url));
+	class KAConnection *connection;
+	int rc;
+	mosqpp::lib_init();
+	connection = new KAConnection(Uuid.c_str(),
+			clientAddress.c_str(),
+			serverAddress.c_str(),
+			broadcastAddress.c_str(),
+			url.c_str(),
+			port);
+
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with MQTT Broker: ",url,
+			" Port: ",toString(port)));
 	KACommand command;
 	KAResponsePack response;
 	string input;
@@ -478,21 +483,36 @@ int main(int argc,char *argv[],char *envp[])
 	response.setParentHostname(parentHostname);
 	response.setMacAddress(macaddress);
 	response.setUuid(Uuid); 	//setting Uuid for response messages.
-	if(!connection.openSession())
+	int reconnectDelay = atoi(connectionOptions.c_str()) - 4;
+	if(reconnectDelay <= 0)
 	{
-		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection could not be established withActiveMQ Broker: ",url));
-		logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","KiskisAgent is closing.."));
-		logMain.closeLogFile();
-		return 400;
+		logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Reconnect Delay cannot be under 0 !! Using default timeout(10)."
+				,toString(reconnectDelay)));
+		reconnectDelay = 10;
 	}
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Successfully opened with ActiveMQ Broker: ",url));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to ActiveMQ Broker.."));
+	while(true)
+	{
+		if(!connection->openSession())
+		{
+			sleep(reconnectDelay);
+			logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying connect to MQTT Broker:",url));
+			if(connection->reConnect())
+				break;
+		}
+		else
+			break;
+	}
+
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Successfully opened with MQTT Broker: ",url));
+
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to MQTT Broker.."));
 
 	/*sending registration message*/
 	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),
 			response.getParentHostname());
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
-	connection.sendMessage(sendout);
+
+	connection->sendMessage(sendout);
 
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Shared Memory MessageQueue is initializing.."));
 	message_queue messageQueue
@@ -502,7 +522,7 @@ int main(int argc,char *argv[],char *envp[])
 			,2500             //max message size
 	);
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Thread is starting.."));
-	boost::thread thread1(threadSend,&messageQueue,&connection,&logMain);
+	boost::thread thread1(threadSend,&messageQueue,connection,&logMain);
 	/* Change the file mode mask */
 	umask(0);
 
@@ -536,7 +556,7 @@ int main(int argc,char *argv[],char *envp[])
 				response.setMacAddress(macaddress);
 				string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),
 						macaddress,hostname,parentHostname,command.getSource(),command.getTaskUuid());
-				connection.sendMessage(resp);
+				connection->sendMessage(resp);
 
 				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 				start = boost::posix_time::second_clock::local_time();	//Reset HeartBeat Default Timeout values
@@ -557,7 +577,7 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						command.deserialize(queueElement);
 						string resp = response.createInQueueMessage(Uuid,command.getTaskUuid());
-						connection.sendMessage(resp);
+						connection->sendMessage(resp);
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","IN_QUEUE Response:", resp));
 					}
 				}
@@ -583,10 +603,19 @@ int main(int argc,char *argv[],char *envp[])
 					}
 				}
 			}
-			if(connection.fetchMessage(input)) 	//check and wait if new message comes?
+			rc = connection->loop(1); // checking the status of the new message
+			if(rc)
+			{
+				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","RC:",toString(rc)));
+				connection->reconnect();
+			}
+			if(connection->checkMessageStatus()) //checking new message arrived ?
 			{
 				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","total running process:",toString(currentProcess)));
-				if(command.deserialize(input))
+				connection->resetMessageStatus(); //reseting message status
+				input = connection->getMessage(); //fetching message..
+
+				if(command.deserialize(input))	 //deserialize the message
 				{
 					logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","New Message is received"));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","New Message:",input));
@@ -614,7 +643,7 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						fstream file;	//opening uuid.txt
 						file.open("/etc/ksks-agent/config/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-						file << input;
+						file << input << endl ;
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Received Message to internal currentProcess!"));
 						file.close();
 					}
@@ -638,7 +667,7 @@ int main(int argc,char *argv[],char *envp[])
 						response.setMacAddress(macaddress);
 						string resp = response.createHeartBeatMessage(Uuid,command.getRequestSequenceNumber(),
 								macaddress,hostname,parentHostname,command.getSource(),command.getTaskUuid());
-						connection.sendMessage(resp);
+						connection->sendMessage(resp);
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","HeartBeat Response:", resp));
 					}
 					else if(command.getType()=="TERMINATE_REQUEST")
@@ -651,13 +680,13 @@ int main(int argc,char *argv[],char *envp[])
 							if(retstatus == 0) //termination is successfully done
 							{
 								string resp = response.createTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
-								connection.sendMessage(resp);
+								connection->sendMessage(resp);
 								logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate success Response:", resp));
 							}
 							else if (retstatus == -1) //termination is failed
 							{
 								string resp = response.createFailTerminateMessage(Uuid,command.getRequestSequenceNumber(),command.getSource(),command.getTaskUuid());
-								connection.sendMessage(resp);
+								connection->sendMessage(resp);
 								logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Terminate Fail Response! Received PID:",toString(command.getPid())));
 							}
 						}
@@ -669,9 +698,22 @@ int main(int argc,char *argv[],char *envp[])
 				}
 				else
 				{
-					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
-					connection.sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),819,
-							"Failed to Parse Json!!!","",command.getSource(),command.getTaskUuid()));
+					logMain.writeLog(3,logMain.setLogData("<KiskisAgent>","Failed at parsing Json String: ",input));
+
+					if(input.size() >= 10000)
+					{
+						connection->sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),1,
+								"Command Size is greater than Maximum Size !! ","",command.getSource(),command.getTaskUuid()));
+						connection->sendMessage(response.createExitMessage(Uuid,9999999,command.getRequestSequenceNumber(),2,
+								command.getSource(),command.getTaskUuid(),1));
+					}
+					else
+					{
+						connection->sendMessage(response.createResponseMessage(Uuid,9999999,command.getRequestSequenceNumber(),1,
+								"Command is not a valid Json string !!","",command.getSource(),command.getTaskUuid()));
+						connection->sendMessage(response.createExitMessage(Uuid,9999999,command.getRequestSequenceNumber(),2,
+								command.getSource(),command.getTaskUuid(),1));
+					}
 				}
 			}
 			else
@@ -683,8 +725,18 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						ofstream file3("/etc/ksks-agent/config/commandQueue2.txt");
 						input = "";
-						getline(file2,str2);
-						input = str2;
+						int count=0;
+						do
+						{
+							getline(file2,str2);
+							if(str2.find("{") != string::npos)
+								count++;
+							input=input + str2 + "\n";
+							str+=str2;
+							if(str2.find("}") != string::npos)
+								count--;
+						}while(count>0);
+						//					file3.open",fstream::in | fstream::out | fstream::app);
 						while(getline(file2,str2))
 						{
 							file3 << str2 << endl;
@@ -717,6 +769,6 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","KiskisAgent is closing Successfully.."));
 	logMain.closeLogFile();
 	kill(getpid(),SIGKILL);
-	activemq::library::ActiveMQCPP::shutdownLibrary();
+	mosqpp::lib_cleanup();
 	return 0;
 }
