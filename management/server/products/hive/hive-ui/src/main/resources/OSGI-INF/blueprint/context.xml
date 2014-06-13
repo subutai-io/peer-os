@@ -9,6 +9,8 @@
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.hive.HiveUI"
           init-method="init" destroy-method="destroy">
