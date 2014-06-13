@@ -13,4 +13,3 @@ else
         echo "export ACTIVEMQ_HOME="$activemqHomeEcho >> $FilePath
 fi
 . $FilePath
-sudo $activemqHomeEcho/bin/activemq start
