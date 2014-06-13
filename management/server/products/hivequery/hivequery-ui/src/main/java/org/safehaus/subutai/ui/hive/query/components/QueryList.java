@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.hive.query.components;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.Select;
 import org.safehaus.subutai.api.hive.query.Config;
 import org.safehaus.subutai.ui.hive.query.HiveQueryUI;
 
@@ -41,7 +40,7 @@ public class QueryList extends ListSelect {
         }
 
         setContainerDataSource(beans);
-        setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
+        setItemCaptionMode(ItemCaptionMode.PROPERTY);
         setItemCaptionPropertyId("name");
     }
 }

@@ -25,8 +25,6 @@
         <module>spark</module>
         <module>shark</module>
         <module>presto</module>
-
-        <module>hivequery</module>
         <module>sqoop</module>
         <module>oozie</module>
         -->
@@ -38,6 +36,7 @@
         <module>hbase</module>
         <module>flume</module>
         <module>hive</module>
+        <module>hivequery</module>
     </modules>
 
 </project>

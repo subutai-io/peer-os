@@ -1,6 +1,5 @@
 package org.safehaus.subutai.ui.hive.query.components;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.TreeTable;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -17,7 +16,7 @@ public class HadoopTreeTable extends TreeTable {
 
     public HadoopTreeTable() {
         this.setWidth("100%");
-        this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        this.setHeight(100, Unit.PERCENTAGE);
 
         this.setPageLength(10);
         this.setSelectable(true);

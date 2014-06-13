@@ -2,8 +2,7 @@ package org.safehaus.subutai.ui.hive.query.components;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hive.query.Config;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -81,7 +80,7 @@ public class HiveQueryLayout extends GridLayout {
 
     private void getRunButton() {
         runButton = new Button("Run");
-        runButton.addListener(new Button.ClickListener() {
+        runButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 resultTextArea.setValue("");
@@ -101,7 +100,7 @@ public class HiveQueryLayout extends GridLayout {
 
     private void getSaveButton() {
         saveButton = new Button("Save");
-        saveButton.addListener(new Button.ClickListener() {
+        saveButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 HiveQueryUI.getManager().save(
@@ -126,9 +125,9 @@ public class HiveQueryLayout extends GridLayout {
         list = new QueryList();
         addComponent(list, 6, 1, 11, 3);
         setComponentAlignment(list, Alignment.MIDDLE_CENTER);
-        list.addListener(new Property.ValueChangeListener() {
+        list.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+            public void valueChange(Property.ValueChangeEvent event) {
                 if (list.getValue() != null) {
                     Config item = (Config) list.getValue();
 
@@ -147,8 +146,8 @@ public class HiveQueryLayout extends GridLayout {
         searchTextField.setSizeFull();
         searchTextField.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
         searchTextField.setTextChangeTimeout(200);
-        searchTextField.addListener(new FieldEvents.TextChangeListener() {
-
+        searchTextField.addTextChangeListener(new FieldEvents.TextChangeListener() {
+            @Override
             public void textChange(FieldEvents.TextChangeEvent event) {
                 list.refreshDataSource(event.getText());
             }
@@ -163,8 +162,8 @@ public class HiveQueryLayout extends GridLayout {
 
     private Embedded getIndicator() {
         indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setHeight(11, Unit.PIXELS);
+        indicator.setWidth(50, Unit.PIXELS);
         indicator.setVisible(false);
 
         return indicator;
