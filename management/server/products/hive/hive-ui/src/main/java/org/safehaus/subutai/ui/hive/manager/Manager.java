@@ -72,10 +72,9 @@ public class Manager {
         });
 
         Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addListener(new Button.ClickListener() {
-
+        destroyClusterBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config == null) {
                     show("Select cluster");
                     return;
@@ -91,7 +90,6 @@ public class Manager {
 
                 contentRoot.getUI().addWindow(alert.getAlert());
             }
-
         });
 
         Button checkAllBtn = new Button("Check all");

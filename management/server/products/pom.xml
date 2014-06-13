@@ -21,7 +21,6 @@
        <module>zookeeper</module>
        <module>mahout</module>
         <module>pig</module>
-        <module>lucene</module>
         <module>spark</module>
         <module>shark</module>
         <module>presto</module>
@@ -37,6 +36,7 @@
         <module>flume</module>
         <module>hive</module>
         <module>hivequery</module>
+        <module>lucene</module>
     </modules>
 
 </project>
