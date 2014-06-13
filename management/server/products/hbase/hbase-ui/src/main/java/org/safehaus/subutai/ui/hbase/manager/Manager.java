@@ -221,7 +221,7 @@ public class Manager {
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                            uuid,
+                            HBaseUI.getAgentManager().getAgentByUUID(uuid).getHostname(),
                             type,
                             progressIcon},
                     null
@@ -238,7 +238,7 @@ public class Manager {
             progressIcon.setVisible(false);
 
             final Object rowId = table.addItem(new Object[]{
-                            uuid,
+                            HBaseUI.getAgentManager().getAgentByUUID(uuid).getHostname(),
                             type,
                             progressIcon},
                     null
