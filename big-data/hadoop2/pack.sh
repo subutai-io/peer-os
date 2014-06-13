@@ -2,12 +2,14 @@
 set -e
 # Check if any deb file exists!!!
 
+hadoopVersion=2.3.0
+
 BASE=$(pwd)
 sh -c 'cd $BASE'
 echo $BASE
 cd ../workspace
-SOURCE=$(pwd)"/big-data/activemq/activemq"
-TARGET="/var/lib/jenkins/Automation/Bigdata/activemq"
+SOURCE=$(pwd)"/big-data/hadoop2/hadoop2"
+TARGET="/var/lib/jenkins/Automation/Bigdata/hadoop2"
 echo $SOURCE
 echo $TARGET
 cd $BASE
@@ -16,42 +18,26 @@ if ls *.deb ; then
 	rm  *.deb
 fi
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 cp -a $SOURCE/etc/ $BASE/$fileName/ 
-cp -a $SOURCE/opt $BASE/$fileName/
+rm -rf $BASE/$fileName/opt/*
+cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
-wget http://apache.bilkent.edu.tr/activemq/5.9.1/apache-activemq-5.9.1-bin.tar.gz -P $fileName/opt/
-cd $fileName/opt
-tar xzvf apache-activemq-5.9.1-bin.tar.gz
-rm apache-activemq-5.9.1-bin.tar.gz
-rm README
-cd $BASE
 
-#Read SSL Passwords for Activemq broker
-passwd=$(cat password.dat)
+wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion.tar.gz -P $fileName/opt/
 
-#Change activemq.xml
-sed -i '/keyStore=.*/c\      keyStore="/opt/apache-activemq-5.9.1/conf/broker.ks" keyStorePassword="'$passwd'"' activemq.xml
-sed -i '/trustStore=.*/c\      trustStore="/opt/apache-activemq-5.9.1/conf/broker.ts" trustStorePassword="'$passwd'"/>' activemq.xml
-
-#Deleting and copied files
-mv activemq.xml $fileName/opt/apache-activemq-5.9.1/conf/
+rm $fileName/opt/README
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-echo $lineNumberVersion
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-echo $lineNumberPackage
 lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-echo $lineVersion
 linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
-echo $inePackage
 
 version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
 package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
-
 echo $version
 echo $package
 

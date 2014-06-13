@@ -5,6 +5,8 @@ FilePath="/etc/profile"
 activemqHomeEcho="/opt/apache-activemq-5.9.1"
 activemqConf=$activemqHomeEcho"/conf"
 
+sudo update-rc.d activemq defaults
+
 if grep -q "export ACTIVEMQ_HOME=" $FilePath
 then
         echo "hadoop home is already added!"
@@ -13,4 +15,3 @@ else
         echo "export ACTIVEMQ_HOME="$activemqHomeEcho >> $FilePath
 fi
 . $FilePath
-sudo $activemqHomeEcho/bin/activemq start
