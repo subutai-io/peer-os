@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+. /etc/profile
+
+hadoopVersion=2.3.0
+tar -xpzf /opt/hadoop-$hadoopVersion.tar.gz -C /opt
+
+# copy conf files from etc/hadoop to conf
+mkdir /opt/hadoop-$hadoopVersion/conf
+cp -a /opt/hadoop-$hadoopVersion/etc/hadoop/* /opt/hadoop-$hadoopVersion/conf
+rm -rf /opt/hadoop-$hadoopVersion/etc
+
+hadoopHomeEcho="/opt/hadoop-$hadoopVersion"
+hadoopConf=$hadoopHomeEcho"/conf"
+
+escape_characters()
+{
+	temp_value=$1
+        #echo "Escaping some special characters like '/' for name:" $temp_name "and value:" $temp_value	
+	escaped_value=$(echo $temp_value | sed -e 's/\//\\\//g')
+	#echo "Escaped Value:" $escaped_value  
+}
+
+# Replace the comment with the real export in the file
+if [[ "x$JAVA_HOME" == "x" ]];
+then
+    sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hadoopConf/hadoop-env.sh
+else
+    escape_characters $JAVA_HOME
+    echo "Using JAVA_HOME:" $JAVA_HOME
+    sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME='$escaped_value'/g' $hadoopConf/hadoop-env.sh
+fi
+
+# Suppress HADOOP_HOME is deprecated message
+# echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> $hadoopConf/hadoop-env.sh
+
+rm -rf /opt/hadoop-$hadoopVersion.tar.gz
+. /etc/profile
+touch $hadoopConf/dfs.exclude
+touch $hadoopConf/dfs.include
+touch $hadoopConf/mapred.exclude
+touch $hadoopConf/mapred.include
+$hadoopHomeEcho/bin/hadoop-configure.sh localhost:8020 localhost:9000 1
+$hadoopHomeEcho/bin/hadoop-master-slave.sh masters clear
+$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves clear
+$hadoopHomeEcho/bin/hadoop-master-slave.sh masters localhost
+$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves localhost
+
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.default.name hdfs://localhost:8020
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.replication 1
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-1.2.1/conf/dfs.include
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/dfs.exclude
+
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude
