@@ -62,6 +62,7 @@ public class SolrUI implements PortalModule {
         solrManager = null;
         agentManager = null;
         tracker = null;
+        commandRunner = null;
         executor.shutdown();
     }
 

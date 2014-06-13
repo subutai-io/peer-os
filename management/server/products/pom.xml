@@ -26,7 +26,6 @@
         <module>spark</module>
         <module>shark</module>
         <module>presto</module>
-        <module>hbase</module>
         <module>hive</module>
         <module>hivequery</module>
         <module>sqoop</module>
@@ -37,6 +36,7 @@
         <module>hadoop</module>
         <module>solr</module>
         <module>cassandra</module>
+        <module>hbase</module>
     </modules>
 
 </project>

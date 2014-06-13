@@ -7,9 +7,8 @@ package org.safehaus.subutai.ui.hbase.wizard;
 
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -18,97 +17,84 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class StepSetBackuUpMasters extends Panel
-{
+public class StepSetBackuUpMasters extends VerticalLayout {
 
-    public StepSetBackuUpMasters( final Wizard wizard )
-    {
+    public StepSetBackuUpMasters(final Wizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight( 100, Sizeable.UNITS_PERCENTAGE );
-        verticalLayout.setMargin( true );
+        verticalLayout.setHeight(100, Unit.PERCENTAGE);
+        verticalLayout.setMargin(true);
 
-        GridLayout grid = new GridLayout( 10, 10 );
-        grid.setSpacing( true );
+        GridLayout grid = new GridLayout(10, 10);
+        grid.setSpacing(true);
         grid.setSizeFull();
 
-        Panel panel = new Panel();
-        Label menu = new Label( "Cluster Installation Wizard" );
+        Label menu = new Label("Cluster Installation Wizard");
 
-        menu.setContentMode( Label.CONTENT_XHTML );
-        panel.addComponent( menu );
-        grid.addComponent( menu, 0, 0, 2, 1 );
-        grid.setComponentAlignment( panel, Alignment.TOP_CENTER );
+        menu.setContentMode(ContentMode.HTML);
+        grid.addComponent(menu, 0, 0, 2, 1);
+        grid.setComponentAlignment(menu, Alignment.TOP_CENTER);
 
         VerticalLayout verticalLayoutForm = new VerticalLayout();
         verticalLayoutForm.setSizeFull();
-        verticalLayoutForm.setSpacing( true );
+        verticalLayoutForm.setSpacing(true);
 
-        Label configServersLabel = new Label( "<strong>Choose hosts that will act as BackUpMaster" );
-        configServersLabel.setContentMode( Label.CONTENT_XHTML );
-        verticalLayoutForm.addComponent( configServersLabel );
+        Label configServersLabel = new Label("<strong>Choose hosts that will act as BackUpMaster");
+        configServersLabel.setContentMode(ContentMode.HTML);
+        verticalLayoutForm.addComponent(configServersLabel);
 
-        final TwinColSelect select = new TwinColSelect( "", new ArrayList<UUID>() );
+        final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
 //        select.setItemCaptionPropertyId( "hostname" );
-        select.setRows( 7 );
-        select.setNullSelectionAllowed( false );
-        select.setMultiSelect( false );
-        select.setImmediate( true );
-        select.setLeftColumnCaption( "Available Nodes" );
-        select.setRightColumnCaption( "BackUpMaster" );
-        select.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        select.setRequired( true );
+        select.setRows(7);
+        select.setNullSelectionAllowed(false);
+        select.setMultiSelect(false);
+        select.setImmediate(true);
+        select.setLeftColumnCaption("Available Nodes");
+        select.setRightColumnCaption("BackUpMaster");
+        select.setWidth(100, Unit.PERCENTAGE);
+        select.setRequired(true);
 
-        verticalLayoutForm.addComponent( select );
+        verticalLayoutForm.addComponent(select);
 
-        grid.addComponent( verticalLayoutForm, 3, 0, 9, 9 );
-        grid.setComponentAlignment( verticalLayoutForm, Alignment.TOP_CENTER );
+        grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
+        grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
-        Button next = new Button( "Next" );
-        next.addListener( new Button.ClickListener()
-        {
-
+        Button next = new Button("Next");
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
-                wizard.getConfig().setBackupMasters( ( UUID ) select.getValue() );
-                if ( wizard.getConfig().getBackupMasters() == null )
-                {
-                    show( "Please add backup servers" );
-                }
-                else
-                {
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                wizard.getConfig().setBackupMasters((UUID) select.getValue());
+                if (wizard.getConfig().getBackupMasters() == null) {
+                    show("Please add backup servers");
+                } else {
                     wizard.next();
                 }
             }
-        } );
+        });
 
-        Button back = new Button( "Back" );
-        back.addListener( new Button.ClickListener()
-        {
+        Button back = new Button("Back");
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent event )
-            {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
-        } );
+        });
 
-        verticalLayout.addComponent( grid );
+        verticalLayout.addComponent(grid);
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponent( back );
-        horizontalLayout.addComponent( next );
-        verticalLayout.addComponent( horizontalLayout );
+        horizontalLayout.addComponent(back);
+        horizontalLayout.addComponent(next);
+        verticalLayout.addComponent(horizontalLayout);
 
-        addComponent( verticalLayout );
-        select.setContainerDataSource( new BeanItemContainer<UUID>( UUID.class, wizard.getConfig().getNodes() ) );
-        select.setValue( wizard.getConfig().getBackupMasters() );
+        addComponent(verticalLayout);
+        select.setContainerDataSource(new BeanItemContainer<UUID>(UUID.class, wizard.getConfig().getNodes()));
+        select.setValue(wizard.getConfig().getBackupMasters());
     }
 
 
-    private void show( String notification )
-    {
-        getWindow().showNotification( notification );
+    private void show(String notification) {
+        Notification.show(notification);
     }
 
 }

@@ -5,14 +5,14 @@
  */
 package org.safehaus.subutai.ui.hbase.wizard;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
 /**
  * @author dilshat
  */
-public class StepStart extends Panel {
+public class StepStart extends VerticalLayout {
 
     public StepStart(final Wizard wizard) {
         setSizeFull();
@@ -23,23 +23,23 @@ public class StepStart extends Panel {
                 "<center><h2>Welcome to HBase Installation Wizard!</h2><br/>"
                         + "Please click Start button to continue</center>"
         );
-        welcomeMsg.setContentMode(Label.CONTENT_XHTML);
+        welcomeMsg.setContentMode(ContentMode.HTML);
         gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
         logoImg.setIcon(new ThemeResource("icons/modules/hbase.png"));
-        logoImg.setContentMode(Label.CONTENT_XHTML);
-        logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(220, Sizeable.UNITS_PIXELS);
+        logoImg.setContentMode(ContentMode.HTML);
+        logoImg.setHeight(150, Unit.PIXELS);
+        logoImg.setWidth(220, Unit.PIXELS);
         gridLayout.addComponent(logoImg, 1, 3, 2, 5);
 
         HorizontalLayout hl = new HorizontalLayout();
 
         Button next = new Button("Start");
-        next.setWidth(100, Sizeable.UNITS_PIXELS);
-        next.addListener(new Button.ClickListener() {
+        next.setWidth(100, Unit.PIXELS);
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.next();
             }
         });
@@ -51,7 +51,7 @@ public class StepStart extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

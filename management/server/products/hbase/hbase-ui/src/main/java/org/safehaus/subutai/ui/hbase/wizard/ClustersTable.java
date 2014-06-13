@@ -3,7 +3,6 @@ package org.safehaus.subutai.ui.hbase.wizard;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Table;
 import org.safehaus.subutai.api.hadoop.Config;
 
@@ -22,7 +21,7 @@ public class ClustersTable extends Table {
         this.setContainerDataSource(getContainer());
 
         this.setWidth("100%");
-        this.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        this.setHeight(100, Unit.PERCENTAGE);
 
         this.setPageLength(10);
         this.setSelectable(true);
@@ -35,12 +34,6 @@ public class ClustersTable extends Table {
 
         // Create the container properties
         container.addContainerProperty("Cluster", String.class, "");
-
-        // Create some orders
-//        List<HadoopClusterInfo> cdList = HadoopDAO.getHadoopClusterInfo();
-//        for (HadoopClusterInfo cluster : cdList) {
-//            addOrderToContainer(container, cluster);
-//        }
 
         return container;
     }

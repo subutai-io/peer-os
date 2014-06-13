@@ -6,9 +6,8 @@
 package org.safehaus.subutai.ui.hbase.wizard;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.ArrayList;
@@ -19,32 +18,29 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public class StepSetQuorum extends Panel {
+public class StepSetQuorum extends VerticalLayout {
 
     public StepSetQuorum(final Wizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        verticalLayout.setHeight(100, Unit.PERCENTAGE);
         verticalLayout.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
         grid.setSpacing(true);
         grid.setSizeFull();
 
-        Panel panel = new Panel();
         Label menu = new Label("Cluster Installation Wizard");
-
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
+        menu.setContentMode(ContentMode.HTML);
         grid.addComponent(menu, 0, 0, 2, 1);
-        grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+        grid.setComponentAlignment(menu, Alignment.TOP_CENTER);
 
         VerticalLayout verticalLayoutForm = new VerticalLayout();
         verticalLayoutForm.setSizeFull();
         verticalLayoutForm.setSpacing(true);
 
         Label configServersLabel = new Label("<strong>Choose hosts that will act as HQuorumPeer");
-        configServersLabel.setContentMode(Label.CONTENT_XHTML);
+        configServersLabel.setContentMode(ContentMode.HTML);
         verticalLayoutForm.addComponent(configServersLabel);
 
         final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
@@ -55,7 +51,7 @@ public class StepSetQuorum extends Panel {
         select.setImmediate(true);
         select.setLeftColumnCaption("Available Nodes");
         select.setRightColumnCaption("HQuorumPeer");
-        select.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        select.setWidth(100, Unit.PERCENTAGE);
         select.setRequired(true);
 
         verticalLayoutForm.addComponent(select);
@@ -64,10 +60,9 @@ public class StepSetQuorum extends Panel {
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.getConfig().setQuorum((Set<UUID>) select.getValue());
                 if (Util.isCollectionEmpty(wizard.getConfig().getQuorum())) {
                     show("Please add quorum servers");
@@ -78,9 +73,9 @@ public class StepSetQuorum extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -98,7 +93,7 @@ public class StepSetQuorum extends Panel {
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

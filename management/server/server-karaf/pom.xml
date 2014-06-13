@@ -675,6 +675,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--HBase-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hbase-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hbase-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hbase-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hbase-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hbase-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Accumulo -->
                                <!-- <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -888,33 +915,6 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>zookeeper-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
-                                &lt;!&ndash; HBase &ndash;&gt;
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 

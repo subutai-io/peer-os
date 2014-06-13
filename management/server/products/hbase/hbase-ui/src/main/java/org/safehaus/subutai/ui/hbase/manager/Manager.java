@@ -8,13 +8,15 @@ package org.safehaus.subutai.ui.hbase.manager;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.api.hbase.HBaseType;
-import org.safehaus.subutai.server.ui.ConfirmationDialogCallback;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.hbase.HBaseUI;
@@ -41,12 +43,12 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(90, Sizeable.Unit.PIXELS);
+        contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
-        content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        content.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
@@ -66,12 +68,10 @@ public class Manager {
         controlsContent.addComponent(clusterNameLabel);
 
         clusterCombo = new ComboBox();
-        clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(200, Sizeable.UNITS_PIXELS);
-        clusterCombo.addListener(new Property.ValueChangeListener() {
-
+        clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+        clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 config = (HBaseConfig) event.getProperty().getValue();
@@ -82,10 +82,9 @@ public class Manager {
         controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
-        refreshClustersBtn.addListener(new Button.ClickListener() {
-
+        refreshClustersBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 refreshClustersInfo();
             }
         });
@@ -93,37 +92,37 @@ public class Manager {
         controlsContent.addComponent(refreshClustersBtn);
 
         Button startClustersBtn = new Button("Start cluster");
-        startClustersBtn.addListener(new Button.ClickListener() {
-
+        startClustersBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().startCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                        public void windowClose(Window.CloseEvent e) {
+                    ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                    window.getWindow().addCloseListener(new Window.CloseListener() {
+                        @Override
+                        public void windowClose(Window.CloseEvent closeEvent) {
                             refreshClustersInfo();
                         }
                     });
+                    contentRoot.getUI().addWindow(window.getWindow());
                 } else {
                     show("Please, select cluster");
                 }
             }
-
         });
 
         controlsContent.addComponent(startClustersBtn);
 
         Button stopClustersBtn = new Button("Stop cluster");
-        stopClustersBtn.addListener(new Button.ClickListener() {
-
+        stopClustersBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().stopCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                        public void windowClose(Window.CloseEvent e) {
+                    ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                    window.getWindow().addCloseListener(new Window.CloseListener() {
+                        @Override
+                        public void windowClose(Window.CloseEvent closeEvent) {
                             refreshClustersInfo();
                         }
                     });
@@ -131,21 +130,20 @@ public class Manager {
                     show("Please, select cluster");
                 }
             }
-
         });
 
         controlsContent.addComponent(stopClustersBtn);
 
         Button checkClustersBtn = new Button("Check cluster");
-        checkClustersBtn.addListener(new Button.ClickListener() {
-
+        checkClustersBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
                     UUID trackID = HBaseUI.getHbaseManager().checkCluster(config.getClusterName());
-                    MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                        public void windowClose(Window.CloseEvent e) {
+                    ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                    window.getWindow().addCloseListener(new Window.CloseListener() {
+                        @Override
+                        public void windowClose(Window.CloseEvent closeEvent) {
                             refreshClustersInfo();
                         }
                     });
@@ -153,7 +151,6 @@ public class Manager {
                     show("Please, select cluster");
                 }
             }
-
         });
 
         controlsContent.addComponent(checkClustersBtn);
@@ -164,25 +161,24 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Cluster destruction confirmation",
-                            String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
+                    ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
+                            "Yes", "No");
+                    alert.getOk().addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            UUID trackID = HBaseUI.getHbaseManager().uninstallCluster(config.getClusterName());
+                            ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = HBaseUI.getHbaseManager().uninstallCluster(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(HBaseConfig.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
+                                public void windowClose(Window.CloseEvent closeEvent) {
+                                    refreshClustersInfo();
                                 }
-                            }
-                    );
+                            });
+                            contentRoot.getUI().addWindow(window.getWindow());
+                        }
+                    });
+
+                    contentRoot.getUI().addWindow(alert.getAlert());
                 } else {
                     show("Please, select cluster");
                 }
@@ -213,7 +209,7 @@ public class Manager {
     }
 
     private void show(String notification) {
-        contentRoot.getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
     private void populateMasterTable(final Table table, Set<UUID> agents, final HBaseType type) {
@@ -300,21 +296,21 @@ public class Manager {
         table.addContainerProperty("Type", HBaseType.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
         table.setSizeFull();
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        table.setHeight(size, Sizeable.Unit.PERCENTAGE);
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
 
-        table.addListener(new ItemClickEvent.ItemClickListener() {
-
+        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            @Override
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = HBaseUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
-                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
-                        MgmtApplication.addCustomWindow(terminal);
+                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HBaseUI.getExecutor(), HBaseUI.getCommandRunner(), HBaseUI.getAgentManager());
+                        contentRoot.getUI().addWindow(terminal.getWindow());
                     } else {
                         show("Agent is not connected");
                     }
