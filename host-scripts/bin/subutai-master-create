@@ -1,0 +1,73 @@
+#!/bin/bash
+
+. /etc/subutai/config
+. /etc/subutai/functionz
+
+
+# Check for Master Existence
+# -----------------------------------------------------------------------------
+
+if [ -n "`lxc-ls "$SUBUTAI_MASTER" | grep "$SUBUTAI_MASTER"`" ]; then
+  echo LXC container $SUBUTAI_MASTER already exists!
+  exit 1
+fi
+
+if [ -n "`zfs list lxc/$SUBUTAI_MASTER`" ]; then
+  echo "Zfs dataset lxc/$SUBUTAI_MASTER already exists!"
+  exit 1
+fi
+
+# Create the container
+# -----------------------------------------------------------------------------
+
+lxc-create -n $SUBUTAI_MASTER   \
+ -t ubuntu                      \
+ -B zfs --                      \
+ -u $SUBUTAI_USER               \
+ -S $SUBUTAI_AUTH_KEY 
+
+# NOTES:
+# -----------------------------------------------------------------------------
+# Unfortunately we cannot create the blank (empty) dataset for the master
+# rootfs because of the lxc-create command above. So to fix this we need to
+# back up the files in it and clear it out, then snapshot, then replace those
+# files. Then we can take the template snapshot.
+
+# (1) Backup rootfs contents and delete contents
+# (2) Take created snapshot and hold
+# (3) Recover from backup of rootfs
+# (4) Delete backup
+# (5) Tage template snapshot and hold
+
+# (1)
+echo Taking $SUBUTAI_CREATED_SNAPSHOT snapshot of master\'s rootfs
+pushd .
+cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs
+tar -cf /tmp/$SUBUTAI_MASTER-rootfs.tgz *
+rm -rf /var/lib/lxc/$SUBUTAI_MASTER/rootfs/*
+
+# (2)
+zfs snapshot lxc/$SUBUTAI_MASTER'@'$SUBUTAI_CREATED_SNAPSHOT
+zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_CREATED_SNAPSHOT
+
+# (3) and (4)
+tar -xf /tmp/$SUBUTAI_MASTER-rootfs.tgz
+rm /tmp/$SUBUTAI_MASTER-rootfs.tgz
+popd
+
+# (5)
+echo Taking $SUBUTAI_TEMPLATE_SNAPSHOT snapshot of master\'s rootfs
+zfs snapshot lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
+zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
+
+# Handle all other mountpoints
+# -----------------------------------------------------------------------------
+# Using the addmount function almost the same operations as we did above on 
+# the rootfs are handled: whatever existing data that was found inside the 
+# mount point on the rootfs are moved over to the new dataset once created
+# snapshots with holds are taken.
+
+addmount $SUBUTAI_MASTER opt lxc
+addmount $SUBUTAI_MASTER home lxc-data
+addmount $SUBUTAI_MASTER var lxc-data
+

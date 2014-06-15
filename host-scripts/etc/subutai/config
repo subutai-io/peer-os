@@ -1,0 +1,7 @@
+export SUBUTAI_VERSION=2.1.0
+export SUBUTAI_PACKAGES=git,wget
+export SUBUTAI_USER=subutai
+export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
+export SUBUTAI_MASTER=master
+export SUBUTAI_CREATED_SNAPSHOT=created
+export SUBUTAI_TEMPLATE_SNAPSHOT=template

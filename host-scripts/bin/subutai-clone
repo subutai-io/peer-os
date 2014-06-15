@@ -1,0 +1,103 @@
+#!/bin/bash
+
+. /etc/subutai/config
+
+parent=$1
+child=$2
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Clone a new non-existant child from an existing parent container.
+  echo
+  echo "	"subutai-clone parent child
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+. /etc/subutai/functionz
+
+
+# Clone child from master
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+# (2) execute lxc-clone with clean output
+# (3) Update the /etc/hosts file with the new container hostname
+# (4) put hold on lxc-clone created snapshots
+# (5) snapshot @created and hold on lxc-clone created child zfs dataset
+# (6) Setup mount datasets and their snapshots
+
+# (1) perform some sanity checks
+check_parent "$parent" "`usage`"
+check_child  "$child" "`usage`"
+
+# (2) swallow bogus complaint from lxc-clone
+output=`lxc-clone -B zfs -s -o "$parent" -n "$child" 2>&1 | grep -v "could not"`
+
+# (2) quote the child container name for consistency and pretty print output
+output=`echo "$output" | sed -e "s/$child/\"$child\"/"`
+msg_info "    - $output"
+
+# (3) Update the hostname in the /etc/hosts file
+hosts="/var/lib/lxc/$child/rootfs/etc/hosts"
+cat $hosts | sed -e "s/$parent/$child/g" >> $hosts".new"
+mv $hosts $hosts".old"
+mv $hosts".new" $hosts
+rm $hosts".old"
+
+# (4) put hold on lxc-clone created snapshot
+zfs hold keep "lxc/$parent@$child"
+msg_info "    - \"keep\" hold set on \"lxc/$parent@$child\""
+
+# (5) snapshot and hold lxc-clone created zfs clone lxc/$child as "@created"
+dataset="lxc/$child"
+snapshot="$dataset@$SUBUTAI_CREATED_SNAPSHOT"
+zfs snapshot "$snapshot"
+msg_info "    - \"$snapshot\" snapshot created"
+zfs hold keep "$snapshot"
+msg_info "    - \"keep\" hold set on \"$snapshot\""
+
+# (6) Setup mount datasets and their snapshots
+# -----------------------------------------------------------------------------
+# (1) pull all config file mounts for external datasets
+# (2) for each mount create and update config file
+
+function clone-mount {
+  child="$1"
+  parent="$2"
+  partition="$3"
+  pool="$4"
+
+  child_ds="$pool/$child-$partition"
+  child_conf="/var/lib/lxc/$child/config"
+  parent_ds="$pool/$parent-$partition"
+
+  zfs snapshot "$parent_ds@$child"
+  msg_info "    - \"$parent_ds@$child\" snapshot created"
+  zfs hold keep "$parent_ds@$child"
+  msg_info "    - \"keep\" hold set on \"$parent_ds@$child\""
+
+  zfs clone "$parent_ds@$child" "$child_ds"
+  msg_info "    - \"$child_ds\" cloned from \"$parent_ds@$child\""
+ 
+  zfs snapshot "$child_ds@$SUBUTAI_CREATED_SNAPSHOT"
+  msg_info "    - \"$child_ds@$SUBUTAI_CREATED_SNAPSHOT\" snapshot created"
+  zfs hold keep "$child_ds@$SUBUTAI_CREATED_SNAPSHOT"
+  msg_info "    - \"keep\" hold set on \"$child_ds@$SUBUTAI_CREATED_SNAPSHOT\""
+
+  child_conf_new=$child_conf".new"
+  parent_part="$parent-$partition"
+  child_part="$child-$partition"
+  cat "$child_conf" | sed -e "s/$parent_part/$child_part/" > "$child_conf_new"
+
+  mv -f "/var/lib/lxc/$child/config" "/var/lib/lxc/$child/config.old"
+  mv "/var/lib/lxc/$child/config.new" "/var/lib/lxc/$child/config"
+  msg_info "    - \"$child_ds\" cloned from \"$parent_ds@$child\""
+}
+
+# (6) Handle creation of external file system mounts
+clone-mount $child $parent opt lxc 
+clone-mount $child $parent var lxc-data
+clone-mount $child $parent home lxc-data
+
+msg_ok "Successfully cloned $child container from $parent"
+
