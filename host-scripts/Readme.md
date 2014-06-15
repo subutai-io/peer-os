@@ -10,6 +10,16 @@ the physical host OS. However they should be replaced with a better mechanism
 for controlling these facilities. If used a package should be made for them
 for use with the subutai distributions.
 
+# How to install and uninstall?
+
+Currently these scripts expect there to be two ZFS zpools. One 'lxc' default 
+zpool for system files, and a 'lxc-data' zpool for application data files. If
+these are not present the scripts are useless.
+
+TODO: add a script to setup zfs and setup the zpools.
+
 # How does it work?
+
+Describe the scheme here.
 
 
