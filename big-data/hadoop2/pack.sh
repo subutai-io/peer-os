@@ -27,6 +27,7 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
 # build hadoop from source ant get the tar ball.
+. /etc/profile
 wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion-src.tar.gz -P $fileName/
 tar -xpf $fileName/hadoop-$hadoopVersion-src.tar.gz -C $fileName
 rm $fileName/hadoop-$hadoopVersion-src.tar.gz
