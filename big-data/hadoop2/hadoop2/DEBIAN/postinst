@@ -42,7 +42,7 @@ touch $hadoopConf/mapred.exclude
 touch $hadoopConf/mapred.include
 
 # core-site.xml
-$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.default.name hdfs://localhost:8020
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.defaultFS hdfs://localhost:8020
 $hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
 
 # hdfs-site.xml
