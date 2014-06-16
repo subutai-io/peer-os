@@ -126,9 +126,9 @@ git add -A
 git commit -m 'initial master /etc import for master'
 
 # (6)
-echo Taking $SUBUTAI_TEMPLATE_SNAPSHOT snapshot of master\'s rootfs
-zfs snapshot lxc/master'@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs hold keep lxc/master'@'$SUBUTAI_TEMPLATE_SNAPSHOT
+echo Taking @template snapshot of master\'s rootfs
+zfs snapshot lxc/master@template
+zfs hold keep lxc/master@template
 
 # Handle all other mountpoints
 # -----------------------------------------------------------------------------

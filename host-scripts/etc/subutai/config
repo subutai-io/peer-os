@@ -17,15 +17,6 @@ export SUBUTAI_EMAIL=subutai@safehaus.org
 # for git and other services later on.
 export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
 
-# The name of the template time snapshot. This will be used together
-# with the creation time snapshot to calculate delta images for new 
-# templates. See zfs send -i snap@before snap@after
-export SUBUTAI_TEMPLATE_SNAPSHOT=template
-
-# The location where Templates of Subutai ARchives are dumped when the 
-# subutai-tsar command is used on a template image.
-export SUBUTAI_TSAR_REPO=/lxc-data/tsars
-
 # A colon separated list of non-overlapping configuration paths which
 # need to be tracked in templates for changes via git. By default /etc
 # is versioned on each container. Use the subutai-config-path utility

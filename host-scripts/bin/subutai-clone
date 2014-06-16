@@ -48,14 +48,6 @@ rm $hosts".old"
 zfs hold keep "lxc/$parent@$child"
 msg_info "    - \"keep\" hold set on \"lxc/$parent@$child\""
 
-# (5) snapshot and hold lxc-clone created zfs clone lxc/$child as "@created"
-dataset="lxc/$child"
-snapshot="$dataset@$SUBUTAI_CREATED_SNAPSHOT"
-zfs snapshot "$snapshot"
-msg_info "    - \"$snapshot\" snapshot created"
-zfs hold keep "$snapshot"
-msg_info "    - \"keep\" hold set on \"$snapshot\""
-
 # (6) Setup mount datasets and their snapshots
 # -----------------------------------------------------------------------------
 # (1) pull all config file mounts for external datasets
@@ -79,11 +71,6 @@ function clone-mount {
   zfs clone "$parent_ds@$child" "$child_ds"
   msg_info "    - \"$child_ds\" cloned from \"$parent_ds@$child\""
  
-  zfs snapshot "$child_ds@$SUBUTAI_CREATED_SNAPSHOT"
-  msg_info "    - \"$child_ds@$SUBUTAI_CREATED_SNAPSHOT\" snapshot created"
-  zfs hold keep "$child_ds@$SUBUTAI_CREATED_SNAPSHOT"
-  msg_info "    - \"keep\" hold set on \"$child_ds@$SUBUTAI_CREATED_SNAPSHOT\""
-
   child_conf_new=$child_conf".new"
   parent_part="$parent-$partition"
   child_part="$child-$partition"
