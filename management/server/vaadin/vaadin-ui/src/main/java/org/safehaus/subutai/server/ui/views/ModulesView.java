@@ -14,6 +14,8 @@ import com.vaadin.event.LayoutEvents;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -87,7 +89,6 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
     private void addModule(final PortalModule module) {
         CssLayout moduleLayout = new CssLayout();
-        moduleLayout.setCaption(module.getName());
         moduleLayout.setId(module.getId());
         moduleLayout.setWidth(null);
         moduleLayout.addStyleName("create");
@@ -99,17 +100,18 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
             }
         });
 
-        /*Button create = new Button(module.getName());
+        Button create = new Button(module.getName());
+        create.setSizeFull();
         create.addStyleName("default");
-        moduleLayout.addComponent(create);*/
+        moduleLayout.addComponent(create);
 
         modulesLayout.addComponent(moduleLayout);
-        /*create.addClickListener(new ClickListener() {
+        create.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 autoCreate(module);
             }
-        });*/
+        });
 
         modulesList.add(moduleLayout);
     }
