@@ -27,6 +27,7 @@
         <module>sqoop</module>
         <module>oozie</module>
         -->
+
         <module>common</module>
         <module>mongodb</module>
         <module>hadoop</module>
