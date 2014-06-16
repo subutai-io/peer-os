@@ -40,7 +40,7 @@ lxc-create -n $SUBUTAI_MASTER   \
 # (2) Take created snapshot and hold
 # (3) Recover from backup of rootfs
 # (4) Delete backup
-# (5) Setup Git repository in /etc
+# (5) Setup git repository in / and control /etc
 # (6) Tag template snapshot and hold
 
 # (0)
@@ -66,8 +66,12 @@ lxc-attach -n $SUBUTAI_MASTER -- \
     apt-get update
 lxc-attach -n $SUBUTAI_MASTER -- \
     apt-get -y dist-upgrade
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+
+if [ -n "$SUBUTAI_PACKAGES" ]; then
+  lxc-attach -n $SUBUTAI_MASTER -- \
+      apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+fi
+
 lxc-attach -n $SUBUTAI_MASTER -- \
     apt-get -y autoclean
 lxc-attach -n $SUBUTAI_MASTER -- \
@@ -94,15 +98,43 @@ tar -xf /tmp/$SUBUTAI_MASTER-rootfs.tgz
 rm /tmp/$SUBUTAI_MASTER-rootfs.tgz
 popd
 
-# (5) setup git repository in /etc
+# (5) setup git repository in / and control /etc
 pushd .
-cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs/etc
+cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs/
 git init
-git config --global user.email 'subutai@safehaus.org'
-git config --global user.name 'subutai'
-echo '*.old' >> .gitignore
-echo blkid.tab >> .gitignore
-echo adjtime >> .gitignore
+git config user.email "$SUBUTAI_EMAIL"
+git config user.name  "$SUBUTAI_USER"
+echo etc/mtab       >> .gitignore
+echo mtab           >> .gitignore
+echo etc/*.old      >> .gitignore
+echo *.old          >> .gitignore
+echo etc/blkid.tab  >> .gitignore
+echo blkid.tab      >> .gitignore
+echo etc/adjtime    >> .gitignore
+echo adjtime        >> .gitignore
+echo bin            >> .gitignore
+echo boot           >> .gitignore
+echo dev            >> .gitignore
+echo home           >> .gitignore
+echo initrd.*       >> .gitignore
+echo lib            >> .gitignore
+echo lib64          >> .gitignore
+echo lost+found     >> .gitignore
+echo lxc            >> .gitignore
+echo lxc-data       >> .gitignore
+echo media          >> .gitignore
+echo mnt            >> .gitignore
+echo opt            >> .gitignore
+echo proc           >> .gitignore
+echo root           >> .gitignore
+echo run            >> .gitignore
+echo sbin           >> .gitignore
+echo srv            >> .gitignore
+echo sys            >> .gitignore
+echo tmp            >> .gitignore
+echo usr            >> .gitignore
+echo var            >> .gitignore
+echo vmlinuz*       >> .gitignore
 git add .gitignore
 git commit -m 'setting up git for master'
 git add -A
