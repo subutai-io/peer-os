@@ -32,7 +32,7 @@ tar -xpf $fileName/hadoop-$hadoopVersion-src.tar.gz -C $fileName
 rm $fileName/hadoop-$hadoopVersion-src.tar.gz
 cd $fileName/hadoop-$hadoopVersion-src
 mvn package -Pdist -DskipTests -Dtar
-cp hadoop-dist/target/hadoop-$hadoopVersion.tar.gz $fileName
+cp hadoop-dist/target/hadoop-$hadoopVersion.tar.gz $BASE/$fileName/opt/
 cd $BASE
 rm -rf $fileName/hadoop-$hadoopVersion-src
 
