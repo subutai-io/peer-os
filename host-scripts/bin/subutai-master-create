@@ -35,6 +35,10 @@ for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
   echo subutai.app.data.path=$appdata_path >> /var/lib/lxc/master/config
 done
 
+# Add pre-start hook script entry
+echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
+     >> /var/lib/lxc/master/config
+
 # NOTES:
 # -----------------------------------------------------------------------------
 # Unfortunately we cannot create the blank (empty) dataset for the master
