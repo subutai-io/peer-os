@@ -31,7 +31,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
     private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
     private TabSheet editors;
-    private HorizontalLayout modulesLayout;
+    private CssLayout modulesLayout;
     private List<Component> modulesList = new ArrayList<Component>();
 
     @Override
@@ -62,8 +62,8 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         titleAndDrafts.addComponent(draftsTitle);
         titleAndDrafts.setComponentAlignment(draftsTitle, Alignment.TOP_CENTER);
 
-        modulesLayout = new HorizontalLayout();
-        modulesLayout.setSpacing(true);
+        modulesLayout = new CssLayout();
+        modulesLayout.setSizeUndefined();
         modulesLayout.addStyleName("catalog");
         titleAndDrafts.addComponent(modulesLayout);
 
@@ -78,7 +78,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
         TabSheet.Tab tab = editors.addTab(module.createComponent());
         tab.setCaption(module.getName());
         tab.setClosable(true);
-        editors.setSelectedTab(editors.getComponentCount() - 1);
+        editors.setSelectedTab(tab);
     }
 
     @Override
