@@ -5,7 +5,7 @@
  */
 package org.safehaus.subutai.ui.mahout.wizard;
 
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -13,7 +13,6 @@ import com.vaadin.ui.ProgressIndicator;
 import org.safehaus.subutai.api.mahout.Config;
 
 /**
- *
  * @author dilshat
  */
 public class Wizard {
@@ -33,7 +32,7 @@ public class Wizard {
         progressBar.setIndeterminate(false);
         progressBar.setEnabled(false);
         progressBar.setValue(0f);
-        progressBar.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        progressBar.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.addComponent(progressBar, 0, 0, 0, 0);
         grid.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
 

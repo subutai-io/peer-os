@@ -19,7 +19,7 @@
        <module>accumulo</module>
        <module>storm</module>
        <module>zookeeper</module>
-       <module>mahout</module>
+
         <module>pig</module>
         <module>spark</module>
         <module>shark</module>
@@ -38,6 +38,7 @@
         <module>hive</module>
         <module>hivequery</module>
         <module>lucene</module>
+        <module>mahout</module>
     </modules>
 
 </project>
