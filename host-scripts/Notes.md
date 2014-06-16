@@ -64,4 +64,57 @@ path entry.
 
 Unfortunately git will need 
 
+# Subutai Templates
+
+We MUST be very careful with our nomenclature and define what exactly a 
+template is and what a tsar file is and how this all works together.
+
+An LXC container on the system is not by itself a template. To become a 
+template it MUST have two snapshot sets applied one before the other. The 
+first is the '@created' snapshot set to all zfs filesystems used by the
+container. This snapshot set is always present on any container and is 
+applied at creation time. The other snapshot set is the '@template' set
+and this is applied when the LXC container is promoted to a template.
+
+With these two snapshot sets the container is effectively a template. Once
+turned into a template, the container can no longer be run. It is locked
+to prevent users from unknowingly modifying the template. If a user modifies
+the template after the '@template' snapshot sets are taken, then these changes
+are no longer accounted for. Future clones will cause  all clone ancestors of the template. 
+
+There are two ways in which a container can be promoted to a template. The 
+first explicit way is to use the subutai-template command. This command 
+will apply the 'template' snapshots to all the container ZFS datasets after
+performing the following operations:
+
+  o commit changes to config paths in the local git repo on $name branch
+  o overwrite the package manifest kept in the /etc/subutai directory
+  o shutdown the container
+
+At this point the rootfs and each file system mount dataset is snapshotted 
+with '@template'. Then a binary block level differential is generated for 
+each ZFS dataset of the container. 
+
+
+Basically there is no reason for us to create an additional file format that
+needs to be kept locally on the physical host along side an lxc image
+
+
+
+
+
+NOTES:
+
+  - might be a good idea to prevent users of potential naming conflicts when
+    cloning containers that are already registered as templates within the 
+    Subutai template registry
+
+  - also we should not allow users to run templates since they will get out
+    of synchronization with the snapshots
+
+  - later on we can perhaps allow this however there must be no child templates
+    so we can re-template snapshot the container datasets
+
+  - we can allow containers to be untemplated too if and only if there are no
+    existing child templates
 
