@@ -26,7 +26,14 @@ lxc-create -n $SUBUTAI_MASTER   \
  -u $SUBUTAI_USER               \
  -S $SUBUTAI_AUTH_KEY 
 
-# --packages $SUBUTAI_PACKAGES   \
+# Add config and app data paths to the config file
+for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
+  echo subutai.config.path=$config_path >> /var/lib/lxc/$SUBUTAI_MASTER/config
+done
+
+for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
+  echo subutai.app.data.path=$appdata_path >> /var/lib/lxc/$SUBUTAI_MASTER/config
+done
 
 # NOTES:
 # -----------------------------------------------------------------------------

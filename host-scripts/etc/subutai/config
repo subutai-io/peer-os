@@ -1,10 +1,54 @@
+#!/bin/bash
+
+# The version of Subutai
 export SUBUTAI_VERSION=2.1.0
+
+# Default set of packages to install on all containers
 export SUBUTAI_PACKAGES=git
+
+# The Subutai user to use for container's non-root user and will also
+# be used to make commits to git and possibly perform additional things
+# in the future like run unpriviledged containers under this user.
 export SUBUTAI_USER=subutai
 export SUBUTAI_EMAIL=subutai@safehaus.org
+
+# The public key to use to allow for non-passwd based access, this is 
+# setup in the SUBUTAI_USER's .ssh/authorized_keys. Could also be used
+# for git and other services later on.
 export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
+
+# The name of the base image. Calling it master by default since
+# this aligns with the master branch in git. It's also the master
+# template so it's just a better name for the master image.
 export SUBUTAI_MASTER=master
+
+# The name of the creation time snapshot. This will be used together
+# with the template time snapshot to calculate delta images for new
+# templates. See zfs send -i snap@before snap@after
 export SUBUTAI_CREATED_SNAPSHOT=created
+
+# The name of the template time snapshot. This will be used together
+# with the creation time snapshot to calculate delta images for new 
+# templates. See zfs send -i snap@before snap@after
 export SUBUTAI_TEMPLATE_SNAPSHOT=template
+
+# A colon separated list of non-overlapping configuration paths which
+# need to be tracked in templates for changes via git. By default /etc
+# is versioned on each container. Use the subutai-config-path utility
+# to add more paths. 
+#
+# NOTE: this is just here as the default for the master image for 
+# manual setup and creation, each container must have this information
+# tracked for itself internally and within the container's configuration
+# files. See the new subutai.config.path property in container configs.
 export SUBUTAI_CONFIG_PATH=/etc
+
+# A colon separated list of non-overlapping application data paths
+# which need to be tracked in 
 export SUBUTAI_APP_DATA_PATH=/var
+
+# Subutai will expose an ubuntu mirror with the packages needed for 
+# all containers. Although all containers reference the standard repo
+# to get their debian packages we can make the physical host proxy
+# instead transparently to this address for the standard repo hostname.
+export SUBUTAI_MIRROR_ADDRESS=
