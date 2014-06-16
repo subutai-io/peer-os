@@ -26,18 +26,57 @@ lxc-create -n $SUBUTAI_MASTER   \
  -u $SUBUTAI_USER               \
  -S $SUBUTAI_AUTH_KEY 
 
+# --packages $SUBUTAI_PACKAGES   \
+
 # NOTES:
 # -----------------------------------------------------------------------------
 # Unfortunately we cannot create the blank (empty) dataset for the master
 # rootfs because of the lxc-create command above. So to fix this we need to
 # back up the files in it and clear it out, then snapshot, then replace those
 # files. Then we can take the template snapshot.
-
+#
+# (0) Start it up, update, dist-upgrade, shutdown
 # (1) Backup rootfs contents and delete contents
 # (2) Take created snapshot and hold
 # (3) Recover from backup of rootfs
 # (4) Delete backup
-# (5) Tage template snapshot and hold
+# (5) Setup Git repository in /etc
+# (6) Tag template snapshot and hold
+
+# (0)
+pkglist=/tmp/pkglist-$SUBUTAI_MASTER.txt
+lxc-start -d -n $SUBUTAI_MASTER
+lxc-wait -n $SUBUTAI_MASTER -s 'RUNNING' -t 5
+
+count=10
+while [ $count -gt 0 ]; do
+  sleep 1
+  ipv4=`lxc-ls -f | grep $SUBUTAI_MASTER | awk '{print $3}'`
+
+  if [ "$ipv4" != "-" ]; then
+    echo Got IPv4 address of $ipv4  
+    lxc-attach -n $SUBUTAI_MASTER -- ping -c 3 mit.edu
+    break
+  fi
+
+  count=`expr $count - 1`
+done
+
+lxc-attach -n $SUBUTAI_MASTER -- \
+    apt-get update
+lxc-attach -n $SUBUTAI_MASTER -- \
+    apt-get -y dist-upgrade
+lxc-attach -n $SUBUTAI_MASTER -- \
+    apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+lxc-attach -n $SUBUTAI_MASTER -- \
+    apt-get -y autoclean
+lxc-attach -n $SUBUTAI_MASTER -- \
+    apt-get -y autoremove
+lxc-attach -n $SUBUTAI_MASTER -- \
+    dpkg -l > /tmp/pkglist.txt
+lxc-stop -n $SUBUTAI_MASTER
+lxc-wait -n $SUBUTAI_MASTER -s 'STOPPED'
+sleep 2
 
 # (1)
 echo Taking $SUBUTAI_CREATED_SNAPSHOT snapshot of master\'s rootfs
@@ -55,7 +94,22 @@ tar -xf /tmp/$SUBUTAI_MASTER-rootfs.tgz
 rm /tmp/$SUBUTAI_MASTER-rootfs.tgz
 popd
 
-# (5)
+# (5) setup git repository in /etc
+pushd .
+cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs/etc
+git init
+git config --global user.email 'subutai@safehaus.org'
+git config --global user.name 'subutai'
+echo '*.old' >> .gitignore
+echo blkid.tab >> .gitignore
+echo adjtime >> .gitignore
+git add .gitignore
+git commit -m 'setting up git for master'
+git add -A
+git commit -m 'initial master /etc import for master'
+popd
+
+# (6)
 echo Taking $SUBUTAI_TEMPLATE_SNAPSHOT snapshot of master\'s rootfs
 zfs snapshot lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
 zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
