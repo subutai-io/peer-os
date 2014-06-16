@@ -27,7 +27,16 @@ rm -rf $BASE/$fileName/opt/*
 cp -a $SOURCE/opt/* $BASE/$fileName/opt/
 
 
-wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion.tar.gz -P $fileName/opt/
+# wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion.tar.gz -P $fileName/opt/
+wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion-src.tar.gz -P $fileName/opt/
+cd $fileName/opt
+tar -xvpf hadoop-$hadoopVersion-src.tar.gz 
+rm hadoop-$hadoopVersion-src.tar.gz
+cd hadoop-$hadoopVersion-src
+mvn package -Pdist -DskipTests -Dtar
+cp hadoop-dist/target/hadoop-$hadoopVersion.tar.gz .
+rm -rf hadoop-$hadoopVersion
+
 
 rm $fileName/opt/README
 
