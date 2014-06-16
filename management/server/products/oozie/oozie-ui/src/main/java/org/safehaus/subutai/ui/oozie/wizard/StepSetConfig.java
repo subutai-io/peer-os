@@ -10,7 +10,7 @@
 package org.safehaus.subutai.ui.oozie.wizard;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
@@ -26,7 +26,7 @@ public class StepSetConfig extends Panel {
     public StepSetConfig(final Wizard wizard) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        verticalLayout.setHeight(100, Unit.PERCENTAGE);
         verticalLayout.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
@@ -36,8 +36,8 @@ public class StepSetConfig extends Panel {
         Panel panel = new Panel();
         Label menu = new Label("Oozie Installation Wizard");
 
-        menu.setContentMode(Label.CONTENT_XHTML);
-        panel.addComponent(menu);
+        menu.setContentMode(ContentMode.HTML);
+        panel.setContent(menu);
         grid.addComponent(menu, 0, 0, 2, 1);
         grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
@@ -46,14 +46,13 @@ public class StepSetConfig extends Panel {
         vl.setSpacing(true);
 
         Label configServersLabel = new Label("<strong>Oozie Server</strong>");
-        configServersLabel.setContentMode(Label.CONTENT_XHTML);
+        configServersLabel.setContentMode(ContentMode.HTML);
         vl.addComponent(configServersLabel);
 
         final Label server = new Label("Server");
         vl.addComponent(server);
 
         final ComboBox cbServers = new ComboBox();
-        cbServers.setMultiSelect(false);
         for (Agent agent : wizard.getConfig().getHadoopNodes()) {
             cbServers.addItem(agent);
             cbServers.setItemCaption(agent, agent.getHostname());
@@ -70,10 +69,10 @@ public class StepSetConfig extends Panel {
         selectClients.setImmediate(true);
         selectClients.setLeftColumnCaption("Available nodes");
         selectClients.setRightColumnCaption("Client nodes");
-        selectClients.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        selectClients.setWidth(100, Unit.PERCENTAGE);
         selectClients.setRequired(true);
         selectClients.setContainerDataSource(
-                new BeanItemContainer<Agent>(
+                new BeanItemContainer<>(
                         Agent.class, wizard.getConfig().getHadoopNodes())
         );
 
@@ -83,10 +82,9 @@ public class StepSetConfig extends Panel {
         grid.setComponentAlignment(vl, Alignment.TOP_CENTER);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.getConfig().setServer((Agent) cbServers.getValue());
                 wizard.getConfig().setClients((Set<Agent>) selectClients.getValue());
 
@@ -105,9 +103,9 @@ public class StepSetConfig extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -119,17 +117,11 @@ public class StepSetConfig extends Panel {
         horizontalLayout.addComponent(next);
         verticalLayout.addComponent(horizontalLayout);
 
-        addComponent(verticalLayout);
-
-//        selectClients.setContainerDataSource(new BeanItemContainer<Agent>(Agent.class, wizard.getConfig().getClients()));
-
-        //set values if this is a second visit
-//        server.setValue(wizard.getConfig().getServer().getHostname());
-//        selectClients.setValue(wizard.getConfig().getClients());
+        setContent(verticalLayout);
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

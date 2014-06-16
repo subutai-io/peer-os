@@ -5,7 +5,6 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 
 /**
@@ -19,7 +18,7 @@ public class StepFinish extends Panel {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        verticalLayout.setHeight(100, Unit.PERCENTAGE);
         verticalLayout.setMargin(true);
 
         GridLayout grid = new GridLayout(10, 10);
@@ -39,18 +38,17 @@ public class StepFinish extends Panel {
         grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
         final Button back = new Button("Cancel");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.cancel();
             }
         });
 
         final Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 next.setCaption("Installing...");
                 back.setEnabled(false);
                 next.setEnabled(false);
@@ -65,13 +63,12 @@ public class StepFinish extends Panel {
         horizontalLayout.addComponent(next);
         verticalLayout.addComponent(horizontalLayout);
 
-        addComponent(verticalLayout);
+        setContent(verticalLayout);
 
     }
 
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
-
 }
