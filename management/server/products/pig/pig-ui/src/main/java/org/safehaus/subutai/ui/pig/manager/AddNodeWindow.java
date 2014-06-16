@@ -6,13 +6,12 @@
 package org.safehaus.subutai.ui.pig.manager;
 
 import com.google.common.base.Strings;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.server.ui.MgmtApplication;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.pig.PigUI;
 
@@ -33,7 +32,7 @@ public class AddNodeWindow extends Window {
         super("Add New Node");
         setModal(true);
 
-        setWidth(600, AddNodeWindow.UNITS_PIXELS);
+        setWidth(600, Unit.PIXELS);
 
         GridLayout content = new GridLayout(1, 3);
         content.setSizeFull();
@@ -47,12 +46,11 @@ public class AddNodeWindow extends Window {
         topContent.addComponent(new Label("Nodes:"));
 
         final ComboBox hadoopNodes = new ComboBox();
-        hadoopNodes.setMultiSelect(false);
         hadoopNodes.setImmediate(true);
         hadoopNodes.setTextInputAllowed(false);
         hadoopNodes.setNullSelectionAllowed(false);
         hadoopNodes.setRequired(true);
-        hadoopNodes.setWidth(200, Sizeable.UNITS_PIXELS);
+        hadoopNodes.setWidth(200, Unit.PIXELS);
         for (Agent node : nodes) {
             hadoopNodes.addItem(node);
             hadoopNodes.setItemCaption(node, node.getHostname());
@@ -64,10 +62,9 @@ public class AddNodeWindow extends Window {
         final Button addNodeBtn = new Button("Add");
         topContent.addComponent(addNodeBtn);
 
-        addNodeBtn.addListener(new Button.ClickListener() {
-
+        addNodeBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 addNodeBtn.setEnabled(false);
                 showProgress();
                 Agent agent = (Agent) hadoopNodes.getValue();
@@ -108,19 +105,18 @@ public class AddNodeWindow extends Window {
 
         indicator = new Label();
         indicator.setIcon(new ThemeResource("icons/indicator.gif"));
-        indicator.setContentMode(Label.CONTENT_XHTML);
-        indicator.setHeight(11, Sizeable.UNITS_PIXELS);
-        indicator.setWidth(50, Sizeable.UNITS_PIXELS);
+        indicator.setContentMode(ContentMode.HTML);
+        indicator.setHeight(11, Unit.PIXELS);
+        indicator.setWidth(50, Unit.PIXELS);
         indicator.setVisible(false);
 
         Button ok = new Button("Ok");
-        ok.addListener(new Button.ClickListener() {
-
+        ok.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-                //close window   
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                //close window
                 track = false;
-                MgmtApplication.removeCustomWindow(getWindow());
+                close();
             }
         });
 
@@ -132,11 +128,11 @@ public class AddNodeWindow extends Window {
         content.addComponent(bottomContent);
         content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
-        addComponent(content);
+        setContent(content);
     }
 
     @Override
-    protected void close() {
+    public void close() {
         super.close();
         track = false;
     }

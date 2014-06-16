@@ -19,7 +19,6 @@
         <module>accumulo</module>
         <module>storm</module>
         <module>zookeeper</module>
-         <module>pig</module>
          <module>spark</module>
          <module>shark</module>
          <module>presto</module>
@@ -38,6 +37,7 @@
         <module>lucene</module>
         <module>mahout</module>
         <module>oozie</module>
+        <module>pig</module>
     </modules>
 
 </project>
