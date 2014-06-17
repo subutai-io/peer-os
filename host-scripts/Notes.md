@@ -35,7 +35,7 @@ template is and what a tsar file is and how this all works together.
 
 An LXC container on the system is not by itself a template. To become a 
 template it MUST have a snapshot with the name 'template'. The master is
-by default already a template. 
+by default is already a template. 
 
 Once a container becomes a template, the container can no longer be run. 
 A pre-start hook script is used to only enable containers that do not have 
@@ -79,7 +79,20 @@ complications however:
   o templates developed locally will not be qualified especially if not
     pubished: the system should make up for this after it is published
     by either renaming containers and snapshots or by just doing some
-    local accounting 
+    local accounting
+
+zfs rename -r lxc/master@foo @akarasulu.foo 
+ - this recursively renames the foo snapshot to akarasulu.foo with akarasulu
+   as the new publisher qualification on the template
+
+git branch -m foo akarasulu.foo
+ - this renames the foo branch to akarasulu.foo locally
+ - the same can be done on the site local repository in the management server
+
+Rename operations for the container however are another story. It seems we
+will have to implement the rename ourselves with is a matter of massaging
+the config file and moving the container, but a zfs remount will be needed
+for the rootfs of the container before doing the move.
 
 The inability to run templates may seem a bit restrictive however it is only 
 a perception which will not inhibit users in most cases. However the benefits
@@ -108,4 +121,9 @@ NOTES:
 
   - we can allow containers to be untemplated too if and only if there are no
     existing child templates
+
+  - IDEA: maybe we can use different LXC groups to manage containers for 
+    different users. Or better yet we might be able to use different users
+    on the physical machine for each user in the system, and use unprivileged
+    containers for added security.
 

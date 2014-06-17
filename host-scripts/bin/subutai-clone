@@ -23,8 +23,7 @@ function usage {
 # (2) execute lxc-clone with clean output
 # (3) Update the /etc/hosts file with the new container hostname
 # (4) put hold on lxc-clone created snapshots
-# (5) snapshot @created and hold on lxc-clone created child zfs dataset
-# (6) Setup mount datasets and their snapshots
+# (5) Setup mount datasets and their snapshots
 
 # (1) perform some sanity checks
 check_parent "$parent" "`usage`"
@@ -48,7 +47,7 @@ rm $hosts".old"
 zfs hold keep "lxc/$parent@$child"
 msg_info "    - \"keep\" hold set on \"lxc/$parent@$child\""
 
-# (6) Setup mount datasets and their snapshots
+# (5) Setup mount datasets and their snapshots
 # -----------------------------------------------------------------------------
 # (1) pull all config file mounts for external datasets
 # (2) for each mount create and update config file
@@ -81,10 +80,17 @@ function clone-mount {
   msg_info "    - \"$child_ds\" cloned from \"$parent_ds@$child\""
 }
 
-# (6) Handle creation of external file system mounts
+# (5) Handle creation of external file system mounts
 clone-mount $child $parent opt lxc 
 clone-mount $child $parent var lxc-data
 clone-mount $child $parent home lxc-data
+
+# (6) Start up the container and checkout new branch 
+
+lxc-start -d -n $child
+lxc-wait -n $child -s RUNNING
+lxc-attach -n $child -- git checkout -b $child
+lxc-stop -n $child
 
 msg_ok "Successfully cloned $child container from $parent"
 

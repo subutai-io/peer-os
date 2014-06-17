@@ -56,6 +56,14 @@ echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
 
 # (0)
 pkglist=/tmp/pkglist-master.txt
+
+if [ -n "$SUBUTAI_APT_MIRROR" ]; then
+  echo $SUBUTAI_APT_MIRROR archive.ubuntu.com \
+      >> /var/lib/lxc/master/rootfs/etc/hosts
+  echo $SUBUTAI_APT_MIRROR security.ubuntu.com \
+      >> /var/lib/lxc/master/rootfs/etc/hosts
+fi
+
 lxc-start -d -n master
 lxc-wait -n master -s 'RUNNING' -t 5
 
