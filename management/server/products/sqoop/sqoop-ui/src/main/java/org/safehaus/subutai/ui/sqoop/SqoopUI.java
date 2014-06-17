@@ -2,39 +2,41 @@ package org.safehaus.subutai.ui.sqoop;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.Sqoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SqoopUI implements Module {
+public class SqoopUI implements PortalModule {
 
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Sqoop manager;
     private static Hadoop hadoopManager;
+    private static CommandRunner commandRunner;
 
     private static ExecutorService executor;
     private static SqoopForm form;
+
+    public SqoopUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Sqoop manager, CommandRunner commandRunner) {
+        SqoopUI.agentManager = agentManager;
+        SqoopUI.tracker = tracker;
+        SqoopUI.hadoopManager = hadoopManager;
+        SqoopUI.manager = manager;
+        SqoopUI.commandRunner = commandRunner;
+    }
 
     public static AgentManager getAgentManager() {
         return agentManager;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
-        SqoopUI.agentManager = agentManager;
-    }
-
     public static Tracker getTracker() {
         return tracker;
-    }
-
-    public void setTracker(Tracker tracker) {
-        SqoopUI.tracker = tracker;
     }
 
     public static Sqoop getManager() {
@@ -49,12 +51,12 @@ public class SqoopUI implements Module {
         return hadoopManager;
     }
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        SqoopUI.hadoopManager = hadoopManager;
-    }
-
     public static ExecutorService getExecutor() {
         return executor;
+    }
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
     }
 
     public static SqoopForm getForm() {
@@ -70,7 +72,13 @@ public class SqoopUI implements Module {
         tracker = null;
         manager = null;
         hadoopManager = null;
+        commandRunner = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return null;
     }
 
     public String getName() {

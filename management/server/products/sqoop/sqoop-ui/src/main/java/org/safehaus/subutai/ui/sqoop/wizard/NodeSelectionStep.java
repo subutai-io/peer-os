@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -29,18 +28,17 @@ public class NodeSelectionStep extends Panel {
         content.setMargin(true);
 
         hadoopClusters = new ComboBox("Hadoop cluster");
-        hadoopClusters.setMultiSelect(false);
         hadoopClusters.setImmediate(true);
         hadoopClusters.setTextInputAllowed(false);
         hadoopClusters.setRequired(true);
         hadoopClusters.setNullSelectionAllowed(false);
-        hadoopClusters.addListener(new Property.ValueChangeListener() {
+        hadoopClusters.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent e) {
                 select.setValue(null);
                 if (e.getProperty().getValue() != null) {
                     Config hadoopInfo = (Config) e.getProperty().getValue();
-                    select.setContainerDataSource(new BeanItemContainer<Agent>(
+                    select.setContainerDataSource(new BeanItemContainer<>(
                                     Agent.class, hadoopInfo.getAllNodes())
                     );
                     // do select if values exist
@@ -68,7 +66,7 @@ public class NodeSelectionStep extends Panel {
         select = makeClientNodeSelector(wizard);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
+        next.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -84,7 +82,7 @@ public class NodeSelectionStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.back();
@@ -104,12 +102,11 @@ public class NodeSelectionStep extends Panel {
         content.addComponent(select);
         content.addComponent(buttons);
 
-        addComponent(layout);
-
+        setContent(layout);
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
     private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
@@ -120,12 +117,12 @@ public class NodeSelectionStep extends Panel {
         tcs.setImmediate(true);
         tcs.setLeftColumnCaption("Available Nodes");
         tcs.setRightColumnCaption("Selected Nodes");
-        tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        tcs.setWidth(100, Unit.PERCENTAGE);
         tcs.setRequired(true);
         if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
             tcs.setValue(wizard.getConfig().getNodes());
         }
-        tcs.addListener(new Property.ValueChangeListener() {
+        tcs.addValueChangeListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {

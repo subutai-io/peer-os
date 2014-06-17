@@ -50,6 +50,7 @@ public class VerificationStep extends Panel {
                         wizard.init();
                     }
                 });
+                getUI().addWindow(window.getWindow());
             }
         });
 

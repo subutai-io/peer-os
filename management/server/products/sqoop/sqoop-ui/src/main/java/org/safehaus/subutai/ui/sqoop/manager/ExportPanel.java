@@ -1,12 +1,16 @@
 package org.safehaus.subutai.ui.sqoop.manager;
 
-import com.vaadin.ui.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.vaadin.ui.AbstractTextField;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ExportPanel extends ImportExportBase {
 
@@ -24,11 +28,9 @@ public class ExportPanel extends ImportExportBase {
 
     @Override
     final void init() {
-
-        removeAllActionHandlers();
         removeAllComponents();
 
-        if(agent == null) {
+        if (agent == null) {
             addComponent(UIUtil.getLabel("<h1>No node selected</h1>", 200));
             return;
         }
@@ -42,7 +44,7 @@ public class ExportPanel extends ImportExportBase {
 
                     public void buttonClick(Button.ClickEvent event) {
                         clearLogMessages();
-                        if(!checkFields()) return;
+                        if (!checkFields()) return;
                         setFieldsEnabled(false);
                         ExportSetting es = makeSettings();
                         final UUID trackId = SqoopUI.getManager().exportData(es);
@@ -66,7 +68,7 @@ public class ExportPanel extends ImportExportBase {
         }));
 
         List<Component> ls = new ArrayList<Component>();
-        ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, UNITS_PERCENTAGE));
+        ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, Unit.PERCENTAGE));
         ls.add(connStringField);
         ls.add(tableField);
         ls.add(usernameField);
@@ -91,10 +93,10 @@ public class ExportPanel extends ImportExportBase {
 
     @Override
     boolean checkFields() {
-        if(super.checkFields()) {
-            if(!hasValue(tableField, "Table name not specified"))
+        if (super.checkFields()) {
+            if (!hasValue(tableField, "Table name not specified"))
                 return false;
-            if(!hasValue(hdfsPathField, "HDFS file path not specified"))
+            if (!hasValue(hdfsPathField, "HDFS file path not specified"))
                 return false;
             // every field has value
             return true;
