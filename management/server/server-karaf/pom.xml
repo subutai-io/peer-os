@@ -1064,33 +1064,7 @@
                                      <artifactId>storm-ui</artifactId>
                                      <version>${project.version}</version>
                                  </artifactItem>
-
-                                 <!- Hadoop &ndash;&gt;
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hadoop-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hadoop-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hadoop-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hadoop-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hadoop-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>-->
+                                 -->
                                 <!-- Products Modules - END -->
 
                                 <!-- Hadoop -->
