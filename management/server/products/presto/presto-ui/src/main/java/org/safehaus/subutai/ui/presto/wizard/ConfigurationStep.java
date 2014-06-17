@@ -8,7 +8,6 @@ package org.safehaus.subutai.ui.presto.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -41,13 +40,11 @@ public class ConfigurationStep extends Panel {
         coordinatorNodeCombo = new ComboBox("Coordinator");
         workersSelect = new TwinColSelect("Workers", new ArrayList<Agent>());
 
-        coordinatorNodeCombo.setMultiSelect(false);
         coordinatorNodeCombo.setImmediate(true);
         coordinatorNodeCombo.setTextInputAllowed(false);
         coordinatorNodeCombo.setRequired(true);
         coordinatorNodeCombo.setNullSelectionAllowed(false);
 
-        hadoopClustersCombo.setMultiSelect(false);
         hadoopClustersCombo.setImmediate(true);
         hadoopClustersCombo.setTextInputAllowed(false);
         hadoopClustersCombo.setRequired(true);
@@ -55,12 +52,11 @@ public class ConfigurationStep extends Panel {
 
         workersSelect.setItemCaptionPropertyId("hostname");
         workersSelect.setRows(7);
-//        workersSelect.setNullSelectionAllowed(false);
         workersSelect.setMultiSelect(true);
         workersSelect.setImmediate(true);
         workersSelect.setLeftColumnCaption("Available Nodes");
         workersSelect.setRightColumnCaption("Selected Nodes");
-        workersSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+        workersSelect.setWidth(100, Unit.PERCENTAGE);
         workersSelect.setRequired(true);
 
         List<Config> clusters = PrestoUI.getHadoopManager().getClusters();
@@ -88,7 +84,7 @@ public class ConfigurationStep extends Panel {
             Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
             wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
             workersSelect.setContainerDataSource(
-                    new BeanItemContainer<Agent>(
+                    new BeanItemContainer<>(
                             Agent.class, hadoopInfo.getAllNodes())
             );
             for (Agent agent : hadoopInfo.getAllNodes()) {
@@ -111,14 +107,14 @@ public class ConfigurationStep extends Panel {
         }
 
         //hadoop cluster selection change listener
-        hadoopClustersCombo.addListener(new Property.ValueChangeListener() {
+        hadoopClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
                     Config hadoopInfo = (Config) event.getProperty().getValue();
                     workersSelect.setValue(null);
                     workersSelect.setContainerDataSource(
-                            new BeanItemContainer<Agent>(
+                            new BeanItemContainer<>(
                                     Agent.class, hadoopInfo.getAllNodes())
                     );
                     coordinatorNodeCombo.setValue(null);
@@ -153,14 +149,13 @@ public class ConfigurationStep extends Panel {
                     for (Agent agent : hadoopNodes) {
                         workersSelect.getContainerDataSource().addItem(agent);
                     }
-                    workersSelect.removeListener(workersSelectChangeListener);
+                    workersSelect.removeValueChangeListener(workersSelectChangeListener);
                     workersSelect.setValue(wizard.getConfig().getWorkers());
-                    workersSelect.addListener(workersSelectChangeListener);
-
+                    workersSelect.addValueChangeListener(workersSelectChangeListener);
                 }
             }
         };
-        coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
+        coordinatorNodeCombo.addValueChangeListener(coordinatorComboChangeListener);
 
         //workers selection change listener
         workersSelectChangeListener = new Property.ValueChangeListener() {
@@ -175,9 +170,9 @@ public class ConfigurationStep extends Panel {
                             && wizard.getConfig().getWorkers().contains(wizard.getConfig().getCoordinatorNode())) {
 
                         wizard.getConfig().setCoordinatorNode(null);
-                        coordinatorNodeCombo.removeListener(coordinatorComboChangeListener);
+                        coordinatorNodeCombo.removeValueChangeListener(coordinatorComboChangeListener);
                         coordinatorNodeCombo.setValue(null);
-                        coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
+                        coordinatorNodeCombo.addValueChangeListener(coordinatorComboChangeListener);
 
                     }
                     Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
@@ -189,21 +184,19 @@ public class ConfigurationStep extends Panel {
                         coordinatorNodeCombo.setItemCaption(agent, agent.getHostname());
                     }
                     if (wizard.getConfig().getCoordinatorNode() != null) {
-                        coordinatorNodeCombo.removeListener(coordinatorComboChangeListener);
+                        coordinatorNodeCombo.removeValueChangeListener(coordinatorComboChangeListener);
                         coordinatorNodeCombo.setValue(wizard.getConfig().getCoordinatorNode());
-                        coordinatorNodeCombo.addListener(coordinatorComboChangeListener);
+                        coordinatorNodeCombo.addValueChangeListener(coordinatorComboChangeListener);
                     }
                 }
             }
         };
-        workersSelect.addListener(workersSelectChangeListener);
+        workersSelect.addValueChangeListener(workersSelectChangeListener);
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Hadoop cluster");
                 } else if (wizard.getConfig().getCoordinatorNode() == null) {
@@ -217,9 +210,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -238,12 +231,11 @@ public class ConfigurationStep extends Panel {
         content.addComponent(workersSelect);
         content.addComponent(buttons);
 
-        addComponent(layout);
+        setContent(layout);
 
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
-
 }

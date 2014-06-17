@@ -21,7 +21,6 @@
         <module>zookeeper</module>
          <module>spark</module>
          <module>shark</module>
-         <module>presto</module>
          <module>sqoop</module>
          -->
 
@@ -38,6 +37,7 @@
         <module>mahout</module>
         <module>oozie</module>
         <module>pig</module>
+        <module>presto</module>
     </modules>
 
 </project>
