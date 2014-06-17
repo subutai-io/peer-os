@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 
 @Theme("dashboard")
 @SuppressWarnings("serial")
-@Title("Mgmt UI")
+@Title("Subutai")
 
 public class MainUI extends UI {
 
@@ -59,7 +59,7 @@ public class MainUI extends UI {
     private HelpManager helpManager;
     private Navigator nav;
 
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<String, Button>();
+    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
     private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
         {
             put("/modules", ModulesView.class);
@@ -221,12 +221,11 @@ public class MainUI extends UI {
                         addComponent(new CssLayout() {
                             {
                                 addStyleName("branding");
-                                Label logo = new Label(
+                                setHeight(150, Unit.PIXELS);
+                                /*Label logo = new Label(
                                         "Subutai",
                                         ContentMode.HTML);
-                                setHeight(150, Unit.PIXELS);
-                                addComponent(logo);
-
+                                addComponent(logo);*/
                                 addComponent(new Image(null, new ThemeResource(
                                         "img/subutai.png")));
                             }
