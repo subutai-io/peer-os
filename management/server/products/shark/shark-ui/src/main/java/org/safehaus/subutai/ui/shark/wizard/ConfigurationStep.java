@@ -29,7 +29,6 @@ public class ConfigurationStep extends Panel {
 
         ComboBox sparkClusters = new ComboBox("Spark cluster");
 
-        sparkClusters.setMultiSelect(false);
         sparkClusters.setImmediate(true);
         sparkClusters.setTextInputAllowed(false);
         sparkClusters.setRequired(true);
@@ -45,7 +44,7 @@ public class ConfigurationStep extends Panel {
         }
 
 
-        sparkClusters.addListener(new Property.ValueChangeListener() {
+        sparkClusters.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 if (event.getProperty().getValue() != null) {
@@ -66,11 +65,9 @@ public class ConfigurationStep extends Panel {
 
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
-
+        next.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                     show("Please, select Spark cluster");
                 } else {
@@ -80,9 +77,9 @@ public class ConfigurationStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 wizard.back();
             }
         });
@@ -99,12 +96,12 @@ public class ConfigurationStep extends Panel {
         content.addComponent(sparkClusters);
         content.addComponent(buttons);
 
-        addComponent(layout);
+        setContent(layout);
 
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

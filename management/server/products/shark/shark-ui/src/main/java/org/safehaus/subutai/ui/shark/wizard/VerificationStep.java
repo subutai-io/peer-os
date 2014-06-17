@@ -5,9 +5,10 @@
  */
 package org.safehaus.subutai.ui.shark.wizard;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.shark.Config;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.shark.SharkUI;
 
@@ -29,7 +30,7 @@ public class VerificationStep extends Panel {
 
         Label confirmationLbl = new Label("<strong>Please verify the installation settings "
                 + "(you may change them by clicking on Back button)</strong><br/>");
-        confirmationLbl.setContentMode(Label.CONTENT_XHTML);
+        confirmationLbl.setContentMode(ContentMode.HTML);
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
@@ -38,19 +39,22 @@ public class VerificationStep extends Panel {
         }
 
         Button install = new Button("Install");
-        install.addListener(new Button.ClickListener() {
-
+        install.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig());
-                MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
-                wizard.init();
+                ProgressWindow window = new ProgressWindow(SharkUI.getExecutor(), SharkUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                window.getWindow().addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        wizard.init();
+                    }
+                });
             }
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.back();
@@ -67,8 +71,7 @@ public class VerificationStep extends Panel {
 
         grid.addComponent(buttons, 0, 4);
 
-        addComponent(grid);
-
+        setContent(grid);
     }
 
 }
