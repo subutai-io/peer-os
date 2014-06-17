@@ -221,11 +221,7 @@ public class MainUI extends UI {
                         addComponent(new CssLayout() {
                             {
                                 addStyleName("branding");
-                                setHeight(150, Unit.PIXELS);
-                                /*Label logo = new Label(
-                                        "Subutai",
-                                        ContentMode.HTML);
-                                addComponent(logo);*/
+                                setHeight(140, Unit.PIXELS);
                                 addComponent(new Image(null, new ThemeResource(
                                         "img/subutai.png")));
                             }
