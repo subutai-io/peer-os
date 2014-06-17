@@ -5832,7 +5832,7 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .sidebar .user > .v-slot {
     display: inline-block;
-    width: 60%;
+    width: 50%;
 }
 
 .dashboard .sidebar .user > .v-slot:first-child {
@@ -5941,7 +5941,7 @@ body .dashboard.v-app .v-app-loading {
     background-color: rgba(40, 40, 40, 0.85);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     color: #a6a9aa;
-    font: $ font;
+    font: $font;
     font-size: 12px;
     -webkit-animation: fade-in 160ms ease-out;
     -moz-animation: fade-in 160ms ease-out;
