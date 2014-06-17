@@ -35,5 +35,8 @@ wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearc
 dpkg-deb -e $fileName/elasticsearch-$esVersion.deb $fileName/DEBIAN/
 dpkg-deb -x $fileName/elasticsearch-$esVersion.deb $fileName/
 
+cp -a $BASE/../workspace/big-data/elasticsearch/elasticsearch/* $BASE/$fileName
+
+rm $BASE/$fileName/elasticsearch-$esVersion.deb
 dpkg-deb -z8 -Zgzip --build $fileName
 cp ksks*.deb /var/lib/jenkins/Automation/Bigdata/elasticsearch
