@@ -431,15 +431,7 @@ public class LxcManagerImpl implements LxcManager {
             Command cloneNStartCommand = Commands.getCloneNStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( cloneNStartCommand );
 
-            LxcState state = LxcState.UNKNOWN;
-            if ( cloneNStartCommand.hasCompleted() ) {
-                AgentResult result = cloneNStartCommand.getResults().entrySet().iterator().next().getValue();
-                if ( result.getStdOut().contains( "RUNNING" ) ) {
-                    state = LxcState.RUNNING;
-                }
-            }
-
-            return LxcState.RUNNING.equals( state );
+            return cloneNStartCommand.hasSucceeded();
         }
         return false;
     }
@@ -513,7 +505,7 @@ public class LxcManagerImpl implements LxcManager {
 
             //wait for completion
             try {
-                for ( LxcInfo lxcInfo : lxcInfos ) {
+                for ( LxcInfo ignored : lxcInfos ) {
                     Future<LxcInfo> future = completer.take();
                     future.get();
                 }
@@ -673,9 +665,7 @@ public class LxcManagerImpl implements LxcManager {
                 future.get();
             }
         }
-        catch ( InterruptedException e ) {
-        }
-        catch ( ExecutionException e ) {
+        catch ( InterruptedException | ExecutionException e ) {
         }
 
         boolean result = true;
