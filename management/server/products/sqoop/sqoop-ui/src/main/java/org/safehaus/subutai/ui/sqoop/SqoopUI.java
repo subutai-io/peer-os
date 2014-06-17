@@ -78,7 +78,7 @@ public class SqoopUI implements PortalModule {
 
     @Override
     public String getId() {
-        return null;
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {

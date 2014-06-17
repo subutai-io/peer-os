@@ -214,7 +214,7 @@ public class MainUI extends UI {
                     // Sidebar
                     {
                         addStyleName("sidebar");
-                        setWidth(null);
+                        setWidth(50, Unit.PIXELS);
                         setHeight("100%");
 
                         // Branding element
