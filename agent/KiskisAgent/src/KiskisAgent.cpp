@@ -32,6 +32,7 @@
  * 	 	 	   manage any system administration task.
  * 	 	 	   The agent may run on physical servers, virtual machines or inside Linux Containers.
  */
+
 #include "KACommand.h"
 #include "KAResponse.h"
 #include "KAUserID.h"
@@ -475,7 +476,7 @@ int main(int argc,char *argv[],char *envp[])
 			" Port: ",toString(port)));
 	KACommand command;
 	KAResponsePack response;
-	string input;
+	string input="";
 	string sendout;
 
 	response.setIps(ipadress);
@@ -575,10 +576,16 @@ int main(int argc,char *argv[],char *envp[])
 				{
 					while(getline(queueFile,queueElement))
 					{
-						command.deserialize(queueElement);
-						string resp = response.createInQueueMessage(Uuid,command.getTaskUuid());
-						connection->sendMessage(resp);
-						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","IN_QUEUE Response:", resp));
+						if(command.deserialize(queueElement))
+						{
+							string resp = response.createInQueueMessage(Uuid,command.getTaskUuid());
+							connection->sendMessage(resp);
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","IN_QUEUE Response:", resp));
+						}
+						else
+						{
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Fetched Element:",queueElement));
+						}
 					}
 				}
 				queueFile.close();
@@ -614,6 +621,7 @@ int main(int argc,char *argv[],char *envp[])
 				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","total running process:",toString(currentProcess)));
 				connection->resetMessageStatus(); //reseting message status
 				input = connection->getMessage(); //fetching message..
+				logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Fetched Message:",input));
 
 				if(command.deserialize(input))	 //deserialize the message
 				{
@@ -643,7 +651,7 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						fstream file;	//opening uuid.txt
 						file.open("/etc/ksks-agent/config/commandQueue.txt",fstream::in | fstream::out | fstream::app);
-						file << input << endl ;
+						file << input;
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Received Message to internal currentProcess!"));
 						file.close();
 					}
@@ -725,18 +733,8 @@ int main(int argc,char *argv[],char *envp[])
 					{
 						ofstream file3("/etc/ksks-agent/config/commandQueue2.txt");
 						input = "";
-						int count=0;
-						do
-						{
-							getline(file2,str2);
-							if(str2.find("{") != string::npos)
-								count++;
-							input=input + str2 + "\n";
-							str+=str2;
-							if(str2.find("}") != string::npos)
-								count--;
-						}while(count>0);
-						//					file3.open",fstream::in | fstream::out | fstream::app);
+						getline(file2,str2);
+						input = str2;
 						while(getline(file2,str2))
 						{
 							file3 << str2 << endl;
