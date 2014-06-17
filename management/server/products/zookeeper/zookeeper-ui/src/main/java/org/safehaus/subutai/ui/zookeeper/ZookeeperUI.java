@@ -29,7 +29,7 @@ public class ZookeeperUI implements PortalModule {
     private static CommandRunner commandRunner;
     private static ExecutorService executor;
 
-    public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager) {
+    public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager, CommandRunner commandRunner) {
         ZookeeperUI.agentManager = agentManager;
         ZookeeperUI.tracker = tracker;
         ZookeeperUI.manager = manager;
