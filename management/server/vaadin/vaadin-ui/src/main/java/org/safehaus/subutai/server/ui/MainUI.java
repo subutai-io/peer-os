@@ -222,7 +222,7 @@ public class MainUI extends UI {
                             {
                                 addStyleName("branding");
                                 Label logo = new Label(
-                                        "<span>Subutai</span> System",
+                                        "<span>Subutai</span>",
                                         ContentMode.HTML);
                                 logo.setSizeUndefined();
                                 addComponent(logo);

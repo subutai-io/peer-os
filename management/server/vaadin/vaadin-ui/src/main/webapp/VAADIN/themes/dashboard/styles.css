@@ -5832,7 +5832,7 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .sidebar .user > .v-slot {
     display: inline-block;
-    width: 50%;
+    width: 60%;
 }
 
 .dashboard .sidebar .user > .v-slot:first-child {
