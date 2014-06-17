@@ -76,4 +76,8 @@ public class ConfirmationDialog {
     public Button getOk() {
         return ok;
     }
+
+    public Button getCancel() {
+        return cancel;
+    }
 }

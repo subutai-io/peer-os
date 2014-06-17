@@ -913,6 +913,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--Spark-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Accumulo -->
                                 <!-- <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
@@ -940,33 +967,6 @@
                                      <version>${project.version}</version>
                                  </artifactItem>
 
-                                 &lt;!&ndash; Presto &ndash;&gt;
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>presto-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>presto-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>presto-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>presto-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>presto-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-
                                  &lt;!&ndash; Shark &ndash;&gt;
                                  <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
@@ -991,33 +991,6 @@
                                  <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
                                      <artifactId>shark-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-
-                                 &lt;!&ndash; Spark &ndash;&gt;
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>spark-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>spark-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>spark-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>spark-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>spark-rest</artifactId>
                                      <version>${project.version}</version>
                                  </artifactItem>
 
