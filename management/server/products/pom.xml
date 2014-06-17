@@ -34,7 +34,7 @@
         <module>oozie</module>
         <module>pig</module>
         <module>presto</module>
-        <!--<module>shark</module>-->
+        <module>shark</module>
         <module>solr</module>
         <module>spark</module>
     </modules>
