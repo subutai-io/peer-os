@@ -22,16 +22,15 @@ public class Commands extends CommandsSingleton {
 
     public static Command getCloneCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand( new RequestBuilder(
-                        String.format( "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s",
-                                lxcHostName ) ).withTimeout( 360 ), Util.wrapAgentToSet( physicalAgent ) );
+                String.format( "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s", lxcHostName ) )
+                .withTimeout( 360 ), Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getCloneNStartCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand( new RequestBuilder( String.format(
-                        "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s;sleep 10;/usr/bin/lxc-start " +
-                                "-n %1$s -d",
-                        lxcHostName ) ).withTimeout( 360 ), Util.wrapAgentToSet( physicalAgent ) );
+                "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s && /usr/bin/lxc-start -n %1$s -d",
+                lxcHostName ) ).withTimeout( 360 ), Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
@@ -41,8 +40,9 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getLxcInfoCommand( Agent physicalAgent, String lxcHostName ) {
-        return createCommand( new RequestBuilder( String.format( "sleep 10 ; /usr/bin/lxc-info -n %s", lxcHostName ) )
-                        .withTimeout( 60 ), Util.wrapAgentToSet( physicalAgent ) );
+        return createCommand(
+                new RequestBuilder( String.format( "/usr/bin/lxc-info -n %s", lxcHostName ) ).withTimeout( 60 ),
+                Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
@@ -62,8 +62,8 @@ public class Commands extends CommandsSingleton {
 
     public static Command getLxcDestroyCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand( new RequestBuilder(
-                        String.format( "/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostName ) )
-                        .withTimeout( 180 ), Util.wrapAgentToSet( physicalAgent ) );
+                String.format( "/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostName ) )
+                .withTimeout( 180 ), Util.wrapAgentToSet( physicalAgent ) );
     }
 
 

@@ -51,6 +51,7 @@ import com.google.common.base.Strings;
 public class LxcManagerImpl implements LxcManager {
 
     private final Pattern p = Pattern.compile( "load average: (.*)" );
+    private final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT = 10000;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
@@ -353,6 +354,11 @@ public class LxcManagerImpl implements LxcManager {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) ) {
             Command startLxcCommand = Commands.getLxcStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( startLxcCommand );
+            try {
+                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
+            }
+            catch ( InterruptedException e ) {
+            }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
@@ -382,6 +388,11 @@ public class LxcManagerImpl implements LxcManager {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) ) {
             Command stopLxcCommand = Commands.getLxcStopCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( stopLxcCommand );
+            try {
+                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
+            }
+            catch ( InterruptedException e ) {
+            }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
