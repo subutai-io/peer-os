@@ -39,6 +39,8 @@ done
 echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
      >> /var/lib/lxc/master/config
 
+mkdir /var/lib/lxc/master/rootfs/etc/subutai
+
 # NOTES:
 # -----------------------------------------------------------------------------
 # Unfortunately we cannot create the blank (empty) dataset for the master
@@ -58,10 +60,8 @@ echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
 pkglist=/tmp/pkglist-master.txt
 
 if [ -n "$SUBUTAI_APT_MIRROR" ]; then
-  echo $SUBUTAI_APT_MIRROR archive.ubuntu.com \
-      >> /var/lib/lxc/master/rootfs/etc/hosts
-  echo $SUBUTAI_APT_MIRROR security.ubuntu.com \
-      >> /var/lib/lxc/master/rootfs/etc/hosts
+  echo "$SUBUTAI_APT_MIRROR archive.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
+  echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
 fi
 
 lxc-start -d -n master
@@ -101,8 +101,8 @@ cd /var/lib/lxc/master/rootfs/
 git init
 git config user.email "$SUBUTAI_EMAIL"
 git config user.name  "$SUBUTAI_USER"
-echo etc/mtab       >> .gitignore
-echo mtab           >> .gitignore
+echo etc/mtab*      >> .gitignore
+echo mtab*          >> .gitignore
 echo etc/*.old      >> .gitignore
 echo *.old          >> .gitignore
 echo etc/blkid.tab  >> .gitignore

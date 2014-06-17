@@ -6,7 +6,7 @@ container=$1
 
 function usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Creates and registers a template from an existing container
+  echo Usage: Converts and registers an instance container as a template
   echo
   echo "	"subutai-template container
   echo
@@ -16,6 +16,11 @@ function usage {
 # Also sources bsfl
 . /etc/subutai/functionz
 
+# The master is already a template
+if [ "$container" == "master" ]; then
+  msg_error "The master is already a template. Aborting ..."
+  exit 1 
+fi
 
 # Plan for creating a template from a container
 # -----------------------------------------------------------------------------
@@ -23,18 +28,139 @@ function usage {
 #     - container MUST exist
 #     - container MUST NOT have a 'template' snapshot
 #     - container name MUST NOT be in the template registry
-#     - container MUST be in the STOPPED state (may change later with hooks):
-#       might want to stop the container if it is in the RUNNING state
-#       might need the container running to calculate package changes
 #     - container parent MUST be present in the template registry
-# (2) commit config point changes and push to git as new branch from parent
-# (3) take 'template' snapshots on all filesystems, and apply "keep" hold
-# (4) generate delta images of all filesystems: 'created' -> 'template'
-# (5) generate the package change information
+# (2) replace package manifest in /etc/subutai
+# (3) commit config point changes and push to site git as new branch from parent
+# (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
+# (5) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
 # (6) generate the tsar file from git differential, deltas, and package info
-# (7) send tsar file to subutai server
+# (7) register and send tsar file to subutai management server
 
+
+
+# -----------------------------------------------------------------------------
 # (1) perform some sanity checks
+# -----------------------------------------------------------------------------
+check_exists $container
 
-# (2) git operations
+# check to make sure the container is NOT already a template
+if [ "`is_template $container`" == "true" ]; then
+  msg_error "Container \"$container\" is already a template. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: \"$container\" is NOT a template"
+fi
+
+# check to make sure container is NOT registered as a template
+if [ "`is_registered $container`" == "true" ]; then
+  msg_error "A template with name \"$container\" is registered. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: \"$container\" is NOT registered"
+fi
+
+parent=`get_parent $container`
+check_parent $parent
+# check to make sure the parent is a template
+if [ "`is_template $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is a template"
+fi
+
+# check to make sure the parent is registered
+if [ "`is_registered $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is registered"
+fi
+
+
+# start container if it is stopped
+if [ -z "`lxc-ls --running | grep $container`" ]; then
+  lxc-start -d -n $container
+fi
+
+# -----------------------------------------------------------------------------
+# (2) replace package manifest in /etc/subutai
+# -----------------------------------------------------------------------------
+
+lxc-attach -n $container -- 'dpkg -l > /etc/subutai/package-manifest.txt'
+
+# -----------------------------------------------------------------------------
+# (3) git operations
+# -----------------------------------------------------------------------------
+
+# add all uncommitted files (should be some: /etc/hosts)
+lxc-attach -n $container -- git add -A
+
+# commit the changes 
+lxc-attach -n $container -- git commit -m \
+  "commit changes for new $container template" 
+
+# capture the commit UUID 
+uuid=`lxc-attach -n $container -- git log | grep commit | head -n 1 | awk '{print $2}'`
+msg_info "    - commit UUID extracted: $uuid"
+
+# push to the subutai site git repository if defined
+if [ -n "$SUBUTAI_SITE_GIT" ]; then
+  lxc-attach -n $container -- git remote set-url upstream $SUBUTAI_SITE_GIT
+  lxc-attach -n $container -- git push -u upstream $container
+fi
+
+
+# -----------------------------------------------------------------------------
+# (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
+# -----------------------------------------------------------------------------
+
+lxc-stop -n $container
+zfs snapshot lxc/$container@template
+zfs hold keep lxc/$container@template
+
+zfs snapshot lxc/$container-opt@template
+zfs hold keep lxc/$container-opt@template
+
+zfs snapshot lxc-data/$container-var@template
+zfs hold keep lxc-data/$container-var@template
+
+zfs snapshot lxc-data/$container-home@template
+zfs hold keep lxc-data/$container-home@template
+
+
+# -----------------------------------------------------------------------------
+# (5) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
+# -----------------------------------------------------------------------------
+
+tsar_root="$SUBUTAI_TMPDIR/$container"
+deltas="$tsar_root/deltas"
+mkdir -p $deltas
+zfs send "lxc/$container@template" > "$deltas/rootfs.delta"
+zfs send "lxc/$container-opt@template" > "$deltas/opt.delta"
+zfs send "lxc-data/$container-var@template" > "$deltas/var.delta"
+zfs send "lxc-data/$container-home@template" > "$deltas/home.delta"
+
+
+# -----------------------------------------------------------------------------
+# (6) generate the tsar file from git differential, deltas, and package info
+# -----------------------------------------------------------------------------
+
+cp /var/lib/lxc/$container/config $tsar_root
+cp /var/lib/lxc/$container/fstab  $tsar_root
+
+mkdir -p $tsar_root/etc
+cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
+echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
+
+tar -zcvf $SUBUTAI_TMPDIR/$container.tsar $tsar_root
+
+# -----------------------------------------------------------------------------
+# (7) register and send tsar file to subutai management server
+# -----------------------------------------------------------------------------
+
+send_n_register $SUBUTAI_TMPDIR/$container.tsar
+
 

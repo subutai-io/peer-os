@@ -14,6 +14,11 @@ function usage {
   echo -----------------------------------------------------------------------
 }
 
+if [ "$clone" == "master" ]; then
+  msg_error "Use subutai-master-destroy instead of subutai-clone-destroy"
+  exit 1
+fi
+
 # Destruction Plan:
 # -----------------------------------------------------------------------------
 # (1) check that clone exists first, and find its parent
@@ -28,6 +33,11 @@ function usage {
 
 # (1) check that clone exists first
 check_exists "$clone" "`usage`"
+
+# if running turn it off
+if [ -n "`lxc-ls --running | grep $clone`" ]; then
+  lxc-stop -n $clone
+fi
 
 # (1) let's get the clone's parent
 parent_snap=`zfs get origin "lxc/$clone" | grep $clone | awk '{print $3}'`

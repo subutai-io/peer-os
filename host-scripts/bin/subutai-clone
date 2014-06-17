@@ -29,6 +29,13 @@ function usage {
 check_parent "$parent" "`usage`"
 check_child  "$child" "`usage`"
 
+if [ "`is_template $parent`" == "false" ]; then
+  msg_notice "    - parent \"$parent\" is not a template ... promoting"
+  subutai-template $parent
+else
+  msg_info "    - parent \"$parent\" is a template"
+fi
+
 # (2) swallow bogus complaint from lxc-clone
 output=`lxc-clone -B zfs -s -o "$parent" -n "$child" 2>&1 | grep -v "could not"`
 

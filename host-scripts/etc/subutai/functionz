@@ -121,6 +121,86 @@ function check_child {
 }
 
 
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to ask Subutai if a template name is registered 
+# already. Since this functionality is not available I just stubbed it 
+# out with a call to is_template. 
+function is_registered {
+  echo `is_template $1`
+}
+
+
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to take the supplied tsar file and upload and 
+# register it with the Subutai management server.
+function send_n_register {
+  tsar=$1
+
+  msg_ok "TSAR file $tsar registered and sent to management server"
+}
+
+
+# checks if the container (arg $1) is a template, echo "true"/"false"
+function is_template {
+  c="$1"
+  s=`zfs list -t snapshot -o name -H | grep "lxc/$c@template" | grep -v '\-opt'`
+
+  if [ -z "$s" ]; then
+    echo false
+  else
+    echo true
+  fi
+}
+
+# gets the parent of a container
+# first argument $1 is the name of the child container
+function get_parent {
+  c="$1"
+
+  if [ "$c" == "master" ]; then
+    echo master
+    return 1
+  fi
+
+  snap=`zfs list -t snapshot -o name -H | egrep "lxc/.*@$c" | grep -v '\-opt'`
+  echo `ctnr_from_ds $snap`
+}
+
+# extracts the container name from a dataset or a dataset snapshot
+function ctnr_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
+}
+
+# extracts the zpool name from a dataset or a dataset snapshot
+function pool_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/\/.*//'
+}
+
+# extracts the snapshot name from a dataset snapshot
+function snap_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/.*@//'
+}
+
+# extracts the partition name from a dataset or a dataset snapshot
+function part_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/.*-//'
+}
+
+
+# lists all the templates available
+function list_templates {
+  for line in `zfs list -t snapshot -o name -H \
+    | grep template               \
+    | egrep -v '\-.*'`; do
+    echo `ctnr_from_ds $line`
+  done
+}
+
+
 function check_lxc {
   return
 }

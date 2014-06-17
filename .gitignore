@@ -1,4 +1,5 @@
 target
+*.swp
 *.iml
 *.log
 .idea
