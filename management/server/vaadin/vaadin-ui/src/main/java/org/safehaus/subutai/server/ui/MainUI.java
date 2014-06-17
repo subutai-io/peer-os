@@ -214,7 +214,7 @@ public class MainUI extends UI {
                     // Sidebar
                     {
                         addStyleName("sidebar");
-                        setWidth(150, Unit.PIXELS);
+                        setWidth(140, Unit.PIXELS);
                         setHeight("100%");
 
                         // Branding element
@@ -224,7 +224,7 @@ public class MainUI extends UI {
                                 Label logo = new Label(
                                         "<span>Subutai</span>",
                                         ContentMode.HTML);
-                                logo.setSizeUndefined();
+                                logo.setWidth(140, Unit.PIXELS);
                                 addComponent(logo);
 
                                 addComponent(new Image(null, new ThemeResource(
