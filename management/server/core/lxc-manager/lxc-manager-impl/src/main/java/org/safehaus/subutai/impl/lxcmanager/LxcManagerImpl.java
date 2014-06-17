@@ -51,6 +51,7 @@ import com.google.common.base.Strings;
 public class LxcManagerImpl implements LxcManager {
 
     private final Pattern p = Pattern.compile( "load average: (.*)" );
+    private final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT = 10000;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private ExecutorService executor;
@@ -353,6 +354,11 @@ public class LxcManagerImpl implements LxcManager {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) ) {
             Command startLxcCommand = Commands.getLxcStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( startLxcCommand );
+            try {
+                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
+            }
+            catch ( InterruptedException e ) {
+            }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
@@ -382,6 +388,11 @@ public class LxcManagerImpl implements LxcManager {
         if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) ) {
             Command stopLxcCommand = Commands.getLxcStopCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( stopLxcCommand );
+            try {
+                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
+            }
+            catch ( InterruptedException e ) {
+            }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
 
@@ -431,15 +442,7 @@ public class LxcManagerImpl implements LxcManager {
             Command cloneNStartCommand = Commands.getCloneNStartCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( cloneNStartCommand );
 
-            LxcState state = LxcState.UNKNOWN;
-            if ( cloneNStartCommand.hasCompleted() ) {
-                AgentResult result = cloneNStartCommand.getResults().entrySet().iterator().next().getValue();
-                if ( result.getStdOut().contains( "RUNNING" ) ) {
-                    state = LxcState.RUNNING;
-                }
-            }
-
-            return LxcState.RUNNING.equals( state );
+            return cloneNStartCommand.hasSucceeded();
         }
         return false;
     }
@@ -513,7 +516,7 @@ public class LxcManagerImpl implements LxcManager {
 
             //wait for completion
             try {
-                for ( LxcInfo lxcInfo : lxcInfos ) {
+                for ( LxcInfo ignored : lxcInfos ) {
                     Future<LxcInfo> future = completer.take();
                     future.get();
                 }
@@ -673,9 +676,7 @@ public class LxcManagerImpl implements LxcManager {
                 future.get();
             }
         }
-        catch ( InterruptedException e ) {
-        }
-        catch ( ExecutionException e ) {
+        catch ( InterruptedException | ExecutionException e ) {
         }
 
         boolean result = true;
