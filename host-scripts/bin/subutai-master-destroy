@@ -6,25 +6,21 @@ echo WARNING: this destroys everything mercilessly
 echo \<Return\> to continue, or Ctrl-C to exit
 read
 
-if [ -z "`zfs list lxc/"$SUBUTAI_MASTER"`" ]; then
-  echo No zfs dataset \'lxc/$SUBUTAI_MASTER\' found - aborting ...
+if [ -z "`zfs list lxc/master`" ]; then
+  echo No zfs dataset \'lxc/master\' found - aborting ...
   exit 1
 fi
 
-zfs release keep lxc/$SUBUTAI_MASTER'-opt@'$SUBUTAI_CREATED_SNAPSHOT
-zfs release keep lxc/$SUBUTAI_MASTER'-opt@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs destroy -r lxc/$SUBUTAI_MASTER'-opt'
+zfs release keep lxc/master-opt@template
+zfs destroy -r lxc/master-opt
 
-zfs release keep lxc-data/$SUBUTAI_MASTER'-var@'$SUBUTAI_CREATED_SNAPSHOT
-zfs release keep lxc-data/$SUBUTAI_MASTER'-var@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs destroy -r lxc-data/$SUBUTAI_MASTER'-var'
+zfs release keep lxc-data/master-var@template
+zfs destroy -r lxc-data/master-var
 
-zfs release keep lxc-data/$SUBUTAI_MASTER'-home@'$SUBUTAI_CREATED_SNAPSHOT
-zfs release keep lxc-data/$SUBUTAI_MASTER'-home@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs destroy -r lxc-data/$SUBUTAI_MASTER'-home'
+zfs release keep lxc-data/master-home@template
+zfs destroy -r lxc-data/master-home
 
-zfs release keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_CREATED_SNAPSHOT
-zfs release keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs destroy -r lxc/$SUBUTAI_MASTER
-lxc-destroy -n $SUBUTAI_MASTER
+zfs release keep lxc/master@template
+zfs destroy -r lxc/master
+lxc-destroy -n master
 

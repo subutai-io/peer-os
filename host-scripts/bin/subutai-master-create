@@ -7,26 +7,37 @@
 # Check for Master Existence
 # -----------------------------------------------------------------------------
 
-if [ -n "`lxc-ls "$SUBUTAI_MASTER" | grep "$SUBUTAI_MASTER"`" ]; then
-  echo LXC container $SUBUTAI_MASTER already exists!
+if [ -n "`lxc-ls master | grep master`" ]; then
+  echo LXC container master already exists!
   exit 1
 fi
 
-if [ -n "`zfs list lxc/$SUBUTAI_MASTER`" ]; then
-  echo "Zfs dataset lxc/$SUBUTAI_MASTER already exists!"
+if [ -n "`zfs list lxc/master`" ]; then
+  echo "Zfs dataset lxc/master already exists!"
   exit 1
 fi
 
 # Create the container
 # -----------------------------------------------------------------------------
 
-lxc-create -n $SUBUTAI_MASTER   \
+lxc-create -n master            \
  -t ubuntu                      \
  -B zfs --                      \
  -u $SUBUTAI_USER               \
  -S $SUBUTAI_AUTH_KEY 
 
-# --packages $SUBUTAI_PACKAGES   \
+# Add config and app data paths to the config file
+for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
+  echo subutai.config.path=$config_path >> /var/lib/lxc/master/config
+done
+
+for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
+  echo subutai.app.data.path=$appdata_path >> /var/lib/lxc/master/config
+done
+
+# Add pre-start hook script entry
+echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
+     >> /var/lib/lxc/master/config
 
 # NOTES:
 # -----------------------------------------------------------------------------
@@ -40,79 +51,88 @@ lxc-create -n $SUBUTAI_MASTER   \
 # (2) Take created snapshot and hold
 # (3) Recover from backup of rootfs
 # (4) Delete backup
-# (5) Setup Git repository in /etc
+# (5) Setup git repository in / and control /etc
 # (6) Tag template snapshot and hold
 
 # (0)
-pkglist=/tmp/pkglist-$SUBUTAI_MASTER.txt
-lxc-start -d -n $SUBUTAI_MASTER
-lxc-wait -n $SUBUTAI_MASTER -s 'RUNNING' -t 5
+pkglist=/tmp/pkglist-master.txt
+lxc-start -d -n master
+lxc-wait -n master -s 'RUNNING' -t 5
 
 count=10
 while [ $count -gt 0 ]; do
   sleep 1
-  ipv4=`lxc-ls -f | grep $SUBUTAI_MASTER | awk '{print $3}'`
+  ipv4=`lxc-ls -f | grep master | awk '{print $3}'`
 
   if [ "$ipv4" != "-" ]; then
     echo Got IPv4 address of $ipv4  
-    lxc-attach -n $SUBUTAI_MASTER -- ping -c 3 mit.edu
+    lxc-attach -n master -- ping -c 3 mit.edu
     break
   fi
 
   count=`expr $count - 1`
 done
 
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get update
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get -y dist-upgrade
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get -y autoclean
-lxc-attach -n $SUBUTAI_MASTER -- \
-    apt-get -y autoremove
-lxc-attach -n $SUBUTAI_MASTER -- \
-    dpkg -l > /tmp/pkglist.txt
-lxc-stop -n $SUBUTAI_MASTER
-lxc-wait -n $SUBUTAI_MASTER -s 'STOPPED'
+lxc-attach -n master -- apt-get update
+lxc-attach -n master -- apt-get -y dist-upgrade
+
+if [ -n "$SUBUTAI_PACKAGES" ]; then
+  lxc-attach -n master -- \
+      apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+fi
+
+lxc-attach -n master -- apt-get -y autoclean
+lxc-attach -n master -- apt-get -y autoremove
+lxc-attach -n master -- dpkg -l > /tmp/pkglist.txt
+lxc-stop -n master
+lxc-wait -n master -s 'STOPPED'
 sleep 2
 
-# (1)
-echo Taking $SUBUTAI_CREATED_SNAPSHOT snapshot of master\'s rootfs
-pushd .
-cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs
-tar -cf /tmp/$SUBUTAI_MASTER-rootfs.tgz *
-rm -rf /var/lib/lxc/$SUBUTAI_MASTER/rootfs/*
-
-# (2)
-zfs snapshot lxc/$SUBUTAI_MASTER'@'$SUBUTAI_CREATED_SNAPSHOT
-zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_CREATED_SNAPSHOT
-
-# (3) and (4)
-tar -xf /tmp/$SUBUTAI_MASTER-rootfs.tgz
-rm /tmp/$SUBUTAI_MASTER-rootfs.tgz
-popd
-
-# (5) setup git repository in /etc
-pushd .
-cd /var/lib/lxc/$SUBUTAI_MASTER/rootfs/etc
+# (5) setup git repository in / and control /etc
+cd /var/lib/lxc/master/rootfs/
 git init
-git config --global user.email 'subutai@safehaus.org'
-git config --global user.name 'subutai'
-echo '*.old' >> .gitignore
-echo blkid.tab >> .gitignore
-echo adjtime >> .gitignore
+git config user.email "$SUBUTAI_EMAIL"
+git config user.name  "$SUBUTAI_USER"
+echo etc/mtab       >> .gitignore
+echo mtab           >> .gitignore
+echo etc/*.old      >> .gitignore
+echo *.old          >> .gitignore
+echo etc/blkid.tab  >> .gitignore
+echo blkid.tab      >> .gitignore
+echo etc/adjtime    >> .gitignore
+echo adjtime        >> .gitignore
+echo bin            >> .gitignore
+echo boot           >> .gitignore
+echo dev            >> .gitignore
+echo home           >> .gitignore
+echo initrd.*       >> .gitignore
+echo lib            >> .gitignore
+echo lib64          >> .gitignore
+echo lost+found     >> .gitignore
+echo lxc            >> .gitignore
+echo lxc-data       >> .gitignore
+echo media          >> .gitignore
+echo mnt            >> .gitignore
+echo opt            >> .gitignore
+echo proc           >> .gitignore
+echo root           >> .gitignore
+echo run            >> .gitignore
+echo sbin           >> .gitignore
+echo srv            >> .gitignore
+echo sys            >> .gitignore
+echo tmp            >> .gitignore
+echo usr            >> .gitignore
+echo var            >> .gitignore
+echo vmlinuz*       >> .gitignore
 git add .gitignore
 git commit -m 'setting up git for master'
 git add -A
 git commit -m 'initial master /etc import for master'
-popd
 
 # (6)
-echo Taking $SUBUTAI_TEMPLATE_SNAPSHOT snapshot of master\'s rootfs
-zfs snapshot lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
-zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
+echo Taking @template snapshot of master\'s rootfs
+zfs snapshot lxc/master@template
+zfs hold keep lxc/master@template
 
 # Handle all other mountpoints
 # -----------------------------------------------------------------------------
@@ -121,7 +141,7 @@ zfs hold keep lxc/$SUBUTAI_MASTER'@'$SUBUTAI_TEMPLATE_SNAPSHOT
 # mount point on the rootfs are moved over to the new dataset once created
 # snapshots with holds are taken.
 
-addmount $SUBUTAI_MASTER opt lxc
-addmount $SUBUTAI_MASTER home lxc-data
-addmount $SUBUTAI_MASTER var lxc-data
+addmount master opt lxc
+addmount master home lxc-data
+addmount master var lxc-data
 

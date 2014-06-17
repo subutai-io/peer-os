@@ -25,20 +25,16 @@ init
 # o Checks to make sure it is properly created and mounted
 # o Adds the LXC mount entries to the lxc configuration file of container
 # o Moves over data contained in the rootfs for the mount to the dataset
-# o Snapshots the newly created filesystems with @created
+# o Snapshots the newly created populated filesystems with @template
 
 function addmount {
   name=$1
   mount=$2
   zpool=$3
-  snap_created=$SUBUTAI_CREATED_SNAPSHOT
-  snap_template=$SUBUTAI_TEMPLATE_SNAPSHOT
 
   dataset=$zpool/$name-$mount
   echo Creating $dataset dataset for $mount mount entry
   zfs create $dataset
-  zfs snapshot $dataset'@'$snap_created
-  zfs hold keep $dataset'@'$snap_created
 
   if [ -z "`zfs list $dataset`" ]; then
     echo Could not create $dataset dataset 
@@ -65,8 +61,8 @@ function addmount {
   popd
 
   # Time to Snapshot and Apply Holds
-  zfs snapshot $dataset'@'$snap_template
-  zfs hold keep $dataset'@'$snap_template
+  zfs snapshot $dataset'@template'
+  zfs hold keep $dataset'@template'
   return
 }
 
