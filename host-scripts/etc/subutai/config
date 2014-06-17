@@ -3,6 +3,9 @@
 # The version of Subutai
 export SUBUTAI_VERSION=2.1.0
 
+# LAN mirror on management server used instead of going over the WAN
+export SUBUTAI_APT_MIRROR=172.16.2.140
+
 # Default set of packages to install on all containers
 export SUBUTAI_PACKAGES=git
 
