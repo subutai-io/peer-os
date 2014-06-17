@@ -88,7 +88,8 @@ fi
 # (2) replace package manifest in /etc/subutai
 # -----------------------------------------------------------------------------
 
-lxc-attach -n $container -- 'dpkg -l > /etc/subutai/package-manifest.txt'
+lxc-attach -n $container -- mkdir -p /etc/subutai
+lxc-attach -n $container -- dpkg -l > /etc/subutai/package-manifest.txt
 
 # -----------------------------------------------------------------------------
 # (3) git operations
@@ -155,7 +156,10 @@ mkdir -p $tsar_root/etc
 cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
 echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
 
-tar -zcvf $SUBUTAI_TMPDIR/$container.tsar $tsar_root
+pushd . 
+cd $SUBUTAI_TMPDIR
+tar -zcvf $container.tsar $container
+popd
 
 # -----------------------------------------------------------------------------
 # (7) register and send tsar file to subutai management server

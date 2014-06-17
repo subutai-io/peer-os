@@ -85,6 +85,24 @@ function check_exists {
 }
 
 
+function check_missing {
+  container="$1"
+  usage="$2"
+
+  if [ -z "$container" ]; then
+    msg_error "No value provided for containe's name. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -n "`lxc-ls "$container" | grep "$container"`" ]; then
+    msg_error "Container \"$container\" exists. Aborting ..."
+    show_usage "$usage"
+  else 
+    msg_ok "Container \"$container\" does not exist."
+  fi
+}
+
+
 function check_parent {
   parent="$1"
   usage="$2"

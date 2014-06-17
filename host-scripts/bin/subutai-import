@@ -1,0 +1,105 @@
+#!/bin/bash
+
+. /etc/subutai/config
+
+container=$1
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Imports a registered Subutai template using a tsar file
+  echo
+  echo "	"subutai-import template
+  echo
+  echo template.tsar file must be present within the subutai temp directory.
+  echo -----------------------------------------------------------------------
+}
+
+# Also sources bsfl
+. /etc/subutai/functionz
+
+
+# Plan for importing a template
+# -----------------------------------------------------------------------------
+# (1) Expand out the tsar file
+# (2) perform sanity checks first
+#     - a container with the same name MUST NOT already exist
+#     - the template name MUST be in the template registry
+#     - the template parent MUST be present and in the template registry
+#       if NOT the user will have to install the parent container first
+# (3) Setup the LXC container area under /var/lib/lxc/
+# (4) Receive delta images of all filesystems starting with the rootfs
+# (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
+
+
+# -----------------------------------------------------------------------------
+# (1) Expand out the tsar file
+# -----------------------------------------------------------------------------
+
+tsar="$SUBUTAI_TMPDIR/$container".tsar
+
+if [ ! -f "$tsar" ]; then
+  msg_error "Could not find template file \"$tsar\". Aborting ..."
+  exit 1
+fi
+
+pushd .
+cd $SUBUTAI_TMPDIR
+tar -zxf "$container".tsar
+popd
+
+# -----------------------------------------------------------------------------
+# (2) perform sanity checks first
+#     - a container with the same name MUST NOT already exist
+#     - the template name MUST be in the template registry
+#     - the template parent MUST be present and in the template registry
+#       if NOT the user will have to install the parent container first
+# -----------------------------------------------------------------------------
+check_missing $container
+
+# check to make sure container is registered as a template
+if [ "`is_registered $container`" == "false" ]; then
+  msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: \"$container\" is registered"
+fi
+
+parent=`get_parent $container`
+echo STUCK! - need to access the parent information from the metadata and it is not there
+echo inject the parent information into the metadata: stop using freaking json
+echo use a simple script based approach for now - others can convert if they like
+echo ===============
+echo On another note, we cannot receive '(import)' the stream from the delta and
+echo properly recreate it. Plus we are not doing incremental sends as we should.
+echo The main problem is that we do not have a snapshot on the main dataset to
+echo leverage: we only have one on the parent dataset: lxc/master@foo. We really
+echo needed the lxc/foo@created snapshot which we removed earlier. If we used it
+echo to take an incremental send delta image:
+echo       zfs send -i lxc/foo@created lxc/foo@template 
+echo this would then work to recreate the file system and the size of the tsar 
+echo would be dramatically smaller.
+
+echo
+echo Tomorrow: re-add the use of the lxc/foo@created snapshot
+echo Tomorrow: fix all scripts to account for it 
+echo Tomorrow: complete the implementation of tsar file imports
+exit 1
+
+check_parent $parent
+# check to make sure the parent is a template
+if [ "`is_template $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is a template"
+fi
+
+# check to make sure the parent is registered
+if [ "`is_registered $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is registered"
+fi
+
+
