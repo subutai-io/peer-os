@@ -8,7 +8,6 @@ package org.safehaus.subutai.ui.zookeeper.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -38,7 +37,7 @@ public class ConfigurationStep extends Panel {
             clusterNameTxtFld.setRequired(true);
             clusterNameTxtFld.setMaxLength(20);
             clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-            clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
+            clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
                     wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
@@ -49,7 +48,7 @@ public class ConfigurationStep extends Panel {
             zkNameTxtFld.setRequired(true);
             zkNameTxtFld.setMaxLength(20);
             zkNameTxtFld.setValue(wizard.getConfig().getZkName());
-            zkNameTxtFld.addListener(new Property.ValueChangeListener() {
+            zkNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
                     wizard.getConfig().setZkName(event.getProperty().getValue().toString().trim());
@@ -58,13 +57,12 @@ public class ConfigurationStep extends Panel {
 
             //number of nodes
             ComboBox nodesCountCombo = new ComboBox("Choose number of nodes", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-            nodesCountCombo.setMultiSelect(false);
             nodesCountCombo.setImmediate(true);
             nodesCountCombo.setTextInputAllowed(false);
             nodesCountCombo.setNullSelectionAllowed(false);
             nodesCountCombo.setValue(wizard.getConfig().getNumberOfNodes());
 
-            nodesCountCombo.addListener(new Property.ValueChangeListener() {
+            nodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
                     wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
@@ -72,7 +70,7 @@ public class ConfigurationStep extends Panel {
             });
 
             Button next = new Button("Next");
-            next.addListener(new Button.ClickListener() {
+            next.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
@@ -88,7 +86,7 @@ public class ConfigurationStep extends Panel {
             });
 
             Button back = new Button("Back");
-            back.addListener(new Button.ClickListener() {
+            back.addClickListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     wizard.back();
@@ -106,7 +104,7 @@ public class ConfigurationStep extends Panel {
             standaloneInstallationControls.addComponent(nodesCountCombo);
             standaloneInstallationControls.addComponent(buttons);
 
-            addComponent(standaloneInstallationControls);
+            setContent(standaloneInstallationControls);
 
         } else {
 
@@ -122,7 +120,7 @@ public class ConfigurationStep extends Panel {
             zkNameTxtFld.setRequired(true);
             zkNameTxtFld.setMaxLength(20);
             zkNameTxtFld.setValue(wizard.getConfig().getZkName());
-            zkNameTxtFld.addListener(new Property.ValueChangeListener() {
+            zkNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
                     wizard.getConfig().setZkName(event.getProperty().getValue().toString().trim());
@@ -132,7 +130,6 @@ public class ConfigurationStep extends Panel {
             ComboBox hadoopClustersCombo = new ComboBox("Hadoop cluster");
             final TwinColSelect hadoopNodesSelect = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
-            hadoopClustersCombo.setMultiSelect(false);
             hadoopClustersCombo.setImmediate(true);
             hadoopClustersCombo.setTextInputAllowed(false);
             hadoopClustersCombo.setRequired(true);
@@ -159,19 +156,19 @@ public class ConfigurationStep extends Panel {
                 Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
                 wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
                 hadoopNodesSelect.setContainerDataSource(
-                        new BeanItemContainer<Agent>(
+                        new BeanItemContainer<>(
                                 Agent.class, hadoopInfo.getAllNodes())
                 );
             }
 
-            hadoopClustersCombo.addListener(new Property.ValueChangeListener() {
+            hadoopClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
                     if (event.getProperty().getValue() != null) {
                         Config hadoopInfo = (Config) event.getProperty().getValue();
                         hadoopNodesSelect.setValue(null);
                         hadoopNodesSelect.setContainerDataSource(
-                                new BeanItemContainer<Agent>(
+                                new BeanItemContainer<>(
                                         Agent.class, hadoopInfo.getAllNodes())
                         );
                         wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
@@ -186,13 +183,13 @@ public class ConfigurationStep extends Panel {
             hadoopNodesSelect.setImmediate(true);
             hadoopNodesSelect.setLeftColumnCaption("Available Nodes");
             hadoopNodesSelect.setRightColumnCaption("Selected Nodes");
-            hadoopNodesSelect.setWidth(100, Sizeable.UNITS_PERCENTAGE);
+            hadoopNodesSelect.setWidth(100, Unit.PERCENTAGE);
             hadoopNodesSelect.setRequired(true);
 
             if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
                 hadoopNodesSelect.setValue(wizard.getConfig().getNodes());
             }
-            hadoopNodesSelect.addListener(new Property.ValueChangeListener() {
+            hadoopNodesSelect.addValueChangeListener(new Property.ValueChangeListener() {
 
                 public void valueChange(Property.ValueChangeEvent event) {
                     if (event.getProperty().getValue() != null) {
@@ -203,11 +200,10 @@ public class ConfigurationStep extends Panel {
             });
 
             Button next = new Button("Next");
-            next.addListener(new Button.ClickListener() {
+            next.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
                     if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
                         show("Please, select Hadoop cluster");
                     } else if (Strings.isNullOrEmpty(wizard.getConfig().getZkName())) {
@@ -221,7 +217,7 @@ public class ConfigurationStep extends Panel {
             });
 
             Button back = new Button("Back");
-            back.addListener(new Button.ClickListener() {
+            back.addClickListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     wizard.back();
@@ -237,13 +233,13 @@ public class ConfigurationStep extends Panel {
             overHadoopInstallationControls.addComponent(hadoopClustersCombo);
             overHadoopInstallationControls.addComponent(hadoopNodesSelect);
             overHadoopInstallationControls.addComponent(buttons);
-            addComponent(overHadoopInstallationControls);
+            setContent(overHadoopInstallationControls);
         }
 
     }
 
     private void show(String notification) {
-        getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
 }

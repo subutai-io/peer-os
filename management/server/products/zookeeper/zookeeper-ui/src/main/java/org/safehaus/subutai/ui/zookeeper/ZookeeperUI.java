@@ -7,11 +7,12 @@ package org.safehaus.subutai.ui.zookeeper;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,12 +20,13 @@ import java.util.concurrent.Executors;
 /**
  * @author dilshat
  */
-public class ZookeeperUI implements Module {
+public class ZookeeperUI implements PortalModule {
 
     private static Zookeeper manager;
     private static AgentManager agentManager;
     private static Tracker tracker;
     private static Hadoop hadoopManager;
+    private static CommandRunner commandRunner;
     private static ExecutorService executor;
 
     public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager) {
@@ -32,6 +34,7 @@ public class ZookeeperUI implements Module {
         ZookeeperUI.tracker = tracker;
         ZookeeperUI.manager = manager;
         ZookeeperUI.hadoopManager = hadoopManager;
+        ZookeeperUI.commandRunner = commandRunner;
     }
 
     public static Hadoop getHadoopManager() {
@@ -54,6 +57,10 @@ public class ZookeeperUI implements Module {
         return agentManager;
     }
 
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
     public void init() {
         executor = Executors.newCachedThreadPool();
     }
@@ -64,6 +71,11 @@ public class ZookeeperUI implements Module {
         tracker = null;
         hadoopManager = null;
         executor.shutdown();
+    }
+
+    @Override
+    public String getId() {
+        return Config.PRODUCT_KEY;
     }
 
     public String getName() {

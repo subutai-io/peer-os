@@ -9,12 +9,13 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.zookeeper.Config;
-import org.safehaus.subutai.server.ui.ConfirmationDialogCallback;
-import org.safehaus.subutai.server.ui.MgmtApplication;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.Util;
@@ -40,12 +41,12 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
-        content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        content.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
@@ -62,11 +63,10 @@ public class Manager {
         controlsContent.addComponent(clusterNameLabel);
 
         clusterCombo = new ComboBox();
-        clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(200, Sizeable.UNITS_PIXELS);
-        clusterCombo.addListener(new Property.ValueChangeListener() {
+        clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+        clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -77,7 +77,7 @@ public class Manager {
         controlsContent.addComponent(clusterCombo);
 
         Button refreshClustersBtn = new Button("Refresh clusters");
-        refreshClustersBtn.addListener(new Button.ClickListener() {
+        refreshClustersBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -88,7 +88,7 @@ public class Manager {
         controlsContent.addComponent(refreshClustersBtn);
 
         Button checkAllBtn = new Button("Check all");
-        checkAllBtn.addListener(new Button.ClickListener() {
+        checkAllBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -99,7 +99,7 @@ public class Manager {
         controlsContent.addComponent(checkAllBtn);
 
         Button startAllBtn = new Button("Start all");
-        startAllBtn.addListener(new Button.ClickListener() {
+        startAllBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -110,7 +110,7 @@ public class Manager {
         controlsContent.addComponent(startAllBtn);
 
         Button stopAllBtn = new Button("Stop all");
-        stopAllBtn.addListener(new Button.ClickListener() {
+        stopAllBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -121,30 +121,29 @@ public class Manager {
         controlsContent.addComponent(stopAllBtn);
 
         Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addListener(new Button.ClickListener() {
+        destroyClusterBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
-                    MgmtApplication.showConfirmationDialog(
-                            "Cluster destruction confirmation",
-                            String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
+                    ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+                            "Yes", "No");
+                    alert.getOk().addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            UUID trackID = ZookeeperUI.getManager().uninstallCluster(config.getClusterName());
+                            ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = ZookeeperUI.getManager().uninstallCluster(config.getClusterName());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
+                                public void windowClose(Window.CloseEvent closeEvent) {
+                                    refreshClustersInfo();
                                 }
-                            }
-                    );
+                            });
+                            contentRoot.getUI().addWindow(window.getWindow());
+                        }
+                    });
+
+                    contentRoot.getUI().addWindow(alert.getAlert());
                 } else {
                     show("Please, select cluster");
                 }
@@ -155,31 +154,23 @@ public class Manager {
 
         Button addNodeBtn = new Button("Add Node");
 
-        addNodeBtn.addListener(new Button.ClickListener() {
+        addNodeBtn.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (config != null) {
                     if (config.isStandalone()) {
-                        MgmtApplication.showConfirmationDialog(
-                                "Confirm adding node",
-                                String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-                                "Yes", "No", new ConfirmationDialogCallback() {
-
-                                    @Override
-                                    public void response(boolean ok) {
-                                        if (ok) {
-                                            UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
-                                            MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                                public void windowClose(Window.CloseEvent e) {
-                                                    refreshClustersInfo();
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                        );
+                        ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
+                                "Yes", "No");
+                        UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
+                        ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                        window.getWindow().addCloseListener(new Window.CloseListener() {
+                            @Override
+                            public void windowClose(Window.CloseEvent closeEvent) {
+                                refreshClustersInfo();
+                            }
+                        });
+                        contentRoot.getUI().addWindow(window.getWindow());
                     } else {
                         org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
@@ -188,10 +179,10 @@ public class Manager {
                             nodes.removeAll(config.getNodes());
                             if (!nodes.isEmpty()) {
                                 AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
-                                MgmtApplication.addCustomWindow(addNodeWindow);
-                                addNodeWindow.addListener(new Window.CloseListener() {
-
-                                    public void windowClose(Window.CloseEvent e) {
+                                contentRoot.getUI().addWindow(addNodeWindow);
+                                addNodeWindow.addCloseListener(new Window.CloseListener() {
+                                    @Override
+                                    public void windowClose(Window.CloseEvent closeEvent) {
                                         refreshClustersInfo();
                                     }
                                 });
@@ -222,7 +213,7 @@ public class Manager {
         customPropertyContent.addComponent(propertyNameTextField);
 
         Button removePropertyBtn = new Button("Remove");
-        removePropertyBtn.addListener(new Button.ClickListener() {
+        removePropertyBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
@@ -234,7 +225,14 @@ public class Manager {
                         show("Please, specify property name to remove");
                     } else {
                         UUID trackID = ZookeeperUI.getManager().removeProperty(config.getClusterName(), fileName, propertyName);
-                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                        ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                        window.getWindow().addCloseListener(new Window.CloseListener() {
+                            @Override
+                            public void windowClose(Window.CloseEvent closeEvent) {
+                                refreshClustersInfo();
+                            }
+                        });
+                        contentRoot.getUI().addWindow(window.getWindow());
                     }
                 } else {
                     show("Please, select cluster");
@@ -248,7 +246,7 @@ public class Manager {
         final TextField propertyValueTextField = new TextField();
         customPropertyContent.addComponent(propertyValueTextField);
         Button addPropertyBtn = new Button("Add");
-        addPropertyBtn.addListener(new Button.ClickListener() {
+        addPropertyBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if (config != null) {
@@ -263,7 +261,14 @@ public class Manager {
                         show("Please, specify property value to set");
                     } else {
                         UUID trackID = ZookeeperUI.getManager().addProperty(config.getClusterName(), fileName, propertyName, propertyValue);
-                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, null);
+                        ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                        window.getWindow().addCloseListener(new Window.CloseListener() {
+                            @Override
+                            public void windowClose(Window.CloseEvent closeEvent) {
+                                refreshClustersInfo();
+                            }
+                        });
+                        contentRoot.getUI().addWindow(window.getWindow());
                     }
                 } else {
                     show("Please, select cluster");
@@ -314,7 +319,7 @@ public class Manager {
     }
 
     private void show(String notification) {
-        contentRoot.getWindow().showNotification(notification);
+        Notification.show(notification);
     }
 
     private void populateTable(final Table table, Set<Agent> agents) {
@@ -341,11 +346,10 @@ public class Manager {
                     null
             );
 
-            checkBtn.addListener(new Button.ClickListener() {
+            checkBtn.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
@@ -368,11 +372,10 @@ public class Manager {
                 }
             });
 
-            startBtn.addListener(new Button.ClickListener() {
+            startBtn.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
@@ -396,11 +399,10 @@ public class Manager {
                 }
             });
 
-            stopBtn.addListener(new Button.ClickListener() {
+            stopBtn.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
                     progressIcon.setVisible(true);
                     startBtn.setEnabled(false);
                     stopBtn.setEnabled(false);
@@ -423,31 +425,28 @@ public class Manager {
                 }
             });
 
-            destroyBtn.addListener(new Button.ClickListener() {
+            destroyBtn.addClickListener(new Button.ClickListener() {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-
-                    MgmtApplication.showConfirmationDialog(
-                            "Node destruction confirmation",
-                            String.format("Do you want to destroy the %s node?", agent.getHostname()),
-                            "Yes", "No", new ConfirmationDialogCallback() {
-
+                    ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
+                            "Yes", "No");
+                    alert.getOk().addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            UUID trackID = ZookeeperUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
+                            ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+                            window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
-                                public void response(boolean ok) {
-                                    if (ok) {
-                                        UUID trackID = ZookeeperUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
-                                        MgmtApplication.showProgressWindow(Config.PRODUCT_KEY, trackID, new Window.CloseListener() {
-
-                                            public void windowClose(Window.CloseEvent e) {
-                                                refreshClustersInfo();
-                                            }
-                                        });
-                                    }
+                                public void windowClose(Window.CloseEvent closeEvent) {
+                                    refreshClustersInfo();
                                 }
-                            }
-                    );
+                            });
+                            contentRoot.getUI().addWindow(window.getWindow());
+                        }
+                    });
 
+                    contentRoot.getUI().addWindow(alert.getAlert());
                 }
             });
         }
@@ -492,21 +491,21 @@ public class Manager {
         table.addContainerProperty("Stop", Button.class, null);
         table.addContainerProperty("Destroy", Button.class, null);
         table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
+        table.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        table.setHeight(size, Sizeable.Unit.PIXELS);
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
 
-        table.addListener(new ItemClickEvent.ItemClickListener() {
-
+        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+            @Override
             public void itemClick(ItemClickEvent event) {
                 if (event.isDoubleClick()) {
                     String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
                     Agent lxcAgent = ZookeeperUI.getAgentManager().getAgentByHostname(lxcHostname);
                     if (lxcAgent != null) {
-                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(lxcAgent));
-                        MgmtApplication.addCustomWindow(terminal);
+                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), ZookeeperUI.getExecutor(), ZookeeperUI.getCommandRunner(), ZookeeperUI.getAgentManager());
+                        contentRoot.getUI().addWindow(terminal.getWindow());
                     } else {
                         show("Agent is not connected");
                     }
