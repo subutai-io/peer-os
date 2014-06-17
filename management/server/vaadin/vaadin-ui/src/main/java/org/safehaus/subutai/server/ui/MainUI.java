@@ -98,7 +98,7 @@ public class MainUI extends UI {
         helpManager.closeAll();
         HelpOverlay w = helpManager
                 .addOverlay(
-                        "Welcome to the Subutai System",
+                        "Welcome to the Subutai",
                         "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
                         "login");
         w.center();
@@ -126,7 +126,7 @@ public class MainUI extends UI {
         labels.addComponent(welcome);
         labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
 
-        Label title = new Label("Subutai System");
+        Label title = new Label("Subutai");
         title.setSizeUndefined();
         title.addStyleName("h2");
         title.addStyleName("light");
@@ -224,7 +224,7 @@ public class MainUI extends UI {
                                 Label logo = new Label(
                                         "Subutai",
                                         ContentMode.HTML);
-                                logo.setHeight(100, Unit.PIXELS);
+                                setHeight(150, Unit.PIXELS);
                                 addComponent(logo);
 
                                 addComponent(new Image(null, new ThemeResource(
