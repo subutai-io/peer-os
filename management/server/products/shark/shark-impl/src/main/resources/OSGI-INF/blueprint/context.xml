@@ -21,6 +21,5 @@
         <argument ref="sparkManager"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
-
+    <service ref="mahout-impl" interface="org.safehaus.subutai.api.shark.Shark"/>
 </blueprint>
