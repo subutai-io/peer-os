@@ -222,9 +222,9 @@ public class MainUI extends UI {
                             {
                                 addStyleName("branding");
                                 Label logo = new Label(
-                                        "<span>Subutai</span>",
+                                        "Subutai",
                                         ContentMode.HTML);
-                                logo.setWidth(140, Unit.PIXELS);
+                                logo.setHeight(100, Unit.PIXELS);
                                 addComponent(logo);
 
                                 addComponent(new Image(null, new ThemeResource(
