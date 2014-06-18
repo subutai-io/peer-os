@@ -1,5 +1,6 @@
 package org.safehaus.subutai.ui.monitor.util;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
 import java.util.Date;
@@ -53,7 +54,7 @@ public class UIUtil {
     public static Label addLabel(AbsoluteLayout parent, String text, String position) {
 
         Label label = new Label(text);
-        label.setContentMode(ContentMode.HTML);
+	    label.setContentMode(ContentMode.HTML);
 
         parent.addComponent(label, position);
 
