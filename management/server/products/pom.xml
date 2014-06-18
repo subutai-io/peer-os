@@ -15,9 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!--
         <module>accumulo</module>
-         -->
         <module>cassandra</module>
         <module>common</module>
         <module>flume</module>

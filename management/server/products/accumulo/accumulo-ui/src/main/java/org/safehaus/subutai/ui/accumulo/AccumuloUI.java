@@ -6,94 +6,104 @@
 package org.safehaus.subutai.ui.accumulo;
 
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.accumulo.Accumulo;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
  * @author dilshat
  */
-public class AccumuloUI implements Module {
+public class AccumuloUI implements PortalModule {
 
-    private static Accumulo accumuloManager;
-    private static Hadoop hadoopManager;
-    private static Zookeeper zookeeperManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static ExecutorService executor;
-
-
-    public AccumuloUI( AgentManager agentManager, Tracker tracker, Accumulo accumuloManager, Hadoop hadoopManager,
-                       Zookeeper zookeeperManager ) {
-        AccumuloUI.agentManager = agentManager;
-        AccumuloUI.tracker = tracker;
-        AccumuloUI.accumuloManager = accumuloManager;
-        AccumuloUI.hadoopManager = hadoopManager;
-        AccumuloUI.zookeeperManager = zookeeperManager;
-    }
+	private static Accumulo accumuloManager;
+	private static Hadoop hadoopManager;
+	private static Zookeeper zookeeperManager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static ExecutorService executor;
+	private static CommandRunner commandRunner;
 
 
-    public static Zookeeper getZookeeperManager() {
-        return zookeeperManager;
-    }
+	public AccumuloUI(AgentManager agentManager, Tracker tracker, Accumulo accumuloManager, Hadoop hadoopManager,
+	                  Zookeeper zookeeperManager, CommandRunner commandRunner) {
+		AccumuloUI.agentManager = agentManager;
+		AccumuloUI.tracker = tracker;
+		AccumuloUI.accumuloManager = accumuloManager;
+		AccumuloUI.hadoopManager = hadoopManager;
+		AccumuloUI.zookeeperManager = zookeeperManager;
+		AccumuloUI.commandRunner = commandRunner;
+	}
 
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public static Zookeeper getZookeeperManager() {
+		return zookeeperManager;
+	}
 
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
 
-    public static Accumulo getAccumuloManager() {
-        return accumuloManager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Accumulo getAccumuloManager() {
+		return accumuloManager;
+	}
 
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
+
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
+
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
 
-    public void destroy() {
-        accumuloManager = null;
-        agentManager = null;
-        tracker = null;
-        hadoopManager = null;
-        zookeeperManager = null;
-        executor.shutdown();
-    }
+	public void destroy() {
+		accumuloManager = null;
+		agentManager = null;
+		tracker = null;
+		hadoopManager = null;
+		zookeeperManager = null;
+		executor.shutdown();
+	}
 
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
+
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
 
 
-    public Component createComponent() {
-        return new AccumuloForm();
-    }
+	public Component createComponent() {
+		return new AccumuloForm();
+	}
 }

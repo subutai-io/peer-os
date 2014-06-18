@@ -594,6 +594,33 @@
 
                                 <!-- Products Modules - START -->
 
+                                <!-- Accumulo -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>accumulo-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>accumulo-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>accumulo-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>accumulo-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>accumulo-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!--MongoDB-->
                                 <artifactItem>
                                     <groupId>${project.groupId}</groupId>
@@ -1037,34 +1064,6 @@
                                     <artifactId>storm-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-
-                                <!-- Accumulo -->
-                                <!-- <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>accumulo-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>accumulo-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>accumulo-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>accumulo-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>accumulo-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 -->
                                 <!-- Products Modules - END -->
 
                                 <!-- Hadoop -->

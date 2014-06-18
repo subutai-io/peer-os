@@ -6,13 +6,9 @@
 package org.safehaus.subutai.ui.accumulo.wizard;
 
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 
 
 /**
@@ -45,7 +41,7 @@ public class WelcomeStep extends Panel {
         grid.addComponent( next, 6, 4, 6, 4 );
         grid.setComponentAlignment( next, Alignment.BOTTOM_RIGHT );
 
-        next.addListener( new Button.ClickListener() {
+        next.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent event ) {
                 wizard.init();
@@ -53,6 +49,6 @@ public class WelcomeStep extends Panel {
             }
         } );
 
-        addComponent( grid );
+        setContent( grid );
     }
 }
