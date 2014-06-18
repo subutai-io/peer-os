@@ -36,7 +36,7 @@ public class Wizard {
         progressBar.setIndeterminate( false );
         progressBar.setEnabled( false );
         progressBar.setValue( 0f );
-        progressBar.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
+        progressBar.setWidth( 100, Unit.PERCENTAGE );
         grid.addComponent( progressBar, 0, 0, 0, 0 );
         grid.setComponentAlignment( progressBar, Alignment.MIDDLE_CENTER );
 

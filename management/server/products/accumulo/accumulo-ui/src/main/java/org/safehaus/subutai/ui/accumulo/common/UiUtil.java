@@ -51,7 +51,7 @@ public class UiUtil {
         twinColSelect.setImmediate( true );
         twinColSelect.setLeftColumnCaption( leftTitle );
         twinColSelect.setRightColumnCaption( rightTitle );
-        twinColSelect.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
+        twinColSelect.setWidth( 100, Unit.PERCENTAGE );
         twinColSelect.setRequired( true );
         return twinColSelect;
     }
@@ -67,8 +67,8 @@ public class UiUtil {
         }
         table.addContainerProperty( "Nodes state", Label.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
-        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        table.setHeight( size, Sizeable.UNITS_PIXELS );
+        table.setWidth( 100, Unit.PERCENTAGE );
+        table.setHeight( size, Unit.PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );

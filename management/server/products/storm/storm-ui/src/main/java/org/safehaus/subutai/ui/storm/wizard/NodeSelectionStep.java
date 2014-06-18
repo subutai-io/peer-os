@@ -2,14 +2,16 @@ package org.safehaus.subutai.ui.storm.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
-import java.util.*;
-
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.storm.StormUI;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class NodeSelectionStep extends Panel {
 
@@ -30,12 +32,11 @@ public class NodeSelectionStep extends Panel {
         masterNodeCombo = makeMasterNodeComboBox(wizard);
         select = makeClientNodeSelector(wizard);
 
-        zkClustersCombo.setMultiSelect(false);
         zkClustersCombo.setImmediate(true);
         zkClustersCombo.setTextInputAllowed(false);
         zkClustersCombo.setRequired(true);
         zkClustersCombo.setNullSelectionAllowed(false);
-        zkClustersCombo.addListener(new Property.ValueChangeListener() {
+        zkClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent e) {
                 masterNodeCombo.removeAllItems();
@@ -47,7 +48,7 @@ public class NodeSelectionStep extends Panel {
                         masterNodeCombo.addItem(a);
                         masterNodeCombo.setItemCaption(a, a.getHostname());
                     }
-                    select.setContainerDataSource(new BeanItemContainer<Agent>(
+                    select.setContainerDataSource(new BeanItemContainer<>(
                             Agent.class, zk.getNodes())
                     );
                     // do select if values exist
@@ -76,7 +77,7 @@ public class NodeSelectionStep extends Panel {
         select.setValue(wizard.getConfig().getSupervisors());
 
         Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
+        next.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -93,7 +94,7 @@ public class NodeSelectionStep extends Panel {
         });
 
         Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
+        back.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.back();
@@ -114,45 +115,18 @@ public class NodeSelectionStep extends Panel {
         content.addComponent(select);
         content.addComponent(buttons);
 
-        addComponent(layout);
+        setContent(layout);
 
-    }
-
-    private void show(String notification) {
-        getWindow().showNotification(notification);
-    }
-
-    private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
-        TwinColSelect tcs = new TwinColSelect("Worker nodes");
-        tcs.setItemCaptionPropertyId("hostname");
-        tcs.setRows(7);
-        tcs.setMultiSelect(true);
-        tcs.setImmediate(true);
-        tcs.setLeftColumnCaption("Available Nodes");
-        tcs.setRightColumnCaption("Selected Nodes");
-        tcs.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        tcs.setRequired(true);
-        tcs.addListener(new Property.ValueChangeListener() {
-
-            public void valueChange(Property.ValueChangeEvent event) {
-                if(event.getProperty().getValue() != null) {
-                    Set<Agent> clients = new HashSet();
-                    clients.addAll((Collection)event.getProperty().getValue());
-                    wizard.getConfig().setSupervisors(clients);
-                }
-            }
-        });
-        return tcs;
     }
 
     private ComboBox makeMasterNodeComboBox(final Wizard wizard) {
         ComboBox cb = new ComboBox("Master node");
-        cb.setMultiSelect(false);
+
         cb.setImmediate(true);
         cb.setTextInputAllowed(false);
         cb.setRequired(true);
         cb.setNullSelectionAllowed(false);
-        cb.addListener(new Property.ValueChangeListener() {
+        cb.addValueChangeListener(new Property.ValueChangeListener() {
 
             public void valueChange(Property.ValueChangeEvent event) {
                 Agent serverNode = (Agent)event.getProperty().getValue();
@@ -170,5 +144,32 @@ public class NodeSelectionStep extends Panel {
         });
         return cb;
     }
+
+    private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
+        TwinColSelect tcs = new TwinColSelect("Worker nodes");
+        tcs.setItemCaptionPropertyId("hostname");
+        tcs.setRows(7);
+        tcs.setMultiSelect(true);
+        tcs.setImmediate(true);
+        tcs.setLeftColumnCaption("Available Nodes");
+        tcs.setRightColumnCaption("Selected Nodes");
+        tcs.setWidth(100, Unit.PERCENTAGE);
+        tcs.setRequired(true);
+        tcs.addValueChangeListener(new Property.ValueChangeListener() {
+
+            public void valueChange(Property.ValueChangeEvent event) {
+                if(event.getProperty().getValue() != null) {
+                    Set<Agent> clients = new HashSet();
+                    clients.addAll((Collection)event.getProperty().getValue());
+                    wizard.getConfig().setSupervisors(clients);
+                }
+            }
+        });
+        return tcs;
+    }
+
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
 }

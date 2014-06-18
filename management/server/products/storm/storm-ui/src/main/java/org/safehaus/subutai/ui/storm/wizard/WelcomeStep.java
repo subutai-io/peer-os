@@ -1,7 +1,7 @@
 package org.safehaus.subutai.ui.storm.wizard;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
 public class WelcomeStep extends Panel {
@@ -16,22 +16,22 @@ public class WelcomeStep extends Panel {
         grid.setSizeFull();
 
         Label welcomeMsg = new Label("<center><h2>Welcome to Storm Installation Wizard!</h2>");
-        welcomeMsg.setContentMode(Label.CONTENT_XHTML);
+        welcomeMsg.setContentMode(ContentMode.HTML);
         grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
         Label logoImg = new Label();
         logoImg.setIcon(new ThemeResource("icons/modules/storm.jpg"));
-        logoImg.setContentMode(Label.CONTENT_XHTML);
-        logoImg.setHeight(150, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(150, Sizeable.UNITS_PIXELS);
+        logoImg.setContentMode(ContentMode.HTML);
+        logoImg.setHeight(150, Unit.PIXELS);
+        logoImg.setWidth(150, Unit.PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
         Button next = new Button("Start");
-        next.setWidth(100, Sizeable.UNITS_PIXELS);
+        next.setWidth(100, Unit.PIXELS);
         grid.addComponent(next, 6, 4, 6, 4);
         grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-        next.addListener(new Button.ClickListener() {
+        next.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 wizard.init();
@@ -39,7 +39,7 @@ public class WelcomeStep extends Panel {
             }
         });
 
-        addComponent(grid);
+	    setContent(grid);
     }
 
 }

@@ -1,23 +1,24 @@
 package org.safehaus.subutai.api.storm;
 
-import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
 
+import java.util.Set;
+
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_NAME = "Storm";
+	public static final String PRODUCT_NAME = "Storm";
 
     private String clusterName;
     private Agent nimbus; // master node
     private Set<Agent> supervisors; // worker nodes
 
-    public String getProductName() {
-        return PRODUCT_NAME;
-    }
-
     public String getClusterName() {
         return clusterName;
+    }
+
+    public String getProductName() {
+        return PRODUCT_NAME;
     }
 
     public void setClusterName(String clusterName) {

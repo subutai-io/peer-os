@@ -13,26 +13,25 @@ import org.safehaus.subutai.ui.lucene.manager.Manager;
 import org.safehaus.subutai.ui.lucene.wizard.Wizard;
 
 /**
- *
  * @author dilshat
  */
 public class LuceneForm extends CustomComponent {
 
-    public LuceneForm() {
-        setSizeFull();
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing(true);
-        verticalLayout.setSizeFull();
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager();
-        Wizard wizard = new Wizard();
-        mongoSheet.addTab(wizard.getContent(), "Install");
-        mongoSheet.addTab(manager.getContent(), "Manage");
-        verticalLayout.addComponent(mongoSheet);
-        setCompositionRoot(verticalLayout);
-        manager.refreshClustersInfo();
-    }
+	public LuceneForm() {
+		setSizeFull();
+		VerticalLayout verticalLayout = new VerticalLayout();
+		verticalLayout.setSpacing(true);
+		verticalLayout.setSizeFull();
+		TabSheet mongoSheet = new TabSheet();
+		mongoSheet.setStyleName(Runo.TABSHEET_SMALL);
+		mongoSheet.setSizeFull();
+		Manager manager = new Manager();
+		Wizard wizard = new Wizard();
+		mongoSheet.addTab(wizard.getContent(), "Install");
+		mongoSheet.addTab(manager.getContent(), "Manage");
+		verticalLayout.addComponent(mongoSheet);
+		setCompositionRoot(verticalLayout);
+		manager.refreshClustersInfo();
+	}
 
 }

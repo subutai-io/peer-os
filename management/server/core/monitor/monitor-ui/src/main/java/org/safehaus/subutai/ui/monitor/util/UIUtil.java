@@ -53,7 +53,7 @@ public class UIUtil {
     public static Label addLabel(AbsoluteLayout parent, String text, String position) {
 
         Label label = new Label(text);
-        label.setContentMode(Label.CONTENT_XHTML);
+        label.setContentMode(ContentMode.HTML);
 
         parent.addComponent(label, position);
 

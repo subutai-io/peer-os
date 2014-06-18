@@ -22,68 +22,68 @@ import java.util.concurrent.Executors;
  */
 public class LuceneUI implements PortalModule {
 
-    private static Lucene luceneManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Hadoop hadoopManager;
-    private static CommandRunner commandRunner;
-    private static ExecutorService executor;
+	private static Lucene luceneManager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Hadoop hadoopManager;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public LuceneUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Lucene luceneManager, CommandRunner commandRunner) {
-        LuceneUI.agentManager = agentManager;
-        LuceneUI.tracker = tracker;
-        LuceneUI.hadoopManager = hadoopManager;
-        LuceneUI.luceneManager = luceneManager;
-        LuceneUI.commandRunner = commandRunner;
-    }
+	public LuceneUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Lucene luceneManager, CommandRunner commandRunner) {
+		LuceneUI.agentManager = agentManager;
+		LuceneUI.tracker = tracker;
+		LuceneUI.hadoopManager = hadoopManager;
+		LuceneUI.luceneManager = luceneManager;
+		LuceneUI.commandRunner = commandRunner;
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Lucene getLuceneManager() {
-        return luceneManager;
-    }
+	public static Lucene getLuceneManager() {
+		return luceneManager;
+	}
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public void destroy() {
-        luceneManager = null;
-        agentManager = null;
-        hadoopManager = null;
-        tracker = null;
-        executor.shutdown();
-    }
+	public void destroy() {
+		luceneManager = null;
+		agentManager = null;
+		hadoopManager = null;
+		tracker = null;
+		executor.shutdown();
+	}
 
-    @Override
-    public String getId() {
-        return Config.PRODUCT_KEY;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
 
-    public Component createComponent() {
-        return new LuceneForm();
-    }
+	public Component createComponent() {
+		return new LuceneForm();
+	}
 
 }

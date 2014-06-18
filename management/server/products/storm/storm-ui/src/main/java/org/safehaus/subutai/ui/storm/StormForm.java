@@ -9,28 +9,27 @@ import org.safehaus.subutai.ui.storm.wizard.Wizard;
 
 public class StormForm extends CustomComponent {
 
-    private final Wizard wizard;
-    private final Manager manager;
+	private final Wizard wizard;
+	private final Manager manager;
 
-    public StormForm() {
-        manager = new Manager();
-        wizard = new Wizard();
+	public StormForm() {
+		manager = new Manager();
+		wizard = new Wizard();
 
-        setSizeFull();
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing(true);
-        verticalLayout.setSizeFull();
+		setSizeFull();
+		VerticalLayout verticalLayout = new VerticalLayout();
+		verticalLayout.setSpacing(true);
+		verticalLayout.setSizeFull();
 
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setStyleName(Runo.TABSHEET_SMALL);
-        tabSheet.setSizeFull();
-        tabSheet.addTab(wizard.getContent(), "Install");
-        tabSheet.addTab(manager.getContent(), "Manage");
+		TabSheet tabSheet = new TabSheet();
+		tabSheet.setStyleName(Runo.TABSHEET_SMALL);
+		tabSheet.setSizeFull();
+		tabSheet.addTab(wizard.getContent(), "Install");
+		tabSheet.addTab(manager.getContent(), "Manage");
 
-        verticalLayout.addComponent(tabSheet);
-        setCompositionRoot(verticalLayout);
+		verticalLayout.addComponent(tabSheet);
+		setCompositionRoot(verticalLayout);
 
-        manager.refreshClustersInfo();
-    }
-
+		manager.refreshClustersInfo();
+	}
 }

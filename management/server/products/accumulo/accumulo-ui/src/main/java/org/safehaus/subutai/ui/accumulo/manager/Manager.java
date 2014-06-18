@@ -62,12 +62,12 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
-        contentRoot.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        contentRoot.setHeight( 100, Sizeable.UNITS_PERCENTAGE );
+        contentRoot.setWidth( 100, Unit.PERCENTAGE );
+        contentRoot.setHeight( 100, Unit.PERCENTAGE );
 
         final VerticalLayout content = new VerticalLayout();
-        content.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-        content.setHeight( 100, Sizeable.UNITS_PERCENTAGE );
+        content.setWidth( 100, Unit.PERCENTAGE );
+        content.setHeight( 100, Unit.PERCENTAGE );
 
         contentRoot.addComponent( content );
         contentRoot.setComponentAlignment( content, Alignment.TOP_CENTER );
@@ -89,7 +89,7 @@ public class Manager {
         clusterCombo.setMultiSelect( false );
         clusterCombo.setImmediate( true );
         clusterCombo.setTextInputAllowed( false );
-        clusterCombo.setWidth( 200, Sizeable.UNITS_PIXELS );
+        clusterCombo.setWidth( 200, Unit.PIXELS );
         clusterCombo.addListener( new Property.ValueChangeListener() {
 
             @Override

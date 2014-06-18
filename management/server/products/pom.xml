@@ -35,7 +35,7 @@
         <module>solr</module>
         <module>spark</module>
         <module>sqoop</module>
-        <!--<module>storm</module>-->
+        <module>storm</module>
         <module>zookeeper</module>
     </modules>
 

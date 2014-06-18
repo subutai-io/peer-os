@@ -3,18 +3,20 @@ package org.safehaus.subutai.ui.storm.manager;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.*;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.server.ui.ConfirmationDialogCallback;
-import org.safehaus.subutai.server.ui.MgmtApplication;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
+import org.safehaus.subutai.server.ui.component.ProgressWindow;
+import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.storm.StormUI;
+
+import java.util.*;
 
 public class Manager {
 
@@ -27,12 +29,12 @@ public class Manager {
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.UNITS_PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        contentRoot.setWidth(90, Sizeable.Unit.PERCENTAGE);
+        contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         VerticalLayout content = new VerticalLayout();
-        content.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        content.setHeight(100, Sizeable.UNITS_PERCENTAGE);
+        content.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        content.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
         contentRoot.addComponent(content);
         contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
@@ -50,11 +52,10 @@ public class Manager {
         controlsContent.addComponent(clusterNameLabel);
 
         clusterCombo = new ComboBox();
-        clusterCombo.setMultiSelect(false);
         clusterCombo.setImmediate(true);
         clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(200, Sizeable.UNITS_PIXELS);
-        clusterCombo.addListener(new Property.ValueChangeListener() {
+        clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+        clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -64,71 +65,72 @@ public class Manager {
         });
 
         Button refreshClustersBtn = new Button("Refresh clusters");
-        refreshClustersBtn.addListener(new Button.ClickListener() {
+        refreshClustersBtn.addClickListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                refreshClustersInfo();
-            }
+	        @Override
+	        public void buttonClick(Button.ClickEvent event) {
+		        refreshClustersInfo();
+	        }
         });
 
         Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addListener(new Button.ClickListener() {
+        destroyClusterBtn.addClickListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if(config == null) {
-                    show("Select cluster");
-                    return;
-                }
-                MgmtApplication.showConfirmationDialog("Destroy cluster",
-                        String.format("Cluster '%s' will be destroyed. Continue?",
-                                config.getClusterName()), "Yes", "Cancel",
-                        new ConfirmationDialogCallback() {
+	        @Override
+	        public void buttonClick(Button.ClickEvent event) {
+		        if (config == null) {
+			        show("Select cluster");
+			        return;
+		        }
 
-                            public void response(boolean ok) {
-                                if(ok) destroyClusterHandler();
-                            }
-                        }
-                );
-            }
+		        ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+				        "Yes", "No");
+		        alert.getOk().addClickListener(new Button.ClickListener() {
+			        @Override
+			        public void buttonClick(Button.ClickEvent clickEvent) {
+				        destroyClusterHandler();
+			        }
+		        });
+
+		        contentRoot.getUI().addWindow(alert.getAlert());
+	        }
 
         });
 
         Button addNodeBtn = new Button("Add Node");
-        addNodeBtn.addListener(new Button.ClickListener() {
+        addNodeBtn.addClickListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if(config == null) {
-                    show("Select cluster");
-                    return;
-                }
+	        @Override
+	        public void buttonClick(Button.ClickEvent event) {
+		        if (config == null) {
+			        show("Select cluster");
+			        return;
+		        }
 
-                org.safehaus.subutai.api.zookeeper.Config zkc;
-                zkc = StormUI.getZookeeper().getCluster(config.getClusterName());
-                if(zkc == null) {
-                    show("Zookeeper cluster info not found");
-                    return;
-                }
+		        org.safehaus.subutai.api.zookeeper.Config zkc;
+		        zkc = StormUI.getZookeeper().getCluster(config.getClusterName());
+		        if (zkc == null) {
+			        show("Zookeeper cluster info not found");
+			        return;
+		        }
 
-                Set<Agent> set = new HashSet<Agent>(zkc.getNodes());
-                set.remove(config.getNimbus());
-                set.removeAll(config.getSupervisors());
-                if(set.isEmpty()) {
-                    show("All nodes in Zookeeper cluster have Storm installed");
-                    return;
-                }
+		        Set<Agent> set = new HashSet<Agent>(zkc.getNodes());
+		        set.remove(config.getNimbus());
+		        set.removeAll(config.getSupervisors());
+		        if (set.isEmpty()) {
+			        show("All nodes in Zookeeper cluster have Storm installed");
+			        return;
+		        }
 
-                AddNodeWindow w = new AddNodeWindow(config, set);
-                MgmtApplication.addCustomWindow(w);
-                w.addListener(new Window.CloseListener() {
-
-                    public void windowClose(Window.CloseEvent e) {
-                        refreshClustersInfo();
-                    }
-                });
-            }
+		        AddNodeWindow addNodeWindow = new AddNodeWindow(config, set);
+		        contentRoot.getUI().addWindow(addNodeWindow);
+		        addNodeWindow.addCloseListener(new Window.CloseListener() {
+			        @Override
+			        public void windowClose(Window.CloseEvent closeEvent) {
+				        refreshClustersInfo();
+			        }
+		        });
+	        }
         });
 
         controlsContent.addComponent(clusterCombo);
@@ -146,198 +148,39 @@ public class Manager {
 
     }
 
-    public Component getContent() {
-        return contentRoot;
-    }
+    private Table createTableTemplate(String caption, int size, boolean master) {
+        final Table table = new Table(caption);
+        table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("Check", Button.class, null);
+        table.addContainerProperty("Start", Button.class, null);
+        table.addContainerProperty("Stop", Button.class, null);
+        table.addContainerProperty("Restart", Button.class, null);
+        if(!master)
+            table.addContainerProperty("Destroy", Button.class, null);
+        table.addContainerProperty("Status", Embedded.class, null);
+        table.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        table.setHeight(size, Sizeable.Unit.PIXELS);
 
-    private void show(String notification) {
-        contentRoot.getWindow().showNotification(notification);
-    }
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
 
-    private void populateTable(final Table table, boolean server, Agent... agents) {
-
-        table.removeAllItems();
-
-        for(final Agent agent : agents) {
-            final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
-            final Button restartBtn = new Button("Restart");
-            final Button destroyBtn = !server ? new Button("Destroy") : null;
-            final Embedded icon = new Embedded("", new ThemeResource(
-                    "img/spinner.gif"));
-
-            startBtn.setEnabled(false);
-            stopBtn.setEnabled(false);
-            restartBtn.setEnabled(false);
-            icon.setVisible(false);
-
-            final List items = new ArrayList();
-            items.add(agent.getHostname());
-            items.add(checkBtn);
-            items.add(startBtn);
-            items.add(stopBtn);
-            items.add(restartBtn);
-            if(destroyBtn != null) {
-                items.add(destroyBtn);
-                destroyBtn.addListener(new Button.ClickListener() {
-
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-
-                        MgmtApplication.showConfirmationDialog(
-                                "Destroy node",
-                                String.format("Do you want to destroy node %s?", agent.getHostname()),
-                                "Yes", "Cancel", new ConfirmationDialogCallback() {
-
-                                    @Override
-                                    public void response(boolean ok) {
-                                        if(!ok) return;
-                                        UUID trackID = StormUI.getManager().destroyNode(
-                                                config.getClusterName(),
-                                                agent.getHostname());
-                                        MgmtApplication.showProgressWindow(
-                                                Config.PRODUCT_NAME, trackID,
-                                                new Window.CloseListener() {
-
-                                                    public void windowClose(Window.CloseEvent e) {
-                                                        refreshClustersInfo();
-                                                    }
-                                                }
-                                        );
-                                    }
-                                }
-                        );
-
-                    }
-                });
-            }
-            items.add(icon);
-
-            table.addItem(items.toArray(), null);
-
-            checkBtn.addListener(new Button.ClickListener() {
-                public void buttonClick(Button.ClickEvent event) {
-                    icon.setVisible(true);
-                    for(Object e : items) {
-                        if(e instanceof Button) ((Button)e).setEnabled(false);
-                    }
-                    final UUID trackId = StormUI.getManager().statusCheck(
-                            config.getClusterName(), agent.getHostname());
-                    StormUI.getExecutor().execute(new Runnable() {
-
-                        public void run() {
-                            ProductOperationView po = null;
-                            while(po == null || po.getState() == ProductOperationState.RUNNING) {
-                                po = StormUI.getTracker().getProductOperation(
-                                        Config.PRODUCT_NAME, trackId);
-                            }
-                            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!running);
-                            stopBtn.setEnabled(running);
-                            restartBtn.setEnabled(running);
-                            if(destroyBtn != null) destroyBtn.setEnabled(true);
-                            icon.setVisible(false);
-                        }
-                    });
-                }
-            });
-
-            startBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    icon.setVisible(true);
-                    for(Object e : items) {
-                        if(e instanceof Button) ((Button)e).setEnabled(false);
-                    }
-                    final UUID trackId = StormUI.getManager().startNode(
-                            config.getClusterName(), agent.getHostname());
-
-                    StormUI.getExecutor().execute(new Runnable() {
-
-                        public void run() {
-                            ProductOperationView po = null;
-                            while(po == null || po.getState() == ProductOperationState.RUNNING) {
-                                po = StormUI.getTracker().getProductOperation(
-                                        Config.PRODUCT_NAME, trackId);
-                            }
-                            boolean started = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!started);
-                            stopBtn.setEnabled(started);
-                            restartBtn.setEnabled(started);
-                            if(destroyBtn != null) destroyBtn.setEnabled(true);
-                            icon.setVisible(false);
-                        }
-                    });
-                }
-            });
-
-            stopBtn.addListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    icon.setVisible(true);
-                    for(Object e : items) {
-                        if(e instanceof Button) ((Button)e).setEnabled(false);
-                    }
-                    final UUID trackId = StormUI.getManager().stopNode(
-                            config.getClusterName(), agent.getHostname());
-
-                    StormUI.getExecutor().execute(new Runnable() {
-
-                        public void run() {
-                            ProductOperationView po = null;
-                            while(po == null || po.getState() == ProductOperationState.RUNNING) {
-                                po = StormUI.getTracker().getProductOperation(
-                                        Config.PRODUCT_NAME, trackId);
-                            }
-                            boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(stopped);
-                            stopBtn.setEnabled(!stopped);
-                            restartBtn.setEnabled(!stopped);
-                            if(destroyBtn != null) destroyBtn.setEnabled(true);
-                            icon.setVisible(false);
-                        }
-                    });
-
-                }
-            });
-
-            restartBtn.addListener(new Button.ClickListener() {
-
-                public void buttonClick(Button.ClickEvent event) {
-                    icon.setVisible(true);
-                    for(Object e : items) {
-                        if(e instanceof Button) ((Button)e).setEnabled(false);
-                    }
-                    final UUID trackId = StormUI.getManager().restartNode(
-                            config.getClusterName(), agent.getHostname());
-
-                    StormUI.getExecutor().execute(new Runnable() {
-
-                        public void run() {
-                            ProductOperationView po = null;
-                            while(po == null || po.getState() == ProductOperationState.RUNNING) {
-                                po = StormUI.getTracker().getProductOperation(
-                                        Config.PRODUCT_NAME, trackId);
-                            }
-                            boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!ok);
-                            stopBtn.setEnabled(ok);
-                            restartBtn.setEnabled(true);
-                            if(destroyBtn != null) destroyBtn.setEnabled(true);
-                            icon.setVisible(false);
-                        }
-                    });
-                }
-            });
-
-        }
+	    table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+		    @Override
+		    public void itemClick(ItemClickEvent event) {
+			    if (event.isDoubleClick()) {
+				    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+				    Agent lxcAgent = StormUI.getAgentManager().getAgentByHostname(lxcHostname);
+				    if (lxcAgent != null) {
+					    TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), StormUI.getExecutor(), StormUI.getCommandRunner(), StormUI.getAgentManager());
+					    contentRoot.getUI().addWindow(terminal.getWindow());
+				    } else {
+					    show("Agent is not connected");
+				    }
+			    }
+		    }
+	    });
+        return table;
     }
 
     private void refreshUI() {
@@ -369,44 +212,27 @@ public class Manager {
         }
     }
 
-    private Table createTableTemplate(String caption, int size, boolean master) {
-        final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Restart", Button.class, null);
-        if(!master)
-            table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-        table.setHeight(size, Sizeable.UNITS_PIXELS);
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
+    private void destroyClusterHandler() {
 
-        table.addListener(new ItemClickEvent.ItemClickListener() {
+        UUID trackID = StormUI.getManager().uninstallCluster(config.getClusterName());
 
-            public void itemClick(ItemClickEvent event) {
-                if(event.isDoubleClick()) {
-                    String hostname = (String)table.getItem(event.getItemId())
-                            .getItemProperty("Host").getValue();
-                    Agent agent = StormUI.getAgentManager().getAgentByHostname(hostname);
-                    if(agent != null) {
-                        Window terminal = MgmtApplication.createTerminalWindow(Util.wrapAgentToSet(agent));
-                        MgmtApplication.addCustomWindow(terminal);
-                    } else
-                        show("Agent is not connected");
-                }
-            }
-        });
-        return table;
+	    ProgressWindow window = new ProgressWindow(StormUI.getExecutor(), StormUI.getTracker(), trackID, Config.PRODUCT_NAME);
+	    window.getWindow().addCloseListener(new Window.CloseListener() {
+		    @Override
+		    public void windowClose(Window.CloseEvent closeEvent) {
+			    refreshClustersInfo();
+		    }
+	    });
+	    contentRoot.getUI().addWindow(window.getWindow());
     }
 
     private Button makeBatchOperationButton(String caption, final String itemProperty) {
         Button btn = new Button(caption);
-        btn.addListener(new Button.ClickListener() {
+        btn.addClickListener(new Button.ClickListener() {
 
             public void buttonClick(Button.ClickEvent event) {
                 Table[] tables = new Table[]{masterTable, workersTable};
@@ -423,17 +249,189 @@ public class Manager {
         return btn;
     }
 
-    private void destroyClusterHandler() {
+    private void populateTable(final Table table, boolean server, Agent... agents) {
 
-        UUID trackId = StormUI.getManager().uninstallCluster(config.getClusterName());
+        table.removeAllItems();
 
-        MgmtApplication.showProgressWindow(Config.PRODUCT_NAME, trackId,
-                new Window.CloseListener() {
+        for(final Agent agent : agents) {
+            final Button checkBtn = new Button("Check");
+            final Button startBtn = new Button("Start");
+            final Button stopBtn = new Button("Stop");
+            final Button restartBtn = new Button("Restart");
+            final Button destroyBtn = !server ? new Button("Destroy") : null;
+            final Embedded icon = new Embedded("", new ThemeResource(
+                    "img/spinner.gif"));
 
-                    public void windowClose(Window.CloseEvent e) {
-                        refreshClustersInfo();
-                    }
-                }
-        );
+            startBtn.setEnabled(false);
+            stopBtn.setEnabled(false);
+            restartBtn.setEnabled(false);
+            icon.setVisible(false);
+
+            final List items = new ArrayList();
+            items.add(agent.getHostname());
+            items.add(checkBtn);
+            items.add(startBtn);
+            items.add(stopBtn);
+            items.add(restartBtn);
+            if(destroyBtn != null) {
+                items.add(destroyBtn);
+                destroyBtn.addClickListener(new Button.ClickListener() {
+
+	                @Override
+	                public void buttonClick(Button.ClickEvent event) {
+
+		                ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
+				                "Yes", "No");
+		                alert.getOk().addClickListener(new Button.ClickListener() {
+			                @Override
+			                public void buttonClick(Button.ClickEvent clickEvent) {
+				                UUID trackID = StormUI.getManager().destroyNode(
+						                config.getClusterName(),
+						                agent.getHostname());
+				                ProgressWindow window = new ProgressWindow(StormUI.getExecutor(), StormUI.getTracker(), trackID, Config.PRODUCT_NAME);
+				                window.getWindow().addCloseListener(new Window.CloseListener() {
+					                @Override
+					                public void windowClose(Window.CloseEvent closeEvent) {
+						                refreshClustersInfo();
+					                }
+				                });
+				                contentRoot.getUI().addWindow(window.getWindow());
+			                }
+		                });
+
+		                contentRoot.getUI().addWindow(alert.getAlert());
+	                }
+                });
+            }
+            items.add(icon);
+
+            table.addItem(items.toArray(), null);
+
+            checkBtn.addClickListener(new Button.ClickListener() {
+	            public void buttonClick(Button.ClickEvent event) {
+		            icon.setVisible(true);
+		            for (Object e : items) {
+			            if (e instanceof Button) ((Button) e).setEnabled(false);
+		            }
+		            final UUID trackId = StormUI.getManager().statusCheck(
+				            config.getClusterName(), agent.getHostname());
+		            StormUI.getExecutor().execute(new Runnable() {
+
+			            public void run() {
+				            ProductOperationView po = null;
+				            while (po == null || po.getState() == ProductOperationState.RUNNING) {
+					            po = StormUI.getTracker().getProductOperation(
+							            Config.PRODUCT_NAME, trackId);
+				            }
+				            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+				            checkBtn.setEnabled(true);
+				            startBtn.setEnabled(!running);
+				            stopBtn.setEnabled(running);
+				            restartBtn.setEnabled(running);
+				            if (destroyBtn != null) destroyBtn.setEnabled(true);
+				            icon.setVisible(false);
+			            }
+		            });
+	            }
+            });
+
+            startBtn.addClickListener(new Button.ClickListener() {
+
+	            @Override
+	            public void buttonClick(Button.ClickEvent event) {
+		            icon.setVisible(true);
+		            for (Object e : items) {
+			            if (e instanceof Button) ((Button) e).setEnabled(false);
+		            }
+		            final UUID trackId = StormUI.getManager().startNode(
+				            config.getClusterName(), agent.getHostname());
+
+		            StormUI.getExecutor().execute(new Runnable() {
+
+			            public void run() {
+				            ProductOperationView po = null;
+				            while (po == null || po.getState() == ProductOperationState.RUNNING) {
+					            po = StormUI.getTracker().getProductOperation(
+							            Config.PRODUCT_NAME, trackId);
+				            }
+				            boolean started = po.getState() == ProductOperationState.SUCCEEDED;
+				            checkBtn.setEnabled(true);
+				            startBtn.setEnabled(!started);
+				            stopBtn.setEnabled(started);
+				            restartBtn.setEnabled(started);
+				            if (destroyBtn != null) destroyBtn.setEnabled(true);
+				            icon.setVisible(false);
+			            }
+		            });
+	            }
+            });
+
+            stopBtn.addClickListener(new Button.ClickListener() {
+
+	            @Override
+	            public void buttonClick(Button.ClickEvent event) {
+		            icon.setVisible(true);
+		            for (Object e : items) {
+			            if (e instanceof Button) ((Button) e).setEnabled(false);
+		            }
+		            final UUID trackId = StormUI.getManager().stopNode(
+				            config.getClusterName(), agent.getHostname());
+
+		            StormUI.getExecutor().execute(new Runnable() {
+
+			            public void run() {
+				            ProductOperationView po = null;
+				            while (po == null || po.getState() == ProductOperationState.RUNNING) {
+					            po = StormUI.getTracker().getProductOperation(
+							            Config.PRODUCT_NAME, trackId);
+				            }
+				            boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
+				            checkBtn.setEnabled(true);
+				            startBtn.setEnabled(stopped);
+				            stopBtn.setEnabled(!stopped);
+				            restartBtn.setEnabled(!stopped);
+				            if (destroyBtn != null) destroyBtn.setEnabled(true);
+				            icon.setVisible(false);
+			            }
+		            });
+
+	            }
+            });
+
+            restartBtn.addClickListener(new Button.ClickListener() {
+
+	            public void buttonClick(Button.ClickEvent event) {
+		            icon.setVisible(true);
+		            for (Object e : items) {
+			            if (e instanceof Button) ((Button) e).setEnabled(false);
+		            }
+		            final UUID trackId = StormUI.getManager().restartNode(
+				            config.getClusterName(), agent.getHostname());
+
+		            StormUI.getExecutor().execute(new Runnable() {
+
+			            public void run() {
+				            ProductOperationView po = null;
+				            while (po == null || po.getState() == ProductOperationState.RUNNING) {
+					            po = StormUI.getTracker().getProductOperation(
+							            Config.PRODUCT_NAME, trackId);
+				            }
+				            boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
+				            checkBtn.setEnabled(true);
+				            startBtn.setEnabled(!ok);
+				            stopBtn.setEnabled(ok);
+				            restartBtn.setEnabled(true);
+				            if (destroyBtn != null) destroyBtn.setEnabled(true);
+				            icon.setVisible(false);
+			            }
+		            });
+	            }
+            });
+
+        }
+    }
+
+    public Component getContent() {
+        return contentRoot;
     }
 }

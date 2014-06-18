@@ -63,7 +63,7 @@ public class AddNodeWindow extends Window {
         hadoopNodes.setTextInputAllowed( false );
         hadoopNodes.setNullSelectionAllowed( false );
         hadoopNodes.setRequired( true );
-        hadoopNodes.setWidth( 200, Sizeable.UNITS_PIXELS );
+        hadoopNodes.setWidth( 200, Unit.PIXELS );
         for ( Agent node : nodes ) {
             hadoopNodes.addItem( node );
             hadoopNodes.setItemCaption( node, node.getHostname() );
@@ -124,9 +124,9 @@ public class AddNodeWindow extends Window {
 
         indicator = new Label();
         indicator.setIcon( new ThemeResource( "icons/indicator.gif" ) );
-        indicator.setContentMode( Label.CONTENT_XHTML );
-        indicator.setHeight( 11, Sizeable.UNITS_PIXELS );
-        indicator.setWidth( 50, Sizeable.UNITS_PIXELS );
+        indicator.setContentMode( ContentMode.HTML );
+        indicator.setHeight( 11, Unit.PIXELS );
+        indicator.setWidth( 50, Unit.PIXELS );
         indicator.setVisible( false );
 
         Button ok = new Button( "Ok" );

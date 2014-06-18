@@ -36,7 +36,7 @@ public class VerificationStep extends Panel {
 
         Label confirmationLbl = new Label( "<strong>Please verify the installation settings "
                 + "(you may change them by clicking on Back button)</strong><br/>" );
-        confirmationLbl.setContentMode( Label.CONTENT_XHTML );
+        confirmationLbl.setContentMode( ContentMode.HTML );
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
