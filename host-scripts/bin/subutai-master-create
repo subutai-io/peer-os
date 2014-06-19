@@ -74,7 +74,6 @@ while [ $count -gt 0 ]; do
 
   if [ "$ipv4" != "-" ]; then
     echo Got IPv4 address of $ipv4  
-    lxc-attach -n master -- ping -c 3 mit.edu
     break
   fi
 

@@ -4,7 +4,7 @@
 export SUBUTAI_VERSION=2.1.0
 
 # LAN mirror on management server used instead of going over the WAN
-#export SUBUTAI_APT_MIRROR=172.16.2.140
+export SUBUTAI_APT_MIRROR=172.16.2.140
 
 # The Site Git Repository: set to have push take place on template creation
 export SUBUTAI_SITE_GIT=
@@ -41,8 +41,3 @@ export SUBUTAI_CONFIG_PATH=/etc
 # which need to be tracked in 
 export SUBUTAI_APP_DATA_PATH=/var
 
-# Subutai will expose an ubuntu mirror with the packages needed for 
-# all containers. Although all containers reference the standard repo
-# to get their debian packages we can make the physical host proxy
-# instead transparently to this address for the standard repo hostname.
-export SUBUTAI_MIRROR_ADDRESS=172.16.2.140

@@ -26,9 +26,7 @@ fi
 # (3) release all holds on clone's rootfs snapshots
 # (4) destroy all snapshots on clones's rootfs
 # (5) lxc-destroy the clone
-# (6) release all holds on clone's parent rootfs snapshot for child
-# (7) destroy clone's snapshot on parent rootfs
-# (8) destroy mounted partitions
+# (6) destroy mounted partitions
 # -----------------------------------------------------------------------------
 
 # (1) check that clone exists first
@@ -40,8 +38,8 @@ if [ -n "`lxc-ls --running | grep $clone`" ]; then
 fi
 
 # (1) let's get the clone's parent
-parent_snap=`zfs get origin "lxc/$clone" | grep $clone | awk '{print $3}'`
-parent=`echo $parent_snap | sed -e "s/lxc\///" -e "s/@$clone//"`
+parent_snap=`zfs get origin "lxc/$clone" -o value -H`
+parent=`ctnr_from_ds $parent_snap`
 
 # (2) check if the clone has dependent children
 function get_children {
@@ -50,7 +48,7 @@ function get_children {
 
   for snap in `zfs list -t snapshot -o name -H \
        | grep lxc/$clone@ | grep -v created | grep -v template`; do
-    child=`echo $snap | sed -e "s/.*@//"`
+    child=`ctnr_from_ds $snap`
     msg_info "    Found child for $clone: $child"
   done
 }
@@ -75,18 +73,7 @@ done
 # (5) lxc-destroy the clone
 lxc-destroy -n $clone
 
-# (6) release all holds on clone's parent rootfs snapshot for child
-for hold in `zfs holds -r $parent_snap | grep $parent_snap | awk '{print $2}'`;
-  do
-  zfs release $hold $parent_snap
-  msg_info "    - \"$hold\" hold removed from parent's \"$parent_snap\""
-done
-
-# (7) destroy clone's snapshot on parent rootfs
-zfs destroy $parent_snap
-msg_info "    - \"$parent_snap\" snapshot destroyed for \"$clone\""
-
-# (8) destroy mounted partitions 
+# (6) destroy mounted partitions 
 function remove-mount {
   child="$1"
   parent="$2"
@@ -109,10 +96,6 @@ function remove-mount {
   # Need to destroy mount
   zfs destroy $child_ds
   msg_info "    - \"$child_ds\" dataset destroyed"
-  zfs release keep $parent_ds@$child
-  msg_info "    - \"keep\" hold removed from \"$child_ds@$child\""
-  zfs destroy $parent_ds@$child
-  msg_info "    - \"$parent_ds@$child\" dataset destroyed"
 }
 
 remove-mount $clone $parent opt lxc

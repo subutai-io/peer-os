@@ -139,10 +139,10 @@ zfs hold keep lxc-data/$container-home@template
 tsar_root="$SUBUTAI_TMPDIR/$container"
 deltas="$tsar_root/deltas"
 mkdir -p $deltas
-zfs send "lxc/$container@template" > "$deltas/rootfs.delta"
-zfs send "lxc/$container-opt@template" > "$deltas/opt.delta"
-zfs send "lxc-data/$container-var@template" > "$deltas/var.delta"
-zfs send "lxc-data/$container-home@template" > "$deltas/home.delta"
+zfs send -I "lxc/$parent@$container" "lxc/$container@template" > "$deltas/rootfs.delta"
+zfs send -I "lxc/$parent-opt@$container" "lxc/$container-opt@template" > "$deltas/opt.delta"
+zfs send -I "lxc-data/$parent-var@$container" "lxc-data/$container-var@template" > "$deltas/var.delta"
+zfs send -I "lxc-data/$parent-home@$container" "lxc-data/$container-home@template" > "$deltas/home.delta"
 
 
 # -----------------------------------------------------------------------------

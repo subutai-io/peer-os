@@ -180,7 +180,7 @@ function get_parent {
     return 1
   fi
 
-  snap=`zfs list -t snapshot -o name -H | egrep "lxc/.*@$c" | grep -v '\-opt'`
+  snap=`zfs get origin -o value -H lxc/$c`
   echo `ctnr_from_ds $snap`
 }
 
@@ -219,8 +219,87 @@ function list_templates {
 }
 
 
-function check_lxc {
-  return
+function clone-mount {
+  child="$1"
+  parent="$2"
+  partition="$3"
+  pool="$4"
+
+  child_ds="$pool/$child-$partition"
+  child_conf="/var/lib/lxc/$child/config"
+  parent_ds="$pool/$parent-$partition"
+
+  zfs clone "$parent_ds@template" "$child_ds"
+  msg_info "    - \"$child_ds\" cloned from \"$parent_ds@template\""
+
+  child_conf_new=$child_conf".new"
+  parent_part="$parent-$partition"
+  child_part="$child-$partition"
+  cat "$child_conf" | sed -e "s/$parent_part/$child_part/" > "$child_conf_new"
+  mv -f "/var/lib/lxc/$child/config" "/var/lib/lxc/$child/config.old"
+  mv "/var/lib/lxc/$child/config.new" "/var/lib/lxc/$child/config"
+}
+
+
+function clone_lxc {
+  parent="$1"
+  child="$2"
+  usage="$3"
+
+  # Clone Plan
+  # --------------------------------------------------------------------------
+  # (1) perform sanity checks
+  #       - check that child does NOT exist
+  #       - check that parent does exist
+  #       - check that parent is a template
+  # (2) copy over config and fstab files, and mkdir for rootfs
+  # (3) massage the utsname and other lxc properties
+  # (4) zfs clone $pool/$parent_ds@template $pool/$child_ds
+  # (5) zfs set mountpoint=/var/lib/lxc/$child/rootfs $pool/$child_ds
+  # (6) handle creation of external file system mounts
+  # (7) alter hostname from /etc/hosts and /etc/hostname
+
+  # (1) perform sanity checks
+  check_missing $child "`usage`" 
+  check_exists $parent "`usage`"
+
+  if [ "`is_template $parent`" == "false" ]; then
+    msg_notice "    - parent \"$parent\" is not a template ... promoting"
+    subutai-template $parent
+  else
+    msg_info "    - parent \"$parent\" is a template"
+  fi
+
+  # (2) copy over config and fstab files, and mkdir for rootfs
+  parent_home=/var/lib/lxc/$parent
+  child_home=/var/lib/lxc/$child
+  child_rootfs=$child_home/rootfs
+  child_conf=$child_home/config
+  child_conf_new="$child_conf".new
+  child_conf_old="$child_conf".old
+
+  mkdir $child_home
+  # (3) massage the utsname and other lxc and filesystem mounts
+  cat $parent_home/config                                          | \
+     sed -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                \
+         -e "s/\/var\/lib\/lxc\/$parent/\/var\/lib\/lxc\/$child/g" > $child_home/config
+  cp $parent_home/fstab $child_home
+  mkdir $child_home/rootfs
+
+  # (4) zfs clone $pool/$parent_ds@template $pool/$child_ds
+  zfs clone lxc/$parent@template lxc/$child
+
+  # (5) zfs set mountpoint=/var/lib/lxc/$child/rootfs $pool/$child_ds
+  zfs set mountpoint=/var/lib/lxc/$child/rootfs lxc/$child
+  
+  # (6) Handle creation of external file system mounts
+  clone-mount $child $parent opt lxc
+  clone-mount $child $parent var lxc-data
+  clone-mount $child $parent home lxc-data
+
+  # (7) alter hostname from /etc/hosts and /etc/hostname
+  echo $child > $child_rootfs/etc/hostname
+  cat $parent_home/rootfs/etc/hosts | sed -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
 }
 
 
