@@ -1,0 +1,61 @@
+#!/bin/bash
+
+. /etc/subutai/config
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Exports the master template as a tsar file
+  echo
+  echo "	"subutai-master-export
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+# Also sources bsfl
+. /etc/subutai/functionz
+
+# Plan for exporting a template
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+# (2) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
+# (3) generate the tsar file from git differential, deltas, and package info
+
+# -----------------------------------------------------------------------------
+# (1) perform some sanity checks
+# -----------------------------------------------------------------------------
+
+if [ -f "$SUBUTAI_TMPDIR/master.tsar" ]; then
+  msg_error "It seems the tsar file has already been generated"
+  msg_error "Destroy $SUBUTAI_TMPDIR/master and the peer tsar file first"
+  exit 1
+fi
+
+tsar_root="$SUBUTAI_TMPDIR/master"
+deltas="$tsar_root/deltas"
+mkdir -p $deltas
+zfs send "lxc/master@template" > "$deltas/rootfs.delta"
+zfs send "lxc/master-opt@template" > "$deltas/opt.delta"
+zfs send "lxc-data/master-var@template" > "$deltas/var.delta"
+zfs send "lxc-data/master-home@template" > "$deltas/home.delta"
+
+
+# -----------------------------------------------------------------------------
+# (3) generate the tsar file from git differential, deltas, and package info
+# -----------------------------------------------------------------------------
+
+cp /var/lib/lxc/master/config $tsar_root
+cp /var/lib/lxc/master/fstab  $tsar_root
+
+mkdir -p $tsar_root/etc
+cp -rf /var/lib/lxc/master/rootfs/etc/subutai $tsar_root/etc
+
+pushd .
+cd /var/lib/lxc/master/rootfs
+uuid=`git log | grep commit | head -n 1 | awk '{print $2}'`
+popd
+echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
+
+tar -zcvf $SUBUTAI_TMPDIR/master.tsar $tsar_root
+
+
