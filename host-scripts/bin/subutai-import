@@ -54,7 +54,7 @@ popd
 #     - the template parent MUST be present and in the template registry
 #       if NOT the user will have to install the parent container first
 # -----------------------------------------------------------------------------
-check_missing $container
+lxc_assert $container
 
 # check to make sure container is registered as a template
 if [ "`is_registered $container`" == "false" ]; then
@@ -85,7 +85,8 @@ echo Tomorrow: fix all scripts to account for it
 echo Tomorrow: complete the implementation of tsar file imports
 exit 1
 
-check_parent $parent
+lxc_assert $parent
+
 # check to make sure the parent is a template
 if [ "`is_template $parent`" == "false" ]; then
   msg_error "Parent \"$parent\" is NOT a template. Aborting ..."

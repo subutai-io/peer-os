@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O ZFS convenience operations
+# --------------------------------------------------------------------------
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+# assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
+# warning: exits!
+function zfs_assert_nosnap {
+  snap="$1"
+  usage="$2"
+
+  if [ "$snap" == "`zfs list -t snapshot -o name -H $snap`" ]; then
+    msg_error "Snapshot \"$snap\" already exists!"
+    show_usage "$usage"
+  fi
+}
+
+
+# assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
+# warning: exits!
+function zfs_assert_snap {
+  snap="$1"
+  usage="$2"
+
+  if [ -z "`zfs list -t snapshot -o name -H $snap`" ]; then
+    msg_error "Snapshot \"$snap\" does NOT exist!"
+    show_usage "$usage"
+  fi
+}
+
+
+# assert dataset (arg $1) does NOT exist, if it does show usage (arg $2)
+# warning: exits!
+function zfs_assert_nods {
+  ds="$1"
+  usage="$2"
+
+  if [ "$ds" == "`zfs list -o name -H $ds`" ]; then
+    msg_error "ZFS dataset \"$ds\" already exists!"
+    show_usage "$usage"
+  fi
+}
+
+
+# assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
+# warning: exits!
+function zfs_assert_ds {
+  ds="$1"
+  usage="$2"
+
+  if [ -z "`zfs list -o name -H $ds`" ]; then
+    msg_error "ZFS dataset \"$ds\" does NOT exist!"
+    show_usage "$usage"
+  fi
+}
+
+
+# checks if the container (arg $1) is a template, echo "true"/"false"
+function zfs_is_template {
+  c="$1"
+  if [ -z "`zfs list -t snapshot -o name -H "lxc/$c@template"`" ]; then
+    echo false
+  else
+    echo true
+  fi
+}
+
+
+# gets the parent of a container
+# first argument $1 is the name of the child container
+# master returns master
+function zfs_get_parent {
+  c="$1"
+
+  if [ "$c" == "master" ]; then
+    echo master
+    return
+  fi
+
+  snap=`zfs get origin -o value -H lxc/$c`
+  echo `zfs_ctnr_from_ds $snap`
+}
+
+
+# extracts the container name from a dataset or a dataset snapshot
+function zfs_ctnr_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
+}
+
+
+# extracts the zpool name from a dataset or a dataset snapshot
+function zfs_pool_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/\/.*//'
+}
+
+
+# extracts the snapshot name from a dataset snapshot
+function zfs_snap_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/.*@//'
+}
+
+
+# extracts the partition name from a dataset or a dataset snapshot
+function zfs_part_from_ds {
+  ds="$1"
+  echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/.*-//'
+}
+
+
+# lists all the templates available
+function zfs_list_templates {
+  for line in `zfs list -t snapshot -o name -H | grep @template`; do
+    echo `ctnr_from_ds $line`
+  done
+}
+
+

@@ -1,8 +1,11 @@
 #!/bin/bash
 
-. /etc/subutai/config
+# Also sources everything we need
+. /etc/subutai/zfs_ops
+. /etc/subutai/lxc_ops
+. /etc/subutai/reg_ops
 
-container=$1
+container="$1"
 
 function usage {
   echo -----------------------------------------------------------------------
@@ -12,9 +15,6 @@ function usage {
   echo
   echo -----------------------------------------------------------------------
 }
-
-# Also sources bsfl
-. /etc/subutai/functionz
 
 # The master is already a template
 if [ "$container" == "master" ]; then
@@ -42,7 +42,7 @@ fi
 # -----------------------------------------------------------------------------
 # (1) perform some sanity checks
 # -----------------------------------------------------------------------------
-check_exists $container
+lxc_assert $container
 
 # check to make sure the container is NOT already a template
 if [ "`is_template $container`" == "true" ]; then
@@ -60,8 +60,8 @@ else
   msg_info "    - check passed: \"$container\" is NOT registered"
 fi
 
-parent=`get_parent $container`
-check_parent $parent
+parent=`zfs_get_parent $container`
+lxc_assert $parent
 # check to make sure the parent is a template
 if [ "`is_template $parent`" == "false" ]; then
   msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
@@ -139,21 +139,22 @@ zfs hold keep lxc-data/$container-home@template
 tsar_root="$SUBUTAI_TMPDIR/$container"
 deltas="$tsar_root/deltas"
 mkdir -p $deltas
-zfs send -I "lxc/$parent@$container" "lxc/$container@template" > "$deltas/rootfs.delta"
-zfs send -I "lxc/$parent-opt@$container" "lxc/$container-opt@template" > "$deltas/opt.delta"
-zfs send -I "lxc-data/$parent-var@$container" "lxc-data/$container-var@template" > "$deltas/var.delta"
-zfs send -I "lxc-data/$parent-home@$container" "lxc-data/$container-home@template" > "$deltas/home.delta"
+zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
+zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
+zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
+zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 
 
 # -----------------------------------------------------------------------------
 # (6) generate the tsar file from git differential, deltas, and package info
 # -----------------------------------------------------------------------------
 
-cp /var/lib/lxc/$container/config $tsar_root
-cp /var/lib/lxc/$container/fstab  $tsar_root
-
+cp /var/lib/lxc/$container/config "$tsar_root"
+cp /var/lib/lxc/$container/fstab  "$tsar_root"
 mkdir -p $tsar_root/etc
 cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
+
+# TODO: this is bogus shit ... find a way to deal (lxc config?)
 echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
 
 pushd . 

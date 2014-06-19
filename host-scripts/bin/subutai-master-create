@@ -1,21 +1,16 @@
 #!/bin/bash
 
-. /etc/subutai/config
-. /etc/subutai/functionz
+. /etc/subutai/functionz # remove me later
+. /etc/subutai/zfs_ops
+. /etc/subutai/lxc_ops
 
 
 # Check for Master Existence
 # -----------------------------------------------------------------------------
 
-if [ -n "`lxc-ls master | grep master`" ]; then
-  echo LXC container master already exists!
-  exit 1
-fi
+lxc_assert_no master
+zfs_assert_nods "lxc/master"
 
-if [ -n "`zfs list lxc/master`" ]; then
-  echo "Zfs dataset lxc/master already exists!"
-  exit 1
-fi
 
 # Create the container
 # -----------------------------------------------------------------------------
@@ -27,25 +22,20 @@ lxc-create -n master            \
  -S $SUBUTAI_AUTH_KEY 
 
 # Add config and app data paths to the config file
+config=/var/lib/lxc/master/config
 for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
-  echo subutai.config.path=$config_path >> /var/lib/lxc/master/config
+  echo subutai.config.path=$config_path >> $config
 done
 
 for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
-  echo subutai.app.data.path=$appdata_path >> /var/lib/lxc/master/config
+  echo subutai.app.data.path=$appdata_path >> $config
 done
 
 # Add pre-start hook script entry
-echo lxc.hook.pre-start=/etc/subutai/pre-start-hook \
-     >> /var/lib/lxc/master/config
+echo lxc.hook.pre-start=/etc/subutai/pre-start-hook >> $config
 
 mkdir /var/lib/lxc/master/rootfs/etc/subutai
 
-# NOTES:
-# -----------------------------------------------------------------------------
-# Unfortunately we cannot create the blank (empty) dataset for the master
-# rootfs because of the lxc-create command above. So to fix this we need to
-# back up the files in it and clear it out, then snapshot, then replace those
 # files. Then we can take the template snapshot.
 #
 # (0) Start it up, update, dist-upgrade, shutdown
@@ -57,29 +47,13 @@ mkdir /var/lib/lxc/master/rootfs/etc/subutai
 # (6) Tag template snapshot and hold
 
 # (0)
-pkglist=/tmp/pkglist-master.txt
 
 if [ -n "$SUBUTAI_APT_MIRROR" ]; then
   echo "$SUBUTAI_APT_MIRROR archive.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
   echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
 fi
 
-lxc-start -d -n master
-lxc-wait -n master -s 'RUNNING' -t 5
-
-count=10
-while [ $count -gt 0 ]; do
-  sleep 1
-  ipv4=`lxc-ls -f | grep master | awk '{print $3}'`
-
-  if [ "$ipv4" != "-" ]; then
-    echo Got IPv4 address of $ipv4  
-    break
-  fi
-
-  count=`expr $count - 1`
-done
-
+lxc_wait_net master
 lxc-attach -n master -- apt-get update
 lxc-attach -n master -- apt-get -y dist-upgrade
 
@@ -90,7 +64,15 @@ fi
 
 lxc-attach -n master -- apt-get -y autoclean
 lxc-attach -n master -- apt-get -y autoremove
-lxc-attach -n master -- dpkg -l > /tmp/pkglist.txt
+
+rootfs_etc_conf=/var/lib/lxc/master/rootfs/etc/subutai
+
+if [ ! -d "$rootfs_etc_conf" ]; then 
+  mkdir -p $rootfs_etc_conf
+fi
+
+echo "dpkg -l" | lxc-attach -n master > $rootfs_etc_conf/package-manifest.txt
+
 lxc-stop -n master
 lxc-wait -n master -s 'STOPPED'
 sleep 2

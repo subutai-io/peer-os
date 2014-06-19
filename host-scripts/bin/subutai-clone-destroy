@@ -1,7 +1,7 @@
 #!/bin/bash
 
-. /etc/subutai/config
-. /etc/subutai/functionz
+# sources everything else we need
+. /etc/subutai/lxc_ops
 
 clone=$1
 
@@ -29,17 +29,13 @@ fi
 # (6) destroy mounted partitions
 # -----------------------------------------------------------------------------
 
-# (1) check that clone exists first
-check_exists "$clone" "`usage`"
-
-# if running turn it off
-if [ -n "`lxc-ls --running | grep $clone`" ]; then
-  lxc-stop -n $clone
-fi
+# (1) check that clone exists first: turn off if on
+lxc_assert "$clone" "`usage`"
+lxc_stop $clone
 
 # (1) let's get the clone's parent
 parent_snap=`zfs get origin "lxc/$clone" -o value -H`
-parent=`ctnr_from_ds $parent_snap`
+parent=`zfs_ctnr_from_ds $parent_snap`
 
 # (2) check if the clone has dependent children
 function get_children {

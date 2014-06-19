@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+function chk_missing {
+  container="$1"
+  usage="$2"
+
+  if [ -z "$container" ]; then
+    msg_error "No value provided for containe's name. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -n "`lxc-ls "$container" | grep "$container"`" ]; then
+    msg_error "Container \"$container\" exists. Aborting ..."
+    show_usage "$usage"
+  else 
+    msg_ok "Container \"$container\" does not exist."
+  fi
+}
+
+
+function chk_parent {
+  parent="$1"
+  usage="$2"
+
+  if [ -z "$parent" ]; then 
+    msg_error "No value provided for parent container. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -z "`lxc-ls "$parent" | grep "$parent"`" ]; then 
+    msg_error "Parent container \"$parent\" does not exist. Aborting ..."
+    show_usage "$usage"
+  else
+    msg_ok "Parent container \"$parent\" exists."
+  fi
+}
+
+
+function chk_child {
+  child="$1"
+  usage="$2"
+
+  if [ -z "$child" ]; then 
+    msg_error "No value provided for child container. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -n "`lxc-ls "$child" | grep "$child"`" ]; then 
+    msg_error "Child container \"$child\" already exists. Aborting ..."
+    show_usage "$usage"
+  else
+    msg_ok "Child container \"$child\" does not exist."
+  fi
+}
+
+
+# checks if the container (arg $1) is a template, echo "true"/"false"
+function is_template {
+  c="$1"
+  s=`zfs list -t snapshot -o name -H | grep "lxc/$c@template" | grep -v '\-opt'`
+
+  if [ -z "$s" ]; then
+    echo false
+  else
+    echo true
+  fi
+}
+
+

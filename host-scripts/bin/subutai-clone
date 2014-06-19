@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. /etc/subutai/config
+# sources everything else we need
+. /etc/subutai/lxc_ops
 
 parent=$1
 child=$2
@@ -14,9 +15,8 @@ function usage {
   echo -----------------------------------------------------------------------
 }
 
-. /etc/subutai/functionz
-
-clone_lxc $parent $child "`usage`"
+# NOTE: underscore for our own lxc clone impl not supplied lxc-clone
+lxc_clone $parent $child "`usage`"
 
 lxc-start -d -n $child
 lxc-wait -n $child -s RUNNING

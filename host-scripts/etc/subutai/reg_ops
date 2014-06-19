@@ -1,0 +1,24 @@
+#!/bin/bash
+
+. /etc/subutai/config
+. /etc/subutai/chk_ops
+
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to ask Subutai if a template name is registered 
+# already. Since this functionality is not available I just stubbed it 
+# out with a call to is_template. 
+function is_registered {
+  echo `is_template $1`
+} 
+    
+  
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to take the supplied tsar file and upload and 
+# register it with the Subutai management server.
+function send_n_register {
+  tsar=$1
+
+  msg_ok "TSAR file $tsar registered and sent to management server"
+} 
+
+
