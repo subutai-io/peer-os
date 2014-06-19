@@ -24,15 +24,16 @@ lxc-create -n master            \
 # Add config and app data paths to the config file
 config=/var/lib/lxc/master/config
 for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
-  echo subutai.config.path=$config_path >> $config
+  echo subutai.config.path = $config_path >> $config
 done
 
 for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
-  echo subutai.app.data.path=$appdata_path >> $config
+  echo subutai.app.data.path = $appdata_path >> $config
 done
 
 # Add pre-start hook script entry
-echo lxc.hook.pre-start=/etc/subutai/pre-start-hook >> $config
+echo lxc.hook.pre-start = /etc/subutai/pre-start-hook >> $config
+echo subutai.parent = master >> $config
 
 mkdir /var/lib/lxc/master/rootfs/etc/subutai
 

@@ -157,10 +157,10 @@ cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
 # TODO: this is bogus shit ... find a way to deal (lxc config?)
 echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
 
-pushd . 
+pushd . >> /dev/null
 cd $SUBUTAI_TMPDIR
-tar -zcvf $container.tsar $container
-popd
+tar -zcf $container.tsar $container
+popd >> /dev/null
 
 # -----------------------------------------------------------------------------
 # (7) register and send tsar file to subutai management server

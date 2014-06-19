@@ -9,6 +9,31 @@
 init
 
 
+# prints out the children for a ds or container name (arg $1)
+# counts and prints out the children
+# returns the child count
+function zfs_get_children {
+  parent="$1"
+
+  # we got a dataset instead of a clone name
+  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then 
+    snap="$parent@template"
+  else
+    snap="lxc/$parent@template"
+  fi
+
+  count=0
+  for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
+  do
+    child=`zfs_ctnr_from_ds $ds`
+    msg_notice "        -> \"$child\" is a child of $parent"
+    count=`expr $count + 1`
+  done
+
+  return $count
+}
+
+
 # assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function zfs_assert_nosnap {

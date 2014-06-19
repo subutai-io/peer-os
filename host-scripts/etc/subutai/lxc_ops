@@ -14,7 +14,7 @@
 function lxc_stop {
   lxc="$1"
   
-  if [ -n "`lxc-ls --running | grep $lxc`" ]; then
+  if [ "$lxc" == "`lxc-ls --running | grep $lxc`" ]; then
     lxc-stop -n $lxc
   fi
 }
@@ -164,6 +164,7 @@ function lxc_clone {
   mkdir -p $child_rootfs
   cat $parent_conf | sed                                         \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                \
+     -e "s/subutai\.parent.*/subutai\.parent = $parent/"         \
      -e "s/\/var\/lib\/lxc\/$parent/\/var\/lib\/lxc\/$child/g" > $child_conf
   cp $parent_home/fstab $child_home
 

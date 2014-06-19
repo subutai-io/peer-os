@@ -14,7 +14,7 @@ function usage {
 }
 
 # Also sources other files
-. /etc/subutai/lxc_ops
+. /etc/subutai/functionz
 
 # Plan for exporting a template
 # -----------------------------------------------------------------------------
@@ -53,7 +53,7 @@ else
   msg_info "    - check passed: \"$container\" is registered"
 fi
 
-parent=`get_parent $container`
+parent=`zfs_get_parent $container`
 lxc_assert $parent
 # check to make sure the parent is a template
 if [ "`is_template $parent`" == "false" ]; then
@@ -79,10 +79,10 @@ fi
 tsar_root="$SUBUTAI_TMPDIR/$container"
 deltas="$tsar_root/deltas"
 mkdir -p $deltas
-zfs send -I "lxc/$parent@$container" "lxc/$container@template" > "$deltas/rootfs.delta"
-zfs send -I "lxc/$parent-opt@$container" "lxc/$container-opt@template" > "$deltas/opt.delta"
-zfs send -I "lxc-data/$parent-var@$container" "lxc-data/$container-var@template" > "$deltas/var.delta"
-zfs send -I "lxc-data/$parent-home@$container" "lxc-data/$container-home@template" > "$deltas/home.delta"
+zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
+zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
+zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
+zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 
 
 # -----------------------------------------------------------------------------
@@ -95,12 +95,19 @@ cp /var/lib/lxc/$container/fstab  $tsar_root
 mkdir -p $tsar_root/etc
 cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
 
-pushd .
+pushd . > /dev/null
 cd /var/lib/lxc/$container/rootfs
 uuid=`git log | grep commit | head -n 1 | awk '{print $2}'`
-popd
+popd > /dev/null
 echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
 
-tar -zcvf $SUBUTAI_TMPDIR/$container.tsar $tsar_root
+pushd . > /dev/null
+cd $SUBUTAI_TMPDIR
+tar -zcf $container.tsar $container
 
+if [ $? -eq 0 -a -f "$container.tsar" ]; then 
+  msg_ok "TSAR file successfully created: \"$container.tsar\""
+fi
+
+popd > /dev/null
 

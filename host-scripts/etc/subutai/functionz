@@ -5,6 +5,10 @@
 . /etc/subutai/bsfl
 init
 
+. /etc/subutai/chk_ops
+. /etc/subutai/reg_ops
+. /etc/subutai/zfs_ops
+. /etc/subutai/lxc_ops
 
 # Function addmount:
 # -----------------------------------------------------------------------------
