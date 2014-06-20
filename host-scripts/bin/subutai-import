@@ -68,7 +68,7 @@ parent=`cat $config | grep subutai.parent | awk '{print $3}'`
 lxc_assert $parent
 
 # check to make sure the parent is a template
-if [ "`is_template $parent`" == "false" ]; then
+if [ "`zfs_is_template $parent`" == "false" ]; then
   msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
   exit 1
 else 

@@ -35,7 +35,7 @@ if [ -f "$SUBUTAI_TMPDIR/$container.tsar" ]; then
 fi
 
 # check to make sure the container is a template
-if [ "`is_template $container`" == "false" ]; then
+if [ "`zfs_is_template $container`" == "false" ]; then
   msg_error "Container \"$container\" is NOT a template. Aborting ..."
   exit 1
 else 
@@ -53,7 +53,7 @@ fi
 parent=`zfs_get_parent $container`
 lxc_assert $parent
 # check to make sure the parent is a template
-if [ "`is_template $parent`" == "false" ]; then
+if [ "`zfs_is_template $parent`" == "false" ]; then
   msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
   exit 1
 else 
