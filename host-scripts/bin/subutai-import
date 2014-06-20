@@ -65,7 +65,8 @@ lxc_assert_no $container
 #  msg_info "    - check passed: \"$container\" is registered"
 #fi
 
-config=$SUBUTAI_TMPDIR/$container/config
+tsar_dir=$SUBUTAI_TMPDIR/$container
+config=$tsar_dir/config
 parent=`cat $config | grep subutai.parent | awk '{print $3}'`
 lxc_assert $parent
 
@@ -84,5 +85,24 @@ if [ "`is_registered $parent`" == "false" ]; then
 else 
   msg_info "    - check passed: parent \"$parent\" is registered"
 fi
+
+# start creating the container
+lxc_home=/var/lib/lxc/$container
+lxc_rootfs=$lxc_home/rootfs
+lxc_config=$lxc_home/config
+deltas=$tsar_dir/deltas
+
+mkdir -p $lxc_rootfs
+echo lxc_rootfs = $lxc_rootfs
+cp $config $lxc_home;
+cp $tsar_dir/fstab $lxc_home;
+
+zfs recv lxc/$container < $deltas/rootfs.delta
+zfs set mountpoint=$lxc_rootfs lxc/$container
+
+zfs recv lxc/$container-opt < $deltas/opt.delta
+zfs recv lxc-data/$container-var < $deltas/var.delta
+zfs recv lxc-data/$container-home < $deltas/home.delta
+
 
 
