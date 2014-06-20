@@ -30,7 +30,7 @@ public class FileUtil {
 	public static void readFile(String filePath) {
 
 		try {
-			String currentPath = System.getProperty("user.dir") + System.lineSeparator() + "res";
+			String currentPath = System.getProperty("user.dir") + "/res";
 			InputStream inputStream = getClassLoader().getResourceAsStream(filePath);
 
 			File folder = new File(currentPath);
@@ -38,7 +38,7 @@ public class FileUtil {
 				folder.mkdir();
 			}
 
-			OutputStream outputStream = new FileOutputStream(new File(currentPath + System.lineSeparator() + "accumulo.png"));
+			OutputStream outputStream = new FileOutputStream(new File(currentPath + "accumulo.png"));
 			int read;
 			byte[] bytes = new byte[1024];
 
