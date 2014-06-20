@@ -16,7 +16,7 @@
 
     <modules>
         <module>accumulo</module>
-        <module>cassandra</module>
+        <!--<module>cassandra</module>
         <module>common</module>
         <module>flume</module>
         <module>hadoop</module>
@@ -34,7 +34,7 @@
         <module>spark</module>
         <module>sqoop</module>
         <module>storm</module>
-        <module>zookeeper</module>
+        <module>zookeeper</module>-->
     </modules>
 
 </project>

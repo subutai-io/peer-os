@@ -15,7 +15,9 @@ import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,6 +26,8 @@ import java.util.concurrent.Executors;
  * @author dilshat
  */
 public class AccumuloUI implements PortalModule {
+
+	public static final String MODULE_IMAGE = "accumulo.png";
 
 	private static Accumulo accumuloManager;
 	private static Hadoop hadoopManager;
@@ -100,6 +104,11 @@ public class AccumuloUI implements PortalModule {
 
 	public String getName() {
 		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(AccumuloUI.MODULE_IMAGE, this);
 	}
 
 

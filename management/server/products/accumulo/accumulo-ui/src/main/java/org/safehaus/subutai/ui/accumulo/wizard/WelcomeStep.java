@@ -32,8 +32,7 @@ public class WelcomeStep extends Panel {
 
 		Label logoImg = new Label();
 		// Image as a file resource
-		FileResource resource = new FileResource(FileUtil.getFile("accumulo.png", this));
-		logoImg.setIcon(resource);
+		logoImg.setIcon(new FileResource(FileUtil.getFile("accumulo.png", this)));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(56, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);
