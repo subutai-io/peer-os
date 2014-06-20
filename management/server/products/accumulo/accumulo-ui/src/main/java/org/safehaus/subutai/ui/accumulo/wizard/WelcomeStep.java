@@ -29,7 +29,7 @@ public class WelcomeStep extends Panel {
 		welcomeMsg.setContentMode(ContentMode.HTML);
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-		ClassResource resource = new ClassResource("org/safehaus/subutai/ui/accumulo/logo.png");
+		ClassResource resource = new ClassResource("logo.png");
 		Label logoImg = new Label();
 		logoImg.setIcon(resource);
 		logoImg.setContentMode(ContentMode.HTML);
