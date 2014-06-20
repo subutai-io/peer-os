@@ -11,6 +11,73 @@ zfs_assert_nods "lxc/master"
 
 # Create the container
 # -----------------------------------------------------------------------------
+# Two modes: import and create
+
+tsar_file=$SUBUTAI_TMPDIR/master.tsar
+tsar_dir=$SUBUTAI_TMPDIR/master
+config=$tsar_dir/config
+fstab=$tsar_dir/fstab
+deltas=$tsar_dir/deltas
+
+if [ -f "$tsar_file" ]; then
+  msg_info "Using available TSAR file for import: $tsar_file"
+
+  if [ -d "$tsar_dir" ]; then
+    rm -rf $tsar_dir
+  fi
+
+  pushd . >> /dev/null
+  cd $SUBUTAI_TMPDIR
+  tar -zxvf $tsar_file
+  popd >> /dev/null
+
+  lxc_home=/var/lib/lxc/master
+  lxc_rootfs=$lxc_home/rootfs
+  mkdir -p $lxc_rootfs
+  cp $config $lxc_home
+  cp $fstab $lxc_home
+  cp $tsar_fir/package-manifest.txt $lxc_home
+
+  zfs recv lxc/master < $deltas/rootfs.delta
+  zfs hold keep lxc/master@template
+  zfs set mountpoint=$lxc_rootfs lxc/master
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for rootfs"
+  else
+    msg_error "Delta import for rootfs failed"
+  fi
+
+  zfs recv lxc/master-opt < $deltas/opt.delta
+  zfs hold keep lxc/master-opt@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for opt"
+  else
+    msg_error "Delta import for opt failed"
+  fi
+
+  zfs recv lxc-data/master-var < $deltas/var.delta
+  zfs hold keep lxc-data/master-var@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/var.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for var"
+  else
+    msg_error "Delta import for var failed"
+  fi
+  
+  zfs recv lxc-data/master-home < $deltas/home.delta
+  zfs hold keep lxc-data/master-home@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/home.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for home"
+  else
+    msg_error "Delta generation for opt failed"
+  fi
+
+  msg_ok "Master import from TSAR file successful"
+  exit 0
+fi
 
 lxc-create -n master            \
  -t ubuntu                      \
@@ -64,13 +131,7 @@ fi
 lxc-attach -n master -- apt-get -y autoclean
 lxc-attach -n master -- apt-get -y autoremove
 
-rootfs_etc_conf=/var/lib/lxc/master/rootfs/etc/subutai
-
-if [ ! -d "$rootfs_etc_conf" ]; then 
-  mkdir -p $rootfs_etc_conf
-fi
-
-echo "dpkg -l" | lxc-attach -n master > $rootfs_etc_conf/package-manifest.txt
+echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/package-manifest.txt
 
 lxc-stop -n master
 lxc-wait -n master -s 'STOPPED'
