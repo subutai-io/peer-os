@@ -79,7 +79,6 @@ public class AccumuloUI implements PortalModule {
 	}
 
 	public void init() {
-		FileUtil.writeFile("img/accumulo.png");
 		executor = Executors.newCachedThreadPool();
 	}
 

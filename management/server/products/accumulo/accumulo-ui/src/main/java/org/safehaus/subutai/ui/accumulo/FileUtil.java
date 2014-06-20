@@ -14,11 +14,20 @@ public class FileUtil {
 
 	private static URLClassLoader classLoader;
 
-	public static void writeFile(String filePath) {
+	public static File getFile(String fileName) {
+		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
+		File file = new File(currentPath);
+		if (!file.exists()) {
+			writeFile(fileName);
+		}
+		return file;
+	}
+
+	private static void writeFile(String fileName) {
 
 		try {
 			String currentPath = System.getProperty("user.dir") + "/res";
-			InputStream inputStream = getClassLoader().getResourceAsStream(filePath);
+			InputStream inputStream = getClassLoader().getResourceAsStream("img/" + fileName);
 
 			File folder = new File(currentPath);
 			if (!folder.exists()) {
@@ -48,10 +57,5 @@ public class FileUtil {
 		classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
 
 		return classLoader;
-	}
-
-	public static File getFile(String fileName) {
-		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
-		return new File(currentPath);
 	}
 }
