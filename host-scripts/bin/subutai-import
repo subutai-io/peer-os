@@ -1,0 +1,115 @@
+#!/bin/bash
+
+. /etc/subutai/funcs
+
+container="$1"
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Imports a registered Subutai template using a tsar file
+  echo
+  echo "	"subutai-import template
+  echo
+  echo template.tsar file must be present within the subutai temp directory.
+  echo -----------------------------------------------------------------------
+}
+
+if [ -z "$container"  ]; then
+  msg_error "Expecting single parameter for the container to import"
+  show_usage "`usage`"
+fi
+
+if [ "$container" == "master" ]; then
+  msg_error "Use subutai-master-create with tsar file to import the master."
+  exit 1
+fi
+
+# Plan for importing a template
+# -----------------------------------------------------------------------------
+# (1) Expand out the tsar file
+# (2) perform sanity checks first
+#     - a container with the same name MUST NOT already exist
+#     - the template name MUST be in the template registry
+#     - the template parent MUST be present and in the template registry
+#       if NOT the user will have to install the parent container first
+# (3) Setup the LXC container area under /var/lib/lxc/
+# (4) Receive delta images of all filesystems starting with the rootfs
+# (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
+
+
+# -----------------------------------------------------------------------------
+# (1) Expand out the tsar file
+# -----------------------------------------------------------------------------
+
+tsar="$SUBUTAI_TMPDIR/$container".tsar
+
+if [ ! -f "$tsar" ]; then
+  msg_error "Could not find template file \"$tsar\". Aborting ..."
+  exit 1
+fi
+
+pushd . > /dev/null
+cd $SUBUTAI_TMPDIR
+tar -zxf "$container".tsar
+popd > /dev/null
+
+# -----------------------------------------------------------------------------
+# (2) perform sanity checks first
+#     - a container with the same name MUST NOT already exist
+#     - the template name MUST be in the template registry
+#     - the template parent MUST be present and in the template registry
+#       if NOT the user will have to install the parent container first
+# -----------------------------------------------------------------------------
+lxc_assert_no $container
+
+# check to make sure container is registered as a template
+# TODO: enable when this works
+#if [ "`is_registered $container`" == "false" ]; then
+#  msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+#  exit 1
+#else 
+#  msg_info "    - check passed: \"$container\" is registered"
+#fi
+
+tsar_dir=$SUBUTAI_TMPDIR/$container
+config=$tsar_dir/config
+parent=`cat $config | grep subutai.parent | awk '{print $3}'`
+lxc_assert $parent
+
+# check to make sure the parent is a template
+if [ "`zfs_is_template $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is a template"
+fi
+
+# check to make sure the parent is registered
+if [ "`is_registered $parent`" == "false" ]; then
+  msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+  exit 1
+else 
+  msg_info "    - check passed: parent \"$parent\" is registered"
+fi
+
+# start creating the container
+lxc_home=/var/lib/lxc/$container
+lxc_rootfs=$lxc_home/rootfs
+lxc_config=$lxc_home/config
+deltas=$tsar_dir/deltas
+
+mkdir -p $lxc_rootfs
+echo lxc_rootfs = $lxc_rootfs
+cp $config $lxc_home;
+cp $tsar_dir/fstab $lxc_home;
+cp $tsar_dir/packages $lxc_home;
+
+zfs recv lxc/$container < $deltas/rootfs.delta
+zfs set mountpoint=$lxc_rootfs lxc/$container
+
+zfs recv lxc/$container-opt < $deltas/opt.delta
+zfs recv lxc-data/$container-var < $deltas/var.delta
+zfs recv lxc-data/$container-home < $deltas/home.delta
+
+
+
