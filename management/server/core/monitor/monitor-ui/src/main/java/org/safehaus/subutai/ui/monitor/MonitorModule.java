@@ -5,6 +5,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.monitor.Monitor;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import java.io.File;
+
 public class MonitorModule implements PortalModule {
 
     private static final String MODULE_NAME = "Monitor";
@@ -22,7 +24,12 @@ public class MonitorModule implements PortalModule {
         return MODULE_NAME;
     }
 
-    public void setMonitor(Monitor monitor) {
+	@Override
+	public File getImage() {
+		return null;
+	}
+
+	public void setMonitor(Monitor monitor) {
         this.monitor = monitor;
     }
 
