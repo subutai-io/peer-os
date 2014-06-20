@@ -6,10 +6,12 @@
 package org.safehaus.subutai.ui.accumulo.wizard;
 
 
-import com.vaadin.server.ClassResource;
+import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.ui.accumulo.FileUtil;
+
+import java.io.IOException;
 
 
 /**
@@ -30,10 +32,14 @@ public class WelcomeStep extends Panel {
 		welcomeMsg.setContentMode(ContentMode.HTML);
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-		System.out.println(FileUtil.getContent("img/logo.png"));
+//		System.out.println(FileUtil.getContent("img/logo.png"));
 
 		Label logoImg = new Label();
-		logoImg.setIcon(new ClassResource("img/logo.png"));
+		try {
+			logoImg.setIcon(new FileResource(FileUtil.readFile("img/logo.png")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(56, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);
