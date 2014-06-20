@@ -93,6 +93,7 @@ mkdir -p $lxc_rootfs
 echo lxc_rootfs = $lxc_rootfs
 cp $config $lxc_home;
 cp $tsar_dir/fstab $lxc_home;
+cp $tsar_dir/packages $lxc_home;
 
 zfs recv lxc/$container < $deltas/rootfs.delta
 zfs set mountpoint=$lxc_rootfs lxc/$container

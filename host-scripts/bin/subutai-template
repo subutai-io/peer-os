@@ -87,7 +87,7 @@ fi
 # -----------------------------------------------------------------------------
 
 lxc_home=/var/lib/lxc/$container
-echo `lxc-attach -n $container -- dpkg -l` > $lxc_home/package-manifest.txt
+echo `lxc-attach -n $container -- dpkg -l` > $lxc_home/packages
 
 # -----------------------------------------------------------------------------
 # (3) git operations
@@ -150,8 +150,7 @@ zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template"
 
 cp /var/lib/lxc/$container/config "$tsar_root"
 cp /var/lib/lxc/$container/fstab  "$tsar_root"
-mkdir -p $tsar_root/etc
-cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
+cp /var/lib/lxc/$container/packages  "$tsar_root"
 
 pushd . >> /dev/null
 cd $SUBUTAI_TMPDIR

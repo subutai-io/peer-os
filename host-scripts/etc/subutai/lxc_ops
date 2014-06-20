@@ -161,6 +161,16 @@ function lxc_clone {
   child="$2"
   usage="$3"
 
+  if [ -z "$parent" ]; then
+    msg_error "Parameters not provided. Aborting ..."
+    exit 1
+  fi
+
+  if [ -z "$child" ]; then
+    msg_error "Child parameter not provided. Aborting ..."
+    exit 1
+  fi
+
   # keep it tight with convenience vars
   parent_home=/var/lib/lxc/$parent
   parent_conf=$parent_home/config

@@ -36,7 +36,7 @@ if [ -f "$tsar_file" ]; then
   mkdir -p $lxc_rootfs
   cp $config $lxc_home
   cp $fstab $lxc_home
-  cp $tsar_fir/package-manifest.txt $lxc_home
+  cp $tsar_fir/packages $lxc_home
 
   zfs recv lxc/master < $deltas/rootfs.delta
   zfs hold keep lxc/master@template
@@ -131,7 +131,7 @@ fi
 lxc-attach -n master -- apt-get -y autoclean
 lxc-attach -n master -- apt-get -y autoremove
 
-echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/package-manifest.txt
+echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/packages.txt
 
 lxc-stop -n master
 lxc-wait -n master -s 'STOPPED'

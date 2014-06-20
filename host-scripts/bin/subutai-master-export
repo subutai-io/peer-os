@@ -75,7 +75,7 @@ fi
 lxc_home=/var/lib/lxc/master
 cp $lxc_home/config $tsar_root
 cp $lxc_home/fstab  $tsar_root
-cp $lxc_home/package-manifest.txt  $tsar_root
+cp $lxc_home/packages  $tsar_root
 
 pushd . > /dev/null
 cd "$SUBUTAI_TMPDIR"

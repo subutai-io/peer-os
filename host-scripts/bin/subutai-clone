@@ -3,8 +3,8 @@
 # sources everything else we need
 . /etc/subutai/funcs
 
-parent=$1
-child=$2
+parent="$1"
+child="$2"
 
 function usage {
   echo -----------------------------------------------------------------------
@@ -14,6 +14,16 @@ function usage {
   echo
   echo -----------------------------------------------------------------------
 }
+
+if [ -z "$parent" ]; then
+  msg_error "Parameters not provided. Aborting ..."
+  show_usage "`usage`"
+fi
+
+if [ -z "$child" ]; then
+  msg_error "Child parameter not provided. Aborting ..."
+  show_usage "`usage`"
+fi
 
 # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
 lxc_clone $parent $child "`usage`"

@@ -16,6 +16,7 @@ function usage {
 # Plan for exporting a template
 # -----------------------------------------------------------------------------
 # (1) perform sanity checks first
+#     - defer exports of master to the subutai-master-export script
 #     - template container MUST exist
 #     - container MUST be a template with the '@template' snapshot
 #     - container parent MUST be present in the template registry
@@ -27,6 +28,11 @@ function usage {
 # (1) perform some sanity checks
 # -----------------------------------------------------------------------------
 lxc_assert $container
+
+if [ "$container" == "master" ]; then
+  subutai-master-export
+  exit $?
+fi
 
 if [ -f "$SUBUTAI_TMPDIR/$container.tsar" ]; then
   msg_error "It seems the tsar file has already been generated"
@@ -88,15 +94,7 @@ zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template"
 
 cp /var/lib/lxc/$container/config $tsar_root
 cp /var/lib/lxc/$container/fstab  $tsar_root
-
-mkdir -p $tsar_root/etc
-cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
-
-pushd . > /dev/null
-cd /var/lib/lxc/$container/rootfs
-uuid=`git log | grep commit | head -n 1 | awk '{print $2}'`
-popd > /dev/null
-echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
+cp /var/lib/lxc/$container/packages  $tsar_root
 
 pushd . > /dev/null
 cd $SUBUTAI_TMPDIR
