@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 public class LxcUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "lxc.jpg";
+	public static final String MODULE_IMAGE = "lxc.png";
 	public static final String MODULE_NAME = "LXC";
 	private static ExecutorService executor;
 	private AgentManager agentManager;
