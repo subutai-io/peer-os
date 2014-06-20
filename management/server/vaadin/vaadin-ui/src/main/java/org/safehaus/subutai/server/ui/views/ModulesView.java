@@ -88,24 +88,26 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	}
 
 	private void addModule(final PortalModule module) {
-		CssLayout moduleLayout = new CssLayout();
-		moduleLayout.setId(module.getId());
-		moduleLayout.setWidth(null);
-		moduleLayout.addStyleName("create");
+		if (module.getImage() != null) {
+			CssLayout moduleLayout = new CssLayout();
+			moduleLayout.setId(module.getId());
+			moduleLayout.setWidth(null);
+			moduleLayout.addStyleName("create");
 
-		Image image = new Image(module.getName(), new FileResource(module.getImage()));
-		image.setSizeFull();
-		moduleLayout.addComponent(image);
+			Image image = new Image(module.getName(), new FileResource(module.getImage()));
+			image.setSizeFull();
+			moduleLayout.addComponent(image);
 
-		modulesLayout.addComponent(moduleLayout);
-		image.addClickListener(new MouseEvents.ClickListener() {
-			@Override
-			public void click(MouseEvents.ClickEvent clickEvent) {
-				autoCreate(module);
-			}
-		});
+			modulesLayout.addComponent(moduleLayout);
+			image.addClickListener(new MouseEvents.ClickListener() {
+				@Override
+				public void click(MouseEvents.ClickEvent clickEvent) {
+					autoCreate(module);
+				}
+			});
 
-		modulesList.add(moduleLayout);
+			modulesList.add(moduleLayout);
+		}
 	}
 
 	public void autoCreate(PortalModule module) {
