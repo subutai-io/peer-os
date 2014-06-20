@@ -65,7 +65,8 @@ lxc_assert_no $container
 #  msg_info "    - check passed: \"$container\" is registered"
 #fi
 
-parent=`zfs_get_parent $container`
+config=$SUBUTAI_TMPDIR/$container/config
+parent=`cat $config | grep subutai.parent | awk '{print $3}'`
 lxc_assert $parent
 
 # check to make sure the parent is a template

@@ -165,7 +165,9 @@ function lxc_clone {
   cat $parent_conf | sed                                         \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"         \
-     -e "s/\/var\/lib\/lxc\/$parent/\/var\/lib\/lxc\/$child/g" > $child_conf
+     -e "s/\/var\/lib\/lxc\/$parent/\/var\/lib\/lxc\/$child/g"   \
+     -e "s/\/lxc\/$parent/\/lxc\/$child/g"                       \
+     -e "s/\/lxc-data\/$parent/\/lxc-data\/$child/g" > $child_conf
   cp $parent_home/fstab $child_home
 
   # (3) zfs clone snapshots for child datasets
