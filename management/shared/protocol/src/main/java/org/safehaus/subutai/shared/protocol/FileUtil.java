@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.accumulo;
+package org.safehaus.subutai.shared.protocol;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +34,7 @@ public class FileUtil {
 				folder.mkdir();
 			}
 
-			OutputStream outputStream = new FileOutputStream(new File(currentPath + "/accumulo.png"));
+			OutputStream outputStream = new FileOutputStream(new File(currentPath + "/" + fileName));
 			int read;
 			byte[] bytes = new byte[1024];
 
