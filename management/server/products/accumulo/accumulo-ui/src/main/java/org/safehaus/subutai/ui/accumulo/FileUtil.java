@@ -38,7 +38,7 @@ public class FileUtil {
 				folder.mkdir();
 			}
 
-			OutputStream outputStream = new FileOutputStream(new File(currentPath + "accumulo.png"));
+			OutputStream outputStream = new FileOutputStream(new File(currentPath + "/accumulo.png"));
 			int read;
 			byte[] bytes = new byte[1024];
 
