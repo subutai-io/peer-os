@@ -1,7 +1,9 @@
 package org.safehaus.subutai.ui.accumulo;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Scanner;
@@ -25,13 +27,27 @@ public class FileUtil {
         return content;
     }*/
 
-	public static URL readFile(String filePath) throws IOException {
+	public static void readFile(String filePath) {
 
-		return getClassLoader().getResource(filePath);
-	    /*String s = streamToString(is);
-        is.close();
+		try {
+			String currentPath = System.getProperty("user.dir") + System.lineSeparator() + "res";
+			InputStream inputStream = getClassLoader().getResourceAsStream(filePath);
 
-        return s;*/
+			File folder = new File(currentPath);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+
+			OutputStream outputStream = new FileOutputStream(new File(currentPath + System.lineSeparator() + "accumulo.png"));
+			int read;
+			byte[] bytes = new byte[1024];
+
+			while ((read = inputStream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, read);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private static URLClassLoader getClassLoader() {
