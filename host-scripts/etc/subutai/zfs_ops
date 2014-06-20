@@ -89,7 +89,7 @@ function zfs_assert_ds {
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function zfs_is_template {
   c="$1"
-  if [ -z "`zfs list -t snapshot -o name -H "lxc/$c@template"`" ]; then
+  if [ -z "`zfs list -t snapshot -o name -H | grep "lxc/$c@template"`" ]; then
     echo false
   else
     echo true
