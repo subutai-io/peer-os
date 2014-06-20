@@ -10,9 +10,9 @@ package org.safehaus.subutai.api.manager;
  */
 public interface TemplateManager {
 
-    public void getTemplatesInfo();
+    public void getTemplates();
 
-    public void getInstancesInfo();
+    public void getInstances();
 
     public void createNewTemplate();
 

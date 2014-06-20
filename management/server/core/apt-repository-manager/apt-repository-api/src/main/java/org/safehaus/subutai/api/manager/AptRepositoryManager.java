@@ -11,15 +11,15 @@ package org.safehaus.subutai.api.manager;
 public interface AptRepositoryManager {
 
 
-    public void getPackagesInRepository();
+    public void getPackages();
 
-    public void putPackageIntoRepository();
+    public void putPackage();
 
-    public void removePackageFromRepository();
+    public void removePackage();
 
-    public void searchPackageInRepository();
+    public void searchPackage();
 
-    public void exportRepository();
+    public void exportPackage();
 
 
 }

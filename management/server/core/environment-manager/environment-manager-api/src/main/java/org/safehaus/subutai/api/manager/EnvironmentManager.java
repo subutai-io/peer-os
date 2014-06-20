@@ -13,9 +13,11 @@ public interface EnvironmentManager {
 
     public void buildEnvironment();
 
-    public void viewExistingEnvironment();
+    public void getEnvironments();
 
-    public void destoryEnvironment();
+    public void getEnvironmentInfo();
+
+    public void destroyEnvironment();
 
 
 }

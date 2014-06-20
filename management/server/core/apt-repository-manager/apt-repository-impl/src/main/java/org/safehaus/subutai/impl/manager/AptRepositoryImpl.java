@@ -16,31 +16,31 @@ public class AptRepositoryImpl implements AptRepositoryManager {
 
 
     @Override
-    public void getPackagesInRepository() {
+    public void getPackages() {
 
     }
 
 
     @Override
-    public void putPackageIntoRepository() {
+    public void putPackage() {
 
     }
 
 
     @Override
-    public void removePackageFromRepository() {
+    public void removePackage() {
 
     }
 
 
     @Override
-    public void searchPackageInRepository() {
+    public void searchPackage() {
 
     }
 
 
     @Override
-    public void exportRepository() {
+    public void exportPackage() {
 
     }
 }

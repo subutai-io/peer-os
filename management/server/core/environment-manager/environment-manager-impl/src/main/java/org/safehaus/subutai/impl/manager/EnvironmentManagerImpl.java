@@ -22,13 +22,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public void viewExistingEnvironment() {
+    public void getEnvironments() {
 
     }
 
 
     @Override
-    public void destoryEnvironment() {
+    public void getEnvironmentInfo() {
+
+    }
+
+
+    @Override
+    public void destroyEnvironment() {
 
     }
 }

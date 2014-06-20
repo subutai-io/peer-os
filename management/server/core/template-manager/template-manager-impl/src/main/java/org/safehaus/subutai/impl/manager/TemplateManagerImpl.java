@@ -16,13 +16,13 @@ public class TemplateManagerImpl implements TemplateManager {
 
 
     @Override
-    public void getTemplatesInfo() {
+    public void getTemplates() {
 
     }
 
 
     @Override
-    public void getInstancesInfo() {
+    public void getInstances() {
 
     }
 
