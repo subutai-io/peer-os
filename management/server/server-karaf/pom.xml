@@ -498,11 +498,11 @@
                                     <artifactId>command-runner-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>command-runner-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
 
                                 <!-- Agent Manager -->
                                 <artifactItem>
@@ -546,11 +546,11 @@
                                 </artifactItem>
 
                                 <!-- LXC Manager -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lxc-manager-api</artifactId>
@@ -575,7 +575,7 @@
                                 </artifactItem>
 
                                 <!-- Monitor -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-api</artifactId>
                                     <version>${project.version}</version>
@@ -589,7 +589,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>monitor-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
                                 <!-- Core Modules - END -->
 
                                 <!-- Products Modules - START -->
@@ -622,7 +622,7 @@
                                 </artifactItem>-->
 
                                 <!--Cassandra-->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-api</artifactId>
                                     <version>${project.version}</version>
@@ -646,7 +646,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
 
                                 <!--MongoDB-->
                                 <!--<artifactItem>
@@ -1067,7 +1067,7 @@
                                 <!-- Products Modules - END -->
 
                                 <!-- Hadoop -->
-                                <artifactItem>
+                                <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-api</artifactId>
                                     <version>${project.version}</version>
@@ -1091,7 +1091,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hadoop-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>
+                                </artifactItem>-->
 
                             </artifactItems>
                         </configuration>
