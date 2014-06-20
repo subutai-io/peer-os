@@ -14,20 +14,20 @@ public class FileUtil {
 
 	private static URLClassLoader classLoader;
 
-	public static File getFile(String fileName) {
+	public static File getFile(String fileName, Object object) {
 		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
 		File file = new File(currentPath);
 		if (!file.exists()) {
-			writeFile(fileName);
+			writeFile(fileName, object);
 		}
 		return file;
 	}
 
-	private static void writeFile(String fileName) {
+	private static void writeFile(String fileName, Object object) {
 
 		try {
 			String currentPath = System.getProperty("user.dir") + "/res";
-			InputStream inputStream = getClassLoader().getResourceAsStream("img/" + fileName);
+			InputStream inputStream = getClassLoader(object).getResourceAsStream("img/" + fileName);
 
 			File folder = new File(currentPath);
 			if (!folder.exists()) {
@@ -46,14 +46,14 @@ public class FileUtil {
 		}
 	}
 
-	private static URLClassLoader getClassLoader() {
+	private static URLClassLoader getClassLoader(Object object) {
 
 		if (classLoader != null) {
 			return classLoader;
 		}
 
 		// Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
-		URL url = new FileUtil().getClass().getProtectionDomain().getCodeSource().getLocation();
+		URL url = object.getClass().getProtectionDomain().getCodeSource().getLocation();
 		classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
 
 		return classLoader;
