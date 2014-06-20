@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class FileUtil {
@@ -15,19 +14,7 @@ public class FileUtil {
 
 	private static URLClassLoader classLoader;
 
-    /*public static String getContent(String filePath) {
-        String content = "";
-
-        try {
-            content = readFile(filePath);
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Error while reading file: " + e);
-        }
-
-        return content;
-    }*/
-
-	public static void readFile(String filePath) {
+	public static void writeFile(String filePath) {
 
 		try {
 			String currentPath = System.getProperty("user.dir") + "/res";
@@ -63,8 +50,8 @@ public class FileUtil {
 		return classLoader;
 	}
 
-	private static String streamToString(InputStream is) {
-		Scanner scanner = new Scanner(is).useDelimiter("\\A");
-		return scanner.hasNext() ? scanner.next() : "";
+	public static File getFile(String fileName) {
+		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
+		return new File(currentPath);
 	}
 }
