@@ -5,6 +5,7 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,8 +54,13 @@ public class TrackerUI implements PortalModule {
         return TrackerUI.MODULE_NAME;
     }
 
+	@Override
+	public File getImage() {
+		return null;
+	}
 
-    @Override
+
+	@Override
     public Component createComponent() {
         /*if(trackerForm == null){
 

@@ -6,6 +6,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import java.io.File;
+
 
 public class CommandRunnerUI implements PortalModule {
 
@@ -42,8 +44,13 @@ public class CommandRunnerUI implements PortalModule {
         return CommandRunnerUI.MODULE_NAME;
     }
 
+	@Override
+	public File getImage() {
+		return null;
+	}
 
-    @Override
+
+	@Override
     public Component createComponent() {
         return new TerminalForm( commandRunner, agentManager );
     }

@@ -5,6 +5,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,8 +55,13 @@ public class LxcUI implements PortalModule {
         return MODULE_NAME;
     }
 
+	@Override
+	public File getImage() {
+		return null;
+	}
 
-    @Override
+
+	@Override
     public Component createComponent() {
         return new LxcForm( agentManager, lxcManager );
     }
