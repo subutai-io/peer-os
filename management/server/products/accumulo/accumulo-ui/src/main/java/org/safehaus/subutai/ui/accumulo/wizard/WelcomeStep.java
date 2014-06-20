@@ -9,6 +9,7 @@ package org.safehaus.subutai.ui.accumulo.wizard;
 import com.vaadin.server.ClassResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.ui.accumulo.AccumuloUI;
 
 
 /**
@@ -28,6 +29,9 @@ public class WelcomeStep extends Panel {
 		Label welcomeMsg = new Label("<center><h2>Welcome to Accumulo Installation Wizard!</h2>");
 		welcomeMsg.setContentMode(ContentMode.HTML);
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
+
+		ClassLoader loader = AccumuloUI.class.getClassLoader();
+		System.out.println(loader.getResource("img/logo.png"));
 
 		Label logoImg = new Label();
 		logoImg.setIcon(new ClassResource("img/logo.png"));
