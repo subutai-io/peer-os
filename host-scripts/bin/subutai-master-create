@@ -1,9 +1,6 @@
 #!/bin/bash
 
-. /etc/subutai/functionz # remove me later
-. /etc/subutai/zfs_ops
-. /etc/subutai/lxc_ops
-
+. /etc/subutai/funcs
 
 # Check for Master Existence
 # -----------------------------------------------------------------------------
@@ -32,8 +29,9 @@ for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
 done
 
 # Add pre-start hook script entry
-echo lxc.hook.pre-start = /etc/subutai/pre-start-hook >> $config
+echo lxc.hook.pre-start = /etc/subutai/pre_start_hook >> $config
 echo subutai.parent = master >> $config
+echo subutai.git.branch = master >> $config
 
 mkdir /var/lib/lxc/master/rootfs/etc/subutai
 
@@ -118,6 +116,8 @@ git add .gitignore
 git commit -m 'setting up git for master'
 git add -A
 git commit -m 'initial master /etc import for master'
+uuid=`git log | grep commit | head -n 1 | awk '{print $2}'`
+echo subutai.git.uuid = $uuid >> $config
 
 # (6)
 echo Taking @template snapshot of master\'s rootfs

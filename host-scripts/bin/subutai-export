@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/subutai/config
+. /etc/subutai/funcs
 
 container=$1
 
@@ -12,9 +12,6 @@ function usage {
   echo
   echo -----------------------------------------------------------------------
 }
-
-# Also sources other files
-. /etc/subutai/functionz
 
 # Plan for exporting a template
 # -----------------------------------------------------------------------------

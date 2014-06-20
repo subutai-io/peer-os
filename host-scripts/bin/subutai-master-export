@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/subutai/config
+. /etc/subutai/funcs
 
 function usage {
   echo -----------------------------------------------------------------------
@@ -11,8 +11,6 @@ function usage {
   echo -----------------------------------------------------------------------
 }
 
-# Also sources bsfl
-. /etc/subutai/functionz
 
 # Plan for exporting a template
 # -----------------------------------------------------------------------------

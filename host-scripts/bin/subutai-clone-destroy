@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # sources everything else we need
-. /etc/subutai/functionz
+. /etc/subutai/funcs
 
 clone=$1
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/subutai/config
+. /etc/subutai/funcs
 
 echo WARNING: this destroys everything mercilessly
 echo \<Return\> to continue, or Ctrl-C to exit

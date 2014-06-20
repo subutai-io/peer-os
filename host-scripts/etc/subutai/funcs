@@ -2,6 +2,7 @@
 
 
 . /etc/subutai/config
+. /etc/lsb-release
 . /etc/subutai/bsfl
 init
 

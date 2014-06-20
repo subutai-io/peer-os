@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Also sources everything we need
-. /etc/subutai/zfs_ops
-. /etc/subutai/lxc_ops
-. /etc/subutai/reg_ops
+. /etc/subutai/funcs
 
 container="$1"
 
@@ -29,7 +27,7 @@ fi
 #     - container MUST NOT have a 'template' snapshot
 #     - container name MUST NOT be in the template registry
 #     - container parent MUST be present in the template registry
-# (2) replace package manifest in /etc/subutai
+# (2) replace package manifest next to config file
 # (3) commit config point changes and push to site git as new branch from parent
 # (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
 # (5) generate delta images of all filesystems: 
@@ -85,11 +83,11 @@ if [ -z "`lxc-ls --running | grep $container`" ]; then
 fi
 
 # -----------------------------------------------------------------------------
-# (2) replace package manifest in /etc/subutai
+# (2) replace package manifest next to config file
 # -----------------------------------------------------------------------------
 
-lxc-attach -n $container -- mkdir -p /etc/subutai
-lxc-attach -n $container -- dpkg -l > /etc/subutai/package-manifest.txt
+lxc_home=/var/lib/lxc/$container
+echo `lxc-attach -n $container -- dpkg -l` > $lxc_home/package-manifest.txt
 
 # -----------------------------------------------------------------------------
 # (3) git operations
@@ -104,6 +102,7 @@ lxc-attach -n $container -- git commit -m \
 
 # capture the commit UUID 
 uuid=`lxc-attach -n $container -- git log | grep commit | head -n 1 | awk '{print $2}'`
+echo "subutai.git.uuid = $uuid" >> $lxc_home/config
 msg_info "    - commit UUID extracted: $uuid"
 
 # push to the subutai site git repository if defined
@@ -146,16 +145,13 @@ zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template"
 
 
 # -----------------------------------------------------------------------------
-# (6) generate the tsar file from git differential, deltas, and package info
+# (6) generate the tsar file from git differential, and deltas
 # -----------------------------------------------------------------------------
 
 cp /var/lib/lxc/$container/config "$tsar_root"
 cp /var/lib/lxc/$container/fstab  "$tsar_root"
 mkdir -p $tsar_root/etc
 cp -rf /var/lib/lxc/$container/rootfs/etc/subutai $tsar_root/etc
-
-# TODO: this is bogus shit ... find a way to deal (lxc config?)
-echo "{\n\t\"UUID\": $uuid\n}" > $tsar_root/etc/metadata.json
 
 pushd . >> /dev/null
 cd $SUBUTAI_TMPDIR

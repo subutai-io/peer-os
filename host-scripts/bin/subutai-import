@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/subutai/config
+. /etc/subutai/funcs
 
 container=$1
 
@@ -13,9 +13,6 @@ function usage {
   echo template.tsar file must be present within the subutai temp directory.
   echo -----------------------------------------------------------------------
 }
-
-# Also sources bsfl
-. /etc/subutai/functionz
 
 
 # Plan for importing a template
