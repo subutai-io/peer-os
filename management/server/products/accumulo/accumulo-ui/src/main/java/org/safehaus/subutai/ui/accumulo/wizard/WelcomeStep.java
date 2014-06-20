@@ -30,15 +30,8 @@ public class WelcomeStep extends Panel {
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
 		ClassResource resource = new ClassResource("img/logo.png");
-		System.out.println(resource.getFilename());
 		Label logoImg = new Label();
-		/*try {
-			logoImg.setIcon(new FileResource(new File(FileUtil.readFile("img/logo.png").toURI())));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
+		logoImg.setIcon(resource);
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(56, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);
