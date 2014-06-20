@@ -1,6 +1,7 @@
 package org.safehaus.subutai.ui.accumulo;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.logging.Logger;
@@ -11,9 +12,9 @@ public class FileUtil {
 
 	private static URLClassLoader classLoader;
 
-	public static URL readFile(String filePath) throws IOException {
+	public static InputStream readFile(String filePath) throws IOException {
 
-		URL resource = getClassLoader().getResource(filePath);
+		InputStream resource = getClassLoader().getResourceAsStream(filePath);
 
 		return resource;
 	}
