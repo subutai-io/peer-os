@@ -5099,7 +5099,7 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .catalog.v-layout {
-    padding: 20px 0 100px 30px;
+    padding: 20px 0 10px 30px;
     background: #eee;
 }
 
@@ -5941,7 +5941,7 @@ body .dashboard.v-app .v-app-loading {
     background-color: rgba(40, 40, 40, 0.85);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     color: #a6a9aa;
-    font: $font;
+    font: $ font;
     font-size: 12px;
     -webkit-animation: fade-in 160ms ease-out;
     -moz-animation: fade-in 160ms ease-out;
