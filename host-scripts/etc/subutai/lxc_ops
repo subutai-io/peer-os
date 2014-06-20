@@ -6,7 +6,6 @@
 # ==========================================================================
 
 # sources everything else we need
-. /etc/subutai/chk_ops
 . /etc/subutai/zfs_ops
 
 
@@ -182,7 +181,7 @@ function lxc_clone {
   lxc_assert_no $child "`usage`"
   lxc_assert $parent "`usage`"
 
-  if [ "`is_template $parent`" == "false" ]; then
+  if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_notice "    - parent \"$parent\" is not a template ... promoting"
     subutai-template $parent
   else
