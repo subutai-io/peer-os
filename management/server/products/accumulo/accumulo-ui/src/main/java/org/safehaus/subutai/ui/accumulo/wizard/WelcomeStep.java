@@ -6,7 +6,6 @@
 package org.safehaus.subutai.ui.accumulo.wizard;
 
 
-import com.vaadin.server.ClassResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
@@ -30,7 +29,7 @@ public class WelcomeStep extends Panel {
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
 		Label logoImg = new Label();
-		logoImg.setIcon(new ClassResource("logo.png"));
+//		logoImg.setIcon(new ClassResource("logo.png"));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(56, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);
