@@ -10,7 +10,7 @@
 
 package org.safehaus.subutai.server.ui.views;
 
-import com.vaadin.event.MouseEvents;
+import com.vaadin.event.LayoutEvents;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FileResource;
@@ -91,21 +91,21 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 		if (module.getImage() != null) {
 			CssLayout moduleLayout = new CssLayout();
 			moduleLayout.setId(module.getId());
-			moduleLayout.setWidth(null);
+			moduleLayout.setWidth(150, Unit.PIXELS);
+			moduleLayout.setHeight(200, Unit.PIXELS);
 			moduleLayout.addStyleName("create");
+			moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
+				@Override
+				public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
+					autoCreate(module);
+				}
+			});
 
 			Image image = new Image(module.getName(), new FileResource(module.getImage()));
 			image.setSizeFull();
 			moduleLayout.addComponent(image);
 
 			modulesLayout.addComponent(moduleLayout);
-			image.addClickListener(new MouseEvents.ClickListener() {
-				@Override
-				public void click(MouseEvents.ClickEvent clickEvent) {
-					autoCreate(module);
-				}
-			});
-
 			modulesList.add(moduleLayout);
 		}
 	}

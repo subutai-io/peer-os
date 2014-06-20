@@ -64,10 +64,6 @@ public class TrackerUI implements PortalModule {
 
 	@Override
 	public Component createComponent() {
-	    /*if(trackerForm == null){
-
-        }*/
-
 		trackerForm = new TrackerForm();
 		trackerForm.refreshSources();
 		trackerForm.startTracking();
