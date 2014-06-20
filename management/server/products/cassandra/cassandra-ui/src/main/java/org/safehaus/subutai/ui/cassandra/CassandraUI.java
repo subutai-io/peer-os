@@ -12,7 +12,9 @@ import org.safehaus.subutai.api.cassandra.Config;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,61 +23,68 @@ import java.util.concurrent.Executors;
  */
 public class CassandraUI implements PortalModule {
 
-    private static Cassandra cassandraManager;
-    private static AgentManager agentManager;
-    private static CommandRunner commandRunner;
-    private static Tracker tracker;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "cassandra.png";
 
-    public CassandraUI(AgentManager agentManager, Cassandra cassandraManager, Tracker tracker, CommandRunner commandRunner) {
-        CassandraUI.cassandraManager = cassandraManager;
-        CassandraUI.agentManager = agentManager;
-        CassandraUI.tracker = tracker;
-        CassandraUI.commandRunner = commandRunner;
-    }
+	private static Cassandra cassandraManager;
+	private static AgentManager agentManager;
+	private static CommandRunner commandRunner;
+	private static Tracker tracker;
+	private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public CassandraUI(AgentManager agentManager, Cassandra cassandraManager, Tracker tracker, CommandRunner commandRunner) {
+		CassandraUI.cassandraManager = cassandraManager;
+		CassandraUI.agentManager = agentManager;
+		CassandraUI.tracker = tracker;
+		CassandraUI.commandRunner = commandRunner;
+	}
 
-    public static Cassandra getCassandraManager() {
-        return cassandraManager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Cassandra getCassandraManager() {
+		return cassandraManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public void destroy() {
-        cassandraManager = null;
-        agentManager = null;
-        tracker = null;
-        executor.shutdown();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    @Override
-    public String getId() {
-        return Config.PRODUCT_KEY;
-    }
+	public void destroy() {
+		cassandraManager = null;
+		agentManager = null;
+		tracker = null;
+		executor.shutdown();
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
 
-    public Component createComponent() {
-        return new CassandraForm();
-    }
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(CassandraUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new CassandraForm();
+	}
 
 }
