@@ -30,7 +30,7 @@ lxc_clone $parent $child "`usage`"
 
 lxc-start -d -n $child
 lxc-wait -n $child -s RUNNING
-lxc-attach -n $child -- git checkout -b $child
+lxc-attach -n $child -- cd /; git checkout -b $child
 
 msg_ok "Successfully cloned $child container from $parent"
 
