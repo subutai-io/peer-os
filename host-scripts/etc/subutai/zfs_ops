@@ -13,7 +13,8 @@ init
 # counts and prints out the children
 # returns the child count
 function zfs_get_children {
-  parent="$1"
+  local parent="$1"
+  local snap=
 
   # we got a dataset instead of a clone name
   if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then 
@@ -22,11 +23,10 @@ function zfs_get_children {
     snap="lxc/$parent@template"
   fi
 
-  count=0
+  local count=0
   for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
   do
-    child=`zfs_ctnr_from_ds $ds`
-    msg_notice "        -> \"$child\" is a child of $parent"
+    msg_notice "        -> \"`zfs_ctnr_from_ds`\" is a child of $parent"
     count=`expr $count + 1`
   done
 
@@ -37,8 +37,8 @@ function zfs_get_children {
 # assert snapshot (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function zfs_assert_nosnap {
-  snap="$1"
-  usage="$2"
+  local snap="$1"
+  local usage="$2"
 
   if [ "$snap" == "`zfs list -t snapshot -o name -H $snap`" ]; then
     msg_error "Snapshot \"$snap\" already exists!"
@@ -50,8 +50,8 @@ function zfs_assert_nosnap {
 # assert snapshot (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function zfs_assert_snap {
-  snap="$1"
-  usage="$2"
+  local snap="$1"
+  local usage="$2"
 
   if [ -z "`zfs list -t snapshot -o name -H $snap`" ]; then
     msg_error "Snapshot \"$snap\" does NOT exist!"
@@ -63,8 +63,8 @@ function zfs_assert_snap {
 # assert dataset (arg $1) does NOT exist, if it does show usage (arg $2)
 # warning: exits!
 function zfs_assert_nods {
-  ds="$1"
-  usage="$2"
+  local ds="$1"
+  local usage="$2"
 
   if [ "$ds" == "`zfs list -o name -H $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
@@ -76,8 +76,8 @@ function zfs_assert_nods {
 # assert dataset (arg $1) exists, if it does NOT show usage (arg $2)
 # warning: exits!
 function zfs_assert_ds {
-  ds="$1"
-  usage="$2"
+  local ds="$1"
+  local usage="$2"
 
   if [ -z "`zfs list -o name -H $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" does NOT exist!"
@@ -88,7 +88,7 @@ function zfs_assert_ds {
 
 # checks if the container (arg $1) is a template, echo "true"/"false"
 function zfs_is_template {
-  c="$1"
+  local c="$1"
   if [ -z "`zfs list -t snapshot -o name -H | grep "lxc/$c@template"`" ]; then
     echo false
   else
@@ -101,50 +101,50 @@ function zfs_is_template {
 # first argument $1 is the name of the child container
 # master returns master
 function zfs_get_parent {
-  c="$1"
+  local c="$1"
 
   if [ "$c" == "master" ]; then
     echo master
     return
   fi
 
-  snap=`zfs get origin -o value -H lxc/$c`
+  local snap=`zfs get origin -o value -H lxc/$c`
   echo `zfs_ctnr_from_ds $snap`
 }
 
 
 # extracts the container name from a dataset or a dataset snapshot
 function zfs_ctnr_from_ds {
-  ds="$1"
+  local ds="$1"
   echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/-.*//'
 }
 
 
 # extracts the zpool name from a dataset or a dataset snapshot
 function zfs_pool_from_ds {
-  ds="$1"
+  local ds="$1"
   echo $ds | sed -e 's/\/.*//'
 }
 
 
 # extracts the snapshot name from a dataset snapshot
 function zfs_snap_from_ds {
-  ds="$1"
+  local ds="$1"
   echo $ds | sed -e 's/.*@//'
 }
 
 
 # extracts the partition name from a dataset or a dataset snapshot
 function zfs_part_from_ds {
-  ds="$1"
+  local ds="$1"
   echo $ds | sed -e 's/lxc.*\///' -e 's/@.*//' -e 's/.*-//'
 }
 
 
 # lists all the templates available
 function zfs_list_templates {
-  for line in `zfs list -t snapshot -o name -H | grep @template`; do
-    echo `ctnr_from_ds $line`
+  for l in `zfs list -t snapshot -o name -H | grep @template | grep -v -`; do
+    echo `zfs_ctnr_from_ds $l`
   done
 }
 

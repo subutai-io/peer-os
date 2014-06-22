@@ -16,7 +16,7 @@ function is_registered {
 # this function needs to take the supplied tsar file and upload and 
 # register it with the Subutai management server.
 function send_n_register {
-  tsar=$1
+  local tsar=$1
 
   msg_ok "TSAR file $tsar registered and sent to management server"
 } 
