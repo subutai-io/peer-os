@@ -50,3 +50,35 @@ function git_child_branch {
 }
 
 
+# takes container name as arg $1
+# returns the uuid of the last commit
+function git_add_commit { 
+  local lxc="$1"
+
+  if [ -z `lxc-ls --running $lxc` ]; then
+    lxc-start -d -n $lxc
+  fi
+
+  lxc-wait -n $lxc -s RUNNING
+  o=`lxc-attach -n $lxc \
+    -- git -C / commit -a -m \
+    "commit changes for $lxc template" 2>&1 > /dev/null`
+  lxc-attach -n $lxc \
+    -- git -C / log | grep commit | head -n 1 | awk '{print $2}'
+}
+
+
+function git_remote_push {
+  local lxc="$1"
+  
+  if [ -z `lxc-ls --running $lxc` ]; then
+    lxc-start -d -n $lxc
+  fi
+
+  lxc-wait -n $lxc -s RUNNING
+  lxc-attach -n $lxc -- git -C / remote 'set-url' upstream $SUBUTAI_SITE_GIT
+  lxc-attach -n $lxc -- git -C / push -u upstream $lxc
+}
+
+
+ 

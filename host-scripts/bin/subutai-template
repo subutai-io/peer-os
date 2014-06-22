@@ -93,22 +93,16 @@ echo `lxc-attach -n $container -- dpkg -l` > $lxc_home/packages
 # (3) git operations
 # -----------------------------------------------------------------------------
 
-# add all uncommitted files (should be some: /etc/hosts)
-lxc-attach -n $container -- git -C / add -A
+# add and commit all uncommitted files (should be some: /etc/hosts)
+uuid=`git_add_commit $container`
 
-# commit the changes 
-lxc-attach -n $container -- git -C / commit -m \
-  "commit changes for new $container template" 
-
-# capture the commit UUID 
-uuid=`lxc-attach -n $container -- git -C / log | grep commit | head -n 1 | awk '{print $2}'`
+# inject the commit UUID 
 echo "subutai.git.uuid = $uuid" >> $lxc_home/config
 msg_info "    - commit UUID extracted: $uuid"
 
 # push to the subutai site git repository if defined
 if [ -n "$SUBUTAI_SITE_GIT" ]; then
-  lxc-attach -n $container -- git -C / remote set-url upstream $SUBUTAI_SITE_GIT
-  lxc-attach -n $container -- git -C / push -u upstream $container
+  git_remote_push $container
 fi
 
 
