@@ -27,10 +27,7 @@ fi
 
 # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
 lxc_clone $parent $child "`usage`"
-
-lxc-start -d -n $child
-lxc-wait -n $child -s RUNNING
-lxc-attach -n $child -- git -C / checkout -b $child
+git_child_branch $child
 
 msg_ok "Successfully cloned $child container from $parent"
 
