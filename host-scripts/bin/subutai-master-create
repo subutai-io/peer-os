@@ -100,10 +100,6 @@ echo lxc.hook.pre-start = /etc/subutai/pre_start_hook >> $config
 echo subutai.parent = master >> $config
 echo subutai.git.branch = master >> $config
 
-mkdir /var/lib/lxc/master/rootfs/etc/subutai
-
-# files. Then we can take the template snapshot.
-#
 # (0) Start it up, update, dist-upgrade, shutdown
 # (1) Backup rootfs contents and delete contents
 # (2) Take created snapshot and hold
@@ -138,47 +134,7 @@ lxc-wait -n master -s 'STOPPED'
 sleep 2
 
 # (5) setup git repository in / and control /etc
-cd /var/lib/lxc/master/rootfs/
-git init
-git config user.email "$SUBUTAI_EMAIL"
-git config user.name  "$SUBUTAI_USER"
-echo etc/mtab*      >> .gitignore
-echo mtab*          >> .gitignore
-echo etc/*.old      >> .gitignore
-echo *.old          >> .gitignore
-echo etc/blkid.tab  >> .gitignore
-echo blkid.tab      >> .gitignore
-echo etc/adjtime    >> .gitignore
-echo adjtime        >> .gitignore
-echo bin            >> .gitignore
-echo boot           >> .gitignore
-echo dev            >> .gitignore
-echo home           >> .gitignore
-echo initrd.*       >> .gitignore
-echo lib            >> .gitignore
-echo lib64          >> .gitignore
-echo lost+found     >> .gitignore
-echo lxc            >> .gitignore
-echo lxc-data       >> .gitignore
-echo media          >> .gitignore
-echo mnt            >> .gitignore
-echo opt            >> .gitignore
-echo proc           >> .gitignore
-echo root           >> .gitignore
-echo run            >> .gitignore
-echo sbin           >> .gitignore
-echo srv            >> .gitignore
-echo sys            >> .gitignore
-echo tmp            >> .gitignore
-echo usr            >> .gitignore
-echo var            >> .gitignore
-echo vmlinuz*       >> .gitignore
-git add .gitignore
-git commit -m 'setting up git for master'
-git add -A
-git commit -m 'initial master /etc import for master'
-uuid=`git log | grep commit | head -n 1 | awk '{print $2}'`
-echo subutai.git.uuid = $uuid >> $config
+git_init_master
 
 # (6)
 echo Taking @template snapshot of master\'s rootfs

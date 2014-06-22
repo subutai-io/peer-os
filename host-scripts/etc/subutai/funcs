@@ -9,6 +9,7 @@ init
 . /etc/subutai/reg_ops
 . /etc/subutai/zfs_ops
 . /etc/subutai/lxc_ops
+. /etc/subutai/git_ops
 
 # Function addmount:
 # -----------------------------------------------------------------------------
