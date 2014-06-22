@@ -29,6 +29,7 @@ public class CommandRunnerUI implements PortalModule {
 
 
 	public void init() {
+		FileUtil.writeFile(CommandRunnerUI.MODULE_IMAGE, this);
 	}
 
 
