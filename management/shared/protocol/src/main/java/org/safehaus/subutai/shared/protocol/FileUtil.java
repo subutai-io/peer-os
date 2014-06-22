@@ -18,6 +18,8 @@ public class FileUtil {
 		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
 		File file = new File(currentPath);
 		if (!file.exists()) {
+			System.out.println();
+			System.out.println(currentPath);
 			writeFile(fileName, object);
 			file = new File(currentPath);
 		}
@@ -27,15 +29,9 @@ public class FileUtil {
 	private static void writeFile(String fileName, Object object) {
 
 		try {
-			String currentPath = System.getProperty("user.dir") + "/res";
+			String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
 			InputStream inputStream = getClassLoader(object).getResourceAsStream("img/" + fileName);
-
-			File folder = new File(currentPath);
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-
-			OutputStream outputStream = new FileOutputStream(new File(currentPath + "/" + fileName));
+			OutputStream outputStream = new FileOutputStream(new File(currentPath));
 			int read;
 			byte[] bytes = new byte[1024];
 
@@ -46,8 +42,6 @@ public class FileUtil {
 			inputStream.close();
 			outputStream.close();
 		} catch (Exception ex) {
-			System.out.println();
-			System.out.println(fileName);
 			ex.printStackTrace();
 		}
 	}
