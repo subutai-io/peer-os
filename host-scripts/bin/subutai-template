@@ -32,7 +32,7 @@ fi
 # (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
 # (5) generate delta images of all filesystems: 
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
-# (6) generate the tsar file from git differential, deltas, and package info
+# (6) generate the tsar file from deltas, and package info
 # (7) register and send tsar file to subutai management server
 
 
