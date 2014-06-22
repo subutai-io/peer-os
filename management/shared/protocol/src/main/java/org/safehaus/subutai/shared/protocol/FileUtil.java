@@ -19,6 +19,7 @@ public class FileUtil {
 		File file = new File(currentPath);
 		if (!file.exists()) {
 			writeFile(fileName, object);
+			file = new File(currentPath);
 		}
 		return file;
 	}
