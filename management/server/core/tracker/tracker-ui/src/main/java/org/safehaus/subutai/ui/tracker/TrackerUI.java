@@ -37,7 +37,6 @@ public class TrackerUI implements PortalModule {
 
 	public void init() {
 		executor = Executors.newCachedThreadPool();
-		FileUtil.writeFile(TrackerUI.MODULE_IMAGE, this);
 	}
 
 

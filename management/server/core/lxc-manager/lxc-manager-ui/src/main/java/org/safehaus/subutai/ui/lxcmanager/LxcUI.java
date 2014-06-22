@@ -38,7 +38,6 @@ public class LxcUI implements PortalModule {
 
 	public void init() {
 		executor = Executors.newCachedThreadPool();
-		FileUtil.writeFile(LxcUI.MODULE_IMAGE, this);
 	}
 
 

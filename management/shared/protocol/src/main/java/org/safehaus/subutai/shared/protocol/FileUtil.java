@@ -25,7 +25,7 @@ public class FileUtil {
 		return file;
 	}
 
-	public static void writeFile(String fileName, Object object) {
+	private static void writeFile(String fileName, Object object) {
 
 		try {
 			String currentPath = System.getProperty("user.dir") + "/res/" + fileName;

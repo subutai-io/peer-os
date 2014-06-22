@@ -5099,8 +5099,6 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .catalog.v-layout {
-    padding: 10px 10px 10px 10px;
-    background: #eee;
 }
 
 .dashboard .schedule .tray {
@@ -5246,7 +5244,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .create {
-    padding: 10px 0;
+    padding: 10px;
+    background: #eee;
 }
 
 .dashboard .reports .create .v-slot {

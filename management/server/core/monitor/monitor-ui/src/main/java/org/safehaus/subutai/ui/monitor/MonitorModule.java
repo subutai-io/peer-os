@@ -28,7 +28,6 @@ public class MonitorModule implements PortalModule {
 
 	@Override
 	public File getImage() {
-		FileUtil.writeFile(MonitorModule.MODULE_IMAGE, this);
 		return FileUtil.getFile(MonitorModule.MODULE_IMAGE, this);
 	}
 
