@@ -127,3 +127,8 @@ NOTES:
     on the physical machine for each user in the system, and use unprivileged
     containers for added security.
 
+# Required packages on physical server
+
+  - build-essential
+  - packaging-dev
+
