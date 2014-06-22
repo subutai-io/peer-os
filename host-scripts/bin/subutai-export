@@ -22,7 +22,7 @@ function usage {
 #     - container parent MUST be present in the template registry
 # (2) generate delta images of all filesystems: 
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
-# (3) generate the tsar file from git differential, deltas, and package info
+# (3) generate the tsar file deltas, and package info
 
 # -----------------------------------------------------------------------------
 # (1) perform some sanity checks
@@ -89,7 +89,7 @@ zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template"
 
 
 # -----------------------------------------------------------------------------
-# (3) generate the tsar file from git differential, deltas, and package info
+# (3) generate the tsar file from deltas, and package info
 # -----------------------------------------------------------------------------
 
 cp /var/lib/lxc/$container/config $tsar_root
