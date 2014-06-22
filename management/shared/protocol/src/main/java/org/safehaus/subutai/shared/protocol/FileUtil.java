@@ -1,6 +1,9 @@
 package org.safehaus.subutai.shared.protocol;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.logging.Logger;
@@ -22,35 +25,27 @@ public class FileUtil {
 
 	private static void writeFile(String fileName, Object object) {
 
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-
 		try {
 			String currentPath = System.getProperty("user.dir") + "/res";
-			inputStream = getClassLoader(object).getResourceAsStream("img/" + fileName);
+			InputStream inputStream = getClassLoader(object).getResourceAsStream("img/" + fileName);
 
 			File folder = new File(currentPath);
 			if (!folder.exists()) {
 				folder.mkdir();
 			}
 
-			outputStream = new FileOutputStream(new File(currentPath + "/" + fileName));
+			OutputStream outputStream = new FileOutputStream(new File(currentPath + "/" + fileName));
 			int read;
 			byte[] bytes = new byte[1024];
 
 			while ((read = inputStream.read(bytes)) != -1) {
 				outputStream.write(bytes, 0, read);
 			}
+
+			inputStream.close();
+			outputStream.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		} finally {
-			try {
-				inputStream.close();
-				outputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 		}
 	}
 
