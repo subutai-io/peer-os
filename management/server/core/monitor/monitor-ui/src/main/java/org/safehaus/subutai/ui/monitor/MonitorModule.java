@@ -10,7 +10,7 @@ import java.io.File;
 
 public class MonitorModule implements PortalModule {
 
-	public static final String MODULE_IMAGE = "monitor.jpg";
+	public static final String MODULE_IMAGE = "monitor.png";
 	private static final String MODULE_NAME = "Monitor";
 
 	private Monitor monitor;

@@ -12,7 +12,7 @@ import java.io.File;
 
 public class CommandRunnerUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "terminal.jpg";
+	public static final String MODULE_IMAGE = "terminal.png";
 	public static final String MODULE_NAME = "Terminal";
 	private CommandRunner commandRunner;
 	private AgentManager agentManager;
