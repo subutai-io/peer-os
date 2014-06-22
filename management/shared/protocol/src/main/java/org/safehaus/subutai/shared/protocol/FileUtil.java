@@ -17,8 +17,6 @@ public class FileUtil {
 		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
 		File file = new File(currentPath);
 		if (!file.exists()) {
-			System.out.println();
-			System.out.println(currentPath);
 			writeFile(fileName, object);
 			file = new File(currentPath);
 		}
