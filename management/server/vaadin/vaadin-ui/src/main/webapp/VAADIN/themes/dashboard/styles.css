@@ -5246,7 +5246,7 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .reports .create {
     padding: 0 10px 0 10px;
     margin: 10px;
-    background: #eee;
+    /*background: #eee;*/
 }
 
 .dashboard .reports .create .v-slot {
