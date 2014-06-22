@@ -12,7 +12,6 @@ public class FileUtil {
 
 	private static final Logger log = Logger.getLogger(FileUtil.class.getName());
 
-	private static URLClassLoader classLoader;
 
 	public static File getFile(String fileName, Object object) {
 		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
@@ -47,14 +46,9 @@ public class FileUtil {
 	}
 
 	private static URLClassLoader getClassLoader(Object object) {
-
-		if (classLoader != null) {
-			return classLoader;
-		}
-
 		// Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
 		URL url = object.getClass().getProtectionDomain().getCodeSource().getLocation();
-		classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
+		URLClassLoader classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
 
 		return classLoader;
 	}
