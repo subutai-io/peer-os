@@ -32,11 +32,11 @@ init
 # o Snapshots the newly created populated filesystems with @template
 
 function addmount {
-  name=$1
-  mount=$2
-  zpool=$3
+  local name=$1
+  local mount=$2
+  local zpool=$3
+  local dataset=$zpool/$name-$mount
 
-  dataset=$zpool/$name-$mount
   echo Creating $dataset dataset for $mount mount entry
   zfs create $dataset
 
@@ -50,7 +50,7 @@ function addmount {
   fi
   echo Copying $mount data from rootfs to new $dataset dataset
   pushd .
-  mountpath=/var/lib/lxc/$name/rootfs/$mount
+  local mountpath=/var/lib/lxc/$name/rootfs/$mount
   cd $mountpath
 
   if [ -n "`ls -A $mountpath`" ]; then
