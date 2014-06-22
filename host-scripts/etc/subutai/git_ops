@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O GIT convenience operations
+# --------------------------------------------------------------------------
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+function git_master_uuid {
+  pushd . > /dev/null
+  cd /var/lib/lxc/master/rootfs
+  git log | grep commit | head -n 1 | awk '{print $2}'
+  popd > /dev/null
+}
+
+
+function git_init_master {
+  local home=/var/lib/lxc/master
+  local config=$home/config
+
+  pushd . > /dev/null
+  cd $home/rootfs
+  git init
+  git config user.email "$SUBUTAI_EMAIL"
+  git config user.name  "$SUBUTAI_USER"
+  cp /etc/subutai/gitignore ./.gitignore
+  git add ./.gitignore
+  git commit -m 'ignoring some files at root'
+  git add -A
+  git commit -m 'initial master /etc import'
+  local uuid=`git_master_uuid`
+  echo subutai.git.uuid = $uuid >> $config
+  popd > /dev/null
+}
+
+
+function git_child_branch {
+  local child="$1"
+
+  if [ -z `lxc-ls --running $child` ]; then
+    lxc-start -d -n $child
+  fi
+
+  lxc-wait -n $child -s RUNNING
+  o=`lxc-attach -n $child -- git -C / checkout -b $child 2>&1`
+  check_status "New child container branch \"$child\" created" "$?"
+}
+
+
