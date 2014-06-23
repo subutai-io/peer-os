@@ -12,7 +12,7 @@ import java.util.List;
 public interface AptRepositoryManager {
 
 
-    public List<String> listPackages( String pattern ) throws AptRepoException;
+    public List<PackageInfo> listPackages( String pattern ) throws AptRepoException;
 
     public void addPackageToRepo( String pathToPackageFile ) throws AptRepoException;
 
