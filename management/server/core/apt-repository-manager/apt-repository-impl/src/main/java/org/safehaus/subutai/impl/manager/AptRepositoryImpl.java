@@ -6,6 +6,9 @@
 package org.safehaus.subutai.impl.manager;
 
 
+import java.util.List;
+
+import org.safehaus.subutai.api.manager.AptRepoException;
 import org.safehaus.subutai.api.manager.AptRepositoryManager;
 
 
@@ -16,31 +19,25 @@ public class AptRepositoryImpl implements AptRepositoryManager {
 
 
     @Override
-    public void getPackages() {
+    public List<String> listPackages( final String pattern ) throws AptRepoException {
+        return null;
+    }
+
+
+    @Override
+    public void addPackageToRepo( final String pathToPackageFile ) throws AptRepoException {
 
     }
 
 
     @Override
-    public void putPackage() {
+    public void removePackageFromRepo( final String packageFileName ) throws AptRepoException {
 
     }
 
 
     @Override
-    public void removePackage() {
-
-    }
-
-
-    @Override
-    public void searchPackage() {
-
-    }
-
-
-    @Override
-    public void exportPackage() {
-
+    public String readFileContents( final String pathToFileInsideDebPackage ) throws AptRepoException {
+        return null;
     }
 }

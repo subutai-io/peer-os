@@ -6,20 +6,19 @@
 package org.safehaus.subutai.api.manager;
 
 
+import java.util.List;
+
+
 /**
  */
 public interface AptRepositoryManager {
 
 
-    public void getPackages();
+    public List<String> listPackages( String pattern ) throws AptRepoException;
 
-    public void putPackage();
+    public void addPackageToRepo( String pathToPackageFile ) throws AptRepoException;
 
-    public void removePackage();
+    public void removePackageFromRepo( String packageFileName ) throws AptRepoException;
 
-    public void searchPackage();
-
-    public void exportPackage();
-
-
+    public String readFileContents( String pathToFileInsideDebPackage ) throws AptRepoException;
 }
