@@ -35,6 +35,7 @@ public class BuildEnvironmentCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
+        System.out.println("Building environment...");
         boolean buildResult = environmentManager.buildEnvironment( blueprintStr );
         if ( buildResult ) {
             System.out.println( "Environment build completed successfully." );

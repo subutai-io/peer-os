@@ -11,8 +11,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "destroy", description = "Command to build environment",
-        detailedDescription = "Command to build environment by given blueprint description")
+@Command(scope = "environment", name = "destroy", description = "Command to destroy environment",
+        detailedDescription = "Command to destroy environment by name")
 public class DestroyEnvironmentCommand extends OsgiCommandSupport {
 
     EnvironmentManager environmentManager;

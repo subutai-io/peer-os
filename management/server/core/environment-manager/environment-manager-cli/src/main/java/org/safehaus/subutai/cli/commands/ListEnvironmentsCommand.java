@@ -13,8 +13,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "ls", description = "Command to build environment",
-        detailedDescription = "Command to build environment by given blueprint description")
+@Command(scope = "environment", name = "ls", description = "Command to list environments",
+        detailedDescription = "Command to list environments")
 public class ListEnvironmentsCommand extends OsgiCommandSupport {
 
     EnvironmentManager environmentManager;
@@ -33,10 +33,12 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         Set<Environment> environments = environmentManager.getEnvironments();
-        for(Environment environment : environments) {
-            System.out.println(environment.getName());
+        if ( environments.size() > 0 ) for ( Environment environment : environments ) {
+            System.out.println( environment.getName() );
         }
-
+        else {
+            System.out.println("No environments found.");
+        }
         return null;
     }
 }

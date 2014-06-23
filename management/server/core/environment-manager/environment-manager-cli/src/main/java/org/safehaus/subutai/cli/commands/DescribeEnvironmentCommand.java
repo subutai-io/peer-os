@@ -11,8 +11,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 6/21/14.
  */
-@Command(scope = "environment", name = "describe", description = "Command to build environment",
-        detailedDescription = "Command to build environment by given blueprint description")
+@Command(scope = "environment", name = "describe", description = "Command to describe environment",
+        detailedDescription = "Command to describe environment by name")
 public class DescribeEnvironmentCommand extends OsgiCommandSupport {
 
     EnvironmentManager environmentManager;
