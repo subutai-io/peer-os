@@ -11,10 +11,12 @@ init
 
 # creates a debian package for a template and its associated files
 # arg $1 = name of the container, template etc
+# should echo out the path to the newly generated deb package file
+#
 # notes:
 #   - the tmp_path variable is where all the files have been collected
 #     that need to be packaged and distributed within the deb pkg
-#   - the following files exist:
+#   - the following files and directory structure exist:
 #      .
 #      ├── config
 #      ├── deltas
