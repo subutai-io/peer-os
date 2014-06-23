@@ -3,6 +3,7 @@ package org.safehaus.subutai.shared.protocol.settings;
 
 public class Common {
 
+    public static final String MANAGEMENT_AGENT_HOSTNAME = "management";
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
     public static final String BASE_CONTAINER_NAME = "base-container";
     public static final int REFRESH_UI_SEC = 3;

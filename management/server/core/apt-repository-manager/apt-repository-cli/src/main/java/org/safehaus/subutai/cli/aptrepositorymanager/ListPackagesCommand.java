@@ -1,4 +1,4 @@
-package org.safehaus.subutai.cli.commands;
+package org.safehaus.subutai.cli.aptrepositorymanager;
 
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;

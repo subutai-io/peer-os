@@ -12,6 +12,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 
@@ -22,6 +24,7 @@ import com.google.common.base.Preconditions;
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private CommandRunner commandRunner;
     private AgentManager agentManager;
+    private Agent managementAgent;
 
 
     public AptRepositoryManagerImpl( final CommandRunner commandRunner, final AgentManager agentManager ) {
@@ -30,6 +33,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
+        managementAgent = agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME );
     }
 
 
