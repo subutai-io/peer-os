@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptCommand;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
@@ -35,9 +34,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private CommandRunner commandRunner;
 
 
-    public AptRepositoryManagerImpl( final CommandRunner commandRunner, final AgentManager agentManager ) {
+    public AptRepositoryManagerImpl( final CommandRunner commandRunner ) {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
 
         this.commandRunner = commandRunner;
     }
