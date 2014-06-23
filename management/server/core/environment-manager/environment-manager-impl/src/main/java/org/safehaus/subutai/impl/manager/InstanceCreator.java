@@ -28,7 +28,7 @@ public class InstanceCreator {
                                                     final String templateName ) throws InstanceCreateException {
         //TODO call new lxc moudle to create instance;
         // EnvironmentGroupInstance instance = new EnvironmentGroupInstance();
-        throw new InstanceCreateException();
+        throw new InstanceCreateException("Error creating instance");
 
         //        return instance;
     }

@@ -6,6 +6,23 @@ package org.safehaus.subutai.impl.manager.exception;
  */
 public class InstanceCreateException extends EnvironmentManagerException {
 
+    private String message;
 
 
+    public InstanceCreateException( final String s ) {
+        super( s );
+    }
+
+
+    public String getMessage() {
+        return message;
+    }
+
+
+    @Override
+    public String toString() {
+        return "InstanceCreateException{" +
+                "message='" + message + '\'' +
+                '}';
+    }
 }

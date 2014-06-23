@@ -25,7 +25,6 @@ public class NodeGroupBuilder {
                         nodeGroup.getPhysicalNodes(), nodeGroup.getPlacementStrategyENUM(), nodeGroup.getTemplateName());
 
                 // call Network bundle for
-
                 // nodeGroup.isExchangeSshKeys();
                 // nodeGroup.isLinkHosts();
 
