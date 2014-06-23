@@ -5,6 +5,7 @@ import org.safehaus.subutai.api.manager.helper.Blueprint;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -16,8 +17,13 @@ public class BlueprintParser {
 
 
     public Blueprint parseBlueprint( final String blueprintStr ) {
+        System.out.println("PARSING BLUEPRINT STRING");
+        try {
+            Blueprint blueprint = gson.fromJson( blueprintStr, Blueprint.class );
+            return blueprint;
+        } catch (JsonSyntaxException e) {
 
-        Blueprint blueprint = gson.fromJson( blueprintStr, Blueprint.class );
-        return blueprint;
+        }
+        return null;
     }
 }

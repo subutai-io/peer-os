@@ -8,10 +8,10 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
-import org.safehaus.subutai.api.manager.util.BlueprintParser;
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 
 
@@ -28,23 +28,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     public boolean buildEnvironment( String blueprintStr ) {
 
         Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
-
-        try {
-            Environment environment = environmentBuilder.build( blueprint );
-            boolean saveResult = environmentDAO.saveEnvironment( environment );
-            if ( !saveResult ) {
-                //rollback build action.
-                environmentBuilder.destroy( environment );
+        if ( blueprint != null ) {
+            try {
+                Environment environment = environmentBuilder.build( blueprint );
+                boolean saveResult = environmentDAO.saveEnvironment( environment );
+                if ( !saveResult ) {
+                    //rollback build action.
+                    environmentBuilder.destroy( environment );
+                    return false;
+                }
+                return true;
+            }
+            catch ( EnvironmentBuildException e ) {
+                e.printStackTrace();
+            }
+            finally {
                 return false;
             }
-            return true;
         }
-        catch ( EnvironmentBuildException e ) {
-            e.printStackTrace();
-        }
-        finally {
-            return false;
-        }
+        return false;
     }
 
 
