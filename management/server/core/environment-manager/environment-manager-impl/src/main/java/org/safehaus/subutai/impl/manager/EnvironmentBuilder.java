@@ -7,6 +7,8 @@ import java.util.Set;
 import org.safehaus.subutai.api.manager.Blueprint;
 import org.safehaus.subutai.api.manager.Environment;
 import org.safehaus.subutai.api.manager.NodeGroup;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
 
 
 /**
@@ -14,15 +16,24 @@ import org.safehaus.subutai.api.manager.NodeGroup;
  */
 public class EnvironmentBuilder {
 
-    NodeGroupBuilder nodeGoupBuilder = new NodeGroupBuilder();
+    NodeGroupBuilder nodeGroupBuilder = new NodeGroupBuilder();
 
 
-    public Environment build( final Blueprint blueprint ) {
+    public Environment build( final Blueprint blueprint ) throws EnvironmentBuildException {
         Environment environment = new Environment();
         Set<NodeGroup> nodeGroupSet = new HashSet<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            NodeGroup createdNodeGroup = nodeGoupBuilder.buildNodeGroup( nodeGroup );
-            nodeGroupSet.add( createdNodeGroup );
+            NodeGroup createdNodeGroup = null;
+            try {
+                createdNodeGroup = nodeGroupBuilder.buildNodeGroup( nodeGroup );
+                nodeGroupSet.add( createdNodeGroup );
+            }
+            catch ( NodeGroupBuildException e ) {
+                e.printStackTrace();
+                //rollback action
+            } finally {
+                throw new EnvironmentBuildException();
+            }
         }
         environment.setNodeGroups( nodeGroupSet );
         return environment;
@@ -31,7 +42,7 @@ public class EnvironmentBuilder {
 
     public boolean destroy( final Environment environment ) {
         for ( NodeGroup nodeGroup : environment.getNodeGroups() ) {
-            nodeGoupBuilder.destroyNodeGroup( nodeGroup );
+            nodeGroupBuilder.destroyNodeGroup( nodeGroup );
         }
         return true;
     }

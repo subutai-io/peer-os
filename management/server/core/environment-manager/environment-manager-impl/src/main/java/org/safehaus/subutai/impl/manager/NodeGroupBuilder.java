@@ -1,13 +1,11 @@
 package org.safehaus.subutai.impl.manager;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.api.manager.GroupInstance;
 import org.safehaus.subutai.api.manager.NodeGroup;
-
-import sun.security.jca.GetInstance;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceDestroyException;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
 
 
 /**
@@ -17,18 +15,37 @@ public class NodeGroupBuilder {
     InstanceCreator instanceCreator = new InstanceCreator();
 
 
-    public NodeGroup buildNodeGroup( final NodeGroup nodeGroup ) {
+    public NodeGroup buildNodeGroup( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
         for ( GroupInstance groupInstance : nodeGroup.getGroupInstances() ) {
-            GroupInstance instance = instanceCreator.createInstance( groupInstance );
-            nodeGroup.getGroupInstances().add( instance );
+            GroupInstance instance = null;
+            try {
+                instance = instanceCreator.createInstance( groupInstance );
+                nodeGroup.getGroupInstances().add( instance );
+            }
+            catch ( InstanceCreateException e ) {
+                e.printStackTrace();
+            }
+            finally {
+                throw new NodeGroupBuildException();
+            }
         }
         return nodeGroup;
     }
 
 
-    public void destroyNodeGroup( final NodeGroup nodeGroup ) {
+    public boolean destroyNodeGroup( final NodeGroup nodeGroup ) {
         for ( GroupInstance groupInstance : nodeGroup.getGroupInstances() ) {
-            instanceCreator.destroyInstance( groupInstance );
+            try {
+                instanceCreator.destroyInstance( groupInstance );
+            }
+            catch ( InstanceDestroyException e ) {
+                e.printStackTrace();
+                //TODO log destroy status log
+            }
+            finally {
+                return false;
+            }
         }
+        return true;
     }
 }

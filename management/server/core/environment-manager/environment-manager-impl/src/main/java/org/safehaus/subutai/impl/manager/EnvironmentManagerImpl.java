@@ -12,6 +12,7 @@ import org.safehaus.subutai.api.manager.Blueprint;
 import org.safehaus.subutai.api.manager.BlueprintParser;
 import org.safehaus.subutai.api.manager.Environment;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 
 
 /**
@@ -20,7 +21,7 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
     EnvironmentDAO environmentDAO = new EnvironmentDAO();
-    EnvironmentBuilder builder = new EnvironmentBuilder();
+    EnvironmentBuilder environmentBuilder = new EnvironmentBuilder();
 
 
     @Override
@@ -28,11 +29,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
         Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
 
-        Environment environment = builder.build( blueprint );
-
-        boolean saveResult = environmentDAO.saveEnvironment( environment );
-
-        return saveResult;
+        Environment environment = null;
+        try {
+            environment = environmentBuilder.build( blueprint );
+            boolean saveResult = environmentDAO.saveEnvironment( environment );
+            if ( !saveResult ) {
+                //rollback build action.
+            }
+            return true;
+        }
+        catch ( EnvironmentBuildException e ) {
+            e.printStackTrace();
+        }
+        finally {
+            return false;
+        }
     }
 
 
@@ -54,7 +65,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     public boolean destroyEnvironment( final String environmentName ) {
         Environment environment = getEnvironmentInfo( environmentName );
         boolean destroyResult;
-        if ( builder.destroy( environment ) ) {
+        if ( environmentBuilder.destroy( environment ) ) {
             destroyResult = true;
         }
         else {
