@@ -3,7 +3,6 @@ package org.safehaus.subutai.impl.manager;
 
 import org.safehaus.subutai.api.manager.EnvironmentGroupInstance;
 import org.safehaus.subutai.api.manager.EnvironmentNodeGroup;
-import org.safehaus.subutai.api.manager.GroupInstance;
 import org.safehaus.subutai.api.manager.NodeGroup;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
@@ -20,9 +19,17 @@ public class NodeGroupBuilder {
     public EnvironmentNodeGroup buildNodeGroup( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
 
         EnvironmentNodeGroup environmentNodeGroup = new EnvironmentNodeGroup();
-        for ( GroupInstance groupInstance : nodeGroup.getGroupInstanceSet() ) {
+        for(int i = 0; i < nodeGroup.getNumberOfNodes(); i++) {
             try {
-                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.createInstance( groupInstance );
+                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.createInstance(
+                        nodeGroup.getPhysicalNodes(), nodeGroup.getPlacementStrategyENUM(), nodeGroup.getTemplateName());
+
+                // call Network bundle for
+
+                // nodeGroup.isExchangeSshKeys();
+                // nodeGroup.isLinkHosts();
+
+
                 environmentNodeGroup.getEnvironmentGroupInstanceSet().add( environmentGroupInstance );
             }
             catch ( InstanceCreateException e ) {
