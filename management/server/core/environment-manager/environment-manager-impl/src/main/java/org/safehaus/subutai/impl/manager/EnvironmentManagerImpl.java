@@ -12,7 +12,7 @@ import org.safehaus.subutai.api.manager.Blueprint;
 import org.safehaus.subutai.api.manager.BlueprintParser;
 import org.safehaus.subutai.api.manager.Environment;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 
 
 /**

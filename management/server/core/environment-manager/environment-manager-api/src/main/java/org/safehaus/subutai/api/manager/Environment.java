@@ -10,7 +10,7 @@ import java.util.Set;
 public class Environment {
 
     private String name;
-    private Set<NodeGroup> nodeGroups;
+    private Set<EnvironmentNodeGroup> environmentNodeGroups;
 
 
     public String getName() {
@@ -23,12 +23,12 @@ public class Environment {
     }
 
 
-    public Set<NodeGroup> getNodeGroups() {
-        return nodeGroups;
+    public Set<EnvironmentNodeGroup> getEnvironmentNodeGroups() {
+        return environmentNodeGroups;
     }
 
 
-    public void setNodeGroups( final Set<NodeGroup> nodeGroups ) {
-        this.nodeGroups = nodeGroups;
+    public void setEnvironmentNodeGroups( final Set<EnvironmentNodeGroup> environmentNodeGroups ) {
+        this.environmentNodeGroups = environmentNodeGroups;
     }
 }

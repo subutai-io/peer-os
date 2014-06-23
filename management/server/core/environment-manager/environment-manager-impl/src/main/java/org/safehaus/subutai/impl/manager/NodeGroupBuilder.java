@@ -1,11 +1,13 @@
 package org.safehaus.subutai.impl.manager;
 
 
+import org.safehaus.subutai.api.manager.EnvironmentGroupInstance;
+import org.safehaus.subutai.api.manager.EnvironmentNodeGroup;
 import org.safehaus.subutai.api.manager.GroupInstance;
 import org.safehaus.subutai.api.manager.NodeGroup;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceDestroyException;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
+import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
+import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
 
 
 /**
@@ -15,12 +17,16 @@ public class NodeGroupBuilder {
     InstanceCreator instanceCreator = new InstanceCreator();
 
 
-    public NodeGroup buildNodeGroup( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
-        for ( GroupInstance groupInstance : nodeGroup.getGroupInstances() ) {
-            GroupInstance instance = null;
+    public EnvironmentNodeGroup buildNodeGroup( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
+
+        EnvironmentNodeGroup environmentNodeGroup = new EnvironmentNodeGroup();
+        for ( GroupInstance groupInstance : nodeGroup.getGroupInstanceSet() ) {
+            EnvironmentGroupInstance environmentGroupInstance = null;
             try {
-                instance = instanceCreator.createInstance( groupInstance );
-                nodeGroup.getGroupInstances().add( instance );
+                environmentGroupInstance = instanceCreator.createInstance( groupInstance );
+                environmentNodeGroup.getEnvironmentGroupInstanceSet().add( environmentGroupInstance );
+
+
             }
             catch ( InstanceCreateException e ) {
                 e.printStackTrace();
@@ -29,16 +35,17 @@ public class NodeGroupBuilder {
                 throw new NodeGroupBuildException();
             }
         }
-        return nodeGroup;
+        return environmentNodeGroup;
+
     }
 
 
-    public boolean destroyNodeGroup( final NodeGroup nodeGroup ) {
-        for ( GroupInstance groupInstance : nodeGroup.getGroupInstances() ) {
+    public boolean destroyEnvironmentNodeGroup( final EnvironmentNodeGroup environmentNodeGroup ) {
+        for ( EnvironmentGroupInstance environmentGroupInstance : environmentNodeGroup.getEnvironmentGroupInstanceSet() ) {
             try {
-                instanceCreator.destroyInstance( groupInstance );
+                instanceCreator.destroyEnvironmentInstance( environmentGroupInstance );
             }
-            catch ( InstanceDestroyException e ) {
+            catch ( EnvironmentInstanceDestroyException e ) {
                 e.printStackTrace();
                 //TODO log destroy status log
             }
@@ -48,4 +55,6 @@ public class NodeGroupBuilder {
         }
         return true;
     }
+
+
 }

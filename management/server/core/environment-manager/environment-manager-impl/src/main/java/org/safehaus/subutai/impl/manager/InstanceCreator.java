@@ -1,9 +1,10 @@
 package org.safehaus.subutai.impl.manager;
 
 
+import org.safehaus.subutai.api.manager.EnvironmentGroupInstance;
 import org.safehaus.subutai.api.manager.GroupInstance;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
-import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.exception.InstanceDestroyException;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
+import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
 
 
 /**
@@ -12,7 +13,7 @@ import org.safehaus.subutai.impl.manager.org.safehaus.subutai.impl.manager.excep
 public class InstanceCreator {
 
 
-    public GroupInstance createInstance( final GroupInstance groupInstance ) throws InstanceCreateException {
+    public EnvironmentGroupInstance createInstance( final GroupInstance groupInstance ) throws InstanceCreateException {
 
         //TODO call new lxc moudle to create instance;\
         throw new InstanceCreateException();
@@ -21,9 +22,9 @@ public class InstanceCreator {
     }
 
 
-    public void destroyInstance( final GroupInstance groupInstance ) throws InstanceDestroyException {
+    public void destroyEnvironmentInstance( final EnvironmentGroupInstance environmentGroupInstance) throws EnvironmentInstanceDestroyException {
 
         //TODO call new lxc moudle to destroy instance;
-        throw new InstanceDestroyException();
+        throw new EnvironmentInstanceDestroyException();
     }
 }
