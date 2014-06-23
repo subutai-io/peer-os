@@ -34,11 +34,89 @@ init
 #     command will expect this file structure to import the newly installed
 #     container
 
+#	
+#	NOTE: Debian package will be created under /tmp/debian folder
+#
+
 function deb_pkg {
   local lxc="$1"
   local tmp="$SUBUTAI_TMPDIR"
   local tmp_path="$tmp/$lxc"
+  debian_tmp_dir=/tmp/debian/$lxc-subutai-template
+  local md5sum_file=$debian_tmp_dir/DEBIAN/md5sums
+  output_dir=$debian_tmp_dir/$tmp_path
 
-  # write code here to create the debian package
+  # ------------------------------------------------------------------------------
+  # (1) create DEBIAN folder and copy required files.
+  # -----------------------------------------------------------------------------
+  mkdir -p $debian_tmp_dir
+  mkdir -p $debian_tmp_dir/DEBIAN
+  mkdir -p $output_dir
+  cp -r $tmp_path/* $output_dir
+
+  # -----------------------------------------------------------------------------
+  # (2)  create control file of debian package
+  # -----------------------------------------------------------------------------
+  create_control_file $lxc
+
+  # -----------------------------------------------------------------------------
+  # (3) create postinst script of debian package
+  # -----------------------------------------------------------------------------
+  create_postinst_script $lxc
+
+  # -----------------------------------------------------------------------------
+  # (4) create debian package
+  # -----------------------------------------------------------------------------
+  dpkg-deb -z8 -Zgzip --build $debian_tmp_dir >> /dev/null
+
+  # -----------------------------------------------------------------------------
+  # (5) remove copied directories for creating debian package
+  # -----------------------------------------------------------------------------		
+  rm -rf $debian_tmp_dir
+
+  # -----------------------------------------------------------------------------
+  # (6) return path of newly generated debian package
+  # -----------------------------------------------------------------------------
+  echo "$debian_tmp_dir.deb"
 }
 
+
+
+# ----------------------------------------------------------------------------------
+# Creates control file of debian package
+# ----------------------------------------------------------------------------------
+function create_control_file {
+
+  local packageName=$1-subutai-template  
+  local control_file=$debian_tmp_dir/DEBIAN/control
+
+  # These properties are needed inside control file of debian package
+  local Package="$packageName" 
+  local Maintainer="subutai"
+  local Architecture="amd64"
+  local Version="1.0.0"
+  local Depends="subutai-host-scripts" 
+  local Description="This is a Subutai delta image debian package"
+
+  # clean control file
+  > $control_file
+
+  echo Package:$Package >> $control_file
+  echo Maintainer:$Maintainer >> $control_file
+  echo Architecture:$Architecture >> $control_file
+  echo Version:$Version >> $control_file
+  echo Depends:$Depends >> $control_file
+  echo Description:$Description >> $control_file
+}
+
+
+# ----------------------------------------------------------------------------------
+# Creates postinst script of debian package
+# ----------------------------------------------------------------------------------
+function create_postinst_script {
+  local postinst_file=$debian_tmp_dir/DEBIAN/postinst
+  echo "#!/bin/bash"  >> $postinst_file
+  echo ""  >> $postinst_file
+  echo "subutai-import" >> $postinst_file
+  chmod +x $postinst_file
+}
