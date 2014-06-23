@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O deb package convenience operations
+# --------------------------------------------------------------------------
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+# creates a debian package for a template and its associated files
+# arg $1 = name of the container, template etc
+# should echo out the path to the newly generated deb package file
+#
+# notes:
+#   - the tmp_path variable is where all the files have been collected
+#     that need to be packaged and distributed within the deb pkg
+#   - the following files and directory structure exist:
+#      .
+#      ├── config
+#      ├── deltas
+#      │   ├── home.delta
+#      │   ├── opt.delta
+#      │   ├── rootfs.delta
+#      │   └── var.delta
+#      ├── fstab
+#      └── packages
+#
+#   - all template deb packages must depend on host-scripts package
+#   - post installation of the package should call subutai-import
+#   - installation should dump package contents under the $tmp directory
+#     into a new directory with the name of the container: the import
+#     command will expect this file structure to import the newly installed
+#     container
+
+function deb_pkg {
+  local lxc="$1"
+  local tmp="$SUBUTAI_TMPDIR"
+  local tmp_path="$tmp/$lxc"
+
+  # write code here to create the debian package
+}
+
