@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.manager.builder;
 
 
 import java.util.HashSet;
@@ -24,12 +24,13 @@ public class EnvironmentBuilder {
         Set<EnvironmentNodeGroup> environmentNodeGroups = new HashSet<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
             try {
-                EnvironmentNodeGroup environmentNodeGroup = nodeGroupBuilder.buildNodeGroup( nodeGroup );
+                EnvironmentNodeGroup environmentNodeGroup = nodeGroupBuilder.build( nodeGroup );
                 environmentNodeGroups.add( environmentNodeGroup );
             }
             catch ( NodeGroupBuildException e ) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 //rollback action
+                System.out.println(e.getMessage());
             }
             finally {
                 throw new EnvironmentBuildException( "Error occured while building nodeGroup" );
@@ -42,7 +43,7 @@ public class EnvironmentBuilder {
 
     public boolean destroy( final Environment environment ) {
         for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
-            nodeGroupBuilder.destroyEnvironmentNodeGroup( nodeGroup );
+            nodeGroupBuilder.destroy( nodeGroup );
         }
         return true;
     }

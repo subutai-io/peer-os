@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.manager.builder;
 
 
 import java.util.Set;
@@ -12,10 +12,10 @@ import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class InstanceCreator {
+public class InstanceBuilder {
 
 
-    public void destroyEnvironmentInstance( final EnvironmentGroupInstance environmentGroupInstance )
+    public void destroy( final EnvironmentGroupInstance environmentGroupInstance )
             throws EnvironmentInstanceDestroyException {
 
         //TODO call new lxc moudle to destroy instance;
@@ -23,7 +23,7 @@ public class InstanceCreator {
     }
 
 
-    public EnvironmentGroupInstance createInstance( final Set<String> physicalNodes,
+    public EnvironmentGroupInstance build( final Set<String> physicalNodes,
                                                     final PlacementStrategyENUM placementStrategyENUM,
                                                     final String templateName ) throws InstanceCreateException {
         //TODO call new lxc moudle to create instance;

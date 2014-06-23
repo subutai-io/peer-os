@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.manager.dao;
 
 
 import java.util.Set;

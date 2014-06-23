@@ -17,12 +17,11 @@ public class BlueprintParser {
 
 
     public Blueprint parseBlueprint( final String blueprintStr ) {
-        System.out.println("PARSING BLUEPRINT STRING");
         try {
             Blueprint blueprint = gson.fromJson( blueprintStr, Blueprint.class );
             return blueprint;
         } catch (JsonSyntaxException e) {
-
+            System.out.println("Error parsing blueprint");
         }
         return null;
     }

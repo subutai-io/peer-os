@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.manager.builder;
 
 
 import org.safehaus.subutai.api.manager.helper.EnvironmentGroupInstance;
@@ -13,16 +13,16 @@ import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
  * Created by bahadyr on 6/24/14.
  */
 public class NodeGroupBuilder {
-    InstanceCreator instanceCreator = new InstanceCreator();
+    InstanceBuilder instanceCreator = new InstanceBuilder();
 
 
-    public EnvironmentNodeGroup buildNodeGroup( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
+    public EnvironmentNodeGroup build( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
 
         EnvironmentNodeGroup environmentNodeGroup = new EnvironmentNodeGroup();
         for(int i = 0; i < nodeGroup.getNumberOfNodes(); i++) {
             try {
-                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.createInstance(
-                        nodeGroup.getPhysicalNodes(), nodeGroup.getPlacementStrategyENUM(), nodeGroup.getTemplateName());
+                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.build( nodeGroup.getPhysicalNodes(),
+                        nodeGroup.getPlacementStrategyENUM(), nodeGroup.getTemplateName() );
 
                 // call Network bundle for
                 // nodeGroup.isExchangeSshKeys();
@@ -32,25 +32,28 @@ public class NodeGroupBuilder {
                 environmentNodeGroup.getEnvironmentGroupInstanceSet().add( environmentGroupInstance );
             }
             catch ( InstanceCreateException e ) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                System.out.println(e.getMessage());
                 // TODO rollback action
+
             }
             finally {
-                throw new NodeGroupBuildException();
+                throw new NodeGroupBuildException("Error building environment node group");
             }
         }
         return environmentNodeGroup;
     }
 
 
-    public boolean destroyEnvironmentNodeGroup( final EnvironmentNodeGroup environmentNodeGroup ) {
+    public boolean destroy( final EnvironmentNodeGroup environmentNodeGroup ) {
         for ( EnvironmentGroupInstance environmentGroupInstance : environmentNodeGroup
                 .getEnvironmentGroupInstanceSet() ) {
             try {
-                instanceCreator.destroyEnvironmentInstance( environmentGroupInstance );
+                instanceCreator.destroy( environmentGroupInstance );
             }
             catch ( EnvironmentInstanceDestroyException e ) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                e.getMessage();
                 //TODO log destroy status log
             }
             finally {

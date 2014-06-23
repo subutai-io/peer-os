@@ -12,6 +12,8 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Blueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
+import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
+import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 
 
@@ -40,7 +42,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 return true;
             }
             catch ( EnvironmentBuildException e ) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
             finally {
                 return false;

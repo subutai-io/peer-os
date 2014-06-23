@@ -6,8 +6,24 @@ package org.safehaus.subutai.impl.manager.exception;
  */
 public class EnvironmentBuildException extends EnvironmentManagerException {
 
+    private String message;
+
+
     public EnvironmentBuildException( final String message ) {
         super( message );
+        this.message = message;
     }
 
+
+    public String getMessage() {
+        return message;
+    }
+
+
+    @Override
+    public String toString() {
+        return "EnvironmentBuildException{" +
+                "message='" + message + '\'' +
+                '}';
+    }
 }
