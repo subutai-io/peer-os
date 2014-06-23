@@ -6,18 +6,22 @@
 package org.safehaus.subutai.api.manager;
 
 
+import java.util.Set;
+
+
 /**
  */
 public interface EnvironmentManager {
 
 
-    public void buildEnvironment();
+    public boolean buildEnvironment(String blueprintStr);
 
-    public void getEnvironments();
+    public Set<Environment> getEnvironments();
 
-    public void getEnvironmentInfo();
+    public Environment getEnvironmentInfo(String environmentName);
 
-    public void destroyEnvironment();
+    public boolean destroyEnvironment(String environmentName);
+
 
 
 }

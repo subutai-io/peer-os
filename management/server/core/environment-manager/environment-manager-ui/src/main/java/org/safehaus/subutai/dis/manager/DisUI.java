@@ -12,7 +12,7 @@ import com.vaadin.ui.Component;
 
 public class DisUI implements Module {
 
-    public static final String MODULE_NAME = "LXC";
+    public static final String MODULE_NAME = "Environment";
     private static ExecutorService executor;
     private AgentManager agentManager;
 
