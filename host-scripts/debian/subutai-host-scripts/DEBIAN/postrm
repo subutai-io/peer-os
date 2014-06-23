@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+subutai_scripts=/usr/bin/subutai*
+subutai_conf_directory=/etc/subutai
+
+if [ -f $subutai_scripts ]; then
+	rm $subutai_scripts 
+fi
+if [ -d $subutai_conf_directory ]; then
+        rm -r $subutai_conf_directory
+fi
