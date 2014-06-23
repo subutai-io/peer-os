@@ -146,17 +146,18 @@ cp /var/lib/lxc/$lxc/config "$deb_root"
 cp /var/lib/lxc/$lxc/fstab  "$deb_root"
 cp /var/lib/lxc/$lxc/packages  "$deb_root"
 
-deb_pkg $lxc 
+local pkg=`deb_pkg $lxc`
 
-pushd . >> /dev/null
-cd $SUBUTAI_TMPDIR
-tar -zcf $lxc.tsar $lxc
-popd >> /dev/null
+# delete me after deb_pkg works
+#pushd . >> /dev/null
+#cd $SUBUTAI_TMPDIR
+#tar -zcf $lxc.tsar $lxc
+#popd >> /dev/null
 
 # -----------------------------------------------------------------------------
 # (7) register and send tsar file to subutai management server
 # -----------------------------------------------------------------------------
 
-send_n_register $SUBUTAI_TMPDIR/$lxc.tsar
+send_n_register $pkg
 
 
