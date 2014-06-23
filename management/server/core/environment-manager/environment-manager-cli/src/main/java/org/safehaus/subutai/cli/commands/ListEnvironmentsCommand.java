@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.commands;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.Environment;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 
 import org.apache.felix.gogo.commands.Command;

@@ -3,8 +3,8 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.EnvironmentGroupInstance;
-import org.safehaus.subutai.api.manager.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.EnvironmentGroupInstance;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
 

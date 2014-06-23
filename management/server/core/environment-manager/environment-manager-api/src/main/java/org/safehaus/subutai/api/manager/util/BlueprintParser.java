@@ -1,5 +1,7 @@
-package org.safehaus.subutai.api.manager;
+package org.safehaus.subutai.api.manager.util;
 
+
+import org.safehaus.subutai.api.manager.helper.Blueprint;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

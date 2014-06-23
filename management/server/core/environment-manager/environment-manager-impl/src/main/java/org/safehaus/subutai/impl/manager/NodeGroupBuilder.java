@@ -1,9 +1,9 @@
 package org.safehaus.subutai.impl.manager;
 
 
-import org.safehaus.subutai.api.manager.EnvironmentGroupInstance;
-import org.safehaus.subutai.api.manager.EnvironmentNodeGroup;
-import org.safehaus.subutai.api.manager.NodeGroup;
+import org.safehaus.subutai.api.manager.helper.EnvironmentGroupInstance;
+import org.safehaus.subutai.api.manager.helper.EnvironmentNodeGroup;
+import org.safehaus.subutai.api.manager.helper.NodeGroup;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.impl.manager.exception.InstanceCreateException;
 import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;

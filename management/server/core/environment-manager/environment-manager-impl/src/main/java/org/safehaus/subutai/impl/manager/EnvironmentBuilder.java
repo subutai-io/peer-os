@@ -4,10 +4,10 @@ package org.safehaus.subutai.impl.manager;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.Blueprint;
-import org.safehaus.subutai.api.manager.Environment;
-import org.safehaus.subutai.api.manager.EnvironmentNodeGroup;
-import org.safehaus.subutai.api.manager.NodeGroup;
+import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.EnvironmentNodeGroup;
+import org.safehaus.subutai.api.manager.helper.NodeGroup;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
 

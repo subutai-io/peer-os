@@ -8,6 +8,8 @@ package org.safehaus.subutai.api.manager;
 
 import java.util.Set;
 
+import org.safehaus.subutai.api.manager.helper.Environment;
+
 
 /**
  */

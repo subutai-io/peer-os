@@ -1,7 +1,4 @@
-package org.safehaus.subutai.api.manager;
-
-
-import org.safehaus.subutai.shared.protocol.Agent;
+package org.safehaus.subutai.api.manager.helper;
 
 
 /**
@@ -11,7 +8,6 @@ public class GroupInstance {
 
     private String name;
     private PlacementStrategyENUM creationStrateyENUM;
-    private Agent agent;
 
 
     public String getName() {
@@ -21,16 +17,6 @@ public class GroupInstance {
 
     public void setName( final String name ) {
         this.name = name;
-    }
-
-
-    public Agent getAgent() {
-        return agent;
-    }
-
-
-    public void setAgent( final Agent agent ) {
-        this.agent = agent;
     }
 
 
