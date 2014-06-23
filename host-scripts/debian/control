@@ -1,9 +1,9 @@
 Package: subutai-host-scripts
-Version: 1.0.0
+Version: 1.0.0-1
 Section: admin
 Priority: optional
 Architecture: all
-Depends: git, awk, sed, grep, coreutils, zfs, btrfs, build-essential, 
+Depends: git, awk, sed, grep, coreutils, build-essential, 
  packaging-dev, lxc, lxc-templates
 Vcs-Git: http://stash.safehaus.org/scm/subutai/main.git
 Vcs-Browser: http://stash.safehaus.org/scm/subutai/main.git
