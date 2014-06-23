@@ -21,27 +21,25 @@ public class NodeGroupBuilder {
 
         EnvironmentNodeGroup environmentNodeGroup = new EnvironmentNodeGroup();
         for ( GroupInstance groupInstance : nodeGroup.getGroupInstanceSet() ) {
-            EnvironmentGroupInstance environmentGroupInstance = null;
             try {
-                environmentGroupInstance = instanceCreator.createInstance( groupInstance );
+                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.createInstance( groupInstance );
                 environmentNodeGroup.getEnvironmentGroupInstanceSet().add( environmentGroupInstance );
-
-
             }
             catch ( InstanceCreateException e ) {
                 e.printStackTrace();
+                // TODO rollback action
             }
             finally {
                 throw new NodeGroupBuildException();
             }
         }
         return environmentNodeGroup;
-
     }
 
 
     public boolean destroyEnvironmentNodeGroup( final EnvironmentNodeGroup environmentNodeGroup ) {
-        for ( EnvironmentGroupInstance environmentGroupInstance : environmentNodeGroup.getEnvironmentGroupInstanceSet() ) {
+        for ( EnvironmentGroupInstance environmentGroupInstance : environmentNodeGroup
+                .getEnvironmentGroupInstanceSet() ) {
             try {
                 instanceCreator.destroyEnvironmentInstance( environmentGroupInstance );
             }
@@ -55,6 +53,4 @@ public class NodeGroupBuilder {
         }
         return true;
     }
-
-
 }

@@ -19,14 +19,12 @@ public class EnvironmentBuilder {
 
     NodeGroupBuilder nodeGroupBuilder = new NodeGroupBuilder();
 
-
     public Environment build( final Blueprint blueprint ) throws EnvironmentBuildException {
         Environment environment = new Environment();
         Set<EnvironmentNodeGroup> environmentNodeGroups = new HashSet<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            EnvironmentNodeGroup environmentNodeGroup = null;
             try {
-                environmentNodeGroup = nodeGroupBuilder.buildNodeGroup( nodeGroup );
+                EnvironmentNodeGroup environmentNodeGroup = nodeGroupBuilder.buildNodeGroup( nodeGroup );
                 environmentNodeGroups.add( environmentNodeGroup );
             }
             catch ( NodeGroupBuildException e ) {
