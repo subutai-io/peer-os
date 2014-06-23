@@ -9,15 +9,15 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>apt-repository-parent</artifactId>
-  <name>Subutai Apt Repository Parent</name>
-  <description>Subutai Apt Repository Parent</description>
+  <artifactId>template-registry-parent</artifactId>
+  <name>Subutai Template Registry Parent</name>
+  <description>Subutai Template Registry Parent</description>
   <packaging>pom</packaging>
 
   <modules>
-    <module>apt-repository-api</module>
-    <module>apt-repository-impl</module>
-    <module>apt-repository-ui</module>
-    <module>apt-repository-cli</module>
+    <module>template-registry-api</module>
+    <module>template-registry-impl</module>
+    <module>template-registry-cli</module>
+    <module>template-registry-ui</module>
   </modules>
 </project>
