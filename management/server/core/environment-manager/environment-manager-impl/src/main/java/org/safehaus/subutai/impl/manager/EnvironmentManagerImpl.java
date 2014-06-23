@@ -29,9 +29,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
         Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
 
-        Environment environment = null;
         try {
-            environment = environmentBuilder.build( blueprint );
+            Environment environment = environmentBuilder.build( blueprint );
             boolean saveResult = environmentDAO.saveEnvironment( environment );
             if ( !saveResult ) {
                 //rollback build action.
@@ -52,7 +51,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public Set<Environment> getEnvironments() {
         Set<Environment> environments = environmentDAO.getEnvironments();
-        return null;
+        return environments;
     }
 
 
