@@ -28,7 +28,11 @@
       <artifactId>apt-repository-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
+    </dependency>
+    <dependency>
+    <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>

@@ -8,17 +8,19 @@ package org.safehaus.subutai.api.aptrepositorymanager;
 
 import java.util.List;
 
+import org.safehaus.subutai.shared.protocol.Agent;
+
 
 public interface AptRepositoryManager {
 
 
-    public List<PackageInfo> listPackages( String pattern ) throws AptRepoException;
+    public List<PackageInfo> listPackages( Agent agent, String pattern ) throws AptRepoException;
 
-    public void addPackageToRepo( String pathToPackageFile ) throws AptRepoException;
+    public void addPackageToRepo( Agent agent, String pathToPackageFile ) throws AptRepoException;
 
-    public void removePackageByFilePath( String packageFileName ) throws AptRepoException;
+    public void removePackageByFilePath( Agent agent, String packageFileName ) throws AptRepoException;
 
-    public void removePackageByName( String packageName ) throws AptRepoException;
+    public void removePackageByName( Agent agent, String packageName ) throws AptRepoException;
 
-    public String readFileContents( String pathToFileInsideDebPackage ) throws AptRepoException;
+    public String readFileContents( Agent agent, String pathToFileInsideDebPackage ) throws AptRepoException;
 }

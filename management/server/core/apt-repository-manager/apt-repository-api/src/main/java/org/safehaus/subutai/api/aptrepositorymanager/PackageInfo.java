@@ -30,4 +30,14 @@ public class PackageInfo {
     public String getDescription() {
         return description;
     }
+
+
+    @Override
+    public String toString() {
+        return "PackageInfo{" +
+                "status='" + status + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

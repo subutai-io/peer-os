@@ -20,7 +20,6 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -34,8 +33,6 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private final String LINE_SEPARATOR = "\n";
 
     private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private Agent managementAgent;
 
 
     public AptRepositoryManagerImpl( final CommandRunner commandRunner, final AgentManager agentManager ) {
@@ -43,24 +40,22 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
 
         this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        managementAgent = agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME );
     }
 
 
     @Override
-    public List<PackageInfo> listPackages( final String pattern ) throws AptRepoException {
-
+    public List<PackageInfo> listPackages( Agent agent, final String pattern ) throws AptRepoException {
+        Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pattern ), "Pattern is null or empty" );
         List<PackageInfo> packages = new LinkedList<>();
 
         Command command = commandRunner
                 .createCommand( new RequestBuilder( String.format( "aptitude search '%s'", pattern ) ),
-                        Sets.newHashSet( managementAgent ) );
-        runCommand( command, managementAgent, AptCommand.LIST_PACKAGES );
+                        Sets.newHashSet( agent ) );
+        runCommand( command, agent, AptCommand.LIST_PACKAGES, false );
 
-        StringTokenizer lines = new StringTokenizer( command.getResults().get( managementAgent.getUuid() ).getStdOut(),
-                LINE_SEPARATOR );
+        StringTokenizer lines =
+                new StringTokenizer( command.getResults().get( agent.getUuid() ).getStdOut(), LINE_SEPARATOR );
 
         while ( lines.hasMoreTokens() ) {
             String line = lines.nextToken();
@@ -73,11 +68,6 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
             }
         }
         return packages;
-    }
-
-
-    private void runCommand( Command command, Agent host, AptCommand aptCommand ) throws AptRepoException {
-        runCommand( command, host, aptCommand, true );
     }
 
 
@@ -105,25 +95,32 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
-    public void addPackageToRepo( final String pathToPackageFile ) throws AptRepoException {
-
+    public void addPackageToRepo( Agent agent, final String pathToPackageFile ) throws AptRepoException {
+        Preconditions.checkNotNull( agent, "Agent is null" );
     }
 
 
     @Override
-    public void removePackageByFilePath( final String packageFileName ) throws AptRepoException {
-
+    public void removePackageByFilePath( Agent agent, final String packageFileName ) throws AptRepoException {
+        Preconditions.checkNotNull( agent, "Agent is null" );
     }
 
 
     @Override
-    public void removePackageByName( final String packageName ) throws AptRepoException {
-
+    public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
+        Preconditions.checkNotNull( agent, "Agent is null" );
     }
 
 
     @Override
-    public String readFileContents( final String pathToFileInsideDebPackage ) throws AptRepoException {
+    public String readFileContents( Agent agent, final String pathToFileInsideDebPackage ) throws AptRepoException {
+        Preconditions.checkNotNull( agent, "Agent is null" );
+
         return null;
+    }
+
+
+    private void runCommand( Command command, Agent host, AptCommand aptCommand ) throws AptRepoException {
+        runCommand( command, host, aptCommand, true );
     }
 }
