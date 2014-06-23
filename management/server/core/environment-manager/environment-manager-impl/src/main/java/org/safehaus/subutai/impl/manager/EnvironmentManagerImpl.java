@@ -35,6 +35,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             boolean saveResult = environmentDAO.saveEnvironment( environment );
             if ( !saveResult ) {
                 //rollback build action.
+                environmentBuilder.destroy( environment );
+                return false;
             }
             return true;
         }

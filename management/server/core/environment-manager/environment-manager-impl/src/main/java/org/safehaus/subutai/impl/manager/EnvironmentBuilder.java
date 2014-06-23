@@ -32,8 +32,9 @@ public class EnvironmentBuilder {
             catch ( NodeGroupBuildException e ) {
                 e.printStackTrace();
                 //rollback action
-            } finally {
-                throw new EnvironmentBuildException("Error occured while building nodeGroup");
+            }
+            finally {
+                throw new EnvironmentBuildException( "Error occured while building nodeGroup" );
             }
         }
         environment.setEnvironmentNodeGroups( environmentNodeGroups );
