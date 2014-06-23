@@ -34,7 +34,13 @@ public class DestroyEnvironmentCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        environmentManager.destroyEnvironment( environmentName );
+        boolean destroyResult = environmentManager.destroyEnvironment( environmentName );
+        if ( destroyResult ) {
+            System.out.println( "Environment destroyed successfully." );
+        }
+        else {
+            System.out.println( "Environment destroy failed." );
+        }
         return null;
     }
 }
