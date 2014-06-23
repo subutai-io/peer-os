@@ -13,11 +13,6 @@ public class NodeGroup {
     Set<GroupInstance> groupInstanceSet;
 
 
-    public Set<GroupInstance> getGroupInstances() {
-        return groupInstanceSet;
-    }
-
-
     public String getName() {
         return name;
     }
@@ -25,5 +20,15 @@ public class NodeGroup {
 
     public void setName( final String name ) {
         this.name = name;
+    }
+
+
+    public Set<GroupInstance> getGroupInstanceSet() {
+        return groupInstanceSet;
+    }
+
+
+    public void setGroupInstanceSet( final Set<GroupInstance> groupInstanceSet ) {
+        this.groupInstanceSet = groupInstanceSet;
     }
 }

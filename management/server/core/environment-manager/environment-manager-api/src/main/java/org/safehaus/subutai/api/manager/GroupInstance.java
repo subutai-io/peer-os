@@ -10,7 +10,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public class GroupInstance {
 
     private String name;
-    private CreationStrateyENUM creationStrateyENUM;
+    private CreationStrategyENUM creationStrateyENUM;
     private Agent agent;
 
 
@@ -34,12 +34,12 @@ public class GroupInstance {
     }
 
 
-    public CreationStrateyENUM getCreationStrateyENUM() {
+    public CreationStrategyENUM getCreationStrateyENUM() {
         return creationStrateyENUM;
     }
 
 
-    public void setCreationStrateyENUM( final CreationStrateyENUM creationStrateyENUM ) {
+    public void setCreationStrateyENUM( final CreationStrategyENUM creationStrateyENUM ) {
         this.creationStrateyENUM = creationStrateyENUM;
     }
 }
