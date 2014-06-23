@@ -111,8 +111,14 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
-    public String readFileContents( Agent agent, final String pathToFileInsideDebPackage ) throws AptRepoException {
+    public String readFileContents( Agent agent, final String pathToPackageFile, final String pathToFileInsidePackage )
+            throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFileInsidePackage ),
+                "Path ot file inside package is null or empty" );
+
+        //
 
         return null;
     }
