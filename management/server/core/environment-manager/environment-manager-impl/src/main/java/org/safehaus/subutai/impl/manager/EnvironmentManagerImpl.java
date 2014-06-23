@@ -26,8 +26,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
 
-        System.out.println( "Build environment." );
-        System.out.println( blueprintStr );
         Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
 
         Environment environment = builder.build( blueprint );

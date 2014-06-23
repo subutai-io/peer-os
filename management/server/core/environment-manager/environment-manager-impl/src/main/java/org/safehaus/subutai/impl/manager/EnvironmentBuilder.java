@@ -23,7 +23,6 @@ public class EnvironmentBuilder {
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
             NodeGroup createdNodeGroup = nodeGoupBuilder.buildNodeGroup( nodeGroup );
             nodeGroupSet.add( createdNodeGroup );
-
         }
         environment.setNodeGroups( nodeGroupSet );
         return environment;
