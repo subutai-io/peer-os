@@ -353,6 +353,28 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Template Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
