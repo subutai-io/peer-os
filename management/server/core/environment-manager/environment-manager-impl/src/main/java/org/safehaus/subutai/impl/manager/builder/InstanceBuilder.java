@@ -19,7 +19,7 @@ public class InstanceBuilder {
             throws EnvironmentInstanceDestroyException {
 
         //TODO call new lxc moudle to destroy instance;
-        throw new EnvironmentInstanceDestroyException();
+        throw new EnvironmentInstanceDestroyException("Error while destroying instance.");
     }
 
 

@@ -9,8 +9,8 @@ public class InstanceCreateException extends EnvironmentManagerException {
     private String message;
 
 
-    public InstanceCreateException( final String s ) {
-        super( s );
+    public InstanceCreateException( final String message ) {
+        super( message );
         this.message = message;
     }
 

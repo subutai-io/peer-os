@@ -7,4 +7,7 @@ package org.safehaus.subutai.impl.manager.exception;
 public class EnvironmentInstanceDestroyException extends EnvironmentManagerException {
 
 
+    public EnvironmentInstanceDestroyException( final String message ) {
+        super( message );
+    }
 }

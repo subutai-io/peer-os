@@ -42,8 +42,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 return true;
             }
             catch ( EnvironmentBuildException e ) {
-//                e.printStackTrace();
-                System.out.println(e.getMessage());
+                //                e.printStackTrace();
+                System.out.println( e.getMessage() );
             }
             finally {
                 return false;
