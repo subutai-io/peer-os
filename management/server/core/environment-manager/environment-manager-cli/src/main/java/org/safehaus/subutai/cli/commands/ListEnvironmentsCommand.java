@@ -1,6 +1,7 @@
 package org.safehaus.subutai.cli.commands;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -32,7 +33,7 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Set<Environment> environments = environmentManager.getEnvironments();
+        List<Environment> environments = environmentManager.getEnvironments();
         if ( environments.size() > 0 ) for ( Environment environment : environments ) {
             System.out.println( environment.getName() );
         }
