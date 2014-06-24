@@ -6,6 +6,7 @@
 package org.safehaus.subutai.impl.aptrepositorymanager;
 
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -19,6 +20,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -47,9 +49,9 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pattern ), "Pattern is null or empty" );
         List<PackageInfo> packages = new LinkedList<>();
 
-        Command command = commandRunner
-                .createCommand( new RequestBuilder( String.format( "aptitude search '%s'", pattern ) ),
-                        Sets.newHashSet( agent ) );
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( String.format( "aptitude search '%s'", pattern ) ).withTimeout( 60 ),
+                Sets.newHashSet( agent ) );
         runCommand( command, agent, AptCommand.LIST_PACKAGES, false );
 
         StringTokenizer lines =
@@ -93,28 +95,47 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
-    public void addPackageToRepo( Agent agent, final String pathToPackageFile ) throws AptRepoException {
+    public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
+            throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
-    }
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
+        Preconditions.checkArgument( new File( pathToPackageFile ).exists(), "Package file does not exist" );
 
+        String commandString =
+                String.format( "%s %s %3$s && rm -rf db/ dists/ pool/ && reprepro includedeb precise %3$s/*.deb",
+                        deleteSourcePackage ? "mv" : "cp", pathToPackageFile, Common.AMD64_ARCH_DEB_PACKAGES_LOCATION );
+        Command command = commandRunner
+                .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
+                        Sets.newHashSet( agent ) );
 
-    @Override
-    public void removePackageByFilePath( Agent agent, final String packageFileName ) throws AptRepoException {
-        Preconditions.checkNotNull( agent, "Agent is null" );
+        runCommand( command, agent, AptCommand.ADD_PACKAGE );
     }
 
 
     @Override
     public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
+
+        String commandString = String.format(
+                "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' ) && rm %2$s/$pkgFileName && rm -rf db/ " +
+                        "dists/ pool/ && " + "reprepro includedeb precise %2$s/*.deb", packageName,
+                Common.AMD64_ARCH_DEB_PACKAGES_LOCATION );
+
+        Command command = commandRunner
+                .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
+                        Sets.newHashSet( agent ) );
+
+        runCommand( command, agent, AptCommand.REMOVE_PACKAGE );
     }
 
 
     @Override
-    public String readFileContents( Agent agent, final String pathToPackageFile, final String pathToFileInsidePackage )
+    public String readFileContents( Agent agent, final String packageName, final String pathToFileInsidePackage )
             throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFileInsidePackage ),
                 "Path ot file inside package is null or empty" );
 

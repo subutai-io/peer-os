@@ -7,8 +7,7 @@ package org.safehaus.subutai.api.aptrepositorymanager;
 public enum AptCommand {
     LIST_PACKAGES( "list packages" ),
     ADD_PACKAGE( "add package" ),
-    REMOVE_PACKAGE_BY_NAME( "remove package by name" ),
-    REMOVE_PACKAGE_BY_PATH( "remove package by path" ),
+    REMOVE_PACKAGE( "remove package" ),
     READ_FILE_INSIDE_PACKAGE( "read file inside package" );
 
 

@@ -16,12 +16,11 @@ public interface AptRepositoryManager {
 
     public List<PackageInfo> listPackages( Agent agent, String pattern ) throws AptRepoException;
 
-    public void addPackageToRepo( Agent agent, String pathToPackageFile ) throws AptRepoException;
-
-    public void removePackageByFilePath( Agent agent, String packageFileName ) throws AptRepoException;
+    public void addPackageByPath( Agent agent, String pathToPackageFile, boolean deleteSourcePackage )
+            throws AptRepoException;
 
     public void removePackageByName( Agent agent, String packageName ) throws AptRepoException;
 
-    public String readFileContents( Agent agent, final String pathToPackageFile, final String pathToFileInsidePackage )
+    public String readFileContents( Agent agent, final String packageName, final String pathToFileInsidePackage )
             throws AptRepoException;
 }
