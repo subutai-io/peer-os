@@ -96,6 +96,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
+    //@todo :  send apt-get update via BROADCAST_TOPIC
     public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
             throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
@@ -115,6 +116,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
+    //@todo :  send apt-get update via BROADCAST_TOPIC
     public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
