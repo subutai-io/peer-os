@@ -156,14 +156,23 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
         String commandString =
                 String.format( "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' | tr _ -) && dpkg-deb -x " +
-                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s ; rm -rf %3$s/%1$s-%4$s", packageName,
+                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s", packageName,
                         Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
 
         Command command = commandRunner
                 .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
                         Sets.newHashSet( agent ) );
 
-        runCommand( command, agent, AptCommand.READ_FILE_INSIDE_PACKAGE, false );
+        try {
+            runCommand( command, agent, AptCommand.READ_FILE_INSIDE_PACKAGE, false );
+        }
+        finally {
+
+            commandRunner.runCommand( commandRunner.createCommand( new RequestBuilder(
+                            String.format( "rm -rf %s/%s-%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, packageName, nano ) ),
+                    Sets.newHashSet( agent ) ) );
+        }
+
 
         String out = command.getResults().get( agent.getUuid() ).getStdOut();
 
