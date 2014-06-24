@@ -13,5 +13,13 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="apt/read-files">
+      <action class="org.safehaus.subutai.cli.aptrepositorymanager.ReadFilesCommand">
+        <property name="aptRepositoryManager" ref="aptRepositoryManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>
