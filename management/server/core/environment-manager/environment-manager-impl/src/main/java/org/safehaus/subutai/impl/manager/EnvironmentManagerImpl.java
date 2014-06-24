@@ -8,6 +8,7 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.Set;
 
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Blueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -22,10 +23,28 @@ import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
-    EnvironmentDAO environmentDAO = new EnvironmentDAO();
-    EnvironmentBuilder environmentBuilder = new EnvironmentBuilder();
+    EnvironmentDAO environmentDAO;
+    EnvironmentBuilder environmentBuilder;
+
+    private DbManager dbManager;
 
 
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
+
+
+    public EnvironmentManagerImpl( ) {
+        this.environmentDAO = new EnvironmentDAO(dbManager);
+        this.environmentBuilder = new EnvironmentBuilder();
+    }
+
+
+    /**
+     * Builds an environment by provided blueprint description
+     * @param blueprintStr
+     * @return
+     */
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
 
