@@ -37,6 +37,8 @@ import com.google.common.collect.Sets;
  * This is an implementation of AptRepositoryManager
  *
  * TODO: add runBroadcastCommand to CommandRunner
+ *
+ * TODO: add TOPIC argument to CommandProducer
  */
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private final String LINE_SEPARATOR = "\n";
