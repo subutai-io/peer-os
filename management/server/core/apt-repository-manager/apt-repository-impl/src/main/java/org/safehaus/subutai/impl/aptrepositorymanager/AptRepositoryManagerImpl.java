@@ -24,6 +24,7 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 
@@ -132,16 +133,42 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
-    public String readFileContents( Agent agent, final String packageName, final String pathToFileInsidePackage )
-            throws AptRepoException {
+    public List<String> readFileContents( Agent agent, final String packageName,
+                                          final List<String> pathsToFilesInsidePackage ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( pathToFileInsidePackage ),
-                "Path ot file inside package is null or empty" );
+        Preconditions.checkArgument( pathsToFilesInsidePackage != null && !pathsToFilesInsidePackage.isEmpty(),
+                "PathsToFilesInsidePackage is null or empty" );
+        StringBuilder filesSB = new StringBuilder();
+        long nano = System.nanoTime();
 
-        //
+        for ( int i = 0; i < pathsToFilesInsidePackage.size(); i++ ) {
+            final String path = pathsToFilesInsidePackage.get( i );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( path ),
+                    "One of the paths to files inside package is null or empty" );
 
-        return null;
+            filesSB.append( " cat " ).append( path );
+            if ( i < pathsToFilesInsidePackage.size() - 1 ) {
+                filesSB.append( " && echo '<<<" ).append( nano ).append( ">>>' && " );
+            }
+        }
+
+        String commandString = String.format(
+                "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' ) && dpkg-deb -x %2$s/$pkgFileName "
+                        + "%3$s/%1$s-%4$s && %5$s && rm -r %3$s/%1$s-%4$s", packageName,
+                Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
+
+        Command command = commandRunner
+                .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
+                        Sets.newHashSet( agent ) );
+
+        runCommand( command, agent, AptCommand.READ_FILE_INSIDE_PACKAGE, false );
+
+        String out = command.getResults().get( agent.getUuid() ).getStdOut();
+
+        String[] outs = out.split( String.format( "<<<%s>>>", nano ) );
+
+        return Lists.newArrayList( outs );
     }
 
 

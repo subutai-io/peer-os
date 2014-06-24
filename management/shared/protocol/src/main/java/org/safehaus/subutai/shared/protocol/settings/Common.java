@@ -20,4 +20,5 @@ public class Common {
     public static final String GIT_REPO_URL = "git@10.10.10.1:/opt/git/project.git";
     public static final String APT_REPO_PATH = "/repo/ksks/";
     public static final String AMD64_ARCH_DEB_PACKAGES_LOCATION = "amd64/precise";
+    public static final String TMP_DEB_PACKAGE_UNPACK_PATH = "/tmp";
 }
