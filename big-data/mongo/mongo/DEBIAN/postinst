@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+. /etc/profile
+
+mongoHome=$MONGO_HOME
+
+if [ "x$MONGO_HOME" = "x" ]; 
+then
+	mongoHome=/opt/mongo
+fi
+
+mongoConfDirectory="$mongoHome/conf"
+mkdir -p $mongoConfDirectory
+originalMongoConfFile=/etc/mongodb.conf
+
+if [ -f $originalMongoConfFile ]; then
+        cp $originalMongoConfFile $mongoConfDirectory
+fi
