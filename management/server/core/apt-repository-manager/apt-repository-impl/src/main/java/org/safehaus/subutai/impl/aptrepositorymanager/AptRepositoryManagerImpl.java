@@ -156,7 +156,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
         String commandString =
                 String.format( "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' | tr _ -) && dpkg-deb -x " +
-                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s && rm -r %3$s/%1$s-%4$s", packageName,
+                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s && rm -rf %3$s/%1$s-%4$s", packageName,
                         Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
 
         Command command = commandRunner
