@@ -13,7 +13,12 @@ import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
  * Created by bahadyr on 6/24/14.
  */
 public class NodeGroupBuilder {
-    InstanceBuilder instanceCreator = new InstanceBuilder();
+    InstanceBuilder instanceCreator;
+
+
+    public NodeGroupBuilder( ) {
+        this.instanceCreator = new InstanceBuilder();
+    }
 
 
     public EnvironmentNodeGroup build( final NodeGroup nodeGroup ) throws NodeGroupBuildException {

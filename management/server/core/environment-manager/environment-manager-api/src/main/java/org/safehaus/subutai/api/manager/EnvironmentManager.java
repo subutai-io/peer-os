@@ -12,16 +12,35 @@ import org.safehaus.subutai.api.manager.helper.Environment;
 
 
 /**
+ *
  */
 public interface EnvironmentManager {
 
-
+    /**
+     * Builds the environment with a given blueprint descriptor.
+     * @param blueprintStr
+     * @return
+     */
     public boolean buildEnvironment(String blueprintStr);
 
+    /**
+     * Returns the set of existing environments.
+     * @return
+     */
     public Set<Environment> getEnvironments();
 
+    /**
+     * Gets the environment by given environment name.
+     * @param environmentName
+     * @return
+     */
     public Environment getEnvironmentInfo(String environmentName);
 
+    /**
+     * Destroys environment by a given environmentt name.
+     * @param environmentName
+     * @return
+     */
     public boolean destroyEnvironment(String environmentName);
 
 
