@@ -15,13 +15,13 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
-@Command( scope = "apt", name = "read-files", description = "Read files inside deb package" )
+@Command(scope = "apt", name = "read-files", description = "Read files inside deb package")
 public class ReadFilesCommand extends OsgiCommandSupport {
-    @Argument( index = 0, name = "package name", required = true, multiValued = false,
-            description = "name of package where files reside" )
-    String packageName;
-    @Argument( index = 1, name = "file path(s)", required = true, multiValued = true,
-            description = "relative file path(s) to read" )
+    @Argument( index = 0, name = "package path", required = true, multiValued = false,
+            description = "path to package" )
+    String packagePath;
+    @Argument(index = 1, name = "file path(s)", required = true, multiValued = true,
+            description = "relative file path(s) to read")
     Collection<String> filesPaths;
 
     private AptRepositoryManager aptRepositoryManager;
@@ -43,7 +43,7 @@ public class ReadFilesCommand extends OsgiCommandSupport {
         List<String> filePathsList = new ArrayList<>( filesPaths );
         try {
             List<String> fileContents = aptRepositoryManager
-                    .readFileContents( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), packageName,
+                    .readFileContents( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), packagePath,
                             filePathsList );
             for ( int i = 0; i < fileContents.size(); i++ ) {
                 final String content = fileContents.get( i );
