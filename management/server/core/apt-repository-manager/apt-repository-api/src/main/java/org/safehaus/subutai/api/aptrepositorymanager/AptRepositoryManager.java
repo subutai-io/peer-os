@@ -21,6 +21,6 @@ public interface AptRepositoryManager {
 
     public void removePackageByName( Agent agent, String packageName ) throws AptRepoException;
 
-    public List<String> readFileContents( Agent agent, final String packageName,
+    public List<String> readFileContents( Agent agent, final String pathToPackageFile,
                                           final List<String> pathsToFilesInsidePackage ) throws AptRepoException;
 }

@@ -101,14 +101,14 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
-        Preconditions.checkArgument( new File( pathToPackageFile ).exists(), "Package file does not exist" );
+        File packageFile = new File( pathToPackageFile );
+        Preconditions.checkArgument( packageFile.exists(), "Package file does not exist" );
+        Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
 
-        String commandString =
-                String.format( "%s %s %3$s && rm -rf db/ dists/ pool/ && reprepro includedeb precise %3$s/*.deb",
-                        deleteSourcePackage ? "mv" : "cp", pathToPackageFile, Common.AMD64_ARCH_DEB_PACKAGES_LOCATION );
-        Command command = commandRunner
-                .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
-                        Sets.newHashSet( agent ) );
+        Command command = commandRunner.createCommand( new RequestBuilder(
+                String.format( "reprepro includedeb precise %s%s", pathToPackageFile,
+                        deleteSourcePackage ? String.format( " && rm -f %s", pathToPackageFile ) : "" ) )
+                .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
         runCommand( command, agent, AptCommand.ADD_PACKAGE );
     }
@@ -119,26 +119,23 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
 
-        String commandString = String.format(
-                "pkgFileName=$(dpkg -S %1$s | grep -o '%1$s[^/]*deb$') && rm %2$s/$pkgFileName && rm " +
-                        "-rf db/ "
-                        +
-                        "dists/ pool/ && " + "reprepro includedeb precise %2$s/*.deb", packageName,
-                Common.AMD64_ARCH_DEB_PACKAGES_LOCATION );
-
-        Command command = commandRunner
-                .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
-                        Sets.newHashSet( agent ) );
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( String.format( "reprepro remove precise %s", packageName ) )
+                        .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
         runCommand( command, agent, AptCommand.REMOVE_PACKAGE );
     }
 
 
     @Override
-    public List<String> readFileContents( Agent agent, final String packageName,
+    public List<String> readFileContents( Agent agent, final String pathToPackageFile,
                                           final List<String> pathsToFilesInsidePackage ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( pathToPackageFile ), "Path to package file is null or empty" );
+        File packageFile = new File( pathToPackageFile );
+        Preconditions.checkArgument( packageFile.exists(), "Package file does not exist" );
+        Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
         Preconditions.checkArgument( pathsToFilesInsidePackage != null && !pathsToFilesInsidePackage.isEmpty(),
                 "PathsToFilesInsidePackage is null or empty" );
         StringBuilder filesSB = new StringBuilder();
@@ -149,16 +146,16 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( path ),
                     "One of the paths to files inside package is null or empty" );
 
-            filesSB.append( " cat " ).append( Common.TMP_DEB_PACKAGE_UNPACK_PATH ).append( "/" ).append( packageName )
-                   .append( "-" ).append( nano ).append( "/" ).append( path );
+            filesSB.append( " cat " ).append( Common.TMP_DEB_PACKAGE_UNPACK_PATH ).append( "/" ).append( nano )
+                   .append( "/" ).append( path );
             if ( i < pathsToFilesInsidePackage.size() - 1 ) {
                 filesSB.append( " && echo '<<<" ).append( nano ).append( ">>>' && " );
             }
         }
 
-        String commandString = String.format( "pkgFileName=$(dpkg -S %1$s | grep -o '%1$s[^/]*deb$') && dpkg-deb -x " +
-                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s", packageName,
-                        Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
+        String commandString =
+                String.format( "dpkg-deb -x %s %s/%s && %s", pathToPackageFile, Common.TMP_DEB_PACKAGE_UNPACK_PATH,
+                        nano, filesSB );
 
         Command command = commandRunner
                 .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
@@ -169,8 +166,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         }
         finally {
 
-            commandRunner.runCommand( commandRunner.createCommand( new RequestBuilder(
-                            String.format( "rm -rf %s/%s-%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, packageName, nano ) ),
+            commandRunner.runCommand( commandRunner.createCommand(
+                    new RequestBuilder( String.format( "rm -rf %s/%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano ) ),
                     Sets.newHashSet( agent ) ) );
         }
 
