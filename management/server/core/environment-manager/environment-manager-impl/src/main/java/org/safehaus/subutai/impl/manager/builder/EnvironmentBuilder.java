@@ -17,7 +17,13 @@ import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
  */
 public class EnvironmentBuilder {
 
-    NodeGroupBuilder nodeGroupBuilder = new NodeGroupBuilder();
+    NodeGroupBuilder nodeGroupBuilder;
+
+
+    public EnvironmentBuilder() {
+        this.nodeGroupBuilder = new NodeGroupBuilder();
+    }
+
 
     public Environment build( final Blueprint blueprint ) throws EnvironmentBuildException {
         Environment environment = new Environment();
