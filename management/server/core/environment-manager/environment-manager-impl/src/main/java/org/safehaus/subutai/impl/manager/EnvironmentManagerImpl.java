@@ -6,6 +6,7 @@
 package org.safehaus.subutai.impl.manager;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -73,8 +74,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public Set<Environment> getEnvironments() {
-        Set<Environment> environments = environmentDAO.getEnvironments();
+    public List<Environment> getEnvironments() {
+        List<Environment> environments = environmentDAO.getEnvironments();
         return environments;
     }
 

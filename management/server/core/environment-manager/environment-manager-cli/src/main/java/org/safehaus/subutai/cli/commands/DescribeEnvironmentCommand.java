@@ -2,6 +2,7 @@ package org.safehaus.subutai.cli.commands;
 
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -34,7 +35,8 @@ public class DescribeEnvironmentCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        environmentManager.getEnvironmentInfo( environmentName );
+        Environment environment = environmentManager.getEnvironmentInfo( environmentName );
+        System.out.println(environment.toString());
         return null;
     }
 }
