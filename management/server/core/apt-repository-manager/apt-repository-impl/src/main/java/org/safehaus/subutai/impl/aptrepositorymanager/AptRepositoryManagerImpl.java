@@ -120,7 +120,9 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
 
         String commandString = String.format(
-                "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' ) && rm %2$s/$pkgFileName && rm -rf db/ " +
+                "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' | tr _ -) && rm %2$s/$pkgFileName && rm " +
+                        "-rf db/ "
+                        +
                         "dists/ pool/ && " + "reprepro includedeb precise %2$s/*.deb", packageName,
                 Common.AMD64_ARCH_DEB_PACKAGES_LOCATION );
 
