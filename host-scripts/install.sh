@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. $DIR/etc/subutai/bsfl
+. $DIR/debian/etc/subutai/bsfl
 init
 
 if [ "$USER" != "root" ]; then 
@@ -14,10 +14,10 @@ if [ ! -d /etc/subutai ]; then
   mkdir /etc/subutai
 fi
 
-cp $DIR/etc/subutai/* /etc/subutai/
+cp $DIR/debian/etc/subutai/* /etc/subutai/
 chmod 755 /etc/subutai/*
-cp $DIR/bin/subutai-* /bin     # Shouldn't this go into /usr/bin? or elsewhere
-chmod 755 /bin/subutai-*
+cp $DIR/debian/usr/bin/subutai-* /usr/bin     # Shouldn't this go into /usr/bin? or elsewhere
+chmod 755 /usr/bin/subutai-*
 
 msg_ok "Installed all scripts and configuration files successfully"
 msg_info "Initializing Subutai Scripts"

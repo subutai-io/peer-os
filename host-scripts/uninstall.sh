@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. $DIR/etc/subutai/bsfl
+. $DIR/debian/etc/subutai/bsfl
 init
 
 if [ "$USER" != "root" ]; then 
@@ -14,7 +14,7 @@ if [ -d /etc/subutai ]; then
   rm -rf /etc/subutai
 fi
 
-rm /bin/subutai-*
+rm /usr/bin/subutai-*
 
 msg_ok "Uninstalled all scripts and configuration files successfully"
 

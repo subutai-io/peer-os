@@ -6,7 +6,15 @@
 package org.safehaus.subutai.impl.manager;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.util.BlueprintParser;
+import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
+import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 
 
 /**
@@ -14,27 +22,61 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
+    EnvironmentDAO environmentDAO = new EnvironmentDAO();
+    EnvironmentBuilder environmentBuilder = new EnvironmentBuilder();
+
 
     @Override
-    public void buildEnvironment() {
+    public boolean buildEnvironment( String blueprintStr ) {
 
+        Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
+        if ( blueprint != null ) {
+            try {
+                Environment environment = environmentBuilder.build( blueprint );
+                boolean saveResult = environmentDAO.saveEnvironment( environment );
+                if ( !saveResult ) {
+                    //rollback build action.
+                    environmentBuilder.destroy( environment );
+                    return false;
+                }
+                return true;
+            }
+            catch ( EnvironmentBuildException e ) {
+                //                e.printStackTrace();
+                System.out.println( e.getMessage() );
+            }
+            finally {
+                return false;
+            }
+        }
+        return false;
     }
 
 
     @Override
-    public void getEnvironments() {
-
+    public Set<Environment> getEnvironments() {
+        Set<Environment> environments = environmentDAO.getEnvironments();
+        return environments;
     }
 
 
     @Override
-    public void getEnvironmentInfo() {
-
+    public Environment getEnvironmentInfo( final String environmentName ) {
+        Environment environment = environmentDAO.getEnvironment( environmentName );
+        return environment;
     }
 
 
     @Override
-    public void destroyEnvironment() {
-
+    public boolean destroyEnvironment( final String environmentName ) {
+        Environment environment = getEnvironmentInfo( environmentName );
+        boolean destroyResult;
+        if ( environmentBuilder.destroy( environment ) ) {
+            destroyResult = true;
+        }
+        else {
+            destroyResult = false;
+        }
+        return true;
     }
 }
