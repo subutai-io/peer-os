@@ -37,7 +37,7 @@ public class AddPackageCommand extends OsgiCommandSupport {
         try {
             aptRepositoryManager
                     .addPackageByPath( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), packagePath,
-                            true );
+                            false );
         }
         catch ( AptRepoException e ) {
             System.out.println( e );
