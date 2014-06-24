@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Exit on error
+set -e
+
+. /etc/profile
+
+mongoHome=$MONGO_HOME
+if [ "x$MONGO_HOME" = "x" ]; 
+then
+        mongoHome=/opt/mongo
+fi
+
+if [ -d $mongoHome ]; then
+        rm -r $mongoHome
+fi
