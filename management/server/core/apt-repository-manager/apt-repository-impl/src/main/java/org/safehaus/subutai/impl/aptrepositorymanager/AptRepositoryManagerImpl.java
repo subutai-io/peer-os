@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.UUID;
 
 import org.safehaus.subutai.api.aptrepositorymanager.AptCommand;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
@@ -19,7 +20,11 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Request;
+import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
@@ -30,17 +35,23 @@ import com.google.common.collect.Sets;
 
 /**
  * This is an implementation of AptRepositoryManager
+ *
+ * TODO: add runBroadcastCommand to CommandRunner
  */
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private final String LINE_SEPARATOR = "\n";
 
     private CommandRunner commandRunner;
+    private CommunicationManager communicationManager;
 
 
-    public AptRepositoryManagerImpl( final CommandRunner commandRunner ) {
+    public AptRepositoryManagerImpl( final CommandRunner commandRunner,
+                                     final CommunicationManager communicationManager ) {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( communicationManager, "Communication Manager is null" );
 
         this.commandRunner = commandRunner;
+        this.communicationManager = communicationManager;
     }
 
 
@@ -96,7 +107,6 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     @Override
-    //@todo :  send apt-get update via BROADCAST_TOPIC
     public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
             throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
@@ -112,11 +122,11 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
                 .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
         runCommand( command, agent, AptCommand.ADD_PACKAGE );
+        broadcastAptGetUpdateCommand();
     }
 
 
     @Override
-    //@todo :  send apt-get update via BROADCAST_TOPIC
     public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
@@ -126,6 +136,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
                         .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
         runCommand( command, agent, AptCommand.REMOVE_PACKAGE );
+        broadcastAptGetUpdateCommand();
     }
 
 
@@ -184,5 +195,14 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
     private void runCommand( Command command, Agent host, AptCommand aptCommand ) throws AptRepoException {
         runCommand( command, host, aptCommand, true );
+    }
+
+
+    private void broadcastAptGetUpdateCommand() {
+        Request aptGetUpdateRequest =
+                new Request( "APT-MANAGER", RequestType.EXECUTE_REQUEST, UUID.randomUUID(), UUID.randomUUID(), 1, "/",
+                        "apt-get update", OutputRedirection.NO, OutputRedirection.NO, null, null, "root", null, null,
+                        null, 120 );
+        communicationManager.broadcastMessage( aptGetUpdateRequest );
     }
 }

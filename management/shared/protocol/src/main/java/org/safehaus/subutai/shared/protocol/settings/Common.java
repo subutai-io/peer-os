@@ -4,6 +4,7 @@ package org.safehaus.subutai.shared.protocol.settings;
 public class Common {
 
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
+    public static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";
     public static final int REFRESH_UI_SEC = 3;
     public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 120;
     public static final int AGENT_FRESHNESS_MIN = 5;
