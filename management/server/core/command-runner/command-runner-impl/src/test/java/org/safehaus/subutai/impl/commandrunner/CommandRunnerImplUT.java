@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
@@ -48,6 +49,7 @@ public class CommandRunnerImplUT {
 
     private static ExecutorService exec;
     private final boolean allTests = true;
+    private AgentManager agentManager;
     private CommunicationManager communicationManager;
     private CommandRunnerImpl commandRunner;
 
@@ -67,7 +69,8 @@ public class CommandRunnerImplUT {
     @Before
     public void beforeMethod() {
         communicationManager = mock( CommunicationManager.class );
-        commandRunner = new CommandRunnerImpl( communicationManager );
+        agentManager = mock( AgentManager.class );
+        commandRunner = new CommandRunnerImpl( communicationManager, agentManager );
         commandRunner.init();
     }
 

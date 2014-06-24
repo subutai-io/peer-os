@@ -92,4 +92,7 @@ public interface CommandRunner {
      * @return - command
      */
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders );
+
+
+    public Command createBroadcastCommand( RequestBuilder requestBuilder );
 }

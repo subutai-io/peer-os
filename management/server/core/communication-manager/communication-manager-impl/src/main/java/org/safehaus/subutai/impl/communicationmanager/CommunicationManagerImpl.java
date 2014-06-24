@@ -128,6 +128,12 @@ public class CommunicationManagerImpl implements CommunicationManager {
     }
 
 
+    @Override
+    public void sendBroadcastRequest( final Request request ) {
+        exec.submit( new CommandProducer( request, this, true ) );
+    }
+
+
     /**
      * Adds listener
      *
