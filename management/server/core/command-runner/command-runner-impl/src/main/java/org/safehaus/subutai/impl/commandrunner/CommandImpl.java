@@ -59,6 +59,8 @@ public class CommandImpl implements Command {
     private volatile int requestsSucceeded = 0;
     //custom object assigned to this command
     private Object data;
+    //indicates if this command is broadcast command
+    private boolean broadcastCommand;
 
 
     /**
@@ -356,12 +358,32 @@ public class CommandImpl implements Command {
     }
 
 
+    public boolean isBroadcastCommand() {
+        return broadcastCommand;
+    }
+
+
+    public void setBroadcastCommand( final boolean broadcastCommand ) {
+        this.broadcastCommand = broadcastCommand;
+    }
+
+
     @Override
     public String toString() {
-        return "CommandImpl{" + "results=" + results + ", requestsCount=" + requestsCount + ", commandUUID="
-                + commandUUID + ", requests=" + requests + ", timeout=" + timeout + ", completionSemaphore="
-                + completionSemaphore + ", updateLock=" + updateLock + ", commandStatus=" + commandStatus
-                + ", requestsCompleted=" + requestsCompleted + ", requestsSucceeded=" + requestsSucceeded + ", data="
-                + data + ", description=" + description + '}';
+        return "CommandImpl{" +
+                "results=" + results +
+                ", requestsCount=" + requestsCount +
+                ", commandUUID=" + commandUUID +
+                ", requests=" + requests +
+                ", timeout=" + timeout +
+                ", completionSemaphore=" + completionSemaphore +
+                ", updateLock=" + updateLock +
+                ", description='" + description + '\'' +
+                ", commandStatus=" + commandStatus +
+                ", requestsCompleted=" + requestsCompleted +
+                ", requestsSucceeded=" + requestsSucceeded +
+                ", data=" + data +
+                ", broadcastCommand=" + broadcastCommand +
+                '}';
     }
 }

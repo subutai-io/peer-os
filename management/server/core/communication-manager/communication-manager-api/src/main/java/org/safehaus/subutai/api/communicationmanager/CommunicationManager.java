@@ -16,7 +16,7 @@ public interface CommunicationManager {
      */
     public void sendRequest( Request request );
 
-    public void broadcastMessage( Request request );
+    public void sendBroadcastRequest( Request request );
 
     /**
      * adds response listener

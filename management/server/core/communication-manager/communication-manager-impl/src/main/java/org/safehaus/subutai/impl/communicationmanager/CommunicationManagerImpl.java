@@ -129,7 +129,7 @@ public class CommunicationManagerImpl implements CommunicationManager {
 
 
     @Override
-    public void broadcastMessage( final Request request ) {
+    public void sendBroadcastRequest( final Request request ) {
         exec.submit( new CommandProducer( request, this, true ) );
     }
 

@@ -4,11 +4,14 @@
 
   <reference id="communicationManager" availability="mandatory"
              interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.impl.commandrunner.CommandRunnerImpl"
         init-method="init" destroy-method="destroy" activation="eager">
     <argument ref="communicationManager" />
+    <argument ref="agentManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
