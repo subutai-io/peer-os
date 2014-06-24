@@ -33,6 +33,7 @@ public class EnvironmentDAO {
 
 
     public boolean saveEnvironment( final Environment environment ) {
+        System.out.println("Environment: " + environment.toString());
         dbManager.saveEnvironmentInfo( "ENV", environment.getName(), environment );
         return true;
     }
