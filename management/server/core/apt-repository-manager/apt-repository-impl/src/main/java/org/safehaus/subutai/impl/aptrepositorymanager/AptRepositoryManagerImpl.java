@@ -147,16 +147,17 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( path ),
                     "One of the paths to files inside package is null or empty" );
 
-            filesSB.append( " cat " ).append( path );
+            filesSB.append( " cat " ).append( Common.TMP_DEB_PACKAGE_UNPACK_PATH ).append( "/" ).append( packageName )
+                   .append( "-" ).append( nano ).append( "/" ).append( path );
             if ( i < pathsToFilesInsidePackage.size() - 1 ) {
                 filesSB.append( " && echo '<<<" ).append( nano ).append( ">>>' && " );
             }
         }
 
-        String commandString = String.format(
-                "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' ) && dpkg-deb -x %2$s/$pkgFileName "
-                        + "%3$s/%1$s-%4$s && %5$s && rm -r %3$s/%1$s-%4$s", packageName,
-                Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
+        String commandString =
+                String.format( "pkgFileName=$(apt-cache show %1$s | grep -o '%1$s[^/]*deb$' | tr _ -) && dpkg-deb -x " +
+                                "%2$s/$pkgFileName " + "%3$s/%1$s-%4$s && %5$s && rm -r %3$s/%1$s-%4$s", packageName,
+                        Common.AMD64_ARCH_DEB_PACKAGES_LOCATION, Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano, filesSB );
 
         Command command = commandRunner
                 .createCommand( new RequestBuilder( commandString ).withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ),
