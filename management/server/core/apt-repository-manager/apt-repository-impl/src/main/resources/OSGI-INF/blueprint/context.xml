@@ -3,13 +3,10 @@
 
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
-  <reference id="communicationManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
 
   <bean id="aptRepositoryManager" scope="singleton"
         class="org.safehaus.subutai.impl.aptrepositorymanager.AptRepositoryManagerImpl">
     <argument ref="commandRunner" />
-    <argument ref="communicationManager" />
   </bean>
 
   <service ref="aptRepositoryManager" interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager" />

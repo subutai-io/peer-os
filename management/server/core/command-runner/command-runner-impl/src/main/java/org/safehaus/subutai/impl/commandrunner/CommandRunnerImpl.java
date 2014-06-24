@@ -138,9 +138,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 
     public Command createBroadcastCommand( RequestBuilder requestBuilder ) {
         Set<Agent> agents = agentManager.getAgents();
-        CommandImpl command = new CommandImpl( null, requestBuilder, agents );
-        command.setBroadcastCommand( true );
-        return command;
+        return new CommandImpl( requestBuilder, agents.size() );
     }
 
 

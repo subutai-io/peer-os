@@ -17,12 +17,9 @@ import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.api.aptrepositorymanager.PackageInfo;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
@@ -38,16 +35,12 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     private final String LINE_SEPARATOR = "\n";
 
     private CommandRunner commandRunner;
-    private CommunicationManager communicationManager;
 
 
-    public AptRepositoryManagerImpl( final CommandRunner commandRunner,
-                                     final CommunicationManager communicationManager ) {
+    public AptRepositoryManagerImpl( final CommandRunner commandRunner ) {
         Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
-        Preconditions.checkNotNull( communicationManager, "Communication Manager is null" );
 
         this.commandRunner = commandRunner;
-        this.communicationManager = communicationManager;
     }
 
 
@@ -195,22 +188,8 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 
 
     private void broadcastAptGetUpdateCommand() {
-        //        Request aptGetUpdateRequest =
-        //                new Request( "APT-MANAGER", RequestType.EXECUTE_REQUEST, UUID.randomUUID(),
-        // UUID.randomUUID(), 1, "/",
-        //                        "apt-get update", OutputRedirection.NO, OutputRedirection.NO, null, null, "root",
-        // null, null,
-        //                        null, 120 );
-        //        communicationManager.sendBroadcastRequest( aptGetUpdateRequest );
         Command command =
                 commandRunner.createBroadcastCommand( new RequestBuilder( "apt-get update" ).withTimeout( 90 ) );
-        commandRunner.runCommand( command, new CommandCallback() {
-            @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command ) {
-                if ( response.isFinal() ) {
-                    System.out.println( agentResult.getAgentUUID() + ":" + agentResult.getExitCode() );
-                }
-            }
-        } );
+        commandRunner.runCommandAsync( command );
     }
 }

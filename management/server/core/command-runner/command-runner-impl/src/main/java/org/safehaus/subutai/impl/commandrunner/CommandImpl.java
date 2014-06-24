@@ -64,6 +64,28 @@ public class CommandImpl implements Command {
 
 
     /**
+     * Constructor which initializes request based on supplied request builder. The same request produced by request
+     * builder will be sent to all connected agents. This is a broadcast command.
+     *
+     * @param requestBuilder - request builder used to produce request
+     * @param requestsCount - number of request to send
+     */
+    public CommandImpl( RequestBuilder requestBuilder, int requestsCount ) {
+
+        Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
+        Preconditions.checkArgument( requestsCount > 0, "Request Count <= 0" );
+
+        this.description = null;
+        this.broadcastCommand = true;
+        this.commandUUID = Util.generateTimeBasedUUID();
+        this.requestsCount = requestsCount;
+        this.timeout = requestBuilder.getTimeout();
+
+        requests.add( requestBuilder.build( commandUUID, commandUUID ) );
+    }
+
+
+    /**
      * Constructor which initializes request based on supplied request builder and set of agents. The same request
      * produced by request builder will be sent to supplied set of agents
      *
@@ -360,11 +382,6 @@ public class CommandImpl implements Command {
 
     public boolean isBroadcastCommand() {
         return broadcastCommand;
-    }
-
-
-    public void setBroadcastCommand( final boolean broadcastCommand ) {
-        this.broadcastCommand = broadcastCommand;
     }
 
 
