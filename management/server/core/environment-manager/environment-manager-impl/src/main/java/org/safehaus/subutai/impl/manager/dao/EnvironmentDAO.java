@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.manager.dao;
 
 
-import java.util.Set;
+import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -13,6 +13,7 @@ import org.safehaus.subutai.api.manager.helper.Environment;
 public class EnvironmentDAO {
 
     DbManager dbManager;
+    private String source = "ENV";
 
 
     public EnvironmentDAO( final DbManager dbManager ) {
@@ -20,23 +21,20 @@ public class EnvironmentDAO {
     }
 
 
-    public Set<Environment> getEnvironments() {
-        //TODO call database manager to retvieve list of environments data
-
-        return null;
+    public List<Environment> getEnvironments() {
+        List<Environment> environments = dbManager.getEnvironmentInfo( source, Environment.class );
+        return environments;
     }
 
 
     public Environment getEnvironment( final String environmentName ) {
-
-        //TODO call database manager to retrive environment by it's name
-        return null;
+        Environment environment = dbManager.getEnvironmentInfo( source, environmentName, Environment.class );
+        return environment;
     }
 
 
     public boolean saveEnvironment( final Environment environment ) {
-        //TODO call database manager to save environment into cassandra
-        dbManager.saveEnvironmentInfo( "ENV", environment.getName(), environment );
+        dbManager.saveEnvironmentInfo( source, environment.getName(), environment );
         return true;
     }
 }

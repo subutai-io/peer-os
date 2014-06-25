@@ -55,6 +55,12 @@ public class DbManagerMock implements DbManager {
 
 
     @Override
+    public <T> List<T> getEnvironmentInfo( final String source, final Class<T> clazz ) {
+        return null;
+    }
+
+
+    @Override
     public boolean deleteInfo( String source, String key ) {
         return deleteInfoResult;
     }

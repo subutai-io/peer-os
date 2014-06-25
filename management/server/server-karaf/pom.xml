@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -451,6 +451,23 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>git-manager-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Apt Repo Manager -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>apt-repository-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>apt-repository-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>apt-repository-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

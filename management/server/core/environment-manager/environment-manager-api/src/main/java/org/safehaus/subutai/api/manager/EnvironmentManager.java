@@ -6,6 +6,7 @@
 package org.safehaus.subutai.api.manager;
 
 
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -27,7 +28,7 @@ public interface EnvironmentManager {
      * Returns the set of existing environments.
      * @return
      */
-    public Set<Environment> getEnvironments();
+    public List<Environment> getEnvironments();
 
     /**
      * Gets the environment by given environment name.

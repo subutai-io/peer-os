@@ -28,5 +28,6 @@
     <module>apt-repository-manager</module>
     <module>environment-manager</module>
     <module>template-registry</module>
+    <module>template-manager</module>
   </modules>
 </project>

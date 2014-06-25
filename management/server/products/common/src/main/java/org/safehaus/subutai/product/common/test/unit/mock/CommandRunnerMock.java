@@ -62,4 +62,10 @@ public class CommandRunnerMock implements CommandRunner {
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
         return null;
     }
+
+
+    @Override
+    public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
+        return null;
+    }
 }

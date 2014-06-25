@@ -72,6 +72,8 @@ public interface DbManager {
      */
     public <T> List<T> getInfo( String source, Class<T> clazz );
 
+    public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz );
+
     /**
      * deletes POJO from DB
      *

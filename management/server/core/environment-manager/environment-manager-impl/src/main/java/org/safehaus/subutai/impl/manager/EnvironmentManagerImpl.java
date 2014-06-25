@@ -6,7 +6,7 @@
 package org.safehaus.subutai.impl.manager;
 
 
-import java.util.Set;
+import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
@@ -16,6 +16,7 @@ import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 
 
 /**
@@ -31,19 +32,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     public void setDbManager( final DbManager dbManager ) {
         this.dbManager = dbManager;
+        this.environmentDAO = new EnvironmentDAO( dbManager );
     }
 
 
-    public EnvironmentManagerImpl( ) {
-        this.environmentDAO = new EnvironmentDAO(dbManager);
+    public EnvironmentManagerImpl() {
         this.environmentBuilder = new EnvironmentBuilder();
     }
 
 
     /**
      * Builds an environment by provided blueprint description
-     * @param blueprintStr
-     * @return
      */
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
@@ -61,7 +60,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 return true;
             }
             catch ( EnvironmentBuildException e ) {
-                //                e.printStackTrace();
                 System.out.println( e.getMessage() );
             }
             finally {
@@ -73,8 +71,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public Set<Environment> getEnvironments() {
-        Set<Environment> environments = environmentDAO.getEnvironments();
+    public List<Environment> getEnvironments() {
+        System.out.println( "getEnvironments method executed..." );
+        List<Environment> environments = environmentDAO.getEnvironments();
         return environments;
     }
 
@@ -89,13 +88,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean destroyEnvironment( final String environmentName ) {
         Environment environment = getEnvironmentInfo( environmentName );
-        boolean destroyResult;
-        if ( environmentBuilder.destroy( environment ) ) {
-            destroyResult = true;
+        try {
+            environmentBuilder.destroy( environment );
+            //TODO environmentDAO.deleteEnvironmentInfo( environment.getName() );
+            return true;
         }
-        else {
-            destroyResult = false;
+        catch ( EnvironmentInstanceDestroyException e ) {
+            e.printStackTrace();
         }
-        return true;
+        return false;
     }
 }

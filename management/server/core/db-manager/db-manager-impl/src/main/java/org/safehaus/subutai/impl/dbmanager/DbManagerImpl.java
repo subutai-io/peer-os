@@ -230,7 +230,8 @@ public class DbManagerImpl implements DbManager {
     public <T> T getEnvironmentInfo( String source, String key, Class<T> clazz ) {
         try {
 
-            ResultSet rs = executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
+            ResultSet rs =
+                    executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
             if ( rs != null ) {
                 Row row = rs.one();
                 if ( row != null ) {
@@ -259,6 +260,24 @@ public class DbManagerImpl implements DbManager {
         List<T> list = new ArrayList<>();
         try {
             ResultSet rs = executeQuery( "select info from product_info where source = ?", source );
+            if ( rs != null ) {
+                for ( Row row : rs ) {
+                    String info = row.getString( "info" );
+                    list.add( gson.fromJson( info, clazz ) );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            LOG.log( Level.SEVERE, "Error in List<T> getInfo", ex );
+        }
+        return list;
+    }
+
+
+    public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz ) {
+        List<T> list = new ArrayList<>();
+        try {
+            ResultSet rs = executeQuery( "select info from environment_info where source = ?", source );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );

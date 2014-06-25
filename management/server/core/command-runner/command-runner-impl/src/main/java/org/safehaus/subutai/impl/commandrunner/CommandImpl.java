@@ -59,6 +59,30 @@ public class CommandImpl implements Command {
     private volatile int requestsSucceeded = 0;
     //custom object assigned to this command
     private Object data;
+    //indicates if this command is broadcast command
+    private boolean broadcastCommand;
+
+
+    /**
+     * Constructor which initializes request based on supplied request builder. The same request produced by request
+     * builder will be sent to all connected agents. This is a broadcast command.
+     *
+     * @param requestBuilder - request builder used to produce request
+     * @param requestsCount - number of request to send
+     */
+    public CommandImpl( RequestBuilder requestBuilder, int requestsCount ) {
+
+        Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
+        Preconditions.checkArgument( requestsCount > 0, "Request Count <= 0" );
+
+        this.description = null;
+        this.broadcastCommand = true;
+        this.commandUUID = Util.generateTimeBasedUUID();
+        this.requestsCount = requestsCount;
+        this.timeout = requestBuilder.getTimeout();
+
+        requests.add( requestBuilder.build( commandUUID, commandUUID ) );
+    }
 
 
     /**
@@ -356,12 +380,27 @@ public class CommandImpl implements Command {
     }
 
 
+    public boolean isBroadcastCommand() {
+        return broadcastCommand;
+    }
+
+
     @Override
     public String toString() {
-        return "CommandImpl{" + "results=" + results + ", requestsCount=" + requestsCount + ", commandUUID="
-                + commandUUID + ", requests=" + requests + ", timeout=" + timeout + ", completionSemaphore="
-                + completionSemaphore + ", updateLock=" + updateLock + ", commandStatus=" + commandStatus
-                + ", requestsCompleted=" + requestsCompleted + ", requestsSucceeded=" + requestsSucceeded + ", data="
-                + data + ", description=" + description + '}';
+        return "CommandImpl{" +
+                "results=" + results +
+                ", requestsCount=" + requestsCount +
+                ", commandUUID=" + commandUUID +
+                ", requests=" + requests +
+                ", timeout=" + timeout +
+                ", completionSemaphore=" + completionSemaphore +
+                ", updateLock=" + updateLock +
+                ", description='" + description + '\'' +
+                ", commandStatus=" + commandStatus +
+                ", requestsCompleted=" + requestsCompleted +
+                ", requestsSucceeded=" + requestsSucceeded +
+                ", data=" + data +
+                ", broadcastCommand=" + broadcastCommand +
+                '}';
     }
 }

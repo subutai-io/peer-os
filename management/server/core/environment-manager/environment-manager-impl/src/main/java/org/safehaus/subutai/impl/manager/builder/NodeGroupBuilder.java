@@ -16,7 +16,7 @@ public class NodeGroupBuilder {
     InstanceBuilder instanceCreator;
 
 
-    public NodeGroupBuilder( ) {
+    public NodeGroupBuilder() {
         this.instanceCreator = new InstanceBuilder();
     }
 
@@ -24,10 +24,11 @@ public class NodeGroupBuilder {
     public EnvironmentNodeGroup build( final NodeGroup nodeGroup ) throws NodeGroupBuildException {
 
         EnvironmentNodeGroup environmentNodeGroup = new EnvironmentNodeGroup();
-        for(int i = 0; i < nodeGroup.getNumberOfNodes(); i++) {
+        for ( int i = 0; i < nodeGroup.getNumberOfNodes(); i++ ) {
             try {
-                EnvironmentGroupInstance environmentGroupInstance = instanceCreator.build( nodeGroup.getPhysicalNodes(),
-                        nodeGroup.getPlacementStrategyENUM(), nodeGroup.getTemplateName() );
+                EnvironmentGroupInstance environmentGroupInstance = instanceCreator
+                        .build( nodeGroup.getPhysicalNodes(), nodeGroup.getPlacementStrategyENUM(),
+                                nodeGroup.getTemplateName() );
 
                 // call Network bundle for
                 // nodeGroup.isExchangeSshKeys();
@@ -37,33 +38,25 @@ public class NodeGroupBuilder {
                 environmentNodeGroup.getEnvironmentGroupInstanceSet().add( environmentGroupInstance );
             }
             catch ( InstanceCreateException e ) {
-//                e.printStackTrace();
-                System.out.println(e.getMessage());
+                //                e.printStackTrace();
+                System.out.println( e.getMessage() );
                 // TODO rollback action
 
             }
             finally {
-                throw new NodeGroupBuildException("Error building environment node group");
+                throw new NodeGroupBuildException( "Error building environment node group" );
             }
         }
         return environmentNodeGroup;
     }
 
 
-    public boolean destroy( final EnvironmentNodeGroup environmentNodeGroup ) {
+    public boolean destroy( final EnvironmentNodeGroup environmentNodeGroup )
+            throws EnvironmentInstanceDestroyException {
         for ( EnvironmentGroupInstance environmentGroupInstance : environmentNodeGroup
                 .getEnvironmentGroupInstanceSet() ) {
-            try {
-                instanceCreator.destroy( environmentGroupInstance );
-            }
-            catch ( EnvironmentInstanceDestroyException e ) {
-//                e.printStackTrace();
-                e.getMessage();
-                //TODO log destroy status log
-            }
-            finally {
-                return false;
-            }
+            instanceCreator.destroy( environmentGroupInstance );
+            //TODO log destroy status log
         }
         return true;
     }
