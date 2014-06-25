@@ -905,6 +905,7 @@
     display: inline-block;
     overflow: hidden;
     vertical-align: middle;
+    color: #ffffff;
 }
 
 .dashboard .v-caption .v-required-field-indicator {
@@ -5281,10 +5282,6 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-label {
-    color: #ffffff;
-}
-
-.dashboard .v-captiontext {
     color: #ffffff;
 }
 
