@@ -5280,6 +5280,14 @@ body .dashboard.v-app .v-app-loading {
     line-height: 18px;
 }
 
+.dashboard .v-label {
+    color: #ffffff;
+}
+
+.dashboard .v-captiontext {
+    color: #ffffff;
+}
+
 .dashboard .reports .draft-thumb .v-label span {
     color: #c1c3c8;
     font-size: 12px;
