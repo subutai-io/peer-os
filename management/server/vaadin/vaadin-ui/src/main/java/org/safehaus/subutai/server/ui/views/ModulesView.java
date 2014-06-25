@@ -89,13 +89,13 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
 	private void addModule(final PortalModule module) {
 		if (module.getImage() != null) {
-			CssLayout moduleLayout = new CssLayout();
-			moduleLayout.setId(module.getId());
-			moduleLayout.setWidth(150, Unit.PIXELS);
-			moduleLayout.setHeight(200, Unit.PIXELS);
-			moduleLayout.addStyleName("create");
+			if (!contains(module)) {
+				CssLayout moduleLayout = new CssLayout();
+				moduleLayout.setId(module.getId());
+				moduleLayout.setWidth(150, Unit.PIXELS);
+				moduleLayout.setHeight(200, Unit.PIXELS);
+				moduleLayout.addStyleName("create");
 
-			if (!modulesList.contains(moduleLayout)) {
 				moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
 					@Override
 					public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
@@ -112,6 +112,16 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 				modulesList.add(moduleLayout);
 			}
 		}
+	}
+
+	private boolean contains(PortalModule module) {
+		for (Component component : modulesList) {
+			if (module.getId().equals(component.getId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public void autoCreate(PortalModule module) {
