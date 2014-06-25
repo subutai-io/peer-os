@@ -1,10 +1,10 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import java.util.Set;
+import java.util.List;
 
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -32,12 +32,19 @@ public class ListEnvironmentsCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Set<Environment> environments = environmentManager.getEnvironments();
-        if ( environments.size() > 0 ) for ( Environment environment : environments ) {
-            System.out.println( environment.getName() );
+        List<Environment> environments = environmentManager.getEnvironments();
+        if ( environments != null ) {
+            if ( environments.size() > 0 ) {
+                for ( Environment environment : environments ) {
+                    System.out.println( environment.getName() );
+                }
+            }
+            else {
+                System.out.println( "No environments found." );
+            }
         }
         else {
-            System.out.println("No environments found.");
+            System.out.println( "No environments found." );
         }
         return null;
     }

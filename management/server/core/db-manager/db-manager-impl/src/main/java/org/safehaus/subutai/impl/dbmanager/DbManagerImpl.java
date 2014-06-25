@@ -192,6 +192,12 @@ public class DbManagerImpl implements DbManager {
     }
 
 
+    public boolean saveEnvironmentInfo( String source, String key, Object info ) {
+        return executeUpdate( "insert into environment_info(source,key,info) values (?,?,?)", source, key,
+                gson.toJson( info ) );
+    }
+
+
     /**
      * Returns POJO from DB
      *
@@ -221,6 +227,27 @@ public class DbManagerImpl implements DbManager {
     }
 
 
+    public <T> T getEnvironmentInfo( String source, String key, Class<T> clazz ) {
+        try {
+
+            ResultSet rs =
+                    executeQuery( "select info from environment_info where source = ? and key = ?", source, key );
+            if ( rs != null ) {
+                Row row = rs.one();
+                if ( row != null ) {
+
+                    String info = row.getString( "info" );
+                    return gson.fromJson( info, clazz );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            LOG.log( Level.SEVERE, "Error in T getInfo", ex );
+        }
+        return null;
+    }
+
+
     /**
      * Returns all POJOs from DB identified by source key
      *
@@ -233,6 +260,24 @@ public class DbManagerImpl implements DbManager {
         List<T> list = new ArrayList<>();
         try {
             ResultSet rs = executeQuery( "select info from product_info where source = ?", source );
+            if ( rs != null ) {
+                for ( Row row : rs ) {
+                    String info = row.getString( "info" );
+                    list.add( gson.fromJson( info, clazz ) );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            LOG.log( Level.SEVERE, "Error in List<T> getInfo", ex );
+        }
+        return list;
+    }
+
+
+    public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz ) {
+        List<T> list = new ArrayList<>();
+        try {
+            ResultSet rs = executeQuery( "select info from environment_info where source = ?", source );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );

@@ -47,6 +47,8 @@ public interface DbManager {
      */
     public boolean saveInfo( String source, String key, Object info );
 
+    public boolean saveEnvironmentInfo( String source, String key, Object info );
+
     /**
      * Returns POJO from DB
      *
@@ -58,6 +60,8 @@ public interface DbManager {
      */
     public <T> T getInfo( String source, String key, Class<T> clazz );
 
+    public <T> T getEnvironmentInfo( String source, String key, Class<T> clazz );
+
     /**
      * Returns all POJOs from DB identified by source key
      *
@@ -67,6 +71,8 @@ public interface DbManager {
      * @return - list of POJOs
      */
     public <T> List<T> getInfo( String source, Class<T> clazz );
+
+    public <T> List<T> getEnvironmentInfo( String source, Class<T> clazz );
 
     /**
      * deletes POJO from DB

@@ -2,4 +2,26 @@
 set -e
 FilePath="/etc/profile"
 
+hbaseVersion=0.94.16
+hbaseConf="/opt/hbase-$hbaseVersion/conf"
+
+
+escape_characters()
+{
+	temp_value=$1
+	#echo "Escaping some special characters like '/' for name:" $temp_name "and value:" $temp_value	
+	escaped_value=$(echo $temp_value | sed -e 's/\//\\\//g')
+	#echo "Escaped Value:" $escaped_value  
+}
+
+# Replace the comment with the real export in the file
+if [ "x$JAVA_HOME" = "x" ];
+then
+    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hbaseConf/hbase-env.sh
+else
+    escape_characters $JAVA_HOME
+    echo "Using JAVA_HOME:" $JAVA_HOME
+    sed -i 's/export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
+fi
+
 . $FilePath

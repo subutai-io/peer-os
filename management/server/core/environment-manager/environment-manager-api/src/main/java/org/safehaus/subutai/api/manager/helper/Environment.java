@@ -31,4 +31,13 @@ public class Environment {
     public void setEnvironmentNodeGroups( final Set<EnvironmentNodeGroup> environmentNodeGroups ) {
         this.environmentNodeGroups = environmentNodeGroups;
     }
+
+
+    @Override
+    public String toString() {
+        return "Environment{" +
+                "name='" + name + '\'' +
+                ", environmentNodeGroups=" + environmentNodeGroups +
+                '}';
+    }
 }

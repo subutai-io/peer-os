@@ -31,13 +31,31 @@ public class DbManagerMock implements DbManager {
 
 
     @Override
+    public boolean saveEnvironmentInfo( final String source, final String key, final Object info ) {
+        return false;
+    }
+
+
+    @Override
     public <T> T getInfo( String source, String key, Class<T> clazz ) {
         return null;
     }
 
 
     @Override
+    public <T> T getEnvironmentInfo( final String source, final String key, final Class<T> clazz ) {
+        return null;
+    }
+
+
+    @Override
     public <T> List<T> getInfo( String source, Class<T> clazz ) {
+        return null;
+    }
+
+
+    @Override
+    public <T> List<T> getEnvironmentInfo( final String source, final Class<T> clazz ) {
         return null;
     }
 
