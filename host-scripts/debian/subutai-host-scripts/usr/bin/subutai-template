@@ -3,7 +3,7 @@
 # Also sources everything we need
 . /etc/subutai/funcs
 
-local lxc="$1"
+lxc="$1"
 
 function usage {
   echo -----------------------------------------------------------------------
@@ -58,7 +58,7 @@ else
   msg_info "    - check passed: \"$lxc\" is NOT registered"
 fi
 
-local parent=`zfs_get_parent $lxc`
+parent=`zfs_get_parent $lxc`
 lxc_assert $parent
 # check to make sure the parent is a template
 if [ "`zfs_is_template $parent`" == "false" ]; then
@@ -86,7 +86,7 @@ fi
 # (2) replace package manifest next to config file
 # -----------------------------------------------------------------------------
 
-local lxc_home=/var/lib/lxc/$lxc
+lxc_home=/var/lib/lxc/$lxc
 echo `lxc-attach -n $lxc -- dpkg -l` > $lxc_home/packages
 
 # -----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ echo `lxc-attach -n $lxc -- dpkg -l` > $lxc_home/packages
 # -----------------------------------------------------------------------------
 
 # add and commit all uncommitted files (should be some: /etc/hosts)
-local uuid=`git_add_commit $lxc`
+uuid=`git_add_commit $lxc`
 
 # inject the commit UUID 
 echo "subutai.git.uuid = $uuid" >> $lxc_home/config
@@ -129,8 +129,8 @@ zfs hold keep lxc-data/$lxc-home@template
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
 # -----------------------------------------------------------------------------
 
-local deb_root="$SUBUTAI_TMPDIR/$lxc"
-local deltas="$deb_root/deltas"
+deb_root="$SUBUTAI_TMPDIR/$lxc"
+deltas="$deb_root/deltas"
 mkdir -p $deltas
 zfs send -I "lxc/$parent@template" "lxc/$lxc@template" > "$deltas/rootfs.delta"
 zfs send -I "lxc/$parent-opt@template" "lxc/$lxc-opt@template" > "$deltas/opt.delta"
@@ -146,7 +146,7 @@ cp /var/lib/lxc/$lxc/config "$deb_root"
 cp /var/lib/lxc/$lxc/fstab  "$deb_root"
 cp /var/lib/lxc/$lxc/packages  "$deb_root"
 
-local pkg=`deb_pkg $lxc`
+pkg=`deb_pkg $lxc`
 
 # delete me after deb_pkg works
 #pushd . >> /dev/null
