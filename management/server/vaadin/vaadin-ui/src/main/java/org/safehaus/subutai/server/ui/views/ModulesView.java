@@ -32,7 +32,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
 	private TabSheet editors;
 	private CssLayout modulesLayout;
-	private List<Component> modulesList = new ArrayList<>();
+	private List<PortalModule> modulesList = new ArrayList<>();
 
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -108,7 +108,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 				moduleLayout.addComponent(image);
 
 				modulesLayout.addComponent(moduleLayout);
-				modulesList.add(moduleLayout);
+				modulesList.add(module);
 			}
 		}
 	}
