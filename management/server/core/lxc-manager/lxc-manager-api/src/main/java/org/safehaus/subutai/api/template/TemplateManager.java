@@ -22,9 +22,7 @@ public interface TemplateManager {
      */
     public Agent clone(String hostName, String templateName, String cloneName);
 
-    public Set<Agent> clone(Set<String> hostNames, String templateName, String cloneName);
-
-    public Set<Agent> clone(Set<String> hostNames, String templateName, String cloneName, PlacementStrategyENUM strategy);
+    public Agent clone(Set<String> hostNames, String templateName, String cloneName, PlacementStrategyENUM... strategy);
 
     /**
      * Destroys a clone with given name.
