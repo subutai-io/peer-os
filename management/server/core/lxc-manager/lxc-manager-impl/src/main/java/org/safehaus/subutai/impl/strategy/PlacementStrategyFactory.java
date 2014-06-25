@@ -5,20 +5,11 @@ import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 
 public class PlacementStrategyFactory {
 
-    private PlacementStrategyFactory() {
+    public static LxcPlacementStrategy create(PlacementStrategyENUM... strategy) {
+        if(strategy == null || strategy.length == 0)
+            return new DefaultLxcPlacementStrategy(1);
+
+        return new BestServerStrategy(strategy);
     }
 
-    public static PlacementStrategyFactory getInstance() {
-        return PlacementStrategyFactoryHolder.INSTANCE;
-    }
-
-    public LxcPlacementStrategy create(PlacementStrategyENUM strategy) {
-        LxcPlacementStrategy st = new DefaultLxcPlacementStrategy(1);
-        return st;
-    }
-
-    private static class PlacementStrategyFactoryHolder {
-
-        private static final PlacementStrategyFactory INSTANCE = new PlacementStrategyFactory();
-    }
 }
