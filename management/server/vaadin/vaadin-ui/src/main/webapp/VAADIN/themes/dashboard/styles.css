@@ -4833,6 +4833,7 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-tabsheet-tabitemcell .v-captiontext {
     vertical-align: baseline;
+    color: inherit;
 }
 
 .dashboard .v-tabsheet-tabitem {
