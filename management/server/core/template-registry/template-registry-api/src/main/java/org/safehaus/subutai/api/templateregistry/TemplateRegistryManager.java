@@ -6,28 +6,22 @@
 package org.safehaus.subutai.api.templateregistry;
 
 
+import java.util.List;
+
+
 /**
  */
 public interface TemplateRegistryManager {
 
-    public void getTemplates();
+    public void registerTemplate( String configFile, String packagesFile );
 
-    public void getInstances();
+    public void unregisterTemplate( String templateName );
 
-    public void createNewTemplate();
+    public Template getTemplate( String templateName );
 
-    public void commitTemplate();
+    public List<Template> getTemplatesByParent( String parentTemplateName );
 
-    public void destoryTemplate();
-
-    public void getTsarFilesInfo();
-
-    public void getTsarFileDescriptor();
-
-    public void deleteTsarFile();
-
-    public void pushTsarFileAsDebPackageIntoRepository();
-
+    public Template getParentTemplate( String childTemplateName );
 
 
 }
