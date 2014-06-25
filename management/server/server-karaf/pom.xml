@@ -622,7 +622,7 @@
                                 </artifactItem>-->
 
                                 <!--Cassandra-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-api</artifactId>
                                     <version>${project.version}</version>
@@ -646,7 +646,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>cassandra-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--MongoDB-->
                                 <!--<artifactItem>

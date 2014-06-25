@@ -101,7 +101,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 				}
 			});
 
-			Image image = new Image(/*module.getName()*/"", new FileResource(module.getImage()));
+			Image image = new Image("", new FileResource(module.getImage()));
 			image.setWidth(90, Unit.PERCENTAGE);
 			image.setDescription(module.getName());
 			moduleLayout.addComponent(image);
