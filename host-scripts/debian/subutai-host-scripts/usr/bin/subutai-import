@@ -41,17 +41,23 @@ fi
 # (1) Expand out the tsar file
 # -----------------------------------------------------------------------------
 
-tsar="$SUBUTAI_TMPDIR/$container".tsar
+debian_file="$SUBUTAI_TMPDIR/$container"-subutai-template.deb
 
-if [ ! -f "$tsar" ]; then
-  msg_error "Could not find template file \"$tsar\". Aborting ..."
+if [ ! -f "$debian_file" ]; then
+  msg_error "Could not find template file \"$debian_file\". Aborting ..."
   exit 1
 fi
 
 pushd . > /dev/null
 cd $SUBUTAI_TMPDIR
-tar -zxf "$container".tsar
+dpkg -i $container-subutai-template.deb
 popd > /dev/null
+
+# Delete this after debian works
+#pushd . > /dev/null
+#cd $SUBUTAI_TMPDIR
+#tar -zxf "$container".tsar
+#popd > /dev/null
 
 # -----------------------------------------------------------------------------
 # (2) perform sanity checks first

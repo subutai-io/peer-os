@@ -4,7 +4,7 @@
 export SUBUTAI_VERSION=2.1.0
 
 # LAN mirror on management server used instead of going over the WAN
-export SUBUTAI_APT_MIRROR=172.16.2.140
+#export SUBUTAI_APT_MIRROR=172.16.2.140
 
 # The Site Git Repository: set to have push take place on template creation
 export SUBUTAI_SITE_GIT=
@@ -40,4 +40,3 @@ export SUBUTAI_CONFIG_PATH=/etc
 # A colon separated list of non-overlapping application data paths
 # which need to be tracked in 
 export SUBUTAI_APP_DATA_PATH=/var
-
