@@ -12,6 +12,17 @@ public class EnvironmentGroupInstance {
 
     private String name;
     private Agent agent;
+    private PlacementStrategyENUM placementStrategyENUM;
+
+
+    public PlacementStrategyENUM getPlacementStrategyENUM() {
+        return placementStrategyENUM;
+    }
+
+
+    public void setPlacementStrategyENUM( final PlacementStrategyENUM placementStrategyENUM ) {
+        this.placementStrategyENUM = placementStrategyENUM;
+    }
 
 
     public String getName() {
