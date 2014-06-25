@@ -1,6 +1,7 @@
 package org.safehaus.subutai.api.manager.helper;
 
 
+import java.util.Date;
 import java.util.Set;
 
 
@@ -11,6 +12,8 @@ public class Environment {
 
     private String name;
     private Set<EnvironmentNodeGroup> environmentNodeGroups;
+    private String owner;
+    private Date creationDate;
 
 
     public String getName() {

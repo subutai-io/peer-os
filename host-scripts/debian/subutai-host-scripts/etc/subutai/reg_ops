@@ -16,9 +16,9 @@ function is_registered {
 # this function needs to take the supplied tsar file and upload and 
 # register it with the Subutai management server.
 function send_n_register {
-  local tsar=$1
+  local debian_file=$1
 
-  msg_ok "TSAR file $tsar registered and sent to management server"
+  msg_ok "DEBIAN file $debian_file registered and sent to management server"
 } 
 
 

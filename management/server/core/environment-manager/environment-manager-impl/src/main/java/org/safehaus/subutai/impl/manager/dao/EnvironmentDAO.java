@@ -13,6 +13,7 @@ import org.safehaus.subutai.api.manager.helper.Environment;
 public class EnvironmentDAO {
 
     DbManager dbManager;
+    private String source = "ENV";
 
 
     public EnvironmentDAO( final DbManager dbManager ) {
@@ -21,19 +22,19 @@ public class EnvironmentDAO {
 
 
     public List<Environment> getEnvironments() {
-        List<Environment> environments = dbManager.getEnvironmentInfo( "ENV", Environment.class );
+        List<Environment> environments = dbManager.getEnvironmentInfo( source, Environment.class );
         return environments;
     }
 
 
     public Environment getEnvironment( final String environmentName ) {
-        Environment environment = dbManager.getEnvironmentInfo( "ENV", environmentName, Environment.class );
+        Environment environment = dbManager.getEnvironmentInfo( source, environmentName, Environment.class );
         return environment;
     }
 
 
     public boolean saveEnvironment( final Environment environment ) {
-        dbManager.saveEnvironmentInfo( "ENV", environment.getName(), environment );
+        dbManager.saveEnvironmentInfo( source, environment.getName(), environment );
         return true;
     }
 }

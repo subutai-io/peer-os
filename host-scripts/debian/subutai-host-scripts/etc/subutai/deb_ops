@@ -42,7 +42,7 @@ function deb_pkg {
   local lxc="$1"
   local tmp="$SUBUTAI_TMPDIR"
   local tmp_path="$tmp/$lxc"
-  debian_tmp_dir=/tmp/debian/$lxc-subutai-template
+  debian_tmp_dir=$SUBUTAI_TMPDIR/$lxc-subutai-template
   local md5sum_file=$debian_tmp_dir/DEBIAN/md5sums
   output_dir=$debian_tmp_dir/$tmp_path
 
@@ -116,7 +116,7 @@ function create_control_file {
 function create_postinst_script {
   local postinst_file=$debian_tmp_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
+  echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  echo "subutai-import" >> $postinst_file
   chmod +x $postinst_file
 }
