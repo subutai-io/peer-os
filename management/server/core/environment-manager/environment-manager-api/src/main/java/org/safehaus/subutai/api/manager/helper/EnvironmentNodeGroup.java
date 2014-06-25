@@ -10,6 +10,18 @@ import java.util.Set;
 public class EnvironmentNodeGroup {
 
 
+    private String templateUsed;
+
+
+    public String getTemplateUsed() {
+        return templateUsed;
+    }
+
+
+    public void setTemplateUsed( final String templateUsed ) {
+        this.templateUsed = templateUsed;
+    }
+
 
     Set<EnvironmentGroupInstance> environmentGroupInstanceSet;
 
