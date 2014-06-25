@@ -39,7 +39,7 @@ public class Wizard {
 		verticalLayout.removeAllComponents();
 		switch (step) {
 			case 1: {
-				verticalLayout.addComponent(new WelcomeStep(this));
+				verticalLayout.addComponent(new StepStart(this));
 				break;
 			}
 			case 2: {
