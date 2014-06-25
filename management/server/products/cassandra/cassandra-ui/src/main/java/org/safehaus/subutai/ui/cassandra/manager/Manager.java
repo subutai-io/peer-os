@@ -30,9 +30,10 @@ import java.util.UUID;
  */
 public class Manager {
 
-	private final VerticalLayout contentRoot;
-	private final ComboBox clusterCombo;
 	private final Table nodesTable;
+	private VerticalLayout contentRoot;
+	private ComboBox clusterCombo;
+	private HorizontalLayout controlsContent;
 	private Config config;
 
 
@@ -42,23 +43,60 @@ public class Manager {
 		contentRoot.setSpacing(true);
 		contentRoot.setSizeFull();
 
-		VerticalLayout content = new VerticalLayout();
-		content.setSizeFull();
-
-		contentRoot.addComponent(content);
-		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
-		contentRoot.setMargin(true);
-
 		//tables go here
-		nodesTable = createTableTemplate("Cluster nodes", 300);
+		nodesTable = createTableTemplate("Cluster nodes");
 
-		HorizontalLayout controlsContent = new HorizontalLayout();
+		controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
+		controlsContent.setHeight(20, Sizeable.Unit.PERCENTAGE);
 
+		getClusterNameLabel();
+		getClusterCombo();
+		getRefreshClusterButton();
+		getCheckAllButton();
+		getStartAllButton();
+		getStopAllButton();
+		getDestroyClusterButton();
+
+		contentRoot.addComponent(controlsContent);
+		contentRoot.addComponent(nodesTable);
+
+	}
+
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setHeight(80, Sizeable.Unit.PERCENTAGE);
+		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), CassandraUI.getExecutor(), CassandraUI.getCommandRunner(), CassandraUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void getClusterNameLabel() {
 		Label clusterNameLabel = new Label("Select the cluster");
 		controlsContent.addComponent(clusterNameLabel);
 		controlsContent.setComponentAlignment(clusterNameLabel, Alignment.MIDDLE_CENTER);
+	}
 
+	private void getClusterCombo() {
 		clusterCombo = new ComboBox();
 		clusterCombo.setImmediate(true);
 		clusterCombo.setTextInputAllowed(false);
@@ -70,9 +108,10 @@ public class Manager {
 				refreshUI();
 			}
 		});
-
 		controlsContent.addComponent(clusterCombo);
+	}
 
+	private void getRefreshClusterButton() {
 		Button refreshClustersBtn = new Button("Refresh clusters");
 		refreshClustersBtn.addStyleName("default");
 		refreshClustersBtn.addClickListener(new Button.ClickListener() {
@@ -81,9 +120,10 @@ public class Manager {
 				refreshClustersInfo();
 			}
 		});
-
 		controlsContent.addComponent(refreshClustersBtn);
+	}
 
+	private void getCheckAllButton() {
 		Button checkAllBtn = new Button("Check all");
 		checkAllBtn.addStyleName("default");
 		checkAllBtn.addClickListener(new Button.ClickListener() {
@@ -102,7 +142,9 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(checkAllBtn);
+	}
 
+	private void getStartAllButton() {
 		Button startAllBtn = new Button("Start all");
 		startAllBtn.addStyleName("default");
 		startAllBtn.addClickListener(new Button.ClickListener() {
@@ -121,7 +163,9 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(startAllBtn);
+	}
 
+	private void getStopAllButton() {
 		Button stopAllBtn = new Button("Stop all");
 		stopAllBtn.addStyleName("default");
 		stopAllBtn.addClickListener(new Button.ClickListener() {
@@ -139,6 +183,10 @@ public class Manager {
 			}
 		});
 
+		controlsContent.addComponent(stopAllBtn);
+	}
+
+	private void getDestroyClusterButton() {
 		Button destroyClusterBtn = new Button("Destroy cluster");
 		destroyClusterBtn.addStyleName("default");
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
@@ -171,38 +219,11 @@ public class Manager {
 			}
 		});
 
-		controlsContent.addComponent(stopAllBtn);
 		controlsContent.addComponent(destroyClusterBtn);
-		content.addComponent(controlsContent);
-		content.addComponent(nodesTable);
-
 	}
 
-	private Table createTableTemplate(String caption, int size) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		table.setHeight(size, Sizeable.Unit.PIXELS);
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), CassandraUI.getExecutor(), CassandraUI.getCommandRunner(), CassandraUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	private void show(String notification) {
+		Notification.show(notification);
 	}
 
 	private void refreshUI() {
@@ -234,10 +255,6 @@ public class Manager {
 				clusterCombo.setValue(info.iterator().next());
 			}
 		}
-	}
-
-	private void show(String notification) {
-		Notification.show(notification);
 	}
 
 	private void populateTable(final Table table, Set<Agent> agents) {
