@@ -50,6 +50,7 @@ public class Manager {
 
 		controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
+		controlsContent.setSizeFull();
 
 		getClusterNameLabel();
 		getClusterCombo();
@@ -68,6 +69,7 @@ public class Manager {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
 		table.setPageLength(10);
 		table.setSelectable(false);
 		table.setImmediate(true);
