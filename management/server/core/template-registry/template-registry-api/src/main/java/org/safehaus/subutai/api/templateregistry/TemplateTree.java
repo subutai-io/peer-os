@@ -35,11 +35,14 @@ public class TemplateTree {
 
     public Template getParentTemplate( String childTemplateName ) {
         String parentTemplateName = getParentTemplateName( childTemplateName );
-
-        List<Template> templates = getChildrenTemplates( parentTemplateName );
-        for ( Template template : templates ) {
-            if ( childTemplateName.equalsIgnoreCase( template.getTemplateName() ) ) {
-                return template;
+        if ( parentTemplateName != null ) {
+            List<Template> templates = getChildrenTemplates( getParentTemplateName( parentTemplateName ) );
+            if ( templates != null ) {
+                for ( Template template : templates ) {
+                    if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) ) {
+                        return template;
+                    }
+                }
             }
         }
         return null;
