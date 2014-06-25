@@ -50,7 +50,7 @@ public class Manager {
 
 		controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
-		controlsContent.setSizeFull();
+		controlsContent.setHeight(100, Sizeable.Unit.PERCENTAGE);
 
 		getClusterNameLabel();
 		getClusterCombo();
@@ -108,7 +108,9 @@ public class Manager {
 				refreshUI();
 			}
 		});
+
 		controlsContent.addComponent(clusterCombo);
+		controlsContent.setComponentAlignment(clusterCombo, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getRefreshClusterButton() {
@@ -120,7 +122,9 @@ public class Manager {
 				refreshClustersInfo();
 			}
 		});
+
 		controlsContent.addComponent(refreshClustersBtn);
+		controlsContent.setComponentAlignment(refreshClustersBtn, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getCheckAllButton() {
@@ -142,6 +146,7 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(checkAllBtn);
+		controlsContent.setComponentAlignment(checkAllBtn, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getStartAllButton() {
@@ -163,6 +168,7 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(startAllBtn);
+		controlsContent.setComponentAlignment(startAllBtn, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getStopAllButton() {
@@ -184,6 +190,7 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(stopAllBtn);
+		controlsContent.setComponentAlignment(stopAllBtn, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getDestroyClusterButton() {
@@ -220,6 +227,7 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(destroyClusterBtn);
+		controlsContent.setComponentAlignment(destroyClusterBtn, Alignment.MIDDLE_CENTER);
 	}
 
 	private void show(String notification) {
