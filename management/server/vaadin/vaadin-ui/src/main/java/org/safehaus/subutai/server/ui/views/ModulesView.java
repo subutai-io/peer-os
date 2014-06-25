@@ -32,7 +32,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
 	private TabSheet editors;
 	private CssLayout modulesLayout;
-	private List<PortalModule> modulesList = new ArrayList<>();
+	private List<Component> modulesList = new ArrayList<>();
 
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -89,12 +89,13 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
 	private void addModule(final PortalModule module) {
 		if (module.getImage() != null) {
-			if (!modulesList.contains(module)) {
-				CssLayout moduleLayout = new CssLayout();
-				moduleLayout.setId(module.getId());
-				moduleLayout.setWidth(150, Unit.PIXELS);
-				moduleLayout.setHeight(200, Unit.PIXELS);
-				moduleLayout.addStyleName("create");
+			CssLayout moduleLayout = new CssLayout();
+			moduleLayout.setId(module.getId());
+			moduleLayout.setWidth(150, Unit.PIXELS);
+			moduleLayout.setHeight(200, Unit.PIXELS);
+			moduleLayout.addStyleName("create");
+
+			if (!modulesList.contains(moduleLayout)) {
 				moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
 					@Override
 					public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
@@ -108,7 +109,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 				moduleLayout.addComponent(image);
 
 				modulesLayout.addComponent(moduleLayout);
-				modulesList.add(module);
+				modulesList.add(moduleLayout);
 			}
 		}
 	}
@@ -129,7 +130,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	public void moduleUnregistered(PortalModule module) {
 
 		for (Component component : modulesList) {
-			if (component.getId().equals(component.getId())) {
+			if (component.getId().equals(module.getId())) {
 				modulesLayout.removeComponent(component);
 				modulesList.remove(component);
 				break;
