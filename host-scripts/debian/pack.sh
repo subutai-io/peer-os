@@ -25,7 +25,8 @@ versionSecond=$(echo $version | awk -F"." '{print $2}')
 versionThird=$(echo $version | awk -F"." '{print $3}')
 
 # Increment least significant version number automatically by one
-updatedVersionThird=$(echo `expr $versionThird + 1`)
+#updatedVersionThird=$(echo `expr $versionThird + 1`)
+updatedVersionThird=$versionThird
 updatedRelease=$versionFirst.$versionSecond.$updatedVersionThird
 replaceVersion="Version: $updatedRelease"
 
