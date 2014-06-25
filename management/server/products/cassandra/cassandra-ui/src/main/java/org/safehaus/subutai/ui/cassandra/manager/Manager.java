@@ -59,7 +59,7 @@ public class Manager {
 		getStopAllButton();
 		getDestroyClusterButton();
 
-		contentRoot.addComponent(controlsContent, 0, 0, 0, 1);
+		contentRoot.addComponent(controlsContent, 0, 0);
 		contentRoot.addComponent(nodesTable, 0, 1, 0, 4);
 
 	}
