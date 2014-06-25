@@ -9,6 +9,7 @@ import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentNodeGroup;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
 
 
@@ -27,6 +28,7 @@ public class EnvironmentBuilder {
 
     public Environment build( final Blueprint blueprint ) throws EnvironmentBuildException {
         Environment environment = new Environment();
+        environment.setName( blueprint.getName() );
         Set<EnvironmentNodeGroup> environmentNodeGroups = new HashSet<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
             try {
@@ -47,10 +49,9 @@ public class EnvironmentBuilder {
     }
 
 
-    public boolean destroy( final Environment environment ) {
+    public void destroy( final Environment environment ) throws EnvironmentInstanceDestroyException {
         for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
             nodeGroupBuilder.destroy( nodeGroup );
         }
-        return true;
     }
 }

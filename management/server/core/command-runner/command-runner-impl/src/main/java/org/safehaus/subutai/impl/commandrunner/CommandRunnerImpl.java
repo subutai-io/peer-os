@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
@@ -39,14 +40,16 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     private static final Logger LOG = Logger.getLogger( CommandRunnerImpl.class.getName() );
 
     private final CommunicationManager communicationManager;
+    private final AgentManager agentManager;
     //cache of command executors where key is command UUID and value is CommandExecutor
     private ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
-    public CommandRunnerImpl( CommunicationManager communicationManager ) {
+    public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager ) {
         Preconditions.checkNotNull( communicationManager, "Communication Manager is null" );
 
         this.communicationManager = communicationManager;
+        this.agentManager = agentManager;
     }
 
 
@@ -133,6 +136,12 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     }
 
 
+    public Command createBroadcastCommand( RequestBuilder requestBuilder ) {
+        Set<Agent> agents = agentManager.getAgents();
+        return new CommandImpl( requestBuilder, agents.size() );
+    }
+
+
     public void runCommandAsync( final Command command, CommandCallback commandCallback ) {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
@@ -154,8 +163,13 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
             //set command status to RUNNING
             commandImpl.setCommandStatus( CommandStatus.RUNNING );
             //execute command
-            for ( Request request : commandImpl.getRequests() ) {
-                communicationManager.sendRequest( request );
+            if ( commandImpl.isBroadcastCommand() ) {
+                communicationManager.sendBroadcastRequest( commandImpl.getRequests().iterator().next() );
+            }
+            else {
+                for ( Request request : commandImpl.getRequests() ) {
+                    communicationManager.sendRequest( request );
+                }
             }
         }
     }

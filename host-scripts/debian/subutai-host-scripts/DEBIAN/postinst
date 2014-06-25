@@ -2,4 +2,5 @@
 
 # Exit on error
 set -e
+. /etc/profile
 

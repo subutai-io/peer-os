@@ -4,11 +4,20 @@
 set -e
 
 subutai_scripts=/usr/bin/subutai*
+subutai_share=/etc/profile.d/subutai-share.sh
 subutai_conf_directory=/etc/subutai
+subutai_share_directory=/usr/share/subutai-host-scripts
 
 if [ -f $subutai_scripts ]; then
 	rm $subutai_scripts 
 fi
 if [ -d $subutai_conf_directory ]; then
         rm -r $subutai_conf_directory
+fi
+if [ -d $subutai_share_directory ]; then
+        rm -r $subutai_share_directory
+fi
+
+if [ -f $subutai_share ]; then
+        rm $subutai_share
 fi
