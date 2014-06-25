@@ -41,6 +41,7 @@ public class Manager {
 
 		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
+		contentRoot.setMargin(true);
 		contentRoot.setSizeFull();
 		contentRoot.setRows(7);
 		contentRoot.setColumns(1);
