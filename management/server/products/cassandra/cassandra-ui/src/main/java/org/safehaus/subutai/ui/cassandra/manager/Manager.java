@@ -31,7 +31,7 @@ import java.util.UUID;
 public class Manager {
 
 	private final Table nodesTable;
-	private VerticalLayout contentRoot;
+	private GridLayout contentRoot;
 	private ComboBox clusterCombo;
 	private HorizontalLayout controlsContent;
 	private Config config;
@@ -39,16 +39,17 @@ public class Manager {
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
+		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
 		contentRoot.setSizeFull();
+		contentRoot.setRows(5);
+		contentRoot.setColumns(1);
 
 		//tables go here
 		nodesTable = createTableTemplate("Cluster nodes");
 
 		controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
-		controlsContent.setHeight(20, Sizeable.Unit.PERCENTAGE);
 
 		getClusterNameLabel();
 		getClusterCombo();
@@ -58,8 +59,8 @@ public class Manager {
 		getStopAllButton();
 		getDestroyClusterButton();
 
-		contentRoot.addComponent(controlsContent);
-		contentRoot.addComponent(nodesTable);
+		contentRoot.addComponent(controlsContent, 0, 0, 0, 1);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 4);
 
 	}
 
@@ -67,8 +68,6 @@ public class Manager {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Status", Embedded.class, null);
-		table.setHeight(80, Sizeable.Unit.PERCENTAGE);
-		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
 		table.setPageLength(10);
 		table.setSelectable(false);
 		table.setImmediate(true);
@@ -93,7 +92,6 @@ public class Manager {
 	private void getClusterNameLabel() {
 		Label clusterNameLabel = new Label("Select the cluster");
 		controlsContent.addComponent(clusterNameLabel);
-		controlsContent.setComponentAlignment(clusterNameLabel, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getClusterCombo() {
