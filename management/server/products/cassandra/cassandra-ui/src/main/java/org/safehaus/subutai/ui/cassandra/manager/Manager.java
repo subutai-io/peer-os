@@ -42,7 +42,7 @@ public class Manager {
 		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
 		contentRoot.setSizeFull();
-		contentRoot.setRows(5);
+		contentRoot.setRows(7);
 		contentRoot.setColumns(1);
 
 		//tables go here
@@ -61,7 +61,7 @@ public class Manager {
 		getDestroyClusterButton();
 
 		contentRoot.addComponent(controlsContent, 0, 0);
-		contentRoot.addComponent(nodesTable, 0, 1, 0, 4);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 6);
 
 	}
 
@@ -94,6 +94,7 @@ public class Manager {
 	private void getClusterNameLabel() {
 		Label clusterNameLabel = new Label("Select the cluster");
 		controlsContent.addComponent(clusterNameLabel);
+		controlsContent.setComponentAlignment(clusterNameLabel, Alignment.MIDDLE_CENTER);
 	}
 
 	private void getClusterCombo() {
