@@ -6,7 +6,11 @@
 package org.safehaus.subutai.impl.templateregistry;
 
 
+import java.util.List;
+
+import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
+import org.safehaus.subutai.api.templateregistry.TemplateTree;
 
 
 /**
@@ -16,55 +20,37 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
-    public void getTemplates() {
+    public void registerTemplate( final String configFile, final String packagesFile ) {
 
     }
 
 
     @Override
-    public void getInstances() {
+    public void unregisterTemplate( final String templateName ) {
 
     }
 
 
     @Override
-    public void createNewTemplate() {
-
+    public Template getTemplate( final String templateName ) {
+        return null;
     }
 
 
     @Override
-    public void commitTemplate() {
-
+    public List<Template> getTemplatesByParent( final String parentTemplateName ) {
+        return null;
     }
 
 
     @Override
-    public void destoryTemplate() {
-
+    public Template getParentTemplate( final String childTemplateName ) {
+        return null;
     }
 
 
     @Override
-    public void getTsarFilesInfo() {
-
-    }
-
-
-    @Override
-    public void getTsarFileDescriptor() {
-
-    }
-
-
-    @Override
-    public void deleteTsarFile() {
-
-    }
-
-
-    @Override
-    public void pushTsarFileAsDebPackageIntoRepository() {
-
+    public TemplateTree getTemplateTree() {
+        return null;
     }
 }

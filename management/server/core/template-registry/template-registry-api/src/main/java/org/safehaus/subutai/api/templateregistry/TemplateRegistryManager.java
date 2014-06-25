@@ -23,5 +23,5 @@ public interface TemplateRegistryManager {
 
     public Template getParentTemplate( String childTemplateName );
 
-
+    public TemplateTree getTemplateTree();
 }
