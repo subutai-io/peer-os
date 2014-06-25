@@ -375,6 +375,28 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Template Registry Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Apt Repo Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>

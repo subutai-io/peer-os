@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.templateregistry;
 
 
-import org.safehaus.subutai.api.manager.TemplateManager;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
 
 /**
- * This is an implementation of LxcManager
+ * This is an implementation of TemplateRegistryManager
  */
-public class TemplateManagerImpl implements TemplateManager {
+public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
