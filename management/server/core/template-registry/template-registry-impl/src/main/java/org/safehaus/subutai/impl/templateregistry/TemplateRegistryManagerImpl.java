@@ -57,7 +57,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             String lxcUtsname = properties.getProperty( "lxc.utsname" );
             String lxcArch = properties.getProperty( "lxc.arch" );
             String subutaiConfigPath = properties.getProperty( "subutai.config.path" );
-            String subutaiAppdataPath = properties.getProperty( "subutai.appdata.path" );
+            String subutaiAppdataPath = properties.getProperty( "subutai.app.data.path" );
             String subutaiParent = properties.getProperty( "subutai.parent" );
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );

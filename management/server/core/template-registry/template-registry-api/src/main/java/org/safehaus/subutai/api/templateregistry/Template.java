@@ -42,7 +42,7 @@ public class Template {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiAppdataPath ),
-                "Missing subutai.appdata.path parameter" );
+                "Missing subutai.app.data.path parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
