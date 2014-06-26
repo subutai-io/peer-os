@@ -11,4 +11,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/register-template">
+      <action class="org.safehaus.subutai.cli.templateregistry.RegisterTemplateCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
