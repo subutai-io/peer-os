@@ -21,91 +21,38 @@ import java.util.UUID;
 
 public class Manager {
 
-	private final VerticalLayout contentRoot;
-	private final ComboBox clusterCombo;
-	private final Table nodesTable;
+	private GridLayout contentRoot;
+	private ComboBox clusterCombo;
+	private Table nodesTable;
 	private Config config;
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
+		contentRoot = new GridLayout();
+		contentRoot.setColumns(1);
+		contentRoot.setRows(7);
 		contentRoot.setSpacing(true);
+		contentRoot.setMargin(true);
 		contentRoot.setSizeFull();
 
-		VerticalLayout content = new VerticalLayout();
-		content.setSizeFull();
-
-		contentRoot.addComponent(content);
-		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
-		contentRoot.setMargin(true);
-
 		//tables go here
-		nodesTable = createTableTemplate("Nodes", 200);
+		nodesTable = createTableTemplate("Nodes");
 		//tables go here
 
 		HorizontalLayout controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
 
-		Label clusterNameLabel = new Label("Select the cluster");
-		controlsContent.addComponent(clusterNameLabel);
+		getClusterNameLabel(controlsContent);
+		getClusterCombo(controlsContent);
+		getRefreshClusterButton(controlsContent);
+		getDestroyClusterButton(controlsContent);
+		getAddNodeButton(controlsContent);
 
-		clusterCombo = new ComboBox();
-		clusterCombo.setImmediate(true);
-		clusterCombo.setTextInputAllowed(false);
-		clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
-		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
-				refreshUI();
-			}
-		});
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 6);
+	}
 
-		controlsContent.addComponent(clusterCombo);
-
-		Button refreshClustersBtn = new Button("Refresh clusters");
-		refreshClustersBtn.addStyleName("default");
-		refreshClustersBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				refreshClustersInfo();
-			}
-		});
-
-		controlsContent.addComponent(refreshClustersBtn);
-
-		Button destroyClusterBtn = new Button("Destroy cluster");
-		destroyClusterBtn.addStyleName("default");
-		destroyClusterBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (config != null) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-							"Yes", "No");
-					alert.getOk().addClickListener(new Button.ClickListener() {
-						@Override
-						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = FlumeUI.getManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(FlumeUI.getExecutor(), FlumeUI.getTracker(), trackID, Config.PRODUCT_KEY);
-							window.getWindow().addCloseListener(new Window.CloseListener() {
-								@Override
-								public void windowClose(Window.CloseEvent closeEvent) {
-									refreshClustersInfo();
-								}
-							});
-							contentRoot.getUI().addWindow(window.getWindow());
-						}
-					});
-
-					contentRoot.getUI().addWindow(alert.getAlert());
-				} else {
-					show("Please, select cluster");
-				}
-			}
-		});
-
-		controlsContent.addComponent(destroyClusterBtn);
-
+	private void getAddNodeButton(HorizontalLayout controlsContent) {
 		Button addNodeBtn = new Button("Add Node");
 		addNodeBtn.addStyleName("default");
 		addNodeBtn.addClickListener(new Button.ClickListener() {
@@ -138,10 +85,74 @@ public class Manager {
 		});
 
 		controlsContent.addComponent(addNodeBtn);
+	}
 
-		content.addComponent(controlsContent);
-		content.addComponent(nodesTable);
+	private void getDestroyClusterButton(HorizontalLayout controlsContent) {
+		Button destroyClusterBtn = new Button("Destroy cluster");
+		destroyClusterBtn.addStyleName("default");
+		destroyClusterBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				if (config != null) {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
+							"Yes", "No");
+					alert.getOk().addClickListener(new Button.ClickListener() {
+						@Override
+						public void buttonClick(Button.ClickEvent clickEvent) {
+							UUID trackID = FlumeUI.getManager().uninstallCluster(config.getClusterName());
+							ProgressWindow window = new ProgressWindow(FlumeUI.getExecutor(), FlumeUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							window.getWindow().addCloseListener(new Window.CloseListener() {
+								@Override
+								public void windowClose(Window.CloseEvent closeEvent) {
+									refreshClustersInfo();
+								}
+							});
+							contentRoot.getUI().addWindow(window.getWindow());
+						}
+					});
 
+					contentRoot.getUI().addWindow(alert.getAlert());
+				} else {
+					show("Please, select cluster");
+				}
+			}
+		});
+
+		controlsContent.addComponent(destroyClusterBtn);
+	}
+
+	private void getRefreshClusterButton(HorizontalLayout controlsContent) {
+		Button refreshClustersBtn = new Button("Refresh clusters");
+		refreshClustersBtn.addStyleName("default");
+		refreshClustersBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				refreshClustersInfo();
+			}
+		});
+
+		controlsContent.addComponent(refreshClustersBtn);
+	}
+
+	private void getClusterCombo(HorizontalLayout controlsContent) {
+		clusterCombo = new ComboBox();
+		clusterCombo.setImmediate(true);
+		clusterCombo.setTextInputAllowed(false);
+		clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				config = (Config) event.getProperty().getValue();
+				refreshUI();
+			}
+		});
+
+		controlsContent.addComponent(clusterCombo);
+	}
+
+	private void getClusterNameLabel(HorizontalLayout controlsContent) {
+		Label clusterNameLabel = new Label("Select the cluster");
+		controlsContent.addComponent(clusterNameLabel);
 	}
 
 	public Component getContent() {
@@ -280,14 +291,13 @@ public class Manager {
 		}
 	}
 
-	private Table createTableTemplate(String caption, int size) {
+	private Table createTableTemplate(String caption) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Start", Button.class, null);
 		table.addContainerProperty("Stop", Button.class, null);
 		table.addContainerProperty("Destroy", Button.class, null);
-		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		table.setHeight(size, Sizeable.Unit.PIXELS);
+		table.setSizeFull();
 		table.setPageLength(10);
 		table.setSelectable(false);
 		table.setImmediate(true);
