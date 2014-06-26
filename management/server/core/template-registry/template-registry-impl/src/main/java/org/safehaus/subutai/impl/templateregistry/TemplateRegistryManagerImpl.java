@@ -31,6 +31,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     public TemplateRegistryManagerImpl( final DbManager dbManager ) {
+        Preconditions.checkNotNull( dbManager, "DB Manager is null" );
         templateDAO = new TemplateDAO( dbManager );
     }
 
@@ -74,6 +75,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public void unregisterTemplate( final String templateName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         //delete template from storage
         Template template = getTemplate( templateName );
         if ( template != null ) {
@@ -87,6 +89,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public Template getTemplate( final String templateName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         //retrieve template from storage
         return templateDAO.getTemplateByName( templateName );
     }
@@ -94,6 +97,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public List<Template> getTemplatesByParent( final String parentTemplateName ) {
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( parentTemplateName ), "Parent template name is null or empty" );
         //retrieve child templates from storage
         return templateDAO.getTemplatesByParentName( parentTemplateName );
     }
@@ -101,6 +106,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public Template getParentTemplate( final String childTemplateName ) {
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( childTemplateName ), "Child template name is null or empty" );
         //retrieve parent template from storage
         return templateDAO.getTemplateByChildName( childTemplateName );
     }

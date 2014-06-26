@@ -119,4 +119,21 @@ public class Template {
     public String getParentTemplateName() {
         return parentTemplateName;
     }
+
+
+    @Override
+    public String toString() {
+        return "Template{" +
+                "templateName='" + templateName + '\'' +
+                ", parentTemplateName='" + parentTemplateName + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcUtsname='" + lxcUtsname + '\'' +
+                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
+                ", subutaiAppdataPath='" + subutaiAppdataPath + '\'' +
+                ", subutaiParent='" + subutaiParent + '\'' +
+                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
+                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", packagesManifest='" + packagesManifest + '\'' +
+                '}';
+    }
 }
