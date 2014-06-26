@@ -66,7 +66,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
                     subutaiGitBranch, subutaiGitUuid, packagesFile );
         }
         catch ( IOException e ) {
-            throw new RuntimeException( String.format( "Error parsing template %s", e ) );
+            throw new RuntimeException( String.format( "Error parsing template configuration %s", e ) );
         }
     }
 
