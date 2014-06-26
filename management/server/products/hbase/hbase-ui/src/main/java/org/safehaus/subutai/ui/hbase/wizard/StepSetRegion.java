@@ -20,80 +20,82 @@ import java.util.UUID;
  */
 public class StepSetRegion extends VerticalLayout {
 
-    public StepSetRegion(final Wizard wizard) {
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        verticalLayout.setHeight(100, Unit.PERCENTAGE);
-        verticalLayout.setMargin(true);
+	public StepSetRegion(final Wizard wizard) {
+		VerticalLayout verticalLayout = new VerticalLayout();
+		verticalLayout.setSizeFull();
+		verticalLayout.setHeight(100, Unit.PERCENTAGE);
+		verticalLayout.setMargin(true);
 
-        GridLayout grid = new GridLayout(10, 10);
-        grid.setSpacing(true);
-        grid.setSizeFull();
+		GridLayout grid = new GridLayout(10, 10);
+		grid.setSpacing(true);
+		grid.setSizeFull();
 
-        Label menu = new Label("Cluster Installation Wizard");
-        menu.setContentMode(ContentMode.HTML);
-        grid.addComponent(menu, 0, 0, 2, 1);
-        grid.setComponentAlignment(menu, Alignment.TOP_CENTER);
+		Label menu = new Label("Cluster Installation Wizard");
+		menu.setContentMode(ContentMode.HTML);
+		grid.addComponent(menu, 0, 0, 2, 1);
+		grid.setComponentAlignment(menu, Alignment.TOP_CENTER);
 
-        VerticalLayout verticalLayoutForm = new VerticalLayout();
-        verticalLayoutForm.setSizeFull();
-        verticalLayoutForm.setSpacing(true);
+		VerticalLayout verticalLayoutForm = new VerticalLayout();
+		verticalLayoutForm.setSizeFull();
+		verticalLayoutForm.setSpacing(true);
 
-        Label configServersLabel = new Label("<strong>Choose hosts that will act as HRegionServer");
-        configServersLabel.setContentMode(ContentMode.HTML);
-        verticalLayoutForm.addComponent(configServersLabel);
+		Label configServersLabel = new Label("<strong>Choose hosts that will act as HRegionServer");
+		configServersLabel.setContentMode(ContentMode.HTML);
+		verticalLayoutForm.addComponent(configServersLabel);
 
-        final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
+		final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
 //        select.setItemCaptionPropertyId("hostname");
-        select.setRows(7);
-        select.setNullSelectionAllowed(false);
-        select.setMultiSelect(true);
-        select.setImmediate(true);
-        select.setLeftColumnCaption("Available Nodes");
-        select.setRightColumnCaption("HRegionServer");
-        select.setWidth(100, Unit.PERCENTAGE);
-        select.setRequired(true);
+		select.setRows(7);
+		select.setNullSelectionAllowed(false);
+		select.setMultiSelect(true);
+		select.setImmediate(true);
+		select.setLeftColumnCaption("Available Nodes");
+		select.setRightColumnCaption("HRegionServer");
+		select.setWidth(100, Unit.PERCENTAGE);
+		select.setRequired(true);
 
-        verticalLayoutForm.addComponent(select);
+		verticalLayoutForm.addComponent(select);
 
-        grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
-        grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
+		grid.addComponent(verticalLayoutForm, 3, 0, 9, 9);
+		grid.setComponentAlignment(verticalLayoutForm, Alignment.TOP_CENTER);
 
-        Button next = new Button("Next");
-        next.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                wizard.getConfig().setRegion((Set<UUID>) select.getValue());
-                if (Util.isCollectionEmpty(wizard.getConfig().getRegion())) {
-                    show("Please add region servers");
-                } else {
-                    wizard.next();
-                }
-            }
-        });
+		Button next = new Button("Next");
+		next.addStyleName("default");
+		next.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.getConfig().setRegion((Set<UUID>) select.getValue());
+				if (Util.isCollectionEmpty(wizard.getConfig().getRegion())) {
+					show("Please add region servers");
+				} else {
+					wizard.next();
+				}
+			}
+		});
 
-        Button back = new Button("Back");
-        back.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                wizard.back();
-            }
-        });
+		Button back = new Button("Back");
+		back.addStyleName("default");
+		back.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.back();
+			}
+		});
 
-        verticalLayout.addComponent(grid);
+		verticalLayout.addComponent(grid);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponent(back);
-        horizontalLayout.addComponent(next);
-        verticalLayout.addComponent(horizontalLayout);
+		HorizontalLayout horizontalLayout = new HorizontalLayout();
+		horizontalLayout.addComponent(back);
+		horizontalLayout.addComponent(next);
+		verticalLayout.addComponent(horizontalLayout);
 
-        addComponent(verticalLayout);
-        select.setContainerDataSource(new BeanItemContainer<>(UUID.class, wizard.getConfig().getNodes()));
-        select.setValue(wizard.getConfig().getRegion());
-    }
+		addComponent(verticalLayout);
+		select.setContainerDataSource(new BeanItemContainer<>(UUID.class, wizard.getConfig().getNodes()));
+		select.setValue(wizard.getConfig().getRegion());
+	}
 
-    private void show(String notification) {
-        Notification.show(notification);
-    }
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
 }

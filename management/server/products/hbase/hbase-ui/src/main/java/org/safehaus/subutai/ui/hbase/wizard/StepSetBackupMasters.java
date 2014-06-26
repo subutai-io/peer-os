@@ -5,25 +5,23 @@
  */
 package org.safehaus.subutai.ui.hbase.wizard;
 
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 
 /**
  * @author dilshat
  */
-public class StepSetQuorum extends VerticalLayout {
+public class StepSetBackupMasters extends VerticalLayout {
 
-	public StepSetQuorum(final Wizard wizard) {
+	public StepSetBackupMasters(final Wizard wizard) {
 		VerticalLayout verticalLayout = new VerticalLayout();
 		verticalLayout.setSizeFull();
-		verticalLayout.setHeight(100, Unit.PERCENTAGE);
 		verticalLayout.setMargin(true);
 
 		GridLayout grid = new GridLayout(10, 10);
@@ -31,6 +29,7 @@ public class StepSetQuorum extends VerticalLayout {
 		grid.setSizeFull();
 
 		Label menu = new Label("Cluster Installation Wizard");
+
 		menu.setContentMode(ContentMode.HTML);
 		grid.addComponent(menu, 0, 0, 2, 1);
 		grid.setComponentAlignment(menu, Alignment.TOP_CENTER);
@@ -39,18 +38,18 @@ public class StepSetQuorum extends VerticalLayout {
 		verticalLayoutForm.setSizeFull();
 		verticalLayoutForm.setSpacing(true);
 
-		Label configServersLabel = new Label("<strong>Choose hosts that will act as HQuorumPeer");
+		Label configServersLabel = new Label("<strong>Choose hosts that will act as BackUpMaster");
 		configServersLabel.setContentMode(ContentMode.HTML);
 		verticalLayoutForm.addComponent(configServersLabel);
 
 		final TwinColSelect select = new TwinColSelect("", new ArrayList<UUID>());
-//        select.setItemCaptionPropertyId("hostname");
+//        select.setItemCaptionPropertyId( "hostname" );
 		select.setRows(7);
 		select.setNullSelectionAllowed(false);
-		select.setMultiSelect(true);
+		select.setMultiSelect(false);
 		select.setImmediate(true);
 		select.setLeftColumnCaption("Available Nodes");
-		select.setRightColumnCaption("HQuorumPeer");
+		select.setRightColumnCaption("BackUpMaster");
 		select.setWidth(100, Unit.PERCENTAGE);
 		select.setRequired(true);
 
@@ -64,9 +63,9 @@ public class StepSetQuorum extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.getConfig().setQuorum((Set<UUID>) select.getValue());
-				if (Util.isCollectionEmpty(wizard.getConfig().getQuorum())) {
-					show("Please add quorum servers");
+				wizard.getConfig().setBackupMasters((UUID) select.getValue());
+				if (wizard.getConfig().getBackupMasters() == null) {
+					show("Please add backup servers");
 				} else {
 					wizard.next();
 				}
@@ -90,9 +89,10 @@ public class StepSetQuorum extends VerticalLayout {
 		verticalLayout.addComponent(horizontalLayout);
 
 		addComponent(verticalLayout);
-		select.setContainerDataSource(new BeanItemContainer<UUID>(UUID.class, wizard.getConfig().getNodes()));
-		select.setValue(wizard.getConfig().getQuorum());
+		select.setContainerDataSource(new BeanItemContainer<>(UUID.class, wizard.getConfig().getNodes()));
+		select.setValue(wizard.getConfig().getBackupMasters());
 	}
+
 
 	private void show(String notification) {
 		Notification.show(notification);

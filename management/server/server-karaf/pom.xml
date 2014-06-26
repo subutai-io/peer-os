@@ -703,7 +703,7 @@
                                  </artifactItem>-->
 
                                 <!--HBase-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-api</artifactId>
                                     <version>${project.version}</version>
@@ -727,7 +727,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hbase-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Flume-->
                                 <artifactItem>
@@ -782,7 +782,7 @@
                                     <artifactId>hadoop-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                
+
                                 <!--Hive-->
                                 <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
