@@ -52,7 +52,11 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+    <dependency>
+    <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>

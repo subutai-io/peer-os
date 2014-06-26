@@ -106,6 +106,7 @@
     <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
     <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
     <xalan.version>2.7.1</xalan.version>
+    <org.apache.commons.configuration.version>1.8</org.apache.commons.configuration.version>
   </properties>
 
   <dependencyManagement>
@@ -223,6 +224,11 @@
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
         <version>${org.xerial.snappy.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-configuration</groupId>
+        <artifactId>commons-configuration</artifactId>
+        <version>${org.apache.commons.configuration.version}</version>
       </dependency>
       <!--shared-->
 

@@ -1,48 +1,102 @@
 package org.safehaus.subutai.api.templateregistry;
 
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+
 /**
- * Created by dilshat on 6/25/14.
+ * Template represents template entry in registry
  */
 public class Template {
 
+    //name of template
     private String templateName;
+    //name of parent template
     private String parentTemplateName;
+    //lxc architecture e.g. amd64, i386
+    private String lxcArch;
+    //lxc container name
+    private String lxcUtsname;
+    //path to cfg files tracked by subutai
+    private String subutaiConfigPath;
+    //path to app data files tracked by subutai
+    private String subutaiAppdataPath;
+    //name of parent template
+    private String subutaiParent;
+    //name of git branch where template cfg files are versioned
+    private String subutaiGitBranch;
+    //id of git commit which pushed template cfg files to git
+    private String subutaiGitUuid;
+    //contents of packages manifest file
+    private String packagesManifest;
 
 
-    /*
-    # Template used to create this container: /usr/share/lxc/templates/lxc-ubuntu
-    # Parameters passed to the template: -u subutai -S /root/.ssh/id_dsa.pub
-    # For additional config options, please look at lxc.conf(5)
-
-    # Common configuration
-    lxc.include = /usr/share/lxc/config/ubuntu.common.conf
-
-    # Container specific configuration
-    lxc.rootfs = /var/lib/lxc/foo/rootfs
-    lxc.mount = /var/lib/lxc/foo/fstab
-    lxc.utsname = foo
-    lxc.arch = amd64
-
-    # Network configuration
-    lxc.network.type = veth
-    lxc.network.flags = up
-    lxc.network.link = lxcbr0
-    lxc.network.hwaddr = 00:16:3e:f7:b1:87
-    subutai.config.path = /etc
-    subutai.app.data.path = /var
-    lxc.hook.pre-start = /etc/subutai/pre_start_hook
-    subutai.parent = master
-    subutai.git.branch = foo
-    lxc.mount.entry = /lxc/foo-opt opt none bind,rw 0 0
-    lxc.mount.entry = /lxc-data/foo-home home none bind,rw 0 0
-    lxc.mount.entry = /lxc-data/foo-var var none bind,rw 0 0
-    subutai.git.uuid = 7375fea345dc326cdc8a54a62d9b6cc96251a2ad
+    public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
+                     final String subutaiAppdataPath, final String subutaiParent, final String subutaiGitBranch,
+                     final String subutaiGitUuid, final String packagesManifest ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiAppdataPath ),
+                "Missing subutai.appdata.path parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
+        this.lxcArch = lxcArch;
+        this.lxcUtsname = lxcUtsname;
+        this.subutaiConfigPath = subutaiConfigPath;
+        this.subutaiAppdataPath = subutaiAppdataPath;
+        this.subutaiParent = subutaiParent;
+        this.subutaiGitBranch = subutaiGitBranch;
+        this.subutaiGitUuid = subutaiGitUuid;
+        this.packagesManifest = packagesManifest;
+        this.templateName = lxcUtsname;
+        this.parentTemplateName = subutaiParent;
+    }
 
 
-    + packages manifest
+    public String getLxcArch() {
+        return lxcArch;
+    }
 
-     */
+
+    public String getLxcUtsname() {
+        return lxcUtsname;
+    }
+
+
+    public String getSubutaiConfigPath() {
+        return subutaiConfigPath;
+    }
+
+
+    public String getSubutaiAppdataPath() {
+        return subutaiAppdataPath;
+    }
+
+
+    public String getSubutaiParent() {
+        return subutaiParent;
+    }
+
+
+    public String getSubutaiGitBranch() {
+        return subutaiGitBranch;
+    }
+
+
+    public String getSubutaiGitUuid() {
+        return subutaiGitUuid;
+    }
+
+
+    public String getPackagesManifest() {
+        return packagesManifest;
+    }
 
 
     public String getTemplateName() {
