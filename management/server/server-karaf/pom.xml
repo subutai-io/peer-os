@@ -61,7 +61,12 @@
       <version>${org.apache.commons.beanutils.version}</version>
     </dependency>
     <dependency>
-    <groupId>commons-pool</groupId>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>${org.apache.commons.collections.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
     </dependency>
@@ -307,6 +312,11 @@
                   <groupId>commons-beanutils</groupId>
                   <artifactId>commons-beanutils</artifactId>
                   <version>${org.apache.commons.beanutils.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>commons-collections</groupId>
+                  <artifactId>commons-collections</artifactId>
+                  <version>${org.apache.commons.collections.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>
