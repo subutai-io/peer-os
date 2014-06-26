@@ -23,8 +23,7 @@ import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.server.ui.api.PortalModuleListener;
 import org.safehaus.subutai.server.ui.api.PortalModuleService;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class ModulesView extends VerticalLayout implements View, PortalModuleListener {
@@ -32,7 +31,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
 	private TabSheet editors;
 	private CssLayout modulesLayout;
-	private List<Component> modulesList = new ArrayList<>();
+	private HashMap<String, PortalModule> modules = new HashMap<>();
 
 	@Override
 	public void enter(ViewChangeEvent event) {
@@ -48,6 +47,14 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 		editors.setSizeFull();
 		editors.addStyleName("borderless");
 		editors.addStyleName("editors");
+
+		editors.setCloseHandler(new TabSheet.CloseHandler() {
+			@Override
+			public void onTabClose(TabSheet components, Component component) {
+				editors.removeComponent(component);
+				modules.remove(components.getSelectedTab().getCaption());
+			}
+		});
 
 		VerticalLayout titleAndDrafts = new VerticalLayout();
 		titleAndDrafts.setSizeUndefined();
@@ -88,39 +95,28 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	}
 
 	private void addModule(final PortalModule module) {
-		if (module.getImage() != null) {
-			CssLayout moduleLayout = new CssLayout();
-			moduleLayout.setId(module.getId());
-			moduleLayout.setWidth(150, Unit.PIXELS);
-			moduleLayout.setHeight(200, Unit.PIXELS);
-			moduleLayout.addStyleName("create");
+		CssLayout moduleLayout = new CssLayout();
+		moduleLayout.setId(module.getId());
+		moduleLayout.setWidth(150, Unit.PIXELS);
+		moduleLayout.setHeight(200, Unit.PIXELS);
+		moduleLayout.addStyleName("create");
 
-			moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
-				@Override
-				public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
-					if (!contains(module)) {
-						autoCreate(module);
-					}
+		moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
+			@Override
+			public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
+				if (!modules.containsKey(module.getId())) {
+					autoCreate(module);
+					modules.put(module.getId(), module);
 				}
-			});
-
-			Image image = new Image("", new FileResource(module.getImage()));
-			image.setWidth(90, Unit.PERCENTAGE);
-			image.setDescription(module.getName());
-			moduleLayout.addComponent(image);
-
-			modulesLayout.addComponent(moduleLayout);
-		}
-	}
-
-	private boolean contains(PortalModule module) {
-		for (Component component : modulesList) {
-			if (module.getId().equals(component.getId())) {
-				return true;
 			}
-		}
+		});
 
-		return false;
+		Image image = new Image("", new FileResource(module.getImage()));
+		image.setWidth(90, Unit.PERCENTAGE);
+		image.setDescription(module.getName());
+		moduleLayout.addComponent(image);
+
+		modulesLayout.addComponent(moduleLayout);
 	}
 
 	public void autoCreate(PortalModule module) {
@@ -137,14 +133,6 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
 	@Override
 	public void moduleUnregistered(PortalModule module) {
-
-		/*for (Component component : modulesList) {
-			if (component.getId().equals(module.getId())) {
-				modulesLayout.removeComponent(component);
-				modulesList.remove(component);
-				break;
-			}
-		}*/
 	}
 }
 
