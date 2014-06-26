@@ -19,6 +19,8 @@ public class Manager extends VerticalLayout {
 		grid.setColumns(1);
 		grid.setRows(7);
 		grid.setSizeFull();
+		grid.setMargin(true);
+		grid.setSpacing(true);
 
 		horizontalLayout = new HorizontalLayout();
 		horizontalLayout.setSizeFull();

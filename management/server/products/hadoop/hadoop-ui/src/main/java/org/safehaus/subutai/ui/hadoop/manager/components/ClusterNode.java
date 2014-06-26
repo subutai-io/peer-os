@@ -31,7 +31,7 @@ public class ClusterNode extends HorizontalLayout {
 		setSpacing(true);
 
 		addComponent(getHostnameLabel());
-		setComponentAlignment(hostname, Alignment.BOTTOM_CENTER);
+		setComponentAlignment(hostname, Alignment.MIDDLE_CENTER);
 		addComponent(getProgressButton());
 		setComponentAlignment(progressButton, Alignment.TOP_CENTER);
 		addComponent(getStartButton());
