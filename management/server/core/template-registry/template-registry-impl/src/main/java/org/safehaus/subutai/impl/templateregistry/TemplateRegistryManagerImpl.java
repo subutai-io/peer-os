@@ -118,7 +118,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             if ( Template.MASTER_TEMPLATE_NAME.equalsIgnoreCase( child.getParentTemplateName() ) ) {
                 return Template.getMasterTemplate();
             }
-            else {
+            else if ( child.getParentTemplateName() != null ) {
                 return getTemplate( child.getParentTemplateName() );
             }
         }
