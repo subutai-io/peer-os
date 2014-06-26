@@ -91,6 +91,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     public Template getTemplate( final String templateName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         //retrieve template from storage
+        if ( Template.MASTER_TEMPLATE_NAME.equalsIgnoreCase( templateName ) ) {
+            return Template.getMasterTemplate();
+        }
         return templateDAO.getTemplateByName( templateName );
     }
 
@@ -109,7 +112,18 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( childTemplateName ), "Child template name is null or empty" );
         //retrieve parent template from storage
-        return templateDAO.getTemplateByChildName( childTemplateName );
+        Template child = getTemplate( childTemplateName );
+
+        if ( child != null ) {
+            if ( Template.MASTER_TEMPLATE_NAME.equalsIgnoreCase( child.getParentTemplateName() ) ) {
+                return Template.getMasterTemplate();
+            }
+            else {
+                return getTemplate( child.getParentTemplateName() );
+            }
+        }
+
+        return null;
     }
 
 

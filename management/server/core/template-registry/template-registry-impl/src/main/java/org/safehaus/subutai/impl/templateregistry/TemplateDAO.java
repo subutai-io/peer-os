@@ -75,15 +75,6 @@ public class TemplateDAO {
     }
 
 
-    public Template getTemplateByChildName( String childTemplateName ) {
-        Template template = getTemplateByName( childTemplateName );
-        if ( template != null ) {
-            return getTemplateByName( template.getParentTemplateName() );
-        }
-        return null;
-    }
-
-
     public Template getTemplateByName( String templateName ) {
         try {
             ResultSet rs = dbManager
