@@ -17,7 +17,7 @@
   
     <bean id="templateManager" scope="singleton" 
           class="org.safehaus.subutai.impl.template.TemplateManagerImpl"
-          init-method="init" destriy-method="destroy">
+          init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager" />
         <property name="commandRunner" ref="commandRunner" />
         <property name="lxcManager" ref="lxcmanager" />
