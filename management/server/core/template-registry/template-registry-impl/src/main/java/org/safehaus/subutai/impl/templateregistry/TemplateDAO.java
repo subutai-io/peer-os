@@ -77,8 +77,10 @@ public class TemplateDAO {
 
     public Template getTemplateByChildName( String childTemplateName ) {
         Template template = getTemplateByName( childTemplateName );
-
-        return getTemplateByName( template.getParentTemplateName() );
+        if ( template != null ) {
+            return getTemplateByName( template.getParentTemplateName() );
+        }
+        return null;
     }
 
 
