@@ -29,7 +29,6 @@ public class Manager extends VerticalLayout {
 		horizontalLayout.addComponent(getIndicator());
 
 		buttonsLayout = new HorizontalLayout();
-		buttonsLayout.setSizeFull();
 		buttonsLayout.setMargin(true);
 		buttonsLayout.setSpacing(true);
 
@@ -50,7 +49,6 @@ public class Manager extends VerticalLayout {
 		stoppedButton.setEnabled(false);
 		buttonsLayout.addComponent(stoppedButton);
 		buttonsLayout.setComponentAlignment(stoppedButton, Alignment.MIDDLE_LEFT);
-		buttonsLayout.addComponent(new Label("Stopped node"));
 
 		Label stoppedNodeLabel = new Label("Stopped node");
 		buttonsLayout.addComponent(stoppedNodeLabel);

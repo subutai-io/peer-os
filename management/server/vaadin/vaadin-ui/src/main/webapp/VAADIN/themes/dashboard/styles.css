@@ -5286,6 +5286,10 @@ body .dashboard.v-app .v-app-loading {
     color: #ffffff;
 }
 
+.dashboard .v-table .v-label {
+    color: inherit;
+}
+
 .dashboard .reports .draft-thumb .v-label span {
     color: #c1c3c8;
     font-size: 12px;
