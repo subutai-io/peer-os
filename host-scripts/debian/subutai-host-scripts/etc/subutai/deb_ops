@@ -94,19 +94,19 @@ function create_control_file {
   local Package="$packageName" 
   local Maintainer="subutai"
   local Architecture="amd64"
-  local Version="1.0.0"
-  local Depends="subutai-host-scripts" 
+  local Version=$SUBUTAI_VERSION
+  local Depends="subutai-host-scripts (= $SUBUTAI_VERSION)" 
   local Description="This is a Subutai delta image debian package"
 
   # clean control file
   > $control_file
 
-  echo Package:$Package >> $control_file
-  echo Maintainer:$Maintainer >> $control_file
-  echo Architecture:$Architecture >> $control_file
-  echo Version:$Version >> $control_file
-  echo Depends:$Depends >> $control_file
-  echo Description:$Description >> $control_file
+  echo Package: $Package >> $control_file
+  echo Maintainer: $Maintainer >> $control_file
+  echo Architecture: $Architecture >> $control_file
+  echo Version: $Version >> $control_file
+  echo Depends: $Depends >> $control_file
+  echo Description: $Description >> $control_file
 }
 
 
