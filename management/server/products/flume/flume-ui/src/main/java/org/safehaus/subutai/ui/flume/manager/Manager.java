@@ -30,7 +30,7 @@ public class Manager {
 
 		contentRoot = new GridLayout();
 		contentRoot.setColumns(1);
-		contentRoot.setRows(7);
+		contentRoot.setRows(10);
 		contentRoot.setSpacing(true);
 		contentRoot.setMargin(true);
 		contentRoot.setSizeFull();
@@ -49,7 +49,7 @@ public class Manager {
 		getAddNodeButton(controlsContent);
 
 		contentRoot.addComponent(controlsContent, 0, 0);
-		contentRoot.addComponent(nodesTable, 0, 1, 0, 6);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
 	}
 
 	private void getAddNodeButton(HorizontalLayout controlsContent) {

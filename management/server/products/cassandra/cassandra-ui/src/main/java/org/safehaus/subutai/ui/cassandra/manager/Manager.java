@@ -43,7 +43,7 @@ public class Manager {
 		contentRoot.setSpacing(true);
 		contentRoot.setMargin(true);
 		contentRoot.setSizeFull();
-		contentRoot.setRows(7);
+		contentRoot.setRows(10);
 		contentRoot.setColumns(1);
 
 		//tables go here
@@ -62,7 +62,7 @@ public class Manager {
 		getDestroyClusterButton();
 
 		contentRoot.addComponent(controlsContent, 0, 0);
-		contentRoot.addComponent(nodesTable, 0, 1, 0, 6);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
 
 	}
 
