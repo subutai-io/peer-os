@@ -676,31 +676,31 @@
                                 </artifactItem>-->
 
                                 <!--Solr-->
-                               <!-- <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>solr-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>solr-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>solr-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>solr-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>solr-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!-- <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>solr-api</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>solr-impl</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>solr-ui</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>solr-cli</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>solr-rest</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>-->
 
                                 <!--HBase-->
                                 <!--<artifactItem>
@@ -756,6 +756,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>-->
 
+                                <!-- Hadoop -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hadoop-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hadoop-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hadoop-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hadoop-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hadoop-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                
                                 <!--Hive-->
                                 <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -784,26 +811,26 @@
                                 </artifactItem>-->
 
                                 <!--Hive Query-->
-                               <!-- <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hivequery-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hivequery-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hivequery-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hivequery-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!-- <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>hivequery-api</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>hivequery-impl</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>hivequery-ui</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>hivequery-cli</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>-->
 
                                 <!--Lucene-->
                                 <!--<artifactItem>
@@ -887,31 +914,31 @@
                                 </artifactItem>-->
 
                                 <!--Pig-->
-                               <!-- <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>pig-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>pig-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>pig-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>pig-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>pig-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!-- <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>pig-api</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>pig-impl</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>pig-ui</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>pig-cli</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>pig-rest</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>-->
 
                                 <!--Presto-->
                                 <!--<artifactItem>
@@ -1065,34 +1092,6 @@
                                     <version>${project.version}</version>
                                 </artifactItem>-->
                                 <!-- Products Modules - END -->
-
-                                <!-- Hadoop -->
-                                <!--<artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hadoop-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hadoop-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hadoop-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hadoop-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hadoop-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-
                             </artifactItems>
                         </configuration>
                     </execution>

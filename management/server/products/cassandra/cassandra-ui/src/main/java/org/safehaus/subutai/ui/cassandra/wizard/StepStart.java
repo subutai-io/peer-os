@@ -53,8 +53,4 @@ public class StepStart extends VerticalLayout {
 		addComponent(gridLayout);
 	}
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
-
 }
