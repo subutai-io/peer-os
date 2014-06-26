@@ -220,7 +220,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                     while ( !Thread.interrupted() ) {
                         try {
                             if ( notifyAgentListeners || System.currentTimeMillis() - lastNotify
-                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 ) {
+                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 / 2 ) {
                                 lastNotify = System.currentTimeMillis();
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet( agents.asMap().values() );
