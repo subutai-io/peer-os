@@ -19,4 +19,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/get-templates-by-parent">
+      <action class="org.safehaus.subutai.cli.templateregistry.GetTemplatesByParentCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
