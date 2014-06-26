@@ -52,7 +52,7 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 			@Override
 			public void onTabClose(TabSheet components, Component component) {
 				editors.removeComponent(component);
-				modules.remove(components.getSelectedTab().getCaption());
+				modules.remove(component.getId());
 			}
 		});
 
@@ -120,7 +120,9 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	}
 
 	public void autoCreate(PortalModule module) {
-		TabSheet.Tab tab = editors.addTab(module.createComponent());
+		Component component = module.createComponent();
+		component.setId(module.getId());
+		TabSheet.Tab tab = editors.addTab(component);
 		tab.setCaption(module.getName());
 		tab.setClosable(true);
 		editors.setSelectedTab(tab);
