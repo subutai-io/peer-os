@@ -63,8 +63,8 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getStartButton() {
 		startButton = new Embedded("", new ThemeResource("img/btn/play.png"));
 		startButton.setDescription("Start");
-		startButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		startButton.setHeight(ICON_SIZE, Unit.PIXELS);
+		/*startButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		startButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return startButton;
 	}
@@ -72,8 +72,8 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getStopButton() {
 		stopButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
 		stopButton.setDescription("Stop");
-		stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		stopButton.setHeight(ICON_SIZE, Unit.PIXELS);
+		/*stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		stopButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return stopButton;
 	}
@@ -81,8 +81,8 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getRestartButton() {
 		restartButton = new Embedded("", new ThemeResource("img/btn/update.png"));
 		restartButton.setDescription("Restart");
-		restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);
+		/*restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return restartButton;
 	}

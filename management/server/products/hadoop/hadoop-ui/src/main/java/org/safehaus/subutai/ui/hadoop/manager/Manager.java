@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.hadoop.manager;
 
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.ui.hadoop.manager.components.ClusterNode;
 
 /**
  * Created by daralbaev on 12.04.14.
@@ -35,18 +34,27 @@ public class Manager extends VerticalLayout {
 		buttonsLayout.setSpacing(true);
 
 		Embedded startedButton = new Embedded("", new ThemeResource("img/btn/play.png"));
-		startedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
-		startedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
+		/*startedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
+		startedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);*/
 		startedButton.setEnabled(false);
 		buttonsLayout.addComponent(startedButton);
-		buttonsLayout.addComponent(new Label("Started node"));
+		buttonsLayout.setComponentAlignment(startedButton, Alignment.MIDDLE_LEFT);
+
+		Label startedNodeLabel = new Label("Started node");
+		buttonsLayout.addComponent(startedNodeLabel);
+		buttonsLayout.setComponentAlignment(startedNodeLabel, Alignment.MIDDLE_LEFT);
 
 		Embedded stoppedButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
-		stoppedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
-		stoppedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
+		/*stoppedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
+		stoppedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);*/
 		stoppedButton.setEnabled(false);
 		buttonsLayout.addComponent(stoppedButton);
+		buttonsLayout.setComponentAlignment(stoppedButton, Alignment.MIDDLE_LEFT);
 		buttonsLayout.addComponent(new Label("Stopped node"));
+
+		Label stoppedNodeLabel = new Label("Stopped node");
+		buttonsLayout.addComponent(stoppedNodeLabel);
+		buttonsLayout.setComponentAlignment(stoppedNodeLabel, Alignment.MIDDLE_LEFT);
 
 		grid.addComponent(horizontalLayout, 0, 0);
 		grid.addComponent(getHadoopTable(), 0, 1, 0, 5);
@@ -69,7 +77,7 @@ public class Manager extends VerticalLayout {
 	}
 
 	private Embedded getIndicator() {
-		indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
+		indicator = new Embedded("", new ThemeResource("img/spinner.gif"));
 		indicator.setHeight(11, Unit.PIXELS);
 		indicator.setWidth(50, Unit.PIXELS);
 		indicator.setVisible(true);
