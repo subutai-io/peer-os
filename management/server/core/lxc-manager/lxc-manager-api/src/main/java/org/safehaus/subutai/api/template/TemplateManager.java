@@ -18,10 +18,23 @@ public interface TemplateManager {
      * is to be cloned
      * @param cloneName the clone name of the new instance container
      * @return an <tt>Agent</tt> instance representing newly created instance
-     * container (clone)
+     * container (clone). In case of an error, <tt>null</tt> is returned
      */
     public Agent clone(String hostName, String templateName, String cloneName);
 
+    /**
+     * Clone an instance container from a given template on one of given
+     * physical servers. Physical server is selected depending on the given
+     * placement strategy(ies).
+     *
+     * @param hostNames list of physical server names
+     * @param templateName the template name from which a new instance container
+     * is to be cloned
+     * @param cloneName the clone name of the new instance container
+     * @param strategy a list of placement strategy criteria
+     * @return an <tt>Agent</tt> instance representing newly created instance
+     * container (clone). In case of an error, <tt>null</tt> is returned
+     */
     public Agent clone(Set<String> hostNames, String templateName, String cloneName, PlacementStrategyENUM... strategy);
 
     /**
