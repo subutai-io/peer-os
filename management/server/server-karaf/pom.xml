@@ -51,37 +51,7 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <version>${org.apache.commons.configuration.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
-      <version>${org.apache.commons.beanutils.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>${org.apache.commons.collections.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>${org.apache.commons.codec.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-digester</groupId>
-      <artifactId>commons-digester</artifactId>
-      <version>${org.apache.commons.digester.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-jexl</artifactId>
-      <version>${org.apache.commons.jexl.version}</version>
-    </dependency>
-    <dependency>
-    <groupId>commons-pool</groupId>
+      <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
     </dependency>
@@ -317,36 +287,6 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-jms-pool</artifactId>
                   <version>${org.apache.activemq.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-configuration</groupId>
-                  <artifactId>commons-configuration</artifactId>
-                  <version>${org.apache.commons.configuration.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-beanutils</groupId>
-                  <artifactId>commons-beanutils</artifactId>
-                  <version>${org.apache.commons.beanutils.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-collections</groupId>
-                  <artifactId>commons-collections</artifactId>
-                  <version>${org.apache.commons.collections.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-codec</groupId>
-                  <artifactId>commons-codec</artifactId>
-                  <version>${org.apache.commons.codec.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>commons-digester</groupId>
-                  <artifactId>commons-digester</artifactId>
-                  <version>${org.apache.commons.digester.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.commons</groupId>
-                  <artifactId>commons-jexl</artifactId>
-                  <version>${org.apache.commons.jexl.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>

@@ -7,16 +7,14 @@ package org.safehaus.subutai.impl.templateregistry;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
-
-import org.apache.commons.configuration.AbstractFileConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -53,21 +51,21 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     //@todo parse packages manifest to create packages list
     private Template parseTemplate( String configFile, String packagesFile ) {
-        AbstractFileConfiguration configuration = new PropertiesConfiguration();
+        Properties properties = new Properties();
         try {
-            configuration.load( new ByteArrayInputStream( configFile.getBytes() ) );
-            String lxcUtsname = ( String ) configuration.getProperty( "lxc.utsname" );
-            String lxcArch = ( String ) configuration.getProperty( "lxc.arch" );
-            String subutaiConfigPath = ( String ) configuration.getProperty( "subutai.config.path" );
-            String subutaiAppdataPath = ( String ) configuration.getProperty( "subutai.appdata.path" );
-            String subutaiParent = ( String ) configuration.getProperty( "subutai.parent" );
-            String subutaiGitBranch = ( String ) configuration.getProperty( "subutai.git.branch" );
-            String subutaiGitUuid = ( String ) configuration.getProperty( "subutai.git.uuid" );
+            properties.load( new ByteArrayInputStream( configFile.getBytes() ) );
+            String lxcUtsname = properties.getProperty( "lxc.utsname" );
+            String lxcArch = properties.getProperty( "lxc.arch" );
+            String subutaiConfigPath = properties.getProperty( "subutai.config.path" );
+            String subutaiAppdataPath = properties.getProperty( "subutai.appdata.path" );
+            String subutaiParent = properties.getProperty( "subutai.parent" );
+            String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
+            String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
             return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiAppdataPath, subutaiParent,
                     subutaiGitBranch, subutaiGitUuid, packagesFile );
         }
-        catch ( ConfigurationException e ) {
+        catch ( IOException e ) {
             throw new RuntimeException( String.format( "Error parsing template %s", e ) );
         }
     }
