@@ -20,23 +20,19 @@ import java.util.*;
 
 public class Manager {
 
-	private final VerticalLayout contentRoot;
+	private GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table serverTable, clientsTable;
 	private Config config;
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
+		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
-		contentRoot.setSizeFull();
-
-		VerticalLayout content = new VerticalLayout();
-		content.setSizeFull();
-
-		contentRoot.addComponent(content);
-		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
 		contentRoot.setMargin(true);
+		contentRoot.setSizeFull();
+		contentRoot.setRows(10);
+		contentRoot.setColumns(1);
 
 		//tables go here
 		serverTable = createTableTemplate("Server node", true);
@@ -150,9 +146,15 @@ public class Manager {
 		controlsContent.addComponent(checkAllBtn);
 		controlsContent.addComponent(addNodeBtn);
 
-		content.addComponent(controlsContent);
-		content.addComponent(serverTable);
-		content.addComponent(clientsTable);
+		VerticalLayout tablesLayout = new VerticalLayout();
+		tablesLayout.setSizeFull();
+		tablesLayout.setSpacing(true);
+
+		tablesLayout.addComponent(serverTable);
+		tablesLayout.addComponent(clientsTable);
+
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(tablesLayout, 0, 1, 0, 9);
 
 	}
 
