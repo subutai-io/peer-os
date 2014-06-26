@@ -77,7 +77,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         //delete template from storage
         Template template = getTemplate( templateName );
         if ( template != null ) {
-            templateDAO.removeTemplate( template );
+            if ( !templateDAO.removeTemplate( template ) ) {
+                throw new RuntimeException( String.format( "Error unregistering template %s", templateName ) );
+            }
         }
         else {
             throw new RuntimeException( String.format( "Template %s not found", templateName ) );

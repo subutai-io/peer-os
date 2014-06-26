@@ -31,7 +31,7 @@ public class GetTemplatesByParentCommand extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         List<Template> templates = templateRegistryManager.getTemplatesByParent( parentTemplateName );
-        if ( templates != null ) {
+        if ( templates != null && !templates.isEmpty() ) {
             for ( Template template : templates ) {
                 System.out.println( template + "\n" );
             }
