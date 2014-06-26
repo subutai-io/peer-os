@@ -99,7 +99,7 @@ public class TrackerForm extends CustomComponent {
 	private void getOutputTextArea() {
 		outputTxtArea = new TextArea("Operation output");
 		outputTxtArea.setSizeFull();
-		outputTxtArea.setRows(20);
+//		outputTxtArea.setRows(20);
 		outputTxtArea.setImmediate(true);
 		outputTxtArea.setWordwrap(true);
 	}
