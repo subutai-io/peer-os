@@ -8,7 +8,6 @@ import org.safehaus.subutai.api.hadoop.Config;
  * Created by daralbaev on 09.04.14.
  */
 public class Wizard {
-	private static final int NUMBER_OF_STEPS = 3;
 	private final GridLayout grid;
 	private int step = 1;
 	private Config config = new Config();

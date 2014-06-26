@@ -784,7 +784,7 @@
                                 </artifactItem>
 
                                 <!--Hive-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-api</artifactId>
                                     <version>${project.version}</version>
@@ -808,7 +808,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>hive-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Hive Query-->
                                 <!-- <artifactItem>

@@ -20,388 +20,394 @@ import java.util.*;
 
 public class Manager {
 
-    private final VerticalLayout contentRoot;
-    private final ComboBox clusterCombo;
-    private final Table serverTable, clientsTable;
-    private Config config;
+	private final VerticalLayout contentRoot;
+	private final ComboBox clusterCombo;
+	private final Table serverTable, clientsTable;
+	private Config config;
 
-    public Manager() {
+	public Manager() {
 
-        contentRoot = new VerticalLayout();
-        contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.Unit.PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
+		contentRoot = new VerticalLayout();
+		contentRoot.setSpacing(true);
+		contentRoot.setSizeFull();
 
-        VerticalLayout content = new VerticalLayout();
-        content.setWidth(100, Sizeable.Unit.PERCENTAGE);
-        content.setHeight(100, Sizeable.Unit.PERCENTAGE);
+		VerticalLayout content = new VerticalLayout();
+		content.setSizeFull();
 
-        contentRoot.addComponent(content);
-        contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
-        contentRoot.setMargin(true);
+		contentRoot.addComponent(content);
+		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
+		contentRoot.setMargin(true);
 
-        //tables go here
-        serverTable = createTableTemplate("Server node", 200, true);
-        clientsTable = createTableTemplate("Nodes", 200, false);
-        //tables go here
+		//tables go here
+		serverTable = createTableTemplate("Server node", true);
+		clientsTable = createTableTemplate("Nodes", false);
+		//tables go here
 
-        HorizontalLayout controlsContent = new HorizontalLayout();
-        controlsContent.setSpacing(true);
+		HorizontalLayout controlsContent = new HorizontalLayout();
+		controlsContent.setSpacing(true);
 
-        Label clusterNameLabel = new Label("Select the cluster");
-        controlsContent.addComponent(clusterNameLabel);
+		Label clusterNameLabel = new Label("Select the cluster");
+		controlsContent.addComponent(clusterNameLabel);
 
-        clusterCombo = new ComboBox();
-        clusterCombo.setImmediate(true);
-        clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
-        clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config) event.getProperty().getValue();
-                refreshUI();
-            }
-        });
+		clusterCombo = new ComboBox();
+		clusterCombo.setImmediate(true);
+		clusterCombo.setTextInputAllowed(false);
+		clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				config = (Config) event.getProperty().getValue();
+				refreshUI();
+			}
+		});
 
-        Button refreshClustersBtn = new Button("Refresh clusters");
-        refreshClustersBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                refreshClustersInfo();
-            }
-        });
+		Button refreshClustersBtn = new Button("Refresh clusters");
+		refreshClustersBtn.addStyleName("default");
+		refreshClustersBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				refreshClustersInfo();
+			}
+		});
 
-        Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                if (config == null) {
-                    show("Select cluster");
-                    return;
-                }
-                ConfirmationDialog alert = new ConfirmationDialog(String.format("Cluster '%s' will be destroyed. Continue?", config.getClusterName()),
-                        "Yes", "No");
-                alert.getOk().addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        destroyClusterHandler();
-                    }
-                });
+		Button destroyClusterBtn = new Button("Destroy cluster");
+		destroyClusterBtn.addStyleName("default");
+		destroyClusterBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				if (config == null) {
+					show("Select cluster");
+					return;
+				}
+				ConfirmationDialog alert = new ConfirmationDialog(String.format("Cluster '%s' will be destroyed. Continue?", config.getClusterName()),
+						"Yes", "No");
+				alert.getOk().addClickListener(new Button.ClickListener() {
+					@Override
+					public void buttonClick(Button.ClickEvent clickEvent) {
+						destroyClusterHandler();
+					}
+				});
 
-                contentRoot.getUI().addWindow(alert.getAlert());
-            }
-        });
+				contentRoot.getUI().addWindow(alert.getAlert());
+			}
+		});
 
-        Button checkAllBtn = new Button("Check all");
-        checkAllBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                Table[] tables = new Table[]{serverTable, clientsTable};
-                for (Table t : tables) {
-                    for (Object itemId : t.getItemIds()) {
-                        Item item = t.getItem(itemId);
-                        Object e = item.getItemProperty("Check").getValue();
-                        if (e instanceof Button) ((Button) e).click();
-                    }
-                }
-            }
-        });
+		Button checkAllBtn = new Button("Check all");
+		checkAllBtn.addStyleName("default");
+		checkAllBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				Table[] tables = new Table[] {serverTable, clientsTable};
+				for (Table t : tables) {
+					for (Object itemId : t.getItemIds()) {
+						Item item = t.getItem(itemId);
+						Object e = item.getItemProperty("Check").getValue();
+						if (e instanceof Button) ((Button) e).click();
+					}
+				}
+			}
+		});
 
-        Button addNodeBtn = new Button("Add Node");
-        addNodeBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                if (config == null) {
-                    show("Select cluster");
-                    return;
-                }
+		Button addNodeBtn = new Button("Add Node");
+		addNodeBtn.addStyleName("default");
+		addNodeBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				if (config == null) {
+					show("Select cluster");
+					return;
+				}
 
-                org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
-                        config.getClusterName());
-                if (hci == null) {
-                    show("Hadoop cluster info not found");
-                    return;
-                }
+				org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
+						config.getClusterName());
+				if (hci == null) {
+					show("Hadoop cluster info not found");
+					return;
+				}
 
-                Set<Agent> set = new HashSet<Agent>(hci.getAllNodes());
-                set.remove(config.getServer());
-                set.removeAll(config.getClients());
-                if (set.isEmpty()) {
-                    show("All nodes in Hadoop cluster have Hive installed");
-                    return;
-                }
+				Set<Agent> set = new HashSet<Agent>(hci.getAllNodes());
+				set.remove(config.getServer());
+				set.removeAll(config.getClients());
+				if (set.isEmpty()) {
+					show("All nodes in Hadoop cluster have Hive installed");
+					return;
+				}
 
-                AddNodeWindow w = new AddNodeWindow(config, set);
-                contentRoot.getUI().addWindow(w);
-                w.addCloseListener(new Window.CloseListener() {
-                    @Override
-                    public void windowClose(Window.CloseEvent closeEvent) {
-                        refreshClustersInfo();
-                    }
-                });
-            }
-        });
+				AddNodeWindow w = new AddNodeWindow(config, set);
+				contentRoot.getUI().addWindow(w);
+				w.addCloseListener(new Window.CloseListener() {
+					@Override
+					public void windowClose(Window.CloseEvent closeEvent) {
+						refreshClustersInfo();
+					}
+				});
+			}
+		});
 
-        controlsContent.addComponent(clusterCombo);
-        controlsContent.addComponent(refreshClustersBtn);
-        controlsContent.addComponent(destroyClusterBtn);
-        controlsContent.addComponent(checkAllBtn);
-        controlsContent.addComponent(addNodeBtn);
+		controlsContent.addComponent(clusterCombo);
+		controlsContent.addComponent(refreshClustersBtn);
+		controlsContent.addComponent(destroyClusterBtn);
+		controlsContent.addComponent(checkAllBtn);
+		controlsContent.addComponent(addNodeBtn);
 
-        content.addComponent(controlsContent);
-        content.addComponent(serverTable);
-        content.addComponent(clientsTable);
+		content.addComponent(controlsContent);
+		content.addComponent(serverTable);
+		content.addComponent(clientsTable);
 
-    }
+	}
 
-    public Component getContent() {
-        return contentRoot;
-    }
+	public Component getContent() {
+		return contentRoot;
+	}
 
-    private void show(String notification) {
-        Notification.show(notification);
-    }
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
-    private void populateTable(final Table table, boolean server, Agent... agents) {
+	private void populateTable(final Table table, boolean server, Agent... agents) {
 
-        table.removeAllItems();
+		table.removeAllItems();
 
-        for (final Agent agent : agents) {
-            final Button checkBtn = new Button("Check");
-            final Button startBtn = new Button("Start");
-            final Button stopBtn = new Button("Stop");
-            final Button restartBtn = new Button("Restart");
-            final Button destroyBtn = !server ? new Button("Destroy") : null;
-            final Embedded icon = new Embedded("", new ThemeResource(
-                    "img/spinner.gif"));
+		for (final Agent agent : agents) {
+			final Button checkBtn = new Button("Check");
+			checkBtn.addStyleName("default");
+			final Button startBtn = new Button("Start");
+			startBtn.addStyleName("default");
+			final Button stopBtn = new Button("Stop");
+			stopBtn.addStyleName("default");
+			final Button restartBtn = new Button("Restart");
+			restartBtn.addStyleName("default");
+			final Button destroyBtn = !server ? new Button("Destroy") : null;
+			destroyBtn.addStyleName("default");
+			final Embedded icon = new Embedded("", new ThemeResource(
+					"img/spinner.gif"));
 
-            startBtn.setEnabled(false);
-            stopBtn.setEnabled(false);
-            restartBtn.setEnabled(false);
-            icon.setVisible(false);
+			startBtn.setEnabled(false);
+			stopBtn.setEnabled(false);
+			restartBtn.setEnabled(false);
+			icon.setVisible(false);
 
-            final List items = new ArrayList();
-            items.add(agent.getHostname());
-            items.add(checkBtn);
-            items.add(startBtn);
-            items.add(stopBtn);
-            items.add(restartBtn);
-            if (destroyBtn != null) {
-                items.add(destroyBtn);
-                destroyBtn.addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy node  %s?", agent.getHostname()),
-                                "Yes", "No");
-                        alert.getOk().addClickListener(new Button.ClickListener() {
-                            @Override
-                            public void buttonClick(Button.ClickEvent clickEvent) {
-                                UUID trackID = HiveUI.getManager().destroyNode(
-                                        config.getClusterName(),
-                                        agent.getHostname());
-                                ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-                                window.getWindow().addCloseListener(new Window.CloseListener() {
-                                    @Override
-                                    public void windowClose(Window.CloseEvent closeEvent) {
-                                        refreshClustersInfo();
-                                    }
-                                });
-                                contentRoot.getUI().addWindow(window.getWindow());
-                            }
-                        });
+			final List items = new ArrayList();
+			items.add(agent.getHostname());
+			items.add(checkBtn);
+			items.add(startBtn);
+			items.add(stopBtn);
+			items.add(restartBtn);
+			if (destroyBtn != null) {
+				items.add(destroyBtn);
+				destroyBtn.addClickListener(new Button.ClickListener() {
+					@Override
+					public void buttonClick(Button.ClickEvent clickEvent) {
+						ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy node  %s?", agent.getHostname()),
+								"Yes", "No");
+						alert.getOk().addClickListener(new Button.ClickListener() {
+							@Override
+							public void buttonClick(Button.ClickEvent clickEvent) {
+								UUID trackID = HiveUI.getManager().destroyNode(
+										config.getClusterName(),
+										agent.getHostname());
+								ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+								window.getWindow().addCloseListener(new Window.CloseListener() {
+									@Override
+									public void windowClose(Window.CloseEvent closeEvent) {
+										refreshClustersInfo();
+									}
+								});
+								contentRoot.getUI().addWindow(window.getWindow());
+							}
+						});
 
-                        contentRoot.getUI().addWindow(alert.getAlert());
-                    }
-                });
-            }
-            items.add(icon);
+						contentRoot.getUI().addWindow(alert.getAlert());
+					}
+				});
+			}
+			items.add(icon);
 
-            table.addItem(items.toArray(), null);
+			table.addItem(items.toArray(), null);
 
-            checkBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    icon.setVisible(true);
-                    for (Object e : items) {
-                        if (e instanceof Button) ((Button) e).setEnabled(false);
-                    }
-                    final UUID trackId = HiveUI.getManager().statusCheck(
-                            config.getClusterName(), agent.getHostname());
-                    HiveUI.getExecutor().execute(new Runnable() {
+			checkBtn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					icon.setVisible(true);
+					for (Object e : items) {
+						if (e instanceof Button) ((Button) e).setEnabled(false);
+					}
+					final UUID trackId = HiveUI.getManager().statusCheck(
+							config.getClusterName(), agent.getHostname());
+					HiveUI.getExecutor().execute(new Runnable() {
 
-                        public void run() {
-                            ProductOperationView po = null;
-                            while (po == null || po.getState() == ProductOperationState.RUNNING) {
-                                po = HiveUI.getTracker().getProductOperation(
-                                        Config.PRODUCT_KEY, trackId);
-                            }
-                            boolean running = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!running);
-                            stopBtn.setEnabled(running);
-                            restartBtn.setEnabled(running);
-                            if (destroyBtn != null) destroyBtn.setEnabled(true);
-                            icon.setVisible(false);
-                        }
-                    });
-                }
-            });
+						public void run() {
+							ProductOperationView po = null;
+							while (po == null || po.getState() == ProductOperationState.RUNNING) {
+								po = HiveUI.getTracker().getProductOperation(
+										Config.PRODUCT_KEY, trackId);
+							}
+							boolean running = po.getState() == ProductOperationState.SUCCEEDED;
+							checkBtn.setEnabled(true);
+							startBtn.setEnabled(!running);
+							stopBtn.setEnabled(running);
+							restartBtn.setEnabled(running);
+							if (destroyBtn != null) destroyBtn.setEnabled(true);
+							icon.setVisible(false);
+						}
+					});
+				}
+			});
 
-            startBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    for (Object e : items) {
-                        if (e instanceof Button) ((Button) e).setEnabled(false);
-                    }
-                    final UUID trackID = HiveUI.getManager().startNode(
-                            config.getClusterName(), agent.getHostname());
+			startBtn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					for (Object e : items) {
+						if (e instanceof Button) ((Button) e).setEnabled(false);
+					}
+					final UUID trackID = HiveUI.getManager().startNode(
+							config.getClusterName(), agent.getHostname());
 
-                    ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-                    window.getWindow().addCloseListener(new Window.CloseListener() {
-                        @Override
-                        public void windowClose(Window.CloseEvent closeEvent) {
-                            ProductOperationView po = HiveUI.getTracker()
-                                    .getProductOperation(Config.PRODUCT_KEY, trackID);
-                            boolean started = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!started);
-                            stopBtn.setEnabled(started);
-                            restartBtn.setEnabled(started);
-                            if (destroyBtn != null) destroyBtn.setEnabled(true);
-                        }
-                    });
-                }
-            });
+					ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+					window.getWindow().addCloseListener(new Window.CloseListener() {
+						@Override
+						public void windowClose(Window.CloseEvent closeEvent) {
+							ProductOperationView po = HiveUI.getTracker()
+									.getProductOperation(Config.PRODUCT_KEY, trackID);
+							boolean started = po.getState() == ProductOperationState.SUCCEEDED;
+							checkBtn.setEnabled(true);
+							startBtn.setEnabled(!started);
+							stopBtn.setEnabled(started);
+							restartBtn.setEnabled(started);
+							if (destroyBtn != null) destroyBtn.setEnabled(true);
+						}
+					});
+				}
+			});
 
-            stopBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    for (Object e : items) {
-                        if (e instanceof Button) ((Button) e).setEnabled(false);
-                    }
-                    final UUID trackID = HiveUI.getManager().stopNode(
-                            config.getClusterName(), agent.getHostname());
+			stopBtn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					for (Object e : items) {
+						if (e instanceof Button) ((Button) e).setEnabled(false);
+					}
+					final UUID trackID = HiveUI.getManager().stopNode(
+							config.getClusterName(), agent.getHostname());
 
-                    ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-                    window.getWindow().addCloseListener(new Window.CloseListener() {
-                        @Override
-                        public void windowClose(Window.CloseEvent closeEvent) {
-                            ProductOperationView po = HiveUI.getTracker()
-                                    .getProductOperation(Config.PRODUCT_KEY, trackID);
-                            boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(stopped);
-                            stopBtn.setEnabled(!stopped);
-                            restartBtn.setEnabled(!stopped);
-                            if (destroyBtn != null) destroyBtn.setEnabled(true);
-                        }
-                    });
-                }
-            });
+					ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+					window.getWindow().addCloseListener(new Window.CloseListener() {
+						@Override
+						public void windowClose(Window.CloseEvent closeEvent) {
+							ProductOperationView po = HiveUI.getTracker()
+									.getProductOperation(Config.PRODUCT_KEY, trackID);
+							boolean stopped = po.getState() == ProductOperationState.SUCCEEDED;
+							checkBtn.setEnabled(true);
+							startBtn.setEnabled(stopped);
+							stopBtn.setEnabled(!stopped);
+							restartBtn.setEnabled(!stopped);
+							if (destroyBtn != null) destroyBtn.setEnabled(true);
+						}
+					});
+				}
+			});
 
-            restartBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    for (Object e : items) {
-                        if (e instanceof Button) ((Button) e).setEnabled(false);
-                    }
-                    final UUID trackID = HiveUI.getManager().restartNode(
-                            config.getClusterName(), agent.getHostname());
+			restartBtn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					for (Object e : items) {
+						if (e instanceof Button) ((Button) e).setEnabled(false);
+					}
+					final UUID trackID = HiveUI.getManager().restartNode(
+							config.getClusterName(), agent.getHostname());
 
-                    ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-                    window.getWindow().addCloseListener(new Window.CloseListener() {
-                        @Override
-                        public void windowClose(Window.CloseEvent closeEvent) {
-                            ProductOperationView po = HiveUI.getTracker()
-                                    .getProductOperation(Config.PRODUCT_KEY, trackID);
-                            boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
-                            checkBtn.setEnabled(true);
-                            startBtn.setEnabled(!ok);
-                            stopBtn.setEnabled(ok);
-                            restartBtn.setEnabled(true);
-                            if (destroyBtn != null) destroyBtn.setEnabled(true);
-                        }
-                    });
-                }
-            });
+					ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+					window.getWindow().addCloseListener(new Window.CloseListener() {
+						@Override
+						public void windowClose(Window.CloseEvent closeEvent) {
+							ProductOperationView po = HiveUI.getTracker()
+									.getProductOperation(Config.PRODUCT_KEY, trackID);
+							boolean ok = po.getState() == ProductOperationState.SUCCEEDED;
+							checkBtn.setEnabled(true);
+							startBtn.setEnabled(!ok);
+							stopBtn.setEnabled(ok);
+							restartBtn.setEnabled(true);
+							if (destroyBtn != null) destroyBtn.setEnabled(true);
+						}
+					});
+				}
+			});
 
-        }
-    }
+		}
+	}
 
-    private void refreshUI() {
-        if (config != null) {
-            populateTable(serverTable, true, config.getServer());
-            populateTable(clientsTable, false, config.getClients().toArray(new Agent[0]));
-        } else {
-            serverTable.removeAllItems();
-            clientsTable.removeAllItems();
-        }
-    }
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(serverTable, true, config.getServer());
+			populateTable(clientsTable, false, config.getClients().toArray(new Agent[0]));
+		} else {
+			serverTable.removeAllItems();
+			clientsTable.removeAllItems();
+		}
+	}
 
-    public void refreshClustersInfo() {
-        Config current = (Config) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        List<Config> clustersInfo = HiveUI.getManager().getClusters();
-        if (clustersInfo != null && clustersInfo.size() > 0) {
-            for (Config ci : clustersInfo) {
-                clusterCombo.addItem(ci);
-                clusterCombo.setItemCaption(ci, ci.getClusterName());
-            }
-            if (current != null) {
-                for (Config ci : clustersInfo) {
-                    if (ci.getClusterName().equals(current.getClusterName())) {
-                        clusterCombo.setValue(ci);
-                        return;
-                    }
-                }
-            }
-        }
-    }
+	public void refreshClustersInfo() {
+		Config current = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		List<Config> clustersInfo = HiveUI.getManager().getClusters();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (Config ci : clustersInfo) {
+				clusterCombo.addItem(ci);
+				clusterCombo.setItemCaption(ci, ci.getClusterName());
+			}
+			if (current != null) {
+				for (Config ci : clustersInfo) {
+					if (ci.getClusterName().equals(current.getClusterName())) {
+						clusterCombo.setValue(ci);
+						return;
+					}
+				}
+			}
+		}
+	}
 
-    private Table createTableTemplate(String caption, int size, boolean server) {
-        final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Restart", Button.class, null);
-        if (!server)
-            table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-        table.setHeight(size, Sizeable.Unit.PERCENTAGE);
+	private Table createTableTemplate(String caption, boolean server) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Check", Button.class, null);
+		table.addContainerProperty("Start", Button.class, null);
+		table.addContainerProperty("Stop", Button.class, null);
+		table.addContainerProperty("Restart", Button.class, null);
+		if (!server)
+			table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
 
-        table.setPageLength(10);
-        table.setSelectable(false);
-        table.setImmediate(true);
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
 
-        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-            @Override
-            public void itemClick(ItemClickEvent event) {
-                String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                Agent lxcAgent = HiveUI.getAgentManager().getAgentByHostname(lxcHostname);
-                if (lxcAgent != null) {
-                    TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HiveUI.getExecutor(), HiveUI.getCommandRunner(), HiveUI.getAgentManager());
-                    contentRoot.getUI().addWindow(terminal.getWindow());
-                } else {
-                    show("Agent is not connected");
-                }
-            }
-        });
-        return table;
-    }
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+				Agent lxcAgent = HiveUI.getAgentManager().getAgentByHostname(lxcHostname);
+				if (lxcAgent != null) {
+					TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HiveUI.getExecutor(), HiveUI.getCommandRunner(), HiveUI.getAgentManager());
+					contentRoot.getUI().addWindow(terminal.getWindow());
+				} else {
+					show("Agent is not connected");
+				}
+			}
+		});
+		return table;
+	}
 
-    private void destroyClusterHandler() {
+	private void destroyClusterHandler() {
 
-        UUID trackID = HiveUI.getManager().uninstallCluster(config.getClusterName());
+		UUID trackID = HiveUI.getManager().uninstallCluster(config.getClusterName());
 
-        ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-        window.getWindow().addCloseListener(new Window.CloseListener() {
-            @Override
-            public void windowClose(Window.CloseEvent closeEvent) {
-                refreshClustersInfo();
-            }
-        });
-        contentRoot.getUI().addWindow(window.getWindow());
-    }
+		ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+		window.getWindow().addCloseListener(new Window.CloseListener() {
+			@Override
+			public void windowClose(Window.CloseEvent closeEvent) {
+				refreshClustersInfo();
+			}
+		});
+		contentRoot.getUI().addWindow(window.getWindow());
+	}
 }

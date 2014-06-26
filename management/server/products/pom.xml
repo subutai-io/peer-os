@@ -20,8 +20,8 @@
         <module>flume</module>
         <module>hadoop</module>
         <module>hbase</module>
-        <!--<module>accumulo</module>
         <module>hive</module>
+        <!--<module>accumulo</module>
         <module>hivequery</module>
         <module>lucene</module>
         <module>mahout</module>
