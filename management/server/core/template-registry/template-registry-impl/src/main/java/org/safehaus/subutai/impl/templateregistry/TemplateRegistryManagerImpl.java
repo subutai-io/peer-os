@@ -8,8 +8,8 @@ package org.safehaus.subutai.impl.templateregistry;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.logging.Logger;
 
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
@@ -26,7 +26,13 @@ import com.google.common.base.Strings;
  * This is an implementation of TemplateRegistryManager
  */
 public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
-    private static final Logger LOG = Logger.getLogger( TemplateRegistryManagerImpl.class.getName() );
+
+    private final TemplateDAO templateDAO;
+
+
+    public TemplateRegistryManagerImpl( final DbManager dbManager ) {
+        templateDAO = new TemplateDAO( dbManager );
+    }
 
 
     @Override
@@ -38,7 +44,9 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Template template = parseTemplate( configFile, packagesFile );
 
         //save template to storage
-
+        if ( !templateDAO.saveTemplate( template ) ) {
+            throw new RuntimeException( String.format( "Error registering template %s", template.getTemplateName() ) );
+        }
     }
 
 
@@ -67,33 +75,47 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     @Override
     public void unregisterTemplate( final String templateName ) {
         //delete template from storage
+        Template template = getTemplate( templateName );
+        if ( template != null ) {
+            templateDAO.removeTemplate( template );
+        }
+        else {
+            throw new RuntimeException( String.format( "Template %s not found", templateName ) );
+        }
     }
 
 
     @Override
     public Template getTemplate( final String templateName ) {
         //retrieve template from storage
-        return null;
+        return templateDAO.getTemplateByName( templateName );
     }
 
 
     @Override
     public List<Template> getTemplatesByParent( final String parentTemplateName ) {
         //retrieve child templates from storage
-        return null;
+        return templateDAO.getTemplatesByParentName( parentTemplateName );
     }
 
 
     @Override
     public Template getParentTemplate( final String childTemplateName ) {
         //retrieve parent template from storage
-        return null;
+        return templateDAO.getTemplateByChildName( childTemplateName );
     }
 
 
     @Override
     public TemplateTree getTemplateTree() {
         //retrieve all templates and fill template tree
-        return null;
+        TemplateTree templateTree = new TemplateTree();
+        //add master template
+        templateTree.addTemplate( Template.getMasterTemplate() );
+        List<Template> allTemplates = templateDAO.getAllTemplates();
+        for ( Template template : allTemplates ) {
+            templateTree.addTemplate( template );
+        }
+        return templateTree;
     }
 }

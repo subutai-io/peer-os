@@ -10,6 +10,8 @@ import com.google.common.base.Strings;
  */
 public class Template {
 
+    public static final String MASTER_TEMPLATE_NAME = "master";
+    private static Template masterTemplate = new Template();
     //name of template
     private String templateName;
     //name of parent template
@@ -56,6 +58,16 @@ public class Template {
         this.packagesManifest = packagesManifest;
         this.templateName = lxcUtsname;
         this.parentTemplateName = subutaiParent;
+    }
+
+
+    private Template() {
+        templateName = MASTER_TEMPLATE_NAME;
+    }
+
+
+    public static Template getMasterTemplate() {
+        return masterTemplate;
     }
 
 
