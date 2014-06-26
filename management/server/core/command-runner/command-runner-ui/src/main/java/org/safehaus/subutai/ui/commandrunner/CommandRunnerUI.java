@@ -29,7 +29,6 @@ public class CommandRunnerUI implements PortalModule {
 
 
 	public void init() {
-
 	}
 
 

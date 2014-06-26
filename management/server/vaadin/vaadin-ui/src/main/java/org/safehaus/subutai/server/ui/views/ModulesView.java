@@ -89,28 +89,27 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 
 	private void addModule(final PortalModule module) {
 		if (module.getImage() != null) {
-			if (!contains(module)) {
-				CssLayout moduleLayout = new CssLayout();
-				moduleLayout.setId(module.getId());
-				moduleLayout.setWidth(150, Unit.PIXELS);
-				moduleLayout.setHeight(200, Unit.PIXELS);
-				moduleLayout.addStyleName("create");
+			CssLayout moduleLayout = new CssLayout();
+			moduleLayout.setId(module.getId());
+			moduleLayout.setWidth(150, Unit.PIXELS);
+			moduleLayout.setHeight(200, Unit.PIXELS);
+			moduleLayout.addStyleName("create");
 
-				moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
-					@Override
-					public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
+			moduleLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
+				@Override
+				public void layoutClick(LayoutEvents.LayoutClickEvent layoutClickEvent) {
+					if (!contains(module)) {
 						autoCreate(module);
 					}
-				});
+				}
+			});
 
-				Image image = new Image("", new FileResource(module.getImage()));
-				image.setWidth(90, Unit.PERCENTAGE);
-				image.setDescription(module.getName());
-				moduleLayout.addComponent(image);
+			Image image = new Image("", new FileResource(module.getImage()));
+			image.setWidth(90, Unit.PERCENTAGE);
+			image.setDescription(module.getName());
+			moduleLayout.addComponent(image);
 
-				modulesLayout.addComponent(moduleLayout);
-				modulesList.add(moduleLayout);
-			}
+			modulesLayout.addComponent(moduleLayout);
 		}
 	}
 
@@ -139,13 +138,13 @@ public class ModulesView extends VerticalLayout implements View, PortalModuleLis
 	@Override
 	public void moduleUnregistered(PortalModule module) {
 
-		for (Component component : modulesList) {
+		/*for (Component component : modulesList) {
 			if (component.getId().equals(module.getId())) {
 				modulesLayout.removeComponent(component);
 				modulesList.remove(component);
 				break;
 			}
-		}
+		}*/
 	}
 }
 
