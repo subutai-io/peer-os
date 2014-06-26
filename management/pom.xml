@@ -109,6 +109,7 @@
     <org.apache.commons.configuration.version>1.8</org.apache.commons.configuration.version>
     <org.apache.commons.beanutils.version>1.8.3</org.apache.commons.beanutils.version>
     <org.apache.commons.collections.version>3.2.1</org.apache.commons.collections.version>
+    <org.apache.commons.codec.version>1.7</org.apache.commons.codec.version>
   </properties>
 
   <dependencyManagement>
@@ -241,6 +242,11 @@
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>${org.apache.commons.collections.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${org.apache.commons.codec.version}</version>
       </dependency>
       <!--shared-->
 
