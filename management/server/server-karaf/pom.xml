@@ -592,6 +592,13 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Environment Manager -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>environment-manager-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                
                 <!-- Core Modules - END -->
 
                 <!-- Products Modules - START -->

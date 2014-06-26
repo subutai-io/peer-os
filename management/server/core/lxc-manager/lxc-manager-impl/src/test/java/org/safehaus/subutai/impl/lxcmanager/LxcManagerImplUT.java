@@ -6,6 +6,7 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
+import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;

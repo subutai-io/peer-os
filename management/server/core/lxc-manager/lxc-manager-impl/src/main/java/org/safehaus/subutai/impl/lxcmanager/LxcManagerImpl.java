@@ -6,6 +6,7 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
+import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
