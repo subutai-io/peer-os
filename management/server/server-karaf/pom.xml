@@ -71,7 +71,12 @@
       <version>${org.apache.commons.codec.version}</version>
     </dependency>
     <dependency>
-    <groupId>commons-pool</groupId>
+      <groupId>commons-digester</groupId>
+      <artifactId>commons-digester</artifactId>
+      <version>${org.apache.commons.digester.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
     </dependency>
@@ -327,6 +332,11 @@
                   <groupId>commons-codec</groupId>
                   <artifactId>commons-codec</artifactId>
                   <version>${org.apache.commons.codec.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>commons-digester</groupId>
+                  <artifactId>commons-digester</artifactId>
+                  <version>${org.apache.commons.digester.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>

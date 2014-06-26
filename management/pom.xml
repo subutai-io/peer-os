@@ -110,6 +110,7 @@
     <org.apache.commons.beanutils.version>1.8.3</org.apache.commons.beanutils.version>
     <org.apache.commons.collections.version>3.2.1</org.apache.commons.collections.version>
     <org.apache.commons.codec.version>1.7</org.apache.commons.codec.version>
+    <org.apache.commons.digester.version>1.6</org.apache.commons.digester.version>
   </properties>
 
   <dependencyManagement>
@@ -247,6 +248,11 @@
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>${org.apache.commons.codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-digester</groupId>
+        <artifactId>commons-digester</artifactId>
+        <version>${org.apache.commons.digester.version}</version>
       </dependency>
       <!--shared-->
 
