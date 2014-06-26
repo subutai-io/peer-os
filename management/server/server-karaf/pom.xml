@@ -76,7 +76,12 @@
       <version>${org.apache.commons.digester.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-jexl</artifactId>
+      <version>${org.apache.commons.jexl.version}</version>
+    </dependency>
+    <dependency>
+    <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
     </dependency>
@@ -337,6 +342,11 @@
                   <groupId>commons-digester</groupId>
                   <artifactId>commons-digester</artifactId>
                   <version>${org.apache.commons.digester.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.commons</groupId>
+                  <artifactId>commons-jexl</artifactId>
+                  <version>${org.apache.commons.jexl.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>
