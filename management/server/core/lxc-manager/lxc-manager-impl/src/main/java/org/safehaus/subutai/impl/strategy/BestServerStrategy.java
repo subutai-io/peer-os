@@ -24,10 +24,15 @@ public class BestServerStrategy extends LxcPlacementStrategy {
         // using each startegy criteria, grade servers one by one
         Map<Agent, Integer> grades = new HashMap<>();
         for(PlacementStrategyENUM sf : strategyFactors) {
-            Agent a = getBestMatch(serverMetrics, MetricComparator.create(sf));
-            if(a != null) {
-                Integer g = grades.get(a);
-                grades.put(a, (g != null ? g : 0) + 1);
+            try {
+                Agent a = getBestMatch(serverMetrics, MetricComparator.create(sf));
+                if(a != null) {
+                    Integer g = grades.get(a);
+                    grades.put(a, (g != null ? g : 0) + 1);
+                }
+            } catch(Exception ex) {
+                // comparator not defined for strategy
+                // TODO: log
             }
         }
 

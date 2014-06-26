@@ -7,6 +7,7 @@ abstract class MetricComparator {
 
     static MetricComparator create(PlacementStrategyENUM st) {
         MetricComparator mc = null;
+        // TODO: add missing case clauses
         switch(st) {
             case MORE_HDD:
                 mc = new MetricComparator() {
@@ -24,6 +25,18 @@ abstract class MetricComparator {
                     }
                 };
                 break;
+            case MORE_CPU:
+                mc = new MetricComparator() {
+                    @Override
+                    int getValue(ServerMetric m) {
+                        return m.getCpuLoadPercent();
+                    }
+
+                    @Override
+                    boolean isLessBetter() {
+                        return true;
+                    }
+                };
             default:
                 throw new AssertionError(st.name());
         }
