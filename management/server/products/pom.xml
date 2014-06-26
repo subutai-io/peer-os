@@ -17,7 +17,7 @@
     <modules>
         <module>cassandra</module>
         <module>common</module>
-        <!--<module>flume</module>-->
+        <module>flume</module>
         <module>hadoop</module>
         <!--<module>accumulo</module>
         <module>hbase</module>

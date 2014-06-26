@@ -67,7 +67,7 @@ public class TerminalWindow {
 		final Button sendBtn = new Button("Send");
 		sendBtn.addStyleName("default");
 		final Label indicator = new Label();
-		indicator.setIcon(new ThemeResource("icons/indicator.gif"));
+		indicator.setIcon(new ThemeResource("img/spinner.gif"));
 		indicator.setContentMode(ContentMode.HTML);
 		indicator.setHeight(11, Unit.PIXELS);
 		indicator.setWidth(50, Unit.PIXELS);

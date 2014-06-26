@@ -730,7 +730,7 @@
                                 </artifactItem>-->
 
                                 <!--Flume-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-api</artifactId>
                                     <version>${project.version}</version>
@@ -754,7 +754,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>flume-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!-- Hadoop -->
                                 <artifactItem>

@@ -161,7 +161,7 @@ public class HiveQueryLayout extends GridLayout {
     }
 
     private Embedded getIndicator() {
-        indicator = new Embedded("", new ThemeResource("icons/indicator.gif"));
+        indicator = new Embedded("", new ThemeResource("img/spinner.gif"));
         indicator.setHeight(11, Unit.PIXELS);
         indicator.setWidth(50, Unit.PIXELS);
         indicator.setVisible(false);
