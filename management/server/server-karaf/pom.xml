@@ -56,7 +56,7 @@
       <version>${org.apache.commons.configuration.version}</version>
     </dependency>
     <dependency>
-    <groupId>commons-pool</groupId>
+      <groupId>commons-pool</groupId>
       <artifactId>commons-pool</artifactId>
       <version>${commons-pool.version}</version>
     </dependency>
@@ -294,7 +294,12 @@
                   <version>${org.apache.activemq.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>commons-pool</groupId>
+                  <groupId>commons-configuration</groupId>
+                  <artifactId>commons-configuration</artifactId>
+                  <version>${org.apache.commons.configuration.version}</version>
+                </artifactItem>
+                <artifactItem>
+                <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
                   <version>${commons-pool.version}</version>
                 </artifactItem>
