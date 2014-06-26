@@ -22,6 +22,7 @@ public class Manager extends VerticalLayout {
 		grid.setSizeFull();
 
 		horizontalLayout = new HorizontalLayout();
+		horizontalLayout.setSizeFull();
 		horizontalLayout.setMargin(true);
 		horizontalLayout.setSpacing(true);
 
@@ -29,17 +30,18 @@ public class Manager extends VerticalLayout {
 		horizontalLayout.addComponent(getIndicator());
 
 		buttonsLayout = new HorizontalLayout();
+		buttonsLayout.setSizeFull();
 		buttonsLayout.setMargin(true);
 		buttonsLayout.setSpacing(true);
 
-		Embedded startedButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
+		Embedded startedButton = new Embedded("", new ThemeResource("img/btn/play.png"));
 		startedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
 		startedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
 		startedButton.setEnabled(false);
 		buttonsLayout.addComponent(startedButton);
 		buttonsLayout.addComponent(new Label("Started node"));
 
-		Embedded stoppedButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
+		Embedded stoppedButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
 		stoppedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
 		stoppedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);
 		stoppedButton.setEnabled(false);
@@ -55,6 +57,7 @@ public class Manager extends VerticalLayout {
 
 	private Button getButtonRefresh() {
 		refreshButton = new Button("Refresh");
+		refreshButton.addStyleName("default");
 		refreshButton.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {

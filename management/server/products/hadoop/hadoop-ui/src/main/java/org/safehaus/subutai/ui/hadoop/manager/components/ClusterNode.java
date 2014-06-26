@@ -16,89 +16,89 @@ import java.util.UUID;
  */
 public class ClusterNode extends HorizontalLayout {
 
-    public static final int ICON_SIZE = 18;
+	public static final int ICON_SIZE = 18;
 
-    protected Config cluster;
-    protected Embedded progressButton, startButton, stopButton, restartButton;
-    protected List<ClusterNode> slaveNodes;
-    protected Label hostname;
+	protected Config cluster;
+	protected Embedded progressButton, startButton, stopButton, restartButton;
+	protected List<ClusterNode> slaveNodes;
+	protected Label hostname;
 
-    public ClusterNode(Config cluster) {
-        this.cluster = cluster;
-        slaveNodes = new ArrayList<ClusterNode>();
+	public ClusterNode(Config cluster) {
+		this.cluster = cluster;
+		slaveNodes = new ArrayList<>();
 
-        setMargin(true);
-        setSpacing(true);
+		setMargin(true);
+		setSpacing(true);
 
-        addComponent(getHostnameLabel());
-        setComponentAlignment(hostname, Alignment.BOTTOM_CENTER);
-        addComponent(getProgressButton());
-        setComponentAlignment(progressButton, Alignment.TOP_CENTER);
-        addComponent(getStartButton());
-        setComponentAlignment(startButton, Alignment.TOP_CENTER);
-        addComponent(getStopButton());
-        setComponentAlignment(stopButton, Alignment.TOP_CENTER);
-        addComponent(getRestartButton());
-        setComponentAlignment(restartButton, Alignment.TOP_CENTER);
-    }
+		addComponent(getHostnameLabel());
+		setComponentAlignment(hostname, Alignment.BOTTOM_CENTER);
+		addComponent(getProgressButton());
+		setComponentAlignment(progressButton, Alignment.TOP_CENTER);
+		addComponent(getStartButton());
+		setComponentAlignment(startButton, Alignment.TOP_CENTER);
+		addComponent(getStopButton());
+		setComponentAlignment(stopButton, Alignment.TOP_CENTER);
+		addComponent(getRestartButton());
+		setComponentAlignment(restartButton, Alignment.TOP_CENTER);
+	}
 
-    private Label getHostnameLabel() {
-        hostname = new Label("");
-        return hostname;
-    }
+	private Label getHostnameLabel() {
+		hostname = new Label("");
+		return hostname;
+	}
 
-    public void setHostname(String value) {
-        hostname.setValue(value);
-    }
+	public void setHostname(String value) {
+		hostname.setValue(value);
+	}
 
-    private Embedded getProgressButton() {
-        progressButton = new Embedded("", new ThemeResource("img/spinner.gif"));
-        progressButton.setWidth(ICON_SIZE + 2, Unit.PIXELS);
-        progressButton.setHeight(ICON_SIZE + 2, Unit.PIXELS);
-        progressButton.setVisible(false);
+	private Embedded getProgressButton() {
+		progressButton = new Embedded("", new ThemeResource("img/spinner.gif"));
+		progressButton.setWidth(ICON_SIZE + 2, Unit.PIXELS);
+		progressButton.setHeight(ICON_SIZE + 2, Unit.PIXELS);
+		progressButton.setVisible(false);
 
-        return progressButton;
-    }
+		return progressButton;
+	}
 
-    private Embedded getStartButton() {
-        startButton = new Embedded("", new ThemeResource("icons/buttons/start.png"));
-        startButton.setDescription("Start");
-        startButton.setWidth(ICON_SIZE, Unit.PIXELS);
-        startButton.setHeight(ICON_SIZE, Unit.PIXELS);
+	private Embedded getStartButton() {
+		startButton = new Embedded("", new ThemeResource("img/btn/play.png"));
+		startButton.setDescription("Start");
+		startButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		startButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
-        return startButton;
-    }
+		return startButton;
+	}
 
-    private Embedded getStopButton() {
-        stopButton = new Embedded("", new ThemeResource("icons/buttons/stop.png"));
-        stopButton.setDescription("Stop");
-        stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
-        stopButton.setHeight(ICON_SIZE, Unit.PIXELS);
+	private Embedded getStopButton() {
+		stopButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
+		stopButton.setDescription("Stop");
+		stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		stopButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
-        return stopButton;
-    }
+		return stopButton;
+	}
 
-    private Embedded getRestartButton() {
-        restartButton = new Embedded("", new ThemeResource("icons/buttons/restart.png"));
-        restartButton.setDescription("Restart");
-        restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
-        restartButton.setHeight(ICON_SIZE, Unit.PIXELS);
+	private Embedded getRestartButton() {
+		restartButton = new Embedded("", new ThemeResource("img/btn/update.png"));
+		restartButton.setDescription("Restart");
+		restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
+		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);
 
-        return restartButton;
-    }
+		return restartButton;
+	}
 
-    public void addSlaveNode(ClusterNode slaveNode) {
-        slaveNodes.add(slaveNode);
-    }
+	public void addSlaveNode(ClusterNode slaveNode) {
+		slaveNodes.add(slaveNode);
+	}
 
-    protected void getStatus(UUID trackID) {
-    }
+	protected void getStatus(UUID trackID) {
+	}
 
-    protected void setLoading(boolean isLoading) {
+	protected void setLoading(boolean isLoading) {
 
-    }
+	}
 
-    public Config getCluster() {
-        return cluster;
-    }
+	public Config getCluster() {
+		return cluster;
+	}
 }
