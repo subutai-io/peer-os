@@ -26,8 +26,8 @@
         <module>mahout</module>
         <module>mongodb</module>
         <module>oozie</module>
-        <!--<module>accumulo</module>
         <module>pig</module>
+        <!--<module>accumulo</module>
         <module>presto</module>
         <module>shark</module>
         <module>solr</module>
