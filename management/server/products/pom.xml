@@ -23,9 +23,9 @@
         <module>hive</module>
         <module>hivequery</module>
         <module>lucene</module>
-        <!--<module>accumulo</module>
         <module>mahout</module>
         <module>mongodb</module>
+        <!--<module>accumulo</module>
         <module>oozie</module>
         <module>pig</module>
         <module>presto</module>

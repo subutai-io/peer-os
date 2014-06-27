@@ -860,7 +860,7 @@
                                 </artifactItem>
 
                                 <!--Mahout-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-api</artifactId>
                                     <version>${project.version}</version>
@@ -884,7 +884,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Oozie-->
                                 <!--<artifactItem>
