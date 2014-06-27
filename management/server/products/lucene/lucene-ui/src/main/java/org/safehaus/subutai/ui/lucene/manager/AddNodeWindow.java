@@ -59,6 +59,7 @@ public class AddNodeWindow extends Window {
 		topContent.addComponent(hadoopNodes);
 
 		final Button addNodeBtn = new Button("Add");
+		addNodeBtn.addStyleName("default");
 		topContent.addComponent(addNodeBtn);
 
 		addNodeBtn.addClickListener(new Button.ClickListener() {
@@ -110,6 +111,7 @@ public class AddNodeWindow extends Window {
 		indicator.setVisible(false);
 
 		Button ok = new Button("Ok");
+		ok.addStyleName("default");
 		ok.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {

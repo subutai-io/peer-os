@@ -62,7 +62,7 @@ public class ConfigurationStep extends Panel {
 			Config hadoopInfo = (Config) hadoopClusters.getValue();
 			wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
 			select.setContainerDataSource(
-					new BeanItemContainer<Agent>(
+					new BeanItemContainer<>(
 							Agent.class, hadoopInfo.getAllNodes())
 			);
 		}
@@ -74,7 +74,7 @@ public class ConfigurationStep extends Panel {
 					Config hadoopInfo = (Config) event.getProperty().getValue();
 					select.setValue(null);
 					select.setContainerDataSource(
-							new BeanItemContainer<Agent>(
+							new BeanItemContainer<>(
 									Agent.class, hadoopInfo.getAllNodes())
 					);
 					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
@@ -105,6 +105,7 @@ public class ConfigurationStep extends Panel {
 		});
 
 		Button next = new Button("Next");
+		next.addStyleName("default");
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -119,6 +120,7 @@ public class ConfigurationStep extends Panel {
 		});
 
 		Button back = new Button("Back");
+		back.addStyleName("default");
 		back.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {

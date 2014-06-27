@@ -833,7 +833,7 @@
                                 </artifactItem>
 
                                 <!--Lucene-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-api</artifactId>
                                     <version>${project.version}</version>
@@ -857,7 +857,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>lucene-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Mahout-->
                                 <!--<artifactItem>

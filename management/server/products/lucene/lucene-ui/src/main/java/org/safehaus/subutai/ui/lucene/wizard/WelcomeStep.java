@@ -5,9 +5,11 @@
  */
 package org.safehaus.subutai.ui.lucene.wizard;
 
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.ui.lucene.LuceneUI;
 
 /**
  * @author dilshat
@@ -28,13 +30,14 @@ public class WelcomeStep extends Panel {
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
 		Label logoImg = new Label();
-		logoImg.setIcon(new ThemeResource("icons/modules/lucene.jpg"));
+		logoImg.setIcon(new FileResource(FileUtil.getFile(LuceneUI.MODULE_IMAGE, this)));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(206, Unit.PIXELS);
 		logoImg.setWidth(100, Unit.PIXELS);
 		grid.addComponent(logoImg, 1, 3, 2, 5);
 
 		Button next = new Button("Start");
+		next.addStyleName("default");
 		next.setWidth(100, Unit.PIXELS);
 		grid.addComponent(next, 6, 4, 6, 4);
 		grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);

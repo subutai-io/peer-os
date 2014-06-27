@@ -22,9 +22,8 @@
         <module>hbase</module>
         <module>hive</module>
         <module>hivequery</module>
-        <!--<module>accumulo</module>
-
         <module>lucene</module>
+        <!--<module>accumulo</module>
         <module>mahout</module>
         <module>mongodb</module>
         <module>oozie</module>

@@ -27,29 +27,21 @@ import java.util.UUID;
  */
 public class Manager {
 
-	private final VerticalLayout contentRoot;
+	private final GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table nodesTable;
 	private Config config;
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
-		contentRoot.setSizeFull();
+		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
-		contentRoot.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-		VerticalLayout content = new VerticalLayout();
-		content.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		content.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-		contentRoot.addComponent(content);
-		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
 		contentRoot.setMargin(true);
-
+		contentRoot.setSizeFull();
+		contentRoot.setRows(10);
+		contentRoot.setColumns(1);
 		//tables go here
-		nodesTable = createTableTemplate("Nodes", 200);
+		nodesTable = createTableTemplate("Nodes");
 		//tables go here
 
 		HorizontalLayout controlsContent = new HorizontalLayout();
@@ -73,6 +65,7 @@ public class Manager {
 		controlsContent.addComponent(clusterCombo);
 
 		Button refreshClustersBtn = new Button("Refresh clusters");
+		refreshClustersBtn.addStyleName("default");
 		refreshClustersBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -83,6 +76,7 @@ public class Manager {
 		controlsContent.addComponent(refreshClustersBtn);
 
 		Button destroyClusterBtn = new Button("Destroy cluster");
+		destroyClusterBtn.addStyleName("default");
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -114,7 +108,7 @@ public class Manager {
 		controlsContent.addComponent(destroyClusterBtn);
 
 		Button addNodeBtn = new Button("Add Node");
-
+		addNodeBtn.addStyleName("default");
 		addNodeBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -146,9 +140,8 @@ public class Manager {
 
 		controlsContent.addComponent(addNodeBtn);
 
-		content.addComponent(controlsContent);
-
-		content.addComponent(nodesTable);
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
 
 	}
 
@@ -231,12 +224,11 @@ public class Manager {
 		}
 	}
 
-	private Table createTableTemplate(String caption, int size) {
+	private Table createTableTemplate(String caption) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Destroy", Button.class, null);
-		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		table.setHeight(size, Sizeable.Unit.PIXELS);
+		table.setSizeFull();
 		table.setPageLength(10);
 		table.setSelectable(false);
 		table.setImmediate(true);
