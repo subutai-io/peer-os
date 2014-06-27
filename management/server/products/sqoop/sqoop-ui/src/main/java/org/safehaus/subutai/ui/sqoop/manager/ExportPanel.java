@@ -14,94 +14,94 @@ import java.util.UUID;
 
 public class ExportPanel extends ImportExportBase {
 
-    AbstractTextField hdfsPathField = UIUtil.getTextField("HDFS file path:", 300);
+	AbstractTextField hdfsPathField = UIUtil.getTextField("HDFS file path:", 300);
 
-    public ExportPanel() {
-        init();
-    }
+	public ExportPanel() {
+		init();
+	}
 
-    @Override
-    public void setAgent(Agent agent) {
-        super.setAgent(agent);
-        init();
-    }
+	@Override
+	public void setAgent(Agent agent) {
+		super.setAgent(agent);
+		init();
+	}
 
-    @Override
-    final void init() {
-        removeAllComponents();
+	@Override
+	final void init() {
+		removeAllComponents();
 
-        if (agent == null) {
-            addComponent(UIUtil.getLabel("<h1>No node selected</h1>", 200));
-            return;
-        }
+		if (agent == null) {
+			addComponent(UIUtil.getLabel("<h1>No node selected</h1>", 200));
+			return;
+		}
 
-        super.init();
-        fields.add(hdfsPathField);
+		super.init();
+		fields.add(hdfsPathField);
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(UIUtil.getButton("Export", 120,
-                new Button.ClickListener() {
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.addComponent(UIUtil.getButton("Export", 120,
+				new Button.ClickListener() {
 
-                    public void buttonClick(Button.ClickEvent event) {
-                        clearLogMessages();
-                        if (!checkFields()) return;
-                        setFieldsEnabled(false);
-                        ExportSetting es = makeSettings();
-                        final UUID trackId = SqoopUI.getManager().exportData(es);
+					public void buttonClick(Button.ClickEvent event) {
+						clearLogMessages();
+						if (!checkFields()) return;
+						setFieldsEnabled(false);
+						ExportSetting es = makeSettings();
+						final UUID trackId = SqoopUI.getManager().exportData(es);
 
-                        OperationWatcher watcher = new OperationWatcher(trackId);
-                        watcher.setCallback(new OperationCallback() {
+						OperationWatcher watcher = new OperationWatcher(trackId);
+						watcher.setCallback(new OperationCallback() {
 
-                            public void onComplete() {
-                                setFieldsEnabled(true);
-                            }
-                        });
-                        SqoopUI.getExecutor().execute(watcher);
-                    }
+							public void onComplete() {
+								setFieldsEnabled(true);
+							}
+						});
+						SqoopUI.getExecutor().execute(watcher);
+					}
 
-                }));
-        buttons.addComponent(UIUtil.getButton("Cancel", 120, new Button.ClickListener() {
+				}));
+		buttons.addComponent(UIUtil.getButton("Cancel", 120, new Button.ClickListener() {
 
-            public void buttonClick(Button.ClickEvent event) {
-                detachFromParent();
-            }
-        }));
+			public void buttonClick(Button.ClickEvent event) {
+				detachFromParent();
+			}
+		}));
 
-        List<Component> ls = new ArrayList<Component>();
-        ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, Unit.PERCENTAGE));
-        ls.add(connStringField);
-        ls.add(tableField);
-        ls.add(usernameField);
-        ls.add(passwordField);
-        ls.add(hdfsPathField);
-        ls.add(buttons);
+		List<Component> ls = new ArrayList<Component>();
+		ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, Unit.PERCENTAGE));
+		ls.add(connStringField);
+		ls.add(tableField);
+		ls.add(usernameField);
+		ls.add(passwordField);
+		ls.add(hdfsPathField);
+		ls.add(buttons);
 
-        addComponents(ls);
-    }
+		addComponents(ls);
+	}
 
-    ExportSetting makeSettings() {
-        ExportSetting s = new ExportSetting();
-        s.setClusterName(clusterName);
-        s.setHostname(agent.getHostname());
-        s.setConnectionString(connStringField.getValue().toString());
-        s.setTableName(tableField.getValue().toString());
-        s.setUsername(usernameField.getValue().toString());
-        s.setPassword(passwordField.getValue().toString());
-        s.setHdfsPath(hdfsPathField.getValue().toString());
-        return s;
-    }
+	ExportSetting makeSettings() {
+		ExportSetting s = new ExportSetting();
+		s.setClusterName(clusterName);
+		s.setHostname(agent.getHostname());
+		s.setConnectionString(connStringField.getValue().toString());
+		s.setTableName(tableField.getValue().toString());
+		s.setUsername(usernameField.getValue().toString());
+		s.setPassword(passwordField.getValue().toString());
+		s.setHdfsPath(hdfsPathField.getValue().toString());
+		return s;
+	}
 
-    @Override
-    boolean checkFields() {
-        if (super.checkFields()) {
-            if (!hasValue(tableField, "Table name not specified"))
-                return false;
-            if (!hasValue(hdfsPathField, "HDFS file path not specified"))
-                return false;
-            // every field has value
-            return true;
-        }
-        return false;
-    }
+	@Override
+	boolean checkFields() {
+		if (super.checkFields()) {
+			if (!hasValue(tableField, "Table name not specified"))
+				return false;
+			if (!hasValue(hdfsPathField, "HDFS file path not specified"))
+				return false;
+			// every field has value
+			return true;
+		}
+		return false;
+	}
 
 }

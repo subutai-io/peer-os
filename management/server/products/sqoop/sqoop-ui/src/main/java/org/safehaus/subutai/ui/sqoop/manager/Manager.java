@@ -17,281 +17,280 @@ import java.util.*;
 
 public class Manager {
 
-    private final VerticalLayout contentRoot;
-    private final ComboBox clusterCombo;
-    private final Table nodesTable;
-    private final ImportPanel importPanel;
-    private final ExportPanel exportPanel;
-    private Config config;
+	private final GridLayout contentRoot;
+	private final ComboBox clusterCombo;
+	private final Table nodesTable;
+	private final ImportPanel importPanel;
+	private final ExportPanel exportPanel;
+	private Config config;
 
-    public Manager() {
+	public Manager() {
 
-        contentRoot = new VerticalLayout();
-        contentRoot.setSpacing(true);
-        contentRoot.setWidth(90, Sizeable.Unit.PERCENTAGE);
-        contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
+		contentRoot = new GridLayout();
+		contentRoot.setSpacing(true);
+		contentRoot.setMargin(true);
+		contentRoot.setSizeFull();
+		contentRoot.setRows(10);
+		contentRoot.setColumns(1);
 
-        VerticalLayout content = new VerticalLayout();
-        content.setWidth(100, Sizeable.Unit.PERCENTAGE);
-        content.setHeight(100, Sizeable.Unit.PERCENTAGE);
+		//tables go here
+		nodesTable = createTableTemplate("Nodes");
+		//tables go here
 
-        contentRoot.addComponent(content);
-        contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
-        contentRoot.setMargin(true);
+		HorizontalLayout controlsContent = new HorizontalLayout();
+		controlsContent.setSpacing(true);
 
-        //tables go here
-        nodesTable = createTableTemplate("Nodes", 200);
-        //tables go here
+		Label clusterNameLabel = new Label("Select the cluster");
+		controlsContent.addComponent(clusterNameLabel);
 
-        HorizontalLayout controlsContent = new HorizontalLayout();
-        controlsContent.setSpacing(true);
+		clusterCombo = new ComboBox();
+		clusterCombo.setImmediate(true);
+		clusterCombo.setTextInputAllowed(false);
+		clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
+		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 
-        Label clusterNameLabel = new Label("Select the cluster");
-        controlsContent.addComponent(clusterNameLabel);
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				config = (Config) event.getProperty().getValue();
+				refreshUI();
+			}
+		});
 
-        clusterCombo = new ComboBox();
-        clusterCombo.setImmediate(true);
-        clusterCombo.setTextInputAllowed(false);
-        clusterCombo.setWidth(200, Sizeable.Unit.PIXELS);
-        clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
+		Button refreshClustersBtn = new Button("Refresh clusters");
+		refreshClustersBtn.addStyleName("default");
+		refreshClustersBtn.addClickListener(new Button.ClickListener() {
 
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                config = (Config) event.getProperty().getValue();
-                refreshUI();
-            }
-        });
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				refreshClustersInfo();
+			}
+		});
 
-        Button refreshClustersBtn = new Button("Refresh clusters");
-        refreshClustersBtn.addClickListener(new Button.ClickListener() {
+		Button destroyClusterBtn = new Button("Destroy cluster");
+		destroyClusterBtn.addStyleName("default");
+		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                refreshClustersInfo();
-            }
-        });
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				if (config == null) {
+					show("Select cluster");
+					return;
+				}
 
-        Button destroyClusterBtn = new Button("Destroy cluster");
-        destroyClusterBtn.addClickListener(new Button.ClickListener() {
+				ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+						"Yes", "No");
+				alert.getOk().addClickListener(new Button.ClickListener() {
+					@Override
+					public void buttonClick(Button.ClickEvent clickEvent) {
+						destroyClusterHandler();
+					}
+				});
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (config == null) {
-                    show("Select cluster");
-                    return;
-                }
+				contentRoot.getUI().addWindow(alert.getAlert());
+			}
 
-                ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
-                        "Yes", "No");
-                alert.getOk().addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        destroyClusterHandler();
-                    }
-                });
+		});
 
-                contentRoot.getUI().addWindow(alert.getAlert());
-            }
+		Button addNodeBtn = new Button("Add Node");
+		addNodeBtn.addStyleName("default");
+		addNodeBtn.addClickListener(new Button.ClickListener() {
 
-        });
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				if (config == null) {
+					show("Select cluster");
+					return;
+				}
 
-        Button addNodeBtn = new Button("Add Node");
-        addNodeBtn.addClickListener(new Button.ClickListener() {
+				org.safehaus.subutai.api.hadoop.Config hci = SqoopUI.getHadoopManager().getCluster(config.getClusterName());
+				if (hci == null) {
+					show("Hadoop cluster info not found");
+					return;
+				}
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (config == null) {
-                    show("Select cluster");
-                    return;
-                }
+				Set<Agent> set = new HashSet<>(hci.getAllNodes());
+				set.removeAll(config.getNodes());
+				if (set.isEmpty()) {
+					show("All nodes in Hadoop cluster have Sqoop installed");
+					return;
+				}
 
-                org.safehaus.subutai.api.hadoop.Config hci = SqoopUI.getHadoopManager().getCluster(config.getClusterName());
-                if (hci == null) {
-                    show("Hadoop cluster info not found");
-                    return;
-                }
+				AddNodeWindow addNodeWindow = new AddNodeWindow(config, set);
+				contentRoot.getUI().addWindow(addNodeWindow);
+				addNodeWindow.addCloseListener(new Window.CloseListener() {
+					@Override
+					public void windowClose(Window.CloseEvent closeEvent) {
+						refreshClustersInfo();
+					}
+				});
+			}
+		});
 
-                Set<Agent> set = new HashSet<Agent>(hci.getAllNodes());
-                set.removeAll(config.getNodes());
-                if (set.isEmpty()) {
-                    show("All nodes in Hadoop cluster have Sqoop installed");
-                    return;
-                }
+		controlsContent.addComponent(clusterCombo);
+		controlsContent.addComponent(refreshClustersBtn);
+		controlsContent.addComponent(destroyClusterBtn);
+		controlsContent.addComponent(addNodeBtn);
 
-                AddNodeWindow addNodeWindow = new AddNodeWindow(config, set);
-                contentRoot.getUI().addWindow(addNodeWindow);
-                addNodeWindow.addCloseListener(new Window.CloseListener() {
-                    @Override
-                    public void windowClose(Window.CloseEvent closeEvent) {
-                        refreshClustersInfo();
-                    }
-                });
-            }
-        });
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
 
-        controlsContent.addComponent(clusterCombo);
-        controlsContent.addComponent(refreshClustersBtn);
-        controlsContent.addComponent(destroyClusterBtn);
-        controlsContent.addComponent(addNodeBtn);
+		importPanel = new ImportPanel();
+		exportPanel = new ExportPanel();
 
-        content.addComponent(controlsContent);
-        content.addComponent(nodesTable);
+	}
 
-        importPanel = new ImportPanel();
-        exportPanel = new ExportPanel();
+	public Component getContent() {
+		return contentRoot;
+	}
 
-    }
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
-    public Component getContent() {
-        return contentRoot;
-    }
+	private void populateTable(final Table table, Collection<Agent> agents) {
 
-    private void show(String notification) {
-        Notification.show(notification);
-    }
+		table.removeAllItems();
 
-    private void populateTable(final Table table, Collection<Agent> agents) {
+		for (final Agent agent : agents) {
+			final Button importBtn = new Button("Import");
+			importBtn.addStyleName("default");
+			final Button exportBtn = new Button("Export");
+			exportBtn.addStyleName("default");
+			final Button destroyBtn = new Button("Destroy");
+			destroyBtn.addStyleName("default");
+			final Embedded icon = new Embedded("", new ThemeResource(
+					"img/spinner.gif"));
+			icon.setVisible(false);
 
-        table.removeAllItems();
+			final List<java.io.Serializable> items = new ArrayList<>();
+			items.add(agent.getHostname());
+			items.add(importBtn);
+			items.add(exportBtn);
+			items.add(destroyBtn);
+			items.add(icon);
 
-        for (final Agent agent : agents) {
-            final Button importBtn = new Button("Import");
-            final Button exportBtn = new Button("Export");
-            final Button destroyBtn = new Button("Destroy");
-            final Embedded icon = new Embedded("", new ThemeResource(
-                    "img/spinner.gif"));
-            icon.setVisible(false);
+			table.addItem(items.toArray(), null);
 
-            final List items = new ArrayList();
-            items.add(agent.getHostname());
-            items.add(importBtn);
-            items.add(exportBtn);
-            items.add(destroyBtn);
-            items.add(icon);
+			importBtn.addClickListener(new Button.ClickListener() {
 
-            table.addItem(items.toArray(), null);
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					importPanel.setAgent(agent);
+					importPanel.setType(null);
+					SqoopUI.getForm().addTab(importPanel);
+				}
+			});
 
-            importBtn.addClickListener(new Button.ClickListener() {
+			exportBtn.addClickListener(new Button.ClickListener() {
 
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    importPanel.setAgent(agent);
-                    importPanel.setType(null);
-                    SqoopUI.getForm().addTab(importPanel);
-                }
-            });
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					exportPanel.setAgent(agent);
+					SqoopUI.getForm().addTab(exportPanel);
+				}
+			});
 
-            exportBtn.addClickListener(new Button.ClickListener() {
+			destroyBtn.addClickListener(new Button.ClickListener() {
 
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    exportPanel.setAgent(agent);
-                    SqoopUI.getForm().addTab(exportPanel);
-                }
-            });
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
 
-            destroyBtn.addClickListener(new Button.ClickListener() {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
+							"Yes", "No");
+					alert.getOk().addClickListener(new Button.ClickListener() {
+						@Override
+						public void buttonClick(Button.ClickEvent clickEvent) {
+							UUID trackID = SqoopUI.getManager().destroyNode(
+									config.getClusterName(),
+									agent.getHostname());
+							ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							window.getWindow().addCloseListener(new Window.CloseListener() {
+								@Override
+								public void windowClose(Window.CloseEvent closeEvent) {
+									refreshClustersInfo();
+								}
+							});
+							contentRoot.getUI().addWindow(window.getWindow());
+						}
+					});
 
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
+					contentRoot.getUI().addWindow(alert.getAlert());
+				}
+			});
 
-                    ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
-                            "Yes", "No");
-                    alert.getOk().addClickListener(new Button.ClickListener() {
-                        @Override
-                        public void buttonClick(Button.ClickEvent clickEvent) {
-                            UUID trackID = SqoopUI.getManager().destroyNode(
-                                    config.getClusterName(),
-                                    agent.getHostname());
-                            ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
-                            window.getWindow().addCloseListener(new Window.CloseListener() {
-                                @Override
-                                public void windowClose(Window.CloseEvent closeEvent) {
-                                    refreshClustersInfo();
-                                }
-                            });
-                            contentRoot.getUI().addWindow(window.getWindow());
-                        }
-                    });
+		}
+	}
 
-                    contentRoot.getUI().addWindow(alert.getAlert());
-                }
-            });
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(nodesTable, config.getNodes());
+		} else {
+			nodesTable.removeAllItems();
+		}
+	}
 
-        }
-    }
+	public void refreshClustersInfo() {
+		Config current = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		List<Config> clustersInfo = SqoopUI.getManager().getClusters();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (Config ci : clustersInfo) {
+				clusterCombo.addItem(ci);
+				clusterCombo.setItemCaption(ci, ci.getClusterName());
+			}
+			if (current != null) {
+				for (Config ci : clustersInfo) {
+					if (ci.getClusterName().equals(current.getClusterName())) {
+						clusterCombo.setValue(ci);
+						return;
+					}
+				}
+			}
+		}
+	}
 
-    private void refreshUI() {
-        if (config != null) {
-            populateTable(nodesTable, config.getNodes());
-        } else {
-            nodesTable.removeAllItems();
-        }
-    }
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Import", Button.class, null);
+		table.addContainerProperty("Export", Button.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
 
-    public void refreshClustersInfo() {
-        Config current = (Config) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
-        List<Config> clustersInfo = SqoopUI.getManager().getClusters();
-        if (clustersInfo != null && clustersInfo.size() > 0) {
-            for (Config ci : clustersInfo) {
-                clusterCombo.addItem(ci);
-                clusterCombo.setItemCaption(ci, ci.getClusterName());
-            }
-            if (current != null) {
-                for (Config ci : clustersInfo) {
-                    if (ci.getClusterName().equals(current.getClusterName())) {
-                        clusterCombo.setValue(ci);
-                        return;
-                    }
-                }
-            }
-        }
-    }
+		table.setPageLength(10);
+		table.setSelectable(true);
+		table.setImmediate(true);
 
-    private Table createTableTemplate(String caption, int size) {
-        final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Import", Button.class, null);
-        table.addContainerProperty("Export", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
-        table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-        table.setHeight(size, Sizeable.Unit.PIXELS);
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = SqoopUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SqoopUI.getExecutor(), SqoopUI.getCommandRunner(), SqoopUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
 
-        table.setPageLength(10);
-        table.setSelectable(true);
-        table.setImmediate(true);
+	private void destroyClusterHandler() {
 
-        table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-            @Override
-            public void itemClick(ItemClickEvent event) {
-                if (event.isDoubleClick()) {
-                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = SqoopUI.getAgentManager().getAgentByHostname(lxcHostname);
-                    if (lxcAgent != null) {
-                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SqoopUI.getExecutor(), SqoopUI.getCommandRunner(), SqoopUI.getAgentManager());
-                        contentRoot.getUI().addWindow(terminal.getWindow());
-                    } else {
-                        show("Agent is not connected");
-                    }
-                }
-            }
-        });
-        return table;
-    }
+		UUID trackID = SqoopUI.getManager().uninstallCluster(config.getClusterName());
 
-    private void destroyClusterHandler() {
-
-        UUID trackID = SqoopUI.getManager().uninstallCluster(config.getClusterName());
-
-        ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
-        window.getWindow().addCloseListener(new Window.CloseListener() {
-            @Override
-            public void windowClose(Window.CloseEvent closeEvent) {
-                refreshClustersInfo();
-            }
-        });
-        contentRoot.getUI().addWindow(window.getWindow());
-    }
+		ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+		window.getWindow().addCloseListener(new Window.CloseListener() {
+			@Override
+			public void windowClose(Window.CloseEvent closeEvent) {
+				refreshClustersInfo();
+			}
+		});
+		contentRoot.getUI().addWindow(window.getWindow());
+	}
 }

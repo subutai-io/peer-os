@@ -1022,7 +1022,7 @@
                                 </artifactItem>
 
                                 <!--Sqoop-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-api</artifactId>
                                     <version>${project.version}</version>
@@ -1046,7 +1046,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>sqoop-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Zookeeper-->
                                 <!--<artifactItem>
