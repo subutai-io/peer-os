@@ -12,35 +12,35 @@ import java.util.List;
  */
 public class QueryList extends ListSelect {
 
-    public static final int ROW_SIZE = 10;
+	public static final int ROW_SIZE = 10;
 
-    public QueryList() {
+	public QueryList() {
 
-        setNullSelectionAllowed(false);
-        setImmediate(true);
-        setRows(QueryList.ROW_SIZE);
+		setNullSelectionAllowed(false);
+		setImmediate(true);
+		setRows(QueryList.ROW_SIZE);
 
-        setSizeFull();
+		setSizeFull();
 
-        refreshDataSource(null);
-    }
+		refreshDataSource(null);
+	}
 
-    public void refreshDataSource(String filter) {
-        List<Config> list = HiveQueryUI.getManager().load();
+	public void refreshDataSource(String filter) {
+		List<Config> list = HiveQueryUI.getManager().load();
 
-        BeanItemContainer<Config> beans =
-                new BeanItemContainer<Config>(Config.class);
+		BeanItemContainer<Config> beans =
+				new BeanItemContainer<Config>(Config.class);
 
-        for (Config item : list) {
-            if (filter == null) {
-                beans.addBean(item);
-            } else if (item.getName().contains(filter) || item.getDescription().contains(filter)) {
-                beans.addBean(item);
-            }
-        }
+		for (Config item : list) {
+			if (filter == null) {
+				beans.addBean(item);
+			} else if (item.getName().contains(filter) || item.getDescription().contains(filter)) {
+				beans.addBean(item);
+			}
+		}
 
-        setContainerDataSource(beans);
-        setItemCaptionMode(ItemCaptionMode.PROPERTY);
-        setItemCaptionPropertyId("name");
-    }
+		setContainerDataSource(beans);
+		setItemCaptionMode(ItemCaptionMode.PROPERTY);
+		setItemCaptionPropertyId("name");
+	}
 }

@@ -21,8 +21,9 @@
         <module>hadoop</module>
         <module>hbase</module>
         <module>hive</module>
-        <!--<module>accumulo</module>
         <module>hivequery</module>
+        <!--<module>accumulo</module>
+
         <module>lucene</module>
         <module>mahout</module>
         <module>mongodb</module>

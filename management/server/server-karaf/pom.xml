@@ -811,26 +811,26 @@
                                 </artifactItem>
 
                                 <!--Hive Query-->
-                                <!-- <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hivequery-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hivequery-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hivequery-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>hivequery-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hivequery-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hivequery-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hivequery-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>hivequery-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!--Lucene-->
                                 <!--<artifactItem>

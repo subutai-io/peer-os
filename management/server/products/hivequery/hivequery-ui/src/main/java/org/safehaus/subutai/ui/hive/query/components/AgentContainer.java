@@ -9,19 +9,19 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class AgentContainer extends HorizontalLayout {
 
-    private Label labelNode;
-    private Agent agent;
+	private Label labelNode;
+	private Agent agent;
 
-    public AgentContainer(Agent agent, String caption) {
-        setMargin(true);
-        setSpacing(true);
+	public AgentContainer(Agent agent, String caption) {
+		setMargin(true);
+		setSpacing(true);
 
-        this.agent = agent;
-        labelNode = new Label(caption);
-        addComponent(labelNode);
-    }
+		this.agent = agent;
+		labelNode = new Label(caption);
+		addComponent(labelNode);
+	}
 
-    public Agent getAgent() {
-        return agent;
-    }
+	public Agent getAgent() {
+		return agent;
+	}
 }
