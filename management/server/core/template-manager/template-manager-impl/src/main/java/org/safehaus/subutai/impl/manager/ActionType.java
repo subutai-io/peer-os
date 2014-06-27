@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.template;
+package org.safehaus.subutai.impl.manager;
 
 enum ActionType {
 
