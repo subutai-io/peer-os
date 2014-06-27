@@ -1,15 +1,13 @@
-package org.safehaus.subutai.impl.template;
+package org.safehaus.subutai.impl.manager;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.template.TemplateManager;
+import org.safehaus.subutai.api.manager.TemplateManager;
 
 public abstract class TemplateManagerBase implements TemplateManager {
 
     CommandRunner commandRunner;
     AgentManager agentManager;
-    LxcManager lxcManager;
 
     ScriptExecutor scriptExecutor;
 
@@ -27,14 +25,6 @@ public abstract class TemplateManagerBase implements TemplateManager {
 
     public void setAgentManager(AgentManager agentManager) {
         this.agentManager = agentManager;
-    }
-
-    public LxcManager getLxcManager() {
-        return lxcManager;
-    }
-
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
     }
 
     public void init() {

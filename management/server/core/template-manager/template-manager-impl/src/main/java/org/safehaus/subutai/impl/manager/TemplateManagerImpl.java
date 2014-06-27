@@ -1,70 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.impl.manager;
 
+import org.safehaus.subutai.shared.protocol.Agent;
 
-import org.safehaus.subutai.api.manager.TemplateManager;
-
-
-/**
- * This is an implementation of LxcManager
- */
-public class TemplateManagerImpl implements TemplateManager {
-
+public class TemplateManagerImpl extends TemplateManagerBase {
 
     @Override
-    public void getTemplates() {
-
+    public Agent clone(String hostName, String templateName, String cloneName) {
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return clone(a, templateName, cloneName);
     }
 
-
     @Override
-    public void getInstances() {
-
+    public boolean cloneDestroy(String hostName, String cloneName) {
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return scriptExecutor.execute(a, ActionType.CLONE_DESTROY, cloneName);
     }
 
-
     @Override
-    public void createNewTemplate() {
-
+    public boolean convertClone(String hostName, String cloneName) {
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return scriptExecutor.execute(a, ActionType.TEMPLATE, cloneName);
     }
 
-
-    @Override
-    public void commitTemplate() {
-
-    }
-
-
-    @Override
-    public void destoryTemplate() {
-
-    }
-
-
-    @Override
-    public void getTsarFilesInfo() {
-
-    }
-
-
-    @Override
-    public void getTsarFileDescriptor() {
-
-    }
-
-
-    @Override
-    public void deleteTsarFile() {
-
-    }
-
-
-    @Override
-    public void pushTsarFileAsDebPackageIntoRepository() {
-
+    private Agent clone(Agent parent, String templateName, String cloneName) {
+        boolean b = scriptExecutor.execute(parent, ActionType.CLONE, templateName, cloneName);
+        if(b) return agentManager.getAgentByHostname(cloneName);
+        return null;
     }
 }

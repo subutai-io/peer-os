@@ -15,15 +15,6 @@
         <argument ref="monitor" />
     </bean>
   
-    <bean id="templateManager" scope="singleton" 
-          class="org.safehaus.subutai.impl.template.TemplateManagerImpl"
-          init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager" />
-        <property name="commandRunner" ref="commandRunner" />
-        <property name="lxcManager" ref="lxcmanager" />
-    </bean>
-
     <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
-    <service ref="templateManager" interface="org.safehaus.subutai.api.template.TemplateManager"/>
 
 </blueprint>
