@@ -648,33 +648,6 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!--MongoDB-->
-                                <!--<artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>mongodb-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-
                                 <!--Solr-->
                                 <!-- <artifactItem>
                                      <groupId>org.safehaus.subutai</groupId>
@@ -883,6 +856,33 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>mahout-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!--MongoDB-->
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>mongodb-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
