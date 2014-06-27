@@ -21,166 +21,168 @@ import java.util.*;
  */
 public class ConfigurationStep extends Panel {
 
-    private final TwinColSelect slaveNodesSelect;
-    private final ComboBox masterNodeCombo;
+	private final TwinColSelect slaveNodesSelect;
+	private final ComboBox masterNodeCombo;
 
-    public ConfigurationStep(final Wizard wizard) {
+	public ConfigurationStep(final Wizard wizard) {
 
-        setSizeFull();
+		setSizeFull();
 
-        GridLayout content = new GridLayout(1, 4);
-        content.setSizeFull();
-        content.setSpacing(true);
-        content.setMargin(true);
+		GridLayout content = new GridLayout(1, 4);
+		content.setSizeFull();
+		content.setSpacing(true);
+		content.setMargin(true);
 
-        ComboBox hadoopClustersCombo = new ComboBox("Hadoop cluster");
-        masterNodeCombo = new ComboBox("Master node");
-        slaveNodesSelect = new TwinColSelect("Slave nodes", new ArrayList<Agent>());
+		ComboBox hadoopClustersCombo = new ComboBox("Hadoop cluster");
+		masterNodeCombo = new ComboBox("Master node");
+		slaveNodesSelect = new TwinColSelect("Slave nodes", new ArrayList<Agent>());
 
-        masterNodeCombo.setImmediate(true);
-        masterNodeCombo.setTextInputAllowed(false);
-        masterNodeCombo.setRequired(true);
-        masterNodeCombo.setNullSelectionAllowed(false);
+		masterNodeCombo.setImmediate(true);
+		masterNodeCombo.setTextInputAllowed(false);
+		masterNodeCombo.setRequired(true);
+		masterNodeCombo.setNullSelectionAllowed(false);
 
-        hadoopClustersCombo.setImmediate(true);
-        hadoopClustersCombo.setTextInputAllowed(false);
-        hadoopClustersCombo.setRequired(true);
-        hadoopClustersCombo.setNullSelectionAllowed(false);
+		hadoopClustersCombo.setImmediate(true);
+		hadoopClustersCombo.setTextInputAllowed(false);
+		hadoopClustersCombo.setRequired(true);
+		hadoopClustersCombo.setNullSelectionAllowed(false);
 
-        slaveNodesSelect.setItemCaptionPropertyId("hostname");
-        slaveNodesSelect.setRows(7);
-        slaveNodesSelect.setMultiSelect(true);
-        slaveNodesSelect.setImmediate(true);
-        slaveNodesSelect.setLeftColumnCaption("Available Nodes");
-        slaveNodesSelect.setRightColumnCaption("Selected Nodes");
-        slaveNodesSelect.setWidth(100, Unit.PERCENTAGE);
-        slaveNodesSelect.setRequired(true);
+		slaveNodesSelect.setItemCaptionPropertyId("hostname");
+		slaveNodesSelect.setRows(7);
+		slaveNodesSelect.setMultiSelect(true);
+		slaveNodesSelect.setImmediate(true);
+		slaveNodesSelect.setLeftColumnCaption("Available Nodes");
+		slaveNodesSelect.setRightColumnCaption("Selected Nodes");
+		slaveNodesSelect.setWidth(100, Unit.PERCENTAGE);
+		slaveNodesSelect.setRequired(true);
 
-        List<Config> clusters = SparkUI.getHadoopManager().getClusters();
+		List<Config> clusters = SparkUI.getHadoopManager().getClusters();
 
-        if (clusters.size() > 0) {
-            for (Config hadoopClusterInfo : clusters) {
-                hadoopClustersCombo.addItem(hadoopClusterInfo);
-                hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
-                        hadoopClusterInfo.getClusterName());
-            }
-        }
+		if (clusters.size() > 0) {
+			for (Config hadoopClusterInfo : clusters) {
+				hadoopClustersCombo.addItem(hadoopClusterInfo);
+				hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
+						hadoopClusterInfo.getClusterName());
+			}
+		}
 
-        Config info = SparkUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
+		Config info = SparkUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
-        if (info != null) {
-            hadoopClustersCombo.setValue(info);
-        } else if (clusters.size() > 0) {
-            hadoopClustersCombo.setValue(clusters.iterator().next());
-        }
+		if (info != null) {
+			hadoopClustersCombo.setValue(info);
+		} else if (clusters.size() > 0) {
+			hadoopClustersCombo.setValue(clusters.iterator().next());
+		}
 
-        if (hadoopClustersCombo.getValue() != null) {
-            Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
-            wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-            slaveNodesSelect.setContainerDataSource(
-                    new BeanItemContainer<>(
-                            Agent.class, hadoopInfo.getAllNodes())
-            );
-            for (Agent agent : hadoopInfo.getAllNodes()) {
-                masterNodeCombo.addItem(agent);
-                masterNodeCombo.setItemCaption(agent, agent.getHostname());
-            }
-        }
+		if (hadoopClustersCombo.getValue() != null) {
+			Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+			wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+			slaveNodesSelect.setContainerDataSource(
+					new BeanItemContainer<>(
+							Agent.class, hadoopInfo.getAllNodes())
+			);
+			for (Agent agent : hadoopInfo.getAllNodes()) {
+				masterNodeCombo.addItem(agent);
+				masterNodeCombo.setItemCaption(agent, agent.getHostname());
+			}
+		}
 
-        hadoopClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Config hadoopInfo = (Config) event.getProperty().getValue();
-                    slaveNodesSelect.setValue(null);
-                    slaveNodesSelect.setContainerDataSource(
-                            new BeanItemContainer<>(
-                                    Agent.class, hadoopInfo.getAllNodes())
-                    );
-                    masterNodeCombo.setValue(null);
-                    masterNodeCombo.removeAllItems();
-                    for (Agent agent : hadoopInfo.getAllNodes()) {
-                        masterNodeCombo.addItem(agent);
-                        masterNodeCombo.setItemCaption(agent, agent.getHostname());
-                    }
-                    wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-                    wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
-                    wizard.getConfig().setMasterNode(null);
-                }
-            }
-        });
+		hadoopClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				if (event.getProperty().getValue() != null) {
+					Config hadoopInfo = (Config) event.getProperty().getValue();
+					slaveNodesSelect.setValue(null);
+					slaveNodesSelect.setContainerDataSource(
+							new BeanItemContainer<>(
+									Agent.class, hadoopInfo.getAllNodes())
+					);
+					masterNodeCombo.setValue(null);
+					masterNodeCombo.removeAllItems();
+					for (Agent agent : hadoopInfo.getAllNodes()) {
+						masterNodeCombo.addItem(agent);
+						masterNodeCombo.setItemCaption(agent, agent.getHostname());
+					}
+					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+					wizard.getConfig().setSlaveNodes(new HashSet<Agent>());
+					wizard.getConfig().setMasterNode(null);
+				}
+			}
+		});
 
-        if (wizard.getConfig().getMasterNode() != null) {
-            masterNodeCombo.setValue(wizard.getConfig().getMasterNode());
-        }
+		if (wizard.getConfig().getMasterNode() != null) {
+			masterNodeCombo.setValue(wizard.getConfig().getMasterNode());
+		}
 
-        masterNodeCombo.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Agent master = (Agent) event.getProperty().getValue();
-                    wizard.getConfig().setMasterNode(master);
-                }
-            }
-        });
+		masterNodeCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				if (event.getProperty().getValue() != null) {
+					Agent master = (Agent) event.getProperty().getValue();
+					wizard.getConfig().setMasterNode(master);
+				}
+			}
+		});
 
-        if (!Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
-            slaveNodesSelect.setValue(wizard.getConfig().getSlaveNodes());
-        }
-        slaveNodesSelect.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null) {
-                    Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-                    wizard.getConfig().setSlaveNodes(agentList);
-                }
-            }
-        });
+		if (!Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
+			slaveNodesSelect.setValue(wizard.getConfig().getSlaveNodes());
+		}
+		slaveNodesSelect.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				if (event.getProperty().getValue() != null) {
+					Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
+					wizard.getConfig().setSlaveNodes(agentList);
+				}
+			}
+		});
 
-        Button next = new Button("Next");
-        next.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
-                    show("Please, select Hadoop cluster");
-                } else if (wizard.getConfig().getMasterNode() == null) {
-                    show("Please, select master node");
-                } else if (Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
-                    show("Please, select slave nodes");
-                } else {
-                    wizard.next();
-                }
-            }
-        });
+		Button next = new Button("Next");
+		next.addStyleName("default");
+		next.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
+					show("Please, select Hadoop cluster");
+				} else if (wizard.getConfig().getMasterNode() == null) {
+					show("Please, select master node");
+				} else if (Util.isCollectionEmpty(wizard.getConfig().getSlaveNodes())) {
+					show("Please, select slave nodes");
+				} else {
+					wizard.next();
+				}
+			}
+		});
 
-        Button back = new Button("Back");
-        back.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                wizard.back();
-            }
-        });
+		Button back = new Button("Back");
+		back.addStyleName("default");
+		back.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.back();
+			}
+		});
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing(true);
-        layout.addComponent(new Label("Please, specify installation settings"));
-        layout.addComponent(content);
+		VerticalLayout layout = new VerticalLayout();
+		layout.setSpacing(true);
+		layout.addComponent(new Label("Please, specify installation settings"));
+		layout.addComponent(content);
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(back);
-        buttons.addComponent(next);
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.addComponent(back);
+		buttons.addComponent(next);
 
-        content.addComponent(hadoopClustersCombo);
-        content.addComponent(masterNodeCombo);
-        content.addComponent(slaveNodesSelect);
-        content.addComponent(buttons);
+		content.addComponent(hadoopClustersCombo);
+		content.addComponent(masterNodeCombo);
+		content.addComponent(slaveNodesSelect);
+		content.addComponent(buttons);
 
-        setContent(layout);
+		setContent(layout);
 
-    }
+	}
 
-    private void show(String notification) {
-        Notification.show(notification);
-    }
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
 }

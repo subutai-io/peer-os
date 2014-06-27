@@ -967,35 +967,8 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!--Spark-->
-                                <!--<artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-
                                 <!--Shark-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-api</artifactId>
                                     <version>${project.version}</version>
@@ -1019,7 +992,34 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>shark-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
+
+                                <!--Spark-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>spark-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!--Sqoop-->
                                 <!--<artifactItem>

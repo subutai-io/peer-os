@@ -28,10 +28,11 @@
         <module>oozie</module>
         <module>pig</module>
         <module>presto</module>
-        <!--<module>accumulo</module>
         <module>shark</module>
-        <module>solr</module>
+
         <module>spark</module>
+        <!--<module>accumulo</module>
+        <module>solr</module>
         <module>sqoop</module>
         <module>storm</module>
         <module>zookeeper</module>-->
