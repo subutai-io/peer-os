@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 public class Manager {
 
-	private final VerticalLayout contentRoot;
+	private final GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table configServersTable;
 	private final Table routersTable;
@@ -45,9 +45,12 @@ public class Manager {
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
+		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
+		contentRoot.setMargin(true);
 		contentRoot.setSizeFull();
+		contentRoot.setRows(11);
+		contentRoot.setColumns(1);
 
 		//tables go here
 		configServersTable = createTableTemplate("Config Servers");
@@ -237,11 +240,11 @@ public class Manager {
 		configContent.addComponent(new Label("Data node port:"));
 		configContent.addComponent(dataNodePort);
 
-		contentRoot.addComponent(controlsContent);
-		contentRoot.addComponent(configContent);
-		contentRoot.addComponent(configServersTable);
-		contentRoot.addComponent(routersTable);
-		contentRoot.addComponent(dataNodesTable);
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(configContent, 0, 1);
+		contentRoot.addComponent(configServersTable, 0, 2, 0, 4);
+		contentRoot.addComponent(routersTable, 0, 5, 0, 7);
+		contentRoot.addComponent(dataNodesTable, 0, 8, 0, 10);
 	}
 
 	public static void checkNodesStatus(Table table) {
