@@ -27,8 +27,8 @@
         <module>mongodb</module>
         <module>oozie</module>
         <module>pig</module>
-        <!--<module>accumulo</module>
         <module>presto</module>
+        <!--<module>accumulo</module>
         <module>shark</module>
         <module>solr</module>
         <module>spark</module>

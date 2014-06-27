@@ -941,7 +941,7 @@
                                 </artifactItem>
 
                                 <!--Presto-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-api</artifactId>
                                     <version>${project.version}</version>
@@ -965,7 +965,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>presto-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Spark-->
                                 <!--<artifactItem>
