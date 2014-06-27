@@ -887,7 +887,7 @@
                                 </artifactItem>
 
                                 <!--Oozie-->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-api</artifactId>
                                     <version>${project.version}</version>
@@ -911,7 +911,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>oozie-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Pig-->
                                 <!-- <artifactItem>
