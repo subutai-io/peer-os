@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class SqoopUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "spark.png";
+	public static final String MODULE_IMAGE = "sqoop.png";
 
 	private static AgentManager agentManager;
 	private static Tracker tracker;
