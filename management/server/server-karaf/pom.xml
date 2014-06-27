@@ -648,33 +648,6 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
-                                <!--Solr-->
-                                <!-- <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>solr-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>solr-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>solr-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>solr-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>solr-rest</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>-->
-
                                 <!--HBase-->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -1018,6 +991,33 @@
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>spark-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!--Solr-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>solr-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>solr-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>solr-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>solr-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>solr-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 

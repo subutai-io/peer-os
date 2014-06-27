@@ -42,7 +42,7 @@ public class Manager {
 		contentRoot.setColumns(1);
 
 		//tables go here
-		nodesTable = createTableTemplate("Nodes", 200);
+		nodesTable = createTableTemplate("Nodes");
 		//tables go here
 
 		HorizontalLayout controlsContent = new HorizontalLayout();
@@ -257,7 +257,7 @@ public class Manager {
 		}
 	}
 
-	private Table createTableTemplate(String caption, int size) {
+	private Table createTableTemplate(String caption) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Destroy", Button.class, null);
