@@ -595,7 +595,7 @@
                                 <!-- Products Modules - START -->
 
                                 <!-- Accumulo -->
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-api</artifactId>
                                     <version>${project.version}</version>
@@ -619,7 +619,7 @@
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>accumulo-rest</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
+                                </artifactItem>
 
                                 <!--Cassandra-->
                                 <artifactItem>

@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>accumulo</module>
         <module>cassandra</module>
         <module>common</module>
         <module>flume</module>
@@ -34,11 +35,6 @@
         <module>sqoop</module>
         <module>storm</module>
         <module>zookeeper</module>
-        <!--<module>accumulo</module>
-
-
-
-        -->
     </modules>
 
 </project>

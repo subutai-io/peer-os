@@ -10,6 +10,7 @@ import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.ui.accumulo.AccumuloUI;
 
 
 /**
@@ -32,7 +33,7 @@ public class WelcomeStep extends Panel {
 
 		Label logoImg = new Label();
 		// Image as a file resource
-		logoImg.setIcon(new FileResource(FileUtil.getFile("accumulo.png", this)));
+		logoImg.setIcon(new FileResource(FileUtil.getFile(AccumuloUI.MODULE_IMAGE, this)));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(56, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);
