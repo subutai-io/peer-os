@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class Manager {
 
-	private final VerticalLayout contentRoot;
+	private final GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table mastersTable;
 	private final Table tracersTable;
@@ -45,23 +45,17 @@ public class Manager {
 
 	public Manager() {
 
-		contentRoot = new VerticalLayout();
+		contentRoot = new GridLayout();
 		contentRoot.setSpacing(true);
-		contentRoot.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		contentRoot.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-		final VerticalLayout content = new VerticalLayout();
-		content.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		content.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-		contentRoot.addComponent(content);
-		contentRoot.setComponentAlignment(content, Alignment.TOP_CENTER);
 		contentRoot.setMargin(true);
+		contentRoot.setSizeFull();
+		contentRoot.setRows(17);
+		contentRoot.setColumns(1);
 
 		//tables go here
-		mastersTable = UiUtil.createTableTemplate("Masters", 150, contentRoot, false);
-		tracersTable = UiUtil.createTableTemplate("Tracers", 150, contentRoot, true);
-		slavesTable = UiUtil.createTableTemplate("Slaves", 150, contentRoot, true);
+		mastersTable = UiUtil.createTableTemplate("Masters", false);
+		tracersTable = UiUtil.createTableTemplate("Tracers", true);
+		slavesTable = UiUtil.createTableTemplate("Slaves", true);
 		//tables go here
 
 		HorizontalLayout controlsContent = new HorizontalLayout();
@@ -85,6 +79,7 @@ public class Manager {
 		controlsContent.addComponent(clusterCombo);
 
 		Button refreshClustersBtn = new Button("Refresh clusters");
+		refreshClustersBtn.addStyleName("default");
 		refreshClustersBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -95,6 +90,7 @@ public class Manager {
 		controlsContent.addComponent(refreshClustersBtn);
 
 		Button checkAllBtn = new Button("Check all");
+		checkAllBtn.addStyleName("default");
 		checkAllBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -107,6 +103,7 @@ public class Manager {
 		controlsContent.addComponent(checkAllBtn);
 
 		Button startClusterBtn = new Button("Start cluster");
+		startClusterBtn.addStyleName("default");
 		startClusterBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -125,6 +122,7 @@ public class Manager {
 		controlsContent.addComponent(startClusterBtn);
 
 		Button stopClusterBtn = new Button("Stop cluster");
+		stopClusterBtn.addStyleName("default");
 		stopClusterBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -143,6 +141,7 @@ public class Manager {
 		controlsContent.addComponent(stopClusterBtn);
 
 		Button destroyClusterBtn = new Button("Destroy cluster");
+		destroyClusterBtn.addStyleName("default");
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -173,6 +172,7 @@ public class Manager {
 		controlsContent.addComponent(destroyClusterBtn);
 
 		Button addTracerBtn = new Button("Add Tracer");
+		addTracerBtn.addStyleName("default");
 		addTracerBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -215,6 +215,7 @@ public class Manager {
 		controlsContent.addComponent(addTracerBtn);
 
 		Button addSlaveBtn = new Button("Add Slave");
+		addSlaveBtn.addStyleName("default");
 		addSlaveBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -265,6 +266,7 @@ public class Manager {
 		customPropertyContent.addComponent(propertyNameTextField);
 
 		Button removePropertyBtn = new Button("Remove");
+		removePropertyBtn.addStyleName("default");
 		removePropertyBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -297,12 +299,13 @@ public class Manager {
 		final TextField propertyValueTextField = new TextField();
 		customPropertyContent.addComponent(propertyValueTextField);
 		Button addPropertyBtn = new Button("Add");
+		addPropertyBtn.addStyleName("default");
 		addPropertyBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				if (config != null) {
-					String propertyName = (String) propertyNameTextField.getValue();
-					String propertyValue = (String) propertyValueTextField.getValue();
+					String propertyName = propertyNameTextField.getValue();
+					String propertyValue = propertyValueTextField.getValue();
 					if (Strings.isNullOrEmpty(propertyName)) {
 						Notification.show("Please, specify property name to add");
 					} else if (Strings.isNullOrEmpty(propertyValue)) {
@@ -327,14 +330,11 @@ public class Manager {
 		});
 		customPropertyContent.addComponent(addPropertyBtn);
 
-		content.addComponent(controlsContent);
-		content.addComponent(customPropertyContent);
-		content.setComponentAlignment(controlsContent, Alignment.TOP_RIGHT);
-		content.setComponentAlignment(customPropertyContent, Alignment.TOP_RIGHT);
-
-		content.addComponent(mastersTable);
-		content.addComponent(tracersTable);
-		content.addComponent(slavesTable);
+		contentRoot.addComponent(controlsContent, 0, 0);
+		contentRoot.addComponent(customPropertyContent, 0, 1);
+		contentRoot.addComponent(mastersTable, 0, 2, 0, 6);
+		contentRoot.addComponent(tracersTable, 0, 7, 0, 11);
+		contentRoot.addComponent(slavesTable, 0, 12, 0, 16);
 	}
 
 	private void refreshUI() {

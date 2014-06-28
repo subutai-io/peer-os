@@ -282,9 +282,8 @@ public class Manager {
 		customPropertyContent.addComponent(addPropertyBtn);
 
 		contentRoot.addComponent(controlsContent, 0, 0);
-		contentRoot.addComponent(customPropertyContent, 0, 1, 0, 5);
-		contentRoot.addComponent(nodesTable, 0, 6, 0, 10);
-
+		contentRoot.addComponent(customPropertyContent, 0, 1);
+		contentRoot.addComponent(nodesTable, 0, 2, 0, 10);
 	}
 
 	public static void checkNodesStatus(Table table) {

@@ -45,8 +45,7 @@ public class UiUtil {
 	}
 
 
-	public static Table createTableTemplate(String caption, int size, final Component parent,
-	                                        boolean destroyButtonNeeded) {
+	public static Table createTableTemplate(String caption, boolean destroyButtonNeeded) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
 		table.addContainerProperty("Check", Button.class, null);
@@ -55,8 +54,7 @@ public class UiUtil {
 		}
 		table.addContainerProperty("Nodes state", Label.class, null);
 		table.addContainerProperty("Status", Embedded.class, null);
-		table.setWidth(100, Sizeable.Unit.PERCENTAGE);
-		table.setHeight(size, Sizeable.Unit.PIXELS);
+		table.setSizeFull();
 		table.setPageLength(10);
 		table.setSelectable(false);
 		table.setImmediate(true);
