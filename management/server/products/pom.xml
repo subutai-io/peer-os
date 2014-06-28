@@ -33,11 +33,12 @@
         <module>spark</module>
         <module>sqoop</module>
         <module>storm</module>
+        <module>zookeeper</module>
         <!--<module>accumulo</module>
 
 
 
-        <module>zookeeper</module>-->
+        -->
     </modules>
 
 </project>

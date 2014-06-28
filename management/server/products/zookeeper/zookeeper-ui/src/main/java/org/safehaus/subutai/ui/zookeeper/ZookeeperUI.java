@@ -13,7 +13,9 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,68 +24,75 @@ import java.util.concurrent.Executors;
  */
 public class ZookeeperUI implements PortalModule {
 
-    private static Zookeeper manager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Hadoop hadoopManager;
-    private static CommandRunner commandRunner;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "zookeeper.png";
 
-    public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager, CommandRunner commandRunner) {
-        ZookeeperUI.agentManager = agentManager;
-        ZookeeperUI.tracker = tracker;
-        ZookeeperUI.manager = manager;
-        ZookeeperUI.hadoopManager = hadoopManager;
-        ZookeeperUI.commandRunner = commandRunner;
-    }
+	private static Zookeeper manager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Hadoop hadoopManager;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public ZookeeperUI(AgentManager agentManager, Tracker tracker, Zookeeper manager, Hadoop hadoopManager, CommandRunner commandRunner) {
+		ZookeeperUI.agentManager = agentManager;
+		ZookeeperUI.tracker = tracker;
+		ZookeeperUI.manager = manager;
+		ZookeeperUI.hadoopManager = hadoopManager;
+		ZookeeperUI.commandRunner = commandRunner;
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
-    public static Zookeeper getManager() {
-        return manager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Zookeeper getManager() {
+		return manager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public void destroy() {
-        manager = null;
-        agentManager = null;
-        tracker = null;
-        hadoopManager = null;
-        executor.shutdown();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    @Override
-    public String getId() {
-        return Config.PRODUCT_KEY;
-    }
+	public void destroy() {
+		manager = null;
+		agentManager = null;
+		tracker = null;
+		hadoopManager = null;
+		executor.shutdown();
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
 
-    public Component createComponent() {
-        return new Form();
-    }
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(ZookeeperUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new Form();
+	}
 
 }
