@@ -454,6 +454,28 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Template Registry Manager -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-registry-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-registry-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-registry-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-registry-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Apt Repo Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -592,6 +614,13 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Environment Manager -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>environment-manager-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                
                 <!-- Core Modules - END -->
 
                 <!-- Products Modules - START -->
