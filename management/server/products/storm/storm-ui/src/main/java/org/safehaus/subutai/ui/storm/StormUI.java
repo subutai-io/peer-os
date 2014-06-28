@@ -8,11 +8,15 @@ import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class StormUI implements PortalModule {
+
+	public static final String MODULE_IMAGE = "storm.png";
 
 	private static AgentManager agentManager;
 	private static Tracker tracker;
@@ -48,6 +52,11 @@ public class StormUI implements PortalModule {
 
 	public String getName() {
 		return Config.PRODUCT_NAME;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(StormUI.MODULE_IMAGE, this);
 	}
 
 	public Component createComponent() {

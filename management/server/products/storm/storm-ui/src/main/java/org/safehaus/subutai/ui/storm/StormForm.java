@@ -3,7 +3,6 @@ package org.safehaus.subutai.ui.storm;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Runo;
 import org.safehaus.subutai.ui.storm.manager.Manager;
 import org.safehaus.subutai.ui.storm.wizard.Wizard;
 
@@ -22,7 +21,6 @@ public class StormForm extends CustomComponent {
 		verticalLayout.setSizeFull();
 
 		TabSheet tabSheet = new TabSheet();
-		tabSheet.setStyleName(Runo.TABSHEET_SMALL);
 		tabSheet.setSizeFull();
 		tabSheet.addTab(wizard.getContent(), "Install");
 		tabSheet.addTab(manager.getContent(), "Manage");

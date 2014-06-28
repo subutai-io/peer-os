@@ -49,6 +49,7 @@ class AddNodeWindow extends Window {
 		availableNodes.setValue(nodes.iterator().next());
 
 		final Button addNodeBtn = new Button("Add");
+		addNodeBtn.addStyleName("default");
 		addNodeBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -104,6 +105,7 @@ class AddNodeWindow extends Window {
 		indicator.setVisible(false);
 
 		ok = new Button("Ok");
+		ok.addStyleName("default");
 		ok.addClickListener(new Button.ClickListener() {
 
 			@Override

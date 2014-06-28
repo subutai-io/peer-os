@@ -1048,6 +1048,24 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!--Storm-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>storm-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>storm-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>storm-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <!--Products Modules - END-->
+
                                 <!--Zookeeper-->
                                 <!--<artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -1074,24 +1092,7 @@
                                     <artifactId>zookeeper-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>-->
-
-                                <!--Storm-->
-                                <!--<artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>storm-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>storm-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>storm-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
-                                <!-- Products Modules - END -->
+                                <!--Products Modules - END-->
                             </artifactItems>
                         </configuration>
                     </execution>
