@@ -50,6 +50,7 @@ public class VerificationStep extends Panel {
 		}
 
 		Button install = new Button("Install");
+		install.addStyleName("default");
 		install.addClickListener(new Button.ClickListener() {
 
 			@Override
@@ -68,6 +69,7 @@ public class VerificationStep extends Panel {
 		});
 
 		Button back = new Button("Back");
+		back.addStyleName("default");
 		back.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent event) {

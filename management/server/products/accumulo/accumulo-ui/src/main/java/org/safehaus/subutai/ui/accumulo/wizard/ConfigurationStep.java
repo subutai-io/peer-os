@@ -236,6 +236,7 @@ public class ConfigurationStep extends Panel {
 		});
 
 		Button next = new Button("Next");
+		next.addStyleName("default");
 		//check valid configuration
 		next.addClickListener(new Button.ClickListener() {
 
@@ -265,6 +266,7 @@ public class ConfigurationStep extends Panel {
 		});
 
 		Button back = new Button("Back");
+		back.addStyleName("default");
 		back.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent event) {

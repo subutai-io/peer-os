@@ -91,6 +91,7 @@ public class UiUtil {
 			int rowId = (Integer) o;
 			Item row = table.getItem(rowId);
 			Button checkBtn = (Button) (row.getItemProperty(buttonCaption).getValue());
+			checkBtn.addStyleName("default");
 			checkBtn.click();
 		}
 	}
