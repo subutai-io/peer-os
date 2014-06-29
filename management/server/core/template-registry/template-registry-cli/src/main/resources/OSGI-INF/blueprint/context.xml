@@ -1,0 +1,54 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="templateRegistryManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/get-template-by-name">
+      <action class="org.safehaus.subutai.cli.templateregistry.GetTemplateCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/register-template">
+      <action class="org.safehaus.subutai.cli.templateregistry.RegisterTemplateCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/get-templates-by-parent">
+      <action class="org.safehaus.subutai.cli.templateregistry.GetTemplatesByParentCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/get-parent-template">
+      <action class="org.safehaus.subutai.cli.templateregistry.GetParentTemplateCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/unregister-template">
+      <action class="org.safehaus.subutai.cli.templateregistry.UnregisterTemplateCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="registry/list-templates">
+      <action class="org.safehaus.subutai.cli.templateregistry.ListTemplatesCommand">
+        <property name="templateRegistryManager" ref="templateRegistryManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>

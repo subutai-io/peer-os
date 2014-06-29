@@ -23,7 +23,11 @@
     <module>tracker</module>
     <module>monitor</module>
     <module>command-runner</module>
-    <!--<module>git-manager</module>-->
-    <!--<module>package-manager</module>-->
+    <module>git-manager</module>
+    <module>package-manager</module>
+    <module>apt-repository-manager</module>
+    <module>environment-manager</module>
+    <module>template-registry</module>
+    <module>template-manager</module>
   </modules>
 </project>

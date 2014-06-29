@@ -1,0 +1,21 @@
+#!/bin/bash
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+msg_debug "first         arg = $1"
+msg_debug "second        arg = $2"
+msg_debug "third         arg = $3"
+msg_debug "fourth        arg = $4"
+msg_debug "fifth         arg = $5"
+msg_debug "LXC_ROOTFS_MOUNT  = $LXC_ROOTFS_MOUNT"
+msg_debug "LXC_ROOTFS_PATH   = $LXC_ROOTFS_PATH"
+msg_debug "LXC_CONFIG_FILE   = $LXC_CONFIG_FILE"
+msg_debug "LXC_NAME          = $LXC_NAME"
+msg_debug "LXC_SRC_NAME      = $LXC_SRC_NAME"
+
+if [ -n "`zfs list -t snapshot | grep lxc/$LXC_NAME@template`" ]; then
+  exit 1
+fi
+

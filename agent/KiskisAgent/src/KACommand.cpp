@@ -95,6 +95,7 @@ bool KACommand::deserialize(string& input)
 	if(!parsedSuccess)	//if it is not successfull
 	{
 		cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
+		cout <<"Failed Message: " << input << endl;
 		return false; //error in parsing Json
 	}
 	//Start mandatory parameters deserialization

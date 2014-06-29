@@ -16,6 +16,7 @@ import org.safehaus.subutai.api.gitmanager.GitCommand;
 import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -27,7 +28,6 @@ import com.google.common.collect.Sets;
  */
 public class GitManagerImpl implements GitManager {
 
-    private final String GIT_REPO_URL = "git@10.10.10.1:/opt/git/project.git";
     private final String MASTER_BRANCH = "master";
     private final String LINE_SEPARATOR = "\n";
     private CommandRunner commandRunner;
@@ -180,7 +180,7 @@ public class GitManagerImpl implements GitManager {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), "Branch name is null or empty" );
 
         Command cloneCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git clone -b %s %s %s", newBranchName, GIT_REPO_URL, targetDir ) )
+                new RequestBuilder( String.format( "git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir ) )
                         .withTimeout( 180 ), Sets.newHashSet( host ) );
 
         runCommand( cloneCommand, host, GitCommand.CLONE );

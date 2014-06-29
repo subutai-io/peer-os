@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+. /etc/profile
+
+hadoopVersion=2.3.0
+tar -xpzf /opt/hadoop-$hadoopVersion.tar.gz -C /opt
+
+# copy conf files from etc/hadoop to conf
+mkdir /opt/hadoop-$hadoopVersion/conf
+cp -a /opt/hadoop-$hadoopVersion/etc/hadoop/* /opt/hadoop-$hadoopVersion/conf
+rm -rf /opt/hadoop-$hadoopVersion/etc
+
+hadoopHomeEcho="/opt/hadoop-$hadoopVersion"
+hadoopConf=$hadoopHomeEcho"/conf"
+
+escape_characters()
+{
+	temp_value=$1
+        #echo "Escaping some special characters like '/' for name:" $temp_name "and value:" $temp_value	
+	escaped_value=$(echo $temp_value | sed -e 's/\//\\\//g')
+	#echo "Escaped Value:" $escaped_value  
+}
+
+# Replace the comment with the real export in the file
+if [[ "x$JAVA_HOME" == "x" ]];
+then
+    sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME=\/usr\/lib\/jvm\/java-1.7.0-openjdk-amd64/g' $hadoopConf/hadoop-env.sh
+else
+    escape_characters $JAVA_HOME
+    echo "Using JAVA_HOME:" $JAVA_HOME
+    sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME='$escaped_value'/g' $hadoopConf/hadoop-env.sh
+fi
+
+# Suppress HADOOP_HOME is deprecated message
+# echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> $hadoopConf/hadoop-env.sh
+
+rm -rf /opt/hadoop-$hadoopVersion.tar.gz
+. /etc/profile
+touch $hadoopConf/dfs.exclude
+touch $hadoopConf/dfs.include
+touch $hadoopConf/mapred.exclude
+touch $hadoopConf/mapred.include
+
+# core-site.xml
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.defaultFS hdfs://localhost:8020
+$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
+
+# hdfs-site.xml
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.replication 1
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.permissions false
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-$hadoopVersion/conf/dfs.include
+$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-$hadoopVersion/conf/dfs.exclude
+
+# mapred-site.xml
+cp /opt/hadoop-$hadoopVersion/conf/mapred-site.xml.template /opt/hadoop-$hadoopVersion/conf/mapred-site.xml
+$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapreduce.framework.name yarn
+
+# yarn-site.xml
+$hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.resource-tracker.address localhost:8025
+$hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.scheduler.address localhost:8030
+$hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.resourcemanager.address localhost:8040
+$hadoopHomeEcho/bin/hadoop-property.sh add yarn-site.xml yarn.nodemanager.aux-services mapreduce_shuffle

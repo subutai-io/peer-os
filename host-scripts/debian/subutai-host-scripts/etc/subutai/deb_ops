@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O deb package convenience operations
+# --------------------------------------------------------------------------
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+# creates a debian package for a template and its associated files
+# arg $1 = name of the container, template etc
+# should echo out the path to the newly generated deb package file
+#
+# notes:
+#   - the tmp_path variable is where all the files have been collected
+#     that need to be packaged and distributed within the deb pkg
+#   - the following files and directory structure exist:
+#      .
+#      ├── config
+#      ├── deltas
+#      │   ├── home.delta
+#      │   ├── opt.delta
+#      │   ├── rootfs.delta
+#      │   └── var.delta
+#      ├── fstab
+#      └── packages
+#
+#   - all template deb packages must depend on host-scripts package
+#   - post installation of the package should call subutai-import
+#   - installation should dump package contents under the $tmp directory
+#     into a new directory with the name of the container: the import
+#     command will expect this file structure to import the newly installed
+#     container
+
+#	
+#	NOTE: Debian package will be created under /tmp/debian folder
+#
+
+function deb_pkg {
+  local lxc="$1"
+  local tmp="$SUBUTAI_TMPDIR"
+  local tmp_path="$tmp/$lxc"
+  debian_tmp_dir=$SUBUTAI_TMPDIR/$lxc-subutai-template
+  local md5sum_file=$debian_tmp_dir/DEBIAN/md5sums
+  output_dir=$debian_tmp_dir/$tmp_path
+
+  # ------------------------------------------------------------------------------
+  # (1) create DEBIAN folder and copy required files.
+  # -----------------------------------------------------------------------------
+  mkdir -p $debian_tmp_dir
+  mkdir -p $debian_tmp_dir/DEBIAN
+  mkdir -p $output_dir
+  cp -r $tmp_path/* $output_dir
+
+  # -----------------------------------------------------------------------------
+  # (2)  create control file of debian package
+  # -----------------------------------------------------------------------------
+  create_control_file $lxc
+
+  # -----------------------------------------------------------------------------
+  # (3) create postinst script of debian package
+  # -----------------------------------------------------------------------------
+  create_postinst_script $lxc
+
+  # -----------------------------------------------------------------------------
+  # (4) create debian package
+  # -----------------------------------------------------------------------------
+  dpkg-deb -z8 -Zgzip --build $debian_tmp_dir >> /dev/null
+
+  # -----------------------------------------------------------------------------
+  # (5) remove copied directories for creating debian package
+  # -----------------------------------------------------------------------------		
+  rm -rf $debian_tmp_dir
+
+  # -----------------------------------------------------------------------------
+  # (6) return path of newly generated debian package
+  # -----------------------------------------------------------------------------
+  echo "$debian_tmp_dir.deb"
+}
+
+
+
+# ----------------------------------------------------------------------------------
+# Creates control file of debian package
+# ----------------------------------------------------------------------------------
+function create_control_file {
+
+  local packageName=$1-subutai-template  
+  local control_file=$debian_tmp_dir/DEBIAN/control
+
+  # These properties are needed inside control file of debian package
+  local Package="$packageName" 
+  local Maintainer="subutai"
+  local Architecture="amd64"
+  local Version=$SUBUTAI_VERSION
+  local Depends="subutai-host-scripts (= $SUBUTAI_VERSION)" 
+  local Description="This is a Subutai delta image debian package"
+
+  # clean control file
+  > $control_file
+
+  echo Package: $Package >> $control_file
+  echo Maintainer: $Maintainer >> $control_file
+  echo Architecture: $Architecture >> $control_file
+  echo Version: $Version >> $control_file
+  echo Depends: $Depends >> $control_file
+  echo Description: $Description >> $control_file
+}
+
+
+# ----------------------------------------------------------------------------------
+# Creates postinst script of debian package
+# ----------------------------------------------------------------------------------
+function create_postinst_script {
+  local postinst_file=$debian_tmp_dir/DEBIAN/postinst
+  echo "#!/bin/bash"  >> $postinst_file
+  echo "set -e"  >> $postinst_file
+  echo ""  >> $postinst_file
+  chmod +x $postinst_file
+}

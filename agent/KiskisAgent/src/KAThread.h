@@ -25,11 +25,11 @@
  */
 #ifndef KATHREAD_H_
 #define KATHREAD_H_
+#include <sys/wait.h>
 #include <pthread.h>
 #include <list>
 #include "KAUserID.h"
 #include "KACommand.h"
-#include "KAConnection.h"
 #include "KAResponsePack.h"
 #include "KAStreamReader.h"
 #include "KALogger.h"

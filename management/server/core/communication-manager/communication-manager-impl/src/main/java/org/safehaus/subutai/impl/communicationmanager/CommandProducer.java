@@ -20,6 +20,7 @@ import javax.jms.TextMessage;
 import org.safehaus.subutai.api.communicationmanager.CommandJson;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
@@ -30,11 +31,19 @@ class CommandProducer implements Runnable {
     private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
+    private final boolean isBroadcast;
 
 
     public CommandProducer( Request command, CommunicationManagerImpl communicationManagerImpl ) {
-        this.communicationManagerImpl = communicationManagerImpl;
+        this( command, communicationManagerImpl, false );
+    }
+
+
+    public CommandProducer( final Request command, final CommunicationManagerImpl communicationManagerImpl,
+                            final boolean isBroadcast ) {
         this.command = command;
+        this.communicationManagerImpl = communicationManagerImpl;
+        this.isBroadcast = isBroadcast;
     }
 
 
@@ -49,9 +58,11 @@ class CommandProducer implements Runnable {
             connection = communicationManagerImpl.createConnection();
             connection.start();
             session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination destination = session.createQueue( command.getUuid().toString() );
+            Destination destination =
+                    session.createTopic( isBroadcast ? Common.BROADCAST_TOPIC : command.getUuid().toString() );
             producer = session.createProducer( destination );
-            producer.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
+            producer.setDeliveryMode( communicationManagerImpl.isPersistentMessages() ? DeliveryMode.PERSISTENT :
+                                      DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
             String json = CommandJson.getJson( command );
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) ) {

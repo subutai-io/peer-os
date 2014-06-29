@@ -216,9 +216,12 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
             exec.execute( new Runnable() {
 
                 public void run() {
+                    long lastNotify = System.currentTimeMillis();
                     while ( !Thread.interrupted() ) {
                         try {
-                            if ( notifyAgentListeners ) {
+                            if ( notifyAgentListeners || System.currentTimeMillis() - lastNotify
+                                    > Common.AGENT_FRESHNESS_MIN * 60 * 1000 / 2 ) {
+                                lastNotify = System.currentTimeMillis();
                                 notifyAgentListeners = false;
                                 Set<Agent> freshAgents = new HashSet( agents.asMap().values() );
                                 for ( Iterator<AgentListener> it = listeners.iterator(); it.hasNext(); ) {
@@ -306,8 +309,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId()
-                );
+                        response.getTransportId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -341,7 +343,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         try {
             if ( response != null && response.getTransportId() != null ) {
                 for ( Agent agent : agents.asMap().values() ) {
-                    if ( response.getTransportId().equalsIgnoreCase( agent.getTransportId() ) ) {
+                    if ( agent.getTransportId().startsWith( response.getTransportId() ) ) {
                         agents.invalidate( agent.getUuid() );
                         notifyAgentListeners = true;
                         return;
