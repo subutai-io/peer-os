@@ -28,8 +28,8 @@ public class Cloner extends VerticalLayout {
 	private final LxcManager lxcManager;
 	private final String physicalHostLabel = "Physical Host";
 	private final String statusLabel = "Status";
-	private final String okIconSource = "icons/16/ok.png";
-	private final String errorIconSource = "icons/16/cancel.png";
+	private final String okIconSource = "img/ok.png";
+	private final String errorIconSource = "img/cancel.png";
 	private final String loadIconSource = "img/spinner.gif";
 	private final String hostValidatorRegex =
 			"^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0," +
