@@ -17,6 +17,7 @@ public class FileUtil {
 		String currentPath = System.getProperty("user.dir") + "/res/" + fileName;
 		File file = new File(currentPath);
 		if (!file.exists()) {
+			checkFolder(System.getProperty("user.dir") + "/res/");
 			writeFile(fileName, object);
 			file = new File(currentPath);
 		}
@@ -40,6 +41,13 @@ public class FileUtil {
 			outputStream.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	private static void checkFolder(String path) {
+		File file = new File(path);
+		if (!file.exists()) {
+			file.mkdir()
 		}
 	}
 
