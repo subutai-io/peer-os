@@ -47,7 +47,7 @@ public class FileUtil {
 	private static void checkFolder(String path) {
 		File file = new File(path);
 		if (!file.exists()) {
-			file.mkdir()
+			file.mkdir();
 		}
 	}
 
