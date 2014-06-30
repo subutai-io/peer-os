@@ -7,6 +7,8 @@
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
     <reference id="monitor" availability="mandatory"
                interface="org.safehaus.subutai.api.monitor.Monitor" />
+    <reference id="templateManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.TemplateManager"/>
 
     <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.lxcmanager.LxcManagerImpl"
           init-method="init" destroy-method="destroy">
@@ -14,7 +16,16 @@
         <argument ref="commandRunner" />
         <argument ref="monitor" />
     </bean>
-  
+
+    <bean id="containerManager" scope="singleton" 
+          class="org.safehaus.subutai.impl.lxcmanager.ContainerManagerImpl"
+          init-method="init" destroy-method="destroy">
+        <property name="lxcManager" ref="lxcmanager"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="templateManager" ref="templateManager"/>
+    </bean>
+    
     <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
+    <service ref="containerManager" interface="org.safehaus.subutai.api.lxcmanager.ContainerManager" />
 
 </blueprint>
