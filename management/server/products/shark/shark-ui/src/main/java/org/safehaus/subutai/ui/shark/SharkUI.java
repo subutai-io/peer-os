@@ -7,71 +7,92 @@ package org.safehaus.subutai.ui.shark;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.shark.Config;
 import org.safehaus.subutai.api.shark.Shark;
 import org.safehaus.subutai.api.spark.Spark;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author dilshat
  */
-public class SharkUI implements Module {
+public class SharkUI implements PortalModule {
 
-    private static Shark sharkManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Spark sparkManager;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "shark.png";
 
-    public SharkUI(AgentManager agentManager, Tracker tracker, Spark sparkManager, Shark sharkManager) {
-        SharkUI.agentManager = agentManager;
-        SharkUI.tracker = tracker;
-        SharkUI.sparkManager = sparkManager;
-        SharkUI.sharkManager = sharkManager;
-    }
+	private static Shark sharkManager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Spark sparkManager;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public SharkUI(AgentManager agentManager, Tracker tracker, Spark sparkManager, Shark sharkManager, CommandRunner commandRunner) {
+		SharkUI.agentManager = agentManager;
+		SharkUI.tracker = tracker;
+		SharkUI.sparkManager = sparkManager;
+		SharkUI.sharkManager = sharkManager;
+		SharkUI.commandRunner = commandRunner;
+	}
 
-    public static Shark getSharkManager() {
-        return sharkManager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Spark getSparkManager() {
-        return sparkManager;
-    }
+	public static Shark getSharkManager() {
+		return sharkManager;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Spark getSparkManager() {
+		return sparkManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void destroy() {
-        sharkManager = null;
-        agentManager = null;
-        sparkManager = null;
-        tracker = null;
-        executor.shutdown();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public Component createComponent() {
-        return new SharkForm();
-    }
+	public void destroy() {
+		sharkManager = null;
+		agentManager = null;
+		sparkManager = null;
+		tracker = null;
+		executor.shutdown();
+	}
+
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
+
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(SharkUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new SharkForm();
+	}
 
 }

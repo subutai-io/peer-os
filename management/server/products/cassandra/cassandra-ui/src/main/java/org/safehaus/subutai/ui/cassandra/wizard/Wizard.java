@@ -12,80 +12,79 @@ import com.vaadin.ui.VerticalLayout;
 import org.safehaus.subutai.api.cassandra.Config;
 
 /**
- *
  * @author dilshat
  */
 public class Wizard {
 
-    private static final int MAX_STEPS = 3;
-    private final VerticalLayout verticalLayout;
-    private int step = 1;
-    private Config config = new Config();
-    GridLayout grid;
+	private static final int MAX_STEPS = 3;
+	private final VerticalLayout verticalLayout;
+	GridLayout grid;
+	private int step = 1;
+	private Config config = new Config();
 
-    public Wizard() {
-        verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        grid = new GridLayout(1, 1);
-        grid.setMargin(true);
-        grid.setSizeFull();
-        grid.addComponent(verticalLayout);
-        grid.setComponentAlignment(verticalLayout, Alignment.TOP_CENTER);
+	public Wizard() {
+		verticalLayout = new VerticalLayout();
+		verticalLayout.setSizeFull();
+		grid = new GridLayout(1, 1);
+		grid.setMargin(true);
+		grid.setSizeFull();
+		grid.addComponent(verticalLayout);
+		grid.setComponentAlignment(verticalLayout, Alignment.TOP_CENTER);
 
-        putForm();
+		putForm();
 
-    }
+	}
 
-    public Component getContent() {
-        return grid;
-    }
+	private void putForm() {
+		verticalLayout.removeAllComponents();
+		switch (step) {
+			case 1: {
+				verticalLayout.addComponent(new StepStart(this));
+				break;
+			}
+			case 2: {
+				verticalLayout.addComponent(new ConfigurationStep(this));
+				break;
+			}
+			case 3: {
+				verticalLayout.addComponent(new VerificationStep(this));
+				break;
+			}
+			default: {
+				step = 1;
+				verticalLayout.addComponent(new StepStart(this));
+				break;
+			}
+		}
+	}
 
-    protected void next() {
-        step++;
-        putForm();
-    }
+	public Component getContent() {
+		return grid;
+	}
 
-    protected void back() {
-        step--;
-        putForm();
-    }
+	protected void next() {
+		step++;
+		putForm();
+	}
 
-    protected void cancel() {
-        step = 1;
-        putForm();
-    }
+	protected void back() {
+		step--;
+		putForm();
+	}
 
-    public Config getConfig() {
-        return config;
-    }
+	protected void cancel() {
+		step = 1;
+		putForm();
+	}
 
-    public void init() {
-        step = 1;
-        config = new Config();
-        putForm();
-    }
+	public Config getConfig() {
+		return config;
+	}
 
-    private void putForm() {
-        verticalLayout.removeAllComponents();
-        switch (step) {
-            case 1: {
-                verticalLayout.addComponent(new StepStart(this));
-                break;
-            }
-            case 2: {
-                verticalLayout.addComponent(new ConfigurationStep(this));
-                break;
-            }
-            case 3: {
-                verticalLayout.addComponent(new VerificationStep(this));
-                break;
-            }
-            default: {
-                step = 1;
-                verticalLayout.addComponent(new StepStart(this));
-                break;
-            }
-        }
-    }
+	public void init() {
+		step = 1;
+		config = new Config();
+		putForm();
+	}
 
 }

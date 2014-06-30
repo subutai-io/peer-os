@@ -2,84 +2,102 @@ package org.safehaus.subutai.ui.sqoop;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.Sqoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SqoopUI implements Module {
+public class SqoopUI implements PortalModule {
 
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Sqoop manager;
-    private static Hadoop hadoopManager;
+	public static final String MODULE_IMAGE = "sqoop.png";
 
-    private static ExecutorService executor;
-    private static SqoopForm form;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Sqoop manager;
+	private static Hadoop hadoopManager;
+	private static CommandRunner commandRunner;
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	private static ExecutorService executor;
+	private static SqoopForm form;
 
-    public void setAgentManager(AgentManager agentManager) {
-        SqoopUI.agentManager = agentManager;
-    }
+	public SqoopUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Sqoop manager, CommandRunner commandRunner) {
+		SqoopUI.agentManager = agentManager;
+		SqoopUI.tracker = tracker;
+		SqoopUI.hadoopManager = hadoopManager;
+		SqoopUI.manager = manager;
+		SqoopUI.commandRunner = commandRunner;
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void setTracker(Tracker tracker) {
-        SqoopUI.tracker = tracker;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Sqoop getManager() {
-        return manager;
-    }
+	public static Sqoop getManager() {
+		return manager;
+	}
 
-    public void setManager(Sqoop manager) {
-        SqoopUI.manager = manager;
-    }
+	public void setManager(Sqoop manager) {
+		SqoopUI.manager = manager;
+	}
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        SqoopUI.hadoopManager = hadoopManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public static SqoopForm getForm() {
-        return form;
-    }
+	public static SqoopForm getForm() {
+		return form;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public void destroy() {
-        agentManager = null;
-        tracker = null;
-        manager = null;
-        hadoopManager = null;
-        executor.shutdown();
-    }
+	public void destroy() {
+		agentManager = null;
+		tracker = null;
+		manager = null;
+		hadoopManager = null;
+		commandRunner = null;
+		executor.shutdown();
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
 
-    public Component createComponent() {
-        SqoopUI.form = new SqoopForm();
-        return SqoopUI.form;
-    }
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(SqoopUI.MODULE_IMAGE, this);
+	}
+
+
+	public Component createComponent() {
+		SqoopUI.form = new SqoopForm();
+		return SqoopUI.form;
+	}
 
 }

@@ -5,6 +5,10 @@
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+    <reference id="templateRegistry" availability="mandatory"
+               interface ="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
+    <reference id="repoManager" availability="mandatory"
+               interface ="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
 
     
     <bean id="templateManager" scope="singleton" 
@@ -12,6 +16,8 @@
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager" />
         <property name="commandRunner" ref="commandRunner" />
+        <property name="templateRegistry" ref="templateRegistry"/>
+        <property name="repoManager" ref="repoManager"/>
     </bean>
     
     <service ref="templateManager" interface="org.safehaus.subutai.api.manager.TemplateManager" />

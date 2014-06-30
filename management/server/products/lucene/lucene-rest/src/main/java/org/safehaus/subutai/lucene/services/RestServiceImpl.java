@@ -8,23 +8,23 @@ import org.safehaus.subutai.api.lucene.Lucene;
 
 public class RestServiceImpl implements RestService {
 
-    private Lucene luceneManager;
+	private Lucene luceneManager;
 
-    public Lucene getLuceneManager() {
-        return luceneManager;
-    }
+	public Lucene getLuceneManager() {
+		return luceneManager;
+	}
 
-    public void setLuceneManager(Lucene luceneManager) {
-        this.luceneManager = luceneManager;
-    }
+	public void setLuceneManager(Lucene luceneManager) {
+		this.luceneManager = luceneManager;
+	}
 
-    @Override
-    public String installCluster(String clusterName) {
-        return null;
-    }
+	@Override
+	public String installCluster(String clusterName) {
+		return null;
+	}
 
-    @Override
-    public String uninstallCluster(String clusterName) {
-        return null;
-    }
+	@Override
+	public String uninstallCluster(String clusterName) {
+		return null;
+	}
 }

@@ -11,21 +11,21 @@ import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
 public class LuceneImplMock extends LuceneImpl {
 
-    private Config clusterConfig = null;
+	private Config clusterConfig = null;
 
-    public LuceneImplMock() {
-        super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock() );
-    }
-
-
-    public LuceneImplMock setClusterConfig( Config clusterConfig ) {
-        this.clusterConfig = clusterConfig;
-        return this;
-    }
+	public LuceneImplMock() {
+		super(new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock());
+	}
 
 
-    @Override
-    public Config getCluster( String clusterName ) {
-        return clusterConfig;
-    }
+	public LuceneImplMock setClusterConfig(Config clusterConfig) {
+		this.clusterConfig = clusterConfig;
+		return this;
+	}
+
+
+	@Override
+	public Config getCluster(String clusterName) {
+		return clusterConfig;
+	}
 }

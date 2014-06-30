@@ -1,26 +1,46 @@
 package org.safehaus.subutai.ui.monitor;
 
 import com.vaadin.ui.Component;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.monitor.Monitor;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
-public class MonitorModule implements Module {
+import java.io.File;
 
-    private static final String MODULE_NAME = "Monitor";
+public class MonitorModule implements PortalModule {
 
-    private Monitor monitor;
+	public static final String MODULE_IMAGE = "monitor.png";
+	private static final String MODULE_NAME = "Monitor";
 
-    @Override
-    public String getName() {
-        return MODULE_NAME;
-    }
+	private Monitor monitor;
+	private AgentManager agentManager;
 
-    public void setMonitor(Monitor monitor) {
-        this.monitor = monitor;
-    }
+	@Override
+	public String getId() {
+		return MODULE_NAME;
+	}
 
-    @Override
-    public Component createComponent() {
-        return new ModuleView(monitor);
-    }
+	@Override
+	public String getName() {
+		return MODULE_NAME;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(MonitorModule.MODULE_IMAGE, this);
+	}
+
+	@Override
+	public Component createComponent() {
+		return new ModuleView(monitor, agentManager);
+	}
+
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
+	}
+
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
 }

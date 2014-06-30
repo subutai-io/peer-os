@@ -11,7 +11,7 @@ public class JavaScript {
     }
 
     public void execute(String code) {
-        window.executeJavaScript(code);
+//        window.executeJavaScript(code);
     }
 
     public void loadFile(String filePath) {

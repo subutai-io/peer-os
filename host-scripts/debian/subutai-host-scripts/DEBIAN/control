@@ -5,8 +5,6 @@ Priority: optional
 Architecture: all
 Depends: git, awk, sed, grep, coreutils, build-essential, 
  packaging-dev, lxc, lxc-templates
-Vcs-Git: http://stash.safehaus.org/scm/subutai/main.git
-Vcs-Browser: http://stash.safehaus.org/scm/subutai/main.git
 Homepage: http://safehaus.org
 Maintainer: Tonyuquq <tonyukuk@safehaus.org>
 Description: Subutai LXC container running server host scripts that enable 

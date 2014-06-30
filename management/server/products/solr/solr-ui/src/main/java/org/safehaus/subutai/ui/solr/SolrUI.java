@@ -7,63 +7,85 @@ package org.safehaus.subutai.ui.solr;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author dilshat
  */
-public class SolrUI implements Module {
+public class SolrUI implements PortalModule {
 
-    private static Solr solrManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "solr.png";
 
-    public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager) {
-        SolrUI.agentManager = agentManager;
-        SolrUI.tracker = tracker;
-        SolrUI.solrManager = solrManager;
-    }
+	private static Solr solrManager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public SolrUI(AgentManager agentManager, Tracker tracker, Solr solrManager, CommandRunner commandRunner) {
+		SolrUI.agentManager = agentManager;
+		SolrUI.tracker = tracker;
+		SolrUI.solrManager = solrManager;
+		SolrUI.commandRunner = commandRunner;
+	}
 
-    public static Solr getSolrManager() {
-        return solrManager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Solr getSolrManager() {
+		return solrManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void destroy() {
-        solrManager = null;
-        agentManager = null;
-        tracker = null;
-        executor.shutdown();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public Component createComponent() {
-        return new SolrForm();
-    }
+	public void destroy() {
+		solrManager = null;
+		agentManager = null;
+		tracker = null;
+		commandRunner = null;
+		executor.shutdown();
+	}
+
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
+
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(SolrUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new SolrForm();
+	}
 
 }

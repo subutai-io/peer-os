@@ -17,7 +17,7 @@ public class JobTracker extends ClusterNode {
         super(cluster);
         setHostname(cluster.getJobTracker().getHostname());
 
-        startButton.addListener(new MouseEvents.ClickListener() {
+        startButton.addClickListener(new MouseEvents.ClickListener() {
             @Override
             public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
@@ -25,7 +25,7 @@ public class JobTracker extends ClusterNode {
             }
         });
 
-        stopButton.addListener(new MouseEvents.ClickListener() {
+        stopButton.addClickListener(new MouseEvents.ClickListener() {
             @Override
             public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
@@ -33,7 +33,7 @@ public class JobTracker extends ClusterNode {
             }
         });
 
-        restartButton.addListener(new MouseEvents.ClickListener() {
+        restartButton.addClickListener(new MouseEvents.ClickListener() {
             @Override
             public void click(MouseEvents.ClickEvent clickEvent) {
                 setLoading(true);
