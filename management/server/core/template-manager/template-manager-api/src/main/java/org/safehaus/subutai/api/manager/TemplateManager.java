@@ -1,7 +1,5 @@
 package org.safehaus.subutai.api.manager;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-
 /**
  * A wrapper interface that wraps LXC and ZFS command scripts on physical hosts.
  *
@@ -15,10 +13,9 @@ public interface TemplateManager {
      * @param templateName the template name from which a new instance container
      * is to be cloned
      * @param cloneName the clone name of the new instance container
-     * @return an <tt>Agent</tt> instance representing newly created instance
-     * container (clone). In case of an error, <tt>null</tt> is returned
+     * @return <tt>true</tt> if successfully cloned, <tt>false</tt> otherwise
      */
-    public Agent clone(String hostName, String templateName, String cloneName);
+    public boolean clone(String hostName, String templateName, String cloneName);
 
     /**
      * Destroys a clone with given name.

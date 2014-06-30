@@ -5,9 +5,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public class TemplateManagerImpl extends TemplateManagerBase {
 
     @Override
-    public Agent clone(String hostName, String templateName, String cloneName) {
+    public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return clone(a, templateName, cloneName);
+        return scriptExecutor.execute(a, ActionType.CLONE, templateName, cloneName);
     }
 
     @Override
@@ -22,9 +22,4 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         return scriptExecutor.execute(a, ActionType.TEMPLATE, cloneName);
     }
 
-    private Agent clone(Agent parent, String templateName, String cloneName) {
-        boolean b = scriptExecutor.execute(parent, ActionType.CLONE, templateName, cloneName);
-        if(b) return agentManager.getAgentByHostname(cloneName);
-        return null;
-    }
 }
