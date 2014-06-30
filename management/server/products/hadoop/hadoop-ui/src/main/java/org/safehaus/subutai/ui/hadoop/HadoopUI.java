@@ -5,71 +5,85 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * Created by daralbaev on 08.04.14.
  */
-public class HadoopUI implements Module {
+public class HadoopUI implements PortalModule {
 
-    private static Hadoop hadoopManager;
-    private static AgentManager agentManager;
-    private static ExecutorService executor;
-    private static Tracker tracker;
+	public static final String MODULE_IMAGE = "hadoop.png";
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	private static Hadoop hadoopManager;
+	private static AgentManager agentManager;
+	private static ExecutorService executor;
+	private static Tracker tracker;
 
-    public void setHadoopManager(Hadoop hadoopManager) {
-        HadoopUI.hadoopManager = hadoopManager;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public void setHadoopManager(Hadoop hadoopManager) {
+		HadoopUI.hadoopManager = hadoopManager;
+	}
 
-    public void setAgentManager(AgentManager agentManager) {
-        HadoopUI.agentManager = agentManager;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public void setAgentManager(AgentManager agentManager) {
+		HadoopUI.agentManager = agentManager;
+	}
 
-    public void setExecutor(ExecutorService executor) {
-        HadoopUI.executor = executor;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public void setExecutor(ExecutorService executor) {
+		HadoopUI.executor = executor;
+	}
 
-    public void setTracker(Tracker tracker) {
-        HadoopUI.tracker = tracker;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void setTracker(Tracker tracker) {
+		HadoopUI.tracker = tracker;
+	}
 
-    public void destroy() {
-        tracker = null;
-        hadoopManager = null;
-        agentManager = null;
-        executor.shutdown();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    @Override
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	public void destroy() {
+		tracker = null;
+		hadoopManager = null;
+		agentManager = null;
+		executor.shutdown();
+	}
 
-    @Override
-    public Component createComponent() {
-        return new HadoopForm();
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(HadoopUI.MODULE_IMAGE, this);
+	}
+
+	@Override
+	public Component createComponent() {
+		return new HadoopForm();
+	}
 }

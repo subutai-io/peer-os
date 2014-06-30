@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.safehaus.subutai</groupId>
@@ -15,26 +15,26 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>common</module>
         <module>accumulo</module>
-        <module>mongodb</module>
-        <module>solr</module>
-        <module>mahout</module>
-        <module>pig</module>
-        <module>lucene</module>
+        <module>cassandra</module>
+        <module>common</module>
         <module>flume</module>
-        <module>spark</module>
-        <module>shark</module>
-        <module>presto</module>
-        <module>hbase</module>
         <module>hadoop</module>
-        <module>zookeeper</module>
+        <module>hbase</module>
         <module>hive</module>
         <module>hivequery</module>
-        <module>sqoop</module>
+        <module>lucene</module>
+        <module>mahout</module>
+        <module>mongodb</module>
         <module>oozie</module>
-        <module>cassandra</module>
+        <module>pig</module>
+        <module>presto</module>
+        <module>shark</module>
+        <module>solr</module>
+        <module>spark</module>
+        <module>sqoop</module>
         <module>storm</module>
+        <module>zookeeper</module>
     </modules>
 
 </project>

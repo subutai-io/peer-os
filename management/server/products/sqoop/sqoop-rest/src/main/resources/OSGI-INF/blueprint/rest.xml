@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/sqoop" id="sqoopRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="sqoopRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="sqoopRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="sqoopRestServiceImpl" class="org.safehaus.subutai.sqoop.services.RestServiceImpl">

@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/mahout" id="mahoutRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="mahoutRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="mahoutRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="mahoutRestServiceImpl" class="org.safehaus.subutai.mahout.services.RestServiceImpl">

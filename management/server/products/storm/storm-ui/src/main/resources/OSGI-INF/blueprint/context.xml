@@ -9,15 +9,18 @@
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="zookeeper" availability="mandatory"
                interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.storm.StormUI"
           init-method="init" destroy-method="destroy">
-        <property name="agentManager" ref="agentManager"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="manager" ref="manager"/>
-        <property name="zookeeper" ref="zookeeper"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="manager"/>
+        <argument ref="zookeeper"/>
+        <argument ref="commandRunner"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
 
 </blueprint>

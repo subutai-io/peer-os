@@ -25,11 +25,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ui-vaadin-services</artifactId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ui-vaadin</artifactId>
+            <artifactId>vaadin-custom</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -42,6 +44,14 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>agent-manager-api</artifactId>
         </dependency>
     </dependencies>
 

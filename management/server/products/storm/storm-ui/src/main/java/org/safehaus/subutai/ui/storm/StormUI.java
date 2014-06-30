@@ -1,78 +1,89 @@
 package org.safehaus.subutai.ui.storm;
 
 import com.vaadin.ui.Component;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
-public class StormUI implements Module {
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Storm manager;
-    private static Zookeeper zookeeper;
+public class StormUI implements PortalModule {
 
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "storm.png";
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Storm manager;
+	private static Zookeeper zookeeper;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public void setAgentManager(AgentManager agentManager) {
-        StormUI.agentManager = agentManager;
-    }
+	public StormUI(AgentManager agentManager, Tracker tracker, Zookeeper zookeeper, Storm manager, CommandRunner commandRunner) {
+		StormUI.agentManager = agentManager;
+		StormUI.tracker = tracker;
+		StormUI.zookeeper = zookeeper;
+		StormUI.manager = manager;
+		StormUI.commandRunner = commandRunner;
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public void setTracker(Tracker tracker) {
-        StormUI.tracker = tracker;
-    }
+	public void destroy() {
+		agentManager = null;
+		tracker = null;
+		manager = null;
+		zookeeper = null;
+		executor.shutdown();
+	}
 
-    public static Storm getManager() {
-        return manager;
-    }
+	@Override
+	public String getId() {
+		return Config.PRODUCT_NAME;
+	}
 
-    public void setManager(Storm manager) {
-        StormUI.manager = manager;
-    }
+	public String getName() {
+		return Config.PRODUCT_NAME;
+	}
 
-    public static Zookeeper getZookeeper() {
-        return zookeeper;
-    }
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(StormUI.MODULE_IMAGE, this);
+	}
 
-    public void setZookeeper(Zookeeper zookeeper) {
-        StormUI.zookeeper = zookeeper;
-    }
+	public Component createComponent() {
+		return new StormForm();
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public void destroy() {
-        agentManager = null;
-        tracker = null;
-        manager = null;
-        zookeeper = null;
-        executor.shutdown();
-    }
+	public static Storm getManager() {
+		return manager;
+	}
 
-    public String getName() {
-        return Config.PRODUCT_NAME;
-    }
+	public static Zookeeper getZookeeper() {
+		return zookeeper;
+	}
 
-    public Component createComponent() {
-        return new StormForm();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 }

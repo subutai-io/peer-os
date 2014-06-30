@@ -22,5 +22,4 @@
     </bean>
 
     <service ref="mahout-impl" interface="org.safehaus.subutai.api.shark.Shark"/>
-
 </blueprint>

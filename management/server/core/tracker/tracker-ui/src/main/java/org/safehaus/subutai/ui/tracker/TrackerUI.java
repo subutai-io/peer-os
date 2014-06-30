@@ -1,58 +1,72 @@
 package org.safehaus.subutai.ui.tracker;
 
 
+import com.vaadin.ui.Component;
+import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
+
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
 
-import com.vaadin.ui.Component;
+public class TrackerUI implements PortalModule {
 
-
-public class TrackerUI implements Module {
-
-    public static final String MODULE_NAME = "Tracker";
-    private static Tracker tracker;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "tracker.png";
+	public static final String MODULE_NAME = "Tracker";
+	public static TrackerForm trackerForm;
+	private static Tracker tracker;
+	private static ExecutorService executor;
 
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
 
-    public void setTracker( Tracker tracker ) {
-        TrackerUI.tracker = tracker;
-    }
+	public void setTracker(Tracker tracker) {
+		TrackerUI.tracker = tracker;
+	}
 
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
 
-    public void destroy() {
-        tracker = null;
-        executor.shutdown();
-    }
+	public void destroy() {
+		tracker = null;
+		executor.shutdown();
+	}
 
 
-    @Override
-    public String getName() {
-        return TrackerUI.MODULE_NAME;
-    }
+	@Override
+	public String getId() {
+		return TrackerUI.MODULE_NAME;
+	}
+
+	@Override
+	public String getName() {
+		return TrackerUI.MODULE_NAME;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(TrackerUI.MODULE_IMAGE, this);
+	}
 
 
-    @Override
-    public Component createComponent() {
-        TrackerForm trackerForm = new TrackerForm();
-        trackerForm.refreshSources();
-        return trackerForm;
-    }
+	@Override
+	public Component createComponent() {
+		trackerForm = new TrackerForm();
+		trackerForm.refreshSources();
+		trackerForm.startTracking();
+		return trackerForm;
+	}
 }

@@ -7,71 +7,93 @@ package org.safehaus.subutai.ui.pig;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.api.pig.Pig;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.services.Module;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author dilshat
  */
-public class PigUI implements Module {
+public class PigUI implements PortalModule {
 
-    private static Pig pigManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Hadoop hadoopManager;
-    private static ExecutorService executor;
+	public static final String MODULE_IMAGE = "pig.png";
 
-    public PigUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Pig pigManager) {
-        PigUI.agentManager = agentManager;
-        PigUI.tracker = tracker;
-        PigUI.hadoopManager = hadoopManager;
-        PigUI.pigManager = pigManager;
-    }
+	private static Pig pigManager;
+	private static AgentManager agentManager;
+	private static Tracker tracker;
+	private static Hadoop hadoopManager;
+	private static CommandRunner commandRunner;
+	private static ExecutorService executor;
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public PigUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Pig pigManager, CommandRunner commandRunner) {
+		PigUI.agentManager = agentManager;
+		PigUI.tracker = tracker;
+		PigUI.hadoopManager = hadoopManager;
+		PigUI.pigManager = pigManager;
+		PigUI.commandRunner = commandRunner;
+	}
 
-    public static Pig getPigManager() {
-        return pigManager;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public static Pig getPigManager() {
+		return pigManager;
+	}
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
+	public static Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void destroy() {
-        pigManager = null;
-        agentManager = null;
-        hadoopManager = null;
-        tracker = null;
-        executor.shutdown();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public String getName() {
-        return Config.PRODUCT_KEY;
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public Component createComponent() {
-        return new PigForm();
-    }
+	public void destroy() {
+		pigManager = null;
+		agentManager = null;
+		hadoopManager = null;
+		tracker = null;
+		commandRunner = null;
+		executor.shutdown();
+	}
+
+	@Override
+	public String getId() {
+		return Config.PRODUCT_KEY;
+	}
+
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
+	@Override
+	public File getImage() {
+		return FileUtil.getFile(PigUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new PigForm();
+	}
 
 }

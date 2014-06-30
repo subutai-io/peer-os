@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/spark" id="sparkRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="sparkRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="sparkRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="sparkRestServiceImpl" class="org.safehaus.subutai.spark.services.RestServiceImpl">

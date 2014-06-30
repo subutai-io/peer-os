@@ -49,6 +49,14 @@
         </fileSet>
 
         <fileSet>
+            <directory>target/dependencies/kiskis-server</directory>
+            <includes>
+                <include>*.war</include>
+            </includes>
+            <outputDirectory>deploy</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>src/main/distribution</directory>
             <outputDirectory>/</outputDirectory>
             <fileMode>0644</fileMode>

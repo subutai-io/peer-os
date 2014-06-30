@@ -19,44 +19,44 @@ import java.util.UUID;
  */
 public class CheckTask implements Runnable {
 
-    private final String clusterName, lxcHostname;
-    private final CompleteEvent completeEvent;
+	private final String clusterName, lxcHostname;
+	private final CompleteEvent completeEvent;
 
-    public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
-        this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
-        this.completeEvent = completeEvent;
-    }
+	public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+		this.clusterName = clusterName;
+		this.lxcHostname = lxcHostname;
+		this.completeEvent = completeEvent;
+	}
 
-    public void run() {
+	public void run() {
 
-        UUID trackID = PrestoUI.getPrestoManager().checkNode(clusterName, lxcHostname);
+		UUID trackID = PrestoUI.getPrestoManager().checkNode(clusterName, lxcHostname);
 
-        NodeState state = NodeState.UNKNOWN;
-        long start = System.currentTimeMillis();
-        while (!Thread.interrupted()) {
-            ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-            if (po != null) {
-                if (po.getState() != ProductOperationState.RUNNING) {
-                    if (po.getLog().contains("Running")) {
-                        state = NodeState.RUNNING;
-                    } else if (po.getLog().contains("Not running")) {
-                        state = NodeState.STOPPED;
-                    }
-                    break;
-                }
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                break;
-            }
-            if (System.currentTimeMillis() - start > 30 * 1000) {
-                break;
-            }
-        }
+		NodeState state = NodeState.UNKNOWN;
+		long start = System.currentTimeMillis();
+		while (!Thread.interrupted()) {
+			ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			if (po != null) {
+				if (po.getState() != ProductOperationState.RUNNING) {
+					if (po.getLog().contains("Running")) {
+						state = NodeState.RUNNING;
+					} else if (po.getLog().contains("Not running")) {
+						state = NodeState.STOPPED;
+					}
+					break;
+				}
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ex) {
+				break;
+			}
+			if (System.currentTimeMillis() - start > 30 * 1000) {
+				break;
+			}
+		}
 
-        completeEvent.onComplete(state);
-    }
+		completeEvent.onComplete(state);
+	}
 
 }

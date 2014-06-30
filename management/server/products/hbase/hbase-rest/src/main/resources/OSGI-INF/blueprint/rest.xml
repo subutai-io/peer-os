@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/hbase" id="hbaseRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="hbaseRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="hbaseRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="hbaseRestServiceImpl" class="org.safehaus.subutai.hbase.services.RestServiceImpl">
