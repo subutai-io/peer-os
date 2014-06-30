@@ -11,131 +11,129 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel {
+public class ConfigurationStep extends VerticalLayout {
 
-    public ConfigurationStep(final Wizard wizard) {
+	public ConfigurationStep(final Wizard wizard) {
 
-        setSizeFull();
+		setSizeFull();
 
-        GridLayout content = new GridLayout(2, 7);
-        content.setSizeFull();
-        content.setSpacing(true);
-        content.setMargin(true);
+		GridLayout content = new GridLayout(2, 7);
+		content.setSizeFull();
+		content.setSpacing(true);
+		content.setMargin(true);
 
-        final TextField clusterNameTxtFld = new TextField("Enter cluster name");
-        clusterNameTxtFld.setInputPrompt("Cluster name");
-        clusterNameTxtFld.setRequired(true);
-        clusterNameTxtFld.setMaxLength(20);
-        if (!Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
-            clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
-        }
-        clusterNameTxtFld.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
-            }
-        });
+		final TextField clusterNameTxtFld = new TextField("Enter cluster name");
+		clusterNameTxtFld.setInputPrompt("Cluster name");
+		clusterNameTxtFld.setRequired(true);
+		clusterNameTxtFld.setMaxLength(20);
+		if (!Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
+			clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+		}
+		clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
+			}
+		});
 
-        //configuration servers number
-//        int[] slaves = new int[50];
-        List<Integer> s = new ArrayList<Integer>();
-        for (int i = 0; i < 50; i++) {
-            s.add( i );
-        }
+		//configuration servers number
+		List<Integer> s = new ArrayList<Integer>();
+		for (int i = 0; i < 50; i++) {
+			s.add(i);
+		}
 
-        ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", s);
-        slaveNodesComboBox.setMultiSelect(false);
-        slaveNodesComboBox.setImmediate(true);
-        slaveNodesComboBox.setTextInputAllowed(false);
-        slaveNodesComboBox.setNullSelectionAllowed(false);
-        slaveNodesComboBox.setValue(wizard.getConfig().getCountOfSlaveNodes());
+		ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", s);
+//        slaveNodesComboBox.setMultiSelect(false);
+		slaveNodesComboBox.setImmediate(true);
+		slaveNodesComboBox.setTextInputAllowed(false);
+		slaveNodesComboBox.setNullSelectionAllowed(false);
+		slaveNodesComboBox.setValue(wizard.getConfig().getCountOfSlaveNodes());
 
-        slaveNodesComboBox.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setCountOfSlaveNodes((Integer) event.getProperty().getValue());
-            }
-        });
+		slaveNodesComboBox.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setCountOfSlaveNodes((Integer) event.getProperty().getValue());
+			}
+		});
 
-        //configuration replication factor
-        ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s);
-        replicationFactorComboBox.setMultiSelect(false);
-        replicationFactorComboBox.setImmediate(true);
-        replicationFactorComboBox.setTextInputAllowed(false);
-        replicationFactorComboBox.setNullSelectionAllowed(false);
-        replicationFactorComboBox.setValue(wizard.getConfig().getReplicationFactor());
+		//configuration replication factor
+		ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s);
+//        replicationFactorComboBox.setMultiSelect(false);
+		replicationFactorComboBox.setImmediate(true);
+		replicationFactorComboBox.setTextInputAllowed(false);
+		replicationFactorComboBox.setNullSelectionAllowed(false);
+		replicationFactorComboBox.setValue(wizard.getConfig().getReplicationFactor());
 
-        replicationFactorComboBox.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setReplicationFactor((Integer) event.getProperty().getValue());
-            }
-        });
+		replicationFactorComboBox.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setReplicationFactor((Integer) event.getProperty().getValue());
+			}
+		});
 
-        TextField domain = new TextField("Enter domain name");
-        domain.setInputPrompt(wizard.getConfig().getDomainName());
-        domain.setValue(wizard.getConfig().getDomainName());
-        domain.setMaxLength(20);
-        domain.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                String value = event.getProperty().getValue().toString().trim();
-                if (!Util.isStringEmpty(value)) {
-                    wizard.getConfig().setDomainName(value);
-                }
-            }
-        });
+		TextField domain = new TextField("Enter domain name");
+		domain.setInputPrompt(wizard.getConfig().getDomainName());
+		domain.setValue(wizard.getConfig().getDomainName());
+		domain.setMaxLength(20);
+		domain.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				String value = event.getProperty().getValue().toString().trim();
+				if (!Util.isStringEmpty(value)) {
+					wizard.getConfig().setDomainName(value);
+				}
+			}
+		});
 
-        Button next = new Button("Next");
-        next.addListener(new Button.ClickListener() {
+		Button next = new Button("Next");
+		next.addStyleName("default");
+		next.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+					show("Please provide cluster name");
+				} else {
+					wizard.next();
+				}
+			}
+		});
 
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
+		Button back = new Button("Back");
+		back.addStyleName("default");
+		back.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.back();
+			}
+		});
 
-                if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
-                    show("Please provide cluster name");
-                } else {
-                    wizard.next();
-                }
-            }
-        });
+		VerticalLayout layout = new VerticalLayout();
+		layout.setSpacing(true);
+		layout.addComponent(new Label("Please, specify installation settings"));
+		layout.addComponent(content);
 
-        Button back = new Button("Back");
-        back.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                wizard.back();
-            }
-        });
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.addComponent(back);
+		buttons.addComponent(next);
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing(true);
-        layout.addComponent(new Label("Please, specify installation settings"));
-        layout.addComponent(content);
+		content.addComponent(clusterNameTxtFld);
+		content.addComponent(domain);
+		content.addComponent(slaveNodesComboBox);
+		content.addComponent(replicationFactorComboBox);
+		content.addComponent(buttons);
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent(back);
-        buttons.addComponent(next);
+		addComponent(layout);
 
-        content.addComponent(clusterNameTxtFld);
-        content.addComponent(domain);
-        content.addComponent(slaveNodesComboBox);
-        content.addComponent(replicationFactorComboBox);
-        content.addComponent(buttons);
+	}
 
-        addComponent(layout);
-
-    }
-
-    private void show(String notification) {
-        getWindow().showNotification(notification);
-    }
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
 }

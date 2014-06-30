@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/hive" id="hiveRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="hiveRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="hiveRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="hiveRestServiceImpl" class="org.safehaus.subutai.hive.services.RestServiceImpl">

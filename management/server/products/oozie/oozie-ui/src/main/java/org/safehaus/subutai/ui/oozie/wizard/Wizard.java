@@ -18,71 +18,71 @@ import org.safehaus.subutai.api.oozie.Config;
  */
 public class Wizard {
 
-    private final VerticalLayout vlayout;
-    private int step = 1;
-    private Config config = new Config();
+	private final VerticalLayout vlayout;
+	private int step = 1;
+	private Config config = new Config();
 
-    public Wizard() {
-        vlayout = new VerticalLayout();
-        vlayout.setSizeFull();
-        vlayout.setMargin(true);
-        putForm();
-    }
+	public Wizard() {
+		vlayout = new VerticalLayout();
+		vlayout.setSizeFull();
+		vlayout.setMargin(true);
+		putForm();
+	}
 
-    public Component getContent() {
-        return vlayout;
-    }
+	public Component getContent() {
+		return vlayout;
+	}
 
-    public void next() {
-        step++;
-        putForm();
-    }
+	public void next() {
+		step++;
+		putForm();
+	}
 
-    public void back() {
-        step--;
-        putForm();
-    }
+	public void back() {
+		step--;
+		putForm();
+	}
 
-    public void cancel() {
-        step = 1;
-        putForm();
-    }
+	public void cancel() {
+		step = 1;
+		putForm();
+	}
 
-    public void init() {
-        step = 1;
-        config = new Config();
-        putForm();
-    }
+	public void init() {
+		step = 1;
+		config = new Config();
+		putForm();
+	}
 
-    public Config getConfig() {
-        return config;
-    }
+	public Config getConfig() {
+		return config;
+	}
 
-    private void putForm() {
-        vlayout.removeAllComponents();
-        switch (step) {
-            case 1: {
-                vlayout.addComponent(new StepStart(this));
-                break;
-            }
-            case 2: {
-                vlayout.addComponent(new ConfigurationStep(this));
-                break;
-            }
-            case 3: {
-                vlayout.addComponent(new StepSetConfig(this));
-                break;
-            }
-            case 4: {
-                vlayout.addComponent(new VerificationStep(this));
-                break;
-            }
-            default: {
-                step = 1;
-                vlayout.addComponent(new StepStart(this));
-                break;
-            }
-        }
-    }
+	private void putForm() {
+		vlayout.removeAllComponents();
+		switch (step) {
+			case 1: {
+				vlayout.addComponent(new StepStart(this));
+				break;
+			}
+			case 2: {
+				vlayout.addComponent(new ConfigurationStep(this));
+				break;
+			}
+			case 3: {
+				vlayout.addComponent(new StepSetConfig(this));
+				break;
+			}
+			case 4: {
+				vlayout.addComponent(new VerificationStep(this));
+				break;
+			}
+			default: {
+				step = 1;
+				vlayout.addComponent(new StepStart(this));
+				break;
+			}
+		}
+	}
 
 }

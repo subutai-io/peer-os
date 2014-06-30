@@ -9,6 +9,8 @@
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.pig.PigUI"
           init-method="init" destroy-method="destroy">
@@ -16,8 +18,9 @@
         <argument ref="tracker"/>
         <argument ref="hadoopManager"/>
         <argument ref="pigManager"/>
+        <argument ref="commandRunner"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module"/>
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
 
 </blueprint>

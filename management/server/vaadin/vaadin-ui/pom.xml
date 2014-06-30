@@ -1,68 +1,192 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
+ * Project Management Environment.
+ *
+ * Copyright (C) 2007-2012  BULL SAS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-ui</artifactId>
+        <artifactId>vaadin-osgi-parent</artifactId>
         <version>2.0.0</version>
     </parent>
-
-    <artifactId>ui-vaadin</artifactId>
-    <packaging>bundle</packaging>
-    <name>Subutai Vaadin UI</name>
-    <description>Subutai Vaadin UI</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>ui-vaadin-bridge</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>ui-vaadin-services</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>command-runner-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>tracker-api</artifactId>
-        </dependency>
-    </dependencies>
+    <artifactId>vaadin-ui</artifactId>
+    <packaging>war</packaging>
+    <name>Subutai Vaadin OSGi UI</name>
+    <description>Subutai Vaadin OSGi UI</description>
 
     <build>
+        <finalName>vaadin-ui</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
+                    <supportedProjectTypes>
+                        <supportedProjectType>war</supportedProjectType>
+                    </supportedProjectTypes>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}.server.ui</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
+
+                        <!-- Add Embed lib -->
+                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Import-Package>*;resolution:=optional</Import-Package>
+                        <Export-Package>
+                            com.vaadin.ui.*;
+                            com.vaadin.data.*;
+                            com.vaadin.server.*;
+                            com.vaadin.event.*;
+                        </Export-Package>
+
+                        <!-- Package format version - do not change -->
+                        <Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
+
+                        <!-- Comma-separated list of widgetsets in the package -->
+                        <Vaadin-Widgetsets>org.safehaus.subutai.server.ui.widgetset.PortalWidgetset</Vaadin-Widgetsets>
+
+                        <!-- OSGi war spec config -->
+                        <Web-ContextPath>subutai</Web-ContextPath>
                     </instructions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>src/main/webapp</directory>
+                            <includes>
+                                <include>**/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                    <archive>
+                        <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!-- Updates Vaadin widgetset definitions based on project dependencies Remove widgetset directory to trigger recompile: rm -Rf src/main/webapp/VAADIN/widgetsets/ -->
+            <id>update-widgetset</id>
+            <activation>
+                <file>
+                    <missing>${basedir}/src/main/webapp/VAADIN/widgetsets/</missing>
+                </file>
+                <property>
+                    <name>vaadin.production</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <configuration>
+                            <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
+                            <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>resources</goal>
+                                    <goal>update-widgetset</goal>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <dependencies>
+        <!-- Vaadin dependencies -->
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiled</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-themes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- OSGi dependencies -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>agent-manager-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

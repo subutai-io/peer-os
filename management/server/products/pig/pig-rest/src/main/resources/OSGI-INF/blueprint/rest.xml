@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/pig" id="pigRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="pigRestServiceImpl"/>
+            <ref org.safehaus.subutai.server.ui.component-id="pigRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="pigRestServiceImpl" class="org.safehaus.subutai.pig.services.RestServiceImpl">

@@ -5,54 +5,52 @@
  */
 package org.safehaus.subutai.ui.pig.wizard;
 
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
+import com.vaadin.server.FileResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
+import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.ui.pig.PigUI;
 
 /**
- *
  * @author dilshat
  */
 public class WelcomeStep extends Panel {
 
-    public WelcomeStep(final Wizard wizard) {
+	public WelcomeStep(final Wizard wizard) {
 
-        setSizeFull();
+		setSizeFull();
 
-        GridLayout grid = new GridLayout(10, 6);
-        grid.setSpacing(true);
-        grid.setMargin(true);
-        grid.setSizeFull();
+		GridLayout grid = new GridLayout(10, 6);
+		grid.setSpacing(true);
+		grid.setMargin(true);
+		grid.setSizeFull();
 
-        Label welcomeMsg = new Label("<center><h2>Welcome to Pig Installation Wizard!</h2>");
-        welcomeMsg.setContentMode(Label.CONTENT_XHTML);
-        grid.addComponent(welcomeMsg, 3, 1, 6, 2);
+		Label welcomeMsg = new Label("<center><h2>Welcome to Pig Installation Wizard!</h2>");
+		welcomeMsg.setContentMode(ContentMode.HTML);
+		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-        Label logoImg = new Label();
-        logoImg.setIcon(new ThemeResource("icons/modules/pig.gif"));
-        logoImg.setContentMode(Label.CONTENT_XHTML);
-        logoImg.setHeight(200, Sizeable.UNITS_PIXELS);
-        logoImg.setWidth(180, Sizeable.UNITS_PIXELS);
-        grid.addComponent(logoImg, 1, 3, 2, 5);
+		Label logoImg = new Label();
+		logoImg.setIcon(new FileResource(FileUtil.getFile(PigUI.MODULE_IMAGE, this)));
+		logoImg.setContentMode(ContentMode.HTML);
+		logoImg.setHeight(200, Unit.PIXELS);
+		logoImg.setWidth(180, Unit.PIXELS);
+		grid.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Start");
-        next.setWidth(100, Sizeable.UNITS_PIXELS);
-        grid.addComponent(next, 6, 4, 6, 4);
-        grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
+		Button next = new Button("Start");
+		next.addStyleName("default");
+		next.setWidth(100, Unit.PIXELS);
+		grid.addComponent(next, 6, 4, 6, 4);
+		grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-        next.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                wizard.init();
-                wizard.next();
-            }
-        });
+		next.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.init();
+				wizard.next();
+			}
+		});
 
-        addComponent(grid);
-    }
+		setContent(grid);
+	}
 
 }
