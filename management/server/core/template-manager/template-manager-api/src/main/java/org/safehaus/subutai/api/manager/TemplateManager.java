@@ -32,5 +32,9 @@ public interface TemplateManager {
      * @param hostName the physical host name
      * @param cloneName name of the clone to be converted
      */
-    public boolean convertClone(String hostName, String cloneName);
+    public boolean promoteClone(String hostName, String cloneName);
+
+    public boolean importTemplate(String hostName, String templateName);
+
+    public boolean exportTemplate(String hostName, String templateName);
 }
