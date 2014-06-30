@@ -106,6 +106,12 @@
     <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
     <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
     <xalan.version>2.7.1</xalan.version>
+    <org.apache.commons.configuration.version>1.8</org.apache.commons.configuration.version>
+    <org.apache.commons.beanutils.version>1.8.3</org.apache.commons.beanutils.version>
+    <org.apache.commons.collections.version>3.2.1</org.apache.commons.collections.version>
+    <org.apache.commons.codec.version>1.7</org.apache.commons.codec.version>
+    <org.apache.commons.digester.version>1.6</org.apache.commons.digester.version>
+    <org.apache.commons.jexl.version>2.1.1</org.apache.commons.jexl.version>
   </properties>
 
   <dependencyManagement>
@@ -224,6 +230,7 @@
         <artifactId>snappy-java</artifactId>
         <version>${org.xerial.snappy.version}</version>
       </dependency>
+
       <!--shared-->
 
       <!--karaf-->
@@ -372,6 +379,28 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>template-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Template Registry Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>template-registry-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 

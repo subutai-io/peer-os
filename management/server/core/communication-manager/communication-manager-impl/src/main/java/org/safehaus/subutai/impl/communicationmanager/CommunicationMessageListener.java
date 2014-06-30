@@ -51,6 +51,9 @@ class CommunicationMessageListener implements MessageListener {
                         LOG.log( Level.INFO, "\nReceived {0}",
                                 CommandJson.getJson( CommandJson.getCommand( jsonCmd ) ) );
                     }
+                    else {
+                        LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
+                    }
                     response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
                     notifyListeners( response );
                 }
