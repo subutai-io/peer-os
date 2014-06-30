@@ -1,12 +1,17 @@
 package org.safehaus.subutai.impl.manager;
 
+import java.nio.file.Paths;
 import java.util.*;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
+import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TemplateManagerImpl extends TemplateManagerBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateManagerImpl.class);
 
     @Override
     public String getMasterTemplateName() {
@@ -46,7 +51,17 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         if(template == null) return false;
 
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.EXPORT, templateName);
+        boolean b = scriptExecutor.execute(a, ActionType.EXPORT, templateName);
+        if(b) {
+            String filePath = getExportedPackageFilePath(a, templateName);
+            try {
+                repoManager.addPackageByPath(a, filePath, false);
+                return true;
+            } catch(AptRepoException ex) {
+                logger.error("Failed to add package to repo", ex);
+            }
+        }
+        return false;
     }
 
     private boolean checkParentTemplate(Agent a, String templateName) {
@@ -72,6 +87,19 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 
         // exit status of grep is 0 if selected lines are found
         return cmd.hasSucceeded();
+    }
+
+    private String getExportedPackageFilePath(Agent a, String templateName) {
+        Command cmd = commandRunner.createCommand(
+                new RequestBuilder("echo $SUBUTAI_TMPDIR"),
+                new HashSet<>(Arrays.asList(a)));
+        commandRunner.runCommand(cmd);
+        AgentResult res = cmd.getResults().get(a.getUuid());
+        if(res.getExitCode() != null && res.getExitCode() == 0) {
+            String dir = res.getStdOut();
+            return Paths.get(dir, templateName).toString();
+        }
+        return null;
     }
 
 }
