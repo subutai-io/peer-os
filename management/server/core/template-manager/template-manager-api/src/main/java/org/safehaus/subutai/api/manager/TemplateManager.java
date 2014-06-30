@@ -6,6 +6,8 @@ package org.safehaus.subutai.api.manager;
  */
 public interface TemplateManager {
 
+    public String getMasterTemplateName();
+
     /**
      * Clone an instance container from a given template.
      *
