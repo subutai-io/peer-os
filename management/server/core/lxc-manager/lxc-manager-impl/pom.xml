@@ -53,6 +53,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>template-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>db-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
     <build>

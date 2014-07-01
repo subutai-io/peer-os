@@ -1,18 +1,23 @@
 package org.safehaus.subutai.impl.container;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.*;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.*;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ContainerManagerImpl extends ContainerManagerBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
 
@@ -25,13 +30,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(Collection<String> hostNames, String templateName,
-            int nodesCount, PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(String groupName, Collection<String> hostNames,
+            String templateName, int nodesCount,
+            PlacementStrategyENUM... strategy) {
+
         LxcPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
         try {
             st.calculatePlacement(lxcManager.getPhysicalServerMetrics());
         } catch(LxcCreateException ex) {
-            Logger.getLogger(ContainerManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Failed to calculate placement", ex);
             return Collections.emptySet();
         }
         Map<Agent, Integer> slots = st.getPlacementDistribution();
@@ -51,6 +58,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             Agent a = agentManager.getAgentByHostname(cloneName);
             if(a != null) clones.add(a);
         }
+        boolean saved = saveNodeGroup(groupName, templateName, clones, strategy);
+        if(!saved) logger.error("Failed to save node group info");
+
         return clones;
     }
 
@@ -62,6 +72,26 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             Agent a = agentManager.getAgentByHostname(name);
             if(a == null) return name;
         }
+    }
+
+    private boolean saveNodeGroup(String name, String templateName, Set<Agent> agents,
+            PlacementStrategyENUM... strategy) {
+
+        String cql = "INSERT INTO node_group(name, info) VALUES(?, ?)";
+        EnvironmentNodeGroup group = new EnvironmentNodeGroup();
+        group.setTemplateUsed(templateName);
+
+        Set<EnvironmentGroupInstance> instances = new HashSet<>();
+        for(Agent a : agents) {
+            EnvironmentGroupInstance gi = new EnvironmentGroupInstance();
+            gi.setAgent(a);
+            gi.setName(a.getHostname());
+            gi.setPlacementStrategyENUM(strategy[0]); // TODO: first value used
+            instances.add(gi);
+        }
+        group.setEnvironmentGroupInstanceSet(instances);
+
+        return dbManager.executeUpdate(cql, name, gson.toJson(group));
     }
 
 }

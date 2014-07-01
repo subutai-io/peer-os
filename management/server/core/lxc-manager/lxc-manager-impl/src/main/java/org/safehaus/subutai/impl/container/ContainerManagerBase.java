@@ -2,6 +2,7 @@ package org.safehaus.subutai.impl.container;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.manager.TemplateManager;
 
@@ -10,6 +11,7 @@ public abstract class ContainerManagerBase implements ContainerManager {
     LxcManager lxcManager;
     AgentManager agentManager;
     TemplateManager templateManager;
+    DbManager dbManager;
 
     public LxcManager getLxcManager() {
         return lxcManager;
@@ -33,6 +35,14 @@ public abstract class ContainerManagerBase implements ContainerManager {
 
     public void setTemplateManager(TemplateManager templateManager) {
         this.templateManager = templateManager;
+    }
+
+    public DbManager getDbManager() {
+        return dbManager;
+    }
+
+    public void setDbManager(DbManager dbManager) {
+        this.dbManager = dbManager;
     }
 
 }
