@@ -1,6 +1,11 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.manager.TemplateManager;
@@ -13,6 +18,9 @@ public class ContainerManagerImpl implements ContainerManager {
     private LxcManager lxcManager;
     private AgentManager agentManager;
     private TemplateManager templateManager;
+
+    // number sequences for template names used for new clone name generation
+    private ConcurrentMap<String, AtomicInteger> sequences;
 
     public LxcManager getLxcManager() {
         return lxcManager;
@@ -39,21 +47,28 @@ public class ContainerManagerImpl implements ContainerManager {
     }
 
     public void init() {
+        sequences = new ConcurrentHashMap<>();
     }
 
     public void destroy() {
+        sequences.clear();
     }
 
     @Override
     public Set<Agent> clone(Collection<String> hostNames, String templateName, int nodesCount, PlacementStrategyENUM... strategy) {
         LxcPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
-        Map<Agent, Integer> slots = st.calculateSlots(lxcManager.getPhysicalServerMetrics());
+        try {
+            st.calculatePlacement(lxcManager.getPhysicalServerMetrics());
+        } catch(LxcCreateException ex) {
+            Logger.getLogger(ContainerManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            return Collections.emptySet();
+        }
+        Map<Agent, Integer> slots = st.getPlacementDistribution();
 
-        int n = 1;
         List<String> cloneNames = new ArrayList<>();
         for(Map.Entry<Agent, Integer> e : slots.entrySet()) {
             for(int i = 0; i < e.getValue(); i++) {
-                String name = nextHostName(templateName, n);
+                String name = nextHostName(templateName);
                 boolean b = templateManager.clone(e.getKey().getHostname(),
                         templateName, name);
                 if(b) cloneNames.add(name);
@@ -68,9 +83,11 @@ public class ContainerManagerImpl implements ContainerManager {
         return clones;
     }
 
-    private String nextHostName(String templateName, int offset) {
+    private String nextHostName(String templateName) {
+        AtomicInteger i = sequences.putIfAbsent(templateName, new AtomicInteger());
+        if(i == null) i = sequences.get(templateName);
         while(true) {
-            String name = templateName + "-" + offset++;
+            String name = templateName + "-" + i.incrementAndGet();
             Agent a = agentManager.getAgentByHostname(name);
             if(a == null) return name;
         }

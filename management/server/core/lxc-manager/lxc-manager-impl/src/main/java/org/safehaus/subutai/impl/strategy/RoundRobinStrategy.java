@@ -18,18 +18,6 @@ public class RoundRobinStrategy extends LxcPlacementStrategy {
     }
 
     @Override
-    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
-        Map<Agent, Integer> res = new HashMap<>();
-        Map<Agent, Map<String, Integer>> map = getPlacementInfoMap();
-        for(Map.Entry<Agent, Map<String, Integer>> e : map.entrySet()) {
-            int total = 0;
-            for(Integer i : e.getValue().values()) total += i;
-            res.put(e.getKey(), total);
-        }
-        return res;
-    }
-
-    @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
         if(serverMetrics == null || serverMetrics.isEmpty()) return;
 
