@@ -18,7 +18,7 @@
     </bean>
 
     <bean id="containerManager" scope="singleton" 
-          class="org.safehaus.subutai.impl.lxcmanager.ContainerManagerImpl"
+          class="org.safehaus.subutai.impl.container.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
         <property name="lxcManager" ref="lxcmanager"/>
         <property name="agentManager" ref="agentManager"/>
@@ -26,6 +26,6 @@
     </bean>
     
     <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
-    <service ref="containerManager" interface="org.safehaus.subutai.api.lxcmanager.ContainerManager" />
+    <service ref="containerManager" interface="org.safehaus.subutai.api.container.ContainerManager" />
 
 </blueprint>
