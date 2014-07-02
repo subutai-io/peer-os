@@ -518,6 +518,23 @@
                                     <artifactId>template-registry-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>-->
+                                
+                                <!-- Template Manager -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Apt Repo Manager -->
                                 <artifactItem>
