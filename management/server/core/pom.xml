@@ -29,5 +29,6 @@
     <module>environment-manager</module>
     <module>template-registry</module>
     <module>template-manager</module>
+    <module>configuration-manager</module>
   </modules>
 </project>
