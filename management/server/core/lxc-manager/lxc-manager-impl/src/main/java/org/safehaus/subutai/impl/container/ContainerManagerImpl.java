@@ -5,7 +5,10 @@ import com.google.gson.GsonBuilder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.manager.helper.*;
@@ -62,6 +65,27 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         if(!saved) logger.error("Failed to save node group info");
 
         return clones;
+    }
+
+    @Override
+    public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd) {
+        return attachAndExecute(physicalHost, cloneName, cmd, 30, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd, long t, TimeUnit unit) {
+        if(cmd == null || cmd.isEmpty()) return false;
+        // synopsis:
+        // lxc-attach {-n name} [-a arch] [-e] [-s namespaces] [-R] [--keep-env] [--clear-env] [-- command]
+        StringBuilder sb = new StringBuilder("lxc-attach -n ");
+        sb.append(cloneName).append(" -- ").append(cmd);
+
+        int timeout = (int)unit.toSeconds(t);
+        Command comm = commandRunner.createCommand(
+                new RequestBuilder(sb.toString()).withTimeout(timeout),
+                new HashSet<>(Arrays.asList(physicalHost)));
+        commandRunner.runCommand(comm);
+        return comm.hasSucceeded();
     }
 
     private String nextHostName(String templateName) {
