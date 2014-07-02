@@ -87,6 +87,7 @@
         <commons-jexl.version>2.1.1</commons-jexl.version>
         <commons-net.version>3.3</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
+        <commons.io.version>2.4</commons.io.version>
         <cssparser.version>0.9.4</cssparser.version>
 
         <io.netty.version>3.9.0.Final</io.netty.version>
@@ -101,7 +102,7 @@
         <org.apache.activemq.version>5.9.1</org.apache.activemq.version>
         <org.apache.cassandra.version>2.0.5</org.apache.cassandra.version>
         <org.apache.commons.version>3.2.1</org.apache.commons.version>
-        <commons.io.version>2.4</commons.io.version>
+
         <org.apache.cxf.version>2.7.11</org.apache.cxf.version>
         <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
         <org.apache.felix.version>2.4.0</org.apache.felix.version>
@@ -115,7 +116,7 @@
         <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
         <org.doomdark.version>1.1.2</org.doomdark.version>
         <org.jsoup.version>1.6.3</org.jsoup.version>
-        <org.eclipse.jetty.orbit.version>2.5.0.v201103041518</org.eclipse.jetty.orbit.version>
+        <!--<org.eclipse.jetty.orbit.version>2.5.0.v201103041518</org.eclipse.jetty.orbit.version>-->
         <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
         <org.mockito.version>1.9.5</org.mockito.version>
         <org.osgi.version>4.3.1</org.osgi.version>
@@ -204,11 +205,11 @@
             <!--command-runner-impl-->
 
             <!--command-runner-ui-->
-            <dependency>
-                <groupId>org.eclipse.jetty.orbit</groupId>
-                <artifactId>javax.servlet</artifactId>
-                <version>${org.eclipse.jetty.orbit.version}</version>
-            </dependency>
+            <!--<dependency>-->
+            <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
+            <!--<artifactId>javax.servlet</artifactId>-->
+            <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
