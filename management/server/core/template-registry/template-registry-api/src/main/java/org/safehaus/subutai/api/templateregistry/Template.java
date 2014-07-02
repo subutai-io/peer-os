@@ -1,6 +1,9 @@
 package org.safehaus.subutai.api.templateregistry;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -32,6 +35,8 @@ public class Template {
     private String subutaiGitUuid;
     //contents of packages manifest file
     private String packagesManifest;
+
+    private List<Template> children;
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
@@ -68,6 +73,14 @@ public class Template {
 
     public static Template getMasterTemplate() {
         return masterTemplate;
+    }
+
+
+    public void addChildren( List<Template> children ) {
+        if ( this.children == null ) {
+            this.children = new ArrayList<>();
+        }
+        this.children.addAll( children );
     }
 
 

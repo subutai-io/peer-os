@@ -44,7 +44,7 @@ public interface TemplateRegistryManager {
      *
      * @return - list of {@code Template}
      */
-    public List<Template> getTemplatesByParent( String parentTemplateName );
+    public List<Template> getChildTemplates( String parentTemplateName );
 
     /**
      * Returns parent template
@@ -61,4 +61,13 @@ public interface TemplateRegistryManager {
      * @return - {@code TemplateTree}
      */
     public TemplateTree getTemplateTree();
+
+    /**
+     * Returns list of all parent templates starting from MASTER
+     *
+     * @param childTemplateName - name of template whose parents to return
+     *
+     * @return - list of {@code Template}
+     */
+    public List<Template> getParentTemplates( String childTemplateName );
 }

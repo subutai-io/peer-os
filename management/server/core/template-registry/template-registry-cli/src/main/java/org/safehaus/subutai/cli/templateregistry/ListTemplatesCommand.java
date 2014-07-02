@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command( scope = "registry", name = "list-templates", description = "List templates" )
+@Command(scope = "registry", name = "list-templates", description = "List templates")
 public class ListTemplatesCommand extends OsgiCommandSupport {
 
     private TemplateRegistryManager templateRegistryManager;
