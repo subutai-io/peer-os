@@ -33,9 +33,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(String groupName, Collection<String> hostNames,
-            String templateName, int nodesCount,
-            PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(String groupName, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
 
         LxcPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
         try {
