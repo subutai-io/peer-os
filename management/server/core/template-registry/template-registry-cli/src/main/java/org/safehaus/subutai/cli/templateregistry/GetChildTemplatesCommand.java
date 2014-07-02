@@ -14,10 +14,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command( scope = "registry", name = "get-templates-by-parent", description = "Get templates by parent template name" )
-public class GetTemplatesByParentCommand extends OsgiCommandSupport {
-    @Argument( index = 0, name = "parent template name", required = true, multiValued = false,
-            description = "parent template name" )
+@Command( scope = "registry", name = "get-child-templates",
+        description = "Get child templates by parent template name" )
+public class GetChildTemplatesCommand extends OsgiCommandSupport {
+    @Argument(index = 0, name = "parent template name", required = true, multiValued = false,
+            description = "parent template name")
     String parentTemplateName;
 
     private TemplateRegistryManager templateRegistryManager;
@@ -30,7 +31,7 @@ public class GetTemplatesByParentCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        List<Template> templates = templateRegistryManager.getTemplatesByParent( parentTemplateName );
+        List<Template> templates = templateRegistryManager.getChildTemplates( parentTemplateName );
         if ( templates != null && !templates.isEmpty() ) {
             for ( Template template : templates ) {
                 System.out.println( template + "\n" );
