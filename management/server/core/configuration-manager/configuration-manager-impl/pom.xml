@@ -32,11 +32,11 @@
       <artifactId>configuration-manager-api</artifactId>
       <!--<version>2.0.0</version>-->
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
-      <!--<version>2.0.0</version>-->
-    </dependency>
+      &lt;!&ndash;<version>2.0.0</version>&ndash;&gt;
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>monitor-api</artifactId>
