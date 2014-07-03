@@ -19,18 +19,10 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>ui-vaadin-services</artifactId>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mgmt-shared-protocol</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>${project.groupId}</groupId>-->
-      <!--<artifactId>ui-vaadin</artifactId>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
@@ -38,6 +30,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>configuration-manager-api</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>environment-manager-api</artifactId>
       <version>2.0.0</version>
     </dependency>
     <dependency>
@@ -53,14 +50,6 @@
       <artifactId>javax.annotation-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.orbit</groupId>
-      <artifactId>javax.servlet</artifactId>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.vaadin</groupId>-->
-      <!--<artifactId>vaadin</artifactId>-->
-    <!--</dependency>-->
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -72,20 +61,6 @@
     <dependency>
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>db-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <version>1.10</version>
-    </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>1.13</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
     </dependency>
   </dependencies>
 

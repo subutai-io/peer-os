@@ -17,7 +17,9 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public void injectRegularConfiguration( final Object conf, final String path, final Agent agent ) {
+    public void injectConfiguration( final Object conf, final String path, final Agent agent ) {
+
+
 
     }
 }

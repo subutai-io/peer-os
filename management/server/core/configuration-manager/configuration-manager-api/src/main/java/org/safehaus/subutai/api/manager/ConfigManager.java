@@ -16,5 +16,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public interface ConfigManager {
 
-    public void injectRegularConfiguration(Object conf, String path, Agent agent);
+    public void injectConfiguration(Object conf, String path, Agent agent);
+
 }
