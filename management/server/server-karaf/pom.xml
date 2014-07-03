@@ -684,7 +684,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Environment Manager -->
+                <!-- Configuration Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-api</artifactId>
