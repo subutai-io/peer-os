@@ -476,6 +476,45 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Environment Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>environment-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>environment-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>environment-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>environment-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Configuration Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>configuration-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>configuration-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>configuration-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
