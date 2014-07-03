@@ -19,10 +19,10 @@
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.api.dbmanager.DbManager" />
 
-  <bean id="manager" scope="singleton" class="org.safehaus.subutai.impl.manager.EnvironmentManagerImpl">
+  <bean id="environmentManager" scope="singleton" class="org.safehaus.subutai.impl.manager.EnvironmentManagerImpl">
     <property name="dbManager" ref="dbManager" />
   </bean>
 
-  <service ref="manager" interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
+  <service ref="environmentManager" interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
 </blueprint>
