@@ -57,15 +57,13 @@ public class BlueprintsForm {
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    BlueprintDetails details = new BlueprintDetails();
-
-                    details.setBlueprint( viewButton.getBlueprint() );
+                    BlueprintDetails details = new BlueprintDetails(viewButton.getBlueprint() );
+                    contentRoot.getUI().addWindow( details );
                     details.setVisible( true );
                 }
             } );
 
             final Object rowId = environmentsTable.addItem( new Object[] {
-
                     blueprint.getName(), viewButton, new Button( "Build environment" ), new Button( "Delete" )
             }, null );
         }

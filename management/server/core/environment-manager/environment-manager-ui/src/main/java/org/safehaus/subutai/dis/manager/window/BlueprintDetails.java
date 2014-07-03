@@ -17,22 +17,23 @@ public class BlueprintDetails extends Window {
     private Blueprint blueprint;
     private TextArea blueprintTxtArea;
 
+    VerticalLayout verticalLayout = getVLayout();
 
-    public BlueprintDetails() {
+
+    public BlueprintDetails(Blueprint blueprint) {
         setCaption( "Blueprint details" );
         setModal( true );
         setClosable( true );
         setVisible( false );
         setWidth( 600, UNITS_PIXELS );
         setHeight( 400, UNITS_PIXELS );
-        VerticalLayout verticalLayout = getVLayout();
         blueprintTxtArea = getTextArea();
         BlueprintParser blueprintParser = new BlueprintParser();
         String blueprintStr = blueprintParser.parseBlueprint( blueprint );
         blueprintTxtArea.setValue( blueprintStr );
         verticalLayout.addComponent( blueprintTxtArea );
 
-//        addComponent( verticalLayout );
+        setContent( verticalLayout );
     }
 
 
