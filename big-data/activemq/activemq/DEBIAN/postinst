@@ -9,9 +9,9 @@ sudo update-rc.d activemq defaults
 
 if grep -q "export ACTIVEMQ_HOME=" $FilePath
 then
-        echo "hadoop home is already added!"
+        echo "activemq home is already added!"
 else
-        echo "hadoop home is being inserted"
+        echo "activemq home is being inserted"
         echo "export ACTIVEMQ_HOME="$activemqHomeEcho >> $FilePath
 fi
 . $FilePath

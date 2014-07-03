@@ -52,7 +52,7 @@ public class TemplateDAO {
     }
 
 
-    public List<Template> getTemplatesByParentName( String parentTemplateName ) {
+    public List<Template> geChildTemplates( String parentTemplateName ) {
         List<Template> list = new ArrayList<>();
         try {
             ResultSet rs = dbManager
