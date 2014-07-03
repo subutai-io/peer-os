@@ -4,14 +4,15 @@ package org.safehaus.subutai.dis.manager.manage;
 import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintsForm {
 
     private VerticalLayout contentRoot;
@@ -31,7 +32,7 @@ public class BlueprintsForm {
 
         Button getEnvironmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addListener( new Button.ClickListener() {
+        getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 updateTableData();
@@ -50,14 +51,25 @@ public class BlueprintsForm {
 
     private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<Environment> environmentList = environmentManager.getEnvironments();
-        for ( Environment environment : environmentList ) {
+        List<Blueprint> blueprints = environmentManager.getBlueprints();
+        for ( Blueprint blueprint : blueprints ) {
+            final ViewButton viewButton = new ViewButton( "View", blueprint );
+            viewButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    BlueprintDetails details = new BlueprintDetails();
+
+                    details.setBlueprint( viewButton.getBlueprint() );
+                    details.setVisible( true );
+                }
+            } );
+
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    environment.getName(), new Button("View"), new Button( "Build environment" ), new Button( "Delete" )
+
+                    blueprint.getName(), viewButton, new Button( "Build environment" ), new Button( "Delete" )
             }, null );
         }
         environmentsTable.refreshRowCache();
-        environmentsTable.requestRepaint();
     }
 
 
@@ -71,14 +83,24 @@ public class BlueprintsForm {
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
-        //        table.addListener( new ItemClickEvent.ItemClickListener() {
-        //
-        //            public void itemClick( ItemClickEvent event ) {
-        //                if ( event.isDoubleClick() ) {
-        //
-        //                }
-        //            }
-        //        } );
+        table.setSizeFull();
         return table;
+    }
+
+
+    private class ViewButton extends Button {
+
+        Blueprint blueprint;
+
+
+        private ViewButton( final String caption, final Blueprint blueprint ) {
+            super( caption );
+            this.blueprint = blueprint;
+        }
+
+
+        public Blueprint getBlueprint() {
+            return blueprint;
+        }
     }
 }

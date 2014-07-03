@@ -75,6 +75,7 @@ public class EnvironmentsForm {
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
+        table.setSizeFull();
         //        table.addListener( new ItemClickEvent.ItemClickListener() {
         //
         //            public void itemClick( ItemClickEvent event ) {
