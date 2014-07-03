@@ -23,7 +23,6 @@ public class EnvironmentsForm {
         this.environmentManager = environmentManager;
 
         contentRoot = new VerticalLayout();
-
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
 
@@ -31,7 +30,7 @@ public class EnvironmentsForm {
 
         Button getEnvironmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addListener( new Button.ClickListener() {
+        getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 updateTableData();
@@ -57,7 +56,6 @@ public class EnvironmentsForm {
             }, null );
         }
         environmentsTable.refreshRowCache();
-        environmentsTable.requestRepaint();
     }
 
 

@@ -76,6 +76,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 System.out.println( e.getMessage() );
             }
             finally {
+                Environment e = new Environment();
+                e.setName( blueprint.getName() );
+                environmentDAO.saveEnvironment( e );
                 return false;
             }
         }

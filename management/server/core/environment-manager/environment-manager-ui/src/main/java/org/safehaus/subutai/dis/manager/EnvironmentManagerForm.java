@@ -32,7 +32,6 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     public EnvironmentManagerForm(EnvironmentManager environmentManager) {
         setHeight( 100, UNITS_PERCENTAGE );
 
-
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();

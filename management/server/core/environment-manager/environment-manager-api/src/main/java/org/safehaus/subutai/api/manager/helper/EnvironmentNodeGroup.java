@@ -1,7 +1,9 @@
 package org.safehaus.subutai.api.manager.helper;
 
 
-import java.util.Set;
+import java.util.List;
+
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
@@ -11,6 +13,7 @@ public class EnvironmentNodeGroup {
 
 
     private String templateUsed;
+    private List<Agent> instances;
 
 
     public String getTemplateUsed() {
@@ -23,15 +26,12 @@ public class EnvironmentNodeGroup {
     }
 
 
-    Set<EnvironmentGroupInstance> environmentGroupInstanceSet;
-
-
-    public Set<EnvironmentGroupInstance> getEnvironmentGroupInstanceSet() {
-        return environmentGroupInstanceSet;
+    public List<Agent> getInstances() {
+        return instances;
     }
 
 
-    public void setEnvironmentGroupInstanceSet( final Set<EnvironmentGroupInstance> environmentGroupInstanceSet ) {
-        this.environmentGroupInstanceSet = environmentGroupInstanceSet;
+    public void setInstances( final List<Agent> instances ) {
+        this.instances = instances;
     }
 }

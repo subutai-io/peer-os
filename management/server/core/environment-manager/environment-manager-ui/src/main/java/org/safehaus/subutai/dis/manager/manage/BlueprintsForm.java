@@ -52,19 +52,36 @@ public class BlueprintsForm {
     private void updateTableData() {
         environmentsTable.removeAllItems();
         List<Blueprint> blueprints = environmentManager.getBlueprints();
-        for ( Blueprint blueprint : blueprints ) {
-            final ViewButton viewButton = new ViewButton( "View", blueprint );
+        for ( final Blueprint blueprint : blueprints ) {
+
+            final Button viewButton = new Button( "View" );
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    BlueprintDetails details = new BlueprintDetails(viewButton.getBlueprint() );
+                    BlueprintDetails details = new BlueprintDetails( blueprint );
                     contentRoot.getUI().addWindow( details );
                     details.setVisible( true );
                 }
             } );
 
+            final Button buildEnvironmentButton = new Button( "Build Environment" );
+            buildEnvironmentButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    environmentManager.buildEnvironment( blueprint );
+                }
+            } );
+
+            final Button deleteBlueprintButton = new Button( "Delete" );
+            deleteBlueprintButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    environmentManager.deleteBlueprint( blueprint.getName() );
+                }
+            } );
+
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    blueprint.getName(), viewButton, new Button( "Build environment" ), new Button( "Delete" )
+                    blueprint.getName(), viewButton, buildEnvironmentButton, deleteBlueprintButton
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -83,22 +100,5 @@ public class BlueprintsForm {
         table.setImmediate( true );
         table.setSizeFull();
         return table;
-    }
-
-
-    private class ViewButton extends Button {
-
-        Blueprint blueprint;
-
-
-        private ViewButton( final String caption, final Blueprint blueprint ) {
-            super( caption );
-            this.blueprint = blueprint;
-        }
-
-
-        public Blueprint getBlueprint() {
-            return blueprint;
-        }
     }
 }
