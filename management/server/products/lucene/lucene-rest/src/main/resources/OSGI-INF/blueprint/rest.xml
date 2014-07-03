@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/lucene" id="luceneRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="luceneRestServiceImpl"/>
+            <ref component-id="luceneRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="luceneRestServiceImpl" class="org.safehaus.subutai.lucene.services.RestServiceImpl">
