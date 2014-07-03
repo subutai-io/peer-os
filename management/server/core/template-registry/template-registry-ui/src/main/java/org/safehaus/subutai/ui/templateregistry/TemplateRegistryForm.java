@@ -47,10 +47,16 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
 
+        container = new HierarchicalContainer();
+        container.addContainerProperty( "value", Template.class, null );
+        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+
         templateTree = new Tree( "Templates" );
-        templateTree.setContainerDataSource( getNodeContainer() );
+        templateTree.setContainerDataSource( container );
         templateTree.setItemIconPropertyId( "icon" );
         templateTree.setImmediate( true );
+
+        fillTemplateTree();
 
         horizontalSplit.setFirstComponent( templateTree );
 
@@ -84,7 +90,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         container = new HierarchicalContainer();
         container.addContainerProperty( "value", Template.class, null );
         container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
-        fillTemplateTree();
+
         return container;
     }
 
