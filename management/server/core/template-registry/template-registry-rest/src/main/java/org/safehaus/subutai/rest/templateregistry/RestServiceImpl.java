@@ -18,7 +18,8 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson =
+            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
     private TemplateRegistryManager templateRegistryManager;
 
 

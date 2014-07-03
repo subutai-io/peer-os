@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.gson.annotations.Expose;
 
 
 /**
@@ -34,6 +35,7 @@ public class Template {
     //id of git commit which pushed template cfg files to git
     private String subutaiGitUuid;
     //contents of packages manifest file
+    @Expose
     private String packagesManifest;
 
     private List<Template> children;
@@ -146,7 +148,6 @@ public class Template {
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-                ", packagesManifest='" + packagesManifest + '\'' +
                 '}';
     }
 }
