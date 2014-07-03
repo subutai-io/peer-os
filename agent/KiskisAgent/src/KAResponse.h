@@ -19,8 +19,8 @@
  *  @details   KAResponse class is designed for marshaling and unmarshalling response messages.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.3
- *  @date      Apr 24, 2014
+ *  @version   1.0.4
+ *  @date      July 02, 2014
  */
 #ifndef KARESPONSE_H_
 #define KARESPONSE_H_
@@ -53,6 +53,10 @@ public:
 	string& getTaskUuid();
 	vector<string>& getIps();
 	string& getSource();
+	string& getconfigPoint();
+	string& getDateTime();
+	string& getChangeType();
+	vector<string>& getConfPoints();
 	void setSource(const string&);
 	void setHostname(const string&);
 	void setParentHostname(const string&);
@@ -67,6 +71,10 @@ public:
 	void setStandardError(const string&);
 	void setStandardOutput(const string&);
 	void setExitCode(int);
+	void setconfigPoint(const string&);
+	void setDateTime(const string&);
+	void setChangeType(const string&);
+	void setConfPoints(vector<string>);
 	void serialize(string&);						//Serializing a Chunk Response message to a Json String
 	void serializeDone(string&);					//Serializing a Last Done Response message to a Json string
 	void clear();
@@ -85,5 +93,9 @@ private:
 	string			parentHostname;
 	vector<string>  ips;
 	string			source;
+	string 			configPoint;
+	string			dateTime;
+	string			changeType;
+	vector<string>  confPoints;
 };
 #endif /* KARESPONSE_H_ */

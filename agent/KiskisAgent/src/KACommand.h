@@ -44,6 +44,7 @@ public:
 	virtual ~KACommand( void );
 	list<pair<string,string> >& getEnvironment();
 	vector<string>& getArguments();
+	vector<string>& getWatchArguments();
 	string& getUuid();
 	string& getWorkingDirectory();
 	string& getProgram();
@@ -102,5 +103,6 @@ private:
 	string			hostname;
 	vector<string>  ips;
 	string			source;
+	vector<string>	watchArgs;
 };
 #endif /* KACOMMAND_H_ */

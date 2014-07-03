@@ -36,6 +36,7 @@ KAResponsePack::~KAResponsePack()
 string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string error,string output,string source,string taskuuid)
 {
+	clear();
 	this->setType("EXECUTE_RESPONSE");			//creating Response chunk message
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
@@ -55,6 +56,7 @@ string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqN
 string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string source, string taskuuid,int exitcode)	//Creating Exit message
 {
+	clear();
 	this->setType("EXECUTE_RESPONSE_DONE");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
@@ -72,6 +74,7 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
  */
 string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,string parenthostname)
 {	//Creating Registration Message
+	clear();
 	this->setType("REGISTRATION_REQUEST");
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);
@@ -86,6 +89,7 @@ string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,s
  */
 string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
 {
+	clear();
 	this->setType("IN_QUEUE");
 	this->setTaskUuid(taskuuid);
 	this->setUuid(uuid);
@@ -99,6 +103,7 @@ string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creat
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,
 		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
 {
+	clear();
 	this->setType("HEARTBEAT_RESPONSE");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
@@ -117,6 +122,7 @@ string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,stri
  */
 string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
 {
+	clear();
 	this->setType("TERMINATE_RESPONSE_DONE");
 	this->setSource(source);
 	this->setExitCode(0);
@@ -133,6 +139,7 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,stri
  */
 string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Failed Terminate Message
 {
+	clear();
 	this->setType("TERMINATE_RESPONSE_FAILED");
 	this->setSource(source);
 	this->setExitCode(1);
@@ -150,6 +157,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
 {
+	clear();
 	this->setType("EXECUTE_TIMEOUT");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
@@ -159,6 +167,36 @@ string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNu
 	this->setResponseSequenceNumber(responseSeqNum);
 	this->setStandardOutput(stdOut);
 	this->setStandardError(stdErr);
+	this->serialize(sendout);
+	return sendout;
+}
+
+/**
+ *  \details   This method creates Inotify response message.
+ */
+string KAResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
+{
+	clear();
+	this->setType("INOTIFY_RESPONSE");
+	this->setUuid(uuid);
+	this->setconfigPoint(configPoint);
+	this->setDateTime(dateTime);
+	this->setChangeType(changeType);
+	this->getConfPoints().clear();
+	this->serialize(sendout);
+	return sendout;
+}
+
+/**
+ *  \details   This method creates Inotify showing all watcher message.
+ */
+string KAResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
+{
+	clear();
+	this->setType("INOTIFY_SHOW_RESPONSE");
+	this->setUuid(uuid);
+	this->setConfPoints(configPoint);
+
 	this->serialize(sendout);
 	return sendout;
 }
