@@ -17,27 +17,36 @@ public class Template {
     public static final String MASTER_TEMPLATE_NAME = "master";
     private static Template masterTemplate = new Template();
     //name of template
+    @Expose
     private String templateName;
     //name of parent template
+    @Expose
     private String parentTemplateName;
     //lxc architecture e.g. amd64, i386
+    @Expose
     private String lxcArch;
     //lxc container name
+    @Expose
     private String lxcUtsname;
     //path to cfg files tracked by subutai
+    @Expose
     private String subutaiConfigPath;
     //path to app data files tracked by subutai
+    @Expose
     private String subutaiAppdataPath;
     //name of parent template
+    @Expose
     private String subutaiParent;
     //name of git branch where template cfg files are versioned
+    @Expose
     private String subutaiGitBranch;
     //id of git commit which pushed template cfg files to git
+    @Expose
     private String subutaiGitUuid;
     //contents of packages manifest file
-    @Expose
-    private String packagesManifest;
 
+    private String packagesManifest;
+    @Expose
     private List<Template> children;
 
 
