@@ -18,6 +18,8 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.TabSheet;
@@ -55,6 +57,26 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         templateTree.setContainerDataSource( container );
         templateTree.setItemIconPropertyId( "icon" );
         templateTree.setImmediate( true );
+        templateTree.setItemDescriptionGenerator( new AbstractSelect.ItemDescriptionGenerator() {
+
+            @Override
+            public String generateDescription( Component source, Object itemId, Object propertyId ) {
+                String description = "";
+
+                Item item = templateTree.getItem( itemId );
+                if ( item != null ) {
+                    Template template = ( Template ) item.getItemProperty( "value" ).getValue();
+                    if ( template != null ) {
+                        description = "Name: " + template.getTemplateName() + "<br>" + "Parent: " + template
+                                .getParentTemplateName() + "<br>" + "Arch: " + template.getLxcArch() + "<br>"
+                                + "Utsname: " + template.getLxcUtsname() + "<br>" + "Cfg Path: " + template
+                                .getSubutaiConfigPath();
+                    }
+                }
+
+                return description;
+            }
+        } );
 
         fillTemplateTree();
 

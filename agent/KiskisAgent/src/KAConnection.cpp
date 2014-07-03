@@ -28,6 +28,7 @@ KAConnection::KAConnection(const char * id, const char * subscribedTopic, const 
 	this->subscribedTopic = subscribedTopic;
 	this->broadcastTopic = broadcastTopic;
 	this->publishedTopic = publishedTopic;
+	this->InotifyTopic = "INOTIFY_TOPIC";
 	this->reveivedMessage=false;
 	this->connectionStatus=false;
 	this->bufferSize = 10000;
@@ -103,12 +104,22 @@ KAConnection::~KAConnection()
 }
 
 /**
- *  \details   This method sends the given strings to MQTT Broker.
+ *  \details   This method sends the given strings about execution responses to MQTT Broker.
  */
 bool KAConnection::sendMessage(string message)
 {
 	const  char * _message = message.c_str();
 	int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
+	return ( ret == MOSQ_ERR_SUCCESS );
+}
+
+/**
+ *  \details   This method sends the given strings about inotify to MQTT Broker.
+ */
+bool KAConnection::sendInotifyMessage(string message)
+{
+	const  char * _message = message.c_str();
+	int ret = publish(NULL,this->InotifyTopic,strlen(_message),_message,2,true);
 	return ( ret == MOSQ_ERR_SUCCESS );
 }
 
@@ -134,7 +145,7 @@ void KAConnection::on_connect(int rc)
 			subscribe(NULL,this->subscribedTopic,2); // resubscribe to agent own Topic.
 			subscribe(NULL,this->broadcastTopic,2); //resubscribe to broadcastTopic.
 		}
-		connectionStatus==true;
+		connectionStatus=true;
 	}
 	else
 	{
@@ -211,3 +222,14 @@ void KAConnection::setMessage(string message)
 {
 	this->messsage = message;
 }
+
+/**
+ *  \details   setting "id" private variable of the KAConnection class.
+ *
+ */
+string KAConnection::getID()
+{
+	string uuid= this->id;
+	return uuid;
+}
+

@@ -9,7 +9,7 @@ function usage() {
 . /etc/profile
 
 #Paths to the configuration files
-yamlFile="${CASSANDRA_HOME}/conf/cassandra.yaml"
+yamlFile="/etc/cassandra/cassandra.yaml"
 
 if [[ "$1" == "rollback" ]];
 then
