@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/shark" id="sharkRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="sharkRestServiceImpl"/>
+            <ref component-id="sharkRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="sharkRestServiceImpl" class="org.safehaus.subutai.shark.services.RestServiceImpl">
