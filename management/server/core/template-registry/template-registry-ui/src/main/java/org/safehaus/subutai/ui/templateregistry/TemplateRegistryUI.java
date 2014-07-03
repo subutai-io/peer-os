@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
@@ -18,6 +19,7 @@ public class TemplateRegistryUI implements PortalModule {
     public static final String MODULE_NAME = "Registry";
     private static ExecutorService executor;
     private AgentManager agentManager;
+    private TemplateRegistryManager registryManager;
 
 
     public static ExecutorService getExecutor() {
@@ -25,13 +27,13 @@ public class TemplateRegistryUI implements PortalModule {
     }
 
 
-    public AgentManager getAgentManager() {
-        return agentManager;
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
-        this.agentManager = agentManager;
+    public void setRegistryManager( final TemplateRegistryManager registryManager ) {
+        this.registryManager = registryManager;
     }
 
 
@@ -65,6 +67,6 @@ public class TemplateRegistryUI implements PortalModule {
 
     @Override
     public Component createComponent() {
-        return null;
+        return new TemplateRegistryForm( agentManager, registryManager );
     }
 }
