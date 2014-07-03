@@ -6,14 +6,22 @@
 package org.safehaus.subutai.ui.templateregistry;
 
 
+import java.util.List;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
-import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.safehaus.subutai.api.templateregistry.TemplateTree;
 import org.safehaus.subutai.shared.protocol.Disposable;
 
+import com.vaadin.data.Item;
+import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 
@@ -23,18 +31,28 @@ import com.vaadin.ui.themes.Runo;
  */
 public class TemplateRegistryForm extends CustomComponent implements Disposable {
 
-    private final static String managerTabCaption = "Manage";
-    private final AgentTree agentTree;
+    private final AgentManager agentManager;
+    private final TemplateRegistryManager registryManager;
+    private HierarchicalContainer container;
+    private Tree templateTree;
 
 
     public TemplateRegistryForm( AgentManager agentManager, TemplateRegistryManager registryManager ) {
         setHeight( 100, Unit.PERCENTAGE );
 
+        this.agentManager = agentManager;
+        this.registryManager = registryManager;
+
         HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
         horizontalSplit.setStyleName( Runo.SPLITPANEL_SMALL );
         horizontalSplit.setSplitPosition( 200, Unit.PIXELS );
-        agentTree = new AgentTree( agentManager );
-        horizontalSplit.setFirstComponent( agentTree );
+
+        templateTree = new Tree( "Templates" );
+        templateTree.setContainerDataSource( getNodeContainer() );
+        templateTree.setItemIconPropertyId( "icon" );
+        templateTree.setImmediate( true );
+
+        horizontalSplit.setFirstComponent( templateTree );
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
@@ -62,7 +80,39 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
     }
 
 
+    public HierarchicalContainer getNodeContainer() {
+        container = new HierarchicalContainer();
+        container.addContainerProperty( "value", Template.class, null );
+        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
+        fillTemplateTree();
+        return container;
+    }
+
+
+    private void fillTemplateTree() {
+        container.removeAllItems();
+        addChildren( registryManager.getTemplateTree(), Template.getMasterTemplate() );
+    }
+
+
+    private void addChildren( TemplateTree tree, Template currentTemplate ) {
+        Item templateItem = container.addItem( currentTemplate.getTemplateName() );
+        templateItem.getItemProperty( "value" ).setValue( currentTemplate );
+        templateTree.setItemCaption( currentTemplate.getTemplateName(), currentTemplate.getTemplateName() );
+
+        List<Template> children = tree.getChildrenTemplates( currentTemplate );
+        if ( children == null || children.isEmpty() ) {
+            return;
+        }
+        else {
+            for ( Template child : children ) {
+                addChildren( tree, child );
+            }
+        }
+    }
+
+
     public void dispose() {
-        agentTree.dispose();
+
     }
 }
