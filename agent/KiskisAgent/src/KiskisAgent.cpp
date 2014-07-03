@@ -358,6 +358,11 @@ int main(int argc,char *argv[],char *envp[])
 	string broadcastAddress="BROADCAST_TOPIC";	//DEFAULT BROADCAST TOPIC
 	string clientAddress;
 	KAThread thread;
+	KALogger logMain;
+	KACommand command;
+	KAResponsePack response;
+	string input="";
+	string sendout;
 	int level;
 
 	if(!thread.getUserID().checkRootUser())
@@ -369,7 +374,6 @@ int main(int argc,char *argv[],char *envp[])
 		close(STDERR_FILENO);
 		return 300;
 	}
-	KALogger logMain;
 	if(!logMain.openLogFileWithName("KiskisAgentMain.log"))
 	{
 		cout << "/var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.."<<endl;
@@ -474,10 +478,6 @@ int main(int argc,char *argv[],char *envp[])
 
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with MQTT Broker: ",url,
 			" Port: ",toString(port)));
-	KACommand command;
-	KAResponsePack response;
-	string input="";
-	string sendout;
 
 	response.setIps(ipadress);
 	response.setHostname(hostname);
@@ -508,7 +508,11 @@ int main(int argc,char *argv[],char *envp[])
 
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to MQTT Broker.."));
 
-	/*sending registration message*/
+	/*
+	 *
+	 * sending registration message
+	 *
+	 */
 	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),
 			response.getParentHostname());
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
@@ -548,9 +552,9 @@ int main(int argc,char *argv[],char *envp[])
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientAddress));
 
 
-	KAWatch agentWatch(connection,&response);
-	agentWatch.initialize(20000);
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Agent Watcher is initializing.."));
+	KAWatch Watcher(connection,&response,&logMain);
+	Watcher.initialize(20000);
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","TheWatcher is initializing.."));
 
 	while(true)
 	{
@@ -620,7 +624,7 @@ int main(int argc,char *argv[],char *envp[])
 				}
 			}
 
-			agentWatch.checkNotification(); //checking the watch event status
+			Watcher.checkNotification(); //checking the watch event status
 
 			rc = connection->loop(1); // checking the status of the new message
 			if(rc)
@@ -723,26 +727,34 @@ int main(int argc,char *argv[],char *envp[])
 					}
 					else if(command.getType()=="INOTIFY_REQUEST")
 					{
-						cout << "new Watch command comes!" <<endl;
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_REQUEST.."));
 						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
-							agentWatch.addWatcher(command.getWatchArguments()[i]);
-						agentWatch.stats();
+						{
+							Watcher.addWatcher(command.getWatchArguments()[i]);
+							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","adding Watcher: ",
+									command.getWatchArguments()[i]));
+						}
+						Watcher.stats();
 					}
 					else if(command.getType()=="INOTIFY_CANCEL_REQUEST")
 					{
-						cout << "erasing the given watcher.." <<endl;
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_CANCEL_REQUEST.."));
 						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
-							agentWatch.eraseWatcher(command.getWatchArguments()[i]);
-						agentWatch.stats();
+						{
+							Watcher.eraseWatcher(command.getWatchArguments()[i]);
+							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Erasing Watcher: ",
+									command.getWatchArguments()[i]));
+						}
+						Watcher.stats();
 					}
 					else if(command.getType()=="INOTIFY_SHOW_REQUEST")
 					{
-						cout << "sending watcher list.." <<endl;
-						agentWatch.stats();
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_SHOW_REQUEST.."));
+						Watcher.stats();
 						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
-						cout << sendout << endl;
 						connection->sendInotifyMessage(sendout);
-						agentWatch.stats();
+						Watcher.stats();
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}
 				}
 				else

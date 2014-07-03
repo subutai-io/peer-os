@@ -42,6 +42,7 @@
 #include<string>
 #include "KAConnection.h"
 #include "KAResponsePack.h"
+#include "KALogger.h"
 
 using namespace std;
 using std::map;
@@ -56,7 +57,7 @@ using std::endl;
 class KAWatch
 {
 public:
-	KAWatch(KAConnection*,KAResponsePack*);
+	KAWatch(KAConnection*,KAResponsePack*,KALogger*);
 	virtual ~KAWatch(void );
 	void initialize(unsigned int);
 	bool addWatcher(const string &);
@@ -106,5 +107,6 @@ private:
 	string sendout;
 	KAResponsePack* watchRepsonse;
 	KAConnection*	watchConnection;
+	KALogger*		watchLogger;
 };
 #endif /* KAWATCH_H_ */

@@ -17,7 +17,7 @@
 /**
  *  \details   Default constructor of KAWatch class.
  */
-KAWatch::KAWatch(KAConnection* connection, KAResponsePack* response)
+KAWatch::KAWatch(KAConnection* connection, KAResponsePack* response, KALogger* logger)
 {
 #ifdef IN_NONBLOCK
 	fd = inotify_init1( IN_NONBLOCK );
@@ -31,6 +31,7 @@ KAWatch::KAWatch(KAConnection* connection, KAResponsePack* response)
 	}
 	this->watchConnection=connection;
 	this->watchRepsonse=response;
+	this->watchLogger=logger;
 }
 
 /**
@@ -182,6 +183,7 @@ void KAWatch::cleanup()
  */
 void KAWatch::stats()
 {
+	watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::stats>","Watcher Stats logging.."));
 	vector<string> myvector;
 	cout << "number of watches=" << watch.size() << " & reverse watches=" << rwatch.size() << endl;
 	cout << "*************" << endl;
@@ -193,6 +195,8 @@ void KAWatch::stats()
 				<<"    Second Item pd: " << iter->second.pd
 				<<" Second Item name: " << iter->second.name << endl;
 		myvector.push_back(iter->second.name);
+		watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::stats>","Watcher: "
+				,iter->second.name));
 	}
 	watchRepsonse->setConfPoints(myvector);
 
@@ -205,6 +209,7 @@ void KAWatch::stats()
 				<<" First Item name: " << iter1->first.name
 				<<"   Second Item: " << iter1->second << endl;
 	}
+
 }
 
 /**
@@ -327,7 +332,7 @@ bool KAWatch::checkNotification()
 		}
 		if (length < 0)
 		{
-			cout << "length is under 0" << endl;
+			watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Length is under zero"));
 			status=false;
 			return status;
 		}
@@ -337,14 +342,14 @@ bool KAWatch::checkNotification()
 
 			if ( event->wd == -1 )
 			{
-				cout<< "Overflow" << endl;
+				watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Overflow!!"));
 				status=false;
 				return status;
 			}
 
 			if ( event->mask & IN_Q_OVERFLOW )
 			{
-				cout<< "Overflow" << endl;
+				watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Overflow!!"));
 				status=false;
 				return status;
 			}
@@ -353,21 +358,22 @@ bool KAWatch::checkNotification()
 			{
 				if ( event->mask & IN_IGNORED )
 				{
-					cout << "IN_IGNORED\n" << endl;
+					watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","IN_IGNORED!!"));
 				}
 				if ( event->mask & IN_CREATE )
 				{
 					setCurrentDirectory(get(event->wd));
-					cout << "event Directory: " << getCurrentDirectory() << endl;
-
+					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR ) //folder events
 					{
 						status=true;
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),false),"Create_Folder");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 					else //file events
 					{
@@ -375,22 +381,25 @@ bool KAWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,false),"Create_File");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 				}
 				else if ( event->mask & IN_DELETE )
 				{
 					setCurrentDirectory(get(event->wd));
-					cout << "event Directory: " << getCurrentDirectory() << endl;
+					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
 						status=true;
 						setNewDirectory(getCurrentDirectory() + "/" + event->name);
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),true),"Delete_Folder");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 					else
 					{
@@ -398,14 +407,16 @@ bool KAWatch::checkNotification()
 						string newFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,true),"Delete_File");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 				}
 				else if ( event->mask & IN_MODIFY )
 				{
 					setCurrentDirectory(get(event->wd));
-					cout << "event Directory: " << getCurrentDirectory() << endl;
+					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
 						status=true;
@@ -417,22 +428,25 @@ bool KAWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_file");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 				}
 				else if ( event->mask & IN_ATTRIB )
 				{
 					setCurrentDirectory(get(event->wd));
-					cout << "event Directory: " << getCurrentDirectory() << endl;
+					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
 						status=true;
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_Folder");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 					else
 					{
@@ -440,8 +454,9 @@ bool KAWatch::checkNotification()
 						string modFile = getCurrentDirectory() + "/" + event->name;
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_File");
-						cout << sendout << endl;
 						watchConnection->sendInotifyMessage(sendout);
+						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+								,sendout));
 					}
 				}
 			}
