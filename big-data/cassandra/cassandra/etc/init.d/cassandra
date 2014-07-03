@@ -14,8 +14,8 @@
 
 # Author: Eric Evans <eevans@racklabs.com>
 
-cassVer="cassandra-2.0.4"
-cassJAR="apache-cassandra-2.0.4.jar"
+cassVer="cassandra-2.0.9"
+cassJAR="apache-cassandra-2.0.9.jar"
 
 DESC="Cassandra"
 NAME=cassandra
