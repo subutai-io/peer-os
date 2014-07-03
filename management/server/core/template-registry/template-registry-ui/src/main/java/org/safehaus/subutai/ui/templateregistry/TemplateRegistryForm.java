@@ -116,6 +116,8 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
                 addChildren( tree, child );
             }
+
+            templateTree.expandItem( currentTemplate.getTemplateName() );
         }
     }
 
