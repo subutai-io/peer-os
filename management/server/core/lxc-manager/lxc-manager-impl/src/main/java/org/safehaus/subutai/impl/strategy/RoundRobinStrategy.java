@@ -26,7 +26,7 @@ public class RoundRobinStrategy extends LxcPlacementStrategy {
         // distribute required nodes among servers in round-robin fashion
         Map<Agent, Integer> slots = new HashMap<>();
         for(int i = 0; i < nodesCount; i++) {
-            Agent best = ls.get(i % nodesCount);
+            Agent best = ls.get(i % ls.size());
             if(slots.containsKey(best)) slots.put(best, slots.get(best) + 1);
             else slots.put(best, 1);
         }
