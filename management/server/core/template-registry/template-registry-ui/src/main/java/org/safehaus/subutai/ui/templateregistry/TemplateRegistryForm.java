@@ -86,15 +86,6 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
     }
 
 
-    public HierarchicalContainer getNodeContainer() {
-        container = new HierarchicalContainer();
-        container.addContainerProperty( "value", Template.class, null );
-        container.addContainerProperty( "icon", Resource.class, new ThemeResource( "img/lxc/physical.png" ) );
-
-        return container;
-    }
-
-
     private void fillTemplateTree() {
         container.removeAllItems();
         addChildren( registryManager.getTemplateTree(), Template.getMasterTemplate() );
@@ -114,7 +105,6 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
         if ( children == null || children.isEmpty() ) {
             container.setChildrenAllowed( currentTemplate.getTemplateName(), false );
-            return;
         }
         else {
             container.setChildrenAllowed( currentTemplate.getTemplateName(), true );
