@@ -1,8 +1,8 @@
 #!/bin/bash
 # Cassandar configuration script
 #
-cassVersion=cassandra-2.0.4
-file=/opt/$cassVersion/conf/cassandra.yaml
+cassVersion=cassandra-2.0.9
+file=/etc/cassandra/cassandra.yaml
 
 usage()
 {
