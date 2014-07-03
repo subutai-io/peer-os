@@ -685,7 +685,7 @@
                 </artifactItem>
 
                 <!-- Configuration Manager -->
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-api</artifactId>
                   <version>${project.version}</version>
@@ -699,7 +699,7 @@
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-cli</artifactId>
                   <version>${project.version}</version>
-                </artifactItem>
+                </artifactItem>-->
 
                 <!-- Core Modules - END -->
 
