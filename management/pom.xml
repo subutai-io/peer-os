@@ -379,6 +379,30 @@
                 <version>${org.apache.cassandra.version}</version>
             </dependency>
 
+            <!--Vaadin START-->
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-server</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-client-compiled</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-client</artifactId>
+                <scope>provided</scope>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-themes</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <!--Vaadin END-->
+
             <!-- Core Modules - START -->
             <dependency>
                 <groupId>org.safehaus.subutai</groupId>
@@ -579,6 +603,45 @@
                 <artifactId>monitor-ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- Environment Manager -->
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>environment-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>environment-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>environment-manager-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>environment-manager-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Configuration Manager -->
+            <!--<dependency>
+              <groupId>org.safehaus.subutai</groupId>
+              <artifactId>configuration-manager-api</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.safehaus.subutai</groupId>
+              <artifactId>configuration-manager-impl</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.safehaus.subutai</groupId>
+              <artifactId>configuration-manager-cli</artifactId>
+              <version>${project.version}</version>
+            </dependency>-->
             <!-- Core Modules - END -->
 
             <!-- Products Modules - START -->

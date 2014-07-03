@@ -15,7 +15,7 @@
   <!-- 2 -->
   <jaxrs:server address="/accumulo" id="accumuloRestService">
     <jaxrs:serviceBeans>
-      <ref org.safehaus.subutai.server.ui.component-id="accumuloRestServiceImpl" />
+      <ref component-id="accumuloRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
   <!-- 3 -->

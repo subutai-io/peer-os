@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/zookeeper" id="zookeeperRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="zookeeperRestServiceImpl"/>
+            <ref component-id="zookeeperRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="zookeeperRestServiceImpl" class="org.safehaus.subutai.zookeeper.services.RestServiceImpl">

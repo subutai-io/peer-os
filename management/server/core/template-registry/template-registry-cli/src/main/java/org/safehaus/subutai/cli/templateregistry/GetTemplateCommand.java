@@ -12,7 +12,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command( scope = "registry", name = "get-template-by-name", description = "Get template by name" )
+@Command( scope = "registry", name = "get-template", description = "Get template by name" )
 public class GetTemplateCommand extends OsgiCommandSupport {
     @Argument( index = 0, name = "template name", required = true, multiValued = false,
             description = "template name" )

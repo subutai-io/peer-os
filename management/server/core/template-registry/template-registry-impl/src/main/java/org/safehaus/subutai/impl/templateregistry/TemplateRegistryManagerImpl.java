@@ -8,6 +8,8 @@ package org.safehaus.subutai.impl.templateregistry;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -99,11 +101,11 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
-    public List<Template> getTemplatesByParent( final String parentTemplateName ) {
+    public List<Template> getChildTemplates( final String parentTemplateName ) {
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( parentTemplateName ), "Parent template name is null or empty" );
         //retrieve child templates from storage
-        return templateDAO.getTemplatesByParentName( parentTemplateName );
+        return templateDAO.geChildTemplates( parentTemplateName );
     }
 
 
@@ -138,5 +140,19 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             templateTree.addTemplate( template );
         }
         return templateTree;
+    }
+
+
+    @Override
+    public List<Template> getParentTemplates( String childTemplateName ) {
+        List<Template> parents = new ArrayList<>();
+
+        Template parent = getParentTemplate( childTemplateName );
+        while ( parent != null ) {
+            parents.add( parent );
+            parent = getParentTemplate( parent.getTemplateName() );
+        }
+        Collections.reverse( parents );
+        return parents;
     }
 }

@@ -24,8 +24,10 @@ import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyExc
  */
 public class EnvironmentManagerImpl implements EnvironmentManager {
 
-    EnvironmentDAO environmentDAO;
-    EnvironmentBuilder environmentBuilder;
+    private EnvironmentDAO environmentDAO;
+    private EnvironmentBuilder environmentBuilder;
+    private BlueprintParser blueprintParser;
+
 
     private DbManager dbManager;
 
@@ -38,6 +40,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     public EnvironmentManagerImpl() {
         this.environmentBuilder = new EnvironmentBuilder();
+        this.blueprintParser = new BlueprintParser();
     }
 
 
@@ -47,7 +50,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
 
-        Blueprint blueprint = new BlueprintParser().parseBlueprint( blueprintStr );
+        Blueprint blueprint = blueprintParser.parseBlueprint( blueprintStr );
+        return build( blueprint );
+    }
+
+
+    public boolean buildEnvironment( Blueprint blueprint ) {
+        return build( blueprint );
+    }
+
+
+    private boolean build( Blueprint blueprint ) {
         if ( blueprint != null ) {
             try {
                 Environment environment = environmentBuilder.build( blueprint );
@@ -72,7 +85,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public List<Environment> getEnvironments() {
-        System.out.println( "getEnvironments method executed..." );
         List<Environment> environments = environmentDAO.getEnvironments();
         return environments;
     }
@@ -97,5 +109,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    @Override
+    public boolean saveBlueprint( String blueprintStr ) {
+        Blueprint blueprint = blueprintParser.parseBlueprint( blueprintStr );
+        boolean saveResult = environmentDAO.saveBlueprint( blueprint );
+        return saveResult;
+    }
+
+
+    @Override
+    public List<Blueprint> getBlueprints() {
+        List<Blueprint> blueprints = environmentDAO.getBlueprints();
+        return blueprints;
+    }
+
+    @Override
+    public boolean deleteBlueprint(String blueprintName) {
+        return environmentDAO.deleteBlueprint( blueprintName );
     }
 }

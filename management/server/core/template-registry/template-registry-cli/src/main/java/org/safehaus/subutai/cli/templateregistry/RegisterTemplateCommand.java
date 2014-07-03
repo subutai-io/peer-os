@@ -16,13 +16,13 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * CLI for TemplateRegistryManager.registerTemplate command
  */
-@Command( scope = "registry", name = "register-template", description = "Register template with registry" )
+@Command(scope = "registry", name = "register-template", description = "Register template with registry")
 public class RegisterTemplateCommand extends OsgiCommandSupport {
-    @Argument( index = 0, name = "path to template config file", required = true, multiValued = false,
-            description = "path to template config file" )
+    @Argument(index = 0, name = "path to template config file", required = true, multiValued = false,
+            description = "path to template config file")
     String configFilePath;
-    @Argument( index = 1, name = "path to template packages file", required = true, multiValued = false,
-            description = "path to template packages file" )
+    @Argument(index = 1, name = "path to template packages file", required = true, multiValued = false,
+            description = "path to template packages file")
     String packagesFilePath;
 
     private TemplateRegistryManager templateRegistryManager;
@@ -35,7 +35,6 @@ public class RegisterTemplateCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-
 
         templateRegistryManager.registerTemplate( readFile( configFilePath, Charset.defaultCharset() ),
                 readFile( packagesFilePath, Charset.defaultCharset() ) );
