@@ -15,7 +15,7 @@ import com.vaadin.ui.Component;
 
 public class TemplateRegistryUI implements PortalModule {
 
-    public static final String MODULE_IMAGE = "registry.jpg";
+    public static final String MODULE_IMAGE = "tree.png";
     public static final String MODULE_NAME = "Registry";
     private static ExecutorService executor;
     private AgentManager agentManager;
