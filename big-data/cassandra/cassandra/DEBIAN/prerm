@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-cassVer="cassandra-2.0.4"
+cassVer="cassandra-2.0.9"
 
 # stop cassandra if it is running
 service cassandra stop
