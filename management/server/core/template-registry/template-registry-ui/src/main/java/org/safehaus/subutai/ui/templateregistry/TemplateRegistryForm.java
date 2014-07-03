@@ -100,12 +100,20 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         templateItem.getItemProperty( "value" ).setValue( currentTemplate );
         templateTree.setItemCaption( currentTemplate.getTemplateName(), currentTemplate.getTemplateName() );
 
+        Template parent = tree.getParentTemplate( currentTemplate );
+        if ( parent != null ) {
+            container.setParent( currentTemplate.getTemplateName(), parent.getTemplateName() );
+        }
+
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
         if ( children == null || children.isEmpty() ) {
+            container.setChildrenAllowed( currentTemplate.getTemplateName(), false );
             return;
         }
         else {
+            container.setChildrenAllowed( currentTemplate.getTemplateName(), true );
             for ( Template child : children ) {
+
                 addChildren( tree, child );
             }
         }
