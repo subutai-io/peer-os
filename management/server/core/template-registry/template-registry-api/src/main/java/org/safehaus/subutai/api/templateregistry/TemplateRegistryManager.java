@@ -10,6 +10,10 @@ import java.util.List;
 
 
 /**
+ *
+ * @TODO
+ * Add List<FilePaths> diffBranches(branch1,branch2) returns list of filepaths changed between branches
+ * Add String diffFile(branch1, branch2, FilePath) - returns diff in the file between branches
  */
 public interface TemplateRegistryManager {
 
