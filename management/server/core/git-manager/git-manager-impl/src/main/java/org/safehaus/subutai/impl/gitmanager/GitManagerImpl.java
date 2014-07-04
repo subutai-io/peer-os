@@ -50,6 +50,13 @@ public class GitManagerImpl implements GitManager {
 
 
     @Override
+    public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1 )
+            throws GitException {
+        return diffBranches( host, repositoryRoot, branchName1, MASTER_BRANCH );
+    }
+
+
+    @Override
     public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1,
                                               final String branchName2 ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -83,15 +90,22 @@ public class GitManagerImpl implements GitManager {
 
     @Override
     public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
-                            final String branchName2, final GitChangedFile changedFile ) throws GitException {
+                            final String filePath ) throws GitException {
+        return diffFile( host, repositoryRoot, branchName1, MASTER_BRANCH, filePath );
+    }
+
+
+    @Override
+    public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
+                            final String branchName2, final String filePath ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName1 ), "Branch name 1 is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
-        Preconditions.checkNotNull( changedFile, "GitChangedFile is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
 
-        Command diffCommand = commandRunner.createCommand( new RequestBuilder(
-                String.format( "git diff %s %s %s", branchName1, branchName2, changedFile.getGitFilePath() ) )
-                .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+        Command diffCommand = commandRunner.createCommand(
+                new RequestBuilder( String.format( "git diff %s %s %s", branchName1, branchName2, filePath ) )
+                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
 
         runCommand( diffCommand, host, GitCommand.DIFF, false );
 

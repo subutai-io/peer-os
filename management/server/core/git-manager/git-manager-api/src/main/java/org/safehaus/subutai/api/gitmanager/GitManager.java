@@ -8,10 +8,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 /**
  * This class executes git commands on agents.
- *
- * TODO
- *
- * Add CLI commands for diff commands
  */
 public interface GitManager {
 
@@ -19,9 +15,15 @@ public interface GitManager {
     public List<GitChangedFile> diffBranches( Agent host, String repositoryRoot, String branchName1,
                                               String branchName2 ) throws GitException;
 
+    public List<GitChangedFile> diffBranches( Agent host, String repositoryRoot, String branchName1 )
+            throws GitException;
 
-    public String diffFile( Agent host, String repositoryRoot, String branchName1, String branchName2,
-                            GitChangedFile changedFile ) throws GitException;
+
+    public String diffFile( Agent host, String repositoryRoot, String branchName1, String filePath )
+            throws GitException;
+
+    public String diffFile( Agent host, String repositoryRoot, String branchName1, String branchName2, String filePath )
+            throws GitException;
 
     /**
      * Initializes empty git repo in the specified directory
