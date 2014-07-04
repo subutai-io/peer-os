@@ -8,14 +8,20 @@ function usage() {
 }
 . /etc/profile
 #Paths to the configuration files
-core_site="${HADOOP_HOME}/conf/core-site.xml"
-mapred_site="${HADOOP_HOME}/conf/mapred-site.xml"
-hdfs_site="${HADOOP_HOME}/conf/hdfs-site.xml"
-masters="${HADOOP_HOME}/conf/masters"
-slaves="${HADOOP_HOME}/conf/slaves"
-dfsInclude="${HADOOP_HOME}/conf/dfs.include"
-mapredInclude="${HADOOP_HOME}/conf/mapred.include"
-dfsExclude="${HADOOP_HOME}/conf/dfs.exclude"
+hadoopConf="/etc/hadoop"
+if [[ "x$HADOOP_CONF_DIR" != "x" ]];
+then
+        hadoopConf=$HADOOP_CONF_DIR
+fi
+
+core_site="$hadoopConf/core-site.xml"
+mapred_site="$hadoopConf/mapred-site.xml"
+hdfs_site="$hadoopConf/hdfs-site.xml"
+masters="$hadoopConf/masters"
+slaves="$hadoopConf/slaves"
+dfsInclude="$hadoopConf/dfs.include"
+mapredInclude="$hadoopConf/mapred.include"
+dfsExclude="$hadoopConf/dfs.exclude"
 mapredExclude="${HADOOP_HOME}/conf/mapred.exclude"
 if [[ "$1" == "rollback" ]];
 then
