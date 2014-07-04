@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 set -e
 usage() {
 	echo "Usage: $0 {product_name}"
@@ -22,7 +22,7 @@ initializeVariables() {
         if ls *.deb ; then
                 rm  *.deb
         fi
-        fileName=`ls | awk '{print $1}' | head -1`
+        fileName=`ls | grep ksks | awk '{print $1}' | head -1`
         echo "FILENAME: " $fileName
 	popd
 }
