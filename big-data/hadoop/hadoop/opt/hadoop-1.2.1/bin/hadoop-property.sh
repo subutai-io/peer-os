@@ -18,16 +18,17 @@ if [[ $1 == "" || $2 == "" || $3 == "" ]];
 then
         usage
 else
-        fileName=/opt/hadoop-1.2.1/conf/$2
+        fileName="/etc/hadoop/$2"
         name_field=$3
 fi
 
-if [ "x$HADOOP_HOME" = "x" ];
+hadoopConf="/etc/hadoop"
+if [[ "x$HADOOP_CONF_DIR" != "x" ]];
 then
-        :
-else
-        fileName="$HADOOP_HOME/conf/$2"
+        hadoopConf=$HADOOP_CONF_DIR
 fi
+
+fileName="$hadoopConf/$2"
 
 do_add()
 {

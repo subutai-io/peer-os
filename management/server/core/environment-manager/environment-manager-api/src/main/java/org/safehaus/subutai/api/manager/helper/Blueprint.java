@@ -1,16 +1,12 @@
 package org.safehaus.subutai.api.manager.helper;
 
 
-import java.util.Set;
-
-
 /**
- * Created by bahadyr on 6/23/14.
+ * Created by bahadyr on 7/4/14.
  */
-public class Blueprint {
+public abstract class Blueprint {
 
     private String name;
-    Set<NodeGroup> nodeGroups;
 
 
     public String getName() {
@@ -21,16 +17,4 @@ public class Blueprint {
     public void setName( final String name ) {
         this.name = name;
     }
-
-
-    public Set<NodeGroup> getNodeGroups() {
-        return nodeGroups;
-    }
-
-
-    public void setNodeGroups( final Set<NodeGroup> nodeGroups ) {
-        this.nodeGroups = nodeGroups;
-    }
-
-
 }

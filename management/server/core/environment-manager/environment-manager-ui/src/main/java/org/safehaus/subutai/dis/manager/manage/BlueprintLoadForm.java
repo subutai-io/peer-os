@@ -28,7 +28,7 @@ public class BlueprintLoadForm {
 
         Button loadBlueprintButton = new Button("Load blueprint");
 
-        loadBlueprintButton.addListener( new Button.ClickListener() {
+        loadBlueprintButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                   uploadBlueprint();

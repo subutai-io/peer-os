@@ -20,7 +20,13 @@ then
 fi
 . /etc/profile
 
-file="${HADOOP_HOME}/conf/${1}"
+hadoopConf="/etc/hadoop"
+if [[ "x$HADOOP_CONF_DIR" != "x" ]];
+then
+        hadoopConf=$HADOOP_CONF_DIR
+fi
+
+file="$hadoopConf/${1}"
 
 if [[ "$2" == "rollback" ]];
 then

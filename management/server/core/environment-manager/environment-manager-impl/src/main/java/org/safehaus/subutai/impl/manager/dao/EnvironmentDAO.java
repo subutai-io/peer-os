@@ -4,7 +4,7 @@ package org.safehaus.subutai.impl.manager.dao;
 import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 
 
@@ -40,7 +40,7 @@ public class EnvironmentDAO {
     }
 
 
-    public boolean saveBlueprint( final Blueprint blueprint ) {
+    public boolean saveBlueprint( final EnvironmentBlueprint blueprint ) {
         //TODO Create table for blueprint objects
         dbManager.saveEnvironmentInfo( "BLUEPRINT", blueprint.getName(), blueprint );
         //TODO Return proper result
@@ -48,8 +48,8 @@ public class EnvironmentDAO {
     }
 
 
-    public List<Blueprint> getBlueprints() {
-        List<Blueprint> blueprints = dbManager.getEnvironmentInfo( "BLUEPRINT", Blueprint.class );
+    public List<EnvironmentBlueprint> getBlueprints() {
+        List<EnvironmentBlueprint> blueprints = dbManager.getEnvironmentInfo( "BLUEPRINT", EnvironmentBlueprint.class );
         return blueprints;
     }
 

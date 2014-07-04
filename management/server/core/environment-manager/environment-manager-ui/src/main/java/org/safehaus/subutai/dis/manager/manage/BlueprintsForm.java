@@ -4,14 +4,16 @@ package org.safehaus.subutai.dis.manager.manage;
 import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
+import org.safehaus.subutai.dis.manager.window.DetailsWindow;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class BlueprintsForm {
 
     private VerticalLayout contentRoot;
@@ -19,11 +21,12 @@ public class BlueprintsForm {
     private EnvironmentManager environmentManager;
 
 
+
     public BlueprintsForm( EnvironmentManager environmentManager ) {
         this.environmentManager = environmentManager;
 
-        contentRoot = new VerticalLayout();
 
+        contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
 
@@ -31,7 +34,7 @@ public class BlueprintsForm {
 
         Button getEnvironmentsButton = new Button( "View" );
 
-        getEnvironmentsButton.addListener( new Button.ClickListener() {
+        getEnvironmentsButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 updateTableData();
@@ -50,14 +53,41 @@ public class BlueprintsForm {
 
     private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<Environment> environmentList = environmentManager.getEnvironments();
-        for ( Environment environment : environmentList ) {
+        List<EnvironmentBlueprint> blueprints = environmentManager.getBlueprints();
+        for ( final EnvironmentBlueprint blueprint : blueprints ) {
+
+            final Button viewButton = new Button( "View" );
+            viewButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    DetailsWindow details = new BlueprintDetails("Blueprint details");
+                    details.setContent( blueprint );
+                    contentRoot.getUI().addWindow( details );
+                    details.setVisible( true );
+                }
+            } );
+
+            final Button buildEnvironmentButton = new Button( "Build Environment" );
+            buildEnvironmentButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    environmentManager.buildEnvironment( blueprint );
+                }
+            } );
+
+            final Button deleteBlueprintButton = new Button( "Delete" );
+            deleteBlueprintButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    environmentManager.deleteBlueprint( blueprint.getName() );
+                }
+            } );
+
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    environment.getName(), new Button("View"), new Button( "Build environment" ), new Button( "Delete" )
+                    blueprint.getName(), viewButton, buildEnvironmentButton, deleteBlueprintButton
             }, null );
         }
         environmentsTable.refreshRowCache();
-        environmentsTable.requestRepaint();
     }
 
 
@@ -71,14 +101,7 @@ public class BlueprintsForm {
         table.setSelectable( false );
         table.setEnabled( true );
         table.setImmediate( true );
-        //        table.addListener( new ItemClickEvent.ItemClickListener() {
-        //
-        //            public void itemClick( ItemClickEvent event ) {
-        //                if ( event.isDoubleClick() ) {
-        //
-        //                }
-        //            }
-        //        } );
+        table.setSizeFull();
         return table;
     }
 }

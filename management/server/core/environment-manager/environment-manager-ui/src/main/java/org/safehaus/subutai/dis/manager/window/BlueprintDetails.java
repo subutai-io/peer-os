@@ -2,60 +2,40 @@ package org.safehaus.subutai.dis.manager.window;
 
 
 import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
 
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 
 /**
  * Created by bahadyr on 6/26/14.
  */
-public class BlueprintDetails extends Window {
+public class BlueprintDetails extends DetailsWindow {
 
-    private Blueprint blueprint;
-    private TextArea blueprintTxtArea;
+    private BlueprintParser blueprintParser;
 
 
-    public BlueprintDetails() {
-        setCaption( "Blueprint details" );
-        setModal( true );
-        setClosable( true );
-        setVisible( false );
-        setWidth( 600, UNITS_PIXELS );
-        setHeight( 400, UNITS_PIXELS );
-        VerticalLayout verticalLayout = getVLayout();
-        blueprintTxtArea = getTextArea();
-        BlueprintParser blueprintParser = new BlueprintParser();
-        String blueprintStr = blueprintParser.parseBlueprint( blueprint );
-        blueprintTxtArea.setValue( blueprintStr );
-        verticalLayout.addComponent( blueprintTxtArea );
-
-//        addComponent( verticalLayout );
+    public BlueprintDetails( String caption ) {
+        super( caption );
+        this.blueprintParser = new BlueprintParser();
     }
 
 
-    public void setBlueprint( final Blueprint blueprint ) {
-        this.blueprint = blueprint;
-    }
-
-
-    private VerticalLayout getVLayout() {
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeFull();
-        content.setMargin( true );
-        content.setSpacing( true );
-        return content;
+    @Override
+    public void setContent( Blueprint blueprint ) {
+        String value = blueprintParser.parseEnvironmentBlueprint( ( EnvironmentBlueprint ) blueprint );
+        TextArea area = getTextArea();
+        area.setValue( value );
     }
 
 
     private TextArea getTextArea() {
-        blueprintTxtArea = new TextArea( "Blueprint" );
-        blueprintTxtArea.setSizeFull();
-        blueprintTxtArea.setRows( 20 );
-        blueprintTxtArea.setImmediate( true );
-        blueprintTxtArea.setWordwrap( false );
-        return blueprintTxtArea;
+        TextArea textArea = new TextArea( "Blueprint" );
+        textArea.setSizeFull();
+        textArea.setRows( 20 );
+        textArea.setImmediate( true );
+        textArea.setWordwrap( false );
+        return textArea;
     }
 }
