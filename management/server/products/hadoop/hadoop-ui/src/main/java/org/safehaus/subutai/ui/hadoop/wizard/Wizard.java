@@ -1,19 +1,19 @@
 package org.safehaus.subutai.ui.hadoop.wizard;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.VerticalLayout;
 import org.safehaus.subutai.api.hadoop.Config;
 
 /**
  * Created by daralbaev on 09.04.14.
  */
 public class Wizard {
-	private final GridLayout grid;
+	private final VerticalLayout grid;
 	private int step = 1;
 	private Config config = new Config();
 
 	public Wizard() {
-		grid = new GridLayout(1, 20);
+		grid = new VerticalLayout();
 		grid.setMargin(true);
 		grid.setSizeFull();
 
@@ -45,7 +45,7 @@ public class Wizard {
 	}
 
 	private void putForm() {
-		grid.removeComponent(0, 1);
+		grid.removeAllComponents();
 		Component component = null;
 		switch (step) {
 			case 1: {
@@ -66,7 +66,7 @@ public class Wizard {
 		}
 
 		if (component != null) {
-			grid.addComponent(component, 0, 1, 0, 19);
+			grid.addComponent(component);
 		}
 	}
 }
