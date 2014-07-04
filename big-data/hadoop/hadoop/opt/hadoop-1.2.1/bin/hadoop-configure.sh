@@ -16,9 +16,9 @@ then
         hadoopConf=$HADOOP_CONF_DIR
 fi
 
-core_site="$hadoopConf/conf/core-site.xml"
-mapred_site="$hadoopConf/conf/mapred-site.xml"
-hdfs_site="$hadoopConf/conf/hdfs-site.xml"
+core_site="$hadoopConf/core-site.xml"
+mapred_site="$hadoopConf/mapred-site.xml"
+hdfs_site="$hadoopConf/hdfs-site.xml"
 
 if [[ "$1" == "rollback" ]];
 then
