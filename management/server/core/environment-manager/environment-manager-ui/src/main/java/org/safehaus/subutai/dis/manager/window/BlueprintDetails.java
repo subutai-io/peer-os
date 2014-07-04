@@ -27,6 +27,7 @@ public class BlueprintDetails extends DetailsWindow {
         String value = blueprintParser.parseEnvironmentBlueprint( ( EnvironmentBlueprint ) blueprint );
         TextArea area = getTextArea();
         area.setValue( value );
+        verticalLayout.addComponent( area );
     }
 
 
