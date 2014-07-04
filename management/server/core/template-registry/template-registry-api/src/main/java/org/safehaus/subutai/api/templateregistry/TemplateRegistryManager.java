@@ -10,6 +10,7 @@ import java.util.List;
 
 
 /**
+ * Class to work with templates registry, templates metadata
  */
 public interface TemplateRegistryManager {
 

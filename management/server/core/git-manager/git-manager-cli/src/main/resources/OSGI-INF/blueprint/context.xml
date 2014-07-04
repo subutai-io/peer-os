@@ -6,6 +6,24 @@
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/diff-branches">
+      <action class="org.safehaus.subutai.cli.commands.DiffBranches">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="git/diff-file">
+      <action class="org.safehaus.subutai.cli.commands.DiffFile">
+        <property name="gitManager" ref="gitManager" />
+        <property name="agentManager" ref="agentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="git/get-current-branch">
       <action class="org.safehaus.subutai.cli.commands.GetCurrentBranch">
         <property name="gitManager" ref="gitManager" />

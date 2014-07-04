@@ -17,7 +17,7 @@ public class Manager extends VerticalLayout {
 
 		GridLayout grid = new GridLayout();
 		grid.setColumns(1);
-		grid.setRows(7);
+		grid.setRows(11);
 		grid.setSizeFull();
 		grid.setMargin(true);
 		grid.setSpacing(true);
@@ -35,19 +35,15 @@ public class Manager extends VerticalLayout {
 		buttonsLayout.setSpacing(true);
 
 		Embedded startedButton = new Embedded("", new ThemeResource("img/btn/play.png"));
-		/*startedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
-		startedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);*/
 		startedButton.setEnabled(false);
 		buttonsLayout.addComponent(startedButton);
-		buttonsLayout.setComponentAlignment(startedButton, Alignment.MIDDLE_LEFT);
+		buttonsLayout.setComponentAlignment(startedButton, Alignment.TOP_LEFT);
 
 		Label startedNodeLabel = new Label("Started node");
 		buttonsLayout.addComponent(startedNodeLabel);
 		buttonsLayout.setComponentAlignment(startedNodeLabel, Alignment.MIDDLE_LEFT);
 
 		Embedded stoppedButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
-		/*stoppedButton.setWidth(ClusterNode.ICON_SIZE, Unit.PIXELS);
-		stoppedButton.setHeight(ClusterNode.ICON_SIZE, Unit.PIXELS);*/
 		stoppedButton.setEnabled(false);
 		buttonsLayout.addComponent(stoppedButton);
 		buttonsLayout.setComponentAlignment(stoppedButton, Alignment.MIDDLE_LEFT);
@@ -57,8 +53,10 @@ public class Manager extends VerticalLayout {
 		buttonsLayout.setComponentAlignment(stoppedNodeLabel, Alignment.MIDDLE_LEFT);
 
 		grid.addComponent(horizontalLayout, 0, 0);
-		grid.addComponent(getHadoopTable(), 0, 1, 0, 5);
-		grid.addComponent(buttonsLayout, 0, 6);
+		grid.addComponent(getHadoopTable(), 0, 1, 0, 9);
+		grid.setComponentAlignment(table, Alignment.TOP_CENTER);
+		grid.addComponent(buttonsLayout, 0, 10);
+		grid.setComponentAlignment(buttonsLayout, Alignment.BOTTOM_CENTER);
 
 		addComponent(grid);
 	}
