@@ -106,6 +106,7 @@ if [[ $1 == "" ]];
 then
         usage
 fi
+# TODO 1st, 2nd and 4th methods are generic for all big-data packages. So, it is better to move those methods to a common place so that every job can call it instead of implementing them!
 # 1) Initialize the variables
 initializeVariables $1
 # 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
@@ -113,5 +114,4 @@ getSourcesToRelevantDirectories
 # 3) Download hadoop tar file and make necessary changes
 downloadHadoopAndMakeChanges
 # 4) Create the Debian package
-# TODO This method is generic for all big-data packages. So, it is better to move this method to a common place so that every job can call it instead of implementing the same inside each of them!
 generateDebianPackage
