@@ -54,7 +54,9 @@ public class Manager extends VerticalLayout {
 
 		grid.addComponent(horizontalLayout, 0, 0);
 		grid.addComponent(getHadoopTable(), 0, 1, 0, 9);
+		grid.setComponentAlignment(table, Alignment.TOP_CENTER);
 		grid.addComponent(buttonsLayout, 0, 10);
+		grid.setComponentAlignment(buttonsLayout, Alignment.BOTTOM_CENTER);
 
 		addComponent(grid);
 	}
