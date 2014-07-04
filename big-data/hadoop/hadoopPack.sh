@@ -6,7 +6,7 @@ usage() {
 	exit 1
 }
 
-initializaVariables() {
+initializeVariables() {
 	product_name=$1
 	product_name_uppercase="$(tr '[:lower:]' '[:upper:]' <<< ${product_name:0:1})${product_name:1}"
 	BASE=/var/lib/jenkins/jobs/master.bigdata.$product_name/$product_name_uppercase
