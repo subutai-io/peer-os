@@ -12,16 +12,52 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public interface GitManager {
 
 
+    /**
+     * Returns list of files changed between specified branches
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param branchName2 - name of branch 2
+     *
+     * @return - list of {@code GitChangedFile}
+     */
     public List<GitChangedFile> diffBranches( Agent host, String repositoryRoot, String branchName1,
                                               String branchName2 ) throws GitException;
 
+    /**
+     * Returns list of files changed between specified branch and master branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     *
+     * @return - list of {@code GitChangedFile}
+     */
     public List<GitChangedFile> diffBranches( Agent host, String repositoryRoot, String branchName1 )
             throws GitException;
 
 
+    /**
+     * Returns diff in file between specified branch and master branch
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param filePath - relative (to repo root) file path
+     */
     public String diffFile( Agent host, String repositoryRoot, String branchName1, String filePath )
             throws GitException;
 
+    /**
+     * Returns diff in file between specified branches
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param branchName2 - name of branch 2
+     * @param filePath - relative (to repo root) file path
+     *
+     * @return - differences in file {@code String}
+     */
     public String diffFile( Agent host, String repositoryRoot, String branchName1, String branchName2, String filePath )
             throws GitException;
 
