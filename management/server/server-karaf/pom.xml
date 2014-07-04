@@ -684,6 +684,18 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                              <!-- FS Modification Tracker -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>fs-tracker-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>fs-tracker-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Configuration Manager -->
                                 <!--<artifactItem>
                                   <groupId>org.safehaus.subutai</groupId>

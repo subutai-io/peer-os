@@ -29,6 +29,7 @@
     <module>environment-manager</module>
     <module>template-registry</module>
     <module>template-manager</module>
+    <module>fs-tracker</module>
     <!--<module>configuration-manager</module>-->
   </modules>
 </project>
