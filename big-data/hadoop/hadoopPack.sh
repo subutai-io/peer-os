@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 set -e
 usage() {
 	echo "Usage: $0 {product_name}"
