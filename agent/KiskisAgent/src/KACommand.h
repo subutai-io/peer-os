@@ -82,6 +82,7 @@ public:
 	void setStandardOutPath(const string&);
 	void setType(const string&);
 	bool deserialize(string&);					//Deserializing Json String to Command Instance
+	bool checkCommandString(const string&);
 	void clear();
 private:
 	string        	type;

@@ -92,17 +92,18 @@ bool KACommand::deserialize(string& input)
 	try
 	{
 		clear(); //clear all arguments firstly..
-		bool parsedSuccess = reader.parse(input,root,false);		//parsing Json String
+		bool parsedNumberSuccess = checkCommandString(input);
+		bool parsedSuccess = reader.parse(input,root,true);		//parsing Json String
 
-		if(!parsedSuccess)	//if it is not successfull
+		if(!parsedSuccess || !parsedNumberSuccess)	//if it is not successfull
 		{
 			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
 			cout <<"Failed Message: " << input << endl;
 			return false; //error in parsing Json
 		}
-		//Start mandatory parameters deserialization
+
 		if(!root["command"]["type"].isNull())
-		{				//initialize type parameter if it is not null
+		{
 			this->setType(root["command"]["type"].asString());
 		}
 		if(!root["command"]["stdOut"].isNull())
@@ -556,4 +557,28 @@ void KACommand::setSource(const string& source)
 vector<string>& KACommand::getWatchArguments()
 {
 	return this->watchArgs;
+}
+
+/**
+ *  \details   checking the number of curly braces in the command string
+ *
+ */
+bool KACommand::checkCommandString(const string& input)
+{
+	unsigned int leftBrace=0;
+	unsigned int rightBrace=0;
+	for(unsigned int i=0; i < input.length();i++)
+	{
+		if(input[i] == '{')
+			leftBrace++;
+		if(input[i] == '}')
+			rightBrace++;
+	}
+	cout << "Right Braces: " << rightBrace << endl;
+	cout << "Left Braces: " << leftBrace << endl;
+
+	if(rightBrace==leftBrace)
+		return true;
+	else
+		return false;
 }
