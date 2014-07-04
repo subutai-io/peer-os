@@ -103,7 +103,6 @@ string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creat
 string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,
 		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
 {
-	clear();
 	this->setType("HEARTBEAT_RESPONSE");
 	this->setSource(source);
 	this->setTaskUuid(taskuuid);
