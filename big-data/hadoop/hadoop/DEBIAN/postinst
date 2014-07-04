@@ -16,8 +16,6 @@ then
         hadoopConf=$HADOOP_CONF_DIR
 fi
 
-mkdir -p $hadoopConf
-mv "$hadoopHomeEcho/conf/*" $hadoopConf
 escape_characters()
 {
 	temp_value=$1
