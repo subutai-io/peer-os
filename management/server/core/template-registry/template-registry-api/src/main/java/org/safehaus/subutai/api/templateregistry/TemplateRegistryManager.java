@@ -13,7 +13,10 @@ import java.util.List;
  *
  * @TODO
  * Add List<FilePaths> diffBranches(branch1,branch2) returns list of filepaths changed between branches
+ * e.g. git diff --name-status SUBUTAI-992 SUBUTAI-991
  * Add String diffFile(branch1, branch2, FilePath) - returns diff in the file between branches
+ * e.g. git diff SUBUTAI-992 SUBUTAI-991 management/server/core/template-registry/template-registry-api/pom.xml
+
  */
 public interface TemplateRegistryManager {
 
