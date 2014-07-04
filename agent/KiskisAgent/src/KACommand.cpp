@@ -93,9 +93,9 @@ bool KACommand::deserialize(string& input)
 	{
 		clear(); //clear all arguments firstly..
 		bool parsedNumberSuccess = checkCommandString(input);
-		bool parsedSuccess = reader.parse(input,root,true);		//parsing Json String
+		bool parsedSuccess = reader.parse(input,root,false);
 
-		if(!parsedSuccess || !parsedNumberSuccess)	//if it is not successfull
+		if(!parsedSuccess || !parsedNumberSuccess)
 		{
 			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
 			cout <<"Failed Message: " << input << endl;
@@ -574,9 +574,6 @@ bool KACommand::checkCommandString(const string& input)
 		if(input[i] == '}')
 			rightBrace++;
 	}
-	cout << "Right Braces: " << rightBrace << endl;
-	cout << "Left Braces: " << leftBrace << endl;
-
 	if(rightBrace==leftBrace)
 		return true;
 	else
