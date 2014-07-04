@@ -4,8 +4,20 @@ set -e
 tar -xpzf /opt/hadoop-1.2.1-bin.tar.gz -C /opt
 
 hadoopHomeEcho="/opt/hadoop-1.2.1"
-hadoopConf=$hadoopHomeEcho"/conf"
+hadoopConf="/etc/hadoop"
 
+if [[ "x$HADOOP_HOME" != "x" ]];
+then
+        hadoopHomeEcho=$HADOOP_HOME
+fi
+
+if [[ "x$HADOOP_CONF_DIR" != "x" ]];
+then
+        hadoopConf=$HADOOP_CONF_DIR
+fi
+
+mkdir -p $hadoopConf
+mv "$hadoopHomeEcho/conf/*" $hadoopConf
 escape_characters()
 {
 	temp_value=$1
@@ -28,7 +40,6 @@ fi
 echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> $hadoopConf/hadoop-env.sh
 
 rm -rf /opt/hadoop-1.2.1-bin.tar.gz
-. /etc/profile
 touch $hadoopConf/dfs.exclude
 touch $hadoopConf/dfs.include
 touch $hadoopConf/mapred.exclude
