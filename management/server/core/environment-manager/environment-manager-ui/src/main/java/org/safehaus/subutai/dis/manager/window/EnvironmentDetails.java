@@ -35,6 +35,7 @@ public class EnvironmentDetails extends DetailsWindow {
 
         TextArea area = getTextArea();
         area.setValue( sb.toString() );
+        verticalLayout.addComponent( area );
 
     }
 
