@@ -31,7 +31,7 @@ getSourcesToRelevantDirectories() {
 	rm -rf $BASE/$fileName/opt/*
 	cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
 	cp -a $SOURCE/etc/ $BASE/$fileName/
-	cp -a $SOURCE/opt/* $BASE/$fileName/opt/
+	cp -a $SOURCE/opt/ $BASE/$fileName/
 	mkdir -p $BASE/$fileName/etc/hadoop
 	popd
 }
@@ -86,8 +86,9 @@ downloadHadoopAndMakeChanges() {
 	pushd $BASE
 	mkdir temp
 	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $BASE/$fileName/opt/temp
-	rm $BASE/$fileName/opt/README
-
+	if [ -f $BASE/$fileName/opt/README ]; then
+	        rm $BASE/$fileName/opt/README
+	fi
 	# unpack tar ball and make changes 
 	pushd temp
 	tar -xpf *.tar.gz -C .
