@@ -108,18 +108,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             PlacementStrategyENUM... strategy) {
 
         String cql = "INSERT INTO node_group(name, info) VALUES(?, ?)";
-        EnvironmentNodeGroup group = new EnvironmentNodeGroup();
-        group.setTemplateUsed(templateName);
 
-        Set<EnvironmentGroupInstance> instances = new HashSet<>();
+        NodeGroupInfo group = new NodeGroupInfo();
+        group.setName(name);
+        group.setTemplateName(templateName);
+        group.setStrategy(EnumSet.of(strategy[0], strategy));
+        group.setInstanceIds(new HashSet<UUID>());
         for(Agent a : agents) {
-            EnvironmentGroupInstance gi = new EnvironmentGroupInstance();
-            gi.setAgent(a);
-            gi.setName(a.getHostname());
-            gi.setPlacementStrategyENUM(strategy[0]); // TODO: first value used
-            instances.add(gi);
+            group.getInstanceIds().add(a.getUuid());
         }
-        group.setEnvironmentGroupInstanceSet(instances);
 
         return dbManager.executeUpdate(cql, name, gson.toJson(group));
     }
