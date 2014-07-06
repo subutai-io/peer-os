@@ -5,7 +5,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.manager.TemplateManager;
+import org.safehaus.subutai.api.template.manager.TemplateManager;
 
 public abstract class ContainerManagerBase implements ContainerManager {
 
