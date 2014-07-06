@@ -4,48 +4,48 @@
                interface="org.safehaus.subutai.api.template.manager.TemplateManager" />
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/get-master-template-name">
-            <action class="org.safehaus.subutai.cli.commands.template.MasterTemplateName">
+        <command name="template/get-master-template-name">
+            <action class="org.safehaus.subutai.cli.template.manager.MasterTemplateName">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/clone">
-            <action class="org.safehaus.subutai.cli.commands.template.CloneTemplate">
+        <command name="template/clone">
+            <action class="org.safehaus.subutai.cli.template.manager.CloneTemplate">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/clone-destroy">
-            <action class="org.safehaus.subutai.cli.commands.template.CloneDestroy">
+        <command name="template/clone-destroy">
+            <action class="org.safehaus.subutai.cli.template.manager.CloneDestroy">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/promote">
-            <action class="org.safehaus.subutai.cli.commands.template.PromoteClone">
+        <command name="template/promote">
+            <action class="org.safehaus.subutai.cli.template.manager.PromoteClone">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/import">
-            <action class="org.safehaus.subutai.cli.commands.template.ImportTemplate">
+        <command name="template/import">
+            <action class="org.safehaus.subutai.cli.template.manager.ImportTemplate">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template-man/export">
-            <action class="org.safehaus.subutai.cli.commands.template.ExportTemplate">
+        <command name="template/export">
+            <action class="org.safehaus.subutai.cli.template.manager.ExportTemplate">
                 <property name="templateManager" ref="templateManager" />
             </action>
         </command>
