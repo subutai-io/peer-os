@@ -1,7 +1,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="templateManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.manager.TemplateManager" />
+               interface="org.safehaus.subutai.api.template.manager.TemplateManager" />
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template-man/get-master-template-name">

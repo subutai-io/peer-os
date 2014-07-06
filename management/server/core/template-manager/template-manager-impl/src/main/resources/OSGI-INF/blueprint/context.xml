@@ -12,7 +12,7 @@
 
     
     <bean id="templateManager" scope="singleton" 
-          class="org.safehaus.subutai.impl.manager.TemplateManagerImpl"
+          class="org.safehaus.subutai.impl.template.manager.TemplateManagerImpl"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager" />
         <property name="commandRunner" ref="commandRunner" />
@@ -20,6 +20,6 @@
         <property name="repoManager" ref="repoManager"/>
     </bean>
     
-    <service ref="templateManager" interface="org.safehaus.subutai.api.manager.TemplateManager" />
+    <service ref="templateManager" interface="org.safehaus.subutai.api.template.manager.TemplateManager" />
 
 </blueprint>
