@@ -1,19 +1,19 @@
-package org.safehaus.subutai.cli.commands.template;
+package org.safehaus.subutai.cli.template.manager;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 
-@Command(scope = "template-man", name = "export", description = "export template")
-public class ExportTemplate extends OsgiCommandSupport {
+@Command(scope = "template", name = "clone-destroy", description = "destroy clone")
+public class CloneDestroy extends OsgiCommandSupport {
 
     private TemplateManager templateManager;
 
     @Argument(index = 0, required = true)
     private String hostName;
     @Argument(index = 1, required = true)
-    private String templateName;
+    private String cloneName;
 
     public TemplateManager getTemplateManaget() {
         return templateManager;
@@ -25,9 +25,9 @@ public class ExportTemplate extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        boolean b = templateManager.exportTemplate(hostName, templateName);
-        if(b) System.out.println("Template successfully exported");
-        else System.out.println("Failed to export");
+        boolean b = templateManager.cloneDestroy(hostName, cloneName);
+        if(b) System.out.println("Clone successfully destroyed");
+        else System.out.println("Failed to destroy");
         return null;
     }
 

@@ -1,12 +1,12 @@
-package org.safehaus.subutai.cli.commands.template;
+package org.safehaus.subutai.cli.template.manager;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 
-@Command(scope = "template-man", name = "clone-destroy", description = "destroy clone")
-public class CloneDestroy extends OsgiCommandSupport {
+@Command(scope = "template", name = "promote", description = "promote clone to template")
+public class PromoteClone extends OsgiCommandSupport {
 
     private TemplateManager templateManager;
 
@@ -25,9 +25,9 @@ public class CloneDestroy extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        boolean b = templateManager.cloneDestroy(hostName, cloneName);
-        if(b) System.out.println("Clone successfully destroyed");
-        else System.out.println("Failed to destroy");
+        boolean b = templateManager.promoteClone(hostName, cloneName);
+        if(b) System.out.println("Clone successfully promoted to a template");
+        else System.out.println("Failed to promote clone");
         return null;
     }
 

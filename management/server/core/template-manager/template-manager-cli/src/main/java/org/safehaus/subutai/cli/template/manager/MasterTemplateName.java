@@ -1,10 +1,10 @@
-package org.safehaus.subutai.cli.commands.template;
+package org.safehaus.subutai.cli.template.manager;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 
-@Command(scope = "template-man", name = "promote", description = "promote clone to template")
+@Command(scope = "template", name = "get-master-template-name", description = "get master template name")
 public class MasterTemplateName extends OsgiCommandSupport {
 
     private TemplateManager templateManager;
