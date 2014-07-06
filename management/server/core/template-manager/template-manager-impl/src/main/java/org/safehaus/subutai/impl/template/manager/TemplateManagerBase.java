@@ -1,9 +1,9 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.template.manager;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.manager.TemplateManager;
+import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
 public abstract class TemplateManagerBase implements TemplateManager {

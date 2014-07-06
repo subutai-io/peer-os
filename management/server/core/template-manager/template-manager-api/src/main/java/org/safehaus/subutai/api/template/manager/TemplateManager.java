@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.manager;
+package org.safehaus.subutai.api.template.manager;
 
 /**
  * A wrapper interface that wraps LXC and ZFS command scripts on physical hosts.

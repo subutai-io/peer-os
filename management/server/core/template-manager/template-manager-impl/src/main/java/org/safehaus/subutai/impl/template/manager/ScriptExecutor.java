@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.impl.template.manager;
 
 import java.util.Arrays;
 import java.util.HashSet;
