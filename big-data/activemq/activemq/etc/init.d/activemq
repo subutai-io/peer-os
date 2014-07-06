@@ -1,5 +1,5 @@
 #!/bin/sh
-# Starts and stops hive thrift server.
+# Starts and stops activemq server.
 
 ACTIVEMQ_HOME="/opt/apache-activemq-5.9.1"
 ACTIVEMQ_BIN=$ACTIVEMQ_HOME"/bin/"

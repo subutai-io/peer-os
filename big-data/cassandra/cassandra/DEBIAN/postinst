@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-cassVer="cassandra-2.0.4"
+cassVer="cassandra-2.0.9"
 FilePath="/etc/profile"
 
 # change listen_address, rpc_adress and seeds parameters

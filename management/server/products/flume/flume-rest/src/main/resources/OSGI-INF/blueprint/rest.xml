@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/flume" id="flumeRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="flumeRestServiceImpl"/>
+            <ref component-id="flumeRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="flumeRestServiceImpl" class="org.safehaus.subutai.flume.services.RestServiceImpl">

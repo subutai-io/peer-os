@@ -227,6 +227,7 @@ public class Manager {
 
 	private Button makeBatchOperationButton(String caption, final String itemProperty) {
 		Button btn = new Button(caption);
+		btn.addStyleName("default");
 		btn.addClickListener(new Button.ClickListener() {
 
 			public void buttonClick(Button.ClickEvent event) {

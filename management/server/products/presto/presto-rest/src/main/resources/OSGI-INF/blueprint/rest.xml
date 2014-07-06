@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/presto" id="prestoRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="prestoRestServiceImpl"/>
+            <ref component-id="prestoRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="prestoRestServiceImpl" class="org.safehaus.subutai.presto.services.RestServiceImpl">

@@ -15,7 +15,7 @@
 
     <jaxrs:server address="/cassandra" id="cassandraRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="cassandraRestServiceImpl"/>
+            <ref component-id="cassandraRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
 

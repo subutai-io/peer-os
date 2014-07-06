@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/hadoop" id="hadoopRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="hadoopRestServiceImpl"/>
+            <ref component-id="hadoopRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.hadoop.services.RestServiceImpl">

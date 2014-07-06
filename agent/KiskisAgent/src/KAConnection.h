@@ -39,20 +39,23 @@ class KAConnection : public mosqpp::mosquittopp
 {
 public:
 	KAConnection(const char*,const char*,const char*,const char*,const char*,int);
-	~KAConnection();
+	virtual ~KAConnection();
 	bool openSession();
 	bool sendMessage(string);
+	bool sendInotifyMessage(string);
 	bool checkMessageStatus();
 	void resetMessageStatus();
 	void setMessage(string);
 	string getMessage();
 	bool reConnect();
+	string getID();
 
 private:
 	const char*	host;
 	const char* id;
 	const char* subscribedTopic;
 	const char* publishedTopic;
+	const char* InotifyTopic;
 	const char* broadcastTopic;
 	int	port;
 	int keepalive;
