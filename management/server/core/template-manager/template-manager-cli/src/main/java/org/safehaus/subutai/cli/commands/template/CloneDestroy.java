@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.commands.template;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.manager.TemplateManager;
+import org.safehaus.subutai.api.template.manager.TemplateManager;
 
 @Command(scope = "template-man", name = "clone-destroy", description = "destroy clone")
 public class CloneDestroy extends OsgiCommandSupport {
