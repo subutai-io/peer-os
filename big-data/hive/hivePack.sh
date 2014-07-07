@@ -6,25 +6,30 @@ set -e
 productName=hive
 downloadHiveAndMakeChanges() {
 	initializeVariables $1
+        optDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/$productName
+	$tempDirectory=$tempDirectory/temp
 	tarFile=apache-hive-0.13.1-bin.tar.gz
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
-
+	
 	wget http://archive.apache.org/dist/hive/hive-0.13.1/$tarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
 	# unpack tar ball and make changes 
+        pushd $optDirectory
+        # Rename existing directory if any
+        mv *$productName* $productName
+	popd
 	pushd $tempDirectory
-	# Rename existing directories if any
-	mv *$productName* $productName
 	tar -xpf $tarFile -C .
 	rm $tarFile
 	mv *$productName*/conf/* $confDirectory
 	# Move extracted tar file contents under relevant directory
-	mv *$productName*/* $productName
+	mv *$productName*/* $optDirectory
 	popd
+        rm -r $tempDirectory
 }
 
 # 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
