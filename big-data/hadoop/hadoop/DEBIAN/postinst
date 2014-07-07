@@ -55,3 +55,6 @@ hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/df
 hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
 hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
 hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude
+
+# Create symlink to configuration files
+ln -s $hadoopConf/* $hadoopHomeEcho/conf/
