@@ -28,21 +28,21 @@ initializeVariables() {
 }
 getSourcesToRelevantDirectories() {
 	pushd $BASE
-	rm -rf $BASE/$fileName/opt/*
-	cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
-	cp -a $SOURCE/etc/ $BASE/$fileName/
-	cp -a $SOURCE/opt/ $BASE/$fileName/
-	mkdir -p $BASE/$fileName/etc/hadoop
+	# Clear the previous contents of the directory
+        if [ -d $BASE/$fileName ]; then
+                rm -r $BASE/$fileName/*
+        fi
+
+        rm -rf $BASE/$fileName
+        mkdir -p $BASE/$fileName/etc/$product_name
+
+	# Copy the sources that are pulled from the version control system
+        cp -a -r $SOURCE/* $BASE/$fileName
+
 	popd
 }
 generateDebianPackage() {
 	pushd $BASE
-	# Clear the previous contents of the directory
-	if [ -d $BASE/$fileName ]; then
-		rm -r $BASE/$fileName/*
-	fi
-	# Copy the sources that are pulled from the version control system
-	cp -a -r $SOURCE/* $BASE/$fileName
 
 	lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 	lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
@@ -83,22 +83,20 @@ generateDebianPackage() {
 }
 
 downloadHadoopAndMakeChanges() {
-	pushd $BASE/$fileName/opt
-	mkdir temp
+	mkdir -p $BASE/$fileName/opt/temp
 	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $BASE/$fileName/opt/temp
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
 	# unpack tar ball and make changes 
-	pushd temp
-	tar -xpf *.tar.gz -C .
-	rm *.tar.gz
+	pushd $BASE/$fileName/opt/temp
+	tar -xpf $hadoopTarFile -C .
+	rm $hadoopTarFile
 	mv hadoop*/conf/* $BASE/$fileName/etc/hadoop
 	rm -r hadoop*/conf
-	tar -cpzf hadoop-1.2.1-bin.tar.gz hadoop*
-	mv hadoop-1.2.1-bin.tar.gz $BASE/$fileName/opt
-	popd
-
+	tar -cpzf $hadoopTarFile hadoop*
+	mv $hadoopTarFile $BASE/$fileName/opt
+        rm -r $BASE/$fileName/opt/temp
 	popd
 }
 
