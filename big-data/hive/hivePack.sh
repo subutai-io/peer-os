@@ -32,7 +32,7 @@ downloadHiveAndMakeChanges() {
 	rm $tarFile
 	mv *$productName*/conf/* $confDirectory
 	# Move extracted tar file contents under relevant directory
-	mv *$productName*/* $optDirectory
+	mv *$productName*/* $optDirectory/$productName
 	popd
         rm -r $tempDirectory
 }
