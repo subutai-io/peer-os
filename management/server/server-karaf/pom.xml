@@ -535,6 +535,11 @@
                                     <artifactId>template-manager-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Apt Repo Manager -->
                                 <artifactItem>
