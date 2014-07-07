@@ -15,12 +15,12 @@ public class ExportTemplate extends OsgiCommandSupport {
     @Argument(index = 1, required = true)
     private String templateName;
 
-    public TemplateManager getTemplateManaget() {
+    public TemplateManager getTemplateManager() {
         return templateManager;
     }
 
-    public void setTemplateManaget(TemplateManager templateManaget) {
-        this.templateManager = templateManaget;
+    public void setTemplateManager(TemplateManager templateManager) {
+        this.templateManager = templateManager;
     }
 
     @Override
