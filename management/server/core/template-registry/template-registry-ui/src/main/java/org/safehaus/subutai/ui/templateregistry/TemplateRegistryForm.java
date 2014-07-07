@@ -88,8 +88,9 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
                 Item item = templateTree.getItem( event.getProperty().getValue() );
 
                 if ( item != null ) {
+                    Template template = ( Template ) item.getItemProperty( "value" ).getValue();
 
-                    Notification.show( item.getItemProperty( "value" ).getValue().toString() );
+                    Notification.show( template.toString() );
                 }
             }
         } );
