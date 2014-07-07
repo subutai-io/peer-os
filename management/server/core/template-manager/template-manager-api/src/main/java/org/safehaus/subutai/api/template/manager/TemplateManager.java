@@ -38,5 +38,12 @@ public interface TemplateManager {
 
     public boolean importTemplate(String hostName, String templateName);
 
-    public boolean exportTemplate(String hostName, String templateName);
+    /**
+     * Exports the template in the given server into a deb package.
+     *
+     * @param hostName the physical host name
+     * @param templateName the template name to be exported
+     * @return path to generated deb package
+     */
+    public String exportTemplate(String hostName, String templateName);
 }

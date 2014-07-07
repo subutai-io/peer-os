@@ -45,10 +45,10 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     }
 
     @Override
-    public boolean exportTemplate(String hostName, String templateName) {
+    public String exportTemplate(String hostName, String templateName) {
         // check if registered as template
         Template template = templateRegistry.getTemplate(templateName);
-        if(template == null) return false;
+        if(template == null) return null;
 
         Agent a = agentManager.getAgentByHostname(hostName);
         boolean b = scriptExecutor.execute(a, ActionType.EXPORT, templateName);
@@ -56,12 +56,12 @@ public class TemplateManagerImpl extends TemplateManagerBase {
             String filePath = getExportedPackageFilePath(a, templateName);
             try {
                 repoManager.addPackageByPath(a, filePath, false);
-                return true;
+                return filePath;
             } catch(AptRepoException ex) {
                 logger.error("Failed to add package to repo", ex);
             }
         }
-        return false;
+        return null;
     }
 
     private boolean checkParentTemplate(Agent a, String templateName) {
@@ -101,6 +101,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         AgentResult res = cmd.getResults().get(a.getUuid());
         if(res.getExitCode() != null && res.getExitCode() == 0) {
             String dir = res.getStdOut();
+            templateName = templateName + "-subutai-template.deb";
             return Paths.get(dir, templateName).toString();
         }
         return null;

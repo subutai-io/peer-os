@@ -25,8 +25,8 @@ public class ExportTemplate extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        boolean b = templateManager.exportTemplate(hostName, templateName);
-        if(b) System.out.println("Template successfully exported");
+        String path = templateManager.exportTemplate(hostName, templateName);
+        if(path != null) System.out.println("Template successfully exported to " + path);
         else System.out.println("Failed to export");
         return null;
     }
