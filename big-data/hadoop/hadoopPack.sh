@@ -8,8 +8,6 @@ downloadHadoopAndMakeChanges() {
 	confDirectory=$BASE/$fileName/etc/$productName
 	hadoopTarFile=hadoop-1.2.1-bin.tar.gz
 	# Create directories that are required for the debian package
-        mkdir -p $binDirectory
-        mkdir -p $sbinDirectory
         mkdir -p $confDirectory
 
 	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $tempDirectory
