@@ -623,7 +623,7 @@
         <artifactId>configuration-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      Core Modules - END
+      <!--Core Modules - END-->
 
       <!-- Products Modules - START -->
 
