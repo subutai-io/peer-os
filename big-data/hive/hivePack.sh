@@ -12,7 +12,7 @@ downloadHiveAndMakeChanges() {
 	tarFile=apache-hive-0.13.1-bin.tar.gz
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
-	
+	mkdir -p $tempDirectory	
 	wget http://archive.apache.org/dist/hive/hive-0.13.1/$tarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
