@@ -15,6 +15,7 @@ import org.safehaus.subutai.api.templateregistry.TemplateTree;
 import org.safehaus.subutai.shared.protocol.Disposable;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
@@ -22,6 +23,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
@@ -75,6 +77,18 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
                 }
 
                 return description;
+            }
+        } );
+
+        templateTree.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
+                    Template template = ( Template ) templateTree.getItem( event.getProperty().getValue() )
+                                                                 .getItemProperty( "value" );
+
+                    Notification.show( template.toString() );
+                }
             }
         } );
 
