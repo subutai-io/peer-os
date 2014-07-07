@@ -19,8 +19,13 @@ downloadHiveAndMakeChanges() {
 	fi
 	# unpack tar ball and make changes 
         pushd $optDirectory
+
         # Rename existing directory if any
-        mv *$productName* $productName
+        fileName=`ls | grep $productName`
+	if [[ $fileName != $productName ]];
+        then
+    		mv *$productName* $productName
+	fi
 	popd
 	pushd $tempDirectory
 	tar -xpf $tarFile -C .
