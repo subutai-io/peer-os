@@ -31,12 +31,12 @@ public class ConfigurationManagerUI implements PortalModule {
     //    }
 
 
-    public ConfigManager getConfigurationManager() {
+    public ConfigManager getConfigManager() {
         return configManager;
     }
 
 
-    public void setConfigurationManager( final ConfigManager configManager ) {
+    public void setConfigManager( final ConfigManager configManager ) {
         this.configManager = configManager;
     }
 
