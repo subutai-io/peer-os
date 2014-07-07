@@ -35,6 +35,7 @@ import com.vaadin.ui.themes.Runo;
  */
 public class TemplateRegistryForm extends CustomComponent implements Disposable {
 
+
     private final AgentManager agentManager;
     private final TemplateRegistryManager registryManager;
     private HierarchicalContainer container;
@@ -67,6 +68,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
                 Item item = templateTree.getItem( itemId );
                 if ( item != null ) {
+
                     Template template = ( Template ) item.getItemProperty( "value" ).getValue();
                     if ( template != null ) {
                         description = "Name: " + template.getTemplateName() + "<br>" + "Parent: " + template
@@ -84,10 +86,11 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    Template template = ( Template ) templateTree.getItem( event.getProperty().getValue() )
-                                                                 .getItemProperty( "value" );
+                    //                    Template template = ( Template ) templateTree.getItem( event.getProperty()
+                    // .getValue() )
+                    //                                                                 .getItemProperty( "value" );
 
-                    Notification.show( template.toString() );
+                    Notification.show( event.getProperty().getValue().toString() );
                 }
             }
         } );
