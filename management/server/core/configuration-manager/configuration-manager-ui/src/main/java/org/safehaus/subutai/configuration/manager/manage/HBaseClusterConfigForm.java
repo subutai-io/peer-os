@@ -9,14 +9,14 @@ import com.vaadin.ui.VerticalLayout;
 
 
 @SuppressWarnings("serial")
-public class CassandraConfigForm {
+public class HBaseClusterConfigForm {
 
     private VerticalLayout contentRoot;
     private Table table;
     private ConfigManager configManager;
 
 
-    public CassandraConfigForm( ConfigManager configManager ) {
+    public HBaseClusterConfigForm( ConfigManager configManager ) {
         this.configManager = configManager;
 
 

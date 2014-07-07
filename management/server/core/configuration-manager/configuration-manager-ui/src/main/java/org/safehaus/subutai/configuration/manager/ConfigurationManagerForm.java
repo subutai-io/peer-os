@@ -7,10 +7,10 @@ package org.safehaus.subutai.configuration.manager;
 
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
-import org.safehaus.subutai.configuration.manager.manage.CassandraConfigForm;
+import org.safehaus.subutai.configuration.manager.manage.CassandraClusterConfigForm;
+import org.safehaus.subutai.configuration.manager.manage.HBaseClusterConfigForm;
+import org.safehaus.subutai.configuration.manager.manage.HadoopClusterConfigForm;
 import org.safehaus.subutai.shared.protocol.Disposable;
-
-import org.apache.log4j.lf5.viewer.configure.ConfigurationManager;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
@@ -24,7 +24,9 @@ import com.vaadin.ui.themes.Runo;
 public class ConfigurationManagerForm extends CustomComponent implements Disposable {
 
 
-    private CassandraConfigForm cassandraConfigForm;
+    private CassandraClusterConfigForm cassandraConfigForm;
+    private HadoopClusterConfigForm hadoopClusterConfigForm;
+    private HBaseClusterConfigForm hBaseClusterConfigForm;
 
 
     public ConfigurationManagerForm( ConfigManager configManager ) {
@@ -39,8 +41,12 @@ public class ConfigurationManagerForm extends CustomComponent implements Disposa
         sheet.setSizeFull();
 //        blueprintManager = new BlueprintLoadForm(environmentManager);
 //        environmentForm = new EnvironmentsForm(environmentManager);
-        cassandraConfigForm = new CassandraConfigForm(configManager);
-        sheet.addTab( cassandraConfigForm.getContentRoot(), "Cassandra cluster" );
+        cassandraConfigForm = new CassandraClusterConfigForm(configManager);
+        hadoopClusterConfigForm = new HadoopClusterConfigForm(configManager);
+        hBaseClusterConfigForm = new HBaseClusterConfigForm( configManager );
+        sheet.addTab( cassandraConfigForm.getContentRoot(), "Cassandra" );
+        sheet.addTab( hadoopClusterConfigForm.getContentRoot(), "Hadoop" );
+        sheet.addTab( hBaseClusterConfigForm.getContentRoot(), "HBase" );
 //        sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
 //        sheet.addTab( environmentForm.getContentRoot(), "Environments" );
         verticalLayout.addComponent( sheet );
