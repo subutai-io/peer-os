@@ -19,7 +19,7 @@ downloadHadoopAndMakeChanges() {
 	tar -xpf $hadoopTarFile -C .
 	rm $hadoopTarFile
 	mv hadoop*/conf/* $confDirectory
-	rm -r hadoop*/conf
+	ln -s $confDirectory/* hadoop*/conf/	
 	popd
 }
 
