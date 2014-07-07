@@ -83,7 +83,7 @@ generateDebianPackage() {
 }
 
 downloadHadoopAndMakeChanges() {
-	pushd $BASE
+	pushd $BASE/$fileName/opt
 	mkdir temp
 	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $BASE/$fileName/opt/temp
 	if [ -f $BASE/$fileName/opt/README ]; then
