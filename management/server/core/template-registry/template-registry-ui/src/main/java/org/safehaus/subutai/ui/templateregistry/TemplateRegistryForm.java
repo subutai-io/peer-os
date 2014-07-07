@@ -85,12 +85,11 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         templateTree.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                if ( event.getProperty().getValue() != null ) {
-                    //                    Template template = ( Template ) templateTree.getItem( event.getProperty()
-                    // .getValue() )
-                    //                                                                 .getItemProperty( "value" );
+                Item item = templateTree.getItem( event.getProperty().getValue() );
 
-                    Notification.show( event.getProperty().getValue().toString() );
+                if ( item != null ) {
+
+                    Notification.show( item.toString() );
                 }
             }
         } );
