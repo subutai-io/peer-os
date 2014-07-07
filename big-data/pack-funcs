@@ -33,7 +33,7 @@ initializeVariables() {
 	then
 		echo "Filename seems empty" $fileName
 		fileName="ksks-$productName"
-		mkdir -p
+		mkdir -p $fileName
 	fi
         echo "FILENAME: " $fileName
 	popd

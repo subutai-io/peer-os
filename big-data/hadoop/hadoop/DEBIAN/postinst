@@ -40,18 +40,21 @@ touch $hadoopConf/dfs.exclude
 touch $hadoopConf/dfs.include
 touch $hadoopConf/mapred.exclude
 touch $hadoopConf/mapred.include
-$hadoopHomeEcho/bin/hadoop-configure.sh localhost:8020 localhost:9000 1
-$hadoopHomeEcho/bin/hadoop-master-slave.sh masters clear
-$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves clear
-$hadoopHomeEcho/bin/hadoop-master-slave.sh masters localhost
-$hadoopHomeEcho/bin/hadoop-master-slave.sh slaves localhost
+hadoop-configure.sh localhost:8020 localhost:9000 1
+hadoop-master-slave.sh masters clear
+hadoop-master-slave.sh slaves clear
+hadoop-master-slave.sh masters localhost
+hadoop-master-slave.sh slaves localhost
 
-$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml fs.default.name hdfs://localhost:8020
-$hadoopHomeEcho/bin/hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
-$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.replication 1
-$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-1.2.1/conf/dfs.include
-$hadoopHomeEcho/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/dfs.exclude
+hadoop-property.sh add core-site.xml fs.default.name hdfs://localhost:8020
+hadoop-property.sh add core-site.xml hadoop.tmp.dir /var/lib/hadoop-'\$'{user.name}
+hadoop-property.sh add hdfs-site.xml dfs.replication 1
+hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-1.2.1/conf/dfs.include
+hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/dfs.exclude
 
-$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
-$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
-$hadoopHomeEcho/bin/hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude
+hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
+hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
+hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude
+
+# Create symlink to configuration files
+ln -s $hadoopConf/* $hadoopHomeEcho/conf/
