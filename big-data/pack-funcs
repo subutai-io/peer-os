@@ -33,6 +33,7 @@ initializeVariables() {
 	then
 		echo "Filename seems empty" $fileName
 		fileName="ksks-$productName"
+		mkdir -p
 	fi
         echo "FILENAME: " $fileName
 	popd
@@ -45,6 +46,7 @@ getSourcesToRelevantDirectories() {
         if [ -d $BASE/$fileName ]; then
                 rm -r $BASE/$fileName
         fi
+	mkdir $BASE/$fileName
 	# Copy the sources that are pulled from the version control system
         cp -a -r $SOURCE/* $BASE/$fileName
 	popd
