@@ -36,7 +36,7 @@ initializeVariables() {
 	fi
         echo "FILENAME: " $fileName
 	popd
-	tempDirectory=$BASE/$fileName/opt/temp
+	tempDirectory=$BASE/$fileName/opt
 }
 getSourcesToRelevantDirectories() {
 	initializeVariables $1
@@ -45,7 +45,6 @@ getSourcesToRelevantDirectories() {
         if [ -d $BASE/$fileName ]; then
                 rm -r $BASE/$fileName
         fi
-	mkdir -p $BASE/$fileName/etc/$productName
 	# Copy the sources that are pulled from the version control system
         cp -a -r $SOURCE/* $BASE/$fileName
 	popd
