@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 . /etc/profile
-tar -xpzf /opt/hadoop-1.2.1-bin.tar.gz -C /opt
 
 hadoopHomeEcho="/opt/hadoop-1.2.1"
 hadoopConf="/etc/hadoop"
@@ -37,7 +36,6 @@ fi
 # Suppress HADOOP_HOME is deprecated message
 echo 'export HADOOP_HOME_WARN_SUPPRESS="TRUE"' >> $hadoopConf/hadoop-env.sh
 
-rm -rf /opt/hadoop-1.2.1-bin.tar.gz
 touch $hadoopConf/dfs.exclude
 touch $hadoopConf/dfs.include
 touch $hadoopConf/mapred.exclude
