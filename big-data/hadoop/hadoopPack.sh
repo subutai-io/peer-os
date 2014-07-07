@@ -5,8 +5,6 @@ set -e
 productName=hadoop
 downloadHadoopAndMakeChanges() {
 	initializeVariables $1
-	binDirectory=$BASE/$fileName/usr/local/bin
-        sbinDirectory=$BASE/$fileName/usr/local/sbin
 	confDirectory=$BASE/$fileName/etc/$productName
 	hadoopTarFile=hadoop-1.2.1-bin.tar.gz
 	# Create directories that are required for the debian package
@@ -24,10 +22,6 @@ downloadHadoopAndMakeChanges() {
 	rm $hadoopTarFile
 	mv hadoop*/conf/* $confDirectory
 	rm -r hadoop*/conf
-	mv hadoop*/bin/* $binDirectory
-        rm -r hadoop*/bin
-	mv hadoop*/sbin/* $sbinDirectory
-        rm -r hadoop*/sbin
 	popd
 }
 
