@@ -30,12 +30,9 @@ getSourcesToRelevantDirectories() {
 	pushd $BASE
 	# Clear the previous contents of the directory
         if [ -d $BASE/$fileName ]; then
-                rm -r $BASE/$fileName/*
+                rm -r $BASE/$fileName
         fi
-
-        rm -rf $BASE/$fileName
         mkdir -p $BASE/$fileName/etc/$product_name
-
 	# Copy the sources that are pulled from the version control system
         cp -a -r $SOURCE/* $BASE/$fileName
 
