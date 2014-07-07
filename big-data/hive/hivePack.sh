@@ -8,7 +8,7 @@ downloadHiveAndMakeChanges() {
 	initializeVariables $1
         optDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/$productName
-	$tempDirectory=$tempDirectory/temp
+	tempDirectory=$tempDirectory/temp
 	tarFile=apache-hive-0.13.1-bin.tar.gz
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
