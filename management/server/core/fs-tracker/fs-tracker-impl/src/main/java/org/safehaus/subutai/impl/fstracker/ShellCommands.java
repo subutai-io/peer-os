@@ -17,8 +17,13 @@ public class ShellCommands extends OsgiCommandSupport {
     @Override
     protected Object doExecute() {
 
-        FSTrackerTest.sayHello();
+//        FSTrackerTest.sayHello();
+        showMessage();
 
         return null;
+    }
+
+    private void showMessage() {
+        System.out.println( "message" );
     }
 }
