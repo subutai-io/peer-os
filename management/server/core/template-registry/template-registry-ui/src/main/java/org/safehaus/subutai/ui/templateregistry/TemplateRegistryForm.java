@@ -89,7 +89,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
                 if ( item != null ) {
 
-                    Notification.show( item.toString() );
+                    Notification.show( item.getItemProperty( "value" ).getValue().toString() );
                 }
             }
         } );
