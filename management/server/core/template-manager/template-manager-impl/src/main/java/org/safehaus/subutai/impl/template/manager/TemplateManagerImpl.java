@@ -66,8 +66,12 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 
     private boolean checkParentTemplate(Agent a, String templateName) {
         Template parent = templateRegistry.getParentTemplate(templateName);
-        String parentName = parent.getTemplateName();
+        if(parent == null) {
+            logger.error("Parent not defined for template {}", templateName);
+            return false;
+        }
 
+        String parentName = parent.getTemplateName();
         if(parentName.equals(getMasterTemplateName())) return true;
 
         if(!zfsIsTemplate(a, parentName)) {
