@@ -19,6 +19,7 @@
  */
 package org.safehaus.subutai.server.ui;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -46,10 +47,11 @@ import java.util.logging.Logger;
 @SuppressWarnings ("serial")
 @Title ("Subutai")
 
+@Push
 public class MainUI extends UI {
 
 	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
-	private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<MainUI>();
+	private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<>();
 
 	private CssLayout root = new CssLayout();
 	private CssLayout menu = new CssLayout();
