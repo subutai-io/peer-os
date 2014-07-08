@@ -11,7 +11,7 @@ downloadFileAndMakeChanges() {
 	esVersion=1.2.1
 
 	# Create directories that are required for the debian package
-    mkdir -p $bin
+    mkdir -p $tempDirectory
 
 	wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$esVersion.deb -P $tempDirectory
 

@@ -6,5 +6,4 @@ Architecture: all
 Depends: libc6, adduser
 Installed-Size: 21590
 Maintainer: kiskis
-Description: Open Source, Distributed, RESTful Search Engine
- Elasticsearch is a distributed RESTful search engine built for the cloud. 
+Description: This is a elasticsearch package of kiskis distribution.
