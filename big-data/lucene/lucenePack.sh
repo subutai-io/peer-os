@@ -11,8 +11,8 @@ downloadFileAndMakeChanges() {
         # Create directories that are required for the debian package
         mkdir -p $confDirectory
 	wget http://archive.apache.org/dist/lucene/java/4.4.0/$tarFile -P $tempDirectory
-        if [ -f $BASE/$fileName/opt/README ]; then
-                rm $BASE/$fileName/opt/README
+        if [ -f $BASE/$fileName/opt/README* ]; then
+                rm $BASE/$fileName/opt/README*
         fi
         # unpack tar ball and make changes 
         pushd $tempDirectory
