@@ -15,14 +15,21 @@ import org.safehaus.subutai.api.templateregistry.TemplateTree;
 import org.safehaus.subutai.shared.protocol.Disposable;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
@@ -32,6 +39,7 @@ import com.vaadin.ui.themes.Runo;
  *
  */
 public class TemplateRegistryForm extends CustomComponent implements Disposable {
+
 
     private final AgentManager agentManager;
     private final TemplateRegistryManager registryManager;
@@ -65,6 +73,7 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
                 Item item = templateTree.getItem( itemId );
                 if ( item != null ) {
+
                     Template template = ( Template ) item.getItemProperty( "value" ).getValue();
                     if ( template != null ) {
                         description = "Name: " + template.getTemplateName() + "<br>" + "Parent: " + template
@@ -78,6 +87,19 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
             }
         } );
 
+        templateTree.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                Item item = templateTree.getItem( event.getProperty().getValue() );
+
+                if ( item != null ) {
+                    Template template = ( Template ) item.getItemProperty( "value" ).getValue();
+
+                    Notification.show( template.toString() );
+                }
+            }
+        } );
+
         fillTemplateTree();
 
         horizontalSplit.setFirstComponent( templateTree );
@@ -85,23 +107,49 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
-        TabSheet commandsSheet = new TabSheet();
-        commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
-        commandsSheet.setSizeFull();
 
-        //        commandsSheet.addTab(new Cloner(lxcManager, agentTree), "Clone");
-        //        commandsSheet.addTab(manager, managerTabCaption);
-        //        commandsSheet.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
-        //            @Override
-        //            public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-        //                TabSheet tabsheet = event.getTabSheet();
-        //                String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
-        //                if (caption.equals(managerTabCaption)) {
-        //                    manager.getLxcInfo();
-        //                }
-        //            }
-        //        });
-        verticalLayout.addComponent( commandsSheet );
+        GridLayout grid = new GridLayout( 4, 4 );
+
+        TextField templateNameTxt = new TextField( "Template name" );
+        templateNameTxt.setReadOnly( true );
+        grid.addComponent( templateNameTxt, 0, 0 );
+        TextField templateParentTxt = new TextField( "Parent name" );
+        templateParentTxt.setReadOnly( true );
+        grid.addComponent( templateParentTxt, 1, 0 );
+        TextField lxcArchTxt = new TextField( "Lxc arch" );
+        lxcArchTxt.setReadOnly( true );
+        grid.addComponent( lxcArchTxt, 2, 0 );
+        TextField lxcUtsnameTxt = new TextField( "Utsname" );
+        lxcUtsnameTxt.setReadOnly( true );
+        grid.addComponent( lxcUtsnameTxt, 0, 1 );
+        TextField cfgPathTxt = new TextField( "Config path" );
+        cfgPathTxt.setReadOnly( true );
+        grid.addComponent( cfgPathTxt, 1, 1 );
+        TextField appDataPathTxt = new TextField( "App Data path" );
+        appDataPathTxt.setReadOnly( true );
+        grid.addComponent( appDataPathTxt, 2, 1 );
+        verticalLayout.addComponent( grid );
+
+        TextArea packagesInstalled = new TextArea( "Packages Installed" );
+        packagesInstalled.setValue( "package1\npackage2\npackage3" );
+        packagesInstalled.setReadOnly( true );
+
+        TextArea packagesChanged = new TextArea( "Packages Changed" );
+        packagesChanged.setValue( "+package4\n+package5\n-package6\n-package7" );
+        packagesChanged.setReadOnly( true );
+
+        HorizontalLayout packagesLayout = new HorizontalLayout();
+        packagesLayout.addComponent( packagesInstalled );
+        packagesLayout.addComponent( packagesChanged );
+
+        verticalLayout.addComponent( packagesLayout );
+
+
+        Label confirmationLbl = new Label( "<font style='color:red'>some lines which were deleted</font><br/>"
+                + "<font style='color:green'>some lines which were added</font><br/>" );
+        confirmationLbl.setContentMode( ContentMode.HTML );
+
+        verticalLayout.addComponent( confirmationLbl );
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
@@ -110,7 +158,12 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
     private void fillTemplateTree() {
         container.removeAllItems();
-        addChildren( registryManager.getTemplateTree(), Template.getMasterTemplate() );
+        TemplateTree tree = registryManager.getTemplateTree();
+        String parent = null;
+        List<Template> uberTemplates = tree.getChildrenTemplates( parent );
+        for ( Template template : uberTemplates ) {
+            addChildren( tree, template );
+        }
     }
 
 
