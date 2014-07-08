@@ -16,12 +16,8 @@ downloadFileAndMakeChanges() {
 	wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$esVersion.deb -P $tempDirectory
 
 	# export all files insdie debian file except DEBIAN folder
-	dpkg-deb -x $fileName/elasticsearch-$esVersion.deb $fileName/
+	dpkg-deb -x $BASE/$fileName/elasticsearch-$esVersion.deb $BASE/$fileName/
 
-
-	if [ -f $BASE/$fileName/opt/README ]; then
-	        rm $BASE/$fileName/opt/README
-	fi
 	# unpack tar ball and make changes 
 	pushd $tempDirectory
 	# remove debian file
