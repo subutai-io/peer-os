@@ -2,7 +2,7 @@
 set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-productName=hadoop
+productName=lucene
 downloadFileAndMakeChanges() {
         initializeVariables $1
         tempDirectory=$BASE/$fileName/opt
