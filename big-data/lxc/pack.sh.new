@@ -65,7 +65,6 @@ ssh-keygen -f "/root/.ssh/known_hosts" -R 172.16.8.100
 #Read Root Passwords for Template LXC
 cd $BASE
 passwd=$(cat password.dat)
-echo "PASSWORD:"$passwd
 /$BASE/presettings.exp.new 172.16.8.100 ubuntu ubuntu $passwd
 /$BASE/postsettings.exp.new 172.16.8.100 root  $passwd
 
