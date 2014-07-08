@@ -1,4 +1,4 @@
-package org.safehaus.subutai.cassandra.services;
+package org.safehaus.subutai.rest.template.manager;
 
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 

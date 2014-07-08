@@ -13,17 +13,17 @@
         </cxf:features>
     </cxf:bus>
 
-    <jaxrs:server address="/template" id="templateManagerRestService">
-        <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="templateManagerRestServiceBean"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-
-    <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.cassandra.services.RestServiceImpl">
-        <property name="templateManager" ref="templateManager"/>
-    </bean>
-
     <reference id="templateManager" availability="mandatory"
                interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
+
+    <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.rest.template.manager.RestServiceImpl">
+        <property name="templateManager" ref="templateManager"/>
+    </bean>
+    
+    <jaxrs:server address="/template" id="templateManagerRestService">
+        <jaxrs:serviceBeans>
+            <ref component-id="templateManagerRestServiceBean"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
     
 </blueprint>

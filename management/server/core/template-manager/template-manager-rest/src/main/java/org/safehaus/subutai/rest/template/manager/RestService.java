@@ -1,4 +1,4 @@
-package org.safehaus.subutai.cassandra.services;
+package org.safehaus.subutai.rest.template.manager;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
