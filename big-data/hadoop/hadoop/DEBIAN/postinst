@@ -16,9 +16,9 @@ then
 fi
 
 # Create symlink to configuration files
-ln -s $hadoopConf/* $hadoopHome/conf/
+ln -sf $hadoopConf/* $hadoopHome/conf/
 # Create symlink to bin directory
-ln -s $hadoopHome/bin/* $binDirectory/
+ln -sf $hadoopHome/bin/* $binDirectory/
 
 escape_characters()
 {
