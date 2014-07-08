@@ -18,15 +18,12 @@ if [[ $1 == "" || $2 == "" || $3 == "" ]];
 then
         usage
 else
-        fileName=/opt/hive-0.11.0-bin/conf/$2
+	if [ "x$HIVE_CONF_DIR" = "x" ];
+	then
+  	  HIVE_CONF_DIR=/etc/hive
+	fi
+        fileName=$HIVE_CONF_DIR/$2
         name_field=$3
-fi
-
-if [ "x$HIVE_HOME" = "x" ];
-then
-        :
-else
-        fileName="$HIVE_HOME/conf/$2"
 fi
 
 do_add()
