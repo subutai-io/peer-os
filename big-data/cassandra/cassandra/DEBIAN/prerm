@@ -1,14 +1,15 @@
 #!/bin/sh
 set -e
 cassVer="cassandra-2.0.9"
+cassConfdir="/etc/cassandra"
 
 # stop cassandra if it is running
 service cassandra stop
 
 casHome="/opt/$cassVer"
-data_dir=$(echo $(sed `expr $(sed -n '/data_file_directories:/=' $casHome/conf/cassandra.yaml) + 1`!d $casHome/conf/cassandra.yaml) | awk -F"-" '{split($2,a," ");print a[1]}')
-commitlog_dir=$(echo $(sed $(sed -n '/commitlog_directory:/=' $casHome/conf/cassandra.yaml)!d $casHome/conf/cassandra.yaml) | awk -F":" '{split($2,a," ");print a[1]}')
-saved_cache_dir=$(echo $(sed $(sed -n '/saved_caches_directory:/=' $casHome/conf/cassandra.yaml)!d $casHome/conf/cassandra.yaml) | awk -F":" '{split($2,a," ");print a[1]}')
+data_dir=$(echo $(sed `expr $(sed -n '/data_file_directories:/=' $cassConfdir/cassandra.yaml) + 1`!d $cassConfdir/cassandra.yaml) | awk -F"-" '{split($2,a," ");print a[1]}')
+commitlog_dir=$(echo $(sed $(sed -n '/commitlog_directory:/=' $cassConfdir/cassandra.yaml)!d $cassConfdir/cassandra.yaml) | awk -F":" '{split($2,a," ");print a[1]}')
+saved_cache_dir=$(echo $(sed $(sed -n '/saved_caches_directory:/=' $cassConfdir/cassandra.yaml)!d $cassConfdir/cassandra.yaml) | awk -F":" '{split($2,a," ");print a[1]}')
 
 rm -rf $data_dir
 rm -rf $commitlog_dir
