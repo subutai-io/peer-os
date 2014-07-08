@@ -93,6 +93,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		commandOutputTxtArea.setSizeFull();
 		commandOutputTxtArea.setImmediate(true);
 		commandOutputTxtArea.setWordwrap(false);
+		commandOutputTxtArea.addStyleName("terminal");
 	}
 
 	private void initIndicator() {
@@ -181,7 +182,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		Label programLbl = new Label("Program");
 		programTxtFld = new TextField();
 		programTxtFld.setValue("pwd");
-		programTxtFld.setWidth(300, Unit.PIXELS);
+		programTxtFld.setWidth(200, Unit.PIXELS);
 		controls.addComponent(programLbl);
 		controls.addComponent(programTxtFld);
 

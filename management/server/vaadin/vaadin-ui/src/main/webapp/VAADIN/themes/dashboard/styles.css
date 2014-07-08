@@ -645,6 +645,11 @@
     }
 }
 
+.dashboard .terminal {
+    color: #ffffff;
+    background-color: #000000;
+}
+
 .dashboard .v-widget {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
