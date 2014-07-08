@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 cassVer="cassandra-2.0.9"
 FilePath="/etc/profile"
