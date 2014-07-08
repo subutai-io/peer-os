@@ -12,5 +12,3 @@ fi
 hiveConf="/etc/hive"
 
 ln -sf $hiveConf/* $hiveHome/conf/
-# Make symlink files read-only
-chmod 444 -R $hiveHome/conf/

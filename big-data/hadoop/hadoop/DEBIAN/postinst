@@ -18,8 +18,6 @@ fi
 
 # Create symlink to configuration files
 ln -sf $hadoopConf/* $hadoopHome/conf/
-# Make symlink files read-only
-chmod 444 -R $hadoopHome/conf/
 
 escape_characters()
 {
