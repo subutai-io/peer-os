@@ -45,6 +45,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private ComboBox requestTypeCombo;
 	private Button sendBtn;
 	private Label indicator;
+	private VerticalLayout controls;
 
 
 	public TerminalForm(final CommandRunner commandRunner, final AgentManager agentManager) {
@@ -62,29 +63,26 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		agentTree = new AgentTree(agentManager);
 		horizontalSplit.setFirstComponent(agentTree);
 
-		GridLayout gridLayout = new GridLayout();
-		gridLayout.setColumns(1);
-		gridLayout.setRows(10);
+		HorizontalSplitPanel gridLayout = new HorizontalSplitPanel();
 		gridLayout.setSizeFull();
-		gridLayout.setMargin(true);
-		gridLayout.setSpacing(true);
+		gridLayout.setSplitPosition(80, Unit.PERCENTAGE);
 
 		initOutputTextArea();
 
-		HorizontalLayout controls = new HorizontalLayout();
+		controls = new VerticalLayout();
 		controls.setSpacing(true);
 		controls.setMargin(true);
 
-		initProgram(controls);
-		initCommand(controls);
-		initTimeout(controls);
-		initRequestType(controls);
-		initClearButton(controls);
-		initSendButton(controls);
-		initIndicator(controls);
+		initProgram();
+		initCommand();
+		initTimeout();
+		initRequestType();
+		initClearButton();
+		initSendButton();
+		initIndicator();
 
-		gridLayout.addComponent(controls, 0, 0, 0, 1);
-		gridLayout.addComponent(commandOutputTxtArea, 0, 2, 0, 9);
+		gridLayout.setFirstComponent(commandOutputTxtArea);
+		gridLayout.setSecondComponent(controls);
 
 		horizontalSplit.setSecondComponent(gridLayout);
 		setCompositionRoot(horizontalSplit);
@@ -97,7 +95,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		commandOutputTxtArea.setWordwrap(false);
 	}
 
-	private void initIndicator(HorizontalLayout controls) {
+	private void initIndicator() {
 		indicator = new Label();
 		indicator.setIcon(new ThemeResource("img/spinner.gif"));
 		indicator.setContentMode(ContentMode.HTML);
@@ -107,7 +105,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(indicator);
 	}
 
-	private void initSendButton(HorizontalLayout controls) {
+	private void initSendButton() {
 		sendBtn = new Button("Send");
 		controls.addComponent(sendBtn);
 		sendBtn.addStyleName("default");
@@ -136,7 +134,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		});
 	}
 
-	private void initClearButton(HorizontalLayout controls) {
+	private void initClearButton() {
 		Button clearBtn = new Button("Clear");
 		clearBtn.addStyleName("default");
 		controls.addComponent(clearBtn);
@@ -149,7 +147,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		});
 	}
 
-	private void initRequestType(HorizontalLayout controls) {
+	private void initRequestType() {
 		Label requestTypeLabel = new Label("Req Type");
 		controls.addComponent(requestTypeLabel);
 		requestTypeCombo = new ComboBox(null,
@@ -162,7 +160,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(requestTypeCombo);
 	}
 
-	private void initTimeout(HorizontalLayout controls) {
+	private void initTimeout() {
 		Label timeoutLbl = new Label("Timeout");
 		timeoutTxtFld = new TextField();
 		timeoutTxtFld.setValue("30");
@@ -171,7 +169,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(timeoutTxtFld);
 	}
 
-	private void initCommand(HorizontalLayout controls) {
+	private void initCommand() {
 		Label workDirLbl = new Label("Cwd");
 		workDirTxtFld = new TextField();
 		workDirTxtFld.setValue("/");
@@ -179,7 +177,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(workDirTxtFld);
 	}
 
-	private void initProgram(HorizontalLayout controls) {
+	private void initProgram() {
 		Label programLbl = new Label("Program");
 		programTxtFld = new TextField();
 		programTxtFld.setValue("pwd");
