@@ -14,8 +14,6 @@ import com.google.gson.annotations.Expose;
  */
 public class Template {
 
-    public static final String MASTER_TEMPLATE_NAME = "master";
-    private static Template masterTemplate = new Template();
     //name of template
     @Expose
     private String templateName;
@@ -59,7 +57,8 @@ public class Template {
                 .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiAppdataPath ),
                 "Missing subutai.app.data.path parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
+        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ),
+        // "Missing subutai.parent parameter" ); // parent might be null
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
@@ -74,16 +73,6 @@ public class Template {
         this.packagesManifest = packagesManifest;
         this.templateName = lxcUtsname;
         this.parentTemplateName = subutaiParent;
-    }
-
-
-    private Template() {
-        templateName = MASTER_TEMPLATE_NAME;
-    }
-
-
-    public static Template getMasterTemplate() {
-        return masterTemplate;
     }
 
 

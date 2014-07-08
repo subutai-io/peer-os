@@ -132,9 +132,11 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
         TextArea packagesInstalled = new TextArea( "Packages Installed" );
         packagesInstalled.setValue( "package1\npackage2\npackage3" );
+        packagesInstalled.setReadOnly( true );
 
         TextArea packagesChanged = new TextArea( "Packages Changed" );
         packagesChanged.setValue( "+package4\n+package5\n-package6\n-package7" );
+        packagesChanged.setReadOnly( true );
 
         HorizontalLayout packagesLayout = new HorizontalLayout();
         packagesLayout.addComponent( packagesInstalled );
@@ -156,7 +158,12 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
     private void fillTemplateTree() {
         container.removeAllItems();
-        addChildren( registryManager.getTemplateTree(), Template.getMasterTemplate() );
+        TemplateTree tree = registryManager.getTemplateTree();
+        String parent = null;
+        List<Template> uberTemplates = tree.getChildrenTemplates( parent );
+        for ( Template template : uberTemplates ) {
+            addChildren( tree, template );
+        }
     }
 
 

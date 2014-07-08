@@ -93,9 +93,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     public Template getTemplate( final String templateName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
         //retrieve template from storage
-        if ( Template.MASTER_TEMPLATE_NAME.equalsIgnoreCase( templateName ) ) {
-            return Template.getMasterTemplate();
-        }
+
         return templateDAO.getTemplateByName( templateName );
     }
 
@@ -117,10 +115,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Template child = getTemplate( childTemplateName );
 
         if ( child != null ) {
-            if ( Template.MASTER_TEMPLATE_NAME.equalsIgnoreCase( child.getParentTemplateName() ) ) {
-                return Template.getMasterTemplate();
-            }
-            else if ( child.getParentTemplateName() != null ) {
+            if ( child.getParentTemplateName() != null ) {
                 return getTemplate( child.getParentTemplateName() );
             }
         }
@@ -133,8 +128,6 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     public TemplateTree getTemplateTree() {
         //retrieve all templates and fill template tree
         TemplateTree templateTree = new TemplateTree();
-        //add master template
-        templateTree.addTemplate( Template.getMasterTemplate() );
         List<Template> allTemplates = templateDAO.getAllTemplates();
         for ( Template template : allTemplates ) {
             templateTree.addTemplate( template );
