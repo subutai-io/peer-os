@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+. /etc/profile
+
 hadoopHome="/opt/hadoop-1.2.1"
 hadoopHomeBin="$hadoopHome/bin"
 hadoopConf="/etc/hadoop"
