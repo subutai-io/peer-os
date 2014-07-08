@@ -38,14 +38,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	final AgentManager agentManager;
 	private volatile int taskCount = 0;
 	private ExecutorService executor;
-	//
-	private HorizontalSplitPanel horizontalSplit;
 	private AgentTree agentTree;
 	private TextArea commandOutputTxtArea;
 	//
 	private TextField programTxtFld, workDirTxtFld, timeoutTxtFld;
 	private ComboBox requestTypeCombo;
-	private Button clearBtn, sendBtn;
+	private Button sendBtn;
 	private Label indicator;
 
 
@@ -57,7 +55,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 		setSizeFull();
 
-		horizontalSplit = new HorizontalSplitPanel();
+		HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
 		horizontalSplit.setSplitPosition(200, Unit.PIXELS);
 		horizontalSplit.setSizeFull();
 
@@ -66,13 +64,13 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.setColumns(1);
-		gridLayout.setRows(20);
+		gridLayout.setRows(10);
 		gridLayout.setSizeFull();
 		gridLayout.setMargin(true);
 		gridLayout.setSpacing(true);
 
 		initOutputTextArea();
-		gridLayout.addComponent(commandOutputTxtArea, 0, 1, 0, 19);
+		gridLayout.addComponent(commandOutputTxtArea, 0, 1, 0, 9);
 
 		HorizontalLayout controls = new HorizontalLayout();
 		controls.setSpacing(true);
@@ -86,7 +84,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		initSendButton(controls);
 		initIndicator(controls);
 
-		gridLayout.addComponent(controls, 0, 0);
+		gridLayout.addComponent(controls, 0, 0, 0, 1);
 
 		horizontalSplit.setSecondComponent(gridLayout);
 		setCompositionRoot(horizontalSplit);
@@ -139,7 +137,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	}
 
 	private void initClearButton(HorizontalLayout controls) {
-		clearBtn = new Button("Clear");
+		Button clearBtn = new Button("Clear");
 		clearBtn.addStyleName("default");
 		controls.addComponent(clearBtn);
 
@@ -240,7 +238,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 			show("Please, enter integer timeout value");
 			return false;
 		} else {
-			int timeout = Integer.valueOf(timeoutTxtFld.getValue().toString());
+			int timeout = Integer.valueOf(timeoutTxtFld.getValue());
 			if (timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC) {
 				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC);
 			}
