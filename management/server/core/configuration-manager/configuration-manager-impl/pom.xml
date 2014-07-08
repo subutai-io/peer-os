@@ -23,10 +23,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mgmt-shared-protocol</artifactId>
     </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>configuration-manager-api</artifactId>
@@ -35,10 +31,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>monitor-api</artifactId>
     </dependency>
-    <!--<dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
@@ -52,10 +44,6 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- <dependency>
-       <groupId>org.safehaus.subutai</groupId>
-       <artifactId>db-manager-api</artifactId>
-     </dependency>-->
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
@@ -143,7 +131,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.configuration.manager.impl</Bundle-SymbolicName>
-            <!--<Export-Package>*</Export-Package>-->
           </instructions>
         </configuration>
       </plugin>
