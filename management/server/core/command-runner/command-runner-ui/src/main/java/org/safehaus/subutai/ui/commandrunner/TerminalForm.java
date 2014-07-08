@@ -64,13 +64,15 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		agentTree = new AgentTree(agentManager);
 		horizontalSplit.setFirstComponent(agentTree);
 
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSizeFull();
-		verticalLayout.setMargin(true);
-		verticalLayout.setSpacing(true);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.setColumns(1);
+		gridLayout.setRows(10);
+		gridLayout.setSizeFull();
+		gridLayout.setMargin(true);
+		gridLayout.setSpacing(true);
 
 		initOutputTextArea();
-		verticalLayout.addComponent(commandOutputTxtArea);
+		gridLayout.addComponent(commandOutputTxtArea, 0, 0, 0, 8);
 
 		HorizontalLayout controls = new HorizontalLayout();
 		controls.setSpacing(true);
@@ -84,9 +86,9 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		initSendButton(controls);
 		initIndicator(controls);
 
-		verticalLayout.addComponent(controls);
+		gridLayout.addComponent(controls, 0, 9);
 
-		horizontalSplit.setSecondComponent(verticalLayout);
+		horizontalSplit.setSecondComponent(gridLayout);
 		setCompositionRoot(horizontalSplit);
 	}
 
