@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
-if [ -d "/opt/lucene-4.4.0" ]; then
-	rm -r /opt/lucene-4.4.0
+if [ "x$LUCENE_HOME" = "x" ];
+then
+  LUCENE_HOME=/opt/lucene-4.4.0
+fi
+if [ -d $LUCENE_HOME ]; then
+	rm -r $LUCENE_HOME
 fi
