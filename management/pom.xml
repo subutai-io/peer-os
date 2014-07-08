@@ -68,7 +68,7 @@
         <!-- OSGI -->
         <org.osgi.version>4.3.1</org.osgi.version>
         <!-- servlet -->
-        <servlet.version>3.1.0</servlet.version>
+        <servlet.version>2.5</servlet.version>
         <!-- Vaadin/GWT -->
         <vaadin.version>7.2.3</vaadin.version>
         <vaadin-shared-deps.version>1.0.2</vaadin-shared-deps.version>
@@ -142,11 +142,6 @@
             </dependency>
             <dependency>
                 <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-push</artifactId>
-                <version>${vaadin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
                 <artifactId>vaadin-client-compiled</artifactId>
                 <version>${vaadin.version}</version>
             </dependency>
@@ -161,13 +156,8 @@
                 <version>${vaadin.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-push</artifactId>
-                <version>${vaadin.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
+                <artifactId>servlet-api</artifactId>
                 <version>${servlet.version}</version>
             </dependency>
             <dependency>

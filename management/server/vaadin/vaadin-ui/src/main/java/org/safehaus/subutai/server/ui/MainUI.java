@@ -19,7 +19,6 @@
  */
 package org.safehaus.subutai.server.ui;
 
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.event.ShortcutAction;
@@ -36,6 +35,7 @@ import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +47,6 @@ import java.util.logging.Logger;
 @SuppressWarnings ("serial")
 @Title ("Subutai")
 
-@Push
 public class MainUI extends UI {
 
 	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
@@ -87,7 +86,7 @@ public class MainUI extends UI {
 		root.addComponent(bg);
 
 		// For synchronization issue
-//        setPollInterval(Common.REFRESH_UI_SEC * 1000);
+		setPollInterval(Common.REFRESH_UI_SEC * 5000);
 
 		buildLoginView(false);
 	}

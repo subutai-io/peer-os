@@ -42,11 +42,6 @@
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-push</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-shared-deps</artifactId>
             <version>${vaadin-shared-deps.version}</version>
         </dependency>
@@ -297,11 +292,6 @@
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin-themes</artifactId>
-                                    <version>${vaadin.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.vaadin</groupId>
-                                    <artifactId>vaadin-push</artifactId>
                                     <version>${vaadin.version}</version>
                                 </artifactItem>
                                 <!--<artifactItem>
@@ -932,31 +922,31 @@
                                 </artifactItem>-->
 
                                 <!--Mahout-->
-                               <!-- <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!-- <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>mahout-api</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>mahout-impl</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>mahout-ui</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>mahout-cli</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>mahout-rest</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>-->
 
                                 <!--MongoDB-->
                                 <!--<artifactItem>
@@ -1094,31 +1084,31 @@
                                 </artifactItem>-->
 
                                 <!--Spark-->
-                               <!-- <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-api</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-ui</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-cli</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-rest</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>-->
+                                <!-- <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>spark-api</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>spark-impl</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>spark-ui</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>spark-cli</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>
+                                 <artifactItem>
+                                     <groupId>org.safehaus.subutai</groupId>
+                                     <artifactId>spark-rest</artifactId>
+                                     <version>${project.version}</version>
+                                 </artifactItem>-->
 
                                 <!--Solr-->
                                 <!--<artifactItem>

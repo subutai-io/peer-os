@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
+ * NovaForge(TM) is a web-based forge offering a Collaborative Development and
  * Project Management Environment.
  *
  * Copyright (C) 2007-2012  BULL SAS
@@ -152,12 +152,8 @@
             <artifactId>vaadin-themes</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-push</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
