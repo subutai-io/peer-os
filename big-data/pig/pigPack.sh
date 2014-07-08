@@ -9,16 +9,14 @@ downloadHadoopAndMakeChanges() {
 	tempDirectory=$BASE/$fileName/opt
 
 	confDirectory=$BASE/$fileName/etc/$productName
-	binDirectory=$BASE/$fileName/usr/local/bin
 	pigVersion=0.13.0
 	pigTarFile=pig-$pigVersion.tar.gz
 
 	# Create directories that are required for the debian package
-    mkdir -p $binDirectory
     mkdir -p $confDirectory
 	mkdir -p $tempDirectory
 
-	wget opt http://archive.apache.org/dist/pig/pig-$pigVersion/$pigTarFile -P $tempDirectory
+	wget http://archive.apache.org/dist/pig/pig-$pigVersion/$pigTarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
@@ -29,9 +27,6 @@ downloadHadoopAndMakeChanges() {
 
 	# move conf directory
 	mv pig*/conf/* $confDirectory
-
-	# move bin directory
-	mv pig*/bin/* $binDirectory
 	popd
 }
 
