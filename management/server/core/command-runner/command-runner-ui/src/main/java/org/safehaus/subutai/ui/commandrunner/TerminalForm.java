@@ -70,7 +70,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		gridLayout.setSpacing(true);
 
 		initOutputTextArea();
-		gridLayout.addComponent(commandOutputTxtArea, 0, 1, 0, 9);
+		gridLayout.addComponent(commandOutputTxtArea, 0, 2, 0, 9);
 
 		HorizontalLayout controls = new HorizontalLayout();
 		controls.setSpacing(true);
