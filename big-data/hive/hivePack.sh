@@ -4,7 +4,7 @@ set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
 productName=hive
-downloadHiveAndMakeChanges() {
+downloadFileAndMakeChanges() {
 	initializeVariables $1
         optDirectory=$BASE/$fileName/opt
 	binDirectory=$BASE/$fileName/opt/$productName/bin
@@ -49,6 +49,6 @@ downloadHiveAndMakeChanges() {
 # 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
 getSourcesToRelevantDirectories $productName
 # 3) Download hadoop tar file and make necessary changes
-downloadHiveAndMakeChanges $productName
+downloadFileAndMakeChanges $productName
 # 4) Create the Debian package
 generateDebianPackage $productName
