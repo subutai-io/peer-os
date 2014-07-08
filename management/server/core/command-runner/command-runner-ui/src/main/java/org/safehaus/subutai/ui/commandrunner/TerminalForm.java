@@ -228,11 +228,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
 			return false;
 		}
 
-		if (!Util.isNumeric(programTxtFld.getValue())
+		/*if (!Util.isNumeric(programTxtFld.getValue())
 				|| Integer.valueOf(programTxtFld.getValue()) <= 0) {
 			show("Please, enter numeric PID greater than 0 to kill");
 			return false;
-		}
+		}*/
 
 		if (Strings.isNullOrEmpty(timeoutTxtFld.getValue()) || !Util.isNumeric(timeoutTxtFld.getValue())) {
 			show("Please, enter integer timeout value");
