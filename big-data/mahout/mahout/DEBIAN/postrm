@@ -1,9 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 # Exit on error
 set -e
 
+if [ "x$MAHOUT_HOME" = "x" ];
+then
+  MAHOUT_HOME=/opt/mahout
+fi
 # Remove Mahout Folder
-if [ -d "/opt/mahout" ]; then
-	rm -r /opt/mahout
+if [ -d "$MAHOUT_HOME" ]; then
+	rm -r $MAHOUT_HOME
 fi

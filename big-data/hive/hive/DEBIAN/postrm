@@ -2,7 +2,6 @@
 
 # Exit on error
 set -e
-. /etc/profile
 
 if [ "x$HIVE_HOME" = "x" ];
 then
@@ -10,10 +9,7 @@ then
 fi
 
 if [ -d "$HIVE_HOME" ]; then
-        echo "$HIVE_HOME exists!"
 	rm -r $HIVE_HOME
-else
-        echo "$HIVE_HOME does not exist!"
 fi
 
 if [ -f "/etc/init.d/hive" ]; then

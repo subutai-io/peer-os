@@ -11,4 +11,4 @@ then
 fi
 hiveConf="/etc/hive"
 
-ln -s $hiveConf/* $hiveHome/conf/
+ln -sf $hiveConf/* $hiveHome/conf/

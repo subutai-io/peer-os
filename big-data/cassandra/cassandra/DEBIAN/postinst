@@ -1,24 +1,26 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 cassVer="cassandra-2.0.9"
 FilePath="/etc/profile"
 
-# change listen_address, rpc_adress and seeds parameters
-# listen_address
-# sed -i "s/listen_address: localhost/listen_address: 10.10.10.1/g" /opt/$cassVer/conf/cassandra.yaml
-
-# rpc_address
-# sed -i "s/rpc_address: localhost/rpc_address: 10.10.10.1/g" /opt/$cassVer/conf/cassandra.yaml
-
-# seeds
-# sed -i "s/- seeds: \"localhost\"/- seeds: \"10.10.10.1\"/g" /opt/$cassVer/conf/cassandra.yaml
-
 # This should add the service to the automatic startup system
 sudo update-rc.d cassandra defaults
 
-FilePath="/etc/profile"
 . $FilePath
 
-# start cassandra 
-# sudo service cassandra start
+cassandraHome="/opt/$cassVer"
+cassandraConf="/etc/cassandra"
 
+if [[ "x$CASSANDRA_HOME" != "x" ]];
+then
+        cassandraHome=$CASSANDRA_HOME
+fi
+
+if [[ "x$CASSANDRA_CONF_DIR" != "x" ]];
+then
+        cassandraConf=$CASSANDRA_CONF_DIR
+fi
+
+
+# Create symlink to configuration files and scripts
+ln -s $cassandraConf/* $cassandraHome/conf/

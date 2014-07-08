@@ -2,23 +2,22 @@
 set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-productName=mahout
+productName=lucene
 downloadFileAndMakeChanges() {
         initializeVariables $1
         tempDirectory=$BASE/$fileName/opt
         confDirectory=$BASE/$fileName/etc/$productName
+        tarFile=lucene-4.4.0.tgz
         # Create directories that are required for the debian package
         mkdir -p $confDirectory
-        mkdir -p $tempDirectory
-	pushd $tempDirectory
-	svn co http://svn.apache.org/repos/asf/mahout/trunk
-	pushd trunk
-	mvn install -DskipTests
-	popd
-	mv trunk $productName
-	if [ -f $BASE/$fileName/opt/README ]; then
-                rm $BASE/$fileName/opt/README
+	wget http://archive.apache.org/dist/lucene/java/4.4.0/$tarFile -P $tempDirectory
+        if [ -f $BASE/$fileName/opt/README* ]; then
+                rm $BASE/$fileName/opt/README*
         fi
+        # unpack tar ball and make changes 
+        pushd $tempDirectory
+        tar -xpf $tarFile -C .
+        rm $tarFile
         popd
 }
 
@@ -27,4 +26,4 @@ getSourcesToRelevantDirectories $productName
 # 3) Download file and make necessary changes
 downloadFileAndMakeChanges $productName
 # 4) Create the debian package
-generateDebianPackageWithoutMD5 $productName
+generateDebianPackage $productName

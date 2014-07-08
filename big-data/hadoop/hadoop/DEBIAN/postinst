@@ -1,19 +1,23 @@
 #!/bin/bash
 set -e
+
 . /etc/profile
 
-hadoopHomeEcho="/opt/hadoop-1.2.1"
+hadoopHome="/opt/hadoop-1.2.1"
 hadoopConf="/etc/hadoop"
 
 if [[ "x$HADOOP_HOME" != "x" ]];
 then
-        hadoopHomeEcho=$HADOOP_HOME
+        hadoopHome=$HADOOP_HOME
 fi
 
 if [[ "x$HADOOP_CONF_DIR" != "x" ]];
 then
         hadoopConf=$HADOOP_CONF_DIR
 fi
+
+# Create symlink to configuration files
+ln -sf $hadoopConf/* $hadoopHome/conf/
 
 escape_characters()
 {
@@ -55,6 +59,3 @@ hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-1.2.1/conf/df
 hadoop-property.sh add mapred-site.xml mapred.job.tracker localhost:9000
 hadoop-property.sh add mapred-site.xml mapred.hosts /opt/hadoop-1.2.1/conf/mapred.include
 hadoop-property.sh add mapred-site.xml mapred.hosts.exclude /opt/hadoop-1.2.1/conf/mapred.exclude
-
-# Create symlink to configuration files
-ln -s $hadoopConf/* $hadoopHomeEcho/conf/

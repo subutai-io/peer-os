@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Strings;
+
 
 /**
  * TemplateTree is used for storing templates in genealogical tree. This class is used by UI modules to visualize
@@ -23,13 +25,15 @@ public class TemplateTree {
      * @param template - {@code Template}
      */
     public void addTemplate( Template template ) {
-        List<Template> children = parentChild.get( template.getParentTemplateName() );
+        String parentTemplateName =
+                Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null : template.getParentTemplateName();
+        List<Template> children = parentChild.get( parentTemplateName );
         if ( children == null ) {
             children = new LinkedList<>();
-            parentChild.put( template.getParentTemplateName(), children );
+            parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( template.getTemplateName(), template.getParentTemplateName() );
+        childParent.put( template.getTemplateName(), parentTemplateName );
     }
 
 
