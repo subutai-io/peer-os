@@ -170,11 +170,11 @@
             <artifactId>snappy-java</artifactId>
             <version>${org.xerial.snappy.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>${org.eclipse.jetty.orbit.version}</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
+        <!--<artifactId>javax.servlet</artifactId>-->
+        <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.doomdark</groupId>
             <artifactId>com.springsource.org.doomdark.uuid</artifactId>
@@ -277,11 +277,11 @@
                                     <artifactId>com.springsource.org.doomdark.uuid</artifactId>
                                     <version>${org.doomdark.version}</version>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.eclipse.jetty.orbit</groupId>
-                                    <artifactId>javax.servlet</artifactId>
-                                    <version>${org.eclipse.jetty.orbit.version}</version>
-                                </artifactItem>
+                                <!--<artifactItem>-->
+                                <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
+                                <!--<artifactId>javax.servlet</artifactId>-->
+                                <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
+                                <!--</artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
@@ -513,26 +513,14 @@
                                     <artifactId>template-registry-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
+                                <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
                                     <artifactId>template-registry-ui</artifactId>
                                     <version>${project.version}</version>
-                                </artifactItem>-->
-                                
-                                <!-- Template Manager -->
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>template-manager-api</artifactId>
-                                    <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>template-manager-impl</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>template-manager-cli</artifactId>
+                                    <artifactId>template-registry-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -632,6 +620,23 @@
                                     <artifactId>lxc-manager-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                
+                                <!-- Template Manager -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!--Network Manager -->
                                 <artifactItem>
@@ -685,6 +690,38 @@
                                     <artifactId>environment-manager-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>environment-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>environment-manager-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>environment-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Configuration Manager -->
+                                <!--<artifactItem>
+                                  <groupId>org.safehaus.subutai</groupId>
+                                  <artifactId>configuration-manager-api</artifactId>
+                                  <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                  <groupId>org.safehaus.subutai</groupId>
+                                  <artifactId>configuration-manager-impl</artifactId>
+                                  <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                  <groupId>org.safehaus.subutai</groupId>
+                                  <artifactId>configuration-manager-cli</artifactId>
+                                  <version>${project.version}</version>
+                                </artifactItem>-->
 
                                 <!-- Core Modules - END -->
 

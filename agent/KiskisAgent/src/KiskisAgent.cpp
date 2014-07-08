@@ -21,8 +21,8 @@
  *  		   It also creates a new process using KAThread Class when the new Execute Request comes.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.6
- *  @date      Jun 13 , 2014
+ *  @version   1.0.7
+ *  @date      July 02, 2014
  */
 /** \mainpage  Welcome to Project KiskisAgent
  *	\section   KisKisAgent
@@ -40,6 +40,7 @@
 #include "KAThread.h"
 #include "KAConnection.h"
 #include "KALogger.h"
+#include "KAWatch.h"
 #include "pugixml.hpp"
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -357,6 +358,11 @@ int main(int argc,char *argv[],char *envp[])
 	string broadcastAddress="BROADCAST_TOPIC";	//DEFAULT BROADCAST TOPIC
 	string clientAddress;
 	KAThread thread;
+	KALogger logMain;
+	KACommand command;
+	KAResponsePack response;
+	string input="";
+	string sendout;
 	int level;
 
 	if(!thread.getUserID().checkRootUser())
@@ -368,7 +374,6 @@ int main(int argc,char *argv[],char *envp[])
 		close(STDERR_FILENO);
 		return 300;
 	}
-	KALogger logMain;
 	if(!logMain.openLogFileWithName("KiskisAgentMain.log"))
 	{
 		cout << "/var/log/ksks-agent/ folder does not exist.. KiskisAgent is going to be closed.."<<endl;
@@ -460,7 +465,6 @@ int main(int argc,char *argv[],char *envp[])
 	clientAddress = Uuid;
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Connection Url:",url));
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Server Address:",serverAddress));
-	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientAddress));
 
 	class KAConnection *connection;
 	int rc;
@@ -474,10 +478,6 @@ int main(int argc,char *argv[],char *envp[])
 
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Trying to open Connection with MQTT Broker: ",url,
 			" Port: ",toString(port)));
-	KACommand command;
-	KAResponsePack response;
-	string input="";
-	string sendout;
 
 	response.setIps(ipadress);
 	response.setHostname(hostname);
@@ -508,7 +508,11 @@ int main(int argc,char *argv[],char *envp[])
 
 	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Registration Message is sending to MQTT Broker.."));
 
-	/*sending registration message*/
+	/*
+	 *
+	 * sending registration message
+	 *
+	 */
 	sendout = response.createRegistrationMessage(response.getUuid(),response.getMacAddress(),response.getHostname(),
 			response.getParentHostname());
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Registration Message:",sendout));
@@ -543,6 +547,14 @@ int main(int argc,char *argv[],char *envp[])
 	int currentProcess=0;
 	string str,str2; //
 	logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Number of cpu core:", toString(ncores)));
+
+
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Client Address:",clientAddress));
+
+
+	KAWatch Watcher(connection,&response,&logMain);
+	Watcher.initialize(20000);
+	logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","TheWatcher is initializing.."));
 
 	while(true)
 	{
@@ -584,6 +596,7 @@ int main(int argc,char *argv[],char *envp[])
 						}
 						else
 						{
+							cout << "error!!" <<endl;
 							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Fetched Element:",queueElement));
 						}
 					}
@@ -595,7 +608,7 @@ int main(int argc,char *argv[],char *envp[])
 				queuetimeout = 30;
 				countQueue = 1;
 			}
-			usleep(20000);//20 ms delay for the main loop
+			//usleep(20000);//20 ms delay for the main loop
 			command.clear();
 			for(list<int>::iterator iter = pidList.begin(); iter != pidList.end();iter++)
 			{
@@ -610,6 +623,9 @@ int main(int argc,char *argv[],char *envp[])
 					}
 				}
 			}
+
+			Watcher.checkNotification(); //checking the watch event status
+
 			rc = connection->loop(1); // checking the status of the new message
 			if(rc)
 			{
@@ -641,6 +657,12 @@ int main(int argc,char *argv[],char *envp[])
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command Program:",command.getProgram()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command runAs:",command.getRunAs()));
 					logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command timeout:",toString(command.getTimeout())));
+					if(command.getWatchArguments().size()!=0)
+					{
+						for(unsigned int i=0;i<command.getWatchArguments().size();i++)
+							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Command WatchArgs:",command.getWatchArguments()[i]));
+					}
+
 
 					if(command.getType()=="REGISTRATION_REQUEST_DONE") //type is registration done
 					{
@@ -703,6 +725,37 @@ int main(int argc,char *argv[],char *envp[])
 							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Irrelevant Terminate Request"));
 						}
 					}
+					else if(command.getType()=="INOTIFY_REQUEST")
+					{
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_REQUEST.."));
+						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
+						{
+							Watcher.addWatcher(command.getWatchArguments()[i]);
+							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","adding Watcher: ",
+									command.getWatchArguments()[i]));
+						}
+						Watcher.stats();
+					}
+					else if(command.getType()=="INOTIFY_CANCEL_REQUEST")
+					{
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_CANCEL_REQUEST.."));
+						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
+						{
+							Watcher.eraseWatcher(command.getWatchArguments()[i]);
+							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Erasing Watcher: ",
+									command.getWatchArguments()[i]));
+						}
+						Watcher.stats();
+					}
+					else if(command.getType()=="INOTIFY_SHOW_REQUEST")
+					{
+						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_SHOW_REQUEST.."));
+						Watcher.stats();
+						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
+						connection->sendInotifyMessage(sendout);
+						Watcher.stats();
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
+					}
 				}
 				else
 				{
@@ -750,6 +803,10 @@ int main(int argc,char *argv[],char *envp[])
 							pidList.push_back(mypointer->threadFunction(&messageQueue,&command,argv));
 							currentProcess++;
 							delete mypointer;
+						}
+						else
+						{
+							cout << "error!" << endl;
 						}
 					}
 				}

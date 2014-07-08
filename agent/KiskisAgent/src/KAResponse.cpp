@@ -63,6 +63,10 @@ void KAResponse::clear()
 	setHostname("");
 	setParentHostname("");
 	getIps().clear();
+	setUuid("");
+	setconfigPoint("");
+	setDateTime("");
+	setChangeType("");
 }
 
 /**
@@ -129,9 +133,25 @@ void KAResponse::serialize(string& output)
 	{
 		root["response"]["macAddress"] = this->getMacAddress();
 	}
-	if(!(this->getSource().empty()))											//check the macAddress is assigned or not
+	if(!(this->getSource().empty()))
 	{
 		root["response"]["source"] = this->getSource();
+	}
+	if(!(this->getconfigPoint().empty()))
+	{
+		root["response"]["configPoint"] = this->getconfigPoint();
+	}
+	if(!(this->getDateTime().empty()))
+	{
+		root["response"]["dateTime"] = this->getDateTime();
+	}
+	if(!(this->getChangeType().empty()))
+	{
+		root["response"]["changeType"] = this->getChangeType();
+	}
+	for(unsigned int index=0; index < this->getConfPoints().size(); index++)
+	{
+		root["response"]["confPoints"][index]=this->getConfPoints()[index];
 	}
 
 	output = writer.write(root);
@@ -386,8 +406,8 @@ void KAResponse::setTaskUuid(const string& taskuuid)
  *  		   This is the list of ips vector that holds the ip addresses of the machine
  */
 void KAResponse::setIps(vector<string> myvector)
-{		//setting ips vector
-
+{
+	this->ips.clear();
 	for(unsigned int index=0 ; index< myvector.size(); index++)
 	{
 		this->ips.push_back(myvector[index]);
@@ -418,4 +438,77 @@ string& KAResponse::getSource()
 void KAResponse::setSource(const string& source)
 {
 	this->source = source;
+}
+
+/**
+ *  \details   setting "configPoint" private variable of KAResponse instance.
+ *  		   This holds the task source information of the response
+ */
+void KAResponse::setconfigPoint(const string& configPoint)
+{
+	this->configPoint = configPoint;
+}
+
+/**
+ *  \details   getting "configPoint" private variable of KAResponse instance.
+ */
+string& KAResponse::getconfigPoint()
+{
+	return this->configPoint;
+}
+
+/**
+ *  \details   setting "dateTime" private variable of KAResponse instance.
+ *  		   This holds the task source information of the response
+ */
+void KAResponse::setDateTime(const string& dateTime)
+{
+	this->dateTime = dateTime;
+}
+
+/**
+ *  \details   getting "dateTime" private variable of KAResponse instance.
+ */
+string& KAResponse::getDateTime()
+{
+	return this->dateTime;
+}
+
+/**
+ *  \details   setting "changeType" private variable of KAResponse instance.
+ *  		   This holds the task source information of the response
+ */
+void KAResponse::setChangeType(const string& changeType)
+{
+	this->changeType = changeType;
+}
+
+/**
+ *  \details   getting "changeType" private variable of KAResponse instance.
+ */
+string& KAResponse::getChangeType()
+{
+	return this->changeType;
+}
+
+/**
+ *  \details   setting "confPoints" private vector variable of KAResponse instance.
+ *  		   This is the list of config Points vector that holds the watching points of the agent
+ */
+void KAResponse::setConfPoints(vector<string> myvector)
+{
+	this->confPoints.clear();
+	for(unsigned int index=0 ; index< myvector.size(); index++)
+	{
+		this->confPoints.push_back(myvector[index]);
+	}
+}
+
+/**
+ *  \details   getting "confPoints" private vector variable of KAResponse instance.
+ */
+vector<string>& KAResponse::getConfPoints()
+{					//getting ips vector
+
+	return this->confPoints;
 }

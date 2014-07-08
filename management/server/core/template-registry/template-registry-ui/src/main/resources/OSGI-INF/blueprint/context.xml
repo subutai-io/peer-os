@@ -3,15 +3,16 @@
 
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
-  <reference id="lxcManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.u.lxcmanager.LxcUI"
+  <reference id="registryManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
+
+  <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.templateregistry.TemplateRegistryUI"
         init-method="init" destroy-method="destroy">
     <property name="agentManager" ref="agentManager" />
-    <property name="lxcManager" ref="lxcManager" />
+    <property name="registryManager" ref="registryManager" />
   </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.services.Module" />
+  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
 
 </blueprint>

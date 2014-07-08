@@ -89,103 +89,119 @@ bool KACommand::deserialize(string& input)
 	pair <string,string> dummy;
 	Json::FastWriter writer;
 
-	clear(); //clear all arguments firstly..
-	bool parsedSuccess = reader.parse(input,root,false);		//parsing Json String
+	try
+	{
+		clear(); //clear all arguments firstly..
+		bool parsedSuccess = reader.parse(input,root,false);		//parsing Json String
 
-	if(!parsedSuccess)	//if it is not successfull
-	{
-		cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
-		cout <<"Failed Message: " << input << endl;
-		return false; //error in parsing Json
-	}
-	//Start mandatory parameters deserialization
-	if(!root["command"]["type"].isNull())
-	{				//initialize type parameter if it is not null
-		this->setType(root["command"]["type"].asString());
-	}
-	if(!root["command"]["stdOut"].isNull())
-	{
-		this->setStandardOutput(root["command"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
-	}
-	if(!root["command"]["stdOutPath"].isNull())
-	{
-		this->setStandardOutPath(root["command"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
-	}
-	if(!root["command"]["stdErr"].isNull())
-	{
-		this->setStandardError(root["command"]["stdErr"].asString());		//initialize standardError parameter if it is not null
-	}
-	if(!root["command"]["stdErrPath"].isNull())
-	{
-		this->setStandardErrPath(root["command"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
-	}
-	if(!root["command"]["uuid"].isNull())
-	{
-		this->setUuid(root["command"]["uuid"].asString());				//initialize UUID parameter if it is not null
-	}
-	if(!root["command"]["pid"].isNull())
-	{
-		this->setPid(root["command"]["pid"].asInt());					//initialize pid parameter if it is not null
-	}
-	if(!root["command"]["workingDirectory"].isNull())
-	{
-		this->setWorkingDirectory(root["command"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
-	}
-	if(!root["command"]["requestSequenceNumber"].isNull())
-	{
-		this->setRequestSequenceNumber(root["command"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
-	}
-	if(!root["command"]["program"].isNull())
-	{
-		this->setProgram(root["command"]["program"].asString());		//initialize program parameter if it is not null
-	}
-	if(!root["command"]["runAs"].isNull())
-	{
-		setRunAs(root["command"]["runAs"].asString());		//initialize runAs parameter if it is not null
-	}
-	if(!root["command"]["timeout"].isNull())
-	{
-		this->setTimeout(root["command"]["timeout"].asInt());		//initialize runAs parameter if it is not null
-	}
-	Json::Value::Members members = root["command"]["environment"].getMemberNames();		//get environment members
+		if(!parsedSuccess)	//if it is not successfull
+		{
+			cout<<"Failed to parse JSON"<<endl<<reader.getFormatedErrorMessages()<<endl;
+			cout <<"Failed Message: " << input << endl;
+			return false; //error in parsing Json
+		}
+		//Start mandatory parameters deserialization
+		if(!root["command"]["type"].isNull())
+		{				//initialize type parameter if it is not null
+			this->setType(root["command"]["type"].asString());
+		}
+		if(!root["command"]["stdOut"].isNull())
+		{
+			this->setStandardOutput(root["command"]["stdOut"].asString());		//initialize standardOutput parameter if it is not null
+		}
+		if(!root["command"]["stdOutPath"].isNull())
+		{
+			this->setStandardOutPath(root["command"]["stdOutPath"].asString());		//initialize standardOutpath parameter if it is not null
+		}
+		if(!root["command"]["stdErr"].isNull())
+		{
+			this->setStandardError(root["command"]["stdErr"].asString());		//initialize standardError parameter if it is not null
+		}
+		if(!root["command"]["stdErrPath"].isNull())
+		{
+			this->setStandardErrPath(root["command"]["stdErrPath"].asString());		//initialize standardError parameter if it is not null
+		}
+		if(!root["command"]["uuid"].isNull())
+		{
+			this->setUuid(root["command"]["uuid"].asString());				//initialize UUID parameter if it is not null
+		}
+		if(!root["command"]["pid"].isNull())
+		{
+			this->setPid(root["command"]["pid"].asInt());					//initialize pid parameter if it is not null
+		}
+		if(!root["command"]["workingDirectory"].isNull())
+		{
+			this->setWorkingDirectory(root["command"]["workingDirectory"].asString());		//initialize workingDirectory parameter if it is not null
+		}
+		if(!root["command"]["requestSequenceNumber"].isNull())
+		{
+			this->setRequestSequenceNumber(root["command"]["requestSequenceNumber"].asInt()); //initialize requestSequenceNumber parameter if it is not null
+		}
+		if(!root["command"]["program"].isNull())
+		{
+			this->setProgram(root["command"]["program"].asString());		//initialize program parameter if it is not null
+		}
+		if(!root["command"]["runAs"].isNull())
+		{
+			setRunAs(root["command"]["runAs"].asString());		//initialize runAs parameter if it is not null
+		}
+		if(!root["command"]["timeout"].isNull())
+		{
+			this->setTimeout(root["command"]["timeout"].asInt());		//initialize runAs parameter if it is not null
+		}
+		Json::Value::Members members = root["command"]["environment"].getMemberNames();		//get environment members
 
-	for(unsigned int index=0; index < members.size(); index++)	//set Env path pairs
-	{
-		dummy.first = members[index].c_str();
-		dummy.second = root["command"]["environment"][members[index].c_str()].asString();
-		this->environment.push_back(dummy);
-	}
+		for(unsigned int index=0; index < members.size(); index++)	//set Env path pairs
+		{
+			dummy.first = members[index].c_str();
+			dummy.second = root["command"]["environment"][members[index].c_str()].asString();
+			this->environment.push_back(dummy);
+		}
 
-	string arg;
-	for(unsigned int index=0; index < root["command"]["args"].size(); index++)	//set arguments
-	{
-		arg =  root["command"]["args"][index].asString();
-		this->getArguments().push_back(arg);
+		string arg;
+		for(unsigned int index=0; index < root["command"]["args"].size(); index++)	//set arguments
+		{
+			arg =  root["command"]["args"][index].asString();
+			this->getArguments().push_back(arg);
+		}
+		if(!root["command"]["taskUuid"].isNull())
+		{
+			setTaskUuid(root["command"]["taskUuid"].asString());		//initialize taskUuid parameter if it is not null
+		}
+		if(!root["command"]["hostname"].isNull())
+		{
+			setHostname(root["command"]["hostname"].asString());		//initialize hostname parameter if it is not null
+		}
+		if(!root["command"]["macAddress"].isNull())
+		{
+			setMacAddress(root["command"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
+		}
+		arg.clear();
+		for(unsigned int index=0; index < root["command"]["ips"].size(); index++)	//set ips
+		{
+			arg =  root["command"]["ips"][index].asString();
+			this->getIps().push_back(arg);
+		}
+		if(!root["command"]["source"].isNull())
+		{
+			setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
+		}
+		string arg1;
+		arg1.clear();
+		watchArgs.clear();
+		for(unsigned int index=0; index < root["command"]["confPoints"].size(); index++)	//set arguments
+		{
+			arg1 =  root["command"]["confPoints"][index].asString();
+			this->getWatchArguments().push_back(arg1);
+		}
+
+		input = writer.write(root);
+		return true;
 	}
-	if(!root["command"]["taskUuid"].isNull())
+	catch(exception e)
 	{
-		setTaskUuid(root["command"]["taskUuid"].asString());		//initialize taskUuid parameter if it is not null
+		cout << e.what() << endl;
 	}
-	if(!root["command"]["hostname"].isNull())
-	{
-		setHostname(root["command"]["hostname"].asString());		//initialize hostname parameter if it is not null
-	}
-	if(!root["command"]["macAddress"].isNull())
-	{
-		setMacAddress(root["command"]["macAddress"].asString());		//initialize macAddress parameter if it is not null
-	}
-	arg.clear();
-	for(unsigned int index=0; index < root["command"]["ips"].size(); index++)	//set ips
-	{
-		arg =  root["command"]["ips"][index].asString();
-		this->getIps().push_back(arg);
-	}
-	if(!root["command"]["source"].isNull())
-	{
-		setSource(root["command"]["source"].asString());		//initialize hostname parameter if it is not null
-	}
-	input = writer.write(root);
-	return true;
 }
 
 /**
@@ -266,7 +282,7 @@ void KACommand::setArguments(vector<string> myvector)
  *  		   This is the list of arguments vector that is used in execution.
  */
 vector<string>& KACommand::getArguments()
-{					//getting Argument vector
+{
 
 	return this->args;
 }
@@ -531,4 +547,13 @@ string& KACommand::getSource()
 void KACommand::setSource(const string& source)
 {
 	this->source = source;
+}
+
+/**
+ *  \details   getting "watchArgs" private vector variable of KACommand instance.
+ *  		   This is the list of arguments vector that is used in execution.
+ */
+vector<string>& KACommand::getWatchArguments()
+{
+	return this->watchArgs;
 }

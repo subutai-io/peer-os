@@ -20,9 +20,17 @@ public class BlueprintParser {
         try {
             Blueprint blueprint = gson.fromJson( blueprintStr, Blueprint.class );
             return blueprint;
-        } catch (JsonSyntaxException e) {
-            System.out.println("Error parsing blueprint");
+        }
+        catch ( JsonSyntaxException e ) {
+            System.out.println( "Error parsing blueprint" );
         }
         return null;
+    }
+
+
+    public String parseBlueprint( Blueprint blueprint ) {
+        //TODO catch parse exception
+        String blueprintStr = gson.toJson( blueprint, Blueprint.class );
+        return blueprintStr;
     }
 }

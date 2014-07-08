@@ -13,7 +13,7 @@
     </cxf:bus>
     <jaxrs:server address="/solr" id="solrRestService">
         <jaxrs:serviceBeans>
-            <ref org.safehaus.subutai.server.ui.component-id="solrRestServiceImpl"/>
+            <ref component-id="solrRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     <bean id="solrRestServiceImpl" class="org.safehaus.subutai.solr.services.RestServiceImpl">

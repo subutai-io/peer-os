@@ -5,7 +5,10 @@ import com.google.gson.GsonBuilder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.manager.helper.*;
@@ -30,19 +33,25 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(String groupName, Collection<String> hostNames,
-            String templateName, int nodesCount,
-            PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(String groupName, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
+
+        // restrict metrics to provided hosts only
+        Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
+        Iterator<Agent> it = metrics.keySet().iterator();
+        while(it.hasNext()) {
+            if(!hosts.contains(it.next())) it.remove();
+        }
 
         LxcPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
         try {
-            st.calculatePlacement(lxcManager.getPhysicalServerMetrics());
+            st.calculatePlacement(metrics);
         } catch(LxcCreateException ex) {
             logger.error("Failed to calculate placement", ex);
             return Collections.emptySet();
         }
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
+        // clone specified number of instances and store their names
         List<String> cloneNames = new ArrayList<>();
         for(Map.Entry<Agent, Integer> e : slots.entrySet()) {
             for(int i = 0; i < e.getValue(); i++) {
@@ -64,6 +73,27 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         return clones;
     }
 
+    @Override
+    public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd) {
+        return attachAndExecute(physicalHost, cloneName, cmd, 30, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd, long t, TimeUnit unit) {
+        if(cmd == null || cmd.isEmpty()) return false;
+        // synopsis:
+        // lxc-attach {-n name} [-a arch] [-e] [-s namespaces] [-R] [--keep-env] [--clear-env] [-- command]
+        StringBuilder sb = new StringBuilder("lxc-attach -n ");
+        sb.append(cloneName).append(" -- ").append(cmd);
+
+        int timeout = (int)unit.toSeconds(t);
+        Command comm = commandRunner.createCommand(
+                new RequestBuilder(sb.toString()).withTimeout(timeout),
+                new HashSet<>(Arrays.asList(physicalHost)));
+        commandRunner.runCommand(comm);
+        return comm.hasSucceeded();
+    }
+
     private String nextHostName(String templateName) {
         AtomicInteger i = sequences.putIfAbsent(templateName, new AtomicInteger());
         if(i == null) i = sequences.get(templateName);
@@ -78,18 +108,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             PlacementStrategyENUM... strategy) {
 
         String cql = "INSERT INTO node_group(name, info) VALUES(?, ?)";
-        EnvironmentNodeGroup group = new EnvironmentNodeGroup();
-        group.setTemplateUsed(templateName);
 
-        Set<EnvironmentGroupInstance> instances = new HashSet<>();
+        NodeGroupInfo group = new NodeGroupInfo();
+        group.setName(name);
+        group.setTemplateName(templateName);
+        group.setStrategy(EnumSet.of(strategy[0], strategy));
+        group.setInstanceIds(new HashSet<UUID>());
         for(Agent a : agents) {
-            EnvironmentGroupInstance gi = new EnvironmentGroupInstance();
-            gi.setAgent(a);
-            gi.setName(a.getHostname());
-            gi.setPlacementStrategyENUM(strategy[0]); // TODO: first value used
-            instances.add(gi);
+            group.getInstanceIds().add(a.getUuid());
         }
-        group.setEnvironmentGroupInstanceSet(instances);
 
         return dbManager.executeUpdate(cql, name, gson.toJson(group));
     }

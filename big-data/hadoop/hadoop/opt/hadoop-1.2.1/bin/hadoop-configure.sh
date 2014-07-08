@@ -9,9 +9,16 @@ function usage() {
 }
 . /etc/profile
 #Paths to the configuration files
-core_site="${HADOOP_HOME}/conf/core-site.xml"
-mapred_site="${HADOOP_HOME}/conf/mapred-site.xml"
-hdfs_site="${HADOOP_HOME}/conf/hdfs-site.xml"
+
+hadoopConf="/etc/hadoop"
+if [[ "x$HADOOP_CONF_DIR" != "x" ]];
+then
+        hadoopConf=$HADOOP_CONF_DIR
+fi
+
+core_site="$hadoopConf/core-site.xml"
+mapred_site="$hadoopConf/mapred-site.xml"
+hdfs_site="$hadoopConf/hdfs-site.xml"
 
 if [[ "$1" == "rollback" ]];
 then
