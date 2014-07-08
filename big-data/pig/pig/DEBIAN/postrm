@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e 
-pig="pig-0.12.0"
+pigVersion="pig-0.13.0"
 
 # Remove Pig Files and Folders
-if [ -d "/opt/$pig" ]; then
-	rm -r /opt/$pig
+if [ -d "/opt/$pigVersion" ]; then
+	rm -r /opt/$pigVersion
 fi
 
 if [ -f "/etc/profile.d/pig-home.sh" ]; then

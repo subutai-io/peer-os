@@ -1,13 +1,27 @@
 #!/bin/bash
-# PIG
-pig="pig-0.12.0"
+pigVersion="pig-0.13.0"
 . /etc/profile
-. /opt/$pig/conf/pig-env.sh
+
+pigHome="/opt/$pigVersion"
+pigConf="/etc/pig"
+
+if [[ "x$PIG_HOME" != "x" ]];
+then
+        pigHome=$PIG_HOME
+fi
+
+if [[ "x$PIG_CONF_DIR" != "x" ]];
+then
+        pigConf=$PIG_CONF_DIR
+fi
+
+. $pigConf/pig-env.sh
+
 
 case "$1" in
 start)
 	echo "Starting PIG ..."
-	cd /opt/$pig/bin
+	cd $pigHome/bin
 	./pig
 ;;
 

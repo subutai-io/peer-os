@@ -1,62 +1,46 @@
-#!/bin/sh
-
+#!/bin/bash
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-if ls | grep .deb ; then
-        rm  *.deb
-fi
+productName=pig
+downloadHadoopAndMakeChanges() {
+	initializeVariables $1
 
-versionOfPig="0.12.0"
+	tempDirectory=$BASE/$fileName/opt
 
-rm -rf ksks-pig*/*
-cp -r ../workspace/big-data/pig/pig/* ksks-pig*/
-cd ksks-pig*
-mkdir opt
-wget -P opt http://archive.apache.org/dist/pig/pig-0.12.0/pig-0.12.0.tar.gz
-tar -xvpf opt/*.tar.gz -C opt/
-rm -rf opt/*.tar.gz
-cd -
+	confDirectory=$BASE/$fileName/etc/$productName
+	binDirectory=$BASE/$fileName/usr/local/bin
+	pigVersion=0.13.0
+	pigTarFile=pig-$pigVersion.tar.gz
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+	# Create directories that are required for the debian package
+    mkdir -p $binDirectory
+    mkdir -p $confDirectory
+	mkdir -p $tempDirectory
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+	wget -P opt http://archive.apache.org/dist/pig/pig-$pigVersion/$pigTarFile $tempDirectory
+	if [ -f $BASE/$fileName/opt/README ]; then
+	        rm $BASE/$fileName/opt/README
+	fi
+	# unpack tar ball and make changes 
+	pushd $tempDirectory
+	tar -xpf $pigTarFile -C .
+	rm $pigTarFile
 
+	# move conf directory
+	mv pig*/conf/* $confDirectory
 
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
-
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
-
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
-versionThird=$(echo $version | awk -F"." '{print $3}')
-updatedVersion=$(echo `expr $versionThird + 1`)
-
-updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-pig-"$updatedRelease"-amd64"
-
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
-
-{
-        mv $fileName $updatedFileName
-} || {
-        echo "Version not changed"
+	# move bin directory
+	mv pig*/bin/* $binDirectory
+	popd
 }
 
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download pig tar file and make necessary changes
+downloadHadoopAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName
 
-sed -i s/pig-[0-9]*.[0-9]*.[0-9]*'\/'/pig-$versionOfPig'\/'/g $updatedFileName/DEBIAN/conffile
-sed -i s/pig=\"pig-[0-9]*.[0-9]*.[0-9]*\"/pig=\"pig-$versionOfPig\"/g $updatedFileName/DEBIAN/postinst
-sed -i s/pig=\"pig-[0-9]*.[0-9]*.[0-9]*\"/pig=\"pig-$versionOfPig\"/g $updatedFileName/DEBIAN/postrm
-sed -i s/pig=\"pig-[0-9]*.[0-9]*.[0-9]*\"/pig=\"pig-$versionOfPig\"/g $updatedFileName/etc/init.d/pig
-#sed -i s/pig-[0-9]*.[0-9]*.[0-9]*/pig-$versionOfPig/g $updatedFileName/opt/pig-$versionOfPig/conf/pig-env.sh
-
-
-
-find ./$updatedFileName -name "*~" -print0 | xargs -0 rm -rf
-rm $updatedFileName/DEBIAN/md5sums
-md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >> $updatedFileName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $updatedFileName/
-
-cp *.deb ~/Automation/Bigdata/pig
+http://archive.apache.org/dist/pig/pig-0.13.0/pig-0.13.0.tar.gz
