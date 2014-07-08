@@ -7,7 +7,7 @@ productName=hive
 downloadHiveAndMakeChanges() {
 	initializeVariables $1
         optDirectory=$BASE/$fileName/opt
-	binDirectory=$BASE/$fileName/opt/bin
+	binDirectory=$BASE/$fileName/opt/$productName/bin
 	confDirectory=$BASE/$fileName/etc/$productName
 	tempDirectory=$optDirectory/temp
 	tarFile=apache-hive-0.13.1-bin.tar.gz
