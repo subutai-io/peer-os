@@ -42,5 +42,3 @@ getSourcesToRelevantDirectories $productName
 downloadHadoopAndMakeChanges $productName
 # 3) Create the Debian package
 generateDebianPackage $productName
-
-http://archive.apache.org/dist/pig/pig-0.13.0/pig-0.13.0.tar.gz
