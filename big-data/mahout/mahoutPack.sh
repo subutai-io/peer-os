@@ -9,7 +9,8 @@ downloadFileAndMakeChanges() {
         confDirectory=$BASE/$fileName/etc/$productName
         # Create directories that are required for the debian package
         mkdir -p $confDirectory
-        pushd $tempDirectory
+        mkdir -p $tempDirectory
+	pushd $tempDirectory
 	svn co http://svn.apache.org/repos/asf/mahout/trunk
 	pushd trunk
 	mvn install -DskipTests
