@@ -40,6 +40,8 @@ downloadHiveAndMakeChanges() {
 	mv *$productName*/* $optDirectory/$productName
 	popd
         rm -r $tempDirectory
+        mv $optDirectory/*$productName*/conf/* $confDirectory
+
 	# Rename files that have space characters
 	mv $optDirectory/$productName/examples/files/person\ age.txt $optDirectory/$productName/examples/files/person_age.txt	
 }
