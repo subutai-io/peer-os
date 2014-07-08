@@ -2,7 +2,6 @@
 
 # Exit on error
 set -e
-. /etc/profile
 
 # Remove Hadoop Files and Folders
 if [ -d "/opt/hadoop-1.2.1" ]; then
