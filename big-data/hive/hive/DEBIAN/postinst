@@ -10,5 +10,9 @@ then
        	HIVE_HOME="/opt/hive"
 fi
 hiveConf="/etc/hive"
+hiveBin="/usr/local/bin"
+hiveHomeBin="$HIVE_HOME/bin"
+mkdir -p $hiveBin
 
-ln -s $hiveConf/* $hiveHome/conf/
+ln -sf $hiveConf/* $hiveHome/conf/
+ln -sf $hiveHomeBin/* $hiveBin/

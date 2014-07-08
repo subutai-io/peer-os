@@ -5,19 +5,20 @@ set -e
 productName=hadoop
 downloadHadoopAndMakeChanges() {
 	initializeVariables $1
+	tempDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/$productName
-	hadoopTarFile=hadoop-1.2.1-bin.tar.gz
+	tarFile=hadoop-1.2.1-bin.tar.gz
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
 
-	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $tempDirectory
+	wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$tarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
 	# unpack tar ball and make changes 
 	pushd $tempDirectory
-	tar -xpf $hadoopTarFile -C .
-	rm $hadoopTarFile
+	tar -xpf $tarFile -C .
+	rm $tarFile
 	mv hadoop*/conf/* $confDirectory
 	popd
 }

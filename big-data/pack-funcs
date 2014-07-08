@@ -20,10 +20,6 @@ initializeVariables() {
 	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
 	TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
 
-	echo "BASE" $BASE
-	echo "SOURCE" $SOURCE
-	echo "TARGET" $TARGET
-
 	pushd $BASE
         if ls *.deb ; then
                 rm  *.deb
@@ -31,13 +27,10 @@ initializeVariables() {
         fileName=`ls | grep ksks | awk '{print $1}' | head -1`
 	if [[ $fileName == "" ]];
 	then
-		echo "Filename seems empty" $fileName
 		fileName="ksks-$productName"
 		mkdir -p $fileName
 	fi
-        echo "FILENAME: " $fileName
 	popd
-	tempDirectory=$BASE/$fileName/opt
 }
 getSourcesToRelevantDirectories() {
 	initializeVariables $1
