@@ -7,12 +7,14 @@ productName=hive
 downloadHiveAndMakeChanges() {
 	initializeVariables $1
         optDirectory=$BASE/$fileName/opt
+	binDirectory=$BASE/$fileName/bin
 	confDirectory=$BASE/$fileName/etc/$productName
 	tempDirectory=$tempDirectory/temp
 	tarFile=apache-hive-0.13.1-bin.tar.gz
 	# Create directories that are required for the debian package
         mkdir -p $confDirectory
 	mkdir -p $tempDirectory	
+	mkdir -p $binDirectory
 	wget http://archive.apache.org/dist/hive/hive-0.13.1/$tarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
@@ -31,6 +33,9 @@ downloadHiveAndMakeChanges() {
 	tar -xpf $tarFile -C .
 	rm $tarFile
 	mv *$productName*/conf/* $confDirectory
+	mv *$productName*/bin/* $binDirectory
+        rm -r *$productName*/conf
+	rm -r *$productName*/bin
 	# Move extracted tar file contents under relevant directory
 	mv *$productName*/* $optDirectory/$productName
 	popd
