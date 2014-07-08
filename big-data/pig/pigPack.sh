@@ -18,7 +18,7 @@ downloadHadoopAndMakeChanges() {
     mkdir -p $confDirectory
 	mkdir -p $tempDirectory
 
-	wget -P opt http://archive.apache.org/dist/pig/pig-$pigVersion/$pigTarFile $tempDirectory
+	wget opt http://archive.apache.org/dist/pig/pig-$pigVersion/$pigTarFile -P $tempDirectory
 	if [ -f $BASE/$fileName/opt/README ]; then
 	        rm $BASE/$fileName/opt/README
 	fi
