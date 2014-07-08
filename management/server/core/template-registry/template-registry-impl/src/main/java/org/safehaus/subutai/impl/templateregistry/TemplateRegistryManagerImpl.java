@@ -115,7 +115,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Template child = getTemplate( childTemplateName );
 
         if ( child != null ) {
-            if ( child.getParentTemplateName() != null ) {
+            if ( !Strings.isNullOrEmpty( child.getParentTemplateName() ) ) {
                 return getTemplate( child.getParentTemplateName() );
             }
         }
