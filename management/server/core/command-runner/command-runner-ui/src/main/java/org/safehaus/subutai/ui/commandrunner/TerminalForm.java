@@ -72,7 +72,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		gridLayout.setSpacing(true);
 
 		initOutputTextArea();
-		gridLayout.addComponent(commandOutputTxtArea, 0, 0, 0, 8);
+		gridLayout.addComponent(commandOutputTxtArea, 0, 0, 0, 7);
 
 		HorizontalLayout controls = new HorizontalLayout();
 		controls.setSpacing(true);
@@ -204,7 +204,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private void addOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
 			commandOutputTxtArea.setValue(String.format("%s%s", commandOutputTxtArea.getValue(), output));
-			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
+			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length() - 1);
 		}
 	}
 
