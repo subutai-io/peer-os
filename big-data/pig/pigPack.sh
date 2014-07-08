@@ -9,12 +9,10 @@ downloadHadoopAndMakeChanges() {
 	tempDirectory=$BASE/$fileName/opt
 
 	confDirectory=$BASE/$fileName/etc/$productName
-	binDirectory=$BASE/$fileName/usr/local/bin
 	pigVersion=0.13.0
 	pigTarFile=pig-$pigVersion.tar.gz
 
 	# Create directories that are required for the debian package
-    mkdir -p $binDirectory
     mkdir -p $confDirectory
 	mkdir -p $tempDirectory
 
