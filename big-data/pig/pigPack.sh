@@ -29,9 +29,6 @@ downloadHadoopAndMakeChanges() {
 
 	# move conf directory
 	mv pig*/conf/* $confDirectory
-
-	# move bin directory
-	mv pig*/bin/* $binDirectory
 	popd
 }
 
