@@ -27,4 +27,4 @@ getSourcesToRelevantDirectories $productName
 # 3) Download file and make necessary changes
 downloadFileAndMakeChanges $productName
 # 4) Create the debian package
-generateDebianPackage $productName
+generateDebianPackageWithoutMD5 $productName
