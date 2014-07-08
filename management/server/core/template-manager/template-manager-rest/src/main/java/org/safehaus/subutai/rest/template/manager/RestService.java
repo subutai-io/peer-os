@@ -1,13 +1,23 @@
 package org.safehaus.subutai.rest.template.manager;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
-@Path("template")
 public interface RestService {
+
+    @GET
+    @Path("management_hostname")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String getManagementHostName();
+
+    @PUT
+    @Path("management_hostname/{hostname}")
+    public void setManagementHostName(@PathParam("hostname") String hostname);
 
     @POST
     @Path("import")
-    public String importTemplate();
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Produces({MediaType.TEXT_PLAIN})
+    public String importTemplate(byte[] input);
 
 }
