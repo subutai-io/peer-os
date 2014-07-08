@@ -22,9 +22,10 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
@@ -102,23 +103,30 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSpacing( true );
         verticalLayout.setSizeFull();
-        TabSheet commandsSheet = new TabSheet();
-        commandsSheet.setStyleName( Runo.TABSHEET_SMALL );
-        commandsSheet.setSizeFull();
 
-        //        commandsSheet.addTab(new Cloner(lxcManager, agentTree), "Clone");
-        //        commandsSheet.addTab(manager, managerTabCaption);
-        //        commandsSheet.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
-        //            @Override
-        //            public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-        //                TabSheet tabsheet = event.getTabSheet();
-        //                String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
-        //                if (caption.equals(managerTabCaption)) {
-        //                    manager.getLxcInfo();
-        //                }
-        //            }
-        //        });
-        verticalLayout.addComponent( commandsSheet );
+        GridLayout grid = new GridLayout( 4, 4 );
+
+        TextField templateNameTxt = new TextField( "Template name" );
+        templateNameTxt.setReadOnly( true );
+        grid.addComponent( templateNameTxt, 0, 0 );
+        TextField templateParentTxt = new TextField( "Parent name" );
+        templateParentTxt.setReadOnly( true );
+        grid.addComponent( templateParentTxt, 1, 0 );
+        TextField lxcArchTxt = new TextField( "Lxc arch" );
+        lxcArchTxt.setReadOnly( true );
+        grid.addComponent( lxcArchTxt, 2, 0 );
+        TextField lxcUtsnameTxt = new TextField( "Utsname" );
+        lxcUtsnameTxt.setReadOnly( true );
+        grid.addComponent( lxcUtsnameTxt, 0, 1 );
+        TextField cfgPathTxt = new TextField( "Config path" );
+        cfgPathTxt.setReadOnly( true );
+        grid.addComponent( cfgPathTxt, 1, 1 );
+        TextField appDataPathTxt = new TextField( "App Data path" );
+        appDataPathTxt.setReadOnly( true );
+        grid.addComponent( appDataPathTxt, 2, 1 );
+
+
+        verticalLayout.addComponent( grid );
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
