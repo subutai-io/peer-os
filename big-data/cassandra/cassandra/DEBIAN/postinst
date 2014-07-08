@@ -24,5 +24,3 @@ fi
 
 # Create symlink to configuration files and scripts
 ln -s $cassandraConf/* $cassandraHome/conf/
-ln -s $cassandraHome/bin/* /usr/local/bin/
-
