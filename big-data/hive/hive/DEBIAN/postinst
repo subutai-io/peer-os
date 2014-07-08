@@ -1,30 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
 # Exit on error
 set -e
 
-tar -xpzf /opt/hive-0.11.0-bin.tar.gz -C /opt
-rm -rf /opt/hive-0.11.0-bin.tar.gz
+. /etc/profile
 
-FilePath="/etc/profile"
-hiveHomeEcho="/opt/hive-0.11.0-bin"
-hivePath="\/opt\/hive-0.11.0-bin\/bin"
-hivePathEcho=$hiveHomeEcho"/bin"
+if [ "x$HIVE_HOME" = "x" ];
+then
+       	HIVE_HOME="/opt/hive"
+fi
+hiveConf="/etc/hive"
 
-. $FilePath
-
-#hadoop dfsadmin -safemode leave        
-##Create /tmp directory in hdfs if does not exist
-#if hadoop fs -test -d /tmp ; then
-#        echo "/tmp directory exists!"
-#else
-#        hadoop fs -mkdir /tmp
-#	hadoop fs -chmod g+w /tmp
-#fi
-##Create user/hive/warehouse in hdfs if does not exist
-#if hadoop fs -test -d /user/hive/warehouse ; then
-#        echo "/user/hive/warehouse directory exists!"
-#else
-#        hadoop fs -mkdir /user/hive/warehouse
-#	hadoop fs -chmod g+w /user/hive/warehouse
-#fi
+ln -sf $hiveConf/* $hiveHome/conf/

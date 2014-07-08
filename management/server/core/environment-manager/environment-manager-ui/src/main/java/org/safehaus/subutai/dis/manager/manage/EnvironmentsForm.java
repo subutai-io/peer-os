@@ -5,13 +5,15 @@ import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.dis.manager.window.DetailsWindow;
+import org.safehaus.subutai.dis.manager.window.EnvironmentDetails;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class EnvironmentsForm {
 
     private VerticalLayout contentRoot;
@@ -50,9 +52,20 @@ public class EnvironmentsForm {
     private void updateTableData() {
         environmentsTable.removeAllItems();
         List<Environment> environmentList = environmentManager.getEnvironments();
-        for ( Environment environment : environmentList ) {
+        for ( final Environment environment : environmentList ) {
+            Button viewEnvironmentInfoButton = new Button( "Info" );
+            viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( final Button.ClickEvent clickEvent ) {
+                    DetailsWindow detailsWindow = new EnvironmentDetails("Environment details");
+                    detailsWindow.setContent( environment );
+                    contentRoot.getUI().addWindow( detailsWindow );
+                    detailsWindow.setVisible( true );
+                }
+            } );
+
             final Object rowId = environmentsTable.addItem( new Object[] {
-                    environment.getName(), "$user", "$date", "Good", new Button( "Info" ), new Button( "Delete" )
+                    environment.getName(), "$user", "$date", "Good", viewEnvironmentInfoButton, new Button( "Delete" )
             }, null );
         }
         environmentsTable.refreshRowCache();
@@ -67,8 +80,8 @@ public class EnvironmentsForm {
         table.addContainerProperty( "Status", String.class, null );
         table.addContainerProperty( "Info", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
-//        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
-//        table.setHeight( size, Sizeable.UNITS_PIXELS );
+        //        table.setWidth( 100, Sizeable.UNITS_PERCENTAGE );
+        //        table.setHeight( size, Sizeable.UNITS_PIXELS );
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setEnabled( true );

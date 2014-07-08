@@ -19,6 +19,8 @@ is_running()
 
 case "$1" in
 start)
+	. /etc/profile
+
         is_running
         stat=$?
         case "$stat" in
@@ -28,7 +30,12 @@ start)
                 echo "Starting "$DESC" ... "
                 [ -e `dirname "$PIDFILE"` ] || \
                         install -d -m755 `dirname $PIDFILE`
-        	DAEMON="/opt/hive-0.11.0-bin/bin/hive"
+		
+		if [ "x$HIVE_HOME" = "x" ];
+		then
+        		HIVE_HOME=/opt/hive
+		fi
+        	DAEMON="$HIVE_HOME/bin/hive"
         	ARGS=" --service hiveserver"
                 start-stop-daemon --start --make-pidfile --background --pidfile  "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
         ;;

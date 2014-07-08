@@ -4,8 +4,9 @@ package org.safehaus.subutai.dis.manager.manage;
 import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
+import org.safehaus.subutai.dis.manager.window.DetailsWindow;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
@@ -20,11 +21,12 @@ public class BlueprintsForm {
     private EnvironmentManager environmentManager;
 
 
+
     public BlueprintsForm( EnvironmentManager environmentManager ) {
         this.environmentManager = environmentManager;
 
-        contentRoot = new VerticalLayout();
 
+        contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
 
@@ -51,14 +53,15 @@ public class BlueprintsForm {
 
     private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<Blueprint> blueprints = environmentManager.getBlueprints();
-        for ( final Blueprint blueprint : blueprints ) {
+        List<EnvironmentBlueprint> blueprints = environmentManager.getBlueprints();
+        for ( final EnvironmentBlueprint blueprint : blueprints ) {
 
             final Button viewButton = new Button( "View" );
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    BlueprintDetails details = new BlueprintDetails( blueprint );
+                    DetailsWindow details = new BlueprintDetails("Blueprint details");
+                    details.setContent( blueprint );
                     contentRoot.getUI().addWindow( details );
                     details.setVisible( true );
                 }

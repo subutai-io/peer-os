@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.impl.manager;
+package org.safehaus.subutai.configuration.manager.impl;
 
 
-import org.safehaus.subutai.api.manager.ConfigManager;
+import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+
 
 
 /**

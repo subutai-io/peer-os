@@ -1,0 +1,33 @@
+#!/usr/bin/expect
+set timeout 20
+
+set ip [lindex $argv 0]
+set user [lindex $argv 1]
+set password [lindex $argv 2]
+set rootPassword [lindex $argv 3]
+#prelogin phase
+spawn ssh "$user\@$ip"
+expect "Are you sure you want to continue connecting (yes/no)?"
+send "yes\r"
+expect "password:"
+send "$password\r";
+
+sleep 1
+#changing sudo passwd for lxc-container
+expect "$ " { send "sudo passwd\r" }
+sleep 1
+expect "password for ubuntu"
+send "$password\r"
+sleep 1
+expect "new UNIX password"
+send "$rootPassword\r"
+sleep 1
+expect "Retype new UNIX password"
+send "$rootPassword\r"
+expect "$ " { send "sudo sed -i '/PermitRootLogin/c\ PermitRootLogin yes' /etc/ssh/sshd_config\r" }
+sleep 1
+expect "$ " { send "sudo service ssh restart\r" }
+
+#exiting to pass postsettings phase
+expect "$ " { send "exit\r" }
+interact
