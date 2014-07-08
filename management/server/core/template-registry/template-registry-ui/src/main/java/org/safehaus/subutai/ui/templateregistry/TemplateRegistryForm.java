@@ -23,8 +23,10 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
@@ -124,9 +126,19 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         TextField appDataPathTxt = new TextField( "App Data path" );
         appDataPathTxt.setReadOnly( true );
         grid.addComponent( appDataPathTxt, 2, 1 );
-
-
         verticalLayout.addComponent( grid );
+
+        TextArea packagesInstalled = new TextArea( "Packages Installed" );
+        packagesInstalled.setValue( "package1\npackage2\npackage3" );
+
+        TextArea packagesChanged = new TextArea( "Packages Changed" );
+        packagesInstalled.setValue( "+package4\n+package5\n-package6\n-package7" );
+
+        HorizontalLayout packagesLayout = new HorizontalLayout();
+        packagesLayout.addComponent( packagesInstalled );
+        packagesLayout.addComponent( packagesChanged );
+
+        verticalLayout.addComponent( packagesLayout );
 
         horizontalSplit.setSecondComponent( verticalLayout );
         setCompositionRoot( horizontalSplit );
