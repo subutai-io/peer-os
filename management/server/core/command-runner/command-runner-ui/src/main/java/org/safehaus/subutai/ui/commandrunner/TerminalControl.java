@@ -33,11 +33,12 @@ public class TerminalControl extends VerticalLayout {
 
 	private void initSendButton() {
 		sendButton = new Button("");
+		sendButton.setId("terminal_submit");
 		sendButton.setVisible(false);
 		sendButton.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				getCommand();
+				System.out.println(commandPrompt.getValue());
 			}
 		});
 	}
@@ -51,11 +52,7 @@ public class TerminalControl extends VerticalLayout {
 		setInputPrompt();
 
 		JavaScript.getCurrent().execute("document.getElementById(\"terminal\").addEventListener(\"keydown\", function(ev){\n" +
-				"          if (ev.which == 13 || ev.keyCode == 13) {\n" +
-				"            //code to execute here\n" +
-				"            return false;\n" +
-				"        }\n" +
-				"        return true;" +
+				"          console.log(ev);\n" +
 				"}, true);");
 	}
 
