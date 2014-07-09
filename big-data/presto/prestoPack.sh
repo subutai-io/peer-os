@@ -64,8 +64,8 @@ downloadFileAndMakeChanges() {
 	rm -r $tempDirectory/discovery-server-$discoveryServerVersion
 
 	# move presto-cli jar 
-	mv presto-cli-$prestoVersion-executable.jar $tempDirectory/opt/presto-server-$prestoVersion/
-	
+	mv presto-cli-$prestoVersion-executable.jar $tempDirectory/presto-server-$prestoVersion/
+
 	popd
 }
 # 1) Get the sources which are downloaded from version control system
