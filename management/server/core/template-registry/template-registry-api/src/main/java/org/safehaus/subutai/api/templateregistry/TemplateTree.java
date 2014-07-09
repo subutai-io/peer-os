@@ -34,8 +34,9 @@ public class TemplateTree {
             parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( String.format( "%s-%s", template.getTemplateName().toLowerCase(),
-                        template.getLxcArch().toLowerCase() ), parentTemplateName );
+        childParent.put( String
+                .format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
+                parentTemplateName );
     }
 
 
@@ -88,7 +89,7 @@ public class TemplateTree {
                     childParent.get( String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
 
             if ( parentName != null ) {
-                return parentName.replace( lxcArch, "" );
+                return parentName.replace( lxcArch.toLowerCase(), "" );
             }
         }
 

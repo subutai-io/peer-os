@@ -175,6 +175,8 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
         templateTree.setItemCaption( itemId, currentTemplate.getTemplateName() );
 
         Template parent = tree.getParentTemplate( currentTemplate );
+        System.out.println(parent);
+        System.out.println(String.format( "%s-%s", parent.getTemplateName(), parent.getLxcArch() ));
         if ( parent != null ) {
             container.setParent( itemId, String.format( "%s-%s", parent.getTemplateName(), parent.getLxcArch() ) );
         }
