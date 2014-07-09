@@ -57,7 +57,7 @@ public class ConfigManagerImpl implements ConfigManager {
         CassandraYamlLoader c = new CassandraYamlLoader();
         Config config = null;
         try {
-            InputStream is = bundle.getEntry( "cassandra.2.0.4/cassandra.yaml" ).openStream();
+            InputStream is = bundle.getEntry( "cassandra.2.0.5/cassandra.yaml" ).openStream();
             /*BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
             String line = "";
             while ( ( line = br.readLine() ) != null ) {
