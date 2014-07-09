@@ -29,6 +29,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.server.ui.util.HelpManager;
@@ -72,7 +73,7 @@ public class MainUI extends UI {
 	protected void init(VaadinRequest request) {
 		setInstance(this);
 		helpManager = new HelpManager(this);
-		getSession().setAttribute("username", username);
+		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("username", username);
 
 		setLocale(Locale.US);
 
