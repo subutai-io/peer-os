@@ -28,6 +28,7 @@ public class TerminalControl extends TextArea {
 		addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
+				System.out.println("Enter");
 				getCommand();
 			}
 		});
@@ -62,6 +63,7 @@ public class TerminalControl extends TextArea {
 
 	public String getCommand() {
 		String value = getValue();
+		System.out.println(value);
 
 		if (Strings.isNullOrEmpty(value)) {
 			String[] args = value.split(inputPrompt);
