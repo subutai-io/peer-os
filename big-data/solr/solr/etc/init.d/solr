@@ -26,8 +26,12 @@ start)
                 echo "Starting "$DESC" ... "
                 [ -e `dirname "$PIDFILE"` ] || \
                         install -d -m755 `dirname $PIDFILE`
-                DAEMON="/usr/bin/java"
-                ARGS=" -jar /opt/solr-4.4.0/example/start.jar"
+                if [ "x$SOLR_HOME" = "x" ];
+		then
+			SOLR_HOME=/opt/solr-4.4.0
+		fi
+		DAEMON="/usr/bin/java"
+                ARGS=" -jar $SOLR_HOME/example/start.jar"
                 start-stop-daemon --start --make-pidfile --background --chdir /opt/solr-4.4.0/example/ --pidfile  "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
         ;;
         esac

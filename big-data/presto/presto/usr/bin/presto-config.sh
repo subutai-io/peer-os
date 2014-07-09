@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prestoVer="0.69"
+prestoVer="0.73"
 presto="presto-server-$prestoVer"
 
 . /etc/profile
@@ -16,7 +16,7 @@ ip=$2
 case "$1" in
 coordinator)
 	echo "Configuring presto coordinator ..."
-	cd /opt/$presto/etc
+	pushd /etc/presto/
 	> config.properties
 	echo "coordinator=true" >> config.properties
 	echo "node-scheduler.include-coordinator=false" >> config.properties
@@ -30,11 +30,12 @@ coordinator)
 		sed -i "s/node.id=ffffffff-ffff-ffff-ffff-ffffffffffff/node.id=$uuid/g" node.properties
 	fi
 	sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$prestoVer'\/'/g jvm.config
+	popd
 ;;
 
 worker)
 	echo "Configuring presto worker ..."
-	cd /opt/$presto/etc
+	pushd /etc/presto/
 	> config.properties
 	echo "coordinator=false" >> config.properties
 	echo "http-server.http.port=8413" >> config.properties
@@ -46,6 +47,7 @@ worker)
 		sed -i "s/node.id=ffffffff-ffff-ffff-ffff-ffffffffffff/node.id=$uuid/g" node.properties
 	fi
 	sed -i s/presto-server-[0-9]*.[0-9]*'\/'/presto-server-$prestoVer'\/'/g jvm.config
+	popd
 ;;
 
 *)

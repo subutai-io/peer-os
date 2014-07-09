@@ -1,39 +1,4 @@
-#!/bin/sh
-
-# Exit on error
+#!/bin/bash
 set -e
+
 . /etc/profile
-export JAVA_HOME=$JAVA_HOME
-
-#Install ZeroMQ(Storm Native Dependency)
-tar -xpzf /opt/zeromq-2.1.7.tar.gz -C /opt
-cd /opt/zeromq-2.1.7
-./configure
-make
-make install
-
-# Install JZMQ(Storm Native Dependency)
-tar -xpzf /opt/jzmq.tar.gz -C /opt
-cd /opt/jzmq
-./autogen.sh
-./configure
-cd /opt/jzmq/src
-touch classdist_noinst.stamp
-CLASSPATH=.:./.:$CLASSPATH javac -d . org/zeromq/ZMQ.java org/zeromq/ZMQException.java org/zeromq/ZMQQueue.java org/zeromq/ZMQForwarder.java org/zeromq/ZMQStreamer.java
-cd /opt/jzmq
-make
-make install
-
-#Install Storm
-tar -xpzf /opt/storm-0.8.2.tar.gz -C /opt
-# Create Storm related folders into "/var" directory
-if [ -d "/var/stormtmp" ]; then
-        echo "/var/stormtmp exists!"
-else
-        echo "/var/stormtmp does not exist!"
-	mkdir /var/stormtmp
-fi
-
-rm -rf /opt/zeromq-2.1.7.tar.gz
-rm -rf /opt/jzmq.tar.gz
-rm -rf /opt/storm-0.8.2.tar.gz

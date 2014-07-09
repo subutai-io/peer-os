@@ -27,7 +27,7 @@ downloadFileAndMakeChanges() {
 	mv hbase-$hbaseVersion*/conf/* $BASE/$fileName/etc/hbase/
 
 	# rename folder --remove hadoop1 from file name --
-	cp -a hbase-$hbaseVersion-hadoop1 hbase-$hbaseVersion
+	cp -a hbase-$hbaseVersion-hadoop1/* hbase-$hbaseVersion
 	rm -rf hbase-$hbaseVersion-hadoop1
 
 	# update libthirft jar file to make hbase compatible with sqoop

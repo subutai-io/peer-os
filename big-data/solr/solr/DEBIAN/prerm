@@ -1,8 +1,5 @@
-#!/bin/sh
-
-# Exit on error
+#!/bin/bash
 set -e
 
-. /etc/profile
 service solr stop
 service solr kill
