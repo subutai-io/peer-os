@@ -43,9 +43,13 @@ downloadFileAndMakeChanges() {
 	fi
 
 	`ls presto-server-$prestoVersion/lib | sed 's/-[0-9].*//' >> $tempDirectory/a`
-	`ls discovery-server-$discoveryServerVersion/lib | sed 's/-[0-9].*//' >> tempDirectory/b`
+	`ls discovery-server-$discoveryServerVersion/lib | sed 's/-[0-9].*//' >> $tempDirectory/b`
 
 	fileNames=$(diff tempDirectory/b tempDirectory/a  | grep -i -- '<' |  cut -c 3-)
+	echo "---------------------------------------"
+	echo " file names : " $fileNames
+	echo "---------------------------------------"
+
 	for index in $fileNames
 	do
         A=$index
@@ -53,8 +57,8 @@ downloadFileAndMakeChanges() {
 		echo "copying $A jar file to presto-server-$prestoVersion/lib folder"
 	done
 
-	# rm $tempDirectory/a 
-	# rm $tempDirectory/b
+	rm $tempDirectory/a 
+	rm $tempDirectory/b
 
 	# remove discovery server folder after copying dependencies
 	rm -r $tempDirectory/discovery-server-$discoveryServerVersion
