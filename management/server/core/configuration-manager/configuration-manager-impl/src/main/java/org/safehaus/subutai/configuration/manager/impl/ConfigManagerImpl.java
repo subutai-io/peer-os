@@ -26,16 +26,11 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     public BundleContext bcontext;
-    private InputStream is;
+    private Bundle bundle;
 
 
     public void start() {
-        try {
-            Bundle bundle = bcontext.getBundle();
-            is = bundle.getEntry( "cassandra.2.0.4/cassandra.yaml" ).openStream();
-        }
-        catch ( IOException e ) {
-        }
+        bundle = bcontext.getBundle();
     }
 
 
@@ -62,9 +57,13 @@ public class ConfigManagerImpl implements ConfigManager {
         CCLoader c = new CCLoader();
         Config o = null;
         try {
+            InputStream is = bundle.getEntry( "cassandra.2.0.4/cassandra.yaml" ).openStream();
             o = c.loadConfig( is );
         }
         catch ( ConfigurationException e ) {
+            e.printStackTrace();
+        }
+        catch ( IOException e ) {
             e.printStackTrace();
         }
         return o;
