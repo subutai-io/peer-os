@@ -1,3 +1,10 @@
 pigHome="/opt/pig-0.13.0"
 export PIG_HOME=$pigHome
-export PATH=$PATH:$PIG_HOME/bin
+
+path_content=$(echo $PATH)
+pattern="$pigHome/bin"
+if [[ $path_content != *$pattern* ]];
+then
+	export PATH=$PATH:$pattern
+fi
+
