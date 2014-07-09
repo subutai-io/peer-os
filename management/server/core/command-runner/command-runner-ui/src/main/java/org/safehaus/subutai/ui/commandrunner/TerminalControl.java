@@ -71,7 +71,7 @@ public class TerminalControl extends VerticalLayout {
 		if (Strings.isNullOrEmpty(commandPrompt.getValue())) {
 			commandPrompt.setValue(String.format("%s", inputPrompt));
 		} else {
-			commandPrompt.setValue(String.format("%s\n$s", commandPrompt.getValue(), inputPrompt));
+			commandPrompt.setValue(String.format("%s\n%s", commandPrompt.getValue(), inputPrompt));
 		}
 	}
 
