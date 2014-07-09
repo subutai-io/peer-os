@@ -33,8 +33,7 @@ downloadFileAndMakeChanges() {
         pushd $tempDirectory
         tar -xpzf $oozieTarFile -C .
         rm $oozieTarFile
-	tar -xvpzf $hadoopTarFile -C .
-	tar -xvpzf $oozieTarFile -C .
+	tar -xpzf $hadoopTarFile -C .
 
 	#Creating libext directory
 	mkdir -p $libextDirectory
