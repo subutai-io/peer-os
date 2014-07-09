@@ -66,7 +66,9 @@ public class TemplateTree {
                     getChildrenTemplates( getParentTemplateName( parentTemplateName, lxcArch ), lxcArch );
             if ( templates != null ) {
                 for ( Template template : templates ) {
-                    if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) ) {
+                    if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) && template.getLxcArch()
+                                                                                                      .equalsIgnoreCase(
+                                                                                                              lxcArch ) ) {
                         return template;
                     }
                 }
@@ -84,14 +86,15 @@ public class TemplateTree {
      * @return - name of parent template {@code String}
      */
     public String getParentTemplateName( String childTemplateName, String lxcArch ) {
-        String childName = ( childTemplateName != null && lxcArch != null ) ?
-                           String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
-        String parentName = childParent.get( childName );
+        if ( lxcArch != null ) {
+            String childName = childTemplateName != null ?
+                               String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
+            String parentName = childParent.get( childName );
 
-        if ( parentName != null ) {
-            return parentName.replace( lxcArch.toLowerCase(), "" );
+            if ( parentName != null ) {
+                return parentName.replace( String.format( "-%s", lxcArch.toLowerCase() ), "" );
+            }
         }
-
         return null;
     }
 
@@ -104,9 +107,13 @@ public class TemplateTree {
      * @return - list of {@code Template}
      */
     public List<Template> getChildrenTemplates( String parentTemplateName, String lxcArch ) {
-        String parentName = ( parentTemplateName != null && lxcArch != null ) ?
-                            String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
-        return parentChild.get( parentName );
+        if ( lxcArch != null ) {
+            String parentName = parentTemplateName != null ?
+                                String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) :
+                                null;
+            return parentChild.get( parentName );
+        }
+        return null;
     }
 
 
