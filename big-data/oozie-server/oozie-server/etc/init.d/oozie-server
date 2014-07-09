@@ -1,11 +1,17 @@
 #!/bin/bash
 # Starts and stops Oozie Server.
 
+. /etc/profile
+. /lib/lsb/init-functions
+
+if [ "x$OOZIE_SERVER_HOME" = "x" ];
+then
+	OOZIE_SERVER_HOME="/opt/oozie-3.3.2"
+fi
 DESC="Oozie Server"
 NAME=oozie-server
-PIDFILE=/opt/oozie-3.3.2/oozie-server/temp/oozie.pid
+PIDFILE="$OOZIE_SERVER_HOME/oozie-server/temp/oozie.pid"
 CMD_PATT="oozie.+"
-. /lib/lsb/init-functions
 
 is_running()
 {
@@ -27,7 +33,7 @@ start)
                 echo "Starting "$DESC" ... "
                 [ -e `dirname "$PIDFILE"` ] || \
                         install -d -m755 `dirname $PIDFILE`
-                DAEMON="/opt/oozie-3.3.2/bin/oozied.sh"
+                DAEMON="$OOZIE_SERVER_HOME/bin/oozied.sh"
                 ARGS=" start"
                 start-stop-daemon --start --pidfile "$PIDFILE" --exec "${DAEMON}" -- ${ARGS}
         ;;
