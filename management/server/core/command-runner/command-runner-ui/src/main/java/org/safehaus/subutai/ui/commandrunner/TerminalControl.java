@@ -2,9 +2,7 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextArea;
 
@@ -14,7 +12,6 @@ import com.vaadin.ui.TextArea;
 public class TerminalControl extends CssLayout {
 
 	private TextArea commandPrompt;
-	private Button sendButton;
 	private String inputPrompt;
 	private String username, currentPath, machineName;
 
@@ -23,24 +20,10 @@ public class TerminalControl extends CssLayout {
 		currentPath = "/";
 		machineName = "";
 
-		initSendButton();
 		initCommandPrompt();
-
-		addComponent(sendButton);
 		addComponent(commandPrompt);
 
 		this.setSizeFull();
-	}
-
-	private void initSendButton() {
-		sendButton = new Button("");
-		sendButton.setStyleName("terminal_submit");
-		sendButton.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				System.out.println(commandPrompt.getValue());
-			}
-		});
 	}
 
 	private void initCommandPrompt() {
@@ -50,19 +33,12 @@ public class TerminalControl extends CssLayout {
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
+		focusPrompt();
 
-		commandPrompt.addFocusListener(new FieldEvents.FocusListener() {
+		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
 			@Override
-			public void focus(FieldEvents.FocusEvent focusEvent) {
-				focusPrompt();
-				sendButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-			}
-		});
-
-		commandPrompt.addBlurListener(new FieldEvents.BlurListener() {
-			@Override
-			public void blur(FieldEvents.BlurEvent blurEvent) {
-				sendButton.removeClickShortcut();
+			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
+				System.out.println(textChangeEvent.getText());
 			}
 		});
 	}
@@ -78,6 +54,7 @@ public class TerminalControl extends CssLayout {
 
 	public void focusPrompt() {
 		commandPrompt.setCursorPosition(commandPrompt.getValue().length());
+		commandPrompt.focus();
 	}
 
 	public String getCommand() {
