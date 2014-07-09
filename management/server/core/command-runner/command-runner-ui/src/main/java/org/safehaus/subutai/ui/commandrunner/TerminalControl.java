@@ -3,7 +3,6 @@ package org.safehaus.subutai.ui.commandrunner;
 import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
@@ -33,8 +32,7 @@ public class TerminalControl extends VerticalLayout {
 
 	private void initSendButton() {
 		sendButton = new Button("");
-		sendButton.setId("terminal_submit");
-		sendButton.setVisible(false);
+		sendButton.setStyleName("terminal_submit");
 		sendButton.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
@@ -50,10 +48,6 @@ public class TerminalControl extends VerticalLayout {
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
-
-		JavaScript.getCurrent().execute("document.getElementById(\"terminal\").addEventListener(\"keydown\", function(ev){\n" +
-				"          console.log(ev);\n" +
-				"}, true);");
 	}
 
 	public void setInputPrompt() {
