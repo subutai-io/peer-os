@@ -2,9 +2,8 @@
 set -e
 FilePath="/etc/profile"
 
-hbaseVersion=0.94.16
-hbaseConf="/opt/hbase-$hbaseVersion/conf"
-
+hbaseVersion=0.98.3
+hbaseConf="/etc/hbase"
 
 escape_characters()
 {
@@ -25,3 +24,12 @@ else
 fi
 
 . $FilePath
+
+
+# default configuration for hbase
+hbase-property.sh add hbase-site.xml hbase.rootdir hdfs://localhost:8020/hbase
+hbase-property.sh add hbase-site.xml hbase.master localhost:60000
+hbase-property.sh add hbase-site.xml hbase.zookeeper.property.dataDir /opt/hbase-$hbaseVersion/zookeeper
+hbase-property.sh add hbase-site.xml hbase.zookeeper.property.clientPort 2181
+hbase-property.sh add hbase-site.xml hbase.zookeeper.quorum localhost
+hbase-property.sh add hbase-site.xml hbase.cluster.distributed true
