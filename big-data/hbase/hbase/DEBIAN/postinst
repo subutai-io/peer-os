@@ -4,6 +4,7 @@ FilePath="/etc/profile"
 
 hbaseVersion=0.98.3
 hbaseConf="/etc/hbase"
+hbaseHome="/opt/hbase-$hbaseVersion/"
 
 escape_characters()
 {
@@ -26,6 +27,9 @@ fi
 . $FilePath
 
 
+# Create symlink to configuration files
+ln -sf $hbaseConf/* $hbaseHome/conf/
+
 # default configuration for hbase
 /opt/hbase-$hbaseVersion/bin/hbase-property.sh add hbase-site.xml hbase.rootdir hdfs://localhost:8020/hbase
 /opt/hbase-$hbaseVersion/bin/hbase-property.sh add hbase-site.xml hbase.master localhost:60000
@@ -41,7 +45,7 @@ then
 else
     escape_characters $JAVA_HOME
     echo "Using JAVA_HOME:" $JAVA_HOME
-    sed -i 's/# export JAVA_HOME=\/usr\/lib\/j2sdk1.5-sun/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
+    sed -i 's/# export JAVA_HOME=.*/export JAVA_HOME='$escaped_value'/g' $hbaseConf/hbase-env.sh
 fi
 
 # set hbase_manages_zk environment variable inside hbase-env.sh
