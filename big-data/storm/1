@@ -1,0 +1,100 @@
+#!/bin/bash
+set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
+
+productName=storm
+downloadFileAndMakeChanges() {
+        initializeVariables $1
+        tempDirectory=$BASE/$fileName/opt/temp
+        optDirectory=$BASE/$fileName/opt
+        stormZipFile=storm-0.8.2.zip
+	zeromqTarFile=zeromq-2.1.7.tar.gz
+	jzmqTarFile=jzmq.tar.gz
+        extractedStormDirectory=storm-0.8.2
+        mkdir -p $tempDirectory
+        mkdir -p $optDirectory
+
+        # Get necessary files
+        wget http://download.zeromq.org/zeromq-2.1.7.tar.gz  -P $tempDirectory
+        wget http://dl.dropboxusercontent.com/s/fl4kr7w0oc8ihdw/storm-0.8.2.zip -P $tempDirectory
+	pushd $tempDirectory
+        git clone https://github.com/nathanmarz/jzmq.git
+	popd
+	
+	if  ls $optDirectory/README* ; then
+                rm $optDirectory/README*
+        fi
+        # unpack tar ball and make changes 
+        pushd $tempDirectory
+        unzip storm-0.8.2.zip
+	
+
+        cp $extractedDirectory/distro/target/$distroTarFile $tempDirectory
+        rm -rf $extractedDirectory
+        tar -xpzf $distroTarFile -C .
+        mv $extractedDirectory/$clientTarFile $optDirectory
+        rm -rf $extractedDirectory
+        rm $distroTarFile
+        popd
+        rm -r $tempDirectory
+        pushd $optDirectory
+        tar -xpzf $clientTarFile -C $optDirectory
+        rm $clientTarFile
+        popd
+
+
+
+	#getting storm packages
+	tar -cvpzf storm-0.8.2.tar.gz storm-0.8.2/
+	mv storm-0.8.2.tar.gz  $fileName/opt/
+	rm storm-0.8.2.zip
+	rm -rf storm-0.8.2
+	tar -cvpzf jzmq.tar.gz jzmq/
+	mv jzmq.tar.gz $fileName/opt/
+	rm -rf jzmq/
+	rm $fileName/opt/README.md
+}
+
+buildStorm() {
+	export JAVA_HOME=$JAVA_HOME
+
+#Install ZeroMQ(Storm Native Dependency)
+tar -xpzf /opt/zeromq-2.1.7.tar.gz -C /opt
+cd /opt/zeromq-2.1.7
+./configure
+make
+make install
+
+# Install JZMQ(Storm Native Dependency)
+tar -xpzf /opt/jzmq.tar.gz -C /opt
+cd /opt/jzmq
+./autogen.sh
+./configure
+cd /opt/jzmq/src
+touch classdist_noinst.stamp
+CLASSPATH=.:./.:$CLASSPATH javac -d . org/zeromq/ZMQ.java org/zeromq/ZMQException.java org/zeromq/ZMQQueue.java org/zeromq/ZMQForwarder.java org/zeromq/ZMQStreamer.java
+cd /opt/jzmq
+make
+make install
+
+#Install Storm
+tar -xpzf /opt/storm-0.8.2.tar.gz -C /opt
+# Create Storm related folders into "/var" directory
+if [ -d "/var/stormtmp" ]; then
+        echo "/var/stormtmp exists!"
+else
+        echo "/var/stormtmp does not exist!"
+        mkdir /var/stormtmp
+fi
+
+rm -rf /opt/zeromq-2.1.7.tar.gz
+rm -rf /opt/jzmq.tar.gz
+rm -rf /opt/storm-0.8.2.tar.gz
+}
+
+# 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 3) Download hadoop tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 4) Create the Debian package
+generateDebianPackage $productName
