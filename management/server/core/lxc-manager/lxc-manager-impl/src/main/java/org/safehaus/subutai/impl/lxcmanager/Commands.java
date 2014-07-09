@@ -69,7 +69,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getMetricsCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc" )
+                new RequestBuilder( "free -m | grep buffers/cache ; df /lxc-data | grep /lxc-data ; uptime ; nproc" )
                         .withTimeout( 30 ), agents );
     }
 }
