@@ -58,6 +58,8 @@ public class MainUI extends UI {
 	private HelpManager helpManager;
 	private Navigator nav;
 
+	private String username = "administrator";
+
 	private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
 	private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
 		{
@@ -70,6 +72,7 @@ public class MainUI extends UI {
 	protected void init(VaadinRequest request) {
 		setInstance(this);
 		helpManager = new HelpManager(this);
+		getSession().setAttribute("username", username);
 
 		setLocale(Locale.US);
 
@@ -240,7 +243,7 @@ public class MainUI extends UI {
 										new ThemeResource("img/profile-pic.png"));
 								profilePic.setWidth("34px");
 								addComponent(profilePic);
-								Label userName = new Label("Administrator");
+								Label userName = new Label(username);
 								userName.setSizeUndefined();
 								addComponent(userName);
 

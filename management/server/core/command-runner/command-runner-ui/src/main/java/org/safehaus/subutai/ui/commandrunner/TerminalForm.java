@@ -39,7 +39,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private volatile int taskCount = 0;
 	private ExecutorService executor;
 	private AgentTree agentTree;
-	private TextArea commandOutputTxtArea;
+	private TerminalControl commandOutputTxtArea;
 	//
 	private TextField programTxtFld, workDirTxtFld, timeoutTxtFld;
 	private ComboBox requestTypeCombo;
@@ -89,14 +89,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	}
 
 	private void initOutputTextArea() {
-		commandOutputTxtArea = new TextArea("Commands output");
-		commandOutputTxtArea.setSizeFull();
-		commandOutputTxtArea.setImmediate(true);
-		commandOutputTxtArea.setWordwrap(false);
-		commandOutputTxtArea.addStyleName("terminal");
-		commandOutputTxtArea.setValue("administrator#");
-		commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length());
-		commandOutputTxtArea.focus();
+		commandOutputTxtArea = new TerminalControl();
 	}
 
 	private void initIndicator() {
