@@ -1,10 +1,9 @@
 #!/bin/bash
-# HBase init script
-#
 
-hbase=hbase-0.94.16
+hbase=hbase-0.98.3
+hbaseConf="/etc/hbase/"
 
-. /opt/$hbase/conf/hbase-env.sh
+. /etc/hbase/hbase-env.sh
 
 if [ ! -f "/tmp/*-zookeeper.pid" ]; then
         pidZookeeper=`ls -alt /tmp | grep hbase-.*-zookeeper.pid | head -1 | awk -F " " '{print $9}'`

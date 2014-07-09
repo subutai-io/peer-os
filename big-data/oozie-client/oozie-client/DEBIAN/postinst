@@ -1,7 +1,2 @@
-#!/bin/sh
-
-# Exit on error
+#!/bin/bash
 set -e
-
-tar -xpzf /opt/oozie-client-3.3.2.tar.gz -C /opt
-rm -rf /opt/oozie-client-3.3.2.tar.gz

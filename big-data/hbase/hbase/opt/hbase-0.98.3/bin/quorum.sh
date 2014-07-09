@@ -1,4 +1,4 @@
-HBASE_CONF=/opt/hbase-0.94.16/conf
+HBASE_CONF=/etc/hbase/
 
 usage="Usage: master.sh \"List of machine names which will be HQourumPeer, do NOT use comma between machine names\""
 

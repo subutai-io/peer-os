@@ -9,8 +9,8 @@ function usage() {
 }
 . /etc/profile
 #Paths to the configuration files
-core_site="${HADOOP_HOME}/conf/core-site.xml"
-hdfs_site="${HADOOP_HOME}/conf/hdfs-site.xml"
+core_site="/etc/hadoop/core-site.xml"
+hdfs_site="/etc/hadoop/hdfs-site.xml"
 
 if [[ "$1" == "rollback" ]];
 then
