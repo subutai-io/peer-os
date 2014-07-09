@@ -23,7 +23,7 @@ downloadFileAndMakeChanges() {
 	# Get necessary files
         wget http://www.apache.org/dist/hadoop/core/hadoop-1.2.1/$hadoopTarFile -P $tempDirectory
         wget http://archive.apache.org/dist/oozie/3.3.2/$oozieTarFile -P $tempDirectory
-        wget extjs.com/deploy/$extZipFile -P $tempDirectory
+        wget extjs.com/deploy/$extZipFile -P $optDirectory
 
 	if  ls $optDirectory/README* ; then
                 rm $optDirectory/README*
@@ -57,7 +57,6 @@ downloadFileAndMakeChanges() {
 	mv $extractedExtDirectory $extractedOozieDirectory/
 	rm -rf $extZipFile
 	popd
-	rm -r $tempDirectory
 	
 	# Remove temp directory
         pushd $BASE
