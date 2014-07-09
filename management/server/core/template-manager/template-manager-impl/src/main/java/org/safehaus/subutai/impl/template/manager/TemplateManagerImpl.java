@@ -2,6 +2,7 @@ package org.safehaus.subutai.impl.template.manager;
 
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.templateregistry.Template;
@@ -21,13 +22,14 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean setup(String hostName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.SETUP, 120);
+        return scriptExecutor.execute(a, ActionType.SETUP, 15, TimeUnit.MINUTES);
     }
 
     @Override
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.CLONE, templateName, cloneName);
+        return scriptExecutor.execute(a, ActionType.CLONE, 15, TimeUnit.MINUTES,
+                templateName, cloneName);
     }
 
     @Override
