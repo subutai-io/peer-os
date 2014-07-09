@@ -15,5 +15,11 @@ fi
 # Create etc/ directory under /opt/presto-server
 mkdir -p $prestoHome/etc/catalog
 # Create symlink to configuration files and scripts
-ln -sf $prestoConf/* $prestoHome/etc/
-ln -sf $prestoConf/catalog/* $prestoHome/etc/catalog/
+# Create symlink to configuration files and scripts
+ln -sf $prestoConf/config.properties $prestoHome/etc/
+ln -sf $prestoConf/jvm.config $prestoHome/etc/
+ln -sf $prestoConf/log.properties $prestoHome/etc/
+ln -sf $prestoConf/node.properties $prestoHome/etc/
+
+ln -sf $prestoConf/catalog/hive.properties $prestoHome/etc/catalog
+ln -sf $prestoConf/catalog/jmx.properties $prestoHome/etc/catalog
