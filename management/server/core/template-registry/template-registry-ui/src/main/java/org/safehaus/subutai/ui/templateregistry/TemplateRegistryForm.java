@@ -159,9 +159,11 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
     private void fillTemplateTree() {
         container.removeAllItems();
         TemplateTree tree = registryManager.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        for ( Template template : uberTemplates ) {
-            addChildren( tree, template );
+        List<Template> rootTemplates = tree.getRootTemplates();
+        if ( rootTemplates != null ) {
+            for ( Template template : rootTemplates ) {
+                addChildren( tree, template );
+            }
         }
     }
 
