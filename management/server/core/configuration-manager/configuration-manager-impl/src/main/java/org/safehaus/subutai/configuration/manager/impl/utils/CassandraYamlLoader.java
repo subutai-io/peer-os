@@ -23,10 +23,10 @@ import org.apache.cassandra.io.util.FileUtils;
 /**
  * Created by bahadyr on 7/9/14.
  */
-public class CCLoader extends YamlConfigurationLoader {
+public class CassandraYamlLoader extends YamlConfigurationLoader {
 
 
-    public CCLoader() {
+    public CassandraYamlLoader() {
         System.setProperty( "cassandra.config", "cassandra.2.0.4/cassandra.yaml" );
     }
 

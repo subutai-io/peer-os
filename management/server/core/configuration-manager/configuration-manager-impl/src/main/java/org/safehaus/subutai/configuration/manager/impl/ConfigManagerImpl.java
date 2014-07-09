@@ -12,7 +12,7 @@ import java.io.InputStream;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
-import org.safehaus.subutai.configuration.manager.impl.utils.CCLoader;
+import org.safehaus.subutai.configuration.manager.impl.utils.CassandraYamlLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import org.apache.cassandra.config.Config;
@@ -54,11 +54,16 @@ public class ConfigManagerImpl implements ConfigManager {
 
     @Override
     public Config getCassandraConfig() {
-        CCLoader c = new CCLoader();
-        Config o = null;
+        CassandraYamlLoader c = new CassandraYamlLoader();
+        Config config = null;
         try {
             InputStream is = bundle.getEntry( "cassandra.2.0.4/cassandra.yaml" ).openStream();
-            o = c.loadConfig( is );
+            /*BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
+            String line = "";
+            while ( ( line = br.readLine() ) != null ) {
+                System.out.println( line );
+            }*/
+            config = c.loadConfig( is );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();
@@ -66,6 +71,6 @@ public class ConfigManagerImpl implements ConfigManager {
         catch ( IOException e ) {
             e.printStackTrace();
         }
-        return o;
+        return config;
     }
 }
