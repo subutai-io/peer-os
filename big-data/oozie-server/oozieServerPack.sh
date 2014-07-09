@@ -2,7 +2,7 @@
 set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-productName=oozie-client
+productName=oozie-server
 downloadFileAndMakeChanges() {
         initializeVariables $1
         tempDirectory=$BASE/$fileName/opt/temp
