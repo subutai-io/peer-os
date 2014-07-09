@@ -7,6 +7,7 @@ package org.safehaus.subutai.ui.commandrunner;
 
 
 import com.google.common.base.Strings;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
@@ -90,6 +91,18 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void initOutputTextArea() {
 		commandOutputTxtArea = new TerminalControl();
+		commandOutputTxtArea.addFocusListener(new FieldEvents.FocusListener() {
+			@Override
+			public void focus(FieldEvents.FocusEvent focusEvent) {
+				sendBtn.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+			}
+		});
+		commandOutputTxtArea.addBlurListener(new FieldEvents.BlurListener() {
+			@Override
+			public void blur(FieldEvents.BlurEvent blurEvent) {
+				sendBtn.removeClickShortcut();
+			}
+		});
 	}
 
 	private void initIndicator() {
@@ -110,7 +123,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		sendBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				Set<Agent> agents = checkAgents();
+				commandOutputTxtArea.getCommand();
+				/*Set<Agent> agents = checkAgents();
 				if (agents != null && validateInputs()) {
 					RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue());
 
@@ -126,7 +140,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 					getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
 					createCommand(requestBuilder, agents);
-				}
+				}*/
 			}
 		});
 	}

@@ -1,8 +1,6 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.TextArea;
 
@@ -21,17 +19,9 @@ public class TerminalControl extends TextArea {
 
 		this.setSizeFull();
 		this.setImmediate(true);
-		this.setWordwrap(true);
 		this.addStyleName("terminal");
 
 		setInputPrompt();
-		addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
-			@Override
-			public void handleAction(Object sender, Object target) {
-				System.out.println("Enter");
-				getCommand();
-			}
-		});
 	}
 
 	public void setInputPrompt() {
