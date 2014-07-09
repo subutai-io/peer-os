@@ -169,7 +169,9 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
 
 
     private void addChildren( TemplateTree tree, Template currentTemplate ) {
+        System.out.println(currentTemplate);
         Item templateItem = container.addItem( currentTemplate.getTemplateName() );
+        System.out.println(templateItem);
         templateItem.getItemProperty( "value" ).setValue( currentTemplate );
         templateTree.setItemCaption( currentTemplate.getTemplateName(), currentTemplate.getTemplateName() );
 
