@@ -25,7 +25,7 @@ downloadFileAndMakeChanges() {
 	rm $tarFile
 
 	#Creating oozie distro
-	$tempDirectory/oozie-3.3.2/bin/mkdistro.sh -DskipTests
+	$extractedDirectory/bin/mkdistro.sh -DskipTests
 	if [ -d "local.repository" ]; then
         	rm -r "local.repository"
 	fi
@@ -37,9 +37,10 @@ downloadFileAndMakeChanges() {
 	rm -rf $extractedDirectory
 	rm $distroTarFile
 	popd
-	
+	rm -r $tempDirectory
 	pushd $optDirectory
         tar -xpzf $clientTarFile -C $optDirectory
+	rm $clientTarFile
 	popd
 }
 
