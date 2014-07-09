@@ -2,6 +2,7 @@ package org.safehaus.subutai.impl.template.manager;
 
 enum ActionType {
 
+    SETUP("subutai-setup"),
     CLONE("subutai-clone"),
     CLONE_DESTROY("subutai-clone-destroy"),
     EXPORT("subutai-export"),

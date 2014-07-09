@@ -9,6 +9,16 @@ public interface TemplateManager {
     public String getMasterTemplateName();
 
     /**
+     * Checks environment and setups master template. It is safe to run this
+     * method multiple times.
+     *
+     * @param hostName the physical host name
+     * @return <tt>true</tt> if check and setup is successful, <tt>false</tt>
+     * otherwise
+     */
+    public boolean setup(String hostName);
+
+    /**
      * Clone an instance container from a given template.
      *
      * @param hostName the physical host name

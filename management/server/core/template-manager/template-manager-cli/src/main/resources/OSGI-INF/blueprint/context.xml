@@ -12,6 +12,14 @@
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="template/setup">
+            <action class="org.safehaus.subutai.cli.template.manager.CheckAndSetup">
+                <property name="templateManager" ref="templateManager" />
+            </action>
+        </command>
+    </command-bundle>
+        
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/clone">
             <action class="org.safehaus.subutai.cli.template.manager.CloneTemplate">
                 <property name="templateManager" ref="templateManager" />

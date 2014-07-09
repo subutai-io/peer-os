@@ -19,6 +19,12 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     }
 
     @Override
+    public boolean setup(String hostName) {
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return scriptExecutor.execute(a, ActionType.SETUP);
+    }
+
+    @Override
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
         return scriptExecutor.execute(a, ActionType.CLONE, templateName, cloneName);
