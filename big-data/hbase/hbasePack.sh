@@ -1,61 +1,46 @@
 #!/bin/bash
-
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-if ls | grep .deb ; then
-        rm  *.deb
-fi
+productName=hbase
+downloadFileAndMakeChanges() {
+	initializeVariables $1
 
-rm -rf ksks-hbase*/*
-cp -r ../workspace/big-data/hbase/hbase/* ksks-hbase*/
-cd ksks-hbase*
-rm -rf opt
-mkdir opt
-wget -P opt http://archive.apache.org/dist/hbase/hbase-0.94.16/hbase-0.94.16.tar.gz
-tar -xvpf opt/*.tar.gz -C opt/
-rm -rf opt/*.tar.gz
-mkdir opt/hbase-0.94.16/zookeeper
-cd -
-cp -r ../workspace/big-data/hbase/hbase/opt/hbase-0.94.16/conf/* ksks-hbase*/opt/hbase-0.94.16/conf/
-cp -r ../workspace/big-data/hbase/hbase/opt/hbase-0.94.16/scripts ksks-hbase*/opt/hbase-0.94.16/
-rm ksks-hbase*/opt/hbase-0.94.16/lib/libthrift-0.8.0.jar
-cp libthrift-0.9.0.jar ksks-hbase*/opt/hbase-0.94.16/lib/
-chmod +x ksks-hbase*/opt/hbase-0.94.16/conf/hbase-env.sh
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+	tempDirectory=$BASE/$fileName/opt
+	confDirectory=$BASE/$fileName/etc/hbase
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+	hbaseVersion=0.98.3
 
+	# Create directories that are required for the debian package
+    mkdir -p $tempDirectory
+    mkdir -p $confDirectory
 
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+	# download hbase which is compatible with hadoop1 version. 
+	wget http://apache.bilkent.edu.tr/hbase/stable/hbase-$hbaseVersion-hadoop1-bin.tar.gz -P $tempDirectory
+	pushd $tempDirectory
+	tar -xpf hbase-*.tar.gz
 
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+	# remove tar file
+	rm hbase-*.tar.gz
 
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
+	# move configuration files 
+	mv hbase-$hbaseVersion*/conf/* $BASE/$fileName/etc/hbase/
 
+	# rename folder --remove hadoop1 from file name --
+	mv hbase-$hbaseVersion-hadoop1 hbase-$hbaseVersion
 
+	# update libthirft jar file to make hbase compatible with sqoop
+	# these operations were needed while using hbase version 0.94.16 ( still we may need them !!! )
+	# rm $tempDirectory/hbase-$hbaseVersion/lib/libthrift-0.8.0.jar
+	# cp $BASE/$fileName/libthrift-0.9.0.jar $tempDirectory/hbase-$hbaseVersion/lib
 
-versionThird=$(echo $version | awk -F"." '{print $3}')
-updatedVersion=$(echo `expr $versionThird + 1`)
-
-updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-hbase-"$updatedRelease"-amd64"
-
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
-
-{
-        mv $fileName $updatedFileName
-} || {
-        echo "Version not changed"
+	chmod +x $BASE/$fileName/etc/hbase/hbase-env.sh
+	popd
 }
-
-find ./$updatedFileName -name "*~" -print0 | xargs -0 rm -rf
-rm $updatedFileName/DEBIAN/md5sums
-md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >> $updatedFileName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $updatedFileName/
-
-cp *.deb ~/Automation/Bigdata/hbase
-
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName

@@ -1,10 +1,9 @@
 #!/bin/bash
-# HBase init script
-#
 
-hbase=hbase-0.94.16
+hbase=hbase-0.98.3
+hbaseConf="/etc/hbase/"
 
-. /opt/$hbase/conf/hbase-env.sh
+. /etc/hbase/hbase-env.sh
 
 if [ ! -f "/tmp/*-regionserver.pid" ]; then
         pidRegion=`ls -alt /tmp | grep hbase-.*-regionserver.pid | head -1 | awk -F " " '{print $9}'`
@@ -56,13 +55,9 @@ calculate(){
 	second=$?
 	is_region_running
 	third=$?
-	#echo $first
-	#echo $second
-	#echo $third
 	a=$((first * 4))
 	b=$((second * 2))
 	c=$((third * 1))
-	#echo "$((a + b + c))"
 	return "$((a + b + c))"
 }
 
