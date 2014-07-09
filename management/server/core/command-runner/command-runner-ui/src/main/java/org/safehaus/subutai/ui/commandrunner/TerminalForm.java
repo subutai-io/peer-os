@@ -94,8 +94,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		commandOutputTxtArea.setImmediate(true);
 		commandOutputTxtArea.setWordwrap(false);
 		commandOutputTxtArea.addStyleName("terminal");
-		commandOutputTxtArea.setValue("#");
-		commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length() - 1);
+		commandOutputTxtArea.setValue("administrator#");
+		commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length());
 		commandOutputTxtArea.focus();
 	}
 
