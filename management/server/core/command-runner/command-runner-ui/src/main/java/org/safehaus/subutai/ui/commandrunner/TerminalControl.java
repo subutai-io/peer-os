@@ -1,8 +1,7 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
+import com.vaadin.data.Property;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
@@ -51,9 +50,9 @@ public class TerminalControl extends VerticalLayout {
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 
-		commandPrompt.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
+		commandPrompt.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
-			public void handleAction(Object sender, Object target) {
+			public void valueChange(Property.ValueChangeEvent event) {
 				getCommand();
 			}
 		});
