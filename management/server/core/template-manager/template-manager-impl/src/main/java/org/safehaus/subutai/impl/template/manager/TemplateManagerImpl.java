@@ -21,7 +21,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean setup(String hostName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.SETUP);
+        return scriptExecutor.execute(a, ActionType.SETUP, 120);
     }
 
     @Override

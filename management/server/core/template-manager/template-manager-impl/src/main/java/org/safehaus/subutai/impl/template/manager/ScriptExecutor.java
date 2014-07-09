@@ -10,17 +10,26 @@ import org.safehaus.subutai.shared.protocol.Agent;
 class ScriptExecutor {
 
     private final CommandRunner commandRunner;
+    int defaultTimeout = 60;
 
     public ScriptExecutor(CommandRunner commandRunner) {
         this.commandRunner = commandRunner;
     }
 
-    public boolean execute(Agent agent, ActionType actionType, String... args) {
+    public void setDefaultTimeout(int defaultTimeout) {
+        this.defaultTimeout = defaultTimeout;
+    }
 
+    public boolean execute(Agent agent, ActionType actionType, String... args) {
+        return execute(agent, actionType, defaultTimeout, args);
+    }
+
+    public boolean execute(Agent agent, ActionType actionType, int timeout, String... args) {
         if(agent == null || actionType == null) return false;
 
-        Command cmd = commandRunner.createCommand(
-                new RequestBuilder(actionType.buildCommand(args)),
+        RequestBuilder rb = new RequestBuilder(actionType.buildCommand(args));
+        rb.withTimeout(defaultTimeout);
+        Command cmd = commandRunner.createCommand(rb,
                 new HashSet<>(Arrays.asList(agent)));
 
         commandRunner.runCommand(cmd);
