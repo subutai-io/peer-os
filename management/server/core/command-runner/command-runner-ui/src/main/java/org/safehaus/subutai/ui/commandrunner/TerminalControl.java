@@ -51,7 +51,11 @@ public class TerminalControl extends VerticalLayout {
 		setInputPrompt();
 
 		JavaScript.getCurrent().execute("document.getElementById(\"terminal\").addEventListener(\"keydown\", function(ev){\n" +
-				"          console.log(ev);\n" +
+				"          if (event.which == 13 || event.keyCode == 13) {\n" +
+				"            //code to execute here\n" +
+				"            return false;\n" +
+				"        }\n" +
+				"        return true;" +
 				"}, true);");
 	}
 
