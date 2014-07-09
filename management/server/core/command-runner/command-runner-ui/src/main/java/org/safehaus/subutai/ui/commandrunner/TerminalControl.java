@@ -53,7 +53,7 @@ public class TerminalControl extends VerticalLayout {
 		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
 			@Override
 			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
-				getCommand();
+				System.out.println(textChangeEvent.getText());
 			}
 		});
 	}
