@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash 
 set -e
 
 hbaseVersion=0.98.3
