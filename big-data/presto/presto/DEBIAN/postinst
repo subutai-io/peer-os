@@ -2,3 +2,15 @@
 set -e
 FilePath="/etc/profile"
 . $FilePath
+
+prestoVersion=0.73
+prestoHome="/opt/presto-server-$prestoVersion"
+prestoConf="/etc/presto"
+
+if [[ "x$PRESTO_HOME" != "x" ]];
+then
+        prestoHome=$PRESTO_HOME
+fi
+
+# Create symlink to configuration files and scripts
+ln -s $prestoConf/* $prestoHome/etc/
