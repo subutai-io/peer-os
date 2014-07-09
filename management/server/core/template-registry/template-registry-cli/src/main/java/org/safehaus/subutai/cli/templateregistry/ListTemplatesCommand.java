@@ -24,10 +24,7 @@ public class ListTemplatesCommand extends OsgiCommandSupport {
         System.out.println(
                 String.format( "%" + ( level > 0 ? level : "" ) + "s %s", "", currentTemplate.getTemplateName() ) );
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( children == null || children.isEmpty() ) {
-            return;
-        }
-        else {
+        if ( !( children == null || children.isEmpty() ) ) {
             for ( Template child : children ) {
                 listFamily( level + 1, tree, child );
             }
@@ -44,8 +41,7 @@ public class ListTemplatesCommand extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
 
         TemplateTree tree = templateRegistryManager.getTemplateTree();
-        String parent = null;
-        List<Template> uberTemplates = tree.getChildrenTemplates( parent );
+        List<Template> uberTemplates = tree.getRootTemplates();
         for ( Template template : uberTemplates ) {
             listFamily( 0, tree, template );
         }
