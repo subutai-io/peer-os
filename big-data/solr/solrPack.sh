@@ -9,7 +9,7 @@ downloadFileAndMakeChanges() {
 	tarFile=solr-4.4.0.tgz
 	mkdir -p $optDirectory
 
-	wget http://archive.apache.org/dist/lucene/solr/4.4.0/$tarFile -P $optDirectpry
+	wget http://archive.apache.org/dist/lucene/solr/4.4.0/$tarFile -P $optDirectory
         if  ls $optDirectory/README* ; then
                 rm $optDirectory/README*
         fi
