@@ -5,8 +5,8 @@ set -e
 
 . /etc/profile
 
-mongoConfDirectory="/etc/mongo"
+mongoConfFiles="/etc/mongo"
 
-if [ -d $mongoConfDirectory ]; then
-        rm -r $mongoConfDirectory
+if ls $mongoConfFiles ; then
+        rm -r $mongoConfFiles
 fi

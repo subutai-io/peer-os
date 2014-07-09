@@ -7,9 +7,6 @@ mongoConfDirectory="/etc/mongo"
 originalMongoConfFile="/etc/mongodb.conf"
 
 mkdir -p $mongoConfDirectory
-if [ -f $originalMongoConfFile ]; then
-        mv $originalMongoConfFile $mongoConfDirectory
-fi
 
-# Create symlink to configuration files
-ln -sf $mongoConfDirectory/* /etc
+# Create a hard link to configuration files
+ln -f $originalMongoConfFile $mongoConfDirectory/
