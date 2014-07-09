@@ -16,4 +16,4 @@ fi
 mkdir -p $prestoHome/etc/catalog
 # Create symlink to configuration files and scripts
 ln -sf $prestoConf/* $prestoHome/etc/
-ls -sf $prestoConf/catalog/* $prestoHome/etc/catalog/
+ln -sf $prestoConf/catalog/* $prestoHome/etc/catalog/
