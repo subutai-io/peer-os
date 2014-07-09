@@ -26,9 +26,9 @@ downloadFileAndMakeChanges() {
 
 	#Creating oozie distro
 	$extractedDirectory/bin/mkdistro.sh -DskipTests
-	if [ -d "local.repository" ]; then
-        	rm -r "local.repository"
-	fi
+	if [ -d "$tempDirectory/../local.repository" ]; then
+                rm -rf "$tempDirectory/../local.repository"
+        fi
 	
 	cp $extractedDirectory/distro/target/$distroTarFile $tempDirectory
 	rm -rf $extractedDirectory
