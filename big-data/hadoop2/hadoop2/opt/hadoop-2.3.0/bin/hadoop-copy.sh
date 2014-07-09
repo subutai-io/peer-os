@@ -8,11 +8,11 @@ function usage() {
 }
 . /etc/profile
 #Paths to the configuration files
-core_site="${HADOOP_HOME}/conf/core-site.xml"
-mapred_site="${HADOOP_HOME}/conf/mapred-site.xml"
-hdfs_site="${HADOOP_HOME}/conf/hdfs-site.xml"
-slaves="${HADOOP_HOME}/conf/slaves"
-yarn="${HADOOP_HOME}/conf/yarn-site.xml"
+core_site="/etc/hadoop/core-site.xml"
+mapred_site="/etc/hadoop/mapred-site.xml"
+hdfs_site="/etc/hadoop/hdfs-site.xml"
+slaves="/etc/hadoop/slaves"
+yarn="/etc/hadoop/yarn-site.xml"
 
 if [[ "$1" == "rollback" ]];
 then

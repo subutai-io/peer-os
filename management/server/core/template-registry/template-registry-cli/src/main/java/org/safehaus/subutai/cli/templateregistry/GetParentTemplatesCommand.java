@@ -12,7 +12,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * CLI for TemplateRegistryManager.getTemplate command
+ * CLI for TemplateRegistryManager.getParentTemplates command
  */
 @Command( scope = "registry", name = "get-parent-templates", description = "Get all parent templates" )
 public class GetParentTemplatesCommand extends OsgiCommandSupport {

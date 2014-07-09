@@ -3,13 +3,15 @@
 # Exit on error
 set -e
 
-hadoopBin="/usr/local/bin"
-# Remove any symlinks that are broken under hadoop bin directory
-find -L $hadoopBin -maxdepth 1 -type l -delete
+hadoopHome=/opt/hadoop-1.2.1
+if [[ "x$HADOOP_HOME" != "x" ]];
+then
+        hadoopHome=$HADOOP_HOME
+fi
 
 # Remove Hadoop Files and Folders
-if [ -d "/opt/hadoop-1.2.1" ]; then
-	rm -r /opt/hadoop-1.2.1
+if [ -d $hadoopHome ]; then
+	rm -r $hadoopHome
 fi
 
 if ls /var/lib/*hadoop* ; then

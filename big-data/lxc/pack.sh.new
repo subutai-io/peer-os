@@ -68,6 +68,7 @@ passwd=$(cat password.dat)
 /$BASE/presettings.exp.new 172.16.8.100 ubuntu ubuntu $passwd
 /$BASE/postsettings.exp.new 172.16.8.100 root  $passwd
 
+cd $LXCSOURCE
 #removing logstash and jmxtrans deb
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-logstash-1.0.1-amd64.deb
 rm $LXCSOURCE/$pattern/rootfs/root/jmxtrans-1.0.1-amd64.deb

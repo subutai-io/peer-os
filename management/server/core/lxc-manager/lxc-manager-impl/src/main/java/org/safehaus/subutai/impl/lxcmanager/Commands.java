@@ -29,13 +29,13 @@ public class Commands extends CommandsSingleton {
 
     public static Command getCloneNStartCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand( new RequestBuilder( String.format(
-                "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s && /usr/bin/lxc-start -n %1$s -d",
+                "/usr/bin/lxc-clone -o base-container -n %1$s && addhostlxc %1$s && /usr/bin/lxc-start -n %1$s -d &",
                 lxcHostName ) ).withTimeout( 360 ), Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getLxcListCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "/usr/bin/lxc-list" ).withTimeout( 60 ), agents );
+        return createCommand( new RequestBuilder( "/usr/bin/lxc-ls -f" ).withTimeout( 60 ), agents );
     }
 
 
@@ -48,28 +48,28 @@ public class Commands extends CommandsSingleton {
 
     public static Command getLxcStartCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand(
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d", lxcHostName ) ).withTimeout( 120 ),
+                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", lxcHostName ) ).withTimeout( 120 ),
                 Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getLxcStopCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand(
-                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s", lxcHostName ) ).withTimeout( 60 ),
+                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", lxcHostName ) ).withTimeout( 60 ),
                 Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getLxcDestroyCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand( new RequestBuilder(
-                String.format( "/usr/bin/lxc-stop -n %1$s && /usr/bin/lxc-destroy -n %1$s", lxcHostName ) )
+                String.format( "/usr/bin/lxc-destroy -n %1$s -f", lxcHostName ) )
                 .withTimeout( 180 ), Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getMetricsCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "free -m | grep buffers/cache ; df /dev/sda1 | grep /dev/sda1 ; uptime ; nproc" )
+                new RequestBuilder( "free -m | grep buffers/cache ; df /lxc-data | grep /lxc-data ; uptime ; nproc" )
                         .withTimeout( 30 ), agents );
     }
 }

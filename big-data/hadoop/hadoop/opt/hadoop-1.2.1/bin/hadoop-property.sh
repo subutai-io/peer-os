@@ -18,7 +18,6 @@ if [[ $1 == "" || $2 == "" || $3 == "" ]];
 then
         usage
 else
-        fileName="/etc/hadoop/$2"
         name_field=$3
 fi
 

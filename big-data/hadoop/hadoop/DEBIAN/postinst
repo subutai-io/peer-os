@@ -4,11 +4,7 @@ set -e
 . /etc/profile
 
 hadoopHome="/opt/hadoop-1.2.1"
-hadoopHomeBin="$hadoopHome/bin"
 hadoopConf="/etc/hadoop"
-hadoopBin="/usr/local/bin"
-
-mkdir -p $hadoopBin
 
 if [[ "x$HADOOP_HOME" != "x" ]];
 then
@@ -22,8 +18,6 @@ fi
 
 # Create symlink to configuration files
 ln -sf $hadoopConf/* $hadoopHome/conf/
-# Create symlink to bin directory
-ln -sf $hadoopHomeBin/* $hadoopBin/
 
 escape_characters()
 {
