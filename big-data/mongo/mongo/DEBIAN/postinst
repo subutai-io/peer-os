@@ -9,4 +9,6 @@ originalMongoConfFile="/etc/mongodb.conf"
 mkdir -p $mongoConfDirectory
 
 # Create a hard link to configuration files
-ln -f $originalMongoConfFile $mongoConfDirectory/
+if [ -f $originalMongoConfFile ]; then
+  ln -f $originalMongoConfFile $mongoConfDirectory/
+fi  
