@@ -46,21 +46,21 @@ buildStormDependencies() {
 
 	#Install ZeroMQ (Storm Native Dependency)
 	pushd $optDirectory/$extractedZeromqDirectory
-	./configure
-	make
-	make install
+	sudo ./configure
+	sudo make
+	sudo make install
 	popd
 
 	# Install JZMQ(Storm Native Dependency)
 	pushd $optDirectory/$jzmqDirectory
-	./autogen.sh
-	./configure
+	sudo ./autogen.sh
+	sudo ./configure
 	pushd src
 	touch classdist_noinst.stamp
 	CLASSPATH=.:./.:$CLASSPATH javac -d . org/zeromq/ZMQ.java org/zeromq/ZMQException.java org/zeromq/ZMQQueue.java org/zeromq/ZMQForwarder.java org/zeromq/ZMQStreamer.java
 	popd
-	make
-	make install
+	sudo make
+	sudo make install
 	popd
 }
 
