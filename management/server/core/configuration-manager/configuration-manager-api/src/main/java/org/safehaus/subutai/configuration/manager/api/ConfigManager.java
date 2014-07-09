@@ -8,6 +8,8 @@ package org.safehaus.subutai.configuration.manager.api;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import org.apache.cassandra.config.Config;
+
 
 /**
  *
@@ -15,5 +17,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public interface ConfigManager {
 
     public void injectConfiguration(Object conf, String path, Agent agent);
+
+    public Config getCassandraConfig();
 
 }

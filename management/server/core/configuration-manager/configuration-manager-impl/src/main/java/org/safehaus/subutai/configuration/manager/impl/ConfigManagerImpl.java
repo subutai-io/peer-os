@@ -7,8 +7,11 @@ package org.safehaus.subutai.configuration.manager.impl;
 
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
+import org.safehaus.subutai.configuration.manager.impl.utils.CCLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import org.apache.cassandra.config.Config;
+import org.apache.cassandra.exceptions.ConfigurationException;
 
 
 /**
@@ -21,6 +24,19 @@ public class ConfigManagerImpl implements ConfigManager {
     public void injectConfiguration( final Object conf, final String path, final Agent agent ) {
 
 
+    }
 
+
+    @Override
+    public Config getCassandraConfig() {
+        CCLoader c = new CCLoader();
+        Config o = null;
+        try {
+            o = c.loadConfig();
+        }
+        catch ( ConfigurationException e ) {
+            e.printStackTrace();
+        }
+        return o;
     }
 }

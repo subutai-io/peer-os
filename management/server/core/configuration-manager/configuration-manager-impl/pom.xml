@@ -40,11 +40,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
     </dependency>
@@ -105,16 +100,26 @@
       <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
-    	<groupId>commons-httpclient</groupId>
-    	<artifactId>commons-httpclient</artifactId>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.apache.jackrabbit</groupId>
-    	<artifactId>jackrabbit-webdav</artifactId>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-webdav</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.apache.ant</groupId>
-    	<artifactId>ant</artifactId>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -131,6 +136,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.configuration.manager.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
