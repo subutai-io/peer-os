@@ -1,7 +1,7 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.data.Property;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
@@ -50,9 +50,9 @@ public class TerminalControl extends VerticalLayout {
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 
-		commandPrompt.addValueChangeListener(new Property.ValueChangeListener() {
+		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
 			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
+			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
 				getCommand();
 			}
 		});
