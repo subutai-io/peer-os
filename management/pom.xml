@@ -100,7 +100,7 @@
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <net.jpountz.lz4.version>1.2.0</net.jpountz.lz4.version>
     <org.apache.activemq.version>5.9.1</org.apache.activemq.version>
-    <org.apache.cassandra.version>2.0.8</org.apache.cassandra.version>
+    <org.apache.cassandra.version>2.0.5</org.apache.cassandra.version>
     <org.apache.commons.version>3.2.1</org.apache.commons.version>
 
     <org.apache.cxf.version>2.7.11</org.apache.cxf.version>
