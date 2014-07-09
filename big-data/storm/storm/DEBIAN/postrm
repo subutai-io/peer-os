@@ -1,35 +1,23 @@
-#!/bin/sh
-
-# Exit on error
+#!/bin/bash
 set -e
+
 . /etc/profile
+
 #Remove ZeroMQ home directory
 if [ -d "/opt/zeromq-2.1.7" ]; then
-        echo "/opt/zeromq-2.1.7 exists!"
 	rm -r /opt/zeromq-2.1.7
-else
-        echo "/opt/zeromq-2.1.7 does not exist!"
 fi
 
 #Remove JZMQ home directory
 if [ -d "/opt/jzmq" ]; then
-        echo "/opt/jzmq exists!"
         rm -r /opt/jzmq
-else
-        echo "/opt/jzmq does not exist!"
 fi
 
 #Remove Storm home directory
 if [ -d "/opt/storm-0.8.2" ]; then
-        echo "/opt/storm-0.8.2 exists!"
         rm -r /opt/storm-0.8.2
-else
-        echo "/opt/storm-0.8.2 does not exist!"
 fi
 # Remove Storm related folders
 if [ -d "/var/stormtmp" ]; then
-        echo "/var/stormtmp exists!"
         rm -r /var/stormtmp
-else
-        echo "/var/stormtmp does not exist!"
 fi

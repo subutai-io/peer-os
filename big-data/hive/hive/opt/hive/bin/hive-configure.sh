@@ -9,7 +9,11 @@ usage() {
 
 . /etc/profile
 #Paths to the configuration files
-hive_site="${HIVE_HOME}/conf/hive-site.xml"
+if [ "x$HIVE_CONF_DIR" = "x" ];
+then
+  HIVE_CONF_DIR=/etc/hive
+fi
+hive_site="${HIVE_CONF_DIR}/hive-site.xml"
 
 if [ "$1" == "" ]; then
 	usage
