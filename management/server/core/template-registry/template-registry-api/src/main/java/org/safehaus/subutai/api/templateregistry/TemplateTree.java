@@ -25,15 +25,16 @@ public class TemplateTree {
      * @param template - {@code Template}
      */
     public void addTemplate( Template template ) {
-        String parentTemplateName =
-                Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null : template.getParentTemplateName();
+        String parentTemplateName = Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
+                                    String.format( "%s-%s", template.getParentTemplateName(), template.getLxcArch() );
         List<Template> children = parentChild.get( parentTemplateName );
         if ( children == null ) {
             children = new LinkedList<>();
             parentChild.put( parentTemplateName, children );
         }
         children.add( template );
-        childParent.put( template.getTemplateName(), parentTemplateName );
+        childParent
+                .put( String.format( "%s-%s", template.getTemplateName(), template.getLxcArch() ), parentTemplateName );
     }
 
 
@@ -45,7 +46,7 @@ public class TemplateTree {
      * @return - parent template {@code Template}
      */
     public Template getParentTemplate( Template childTemplate ) {
-        return getParentTemplate( childTemplate.getTemplateName() );
+        return getParentTemplate( childTemplate.getTemplateName(), childTemplate.getLxcArch() );
     }
 
 
@@ -56,10 +57,11 @@ public class TemplateTree {
      *
      * @return - parent template {@code Template}
      */
-    public Template getParentTemplate( String childTemplateName ) {
-        String parentTemplateName = getParentTemplateName( childTemplateName );
+    public Template getParentTemplate( String childTemplateName, String lxcArch ) {
+        String parentTemplateName = getParentTemplateName( childTemplateName, lxcArch );
         if ( parentTemplateName != null ) {
-            List<Template> templates = getChildrenTemplates( getParentTemplateName( parentTemplateName ) );
+            List<Template> templates =
+                    getChildrenTemplates( getParentTemplateName( parentTemplateName, lxcArch ), lxcArch );
             if ( templates != null ) {
                 for ( Template template : templates ) {
                     if ( parentTemplateName.equalsIgnoreCase( template.getTemplateName() ) ) {
@@ -79,8 +81,14 @@ public class TemplateTree {
      *
      * @return - name of parent template {@code String}
      */
-    public String getParentTemplateName( String childTemplateName ) {
-        return childParent.get( childTemplateName );
+    public String getParentTemplateName( String childTemplateName, String lxcArch ) {
+        String parentName = childParent.get( String.format( "%s-%s", childTemplateName, lxcArch ) );
+
+        if ( parentName != null ) {
+            return parentName.replace( lxcArch, "" );
+        }
+
+        return null;
     }
 
 
@@ -91,8 +99,13 @@ public class TemplateTree {
      *
      * @return - list of {@code Template}
      */
-    public List<Template> getChildrenTemplates( String parentTemplateName ) {
-        return parentChild.get( parentTemplateName );
+    public List<Template> getChildrenTemplates( String parentTemplateName, String lxcArch ) {
+        return parentChild.get( String.format( "%s-%s", parentTemplateName, lxcArch ) );
+    }
+
+
+    public List<Template> getRootTemplates() {
+        return parentChild.get( null );
     }
 
 
@@ -104,6 +117,6 @@ public class TemplateTree {
      * @return - list of {@code Template}
      */
     public List<Template> getChildrenTemplates( Template parentTemplate ) {
-        return getChildrenTemplates( parentTemplate.getTemplateName() );
+        return getChildrenTemplates( parentTemplate.getTemplateName(), parentTemplate.getLxcArch() );
     }
 }
