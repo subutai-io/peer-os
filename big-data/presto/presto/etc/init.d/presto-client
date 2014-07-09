@@ -1,7 +1,7 @@
 #!/bin/bash
 # Presto
 
-prestoVer="0.69"
+prestoVer="0.73"
 presto="presto-server-$prestoVer"
 
 . /etc/profile
