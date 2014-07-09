@@ -52,11 +52,11 @@ public class TemplateDAO {
     }
 
 
-    public List<Template> geChildTemplates( String parentTemplateName ) {
+    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) {
         List<Template> list = new ArrayList<>();
         try {
-            ResultSet rs = dbManager
-                    .executeQuery( "select info from template_registry_info where parent = ?", parentTemplateName );
+            ResultSet rs = dbManager.executeQuery( "select info from template_registry_info where parent = ?",
+                    String.format( "%s-%s", parentTemplateName, lxcArch ) );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -75,10 +75,10 @@ public class TemplateDAO {
     }
 
 
-    public Template getTemplateByName( String templateName ) {
+    public Template getTemplateByName( String templateName, String lxcArch ) {
         try {
-            ResultSet rs = dbManager
-                    .executeQuery( "select info from template_registry_info where template = ?", templateName );
+            ResultSet rs = dbManager.executeQuery( "select info from template_registry_info where template = ?",
+                    String.format( "%s-%s", templateName, lxcArch ) );
             if ( rs != null ) {
                 Row row = rs.one();
                 if ( row != null ) {
@@ -97,12 +97,14 @@ public class TemplateDAO {
 
     public boolean saveTemplate( Template template ) {
         return dbManager.executeUpdate( "insert into template_registry_info(template, parent, info) values(?,?,?)",
-                template.getTemplateName(), template.getParentTemplateName(), gson.toJson( template ) );
+                String.format( "%s-%s", template.getTemplateName(), template.getLxcArch() ),
+                String.format( "%s-%s", template.getParentTemplateName(), template.getLxcArch() ),
+                gson.toJson( template ) );
     }
 
 
     public boolean removeTemplate( Template template ) {
-        return dbManager
-                .executeUpdate( "delete from template_registry_info where template = ?", template.getTemplateName() );
+        return dbManager.executeUpdate( "delete from template_registry_info where template = ?",
+                String.format( "%s-%s", template.getTemplateName(), template.getLxcArch() ) );
     }
 }
