@@ -12,6 +12,10 @@ import com.google.common.base.Strings;
 /**
  * TemplateTree is used for storing templates in genealogical tree. This class is used by UI modules to visualize
  * template hierarchy.
+ *
+ * @TODO
+ * add methods for supplying lxc arch
+ * fix comments
  */
 public class TemplateTree {
 
