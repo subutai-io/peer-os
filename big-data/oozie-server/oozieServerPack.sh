@@ -48,11 +48,6 @@ downloadFileAndMakeChanges() {
         fi
 	popd
 
-	# Remove temp directory
-	pushd $BASE
-	rm -r $tempDirectory
-	popd
-
 	#Extract tar files under opt directory
 	pushd $optDirectory
 	tar -xpzf $distroTarFile -C .
@@ -63,6 +58,11 @@ downloadFileAndMakeChanges() {
 	rm -rf $extZipFile
 	popd
 	rm -r $tempDirectory
+	
+	# Remove temp directory
+        pushd $BASE
+        rm -r $tempDirectory
+        popd
 }
 
 # 2) Get the sources which are downloaded from version control system to local machine to relevant directories to generate the debian package
