@@ -1,6 +1,8 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
@@ -21,18 +23,47 @@ public class TerminalControl extends VerticalLayout {
 		currentPath = "/";
 		machineName = "";
 
+		initSendButton();
+		initCommandPrompt();
+
+		addComponent(sendButton);
+		addComponent(commandPrompt);
+		focusPrompt();
+
+		this.setSizeFull();
+	}
+
+	private void initSendButton() {
+		sendButton = new Button("");
+		sendButton.setVisible(false);
+		sendButton.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				getCommand();
+			}
+		});
+	}
+
+	private void initCommandPrompt() {
 		commandPrompt = new TextArea();
 		commandPrompt.setSizeFull();
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 
-		sendButton = new Button("");
-		sendButton.setVisible(false);
+		commandPrompt.addFocusListener(new FieldEvents.FocusListener() {
+			@Override
+			public void focus(FieldEvents.FocusEvent focusEvent) {
+				sendButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+			}
+		});
 
-		addComponent(sendButton);
-		addComponent(commandPrompt);
-		this.setSizeFull();
+		commandPrompt.addBlurListener(new FieldEvents.BlurListener() {
+			@Override
+			public void blur(FieldEvents.BlurEvent blurEvent) {
+				sendButton.removeClickShortcut();
+			}
+		});
 	}
 
 	public void setInputPrompt() {
@@ -42,24 +73,11 @@ public class TerminalControl extends VerticalLayout {
 		} else {
 			commandPrompt.setValue(String.format("%s\n$s", commandPrompt.getValue(), inputPrompt));
 		}
+	}
+
+	public void focusPrompt() {
 		commandPrompt.setCursorPosition(commandPrompt.getValue().length());
-		this.focus();
-	}
-
-	public String getCurrentPath() {
-		return currentPath;
-	}
-
-	public void setCurrentPath(String currentPath) {
-		this.currentPath = currentPath;
-	}
-
-	public String getMachineName() {
-		return machineName;
-	}
-
-	public void setMachineName(String machineName) {
-		this.machineName = machineName;
+		commandPrompt.focus();
 	}
 
 	public String getCommand() {
