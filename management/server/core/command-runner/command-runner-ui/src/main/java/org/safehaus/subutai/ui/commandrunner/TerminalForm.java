@@ -7,7 +7,6 @@ package org.safehaus.subutai.ui.commandrunner;
 
 
 import com.google.common.base.Strings;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
@@ -91,18 +90,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void initOutputTextArea() {
 		commandOutputTxtArea = new TerminalControl();
-		commandOutputTxtArea.addFocusListener(new FieldEvents.FocusListener() {
-			@Override
-			public void focus(FieldEvents.FocusEvent focusEvent) {
-				sendBtn.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-			}
-		});
-		commandOutputTxtArea.addBlurListener(new FieldEvents.BlurListener() {
-			@Override
-			public void blur(FieldEvents.BlurEvent blurEvent) {
-				sendBtn.removeClickShortcut();
-			}
-		});
 	}
 
 	private void initIndicator() {
@@ -149,13 +136,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		Button clearBtn = new Button("Clear");
 		clearBtn.addStyleName("default");
 		controls.addComponent(clearBtn);
-
-		clearBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				commandOutputTxtArea.setValue("");
-			}
-		});
 	}
 
 	private void initRequestType() {
@@ -210,8 +190,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void addOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
-			commandOutputTxtArea.setValue(String.format("%s%s", commandOutputTxtArea.getValue(), output));
-			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length() - 1);
 		}
 	}
 

@@ -2,13 +2,17 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * Created by daralbaev on 7/9/14.
  */
-public class TerminalControl extends TextArea {
+public class TerminalControl extends VerticalLayout {
 
+	private TextArea commandPrompt;
+	private Button sendButton;
 	private String inputPrompt;
 	private String username, currentPath, machineName;
 
@@ -17,21 +21,28 @@ public class TerminalControl extends TextArea {
 		currentPath = "/";
 		machineName = "";
 
-		this.setSizeFull();
-		this.setImmediate(true);
-		this.addStyleName("terminal");
-
+		commandPrompt = new TextArea();
+		commandPrompt.setSizeFull();
+		commandPrompt.setImmediate(true);
+		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
+
+		sendButton = new Button("");
+		sendButton.setVisible(false);
+
+		addComponent(sendButton);
+		addComponent(commandPrompt);
+		this.setSizeFull();
 	}
 
 	public void setInputPrompt() {
 		inputPrompt = String.format("%s@%s:%s#", username, machineName, currentPath);
-		if (Strings.isNullOrEmpty(getValue())) {
-			setValue(String.format("%s", inputPrompt));
+		if (Strings.isNullOrEmpty(commandPrompt.getValue())) {
+			commandPrompt.setValue(String.format("%s", inputPrompt));
 		} else {
-			setValue(String.format("%s\n$s", getValue(), inputPrompt));
+			commandPrompt.setValue(String.format("%s\n$s", commandPrompt.getValue(), inputPrompt));
 		}
-		this.setCursorPosition(this.getValue().length());
+		commandPrompt.setCursorPosition(commandPrompt.getValue().length());
 		this.focus();
 	}
 
@@ -52,7 +63,7 @@ public class TerminalControl extends TextArea {
 	}
 
 	public String getCommand() {
-		String value = getValue();
+		String value = commandPrompt.getValue();
 		System.out.println(value);
 
 		if (Strings.isNullOrEmpty(value)) {
