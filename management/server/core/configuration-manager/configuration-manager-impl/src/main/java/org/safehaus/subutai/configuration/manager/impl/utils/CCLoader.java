@@ -31,17 +31,17 @@ public class CCLoader extends YamlConfigurationLoader {
     }
 
 
-    public Config loadConfig(InputStream input) throws ConfigurationException {
-//        InputStream input = null;
+    public Config loadConfig( InputStream input ) throws ConfigurationException {
+        //        InputStream input = null;
         try {
-//            URL url = getStorageConfigURL();
-//            try {
-//                input = url.openStream();
-//            }
-//            catch ( IOException e ) {
-//                getStorageConfigURL should have ruled this out
-//                throw new AssertionError( e );
-//            }
+            //            URL url = getStorageConfigURL();
+            //            try {
+            //                input = url.openStream();
+            //            }
+            //            catch ( IOException e ) {
+            //                getStorageConfigURL should have ruled this out
+            //                throw new AssertionError( e );
+            //            }
             org.yaml.snakeyaml.constructor.Constructor constructor =
                     new org.yaml.snakeyaml.constructor.Constructor( Config.class );
             TypeDescription seedDesc = new TypeDescription( SeedProviderDef.class );
@@ -51,7 +51,6 @@ public class CCLoader extends YamlConfigurationLoader {
             constructor.setPropertyUtils( propertiesChecker );
             Yaml yaml = new Yaml( constructor );
             Config result = yaml.loadAs( input, Config.class );
-            result.configHintedHandoff();
             propertiesChecker.check();
             return result;
         }
