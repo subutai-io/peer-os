@@ -2,6 +2,7 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
@@ -27,7 +28,6 @@ public class TerminalControl extends VerticalLayout {
 
 		addComponent(sendButton);
 		addComponent(commandPrompt);
-		focusPrompt();
 
 		this.setSizeFull();
 	}
@@ -50,10 +50,19 @@ public class TerminalControl extends VerticalLayout {
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 
-		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
+		commandPrompt.addFocusListener(new FieldEvents.FocusListener() {
 			@Override
-			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
-				System.out.println(textChangeEvent.getText());
+			public void focus(FieldEvents.FocusEvent focusEvent) {
+				focusPrompt();
+				sendButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+			}
+		});
+
+		commandPrompt.addBlurListener(new FieldEvents.BlurListener() {
+			@Override
+			public void blur(FieldEvents.BlurEvent blurEvent) {
+				focusPrompt();
+				sendButton.removeClickShortcut();
 			}
 		});
 	}
@@ -69,7 +78,6 @@ public class TerminalControl extends VerticalLayout {
 
 	public void focusPrompt() {
 		commandPrompt.setCursorPosition(commandPrompt.getValue().length());
-		commandPrompt.focus();
 	}
 
 	public String getCommand() {
