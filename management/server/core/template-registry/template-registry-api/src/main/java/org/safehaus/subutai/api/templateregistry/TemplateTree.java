@@ -84,13 +84,12 @@ public class TemplateTree {
      * @return - name of parent template {@code String}
      */
     public String getParentTemplateName( String childTemplateName, String lxcArch ) {
-        if ( childTemplateName != null && lxcArch != null ) {
-            String parentName =
-                    childParent.get( String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
+        String childName = ( childTemplateName != null && lxcArch != null ) ?
+                           String.format( "%s-%s", childTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
+        String parentName = childParent.get( childName );
 
-            if ( parentName != null ) {
-                return parentName.replace( lxcArch.toLowerCase(), "" );
-            }
+        if ( parentName != null ) {
+            return parentName.replace( lxcArch.toLowerCase(), "" );
         }
 
         return null;
@@ -105,10 +104,9 @@ public class TemplateTree {
      * @return - list of {@code Template}
      */
     public List<Template> getChildrenTemplates( String parentTemplateName, String lxcArch ) {
-        if ( parentTemplateName != null && lxcArch != null ) {
-            return parentChild.get( String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
-        }
-        return null;
+        String parentName = ( parentTemplateName != null && lxcArch != null ) ?
+                            String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) : null;
+        return parentChild.get( parentName );
     }
 
 
