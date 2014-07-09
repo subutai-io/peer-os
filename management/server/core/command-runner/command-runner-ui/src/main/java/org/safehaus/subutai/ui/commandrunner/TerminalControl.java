@@ -1,10 +1,9 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
@@ -45,26 +44,15 @@ public class TerminalControl extends VerticalLayout {
 
 	private void initCommandPrompt() {
 		commandPrompt = new TextArea();
+		commandPrompt.setId("terminal");
 		commandPrompt.setSizeFull();
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 
-		commandPrompt.addFocusListener(new FieldEvents.FocusListener() {
-			@Override
-			public void focus(FieldEvents.FocusEvent focusEvent) {
-				focusPrompt();
-				sendButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-			}
-		});
-
-		commandPrompt.addBlurListener(new FieldEvents.BlurListener() {
-			@Override
-			public void blur(FieldEvents.BlurEvent blurEvent) {
-				focusPrompt();
-				sendButton.removeClickShortcut();
-			}
-		});
+		JavaScript.getCurrent().execute("document.getElementById(\"terminal\").addEventListener(\"keydown\", function(ev){\n" +
+				"          console.log(ev);\n" +
+				"}, true);");
 	}
 
 	public void setInputPrompt() {
