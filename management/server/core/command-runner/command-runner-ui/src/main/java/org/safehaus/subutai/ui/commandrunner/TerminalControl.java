@@ -3,13 +3,13 @@ package org.safehaus.subutai.ui.commandrunner;
 import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
 
 /**
  * Created by daralbaev on 7/9/14.
  */
-public class TerminalControl extends VerticalLayout {
+public class TerminalControl extends CssLayout {
 
 	private TextArea commandPrompt;
 	private Button sendButton;

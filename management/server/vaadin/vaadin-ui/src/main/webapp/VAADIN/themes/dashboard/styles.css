@@ -646,7 +646,7 @@
 }
 
 .dashboard .terminal_submit {
-    display: none;
+    display: none !important;
 }
 
 .dashboard .terminal {
