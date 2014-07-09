@@ -1,12 +1,13 @@
 package org.safehaus.subutai.rest.template.manager;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
@@ -90,6 +91,20 @@ public class RestServiceImpl implements RestService {
             path.toFile().delete();
         }
         return "Template package successfully imported.";
+    }
+
+    @Override
+    public Response exportTemplate(String templateName) {
+        // TODO: we need to be able to export in specified physical sever
+        // currently this method calls export script on management server
+        String path = templateManager.exportTemplate(managementHostName, templateName);
+        if(path == null)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
+        String cd = "attachment; filename=\"" + Paths.get(path).getFileName() + "\"";
+        return Response.ok(new File(path)).
+                header("Content-Disposition", cd).
+                type(MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
     }
 
     private String mergeLines(List<String> lines) {
