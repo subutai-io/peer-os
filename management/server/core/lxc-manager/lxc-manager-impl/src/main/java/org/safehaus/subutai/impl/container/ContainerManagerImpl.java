@@ -122,6 +122,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         NodeGroupInfo group = new NodeGroupInfo();
         group.setName(name);
         group.setTemplateName(templateName);
+        if(strategy == null || strategy.length == 0)
+            strategy = new PlacementStrategyENUM[]{
+                PlacementStrategyFactory.getDefaultStrategyType()
+            };
         group.setStrategy(EnumSet.of(strategy[0], strategy));
         group.setInstanceIds(new HashSet<UUID>());
         for(Agent a : agents) {
