@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 . /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
+. /etc/profile
 
 productName=storm
 downloadFileAndMakeChanges() {
@@ -43,7 +44,7 @@ downloadFileAndMakeChanges() {
 
 buildStormDependencies() {
 	export JAVA_HOME=$JAVA_HOME
-
+	echo "JAVA_HOME:" $JAVA_HOME
 	#Install ZeroMQ (Storm Native Dependency)
 	pushd $optDirectory/$extractedZeromqDirectory
 	sudo ./configure
