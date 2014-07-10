@@ -1,21 +1,20 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-tar -xpzf /opt/zookeeper-3.4.5.tar.gz -C /opt
-rm -rf /opt/zookeeper-3.4.5.tar.gz
+. /etc/profile
 
-# Create zookeeper related folders into "/var" directory
-if [ -d "/var/zookeeper" ]; then
-        echo "/var/zookeeper exists!"
-else
-        echo "/var/zookeeper does not exist!"
-	mkdir /var/zookeeper
+zookeeperHome="/opt/zookeeper-3.4.5"
+zookeeperConf="/etc/zookeeper"
+
+if [[ "x$ZOOKEEPER_HOME" != "x" ]];
+then
+        zookeeperHome=$ZOOKEEPER_HOME
 fi
 
-FilePath="/etc/profile"
-zookeeperHomeEcho="/opt/zookeeper-3.4.5"
-zookeeperPath="\/opt\/zookeeper-3.4.5\/bin"
-zookeeperPathEcho=$zookeeperHomeEcho"/bin"
+if [[ "x$ZOOKEEPER_CONF_DIR" != "x" ]];
+then
+        zookeeperConf=$ZOOKEEPER_CONF_DIR
+fi
 
-# edit zkServer.sh script to clean warning "[: /var/zookeeper/: unexpected operator"
-sed -i "s/if \[ \-f \$ZOOPIDFILE \]; then/    if [ -f \"\$ZOOPIDFILE\" ]; then/g" $zookeeperHomeEcho/bin/zkServer.sh
-. $FilePath
+# Create symlink to configuration files
+ln -sf $zookeeperConf/* $zookeeperHome/conf/

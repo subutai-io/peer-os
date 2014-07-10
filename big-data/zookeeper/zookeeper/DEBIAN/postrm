@@ -1,13 +1,20 @@
-#!/bin/sh
-
-# Exit on error
+#!/bin/bash
 set -e
 
 . /etc/profile
+
+zookeeperHome="/opt/zookeeper-3.4.5"
+if [[ "x$ZOOKEEPER_HOME" != "x" ]];
+then
+        zookeeperHome=$ZOOKEEPER_HOME
+fi
+
+# Remove Zookeeper home folder
+if [ -d $zookeeperHome ]; then
+        rm -r $zookeeperHome
+fi
+
 # Remove zookeeper related folders
 if [ -d "/var/zookeeper" ]; then
-        echo "/var/zookeeper exists!"
         rm -r /var/zookeeper
-else
-        echo "/var/zookeeper does not exist!"
 fi

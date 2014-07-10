@@ -52,7 +52,7 @@ getSourcesToRelevantDirectories() {
 generateDebianPackage() {
 	updatePackageContent $1
         pushd $BASE
-	generateMD5Sum
+	generateMD5Sum $1
 	dpkg-deb -z8 -Zgzip --build $packageName/
 	cp $packageName".deb" $TARGET/
 	popd
@@ -105,5 +105,8 @@ updatePackageContent() {
 	popd
 }
 generateMD5Sum() {
+	initializeVariables $1
+        pushd $BASE
         md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
+	popd
 }
