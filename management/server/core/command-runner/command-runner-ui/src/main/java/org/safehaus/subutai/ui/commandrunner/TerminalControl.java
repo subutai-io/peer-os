@@ -2,7 +2,6 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextArea;
 import org.safehaus.subutai.ui.commandrunner.custom.TerminalArea;
@@ -33,7 +32,6 @@ public class TerminalControl extends CssLayout {
 		commandPrompt.setSizeFull();
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
-		commandPrompt.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
 		setInputPrompt();
 		focusPrompt();
 		TerminalArea.extend(commandPrompt);
