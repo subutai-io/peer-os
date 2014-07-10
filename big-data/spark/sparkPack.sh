@@ -29,7 +29,9 @@ downloadFileAndMakeChanges() {
 	rm -r spark-$sparkVersion-bin*
 	
 	# move configuration files 
-	mv nutch-$nutchVersion/conf/* $confDirectory
+	mv spark-$sparkVersion/conf/* $confDirectory
+
+	chmod +x $confDirectory/spark-env.sh
 	popd
 }
 # 1) Get the sources which are downloaded from version control system
