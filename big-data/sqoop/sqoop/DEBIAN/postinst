@@ -6,7 +6,7 @@ FilePath="/etc/profile"
 
 sqoopVersion=1.4.4
 sqoopHome="/opt/sqoop-$sqoopVersion"
-pigConf="/etc/sqoop"
+sqoopConf="/etc/sqoop"
 
 if [[ "x$SQOOP_HOME" != "x" ]];
 then
