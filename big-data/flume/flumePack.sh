@@ -16,7 +16,7 @@ downloadFileAndMakeChanges() {
     mkdir -p $confDirectory
 
 	# download flume
-	wget http://www.apache.org/dyn/closer.cgi/flume/$flumeVersion/apache-flume-$flumeVersion-bin.tar.gz -P $tempDirectory
+	wget http://archive.apache.org/dist/flume/$flumeVersion/apache-flume-$flumeVersion-bin.tar.gz -P $tempDirectory
 	
 	pushd $tempDirectory
 	tar -xzpf apache-flume-*.tar.gz
@@ -31,7 +31,7 @@ downloadFileAndMakeChanges() {
 	mv flume-$flumeVersion/conf/* $confDirectory/
 
 	# remove old dependencies
-	rm $tempDirectory/flume-$flumeVersion/lib/lucene*
+	# rm $tempDirectory/flume-$flumeVersion/lib/lucene*
 
 	# download dependencies and place them under /flume/lib folder.
 	luceneVersion=4.6.0
