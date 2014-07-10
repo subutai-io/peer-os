@@ -52,7 +52,7 @@ getSourcesToRelevantDirectories() {
 generateDebianPackage() {
 	updatePackageContent $1
         pushd $BASE
-	generateMD5Sum
+	generateMD5Sum $1
 	dpkg-deb -z8 -Zgzip --build $packageName/
 	cp $packageName".deb" $TARGET/
 	popd
