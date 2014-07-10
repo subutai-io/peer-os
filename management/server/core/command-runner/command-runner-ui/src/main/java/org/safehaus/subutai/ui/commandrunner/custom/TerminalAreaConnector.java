@@ -24,13 +24,13 @@ public class TerminalAreaConnector extends AbstractExtensionConnector {
 			}
 
 			int keyCode = event.getNativeEvent().getKeyCode();
-			System.out.println(keyCode + " ");
+			textArea.setText(String.format(" %s -> %d ", textArea.getText(), keyCode));
 		}
 	};
 
 	@Override
-	protected void extend(ServerConnector target){
-		textArea = (VTextArea) ((ComponentConnector)target).getWidget();
+	protected void extend(ServerConnector target) {
+		textArea = (VTextArea) ((ComponentConnector) target).getWidget();
 		textArea.addKeyPressHandler(keyPressHandler);
 	}
 }
