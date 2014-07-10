@@ -5,7 +5,7 @@ FilePath="/etc/profile"
 . $FilePath
 
 sqoopVersion=1.4.4
-sqoopHome="/opt/$sqoopVersion"
+sqoopHome="/opt/sqoop-$sqoopVersion"
 pigConf="/etc/sqoop"
 
 if [[ "x$SQOOP_HOME" != "x" ]];
