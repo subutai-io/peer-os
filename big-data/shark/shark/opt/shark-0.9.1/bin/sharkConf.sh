@@ -4,8 +4,8 @@ set -e
 function usage()
 {
 	echo "Example usage:"
-        echo "sharkConf.sh clear master/hive -> Clears the content of the shark-env.sh file with respect to second argument"
-        echo "sharkConf.sh master x -> Exports x as spark master in shark-env.sh"
+    echo "sharkConf.sh clear master/hive -> Clears the content of the shark-env.sh file with respect to second argument"
+    echo "sharkConf.sh master x -> Exports x as spark master in shark-env.sh"
 	echo "sharkConf.sh hive x -> Exports x as HIVE_HOME and HIVE_CONF_DIR in spark-env.sh"
 	exit 0
 }
@@ -19,7 +19,7 @@ then
 fi
 . /etc/profile
 
-file="${SHARK_HOME}/conf/shark-env.sh"
+file="/etc/shark/shark-env.sh"
 
 case "$1" in
 clear)
