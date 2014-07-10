@@ -159,36 +159,40 @@ public class TemplateRegistryForm extends CustomComponent implements Disposable 
     private void fillTemplateTree() {
         container.removeAllItems();
         TemplateTree tree = registryManager.getTemplateTree();
-        String parent = null;
-        List<Template> uberTemplates = tree.getChildrenTemplates( parent );
-        for ( Template template : uberTemplates ) {
-            addChildren( tree, template );
+        List<Template> rootTemplates = tree.getRootTemplates();
+        if ( rootTemplates != null ) {
+            for ( Template template : rootTemplates ) {
+                addChildren( tree, template );
+            }
         }
     }
 
 
     private void addChildren( TemplateTree tree, Template currentTemplate ) {
-        Item templateItem = container.addItem( currentTemplate.getTemplateName() );
+        String itemId = String.format( "%s-%s", currentTemplate.getTemplateName(), currentTemplate.getLxcArch() );
+        Item templateItem = container.addItem( itemId );
         templateItem.getItemProperty( "value" ).setValue( currentTemplate );
-        templateTree.setItemCaption( currentTemplate.getTemplateName(), currentTemplate.getTemplateName() );
+        templateTree.setItemCaption( itemId, currentTemplate.getTemplateName() );
 
         Template parent = tree.getParentTemplate( currentTemplate );
+        System.out.println( parent );
         if ( parent != null ) {
-            container.setParent( currentTemplate.getTemplateName(), parent.getTemplateName() );
+            System.out.println( String.format( "%s-%s", parent.getTemplateName(), parent.getLxcArch() ) );
+            container.setParent( itemId, String.format( "%s-%s", parent.getTemplateName(), parent.getLxcArch() ) );
         }
 
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
         if ( children == null || children.isEmpty() ) {
-            container.setChildrenAllowed( currentTemplate.getTemplateName(), false );
+            container.setChildrenAllowed( itemId, false );
         }
         else {
-            container.setChildrenAllowed( currentTemplate.getTemplateName(), true );
+            container.setChildrenAllowed( itemId, true );
             for ( Template child : children ) {
 
                 addChildren( tree, child );
             }
 
-            templateTree.expandItem( currentTemplate.getTemplateName() );
+            templateTree.expandItem( itemId );
         }
     }
 
