@@ -43,7 +43,7 @@ downloadFileAndMakeChanges() {
 
 buildStormDependencies() {
 	export JAVA_HOME=$JAVA_HOME
-
+	echo "JAVA_HOME:" $JAVA_HOME
 	#Install ZeroMQ (Storm Native Dependency)
 	pushd $optDirectory/$extractedZeromqDirectory
 	sudo ./configure
