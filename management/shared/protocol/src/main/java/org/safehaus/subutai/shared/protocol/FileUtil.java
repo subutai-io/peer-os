@@ -1,11 +1,10 @@
 package org.safehaus.subutai.shared.protocol;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileUtil {
@@ -57,5 +56,31 @@ public class FileUtil {
 		URLClassLoader classLoader = new URLClassLoader(new URL[] {url}, Thread.currentThread().getContextClassLoader());
 
 		return classLoader;
+	}
+
+	private static String streamToString(InputStream is) {
+		Scanner scanner = new Scanner(is).useDelimiter("\\A");
+		return scanner.hasNext() ? scanner.next() : "";
+	}
+
+	private static String readFile(String filePath, Object object) throws IOException {
+
+		InputStream is = getClassLoader(object).getResourceAsStream(filePath);
+		String s = streamToString(is);
+		is.close();
+
+		return s;
+	}
+
+	public static String getContent(String filePath, Object object) {
+		String content = "";
+
+		try {
+			content = readFile(filePath, object);
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Error while reading file: " + e);
+		}
+
+		return content;
 	}
 }

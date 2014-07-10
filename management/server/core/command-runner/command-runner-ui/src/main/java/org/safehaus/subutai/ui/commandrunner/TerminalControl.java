@@ -3,8 +3,9 @@ package org.safehaus.subutai.ui.commandrunner;
 import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextArea;
-import org.safehaus.subutai.ui.commandrunner.custom.TerminalArea;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
 /**
  * Created by daralbaev on 7/9/14.
@@ -34,7 +35,8 @@ public class TerminalControl extends CssLayout {
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 		focusPrompt();
-		TerminalArea.extend(commandPrompt);
+
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
 	}
 
 	public void setInputPrompt() {
