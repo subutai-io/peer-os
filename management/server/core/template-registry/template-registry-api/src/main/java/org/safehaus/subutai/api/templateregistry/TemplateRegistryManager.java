@@ -109,7 +109,7 @@ public interface TemplateRegistryManager {
     /**
      * Returns list of all parent templates starting from MASTER
      *
-     * @param childTemplateName - namee of template whose parents to return
+     * @param childTemplateName - name of template whose parents to return
      *
      * @return - list of {@code Template}
      */
