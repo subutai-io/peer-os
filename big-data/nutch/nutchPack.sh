@@ -28,8 +28,6 @@ downloadFileAndMakeChanges() {
 	
 	# move configuration files 
 	mv nutch-$nutchVersion/conf/* $confDirectory
-
-	chmod +x $BASE/$fileName/etc/nutch/nutch-env.sh
 	popd
 }
 # 1) Get the sources which are downloaded from version control system
