@@ -29,8 +29,9 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
         return scriptExecutor.execute(a, ActionType.CLONE,
-                templateName, cloneName, " 1>/dev/null 2>&1");
+                templateName, cloneName, " &");
         // TODO: script does not return w/o redirecting outputs!!!
+        // for now, script is run in background
     }
 
     @Override
