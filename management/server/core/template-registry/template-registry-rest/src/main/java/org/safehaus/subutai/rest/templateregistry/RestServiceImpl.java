@@ -35,8 +35,20 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getParentTemplate( final String childName ) {
-        return gson.toJson( templateRegistryManager.getParentTemplate( childName ) );
+    public String getTemplate( final String templateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
+    }
+
+
+    @Override
+    public String getParentTemplate( final String childTemplateName ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName ) );
+    }
+
+
+    @Override
+    public String getParentTemplate( final String childTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName, lxcArch ) );
     }
 
 
@@ -51,8 +63,24 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public String getParentTemplates( final String childTemplateName, final String lxcArch ) {
+        List<String> parents = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName, lxcArch ) ) {
+            parents.add( template.getTemplateName() );
+        }
+        return gson.toJson( parents );
+    }
+
+
+    @Override
     public String getChildTemplates( final String parentTemplateName ) {
         return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
+    }
+
+
+    @Override
+    public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
     }
 
 
