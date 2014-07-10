@@ -54,8 +54,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         // clone specified number of instances and store their names
         List<String> cloneNames = new ArrayList<>();
         for(Map.Entry<Agent, Integer> e : slots.entrySet()) {
+            Set<String> existingNames = getContainerNames(e.getKey().getHostname());
             for(int i = 0; i < e.getValue(); i++) {
-                String name = nextHostName(templateName);
+                String name = nextHostName(templateName, existingNames);
                 boolean b = templateManager.clone(e.getKey().getHostname(),
                         templateName, name);
                 if(b) cloneNames.add(name);
@@ -94,14 +95,23 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         return comm.hasSucceeded();
     }
 
-    private String nextHostName(String templateName) {
+    private String nextHostName(String templateName, Set<String> existingNames) {
         AtomicInteger i = sequences.putIfAbsent(templateName, new AtomicInteger());
         if(i == null) i = sequences.get(templateName);
         while(true) {
             String name = templateName + "-" + i.incrementAndGet();
-            Agent a = agentManager.getAgentByHostname(name);
-            if(a == null) return name;
+            if(!existingNames.contains(name)) return name;
         }
+    }
+
+    private Set<String> getContainerNames(String hostname) {
+        Map<String, EnumMap<LxcState, List<String>>> map = lxcManager.getLxcOnPhysicalServers();
+        EnumMap<LxcState, List<String>> lxcs = map.get(hostname);
+        if(lxcs == null) return Collections.emptySet();
+
+        Set<String> res = new HashSet<>();
+        for(List<String> ls : lxcs.values()) res.addAll(ls);
+        return res;
     }
 
     private boolean saveNodeGroup(String name, String templateName, Set<Agent> agents,
