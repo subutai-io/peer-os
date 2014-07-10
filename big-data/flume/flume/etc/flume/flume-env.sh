@@ -21,7 +21,7 @@
 # Enviroment variables can be set here.
 
 export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
-export FLUME_HOME=/opt/flume-1.4.0
+export FLUME_HOME=/opt/flume-1.5.0
 export FLUME_CONF_DIR=$FLUME_HOME/conf
 export HADOOP_HOME=/opt/hadoop-1.2.1
 export HBASE_HOME=/opt/hbase-0.94.11
