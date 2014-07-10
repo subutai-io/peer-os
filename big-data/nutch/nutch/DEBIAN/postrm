@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash 
 set -e
 # Remove Nutch Files and Folders
 if [ -d "/opt/nutch-1.8" ]; then
