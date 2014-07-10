@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumuloVer="1.4.2"
+accumuloVer="1.6.0"
 
 function usage()
 {
@@ -26,7 +26,7 @@ escape_characters()
 	echo $escaped_name
 }
 . /etc/profile
-ACCUMULO_HOME="/opt/accumulo-1.4.2"
-file="$ACCUMULO_HOME/conf/accumulo-env.sh"
+ACCUMULO_HOME="/opt/accumulo-$accumuloVer"
+file="/etc/accumulo/accumulo-env.sh"
 path=$(escape_characters $2)
 sed -i "s/export $1=.*/export $1=$path/g" $file

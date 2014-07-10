@@ -1,32 +1,44 @@
-#!/bin/sh 
+#!/bin/bash 
 set -e
 FilePath="/etc/profile"
-accumuloHomeEcho="/opt/accumulo-1.4.2"
+
+accumuloVersion=1.6.0
+accumuloHome="/opt/$accumuloVersion"
+accumuloConf="/etc/cassandra"
+
+if [[ "x$ACCUMULO_HOME" != "x" ]];
+then
+        accumuloHome=$ACCUMULO_HOME
+fi
+
+# Create symlink to configuration files and scripts
+ln -s $accumuloConf/* $accumuloHome/conf/
 
 if [ "x$JAVA_HOME" = "x" ];
 then
-	$accumuloHomeEcho/bin/accumulo-property.sh JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk-amd64
+	$accumuloHome/bin/accumulo-property.sh JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk-amd64
 else
-	$accumuloHomeEcho/bin/accumulo-property.sh JAVA_HOME $JAVA_HOME 
+	$accumuloHome/bin/accumulo-property.sh JAVA_HOME $JAVA_HOME 
 fi
 
 if [ "x$HADOOP_HOME" = "x" ];
 then
-	$accumuloHomeEcho/bin/accumulo-property.sh HADOOP_HOME /opt/hadoop-1.2.1
+	$accumuloHome/bin/accumulo-property.sh HADOOP_HOME /opt/hadoop-1.2.1
 else
-        $accumuloHomeEcho/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
+        $accumuloHome/bin/accumulo-property.sh HADOOP_HOME $HADOOP_HOME
 fi
 
 if [ "x$ZOOKEEPER_HOME" = "x" ];
 then
-        $accumuloHomeEcho/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
+        $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME /opt/zookeeper-3.4.5
 else
-        $accumuloHomeEcho/bin/accumulo-property.sh ZOOKEEPER_HOME $ZOOKEEPER_HOME
+        $accumuloHome/bin/accumulo-property.sh ZOOKEEPER_HOME $ZOOKEEPER_HOME
 fi
 
 if [ "x$ACCUMULO_LOG_DIR" = "x" ];
 then
-        $accumuloHomeEcho/bin/accumulo-property.sh ACCUMULO_LOG_DIR /opt/accumulo-1.4.2/log 
+        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR /opt/accumulo-1.4.2/log 
 else
-        $accumuloHomeEcho/bin/accumulo-property.sh ACCUMULO_LOG_DIR $ACCUMULO_LOG_DIR
+        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $ACCUMULO_LOG_DIR
 fi
+

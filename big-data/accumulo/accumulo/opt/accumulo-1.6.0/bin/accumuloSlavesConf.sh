@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumuloVer="1.4.2"
+accumuloVer="1.6.0"
 
 function usage()
 {
@@ -20,7 +20,7 @@ then
 	usage	
 fi
 
-slavesFile="${ACCUMULO_HOME}/conf/slaves"
+slavesFile="/etc/accumulo/slaves"
 
 case "$1" in
 	slaves)
