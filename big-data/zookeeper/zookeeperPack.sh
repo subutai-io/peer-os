@@ -41,4 +41,4 @@ getSourcesToRelevantDirectories $productName
 # 3) Download hadoop tar file and make necessary changes
 downloadFileAndMakeChanges $productName
 # 4) Create the Debian package
-generateDebianPackage $productName
+generateDebianPackageWithoutMD5 $productName
