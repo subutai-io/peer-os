@@ -60,8 +60,10 @@ public class RestServiceImpl implements RestService {
     public String getTemplateTree() {
         TemplateTree tree = templateRegistryManager.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
-        for ( Template template : uberTemplates ) {
-            addChildren( tree, template );
+        if ( uberTemplates != null ) {
+            for ( Template template : uberTemplates ) {
+                addChildren( tree, template );
+            }
         }
         return gson.toJson( uberTemplates );
     }

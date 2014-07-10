@@ -42,8 +42,10 @@ public class ListTemplatesCommand extends OsgiCommandSupport {
 
         TemplateTree tree = templateRegistryManager.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
-        for ( Template template : uberTemplates ) {
-            listFamily( 0, tree, template );
+        if ( uberTemplates != null ) {
+            for ( Template template : uberTemplates ) {
+                listFamily( 0, tree, template );
+            }
         }
 
         return null;
