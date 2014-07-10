@@ -32,7 +32,7 @@ downloadFileAndMakeChanges() {
 
 	# edit zkServer.sh script to clean warning "[: /var/zookeeper/: unexpected operator"
 	sed -i "s/if \[ \-f \$ZOOPIDFILE \]; then/    if [ -f \"\$ZOOPIDFILE\" ]; then/g" $optDirectory/$extractedZookeeperDirectory/bin/zkServer.sh
-
+	popd
 
 }
 
