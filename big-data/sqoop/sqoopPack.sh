@@ -24,6 +24,9 @@ downloadFileAndMakeChanges() {
 	# remove tar file
 	rm sqoop-*.tar.gz
 
+	# remane downloaded file -- remove hadoop-1 from file name -- 
+	mv sqoop-$sqoopVersion.bin__hadoop-1* sqoop-$sqoopVersion
+
 	# move configuration files of sqoop under etc/
 	mv sqoop-*/conf/* $confDirectory/
 
