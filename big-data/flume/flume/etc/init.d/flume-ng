@@ -16,7 +16,7 @@
 # limitations under the License.
 
 
-. /opt/flume-1.4.0/conf/flume-env.sh
+. /etc/flume/flume-env.sh
 
 usage="Usage: $0.sh (start|stop) <flume-command> <args...>"
 
