@@ -9,6 +9,7 @@ downloadFileAndMakeChanges() {
         optDirectory=$BASE/$fileName/opt
         confDirectory=$BASE/$fileName/etc/$productName
         tarFile=zookeeper-3.4.5.tar.gz
+	extractedZookeeperDirectory=zookeeper-3.4.5
         mkdir -p $optDirectory
 	mkdir -p $confDirectory
 
@@ -30,7 +31,7 @@ downloadFileAndMakeChanges() {
 	fi
 
 	# edit zkServer.sh script to clean warning "[: /var/zookeeper/: unexpected operator"
-	sed -i "s/if \[ \-f \$ZOOPIDFILE \]; then/    if [ -f \"\$ZOOPIDFILE\" ]; then/g" $optDirectory/$fileName/bin/zkServer.sh
+	sed -i "s/if \[ \-f \$ZOOPIDFILE \]; then/    if [ -f \"\$ZOOPIDFILE\" ]; then/g" $optDirectory/$extractedZookeeperDirectory/bin/zkServer.sh
 
 
 }
