@@ -74,7 +74,8 @@ public class ShellCommands extends OsgiCommandSupport {
                 connection = pooledConnectionFactory.createConnection();
                 connection.start();
                 session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-                Destination destination = session.createTopic( "BROADCAST_TOPIC" );
+//                Destination destination = session.createTopic( "BROADCAST_TOPIC" );
+                Destination destination = session.createTopic( "95d37e69-c118-4706-b65b-752a6aca9ad7" );
                                                                            //: command.getUuid().toString() );
 
                 producer = session.createProducer( destination );
@@ -85,7 +86,7 @@ public class ShellCommands extends OsgiCommandSupport {
                   + "\"command\": { "
                   + "\"source\": \"FS_TRACKER\", "
                   + "\"type\": \"EXECUTE_REQUEST\", "
-                  + "\"uuid\": \"499f4b6e-36f7-4588-92a2-13d9008de628\", "
+                  + "\"uuid\": \"95d37e69-c118-4706-b65b-752a6aca9ad7\", "
                   + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\", "
                   + "\"requestSequenceNumber\": 1, "
                   + "\"workingDirectory\": \"/\", "
@@ -99,20 +100,18 @@ public class ShellCommands extends OsgiCommandSupport {
                   + "}";
 
 
-
-                /*
+/*
                 json = "{"
                       + "\"command\": { "
                       + "\"source\": \"FS_TRACKER\", "
                       + "\"type\": \"INOTIFY_SHOW_REQUEST\", "
-                      + "\"uuid\": \"499f4b6e-36f7-4588-92a2-13d9008de628\", "
+                      + "\"uuid\": \"95d37e69-c118-4706-b65b-752a6aca9ad7\", "
                       + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\" "
                       + "}"
                       + "}";
-*/
 
 
-                /*json = "{"
+                json = "{"
                       + "\"command\": { "
                       + "\"source\": \"FS_TRACKER\", "
                       + "\"type\": \"INOTIFY_REQUEST\", "
@@ -122,6 +121,7 @@ public class ShellCommands extends OsgiCommandSupport {
                       + "}"
                       + "}";
 */
+
 
                 /*
                 json = "{"
@@ -168,7 +168,9 @@ public class ShellCommands extends OsgiCommandSupport {
             // Do not close this connection otherwise server listener will be closed
             connection.start();
             Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
-            Destination adminQueue = session.createTopic( "BROADCAST_TOPIC" );
+//            Destination adminQueue = session.createTopic( "BROADCAST_TOPIC" );
+            Destination adminQueue = session.createTopic( "INOTIFY_TOPIC" );
+
             MessageConsumer consumer = session.createConsumer( adminQueue );
 
             TestMessageListener testMessageListener = new TestMessageListener();

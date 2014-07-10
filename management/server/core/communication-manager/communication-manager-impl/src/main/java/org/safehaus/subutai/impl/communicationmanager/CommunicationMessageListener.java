@@ -18,15 +18,17 @@ import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
 
 
 /**
- * This class is used internally by CommunicationManagerImpl to notify response listener on new message.
+ * Used internally by CommunicationManagerImpl to notify a response listener on a new message.
  */
 class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
+
     private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
 
@@ -37,6 +39,11 @@ class CommunicationMessageListener implements MessageListener {
      */
     @Override
     public void onMessage( Message message ) {
+
+        System.out.println( ">> " + message );
+        System.out.println( message instanceof BytesMessage );
+        System.out.println( message instanceof ActiveMQMessage );
+
         try {
 
             if ( message instanceof BytesMessage ) {
@@ -61,6 +68,10 @@ class CommunicationMessageListener implements MessageListener {
                     LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
                 }
             }
+            else if ( message instanceof ActiveMQTextMessage ) {
+                ActiveMQTextMessage msg = ( ActiveMQTextMessage ) message;
+                System.out.printf( "text: " + msg.getText() );
+            }
             else if ( message instanceof ActiveMQMessage ) {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
 
@@ -72,6 +83,7 @@ class CommunicationMessageListener implements MessageListener {
                     notifyListeners( agentDisconnect );
                 }
             }
+
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in onMessage", ex );
