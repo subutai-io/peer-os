@@ -3,7 +3,7 @@ set -e
 FilePath="/etc/profile"
 
 accumuloVersion=1.6.0
-accumuloHome="/opt/$accumuloVersion"
+accumuloHome="/opt/accumulo-$accumuloVersion"
 accumuloConf="/etc/cassandra"
 
 if [[ "x$ACCUMULO_HOME" != "x" ]];
