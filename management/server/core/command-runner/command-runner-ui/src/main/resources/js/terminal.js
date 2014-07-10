@@ -1,18 +1,19 @@
 function escapeInput(e) {
-    console.log(e.keyCode);
     switch (e.keyCode) {
         case 37:
             // left key pressed
-            break;
+            return false;
         case 38:
             // up key pressed
-            break;
+            return false;
         case 39:
             // right key pressed
-            break;
+            return false;
         case 40:
             // down key pressed
-            break;
+            return false;
+        default:
+            return true;
     }
 }
 document.getElementById("terminal").onkeydown = escapeInput;
