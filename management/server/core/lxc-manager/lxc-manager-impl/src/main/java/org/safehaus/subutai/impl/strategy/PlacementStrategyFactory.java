@@ -20,4 +20,8 @@ public class PlacementStrategyFactory {
         return new BestServerStrategy(nodesCount, strategy);
     }
 
+    public static PlacementStrategyENUM getDefaultStrategyType() {
+        return PlacementStrategyENUM.ROUND_ROBIN;
+    }
+
 }
