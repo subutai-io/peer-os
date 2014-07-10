@@ -44,23 +44,23 @@ downloadFileAndMakeChanges() {
 
 buildStormDependencies() {
 	export JAVA_HOME=$JAVA_HOME
-	echo "JAVA_HOME:" $JAVA_HOME
+	
 	#Install ZeroMQ (Storm Native Dependency)
 	pushd $optDirectory/$extractedZeromqDirectory
-	sudo ./configure
-	sudo make
+	./configure
+	make
 	sudo make install
 	popd
 
 	# Install JZMQ(Storm Native Dependency)
 	pushd $optDirectory/$jzmqDirectory
-	sudo ./autogen.sh
-	sudo ./configure
+	./autogen.sh
+	./configure
 	pushd src
 	touch classdist_noinst.stamp
 	CLASSPATH=.:./.:$CLASSPATH javac -d . org/zeromq/ZMQ.java org/zeromq/ZMQException.java org/zeromq/ZMQQueue.java org/zeromq/ZMQForwarder.java org/zeromq/ZMQStreamer.java
 	popd
-	sudo make
+	make
 	sudo make install
 	popd
 }
