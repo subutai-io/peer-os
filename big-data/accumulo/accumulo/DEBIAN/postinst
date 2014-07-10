@@ -4,7 +4,7 @@ FilePath="/etc/profile"
 
 accumuloVersion=1.6.0
 accumuloHome="/opt/accumulo-$accumuloVersion"
-accumuloConf="/etc/cassandra"
+accumuloConf="/etc/accumulo"
 
 if [[ "x$ACCUMULO_HOME" != "x" ]];
 then
