@@ -1,10 +1,11 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextArea;
+import org.safehaus.subutai.ui.commandrunner.custom.TerminalArea;
 
 /**
  * Created by daralbaev on 7/9/14.
@@ -32,15 +33,10 @@ public class TerminalControl extends CssLayout {
 		commandPrompt.setSizeFull();
 		commandPrompt.setImmediate(true);
 		commandPrompt.addStyleName("terminal");
+		commandPrompt.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.LAZY);
 		setInputPrompt();
 		focusPrompt();
-
-		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
-			@Override
-			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
-				System.out.println(textChangeEvent.getText());
-			}
-		});
+		TerminalArea.extend(commandPrompt);
 	}
 
 	public void setInputPrompt() {
