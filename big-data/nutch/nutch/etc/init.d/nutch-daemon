@@ -9,7 +9,7 @@
 
 # resolve links - $0 may be a softlink
 
-. /opt/nutch-1.5/conf/nutch-env.sh
+. /etc/nutch/nutch-env.sh
 
 this="$0"
 while [ -h "$this" ]; do

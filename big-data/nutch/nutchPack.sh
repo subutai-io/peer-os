@@ -1,52 +1,41 @@
-#!/bin/sh
-
+#!/bin/bash
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-if ls | grep .deb ; then
-        rm  *.deb
-fi
+productName=nutch
+downloadFileAndMakeChanges() {
+	initializeVariables $1
 
-rm -rf ksks-nutch*/*
-cp -r ../workspace/big-data/nutch/nutch/* ksks-nutch*/
-cd ksks-nutch*
-mkdir opt
-wget -P opt http://archive.apache.org/dist/nutch/1.5/apache-nutch-1.5-bin.tar.gz
-mkdir -p opt/nutch-1.5 && tar -xvpf opt/*.tar.gz -C opt/nutch-1.5
-rm -rf opt/*.tar.gz
-cd -
+	tempDirectory=$BASE/$fileName/opt
+	confDirectory=$BASE/$fileName/etc/nutch
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+	nutchVersion=1.8
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+	# Create directories that are required for the debian package
+    mkdir -p $tempDirectory
+    mkdir -p $confDirectory
 
+	# download hbase which is compatible with hadoop1 version. 
+	wget http://archive.apache.org/dist/nutch/$nutchVersion/apache-nutch-$nutchVersion-bin.tar.gz -P $tempDirectory
+	pushd $tempDirectory
+	tar -xzpf apache-nutch-*.tar.gz
 
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+	# remove tar file
+	rm apache-nutch-*.tar.gz
 
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+	# rename folder --remove hadoop1 from file name --
+	mv apache-nutch-* nutch-$nutchVersion
+	
+	# move configuration files 
+	mv nutch-$nutchVersion/conf $confDirectory
 
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
-versionThird=$(echo $version | awk -F"." '{print $3}')
-updatedVersion=$(echo `expr $versionThird + 1`)
-
-updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-nutch-"$updatedRelease"-amd64"
-
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
-
-{
-        mv $fileName $updatedFileName
-} || {
-        echo "Version not changed"
+	chmod +x $BASE/$fileName/etc/nutch/nutch-env.sh
+	popd
 }
-
-find ./$updatedFileName -name "*~" -print0 | xargs -0 rm -rf
-rm $updatedFileName/DEBIAN/md5sums
-md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >> $updatedFileName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $updatedFileName/
-
-cp *.deb ~/Automation/Bigdata/nutch
-
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName
