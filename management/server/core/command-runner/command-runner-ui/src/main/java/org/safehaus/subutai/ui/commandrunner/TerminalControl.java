@@ -1,7 +1,6 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
@@ -36,12 +35,6 @@ public class TerminalControl extends CssLayout {
 		commandPrompt.addStyleName("terminal");
 		setInputPrompt();
 		focusPrompt();
-		commandPrompt.addTextChangeListener(new FieldEvents.TextChangeListener() {
-			@Override
-			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
-				System.out.println(textChangeEvent.getText());
-			}
-		});
 
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
 	}

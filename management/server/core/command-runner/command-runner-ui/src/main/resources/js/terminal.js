@@ -1,4 +1,5 @@
 function escapeInput(e) {
+    console.log(document.getElementById("terminal").value);
     switch (e.keyCode) {
         case 37:
             // left key pressed
@@ -12,7 +13,7 @@ function escapeInput(e) {
         case 40:
             // down key pressed
             return false;
-        default:
+        case 13:
             return true;
     }
 }
