@@ -2,6 +2,10 @@
 
     <reference id="templateManager" availability="mandatory"
                interface="org.safehaus.subutai.api.template.manager.TemplateManager" />
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.container.ContainerManager" />
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/get-master-template-name">
@@ -59,4 +63,23 @@
         </command>
     </command-bundle>
 
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="container/clone-many">
+            <action class="org.safehaus.subutai.cli.container.manager.CloneMany">
+                <property name="templateManager" ref="templateManager" />
+                <property name="containerManager" ref="containerManager" />
+                <property name="agentManager" ref="agentManager" />
+            </action>
+        </command>
+    </command-bundle>
+    
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="container/attach">
+            <action class="org.safehaus.subutai.cli.container.manager.AttachAndExecute">
+                <property name="containerManager" ref="containerManager" />
+                <property name="agentManager" ref="agentManager" />
+            </action>
+        </command>
+    </command-bundle>
+    
 </blueprint>
