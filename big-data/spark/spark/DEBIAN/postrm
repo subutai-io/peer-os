@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-sparkVer="spark-0.9.1"
+sparkVer="spark-1.0.0"
 
 FilePath="/etc/profile"
 

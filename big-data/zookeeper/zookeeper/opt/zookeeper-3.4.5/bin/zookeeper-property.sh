@@ -13,7 +13,6 @@ usage()
 
 . /etc/profile
 add_prop="";
-DEFAULT_ZOOKEEPER_HOME=/opt/zookeeper-3.4.5
 
 # Check if there are at least 3 parameters are passed to the methods!
 if [[ $1 == "" || $2 == "" || $3 == "" ]];
@@ -22,11 +21,13 @@ then
 else
         name_field=$3
 fi
-if [ "x$ZOOKEEPER_HOME" = "x" ];
+zookeeperConf="/etc/zookeeper"
+if [[ "x$ZOOKEEPER_CONF_DIR" != "x" ]];
 then
-       ZOOKEEPER_HOME=$DEFAULT_ZOOKEEPER_HOME 
+        zookeeperConf=$ZOOKEEPER_CONF_DIR
 fi
-fileName="$ZOOKEEPER_HOME/conf/$2"
+
+fileName="$zookeeperConf/$2"
 
 do_add()
 {

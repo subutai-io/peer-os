@@ -5,12 +5,8 @@ set -e
 
 . /etc/profile
 
-mongoHome=$MONGO_HOME
-if [ "x$MONGO_HOME" = "x" ]; 
-then
-        mongoHome=/opt/mongo
-fi
+mongoConfFiles="/etc/mongo"
 
-if [ -d $mongoHome ]; then
-        rm -r $mongoHome
+if ls $mongoConfFiles ; then
+        rm -r $mongoConfFiles
 fi

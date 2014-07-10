@@ -4,7 +4,7 @@ package org.safehaus.subutai.shared.protocol.settings;
 public class Common {
 
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
-    public static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";
+    public static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";   //todo migrate to amqConfig
     public static final int REFRESH_UI_SEC = 3;
     public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 120;
     public static final int AGENT_FRESHNESS_MIN = 4;
@@ -17,9 +17,10 @@ public class Common {
 
     //constant that can be converted into settings in the future
     public static final String BASE_CONTAINER_NAME = "base-container";
+    public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_AGENT_HOSTNAME = "management";
     public static final String GIT_REPO_URL = "git@10.10.10.1:/opt/git/project.git";
     public static final String APT_REPO_PATH = "/repo/ksks/";
-    public static final String AMD64_ARCH_DEB_PACKAGES_LOCATION = "amd64/precise";
     public static final String TMP_DEB_PACKAGE_UNPACK_PATH = "/tmp";
+    public static final String DEFAULT_LXC_ARCH = "amd64";
 }

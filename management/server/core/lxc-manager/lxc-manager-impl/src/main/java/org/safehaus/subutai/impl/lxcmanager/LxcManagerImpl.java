@@ -6,7 +6,6 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,6 +37,7 @@ import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.monitor.Metric;
 import org.safehaus.subutai.api.monitor.Monitor;
+import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
@@ -290,29 +290,22 @@ public class LxcManagerImpl implements LxcManager {
                             agent == null ? String.format( "Offline[%s]", result.getAgentUUID() ) : agent.getHostname();
                     EnumMap<LxcState, List<String>> lxcs = new EnumMap<>( LxcState.class );
                     String[] lxcStrs = result.getStdOut().split( "\\n" );
-                    LxcState currState = null;
-                    for ( String lxcStr : lxcStrs ) {
-                        if ( LxcState.RUNNING.name().equalsIgnoreCase( lxcStr ) ) {
-                            if ( lxcs.get( LxcState.RUNNING ) == null ) {
-                                lxcs.put( LxcState.RUNNING, new ArrayList<String>() );
+
+                    for ( int i = 2; i < lxcStrs.length; i++ ) {
+                        String[] lxcProperties = lxcStrs[i].split( "\\s+" );
+                        if ( lxcProperties.length > 1 ) {
+                            String lxcHostname = lxcProperties[0];
+                            if ( !( Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcHostname )
+                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase( lxcHostname ) ) ) {
+                                String lxcStatus = lxcProperties[1];
+
+                                LxcState state = LxcState.parseState( lxcStatus );
+
+                                if ( lxcs.get( state ) == null ) {
+                                    lxcs.put( state, new ArrayList<String>() );
+                                }
+                                lxcs.get( state ).add( lxcHostname );
                             }
-                            currState = LxcState.RUNNING;
-                        }
-                        else if ( LxcState.STOPPED.name().equalsIgnoreCase( lxcStr ) ) {
-                            if ( lxcs.get( LxcState.STOPPED ) == null ) {
-                                lxcs.put( LxcState.STOPPED, new ArrayList<String>() );
-                            }
-                            currState = LxcState.STOPPED;
-                        }
-                        else if ( LxcState.FROZEN.name().equalsIgnoreCase( lxcStr ) ) {
-                            if ( lxcs.get( LxcState.FROZEN ) == null ) {
-                                lxcs.put( LxcState.FROZEN, new ArrayList<String>() );
-                            }
-                            currState = LxcState.FROZEN;
-                        }
-                        else if ( currState != null && !Common.BASE_CONTAINER_NAME.equalsIgnoreCase( lxcStr.trim() )
-                                && !Strings.isNullOrEmpty( lxcStr ) ) {
-                            lxcs.get( currState ).add( lxcStr.trim() );
                         }
                     }
 
