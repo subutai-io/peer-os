@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumulo=accumulo-1.4.2
+accumulo=accumulo-1.6.0
 
 usage()
 {
@@ -19,7 +19,7 @@ if [[ $1 == "" || $2 == "" || $3 == "" ]];
 then
         usage
 else
-        fileName=/opt/$accumulo/conf/$2
+        fileName=/etc/accumulo/$2
         name_field=$3
 fi
 
@@ -27,7 +27,7 @@ if [ "x$ACCUMULO_HOME" = "x" ];
 then
         :
 else
-        fileName="$ACCUMULO_HOME/conf/$2"
+        fileName="/etc/accumulo/$2"
 fi
 
 do_add()

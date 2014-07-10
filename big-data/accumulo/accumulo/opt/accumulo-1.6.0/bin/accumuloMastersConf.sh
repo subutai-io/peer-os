@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumuloVer="1.4.2"
+accumuloVer="1.6.0"
 
 function usage()
 {
@@ -23,10 +23,10 @@ then
 	usage	
 fi
 
-mastersFile="${ACCUMULO_HOME}/conf/masters"
-tracersFile="${ACCUMULO_HOME}/conf/tracers"
-monitorFile="${ACCUMULO_HOME}/conf/monitor"
-gcFile="${ACCUMULO_HOME}/conf/gc"
+mastersFile="/etc/accumulo/masters"
+tracersFile="/etc/accumulo/tracers"
+monitorFile="/etc/accumulo/monitor"
+gcFile="/etc/accumulo/gc"
 
 case "$1" in
 	masters)
