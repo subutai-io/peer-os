@@ -9,10 +9,10 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>template-manager-impl</artifactId>
+    <artifactId>template-manager-rest</artifactId>
+    <name>Subutai Template Manager Rest</name>
+    <description>Subutai Template Manager Rest</description>
     <packaging>bundle</packaging>
-    <name>Subutai Template Manager</name>
-    <description>Subutai Template Manager Impl</description>
 
     <dependencies>
         <dependency>
@@ -25,38 +25,49 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>template-manager-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>command-runner-api</artifactId>
+            <artifactId>agent-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>apt-repository-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>template-registry-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>apt-repository-api</artifactId>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--CXF-->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+        
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.template.manager.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.rest.template.manager</Bundle-SymbolicName>
+                        <Export-Package>
+                            {local-packages};version=${project.version};-noimport:=true
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

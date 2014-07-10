@@ -1,15 +1,17 @@
-package org.safehaus.subutai.impl.template;
+package org.safehaus.subutai.impl.template.manager;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.template.TemplateManager;
+import org.safehaus.subutai.api.template.manager.TemplateManager;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
 public abstract class TemplateManagerBase implements TemplateManager {
 
     CommandRunner commandRunner;
     AgentManager agentManager;
-    LxcManager lxcManager;
+    TemplateRegistryManager templateRegistry;
+    AptRepositoryManager repoManager;
 
     ScriptExecutor scriptExecutor;
 
@@ -29,12 +31,20 @@ public abstract class TemplateManagerBase implements TemplateManager {
         this.agentManager = agentManager;
     }
 
-    public LxcManager getLxcManager() {
-        return lxcManager;
+    public TemplateRegistryManager getTemplateRegistry() {
+        return templateRegistry;
     }
 
-    public void setLxcManager(LxcManager lxcManager) {
-        this.lxcManager = lxcManager;
+    public void setTemplateRegistry(TemplateRegistryManager templateRegistry) {
+        this.templateRegistry = templateRegistry;
+    }
+
+    public AptRepositoryManager getRepoManager() {
+        return repoManager;
+    }
+
+    public void setRepoManager(AptRepositoryManager repoManager) {
+        this.repoManager = repoManager;
     }
 
     public void init() {

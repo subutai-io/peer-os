@@ -1,60 +1,65 @@
-#!/bin/sh
-
+#!/bin/bash
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-if ls | grep .deb ; then
-        rm  *.deb
-fi
+productName=flume
+downloadFileAndMakeChanges() {
+	initializeVariables $1
 
-rm -rf ksks-flume*/*
-cp -r ../workspace/big-data/flume/flume/* ksks-flume*/
-cd ksks-flume*
-rm -rf opt
-mkdir opt
-wget -P opt http://archive.apache.org/dist/flume/1.4.0/apache-flume-1.4.0-bin.tar.gz
-tar -xvpf opt/*.tar.gz -C opt/
-rm -rf opt/*.tar.gz
-mv opt/* opt/flume-1.4.0
-cd -
-rm ksks-flume*/opt/flume-1.4.0/lib/lucene*
-cp extraJar/* ksks-flume*/opt/flume-1.4.0/lib/
-cp -r ../workspace/big-data/flume/flume/opt/flume-1.4.0/conf/* ksks-flume*/opt/flume-1.4.0/conf/
-cd ksks-flume*/opt/flume-1.4.0
-mkdir logs
-cd -
+	tempDirectory=$BASE/$fileName/opt
+	confDirectory=$BASE/$fileName/etc/flume
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+	flumeVersion=1.5.0
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+	# Create directories that are required for the debian package
+    mkdir -p $tempDirectory
+    mkdir -p $confDirectory
 
+	# download flume
+	wget http://archive.apache.org/dist/flume/$flumeVersion/apache-flume-$flumeVersion-bin.tar.gz -P $tempDirectory
+	
+	pushd $tempDirectory
+	tar -xzpf apache-flume-*.tar.gz
 
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+	# remove tar file
+	rm apache-flume-*.tar.gz
 
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+	# rename folder
+	mv apache-flume-$flumeVersion-bin* flume-$flumeVersion
 
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
-versionThird=$(echo $version | awk -F"." '{print $3}')
-updatedVersion=$(echo `expr $versionThird + 1`)
+	# move configuration files 
+	mv flume-$flumeVersion/conf/* $confDirectory/
 
-updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-flume-"$updatedRelease"-amd64"
+	# remove old dependencies
+	# rm $tempDirectory/flume-$flumeVersion/lib/lucene*
 
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
+	# download dependencies and place them under /flume/lib folder.
+	luceneVersion=4.6.0
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-analyzers-common/$luceneVersion/lucene-analyzers-common-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-analyzers-kuromoji/$luceneVersion/lucene-analyzers-kuromoji-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-analyzers-phonetic/$luceneVersion/lucene-analyzers-phonetic-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-codecs/$luceneVersion/lucene-codecs-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-core/$luceneVersion/lucene-core-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-grouping/$luceneVersion/lucene-grouping-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-highlighter/$luceneVersion/lucene-highlighter-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-memory/$luceneVersion/lucene-memory-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-misc/$luceneVersion/lucene-misc-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-queries/$luceneVersion/lucene-queries-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-queryparser/$luceneVersion/lucene-queryparser-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-spatial/$luceneVersion/lucene-spatial-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/lucene/lucene-suggest/$luceneVersion/lucene-suggest-$luceneVersion.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/apache/hbase/hbase/0.94.16/hbase-0.94.16.jar -P $tempDirectory/flume-$flumeVersion/lib/
+	wget http://central.maven.org/maven2/org/elasticsearch/elasticsearch/0.90.9/elasticsearch-0.90.9.jar -P $tempDirectory/flume-$flumeVersion/lib/ 
 
-{
-        mv $fileName $updatedFileName
-} || {
-        echo "Version not changed"
+	# create logs directory
+	mkdir -p $tempDirectory/flume-$flumeVersion/logs
+	
+	popd
 }
-
-find ./$updatedFileName -name "*~" -print0 | xargs -0 rm -rf
-rm $updatedFileName/DEBIAN/md5sums
-md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >> $updatedFileName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $updatedFileName/
-
-cp *.deb ~/Automation/Bigdata/flume
-
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName
