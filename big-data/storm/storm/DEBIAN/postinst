@@ -1,4 +1,21 @@
 #!/bin/bash
 set -e
-
 . /etc/profile
+export JAVA_HOME=$JAVA_HOME
+
+#Install ZeroMQ(Storm Native Dependency)
+cd /opt/zeromq-2.1.7
+./configure
+make
+make install
+
+# Install JZMQ(Storm Native Dependency)
+cd /opt/jzmq
+./autogen.sh
+./configure
+cd /opt/jzmq/src
+touch classdist_noinst.stamp
+CLASSPATH=.:./.:$CLASSPATH javac -d . org/zeromq/ZMQ.java org/zeromq/ZMQException.java org/zeromq/ZMQQueue.java org/zeromq/ZMQForwarder.java org/zeromq/ZMQStreamer.java
+cd /opt/jzmq
+make
+make install

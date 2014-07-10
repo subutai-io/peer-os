@@ -1,7 +1,7 @@
 #!/bin/sh
 # Starts and stops spark.
 
-sparkVer="spark-0.9.1"
+sparkVer="spark-1.0.0"
 if [ -d "/var/run/spark" ]; then
 	Master=`ls -alt /var/run/spark/ | grep spark-.*.Master-.*.pid | head -1 | awk -F " " '{print $9}'`
 	Worker=`ls -alt /var/run/spark/ | grep spark-.*.Worker-.*.pid | head -1 | awk -F " " '{print $9}'`
@@ -45,7 +45,6 @@ calculate()
 	second=$?
 	a=$((first * 2))
 	b=$((second * 1))
-	#echo "a+b" "$((a + b))"
 	return "$((a + b))"
 }
 

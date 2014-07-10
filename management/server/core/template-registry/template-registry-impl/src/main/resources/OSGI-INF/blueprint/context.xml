@@ -4,11 +4,11 @@
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.api.dbmanager.DbManager" />
 
-  <bean id="templateManager" scope="singleton"
+  <bean id="templateRegistryManager" scope="singleton"
         class="org.safehaus.subutai.impl.templateregistry.TemplateRegistryManagerImpl">
     <argument ref="dbManager" />
   </bean>
 
-  <service ref="templateManager" interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
+  <service ref="templateRegistryManager" interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
 
 </blueprint>

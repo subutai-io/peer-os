@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-sharkVer="shark-0.9.0"
+sharkVer="shark-0.9.1"
 
 #Remove paths and exports from relevant files
 FilePath="/etc/profile"

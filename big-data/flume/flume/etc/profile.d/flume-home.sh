@@ -1,3 +1,10 @@
-flumeHome="/opt/flume-1.4.0"
+flumeHome="/opt/flume-1.5.0"
 export FLUME_HOME=$flumeHome
-export PATH=$PATH:$FLUME_HOME/bin
+
+path_content=$(echo $PATH)
+pattern="$flumeHome/bin"
+if [[ $path_content != *$pattern* ]];
+then
+	export PATH=$PATH:$pattern
+fi
+
