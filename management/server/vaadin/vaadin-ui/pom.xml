@@ -54,6 +54,8 @@
                             com.vaadin.data.*;
                             com.vaadin.server.*;
                             com.vaadin.event.*;
+                            com.vaadin.client.*;
+                            com.google.gwt.*;
                         </Export-Package>
 
                         <!-- Package format version - do not change -->
