@@ -15,7 +15,7 @@ downloadFileAndMakeChanges() {
     mkdir -p $tempDirectory
     mkdir -p $confDirectory
 
-	# download hbase which is compatible with hadoop1 version. 
+	# download nutch  
 	wget http://archive.apache.org/dist/nutch/$nutchVersion/apache-nutch-$nutchVersion-bin.tar.gz -P $tempDirectory
 	pushd $tempDirectory
 	tar -xzpf apache-nutch-*.tar.gz

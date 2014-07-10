@@ -4,8 +4,8 @@ set -e
 function usage()
 {
 	echo "Example usage:"
-        echo "sparkSlaveConf.sh clear -> Clears the content of the slaves file"
-        echo "sparkSlaveConf.sh clear x -> Removes x from slaves file"
+    echo "sparkSlaveConf.sh clear -> Clears the content of the slaves file"
+    echo "sparkSlaveConf.sh clear x -> Removes x from slaves file"
 	echo "sparkSlaveConf.sh x y z -> Adds x, y, z  to slaves file. Do NOT use comma between nodes"
 	exit 0
 }
@@ -20,7 +20,7 @@ then
 fi
 . /etc/profile
 
-file="${SPARK_HOME}/conf/slaves"
+file="/etc/spark/slaves"
 
 #Clear the whole file or remove one machine from the slaves file
 if [[ "$1" == "clear" ]];
