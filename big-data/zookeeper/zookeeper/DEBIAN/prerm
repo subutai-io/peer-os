@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+service zookeeper stop
+service zookeeper kill
