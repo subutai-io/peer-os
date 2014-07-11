@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function publish {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function publish_description {
+  echo publish a template to the site template registry
+}
+

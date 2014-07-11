@@ -66,9 +66,19 @@ function usage {
       desc="no description available for subcommand $binding"
     fi
 
-    echo -e "\t$binding\t- $desc"
+    if [ `echo ${#binding}` -gt 9 ]; then
+      echo -e "\t$binding\t- $desc"
+    else
+      echo -e "\t$binding\t\t- $desc"
+    fi
   done
 }
+
+if [ $# == 0 ]; then
+  msg_error "No arguments provided"
+  usage
+  exit 1
+fi
 
 export subutai_quiet="false"
 shift_amount=0;
