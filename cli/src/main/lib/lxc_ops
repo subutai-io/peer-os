@@ -68,7 +68,7 @@ function lxc_assert_no {
     msg_error "Container \"$lxc\" exists. Aborting ..."
     show_usage "$usage"
   else
-    msg_info "    - check passed: container \"$lxc\" exists."
+    msg_info "    - check passed: container \"$lxc\" does NOT exist."
   fi
 }
 
@@ -182,8 +182,8 @@ function lxc_clone {
   lxc_assert $parent "`usage`"
 
   if [ "`zfs_is_template $parent`" == "false" ]; then
-    msg_notice "    - parent \"$parent\" is not a template ... promoting"
-    subutai-template $parent
+    msg_error "Parent \"$parent\" is not a template"
+    exit 1
   else
     msg_info "    - parent \"$parent\" is a template"
   fi
