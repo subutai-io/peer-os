@@ -7,12 +7,14 @@ downloadFileAndMakeChanges() {
         initializeVariables $1
         tempDirectory=$BASE/$fileName/opt
         optDirectory=$BASE/$fileName/opt
-        stormZipFile=storm-0.8.2.zip
+        confDirectory=$BASE/$fileName/etc/$productName
+	stormZipFile=storm-0.8.2.zip
 	zeromqTarFile=zeromq-2.1.7.tar.gz
 	jzmqTarFile=jzmq.tar.gz
 	jzmqDirectory=jzmq
         mkdir -p $tempDirectory
         mkdir -p $optDirectory
+	mkdir -p $confDirectory
 
         # Get necessary files
         wget http://download.zeromq.org/$zeromqTarFile  -P $tempDirectory
@@ -31,6 +33,7 @@ downloadFileAndMakeChanges() {
 	tar -xpzf $zeromqTarFile -C .
 	rm $stormZipFile
 	rm $zeromqTarFile
+        mv storm*/conf/* $confDirectory
 	popd
         # Create Storm related folders into "/var" directory
 	pushd $optDirectory/..

@@ -1,16 +1,18 @@
 #!/bin/bash
 
 
-. /etc/subutai/config
 . /etc/lsb-release
-. /etc/subutai/bsfl
+
+. $subutai_conf_base/config
+
+. $subutai_lib_base/bsfl
 init
 
-. /etc/subutai/reg_ops
-. /etc/subutai/zfs_ops
-. /etc/subutai/lxc_ops
-. /etc/subutai/git_ops
-. /etc/subutai/deb_ops
+. $subutai_lib_base/reg_ops
+. $subutai_lib_base/zfs_ops
+. $subutai_lib_base/lxc_ops
+. $subutai_lib_base/git_ops
+. $subutai_lib_base/deb_ops
 
 # Function addmount:
 # -----------------------------------------------------------------------------

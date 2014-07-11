@@ -26,6 +26,9 @@ downloadFileAndMakeChanges() {
 	
 	# move configuration files 
 	mv accumulo-$accumuloVersion/conf/* $confDirectory
+
+	# copy sample configuration files
+	cp -a $confDirectory/examples/1GB/native-standalone/* $confDirectory/
 	popd
 }
 # 1) Get the sources which are downloaded from version control system
