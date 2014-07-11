@@ -3,8 +3,8 @@ set -e
 FilePath="/etc/profile"
 
 accumuloVersion=1.6.0
-accumuloHome="/opt/$accumuloVersion"
-accumuloConf="/etc/cassandra"
+accumuloHome="/opt/accumulo-$accumuloVersion"
+accumuloConf="/etc/accumulo"
 
 if [[ "x$ACCUMULO_HOME" != "x" ]];
 then
@@ -12,7 +12,18 @@ then
 fi
 
 # Create symlink to configuration files and scripts
-ln -s $accumuloConf/* $accumuloHome/conf/
+ln -s $accumuloConf/accumulo-env.sh $accumuloHome/conf/
+ln -s $accumuloConf/accumulo-metrics.xml $accumuloHome/conf/
+ln -s $accumuloConf/accumulo.policy.example $accumuloHome/conf/
+ln -s $accumuloConf/accumulo-site.xml $accumuloHome/conf/
+ln -s $accumuloConf/auditLog.xml $accumuloHome/conf/
+ln -s $accumuloConf/gc $accumuloHome/conf/
+ln -s $accumuloConf/generic_logger.xml $accumuloHome/conf/
+ln -s $accumuloConf/log4j.properties $accumuloHome/conf/
+ln -s $accumuloConf/masters $accumuloHome/conf/
+ln -s $accumuloConf/monitor_logger.xml $accumuloHome/conf/
+ln -s $accumuloConf/slaves $accumuloHome/conf/
+ln -s $accumuloConf/tracers $accumuloHome/conf/
 
 if [ "x$JAVA_HOME" = "x" ];
 then
