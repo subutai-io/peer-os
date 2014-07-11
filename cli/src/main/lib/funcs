@@ -4,7 +4,6 @@
 . /etc/lsb-release
 
 . $subutai_conf_base/config
-
 . $subutai_lib_base/bsfl
 init
 

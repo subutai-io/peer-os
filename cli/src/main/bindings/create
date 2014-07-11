@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+function create {
+  echo unimplemented function binding $FUNCNAME
+}
+
+
+function create_description {
+  echo creates an instance container from a template
+}
+

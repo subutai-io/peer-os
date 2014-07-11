@@ -2,7 +2,8 @@
 
 # expected paths when in production mode
 subutai_conf_base=/etc/subutai
-subutai_lib_base=/usr/share/subutai-cli/subutai/libs
+subutai_binding_base=/etc/subutai/bindings
+subutai_lib_base=/usr/share/subutai-cli/subutai/lib
 
 # source user overrides and settings
 if [ -f ~/.subutairc ]; then
@@ -16,16 +17,85 @@ fi
 
 if [ -n "$TEST_MODE" -a "$TEST_MODE" == "true" ]; then
   export subutai_conf_base="$PROJECT_HOME/src/main/config"
-  export subutai_lib_base="$PROJECT_HOME/src/main/scripts"
+  export subutai_lib_base="$PROJECT_HOME/src/main/lib"
+  export subutai_binding_base="$PROJECT_HOME/src/main/bindings"
+
+  if [ ! -d $subutai_lib_base ]; then
+    echo "Missing directory $subutai_lib_base"
+    exit 1
+  fi
 
   . $subutai_lib_base/funcs
-
+  export TEST_MODE
   msg_warning "Operating in test mode!!!"
 else 
   export subutai_conf_base
   export subutai_lib_base
+  export subutai_binding_base
+
+  if [ ! -d $subutai_lib_base ]; then
+    echo "Missing directory $subutai_lib_base"
+    exit 1
+  fi
+
+  . $subutai_lib_base/funcs
 fi
 
-echo args="$@"
+if [ ! -d $subutai_conf_base ]; then 
+  msg_error "Missing directory $subutai_conf_base"
+  exit 1
+fi
 
+if [ ! -d $subutai_binding_base ]; then
+  msg_error "Missing directory $subutai_binding_base"
+  exit 1
+fi 
+
+function usage {
+  for binding in `ls $subutai_binding_base`; do 
+    . $subutai_binding_base/$binding
+    desc="$binding"_description
+
+    if [ "function" == "`type -t $desc`" ]; then
+      desc=`$desc`
+    else
+      desc="no description available for subcommand $binding"
+    fi
+
+    if [ -z "$desc" ]; then
+      desc="no description available for subcommand $binding"
+    fi
+
+    echo -e "\t$binding\t- $desc"
+  done
+}
+
+export subutai_quiet="false"
+shift_amount=0;
+while getopts ":qh" opt; do
+  case $opt in
+    q)
+      export subutai_quiet="true"
+      ;;
+    h)
+      usage
+      exit
+      ;;
+    \?)
+      echo unrecognized option -$OPTARG >&2
+      exit 1
+      ;;
+  esac
+
+  shift_amount=$(($shift_amount + 1))
+done
+
+shift $shift_amount
+subcommand="$1"
+#echo subutai subcommand = $subcommand
+#echo subutai args remaining after shifting = "$@"
+
+. $subutai_binding_base/$subcommand
+shift
+$subcommand "$@"
 

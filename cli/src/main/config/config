@@ -40,3 +40,4 @@ export SUBUTAI_CONFIG_PATH=/etc
 # A colon separated list of non-overlapping application data paths
 # which need to be tracked in 
 export SUBUTAI_APP_DATA_PATH=/var
+

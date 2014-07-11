@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function import {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function import_description {
+  echo import a template
+}
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function promote {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function promote_description {
+  echo promotes an instance container into a template
+}
+

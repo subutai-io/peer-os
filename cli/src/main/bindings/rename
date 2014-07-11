@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function rename {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function rename_description {
+  echo renames an instance container or a template
+}
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function destroy {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function destroy_description {
+  echo destroys a template or instance container
+}
+

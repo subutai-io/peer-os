@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function export {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function export_description {
+  echo export a template and publishes it
+}
+
