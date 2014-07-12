@@ -81,7 +81,6 @@ fi
 
 
 export subutai_quiet="false"
-shift_amount=0;
 while getopts ":qh" opt; do
   case $opt in
     q)
@@ -116,11 +115,12 @@ while getopts ":qh" opt; do
       exit 1
       ;;
   esac
-
-  shift_amount=$(($shift_amount + 1))
 done
 
-shift $shift_amount
+while [ -n "`echo $1 | grep -`" ]; do
+  shift
+done
+
 subcommand="$1"
 
 . $subutai_binding_base/$subcommand
