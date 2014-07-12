@@ -66,7 +66,7 @@ function zfs_assert_nods {
   local ds="$1"
   local usage="$2"
 
-  if [ "$ds" == "`zfs list -o name -H $ds`" ]; then
+  if [ -z "`zfs list -o name -H | grep $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
     show_usage "$usage"
   fi
@@ -148,4 +148,45 @@ function zfs_list_templates {
   done
 }
 
+function zfs_copy_ds {
+  local from_ds="$1"
+
+  if [ -n "`echo $from_ds | grep -`" ]; then
+    local from_part="`zfs_part_from_ds $from_ds`"
+  else
+    local from_part=""
+  fi
+
+  local from_pool="`zfs_pool_from_ds $from_ds`"
+  local from_lxc="`zfs_ctnr_from_ds $from_ds`"
+  local parent_lxc="`zfs_get_parent $from_lxc`"
+  local to_ds="$2"
+
+  if [ -z "$from_part" ]; then 
+    local parent_ds="$from_pool/$parent_lxc"
+  else
+    local parent_ds="$from_pool/$parent_lxc-$from_part"
+  fi
+
+  local parent_snap="$parent_ds@template"
+
+  # make sure the from_ds exists and the to_ds does not
+  zfs_assert_ds "$from_ds"
+  zfs_assert_nods "$to_ds"
+  zfs_assert_ds "$parent_ds"
+  zfs_assert_snap "$parent_snap"
+
+  local now=`date +"%m_%d_%Y"`
+  local from_snap="$from_ds@$now"
+
+  zfs snapshot "$from_snap"
+  local stream="$SUBUTAI_TMPDIR/$parent_lxc$from_lxc$now"
+  zfs send -I "$parent_snap" "$from_snap" > "$stream"
+  zfs recv "$to_ds" < "$stream"
+
+  # cleanup
+  rm "$stream"
+  zfs destroy "$from_snap"
+  zfs destroy "$to_ds@$now"
+}
 
