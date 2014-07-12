@@ -272,4 +272,75 @@ function lxc_copy {
 }
 
 
+function lxc_rename {
+  local src="$1"
+  local dst="$2"
+  local usage="$3"
+
+  if [ -z "$src" ]; then
+    msg_error "Parameters not provided for source container. Aborting ..."
+    exit 1
+  fi
+
+  if [ -z "$dst" ]; then
+    msg_error "Parameters not provided for destination container. Aborting ..."
+    exit 1
+  fi
+
+  # keep it tight with convenience vars
+  local src_home=/var/lib/lxc/$src
+  local src_conf=$src_home/config
+  local dst_home=/var/lib/lxc/$dst
+  local dst_rootfs=$dst_home/rootfs
+  local dst_conf=$dst_home/config
+
+  # (1) perform sanity checks
+  lxc_assert_no $dst "`usage`"
+  lxc_assert $src "`usage`"
+
+  if [ "`zfs_is_template $src`" == "true" ]; then
+    msg_error "Source \"$src\" must not be a template for a rename op"
+    exit 1
+  fi
+
+  # (2) setup skeleton of destination container
+  mkdir -p "$dst_rootfs"
+  cat "$src_conf" | sed                                           \
+     -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                   \
+     -e "s/\/var\/lib\/lxc\/$src\//\/var\/lib\/lxc\/$dst\//g"     \
+     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $dst/"   \
+     -e "s/$src-/$dst-/g" | grep -v subutai.git.uuid >> "$dst_conf"
+  cp "$src_home/fstab" "$dst_home"
+  
+  lxc_stop "$src"
+  
+  # umount all the partitions
+  umount "/lxc-data/$src-home"
+  umount "/lxc-data/$src-var"
+  umount "/lxc/$src-opt"
+  umount "/var/lib/lxc/$src/rootfs"
+  
+  # rename datasets and set mount point for rootfs
+  zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
+  zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
+  zfs rename "lxc/$src-opt" "lxc/$dst-opt"
+  zfs rename "lxc/$src" "lxc/$dst"
+  zfs set mountpoint="$dst_rootfs" "lxc/$dst"
+
+  zfs mount "lxc/$dst"
+  zfs mount "lxc/$dst-opt"
+  zfs mount "lxc-data/$dst-home"
+  zfs mount "lxc-data/$dst-var"
+
+  # change the hostname
+  echo "$dst" > "$dst_rootfs/etc/hostname"
+  str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"
+
+  # cleanup the old source, start up the new container, and adjust git
+  rm -rf "/var/lib/lxc/$src"
+  lxc_wait_net "$dst"
+  git_rename_branch "$src" "$dst"
+  lxc_stop "$dst"
+}
+
 

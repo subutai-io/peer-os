@@ -93,8 +93,12 @@ while getopts ":qh" opt; do
       unset msg_info
       unset msg_notice
       unset msg_error
+      unset msg_debug
       function msg_ok {
         echo "$1"
+      }
+      function msg_debug {
+        return 0
       }
       function msg_info {
         return 0

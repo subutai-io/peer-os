@@ -124,10 +124,15 @@ function promote {
 
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
-  if [ -n "$newname" ]; then
+  if [ -n "$newname" -a "true" == "$copyit" ]; then
     lxc_assert_no "$newname" "`usage`"
     lxc_stop "$lxc"
     lxc_copy "$lxc" "$newname"
+    lxc_template="$newname"
+  elif [ -n "$newname" -a "false" == "$copyit" ]; then
+    lxc_assert_no "$newname" "`usage`"
+    lxc_stop "$lxc"
+    lxc_rename "$lxc" "$newname"
     lxc_template="$newname"
   else
     lxc_template="$lxc"
