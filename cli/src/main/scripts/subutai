@@ -76,9 +76,9 @@ function usage {
 
 if [ $# == 0 ]; then
   msg_error "No arguments provided"
-  usage
-  exit 1
+  show_usage "`usage`"
 fi
+
 
 export subutai_quiet="false"
 shift_amount=0;
@@ -86,6 +86,26 @@ while getopts ":qh" opt; do
   case $opt in
     q)
       export subutai_quiet="true"
+      unset msg_ok
+      unset msg_warning
+      unset msg_info
+      unset msg_notice
+      unset msg_error
+      function msg_ok {
+        echo "$1"
+      }
+      function msg_info {
+        return 0
+      }
+      function msg_warning {
+        return 0
+      }
+      function msg_notice {
+        return 0
+      }
+      function msg_error {
+        echo "$1"
+      }
       ;;
     h)
       usage
@@ -102,8 +122,6 @@ done
 
 shift $shift_amount
 subcommand="$1"
-#echo subutai subcommand = $subcommand
-#echo subutai args remaining after shifting = "$@"
 
 . $subutai_binding_base/$subcommand
 shift
