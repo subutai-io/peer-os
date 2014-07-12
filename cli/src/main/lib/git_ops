@@ -4,10 +4,6 @@
 # Bunch-O GIT convenience operations
 # --------------------------------------------------------------------------
 
-. /etc/subutai/config
-. /etc/subutai/bsfl
-init
-
 
 function git_master_uuid {
   pushd . > /dev/null
@@ -26,7 +22,7 @@ function git_init_master {
   git init
   git config user.email "$SUBUTAI_EMAIL"
   git config user.name  "$SUBUTAI_USER"
-  cp /etc/subutai/gitignore ./.gitignore
+  cp $subutai_conf_base/gitignore ./.gitignore
   git add ./.gitignore
   git commit -m 'ignoring some files at root'
   git add -A

@@ -5,9 +5,6 @@
 # functions.
 # ==========================================================================
 
-# sources everything else we need
-. /etc/subutai/zfs_ops
-
 
 # simply check if running before stopping
 function lxc_stop {

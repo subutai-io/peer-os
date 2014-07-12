@@ -1,8 +1,5 @@
 #!/bin/bash
 
-. /etc/subutai/config
-. /etc/subutai/zfs_ops # TODO: remove me once methods implemented
-
 # URGENT: this is a stub function and needs to be properly implemented
 # this function needs to ask Subutai if a template name is registered 
 # already. Since this functionality is not available I just stubbed it 

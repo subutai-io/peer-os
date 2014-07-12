@@ -4,10 +4,6 @@
 # Bunch-O ZFS convenience operations
 # --------------------------------------------------------------------------
 
-. /etc/subutai/config
-. /etc/subutai/bsfl
-init
-
 
 # prints out the children for a ds or container name (arg $1)
 # counts and prints out the children
@@ -66,7 +62,7 @@ function zfs_assert_nods {
   local ds="$1"
   local usage="$2"
 
-  if [ -z "`zfs list -o name -H | grep $ds`" ]; then
+  if [ -n "`zfs list -o name -H | grep $ds`" ]; then
     msg_error "ZFS dataset \"$ds\" already exists!"
     show_usage "$usage"
   fi

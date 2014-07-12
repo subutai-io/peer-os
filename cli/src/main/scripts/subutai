@@ -4,6 +4,7 @@
 subutai_conf_base=/etc/subutai
 subutai_binding_base=/etc/subutai/bindings
 subutai_lib_base=/usr/share/subutai-cli/subutai/lib
+subutai_script_base=/usr/bin
 
 # source user overrides and settings
 if [ -f ~/.subutairc ]; then
@@ -19,6 +20,7 @@ if [ -n "$TEST_MODE" -a "$TEST_MODE" == "true" ]; then
   export subutai_conf_base="$PROJECT_HOME/src/main/config"
   export subutai_lib_base="$PROJECT_HOME/src/main/lib"
   export subutai_binding_base="$PROJECT_HOME/src/main/bindings"
+  export subutai_script_base="$PROJECT_HOME/src/main/scripts"
 
   if [ ! -d $subutai_lib_base ]; then
     echo "Missing directory $subutai_lib_base"
@@ -32,6 +34,7 @@ else
   export subutai_conf_base
   export subutai_lib_base
   export subutai_binding_base
+  export subutai_script_base
 
   if [ ! -d $subutai_lib_base ]; then
     echo "Missing directory $subutai_lib_base"
@@ -123,7 +126,7 @@ done
 
 subcommand="$1"
 
-. $subutai_binding_base/$subcommand
+. "$subutai_binding_base/$subcommand"
 shift
-$subcommand "$@"
+"$subcommand" "$@"
 

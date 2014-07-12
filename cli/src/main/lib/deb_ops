@@ -4,10 +4,6 @@
 # Bunch-O deb package convenience operations
 # --------------------------------------------------------------------------
 
-. /etc/subutai/config
-. /etc/subutai/bsfl
-init
-
 
 # creates a debian package for a template and its associated files
 # arg $1 = name of the container, template etc
