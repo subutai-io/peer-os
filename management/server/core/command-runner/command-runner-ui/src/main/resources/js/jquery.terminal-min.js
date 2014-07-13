@@ -2168,7 +2168,7 @@
 
         function show_greetings() {
             if (settings.greetings === undefined) {
-                self.echo(self.signature)
+//                self.echo(self.signature)
             } else if (settings.greetings) {
                 var type = typeof settings.greetings;
                 if (type === "string") {
@@ -2745,7 +2745,7 @@
                 var cols = self.cols();
                 var i = cols < 15 ? null : cols < 35 ? 0 : cols < 55 ? 1 : cols < 64 ? 2 : cols < 75 ? 3 : 4;
                 if (i !== null) {
-                    return ""
+                    return signatures[i].join("\n") + "\n"
                 } else {
                     return""
                 }
