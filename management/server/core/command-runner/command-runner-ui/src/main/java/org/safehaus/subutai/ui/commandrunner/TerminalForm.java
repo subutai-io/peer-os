@@ -73,15 +73,19 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.setSpacing(true);
 		controls.setMargin(true);
 
-		initProgram();
+		/*initProgram();
 		initCommand();
 		initTimeout();
 		initRequestType();
 		initClearButton();
 		initSendButton();
-		initIndicator();
+		initIndicator();*/
 
-		gridLayout.setFirstComponent(commandOutputTxtArea);
+		CssLayout terminal = new CssLayout();
+		terminal.setSizeFull();
+		terminal.setId("terminal");
+
+		gridLayout.setFirstComponent(terminal);
 		gridLayout.setSecondComponent(controls);
 
 		horizontalSplit.setSecondComponent(gridLayout);
