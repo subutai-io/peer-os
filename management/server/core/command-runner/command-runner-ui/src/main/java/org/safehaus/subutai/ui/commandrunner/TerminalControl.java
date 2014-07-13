@@ -3,12 +3,14 @@ package org.safehaus.subutai.ui.commandrunner;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
+import com.vaadin.ui.TextField;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
 /**
  * Created by daralbaev on 7/9/14.
  */
 public class TerminalControl extends CssLayout {
+	private TextField textField;
 	private String inputPrompt;
 	private String username, currentPath, machineName;
 
@@ -18,7 +20,11 @@ public class TerminalControl extends CssLayout {
 		machineName = "";
 		setId("terminal");
 
+		textField = new TextField();
+		textField.addStyleName("terminal_submit");
+
 		initCommandPrompt();
+		addComponent(textField);
 
 		this.setSizeFull();
 	}
