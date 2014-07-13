@@ -1,0 +1,13 @@
+_subutai()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="clone demote destroy export import list master_create master_destroy master_export promote publish rename setup"
+
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+}
+complete -F _subutai subutai
