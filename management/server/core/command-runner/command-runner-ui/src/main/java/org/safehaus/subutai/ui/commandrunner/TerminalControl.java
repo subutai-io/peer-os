@@ -36,7 +36,9 @@ public class TerminalControl extends CssLayout {
 		setInputPrompt();
 		focusPrompt();
 
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery-1.7.1.min.js", this));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery.terminal-min.js", this));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery.mousewheel-min.js", this));
 	}
 
 	public void setInputPrompt() {
