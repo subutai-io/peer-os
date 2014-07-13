@@ -1806,11 +1806,7 @@
     var version_string = version_set ? " version " + version : " ";
     var reg = new RegExp(" {" + version_string.length + "}$");
     var signatures = [
-        ["", ""],
-        ["", ""],
-        ["", ""],
-        ["", "", "", "", "", ""],
-        ["", "", "", "", "", ""]
+        ["", ""]
     ];
     $.terminal.defaults = {prompt: "> ", history: true, exit: true, clear: true, enabled: true, historySize: 60, checkArity: true, exceptionHandler: null, cancelableAjax: true, processArguments: true, linksNoReferrer: false, login: null, outputLimit: -1, onAjaxError: null, onRPCError: null, completion: false, historyFilter: null, onInit: $.noop, onClear: $.noop, onBlur: $.noop, onFocus: $.noop, onTerminalChange: $.noop, onExit: $.noop, keypress: $.noop, keydown: $.noop, strings: {wrongPasswordTryAgain: "Wrong password try again!", wrongPassword: "Wrong password!", ajaxAbortError: "Error while aborting ajax call!", wrongArity: "Wrong number of arguments. Function '%s' expect %s got %s!", commandNotFound: "Command '%s' Not Found!", oneRPCWithIgnore: "You can use only one rpc with ignoreSystemDescribe", oneInterpreterFunction: "You can't use more then one function (rpc with " + "ignoreSystemDescribe is count as one)", loginFunctionMissing: "You don't have login function", noTokenError: "Access denied (no token)", serverResponse: "Server reponse is", wrongGreetings: "Wrong value of greetings parameter", notWhileLogin: "You can't call that function while in login", loginIsNotAFunction: "Authenticate must be a function", canExitError: "You can't exit from main interpeter", invalidCompletion: "Invalid completion", login: "login", password: "password"}};
     var requests = [];
