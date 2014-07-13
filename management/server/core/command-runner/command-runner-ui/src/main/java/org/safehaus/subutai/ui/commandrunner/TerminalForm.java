@@ -110,7 +110,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		sendBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				commandOutputTxtArea.getCommand();
+//				commandOutputTxtArea.getCommand();
 				/*Set<Agent> agents = checkAgents();
 				if (agents != null && validateInputs()) {
 					RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue());
