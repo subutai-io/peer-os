@@ -1802,15 +1802,15 @@
 
     var version = "0.8.8";
     var version_set = !version.match(/^\{\{/);
-    var copyright = "";
+    var copyright = "Copyright (c) 2011-2013 Jakub Jankiewicz <http://jcubic.pl>";
     var version_string = version_set ? " version " + version : " ";
     var reg = new RegExp(" {" + version_string.length + "}$");
     var signatures = [
-        ["", ""],
-        ["", ""],
-        ["", ""],
-        ["", "", "", "", "", ""],
-        ["", "", "", "", "", ""]
+        ["jQuery Terminal", "(c) 2011-2013 jcubic"],
+        ["jQuery Terminal Emulator" + (version_set ? " v. " + version : ""), copyright.replace(/ *<.*>/, "")],
+        ["jQuery Terminal Emulator" + (version_set ? version_string : ""), copyright.replace(/^Copyright /, "")],
+        ["      _______                 ________                        __", "     / / _  /_ ____________ _/__  ___/______________  _____  / /", " __ / / // / // / _  / _/ // / / / _  / _/     / /  \\/ / _ \\/ /", "/  / / // / // / ___/ // // / / / ___/ // / / / / /\\  / // / /__", "\\___/____ \\\\__/____/_/ \\__ / /_/____/_//_/ /_/ /_/  \\/\\__\\_\\___/", "         \\/          /____/                                   ".replace(reg, " ") + version_string, copyright],
+        ["      __ _____                     ________                              __", "     / // _  /__ __ _____ ___ __ _/__  ___/__ ___ ______ __ __  __ ___  / /", " __ / // // // // // _  // _// // / / // _  // _//     // //  \\/ // _ \\/ /", "/  / // // // // // ___// / / // / / // ___// / / / / // // /\\  // // / /__", "\\___//____ \\\\___//____//_/ _\\_  / /_//____//_/ /_/ /_//_//_/ /_/ \\__\\_\\___/", "          \\/              /____/                                          ".replace(reg, "") + version_string, copyright]
     ];
     $.terminal.defaults = {prompt: "> ", history: true, exit: true, clear: true, enabled: true, historySize: 60, checkArity: true, exceptionHandler: null, cancelableAjax: true, processArguments: true, linksNoReferrer: false, login: null, outputLimit: -1, onAjaxError: null, onRPCError: null, completion: false, historyFilter: null, onInit: $.noop, onClear: $.noop, onBlur: $.noop, onFocus: $.noop, onTerminalChange: $.noop, onExit: $.noop, keypress: $.noop, keydown: $.noop, strings: {wrongPasswordTryAgain: "Wrong password try again!", wrongPassword: "Wrong password!", ajaxAbortError: "Error while aborting ajax call!", wrongArity: "Wrong number of arguments. Function '%s' expect %s got %s!", commandNotFound: "Command '%s' Not Found!", oneRPCWithIgnore: "You can use only one rpc with ignoreSystemDescribe", oneInterpreterFunction: "You can't use more then one function (rpc with " + "ignoreSystemDescribe is count as one)", loginFunctionMissing: "You don't have login function", noTokenError: "Access denied (no token)", serverResponse: "Server reponse is", wrongGreetings: "Wrong value of greetings parameter", notWhileLogin: "You can't call that function while in login", loginIsNotAFunction: "Authenticate must be a function", canExitError: "You can't exit from main interpeter", invalidCompletion: "Invalid completion", login: "login", password: "password"}};
     var requests = [];
@@ -2168,7 +2168,7 @@
 
         function show_greetings() {
             if (settings.greetings === undefined) {
-//                self.echo(self.signature)
+                self.echo(self.signature)
             } else if (settings.greetings) {
                 var type = typeof settings.greetings;
                 if (type === "string") {
