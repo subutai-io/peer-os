@@ -1,3 +1,3 @@
 $('#terminal').terminal(function (command, term) {
     $('.terminal_submit').val(command);
-}, { prompt: '$cmd', greeting: false });
+}, { prompt: '$cmd', greetings: "Subutai System Console" });
