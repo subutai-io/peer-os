@@ -85,7 +85,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		horizontalSplit.setSecondComponent(gridLayout);
 		setCompositionRoot(horizontalSplit);
 
-		commandOutputTxtArea.setInputPrompt();
+		commandOutputTxtArea.initCommandPrompt();
 	}
 
 	private void initOutputTextArea() {
