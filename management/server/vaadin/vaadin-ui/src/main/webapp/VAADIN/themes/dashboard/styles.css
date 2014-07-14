@@ -6183,6 +6183,11 @@ body .dashboard.v-app .v-app-loading {
     background-color: black;
 }
 
+/* The current prompt text color */
+.jqconsole-prompt {
+    color: #0d0;
+}
+
 .jqconsole-ansi-bold {
     font-weight: bold !important;
 }

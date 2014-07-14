@@ -40,12 +40,15 @@ public class TerminalControl extends CssLayout {
 	public void initCommandPrompt() {
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery-1.7.1.min.js", this));
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/jqconsole.min.js", this));
-//		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
+
+		// Adding callback to communicate javascript with Vaadin
 		JavaScript.getCurrent().addFunction("callback",
 				new JavaScriptFunction() {
 					@Override
 					public void call(JSONArray arguments) throws JSONException {
-						Notification.show(arguments.toString());
+						if (arguments != null && arguments.length() > 0) {
+							Notification.show(arguments.getString(0));
+						}
 					}
 				});
 
