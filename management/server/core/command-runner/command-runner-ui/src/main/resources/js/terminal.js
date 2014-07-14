@@ -4,11 +4,12 @@ function termOpen() {
     if ((!term) || (term.closed)) {
         term = new Terminal(
             {
-                x: 220,
-                y: 70,
                 termDiv: 'terminal',
-                bgColor: '#232e45',
+                bgColor: 'black',
+                textColor: 'white',
                 handler: termHandler,
+                ps: '#',
+                closeOnESC: false,
                 wrapping: true
             }
         );
@@ -24,3 +25,5 @@ function termHandler() {
     this.newLine();
     this.prompt();
 }
+
+termOpen();
