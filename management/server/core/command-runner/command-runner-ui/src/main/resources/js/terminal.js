@@ -1,5 +1,3 @@
-var term;
-
 function termOpen() {
     if ((!term) || (term.closed)) {
         term = new Terminal(
@@ -26,4 +24,5 @@ function termHandler() {
     this.prompt();
 }
 
+var term;
 termOpen();

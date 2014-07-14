@@ -3,7 +3,6 @@ package org.safehaus.subutai.ui.commandrunner;
 import com.vaadin.data.Property;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.TextField;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -22,8 +21,6 @@ public class TerminalControl extends CssLayout {
 		machineName = "";
 		setId("terminal");
 
-		FormLayout form = new FormLayout();
-		form.setId("terminal_form");
 		textField = new TextField();
 		textField.setImmediate(true);
 		textField.addValueChangeListener(new Property.ValueChangeListener() {
@@ -33,10 +30,9 @@ public class TerminalControl extends CssLayout {
 			}
 		});
 		textField.addStyleName("terminal_submit");
-		form.addComponent(textField);
 
 		initCommandPrompt();
-		addComponent(form);
+		addComponent(textField);
 
 		this.setSizeFull();
 	}
