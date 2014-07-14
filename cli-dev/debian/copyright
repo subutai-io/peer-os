@@ -2,15 +2,6 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: subutai-cli
 Source: <url://safehaus.org>
 
-Files: *
-Copyright: <2014> <bicak.cs@gmail.com>
-           <2014> <salihkardan@gmail.com>
-License: Apache-2.0 
-
-Files: debian/*
-Copyright: 2014 Salih Kardan <salihkardan@gmail.com>
-License: Apache-2.0
-
 License: Apache-2.0
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
