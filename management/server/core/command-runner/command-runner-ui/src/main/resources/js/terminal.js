@@ -5,8 +5,6 @@ $(function () {
         // Start the prompt with history enabled.
         jqconsole.Prompt(true, function (input) {
             // Output input with the class jqconsole-output.
-            $('#pwd').val(input);
-            jqconsole.Write(input + '\n', 'jqconsole-output');
             callback(input);
             // Restart the prompt.
             startPrompt();
