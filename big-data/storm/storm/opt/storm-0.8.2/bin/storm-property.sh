@@ -27,6 +27,10 @@ initializeFiles()
 . /etc/profile
 add_prop="";
 
+if [[ $1 == "" || $2 == "" ]];
+then
+	usage
+fi
 stormConf="/etc/storm"
 if [[ "x$STORM_CONF_DIR" != "x" ]];
 then

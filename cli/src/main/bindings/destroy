@@ -1,0 +1,100 @@
+#!/bin/bash
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Destroy an existing container clone.
+  echo
+  echo "        "subutai-clone-destory clone-name
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+function destroy {
+  local clone="$1"
+
+  if [ "$clone" == "master" ]; then
+    msg_error "Use subutai-master-destroy instead of subutai-clone-destroy"
+    exit 1
+  fi
+
+  # Destruction Plan:
+  # ----------------------------------------------------------------------------
+  # (1) check that clone exists first, and find its parent
+  # (2) check if the clone has dependent child and abort if so
+  # (3) release all holds on clone's rootfs snapshots
+  # (4) destroy all snapshots on clones's rootfs
+  # (5) lxc-destroy the clone
+  # (6) destroy mounted partitions
+  # ----------------------------------------------------------------------------
+
+  # (1) check that clone exists first: turn off if on
+  lxc_assert "$clone" "`usage`"
+  lxc_stop $clone
+
+  # (1) let's get the clone's parent
+  parent_snap=`zfs get origin "lxc/$clone" -o value -H`
+  parent=`zfs_ctnr_from_ds $parent_snap`
+
+  # (2) check if the clone has dependent children
+  # TODO: add a -r switch option to allow recursive destruction of children
+  msg_info "    - checking if \"$clone\" has dependent children ..."
+  zfs_get_children $clone
+  child_count=$?
+
+  if [ $child_count -gt 0 ]; then
+    msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
+    exit 1
+  fi
+
+  # (3) & (4) release all holds on clone's rootfs snaps and delete snaps
+  for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
+    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
+      zfs release $hold $snap
+      msg_info "    - \"$hold\" hold removed from $snap"
+    done
+
+    zfs destroy $snap
+    msg_info "    - \"$snap\" snapshot destroyed"
+  done
+
+  # (5) lxc-destroy the clone
+  lxc-destroy -n $clone
+
+  # (6) destroy mounted partitions 
+  remove-mount $clone $parent opt lxc
+  remove-mount $clone $parent var lxc-data
+  remove-mount $clone $parent home lxc-data
+
+  msg_ok "Destruction of \"$clone\" completed successfully"
+
+}
+
+
+function remove-mount {
+  child="$1"
+  parent="$2"
+  partition="$3"
+  pool="$4"
+
+  child_ds="$pool/$child-$partition"
+  parent_ds="$pool/$parent-$partition"
+
+  for snap in `zfs list -t snapshot -o name -H | grep $child_ds@`; do
+    for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
+      zfs release $hold $snap
+      msg_info "    - \"$hold\" hold removed from \"$snap\""
+    done
+
+    zfs destroy $snap
+    msg_info "    - \"$snap\" snapshot destroyed"
+  done
+
+  # Need to destroy mount
+  zfs destroy $child_ds
+  msg_info "    - \"$child_ds\" dataset destroyed"
+}
+
+function destroy_description {
+  echo destroys a template or instance container
+}
+
