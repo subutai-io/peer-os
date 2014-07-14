@@ -102,6 +102,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void initSendButton() {
 		sendBtn = new Button("Send");
+		sendBtn.setId("sendBtn");
 		controls.addComponent(sendBtn);
 		sendBtn.addStyleName("default");
 
@@ -169,6 +170,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private void initProgram() {
 		Label programLbl = new Label("Program");
 		programTxtFld = new TextField();
+		programTxtFld.setId("pwd");
 		programTxtFld.setValue("pwd");
 		programTxtFld.setWidth(200, Unit.PIXELS);
 		controls.addComponent(programLbl);
