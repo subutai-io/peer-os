@@ -662,8 +662,7 @@
         function change_num_chars() {
             var W = self.width();
             var w = cursor.innerWidth();
-//            num_chars = Math.floor(W / w);
-            num_chars = 80;
+            num_chars = Math.floor(W / w);
         }
 
         function str_repeat(str, n) {
