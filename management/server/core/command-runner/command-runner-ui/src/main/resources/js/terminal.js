@@ -6,7 +6,7 @@ $(function () {
             // Output input with the class jqconsole-output.
             $('#pwd').val(input);
             jqconsole.Write(input + '\n', 'jqconsole-output');
-            callback();
+            callback(input);
             // Restart the prompt.
             startPrompt();
         });

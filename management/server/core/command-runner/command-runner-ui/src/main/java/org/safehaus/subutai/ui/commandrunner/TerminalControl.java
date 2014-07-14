@@ -46,10 +46,8 @@ public class TerminalControl extends CssLayout {
 					@Override
 					public void call(JSONArray arguments) throws JSONException {
 						try {
-							String message = arguments.getString(0);
-							int value = arguments.getInt(1);
-							Notification.show("Message: " + message +
-									", value: " + value);
+//							String message = arguments.getString(0);
+							Notification.show(arguments.toString());
 						} catch (JSONException e) {
 							Notification.show("Error: " + e.getMessage());
 						}
