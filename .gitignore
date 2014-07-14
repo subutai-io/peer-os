@@ -9,7 +9,6 @@ target
 *.mk
 *.a
 *.deb
-md5sums
 agent/agent/KiskisAgent/Debug/*
 agent/agent/KiskisAgent/Release/*
 
