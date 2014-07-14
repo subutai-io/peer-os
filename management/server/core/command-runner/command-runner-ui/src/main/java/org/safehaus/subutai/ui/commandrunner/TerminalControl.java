@@ -42,15 +42,13 @@ public class TerminalControl extends CssLayout {
 	}
 
 	private void initCommandPrompt() {
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery-1.7.1.min.js", this));
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery.terminal-min.js", this));
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery.mousewheel-min.js", this));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/termlib.js", this));
 
 		setInputPrompt();
 	}
 
 	public void setInputPrompt() {
 		inputPrompt = String.format("%s@%s:%s>", username, machineName, currentPath);
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this).replace("$cmd", inputPrompt));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
 	}
 }
