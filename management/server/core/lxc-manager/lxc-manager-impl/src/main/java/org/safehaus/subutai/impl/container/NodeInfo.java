@@ -4,19 +4,19 @@ import java.util.Set;
 import java.util.UUID;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 
-class NodeGroupInfo {
+class NodeInfo {
 
-    String name;
+    int envId;
     String templateName;
     Set<PlacementStrategyENUM> strategy;
-    Set<UUID> instanceIds;
+    UUID instanceId;
 
-    public String getName() {
-        return name;
+    public int getEnvId() {
+        return envId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEnvId(int envId) {
+        this.envId = envId;
     }
 
     public String getTemplateName() {
@@ -35,12 +35,12 @@ class NodeGroupInfo {
         this.strategy = strategy;
     }
 
-    public Set<UUID> getInstanceIds() {
-        return instanceIds;
+    public UUID getInstanceId() {
+        return instanceId;
     }
 
-    public void setInstanceIds(Set<UUID> instanceIds) {
-        this.instanceIds = instanceIds;
+    public void setInstanceId(UUID instanceId) {
+        this.instanceId = instanceId;
     }
 
 }

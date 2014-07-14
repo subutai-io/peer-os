@@ -33,7 +33,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(String groupName, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(int envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
@@ -68,8 +68,11 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             Agent a = agentManager.getAgentByHostname(cloneName);
             if(a != null) clones.add(a);
         }
-        boolean saved = saveNodeGroup(groupName, templateName, clones, strategy);
-        if(!saved) logger.error("Failed to save node group info");
+        try {
+            saveNodeGroup(envId, templateName, clones, strategy);
+        } catch(Exception ex) {
+            logger.error("Failed to save nodes info", ex);
+        }
 
         return clones;
     }
@@ -114,25 +117,23 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         return res;
     }
 
-    private boolean saveNodeGroup(String name, String templateName, Set<Agent> agents,
+    private void saveNodeGroup(int envId, String templateName, Set<Agent> agents,
             PlacementStrategyENUM... strategy) {
 
-        String cql = "INSERT INTO node_group(name, info) VALUES(?, ?)";
+        String cql = "INSERT INTO nodes(uuid, env_id, info) VALUES(?, ?, ?)";
 
-        NodeGroupInfo group = new NodeGroupInfo();
-        group.setName(name);
+        NodeInfo group = new NodeInfo();
+        group.setEnvId(envId);
         group.setTemplateName(templateName);
         if(strategy == null || strategy.length == 0)
             strategy = new PlacementStrategyENUM[]{
                 PlacementStrategyFactory.getDefaultStrategyType()
             };
         group.setStrategy(EnumSet.of(strategy[0], strategy));
-        group.setInstanceIds(new HashSet<UUID>());
         for(Agent a : agents) {
-            group.getInstanceIds().add(a.getUuid());
+            group.setInstanceId(a.getUuid());
+            dbManager.executeUpdate(cql, a.getUuid().toString(), envId, gson.toJson(group));
         }
-
-        return dbManager.executeUpdate(cql, name, gson.toJson(group));
     }
 
 }
