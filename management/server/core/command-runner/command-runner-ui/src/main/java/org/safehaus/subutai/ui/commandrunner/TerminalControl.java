@@ -52,6 +52,6 @@ public class TerminalControl extends CssLayout {
 	}
 
 	public void setOutputPrompt(String output) {
-		JavaScript.getCurrent().execute(String.format("jqconsole.Write('%s' + '\\n', 'jqconsole-output');", output));
+		JavaScript.getCurrent().execute(String.format("jqconsole.Write('%s'  + '\\n', 'jqconsole-output');", output));
 	}
 }
