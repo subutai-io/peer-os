@@ -22,8 +22,6 @@ public class CloneMany extends OsgiCommandSupport {
     private int nodesCount;
     @Argument(index = 2, required = true)
     private String hosts;
-    @Argument(index = 3)
-    private int envId = -1;
 
     public void setTemplateManager(TemplateManager templateManager) {
         this.templateManager = templateManager;
@@ -42,6 +40,7 @@ public class CloneMany extends OsgiCommandSupport {
 
         Agent a = agentManager.getAgentByHostname(hosts);
         List<Agent> target = getHosts();
+        UUID envId = UUID.randomUUID();
         Set<Agent> set = containerManager.clone(envId, template, nodesCount, target);
         if(set.isEmpty()) System.out.println("Result set is empty");
         else System.out.println("Returned clones: " + set.size());

@@ -6,16 +6,16 @@ import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 
 class NodeInfo {
 
-    int envId;
+    UUID envId;
     String templateName;
     Set<PlacementStrategyENUM> strategy;
     UUID instanceId;
 
-    public int getEnvId() {
+    public UUID getEnvId() {
         return envId;
     }
 
-    public void setEnvId(int envId) {
+    public void setEnvId(UUID envId) {
         this.envId = envId;
     }
 
