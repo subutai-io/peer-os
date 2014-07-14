@@ -1,0 +1,118 @@
+#!/bin/bash
+
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Publishes the templates debian pkg to the site template registry
+  echo
+  echo "        "subutai export template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for exporting a template
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - defer exports of master to the subutai-master-export script
+#     - template container MUST exist
+#     - container MUST be a template with the '@template' snapshot
+#     - container parent MUST be present in the template registry
+# (2) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
+# (3) generate the tsar file deltas, and package info
+
+function publish {
+  local container="$1"
+
+  # ----------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ----------------------------------------------------------------------------
+
+  lxc_assert $container "`usage`"
+
+  if [ "$container" == "master" ]; then
+    subutai-master-export
+    exit $?
+  fi
+
+  if [ -f "$SUBUTAI_TMPDIR/$container.tsar" ]; then
+    msg_error "It seems the tsar file has already been generated"
+    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer tsar file first"
+    exit 1
+  fi
+
+  # check to make sure the container is a template
+  if [ "`zfs_is_template $container`" == "false" ]; then
+    msg_error "Container \"$container\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$container\" is a template"
+  fi
+
+  # check to make sure container is registered as a template
+  if [ "`is_registered $container`" == "false" ]; then
+    msg_error "Container \"$container\" NOT registered as template. Aborting ..."
+    exit 1
+    else
+    msg_info "    - check passed: \"$container\" is registered"
+  fi
+
+  parent=`zfs_get_parent $container`
+  lxc_assert $parent
+  # check to make sure the parent is a template
+  if [ "`zfs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
+  # ----------------------------------------------------------------------------
+  # (2) generate delta images of all filesystems: 
+  #     'pool/parent-partition@child' -> 'pool/child-partition@template'
+  # ----------------------------------------------------------------------------
+
+  tsar_root="$SUBUTAI_TMPDIR/$container"
+  deltas="$tsar_root/deltas"
+  mkdir -p $deltas
+  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
+  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
+  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
+  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
+
+
+  # ----------------------------------------------------------------------------
+  # (3) generate the tsar file from deltas, and package info
+  # ----------------------------------------------------------------------------
+
+  cp /var/lib/lxc/$container/config $tsar_root
+  cp /var/lib/lxc/$container/fstab  $tsar_root
+  cp /var/lib/lxc/$container/packages  $tsar_root
+
+  pushd . > /dev/null
+  cd $SUBUTAI_TMPDIR
+  tar -zcf $container.tsar $container
+
+  if [ $? -eq 0 -a -f "$container.tsar" ]; then
+    msg_ok "TSAR file successfully created: \"$container.tsar\""
+  fi
+
+  popd > /dev/null
+
+}
+
+
+function publish_description {
+  echo publish a template
+}
+
+

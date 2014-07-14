@@ -1,7 +1,6 @@
 package org.safehaus.subutai.cli.container.manager;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -40,10 +39,22 @@ public class CloneMany extends OsgiCommandSupport {
     protected Object doExecute() throws Exception {
 
         Agent a = agentManager.getAgentByHostname(hosts);
-        Set<Agent> set = containerManager.clone("my_group", template, nodesCount, Arrays.asList(a));
-        if(set.isEmpty()) System.out.println("Empty set");
+        List<Agent> target = getHosts();
+        Set<Agent> set = containerManager.clone("my_group", template, nodesCount, target);
+        if(set.isEmpty()) System.out.println("Result set is empty");
         else System.out.println("Returned clones: " + set.size());
         return null;
+    }
+
+    private List<Agent> getHosts() {
+        String[] arr = hosts.split("[\\s;,]");
+        List<Agent> agents = new ArrayList<>();
+        for(String host : arr) {
+            if(host.isEmpty()) continue;
+            Agent a = agentManager.getAgentByHostname(host);
+            if(a != null) agents.add(a);
+        }
+        return agents;
     }
 
 }

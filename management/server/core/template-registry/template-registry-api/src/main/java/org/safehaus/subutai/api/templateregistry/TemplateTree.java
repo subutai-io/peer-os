@@ -56,6 +56,7 @@ public class TemplateTree {
      * Returns parent template of the supplied template or null if the supplied template is root template
      *
      * @param childTemplateName - name of template whose parent to return
+     * @param lxcArch - lxc architecture
      *
      * @return - parent template {@code Template}
      */
@@ -82,6 +83,7 @@ public class TemplateTree {
      * Returns parent template name of the supplied template or null if the template is root template
      *
      * @param childTemplateName - name of template whose parent template name to return
+     * @param lxcArch - lxc architecture
      *
      * @return - name of parent template {@code String}
      */
@@ -103,6 +105,7 @@ public class TemplateTree {
      * Returns list of child templates of the supplied template
      *
      * @param parentTemplateName - name of template whose children to return
+     * @param lxcArch - lxc architecture
      *
      * @return - list of {@code Template}
      */
