@@ -31,13 +31,13 @@ public class TerminalControl extends CssLayout {
 		});
 		textField.addStyleName("terminal_submit");
 
-		initCommandPrompt();
+//		initCommandPrompt();
 		addComponent(textField);
 
 		this.setSizeFull();
 	}
 
-	private void initCommandPrompt() {
+	public void initCommandPrompt() {
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/termlib.js", this));
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
 
