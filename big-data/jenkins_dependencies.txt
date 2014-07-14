@@ -1,0 +1,7 @@
+# This file contains dependencies that should be installed on 
+Jenkins machine so that it can generate all the debian packages properly. 
+Each dependency is seperated with a space so that a developer can copy and 
+paste the below dependencies while running "apt-get"
+
+Package Dependency List:
+subversion

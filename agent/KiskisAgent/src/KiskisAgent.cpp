@@ -735,6 +735,10 @@ int main(int argc,char *argv[],char *envp[])
 									command.getWatchArguments()[i]));
 						}
 						Watcher.stats();
+						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
+						connection->sendInotifyMessage(sendout);
+						Watcher.stats();
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}
 					else if(command.getType()=="INOTIFY_CANCEL_REQUEST")
 					{
@@ -746,6 +750,10 @@ int main(int argc,char *argv[],char *envp[])
 									command.getWatchArguments()[i]));
 						}
 						Watcher.stats();
+						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
+						connection->sendInotifyMessage(sendout);
+						Watcher.stats();
+						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}
 					else if(command.getType()=="INOTIFY_SHOW_REQUEST")
 					{

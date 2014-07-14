@@ -1,13 +1,17 @@
 #!/bin/bash
 # Starts and stops Zookeeper.
+if [ "x$ZOOKEEPER_HOME" = "x" ];
+then
+	ZOOKEEPER_HOME=/opt/zookeeper-3.4.5
+fi
 
 case "$1" in
 start)
-	start-stop-daemon --start --exec /opt/zookeeper-3.4.5/bin/zookeeper.sh start
+	start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh start
 ;;
 
 stop)
-	start-stop-daemon --start --exec /opt/zookeeper-3.4.5/bin/zookeeper.sh stop
+	start-stop-daemon --start --exec $ZOOKEEPER_HOME/bin/zookeeper.sh stop
 ;;
 
 restart)

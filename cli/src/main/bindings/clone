@@ -1,0 +1,40 @@
+#!/bin/bash
+
+
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Clone a new non-existant child from an existing parent container.
+  echo
+  echo "        "subutai clone parent child
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+function clone {
+  local parent="$1"
+  local child="$2"
+
+  if [ -z "$parent" ]; then
+    msg_error "Parameters not provided. Aborting ..."
+    show_usage "`usage`"
+  fi
+
+  if [ -z "$child" ]; then
+    msg_error "Child parameter not provided. Aborting ..."
+    show_usage "`usage`"
+  fi
+
+  # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
+  lxc_clone $parent $child "`usage`"
+  git_child_branch $child
+
+  msg_ok "Successfully cloned $child container from $parent"
+}
+
+
+function clone_description {
+  echo clones an instance container from a template
+}
+

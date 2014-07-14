@@ -1,67 +1,44 @@
-#!/bin/sh
+#!/bin/bash
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-name="shark"
-BASE=$(pwd)
-cd ../workspace
-SOURCE=$(pwd)"/big-data/$name/$name"
-TARGET="/var/lib/jenkins/Automation/Bigdata/$name"
-cd $BASE
+productName=shark
+downloadFileAndMakeChanges() {
+	initializeVariables $1
 
-# Check if any deb file exists!!!
-if ls *.deb ; then
-	rm  *.deb
-fi
+	tempDirectory=$BASE/$fileName/opt
+	confDirectory=$BASE/$fileName/etc/shark
 
-fileName=`ls | awk '{print $1}' | head -1`
-echo "FILENAME: " $fileName
+	sharkVersion=0.9.1
 
-cp -a $SOURCE/DEBIAN/ $BASE/$fileName/
-cp -a $SOURCE/etc/ $BASE/$fileName/ 
-rm -rf $BASE/$fileName/opt/*
-cp -a $SOURCE/opt/* $BASE/$fileName/opt/
+	# Create directories that are required for the debian package
+    mkdir -p $tempDirectory
+    mkdir -p $confDirectory
 
-wget http://s3.amazonaws.com/spark-related-packages/shark-0.9.1-bin-hadoop1.tgz -P $fileName/opt/
-tar -xvzf $fileName/opt/*.tgz -C $fileName/opt
-cp -a -r $fileName/opt/shark-0.9.1-bin-hadoop1/* $fileName/opt/shark-0.9.1/
-cp $fileName/opt/shark-0.9.1/conf/shark-env.sh.template $fileName/opt/shark-0.9.1/conf/shark-env.sh
-rm -rf $fileName/opt/shark-0.9.1-bin-hadoop1
-rm $fileName/opt/*.tgz
+	# download shark which is compatible with hadoop1 version. 
+	wget https://s3.amazonaws.com/spark-related-packages/shark-$sharkVersion-bin-hadoop1.tgz -P $tempDirectory
+	
+	pushd $tempDirectory
+	tar -xzpf shark-*.tgz
 
-# download derby client jar file
-wget http://repo1.maven.org/maven2/org/apache/derby/derbyclient/10.4.2.0/derbyclient-10.4.2.0.jar -P $fileName/opt/shark-0.9.1/lib/
+	# remove tar file
+	rm shark-*.tgz
 
-if [ -f "$fileName/opt/README" ]; then
-	rm $fileName/opt/README
-fi
+	# copy downloaded shark files
+	cp -a shark-$sharkVersion-bin*/* shark-$sharkVersion/
+	rm -r shark-$sharkVersion-bin*
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
-
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
-package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
-
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
-versionThird=$(echo $version | awk -F"." '{print $3}')
-
-#updatedVersion=$(echo `expr $versionThird + 1`)
-updatedRelease=$versionFirst.$versionSecond.$versionThird
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
-packageName=$package-$updatedRelease"-amd64"
-
-if [ "$fileName" != "$packageName" ] ;then
-mv $fileName $packageName
-fi
-
-find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
-if [ -f "$packageName/DEBIAN/md5sums" ]; then
-	rm $packageName/DEBIAN/md5sums
-fi
-md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $packageName/
-cp $packageName".deb" $TARGET/
-
+	# download derby client jar file
+	wget http://repo1.maven.org/maven2/org/apache/derby/derbyclient/10.4.2.0/derbyclient-10.4.2.0.jar -P $tempDirectory/shark-$sharkVersion/lib
+	
+	# move configuration files 
+	mv shark-$sharkVersion/conf/* $confDirectory
+	popd
+}
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName

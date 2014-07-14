@@ -13,7 +13,7 @@ usage()
 
 . /etc/profile
 add_prop="";
-DEFAULT_PRESTO_HOME=/opt/presto-server-0.69
+DEFAULT_PRESTO_HOME=/opt/presto-server-0.73
 
 # Check if there are at least 3 parameters are passed to the methods!
 if [[ $1 == "" || $2 == "" || $3 == "" ]];
@@ -26,7 +26,8 @@ if [ "x$PRESTO_HOME" = "x" ];
 then
        PRESTO_HOME=$DEFAULT_PRESTO_HOME 
 fi
-fileName="$PRESTO_HOME/etc/$2"
+
+fileName="/etc/presto/$2"
 
 do_add()
 {

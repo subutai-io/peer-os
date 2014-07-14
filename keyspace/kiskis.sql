@@ -32,3 +32,10 @@ create table template_registry_info(
   primary key (template)
 );
 create INDEX on template_registry_info (parent);
+
+create table node_group (
+  name      text,
+  info      text,
+  primary key (name)
+);
+

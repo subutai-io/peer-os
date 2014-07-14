@@ -1,3 +1,17 @@
-sparkHome="/opt/spark-0.9.1"
+sparkHome="/opt/spark-1.0.0"
 export SPARK_HOME=$sparkHome
-export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+path_content=$(echo $PATH)
+
+pattern="$sparkHome/bin"
+if [[ $path_content != *$pattern* ]];
+then
+	export PATH=$PATH:$pattern
+fi
+
+pattern="$sparkHome/sbin"
+if [[ $path_content != *$pattern* ]];
+then
+        export PATH=$PATH:$pattern
+fi
+

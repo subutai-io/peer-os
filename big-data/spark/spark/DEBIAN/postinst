@@ -1,11 +1,24 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-sparkVer="spark-0.9.1"
+sparkVer="spark-1.0.0"
 
 FilePath="/etc/profile"
 . $FilePath
 
+sparkVer="spark-1.0.0"
+sparkHome="/opt/$sparkVer"
+sparkConf="/etc/spark"
+
 # insert pid_dir to spark-env.sh
-file="/opt/spark-0.9.1/conf/spark-env.sh"
+file="$sparkConf/spark-env.sh"
 PIDDIR=/var/run/spark
 echo "SPARK_PID_DIR=$PIDDIR" >> $file
+
+if [[ "x$SPARK_HOME" != "x" ]];
+then
+        sparkHome=$SPARK_HOME
+fi
+
+# Create symlink to configuration files
+ln -sf $sparkConf/* $sparkHome/conf/
+

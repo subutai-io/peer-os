@@ -35,8 +35,20 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getParentTemplate( final String childName ) {
-        return gson.toJson( templateRegistryManager.getParentTemplate( childName ) );
+    public String getTemplate( final String templateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
+    }
+
+
+    @Override
+    public String getParentTemplate( final String childTemplateName ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName ) );
+    }
+
+
+    @Override
+    public String getParentTemplate( final String childTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName, lxcArch ) );
     }
 
 
@@ -51,18 +63,35 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public String getParentTemplates( final String childTemplateName, final String lxcArch ) {
+        List<String> parents = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName, lxcArch ) ) {
+            parents.add( template.getTemplateName() );
+        }
+        return gson.toJson( parents );
+    }
+
+
+    @Override
     public String getChildTemplates( final String parentTemplateName ) {
         return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
     }
 
 
     @Override
+    public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
+    }
+
+
+    @Override
     public String getTemplateTree() {
         TemplateTree tree = templateRegistryManager.getTemplateTree();
-        String parent = null;
-        List<Template> uberTemplates = tree.getChildrenTemplates( parent );
-        for ( Template template : uberTemplates ) {
-            addChildren( tree, template );
+        List<Template> uberTemplates = tree.getRootTemplates();
+        if ( uberTemplates != null ) {
+            for ( Template template : uberTemplates ) {
+                addChildren( tree, template );
+            }
         }
         return gson.toJson( uberTemplates );
     }
@@ -70,10 +99,7 @@ public class RestServiceImpl implements RestService {
 
     private void addChildren( TemplateTree tree, Template currentTemplate ) {
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( children == null || children.isEmpty() ) {
-            return;
-        }
-        else {
+        if ( !( children == null || children.isEmpty() ) ) {
             currentTemplate.addChildren( children );
             for ( Template child : children ) {
                 addChildren( tree, child );

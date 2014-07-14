@@ -1,0 +1,10 @@
+#!/bin/bash
+
+function demote {
+  echo unimplemented function binding $FUNCNAME
+}
+
+function demote_description {
+  echo demotes a template back to an instance container
+}
+
