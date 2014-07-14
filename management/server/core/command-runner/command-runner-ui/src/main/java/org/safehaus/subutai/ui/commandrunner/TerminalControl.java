@@ -1,8 +1,9 @@
 package org.safehaus.subutai.ui.commandrunner;
 
-import com.vaadin.data.Property;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.*;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
+import com.vaadin.ui.JavaScriptFunction;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -11,28 +12,18 @@ import org.safehaus.subutai.shared.protocol.FileUtil;
  * Created by daralbaev on 7/9/14.
  */
 public class TerminalControl extends CssLayout {
-	private TextField textField;
+	private TerminalForm parent;
 	private String inputPrompt;
 	private String username, currentPath, machineName;
 
-	public TerminalControl() {
+	public TerminalControl(TerminalForm parent) {
 		username = (String) VaadinService.getCurrentRequest().getWrappedSession().getAttribute("username");
 		currentPath = "/";
 		machineName = "";
 		setId("terminal");
 
-		textField = new TextField();
-		textField.setImmediate(true);
-		textField.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				System.out.println(textField.getValue());
-			}
-		});
-		textField.addStyleName("terminal_submit");
-
+		this.parent = parent;
 		initCommandPrompt();
-		addComponent(textField);
 
 		this.setSizeFull();
 	}
@@ -47,7 +38,7 @@ public class TerminalControl extends CssLayout {
 					@Override
 					public void call(JSONArray arguments) throws JSONException {
 						if (arguments != null && arguments.length() > 0) {
-							Notification.show(arguments.getString(0));
+							parent.sendCommand(arguments.getString(0));
 						}
 					}
 				});
@@ -55,8 +46,12 @@ public class TerminalControl extends CssLayout {
 		setInputPrompt();
 	}
 
-	public void setInputPrompt() {
+	private void setInputPrompt() {
 		inputPrompt = String.format("%s@%s:%s#", username, machineName, currentPath);
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this).replace("$prompt", inputPrompt));
+	}
+
+	public void setOutputPrompt(String output) {
+		JavaScript.getCurrent().execute(String.format("jqconsole.Write(%s + '\\n', 'jqconsole-output');", output));
 	}
 }

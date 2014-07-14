@@ -41,7 +41,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	//
 	private TextField programTxtFld, workDirTxtFld, timeoutTxtFld;
 	private ComboBox requestTypeCombo;
-	private Button sendBtn;
 	private Label indicator;
 	private VerticalLayout controls;
 
@@ -59,13 +58,14 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		horizontalSplit.setSizeFull();
 
 		agentTree = new AgentTree(agentManager);
+
 		horizontalSplit.setFirstComponent(agentTree);
 
 		HorizontalSplitPanel gridLayout = new HorizontalSplitPanel();
 		gridLayout.setSizeFull();
 		gridLayout.setSplitPosition(80, Unit.PERCENTAGE);
 
-		initOutputTextArea();
+		commandOutputTxtArea = new TerminalControl(this);
 
 		controls = new VerticalLayout();
 		controls.setSpacing(true);
@@ -75,8 +75,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		initCommand();
 		initTimeout();
 		initRequestType();
-		initClearButton();
-		initSendButton();
 		initIndicator();
 
 		gridLayout.setFirstComponent(commandOutputTxtArea);
@@ -86,55 +84,31 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		setCompositionRoot(horizontalSplit);
 	}
 
-	private void initOutputTextArea() {
-		commandOutputTxtArea = new TerminalControl();
+	private void initProgram() {
+		Label programLbl = new Label("Program");
+		programTxtFld = new TextField();
+		programTxtFld.setId("pwd");
+		programTxtFld.setValue("pwd");
+		programTxtFld.setWidth(200, Unit.PIXELS);
+		controls.addComponent(programLbl);
+		controls.addComponent(programTxtFld);
 	}
 
-	private void initIndicator() {
-		indicator = new Label();
-		indicator.setIcon(new ThemeResource("img/spinner.gif"));
-		indicator.setContentMode(ContentMode.HTML);
-		indicator.setHeight(11, Unit.PIXELS);
-		indicator.setWidth(50, Unit.PIXELS);
-		indicator.setVisible(false);
-		controls.addComponent(indicator);
+	private void initCommand() {
+		Label workDirLbl = new Label("Cwd");
+		workDirTxtFld = new TextField();
+		workDirTxtFld.setValue("/");
+		controls.addComponent(workDirLbl);
+		controls.addComponent(workDirTxtFld);
 	}
 
-	private void initSendButton() {
-		sendBtn = new Button("Send");
-		sendBtn.setId("sendBtn");
-		controls.addComponent(sendBtn);
-		sendBtn.addStyleName("default");
-
-		sendBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-//				commandOutputTxtArea.getCommand();
-				/*Set<Agent> agents = checkAgents();
-				if (agents != null && validateInputs()) {
-					RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue());
-
-					if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
-						requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue()));
-						requestBuilder.withType(RequestType.TERMINATE_REQUEST);
-					} else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
-						requestBuilder.withType(RequestType.PS_REQUEST);
-					}
-
-					requestBuilder.withTimeout(Integer.valueOf(timeoutTxtFld.getValue()));
-					requestBuilder.withCwd(workDirTxtFld.getValue());
-
-					getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
-					createCommand(requestBuilder, agents);
-				}*/
-			}
-		});
-	}
-
-	private void initClearButton() {
-		Button clearBtn = new Button("Clear");
-		clearBtn.addStyleName("default");
-		controls.addComponent(clearBtn);
+	private void initTimeout() {
+		Label timeoutLbl = new Label("Timeout");
+		timeoutTxtFld = new TextField();
+		timeoutTxtFld.setValue("30");
+		timeoutTxtFld.setWidth(30, Unit.PIXELS);
+		controls.addComponent(timeoutLbl);
+		controls.addComponent(timeoutTxtFld);
 	}
 
 	private void initRequestType() {
@@ -150,52 +124,34 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(requestTypeCombo);
 	}
 
-	private void initTimeout() {
-		Label timeoutLbl = new Label("Timeout");
-		timeoutTxtFld = new TextField();
-		timeoutTxtFld.setValue("30");
-		timeoutTxtFld.setWidth(30, Unit.PIXELS);
-		controls.addComponent(timeoutLbl);
-		controls.addComponent(timeoutTxtFld);
+	private void initIndicator() {
+		indicator = new Label();
+		indicator.setIcon(new ThemeResource("img/spinner.gif"));
+		indicator.setContentMode(ContentMode.HTML);
+		indicator.setHeight(11, Unit.PIXELS);
+		indicator.setWidth(50, Unit.PIXELS);
+		indicator.setVisible(false);
+		controls.addComponent(indicator);
 	}
 
-	private void initCommand() {
-		Label workDirLbl = new Label("Cwd");
-		workDirTxtFld = new TextField();
-		workDirTxtFld.setValue("/");
-		controls.addComponent(workDirLbl);
-		controls.addComponent(workDirTxtFld);
-	}
+	public void sendCommand(String command) {
+		Set<Agent> agents = checkAgents();
+		if (agents != null && validateInputs(command)) {
+			RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue());
 
-	private void initProgram() {
-		Label programLbl = new Label("Program");
-		programTxtFld = new TextField();
-		programTxtFld.setId("pwd");
-		programTxtFld.setValue("pwd");
-		programTxtFld.setWidth(200, Unit.PIXELS);
-		controls.addComponent(programLbl);
-		controls.addComponent(programTxtFld);
-
-		/*programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
-			@Override
-			public void handleAction(Object sender, Object target) {
-				sendBtn.click();
+			if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
+				requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue()));
+				requestBuilder.withType(RequestType.TERMINATE_REQUEST);
+			} else if (requestTypeCombo.getValue() == RequestType.PS_REQUEST) {
+				requestBuilder.withType(RequestType.PS_REQUEST);
 			}
-		});*/
-	}
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
+			requestBuilder.withTimeout(Integer.valueOf(timeoutTxtFld.getValue()));
+			requestBuilder.withCwd(workDirTxtFld.getValue());
 
-	private void addOutput(String output) {
-		if (!Strings.isNullOrEmpty(output)) {
+			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
+			createCommand(requestBuilder, agents);
 		}
-	}
-
-	public void dispose() {
-		agentTree.dispose();
-		executor.shutdown();
 	}
 
 	private Set<Agent> checkAgents() {
@@ -208,18 +164,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		return agents;
 	}
 
-	private boolean validateInputs() {
+	private boolean validateInputs(String command) {
 
-		if (Strings.isNullOrEmpty(programTxtFld.getValue())) {
+		if (Strings.isNullOrEmpty(command)) {
 			show("Please, enter command");
 			return false;
 		}
-
-		/*if (!Util.isNumeric(programTxtFld.getValue())
-				|| Integer.valueOf(programTxtFld.getValue()) <= 0) {
-			show("Please, enter numeric PID greater than 0 to kill");
-			return false;
-		}*/
 
 		if (Strings.isNullOrEmpty(timeoutTxtFld.getValue()) || !Util.isNumeric(timeoutTxtFld.getValue())) {
 			show("Please, enter integer timeout value");
@@ -270,7 +220,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								out.append(response.getType()).append("\n\n");
 							}
 						}
-						addOutput(out.toString());
+
+						show(out.toString());
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -281,5 +232,14 @@ public class TerminalForm extends CustomComponent implements Disposable {
 				}
 			}
 		});
+	}
+
+	private void show(String notification) {
+		commandOutputTxtArea.setOutputPrompt(notification);
+	}
+
+	public void dispose() {
+		agentTree.dispose();
+		executor.shutdown();
 	}
 }
