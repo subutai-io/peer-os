@@ -4,7 +4,36 @@ _subutai()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="clone demote destroy export import list master_create master_destroy master_export promote publish rename setup"
+    opts="clone demote destroy export import list promote publish rename"
+
+    case "${prev}" in
+        clone)
+            ;;
+        demote)
+            ;;
+        destroy)
+            ;;
+        export)
+            ;;
+        import)
+            ;;
+        list)
+            args="-t[templates] -c[containers] -p[parents] -a[ancestry]"
+            COMPREPLY=( $(compgen -W "${args}" -- ${cur}))
+            return 0
+            ;;
+        promote)
+            args="-c[concert] -n[name]"
+            COMPREPLY=( $(compgen -W "${args}" ${cur}))
+            return 0
+            ;;
+        publish)
+            ;;
+        rename) 
+            ;;    
+        *)
+            ;;
+    esac
 
 
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
