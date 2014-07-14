@@ -6175,6 +6175,14 @@ body .dashboard.v-app .v-app-loading {
 }
 
 /*terminal css*/
+/* The console container element */
+#terminal {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+}
+
 .jqconsole-ansi-bold {
     font-weight: bold !important;
 }
