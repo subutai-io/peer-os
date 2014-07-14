@@ -662,7 +662,8 @@
         function change_num_chars() {
             var W = self.width();
             var w = cursor.innerWidth();
-            num_chars = Math.floor(W / w)
+            num_chars = Math.floor(W / w);
+            $("title").val(num_chars);
         }
 
         function str_repeat(str, n) {
