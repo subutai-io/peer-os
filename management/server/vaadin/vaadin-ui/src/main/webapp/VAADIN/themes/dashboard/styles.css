@@ -6275,11 +6275,11 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .terminal, .cmd {
-    font-family: FreeMono, monospace;
-    color: #aaa;
+    /*font-family: FreeMono, monospace;*/
+    /*color: #aaa;*/
     background-color: #000;
-    font-size: 12px;
-    line-height: 14px;
+    /*font-size: 12px;*/
+    line-height: 15px;
 }
 
 .terminal-output > div {

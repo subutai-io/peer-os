@@ -7,8 +7,6 @@ package org.safehaus.subutai.ui.commandrunner;
 
 
 import com.google.common.base.Strings;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -176,12 +174,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		controls.addComponent(programLbl);
 		controls.addComponent(programTxtFld);
 
-		programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
+		/*programTxtFld.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
 				sendBtn.click();
 			}
-		});
+		});*/
 	}
 
 	private void show(String notification) {
