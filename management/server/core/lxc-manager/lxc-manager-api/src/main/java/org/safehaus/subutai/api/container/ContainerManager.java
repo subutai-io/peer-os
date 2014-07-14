@@ -8,7 +8,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public interface ContainerManager {
 
-    public Set<Agent> clone(String groupName, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy);
+    public Set<Agent> clone(int envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy);
 
     public boolean attachAndExecute(Agent physicalHost, String cloneName, String cmd);
 
