@@ -43,8 +43,9 @@ public class TerminalControl extends CssLayout {
 
 	private void initCommandPrompt() {
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/termlib.js", this));
+		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
 
-		setInputPrompt();
+//		setInputPrompt();
 	}
 
 	public void setInputPrompt() {
