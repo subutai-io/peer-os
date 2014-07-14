@@ -2,9 +2,9 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.vaadin.data.Property;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.JavaScript;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
 /**
@@ -41,6 +41,20 @@ public class TerminalControl extends CssLayout {
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/jquery-1.7.1.min.js", this));
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/jqconsole.min.js", this));
 //		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this));
+		JavaScript.getCurrent().addFunction("callback",
+				new JavaScriptFunction() {
+					@Override
+					public void call(JSONArray arguments) throws JSONException {
+						try {
+							String message = arguments.getString(0);
+							int value = arguments.getInt(1);
+							Notification.show("Message: " + message +
+									", value: " + value);
+						} catch (JSONException e) {
+							Notification.show("Error: " + e.getMessage());
+						}
+					}
+				});
 
 		setInputPrompt();
 	}
