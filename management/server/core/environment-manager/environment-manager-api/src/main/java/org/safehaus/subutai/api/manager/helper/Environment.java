@@ -11,11 +11,22 @@ import org.safehaus.subutai.shared.protocol.Agent;
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class Environment extends Blueprint {
+public class Environment  {
 
     private String owner;
     private UUID uuid;
     private Set<Agent> agents;
+    private String name;
+
+
+        public String getName() {
+            return name;
+        }
+
+
+        public void setName( final String name ) {
+            this.name = name;
+        }
 
 
     public Environment() {

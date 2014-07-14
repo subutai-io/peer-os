@@ -1,7 +1,6 @@
 package org.safehaus.subutai.dis.manager.window;
 
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -19,13 +18,11 @@ public class EnvironmentDetails extends DetailsWindow {
     }
 
 
-    @Override
-    public void setContent( final Blueprint blueprint ) {
-        Environment environment = ( Environment ) blueprint;
+    public void setContent( final Environment blueprint ) {
         StringBuilder sb = new StringBuilder();
-        sb.append( environment.getName() ).append( "\n" );
-        if ( environment.getAgents() != null ) {
-                for ( Agent agent : environment.getAgents() ) {
+        sb.append( blueprint.getName() ).append( "\n" );
+        if ( blueprint.getAgents() != null ) {
+                for ( Agent agent : blueprint.getAgents() ) {
                     sb.append( agent.getHostname() ).append( "\n" );
             }
         }

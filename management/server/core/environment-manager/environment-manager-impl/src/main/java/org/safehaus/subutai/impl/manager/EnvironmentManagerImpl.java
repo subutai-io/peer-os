@@ -53,7 +53,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     public boolean buildEnvironment( String blueprintStr ) {
 
         EnvironmentBlueprint blueprint =
-                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
+                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
         return build( blueprint );
     }
 
@@ -121,7 +121,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
         EnvironmentBlueprint blueprint =
-                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
+                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
         boolean saveResult = environmentDAO.saveBlueprint( blueprint );
         return saveResult;
     }
