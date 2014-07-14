@@ -56,7 +56,7 @@ public class ShellCommands extends OsgiCommandSupport {
         pooledConnectionFactory.start();
 
         try {
-//            setupListener( pooledConnectionFactory );
+            setupListener( pooledConnectionFactory );
             sendMessage( pooledConnectionFactory );
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,6 +65,10 @@ public class ShellCommands extends OsgiCommandSupport {
     }
 
     public void sendMessage(PooledConnectionFactory pooledConnectionFactory) {
+
+
+        String uuid = "95d37e69-c118-4706-b65b-752a6aca9ad7";
+//        String uuid = "b4dcfcbe-7838-4d39-b08d-63008c4d8ab4";
 
             Connection connection = null;
             Session session = null;
@@ -75,14 +79,18 @@ public class ShellCommands extends OsgiCommandSupport {
                 connection.start();
                 session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
 //                Destination destination = session.createTopic( "BROADCAST_TOPIC" );
-                Destination destination = session.createTopic( "95d37e69-c118-4706-b65b-752a6aca9ad7" );
-                                                                           //: command.getUuid().toString() );
+//                Destination destination = session.createTopic( "SERVICE_TOPIC" );
+                Destination destination = session.createTopic( uuid );
 
                 producer = session.createProducer( destination );
                 producer.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
                 producer.setTimeToLive( 1000 );
 
-                String json = "{"
+
+                String json = "";
+
+                /*
+                json = "{"
                   + "\"command\": { "
                   + "\"source\": \"FS_TRACKER\", "
                   + "\"type\": \"EXECUTE_REQUEST\", "
@@ -98,43 +106,41 @@ public class ShellCommands extends OsgiCommandSupport {
                   + "\"timeout\": 30 "
                   + "}"
                   + "}";
+                  */
 
+                json = "{"
+                        + "\"command\": { "
+                        + "\"source\": \"FS_TRACKER\", "
+                        + "\"type\": \"INOTIFY_SHOW_REQUEST\", "
+                        + "\"uuid\": \"" + uuid + "\", "
+                        + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e3\" "
+                        + "}"
+                        + "}";
+
+
+                /*json = "{"
+                      + "\"command\": { "
+                      + "\"source\": \"FS_TRACKER\", "
+                      + "\"type\": \"INOTIFY_REQUEST\", "
+                      + "\"uuid\": \"" + uuid + "\", "
+                      + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\", "
+//                      + "\"confPoints\":[\"/etc/ksks-agent\"] "
+                      + "\"confPoints\":[\"/opt\"] "
+                      + "}"
+                      + "}";
+                */
 
 /*
                 json = "{"
                       + "\"command\": { "
                       + "\"source\": \"FS_TRACKER\", "
-                      + "\"type\": \"INOTIFY_SHOW_REQUEST\", "
-                      + "\"uuid\": \"95d37e69-c118-4706-b65b-752a6aca9ad7\", "
-                      + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\" "
-                      + "}"
-                      + "}";
-
-
-                json = "{"
-                      + "\"command\": { "
-                      + "\"source\": \"FS_TRACKER\", "
-                      + "\"type\": \"INOTIFY_REQUEST\", "
-                      + "\"uuid\": \"499f4b6e-36f7-4588-92a2-13d9008de628\", "
-                      + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\", "
-                      + "\"confPoints\":[\"/etc\",\"/etc/approx\",\"/etc/nginx\"] "
-                      + "}"
-                      + "}";
-*/
-
-
-                /*
-                json = "{"
-                      + "\"command\": { "
-                      + "\"source\": \"FS_TRACKER\", "
                       + "\"type\": \"INOTIFY_CANCEL_REQUEST\", "
-                      + "\"uuid\": \"499f4b6e-36f7-4588-92a2-13d9008de628\", "
-                      + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\" "
-                      + "\"confPoints\":[\"/etc\"] "
+                      + "\"uuid\": \"" + uuid + "\", "
+                      + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e5\", "
+                      + "\"confPoints\":[\"/opt\"] "
                       + "}"
-                      + "}";
+                      + "}";*/
 
-*/
                 System.out.println( "json: " + json );
 
                 TextMessage message = session.createTextMessage( json );

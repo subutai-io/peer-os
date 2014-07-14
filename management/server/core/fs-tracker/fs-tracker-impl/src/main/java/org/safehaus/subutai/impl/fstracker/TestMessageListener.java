@@ -30,16 +30,45 @@ class TestMessageListener implements MessageListener {
         try {
             if ( message instanceof BytesMessage ) {
                 System.out.println( ">> BytesMessage" );
+                handleBytesMessage( (BytesMessage) message );
             }
             else if ( message instanceof ActiveMQMessage ) {
-                System.out.println( ">> ActiveMQMessage" );
-                printMessage((ActiveMQMessage) message);
+//                System.out.println( ">> ActiveMQMessage" );
+//                printMessage((ActiveMQMessage) message);
             }
         }
         catch ( Exception e ) {
             e.printStackTrace();
         }
     }
+
+
+    private static void handleBytesMessage( BytesMessage msg ) throws Exception {
+
+        byte[] msg_bytes = new byte[( int ) msg.getBodyLength()];
+        msg.readBytes( msg_bytes );
+        String jsonCmd = new String( msg_bytes, "UTF-8" );
+
+        System.out.println( ">> jsonCmd: " + jsonCmd );
+
+
+        /*if ( response != null ) {
+            if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE ) {
+                LOG.log( Level.INFO, "\nReceived {0}",
+                        CommandJson.getJson( CommandJson.getCommand( jsonCmd ) ) );
+            }
+            else {
+                LOG.log( Level.INFO, "Heartbeat from {0}", response.getHostname() );
+            }
+            response.setTransportId( ( ( ActiveMQMessage ) message ).getProducerId().toString() );
+            notifyListeners( response );
+        }
+        else {
+            LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
+        }*/
+
+    }
+
 
     private static void printMessage( ActiveMQMessage message ) throws JMSException {
 
@@ -48,10 +77,10 @@ class TestMessageListener implements MessageListener {
 //        agentDisconnect.setTransportId( ( ( RemoveInfo ) message.getDataStructure() ).getObjectId().toString() );
 
 
-        System.out.println( " --- ");
-        System.out.println( ">> message: " + message );
-        System.out.println( ">> dataStructure: " + message.getDataStructure() );
-        System.out.println( " --- ");
+//        System.out.println( " --- ");
+//        System.out.println( ">> message: " + message );
+//        System.out.println( ">> dataStructure: " + message.getDataStructure() );
+//        System.out.println( " --- ");
 
 
 /*        if ( message.getDataStructure() instanceof RemoveInfo ) {

@@ -39,13 +39,7 @@ class CommunicationMessageListener implements MessageListener {
      */
     @Override
     public void onMessage( Message message ) {
-
-        System.out.println( ">> " + message );
-        System.out.println( message instanceof BytesMessage );
-        System.out.println( message instanceof ActiveMQMessage );
-
         try {
-
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
 
@@ -53,6 +47,7 @@ class CommunicationMessageListener implements MessageListener {
                 msg.readBytes( msg_bytes );
                 String jsonCmd = new String( msg_bytes, "UTF-8" );
                 Response response = CommandJson.getResponse( jsonCmd );
+
                 if ( response != null ) {
                     if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE ) {
                         LOG.log( Level.INFO, "\nReceived {0}",
@@ -70,7 +65,6 @@ class CommunicationMessageListener implements MessageListener {
             }
             else if ( message instanceof ActiveMQTextMessage ) {
                 ActiveMQTextMessage msg = ( ActiveMQTextMessage ) message;
-                System.out.printf( "text: " + msg.getText() );
             }
             else if ( message instanceof ActiveMQMessage ) {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
