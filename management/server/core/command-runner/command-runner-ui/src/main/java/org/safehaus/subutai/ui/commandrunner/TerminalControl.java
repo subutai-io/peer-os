@@ -4,6 +4,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.TextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -13,6 +14,7 @@ import org.safehaus.subutai.shared.protocol.FileUtil;
  */
 public class TerminalControl extends CssLayout {
 	private TerminalForm parent;
+	private TextArea hiddenOutput;
 	private String inputPrompt;
 	private String username, currentPath, machineName;
 
@@ -24,6 +26,11 @@ public class TerminalControl extends CssLayout {
 
 		this.parent = parent;
 		initCommandPrompt();
+
+		hiddenOutput = new TextArea();
+		hiddenOutput.setId("terminal_submit");
+		hiddenOutput.addStyleName("terminal_submit");
+		addComponent(hiddenOutput);
 
 		this.setSizeFull();
 	}
@@ -52,6 +59,6 @@ public class TerminalControl extends CssLayout {
 	}
 
 	public void setOutputPrompt(String output) {
-		JavaScript.getCurrent().execute(String.format("jqconsole.Write('%s'  + '\\n', 'jqconsole-output');", output));
+		JavaScript.getCurrent().execute(String.format("$('.jqconsole-output').last().val(%s)", output));
 	}
 }
