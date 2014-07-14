@@ -45,12 +45,7 @@ public class TerminalControl extends CssLayout {
 				new JavaScriptFunction() {
 					@Override
 					public void call(JSONArray arguments) throws JSONException {
-						try {
-//							String message = arguments.getString(0);
-							Notification.show(arguments.toString());
-						} catch (JSONException e) {
-							Notification.show("Error: " + e.getMessage());
-						}
+						Notification.show(arguments.toString());
 					}
 				});
 
