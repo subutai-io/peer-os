@@ -27,7 +27,7 @@ public class CassandraYamlLoader extends YamlConfigurationLoader {
 
 
     public CassandraYamlLoader() {
-        System.setProperty( "cassandra.config", "cassandra.2.0.4/cassandra.yaml" );
+        System.setProperty( "cassandra.config", "cassandra.2.0.5/cassandra.yaml" );
     }
 
 
