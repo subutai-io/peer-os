@@ -1,6 +1,6 @@
 package org.safehaus.subutai.ui.commandrunner;
 
-import com.vaadin.event.FieldEvents;
+import com.vaadin.data.Property;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
@@ -22,17 +22,17 @@ public class TerminalControl extends CssLayout {
 		setId("terminal");
 
 		textField = new TextField();
+		textField.setImmediate(true);
+		textField.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				System.out.println(textField.getValue());
+			}
+		});
 		textField.addStyleName("terminal_submit");
 
 		initCommandPrompt();
 		addComponent(textField);
-
-		textField.addTextChangeListener(new FieldEvents.TextChangeListener() {
-			@Override
-			public void textChange(FieldEvents.TextChangeEvent textChangeEvent) {
-				System.out.println(textChangeEvent.getText());
-			}
-		});
 
 		this.setSizeFull();
 	}
