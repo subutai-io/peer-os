@@ -31,7 +31,7 @@ public class EnvironmentBuilder {
             int nodeCount = 3;
 
             Set<Agent> agentList =
-                    containerManager.clone( 1, nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
+                    containerManager.clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
 
             environment.getAgents().addAll( agentList );
         }
