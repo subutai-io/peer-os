@@ -106,7 +106,7 @@ public class Manager {
 			}
 		});
 
-		controlsContent.addComponent(destroyClusterBtn);
+//		controlsContent.addComponent(destroyClusterBtn);
 
 		Button addNodeBtn = new Button("Add Node");
 		addNodeBtn.addStyleName("default");
@@ -140,7 +140,7 @@ public class Manager {
 			}
 		});
 
-		controlsContent.addComponent(addNodeBtn);
+//		controlsContent.addComponent(addNodeBtn);
 
 		contentRoot.addComponent(controlsContent, 0, 0);
 		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);

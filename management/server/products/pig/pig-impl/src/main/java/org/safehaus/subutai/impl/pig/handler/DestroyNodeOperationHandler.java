@@ -44,11 +44,12 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             return;
         }
 
-        if ( config.getNodes().size() == 1 ) {
-            productOperation.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
-            return;
-        }
+        //        if ( config.getNodes().size() == 1 ) {
+        //            productOperation.addLogFailed(
+        //                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation
+        // aborted" );
+        //            return;
+        //        }
 
         productOperation.addLog( "Uninstalling Pig..." );
         Command uninstallCommand = manager.getCommands().getUninstallCommand( Util.wrapAgentToSet( agent ) );
@@ -73,7 +74,10 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             config.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+
+            if ( config.getNodes().isEmpty() ?
+                 manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
+                 manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }
             else {

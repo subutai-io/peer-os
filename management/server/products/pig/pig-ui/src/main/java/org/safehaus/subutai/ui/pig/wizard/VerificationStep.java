@@ -33,9 +33,9 @@ public class VerificationStep extends Panel {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Installation Name", wizard.getConfig().getClusterName());
 		for (Agent agent : wizard.getConfig().getNodes()) {
-			cfgView.addStringCfg("Node to install", agent.getHostname() + "");
+			cfgView.addStringCfg("Nodes to install Pig to", agent.getHostname() + "");
 		}
 
 		Button install = new Button("Install");
