@@ -58,13 +58,11 @@ public class TerminalControl extends CssLayout {
 		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this).replace("$prompt", inputPrompt));
 	}
 
-	public void setOutputPrompt(String output, boolean isError) {
+	public void setOutputPrompt(String output) {
 		String jquery = "var d = document.createElement('span');\n" +
 				"$(d).html('%s\\n');\n" +
 				"$('.jqconsole-output').last().append(d);\n";
-		if (isError) {
-			jquery += "$(d).css('color', 'red');";
-		}
+
 		JavaScript.getCurrent().execute(String.format(jquery, output.replaceAll("\\n", "\\\\n")));
 	}
 }

@@ -158,7 +158,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		Set<Agent> agents = agentTree.getSelectedAgents();
 		if (agents.isEmpty()) {
 			agents = null;
-			show("Please, select nodes", true);
+			show("Please, select nodes");
 		}
 
 		return agents;
@@ -167,22 +167,22 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private boolean validateInputs(String command) {
 
 		if (Strings.isNullOrEmpty(command)) {
-			show("Please, enter command", true);
+			show("Please, enter command");
 			return false;
 		}
 
 		if (Strings.isNullOrEmpty(timeoutTxtFld.getValue()) || !Util.isNumeric(timeoutTxtFld.getValue())) {
-			show("Please, enter integer timeout value", true);
+			show("Please, enter integer timeout value");
 			return false;
 		} else {
 			int timeout = Integer.valueOf(timeoutTxtFld.getValue());
 			if (timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC) {
-				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC, true);
+				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC);
 			}
 		}
 
 		if (Strings.isNullOrEmpty(workDirTxtFld.getValue())) {
-			show("Please, enter working directory", true);
+			show("Please, enter working directory");
 			return false;
 		}
 
@@ -208,36 +208,39 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								/*new StringBuilder(host).append(" [").append(response.getPid())
 										.append("]").append(":\n");*/
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
-							output[0] = response.getStdOut().trim();
-							show(output[0], false);
+							out.append(response.getStdOut()).append("\n");
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
-							output[0] = response.getStdErr().trim();
-							show(output[0], true);
+							out.append("<span style='color:red'>" +
+											response.getStdErr() +
+											"</span>"
+							).append("\n");
 						}
 						if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-								output[0] = "Exit code: " + response.getExitCode() +
-										" [" + response.getPid() + "]" +
-										" Host:" + host;
-								show(output[0], false);
+								out.append("Exit code: ").append(response.getExitCode())
+										.append("\n\n");
+							} else {
+								out.append(response.getType()).append("\n\n");
 							}
 						}
 
+						output[0] += out.toString();
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
 
 				taskCount--;
 				if (taskCount == 0) {
+					show(output[0]);
 					indicator.setVisible(false);
 				}
 			}
 		});
 	}
 
-	private void show(String notification, boolean isError) {
-		commandOutputTxtArea.setOutputPrompt(notification, isError);
+	private void show(String notification) {
+		commandOutputTxtArea.setOutputPrompt(notification);
 	}
 
 	public void dispose() {
