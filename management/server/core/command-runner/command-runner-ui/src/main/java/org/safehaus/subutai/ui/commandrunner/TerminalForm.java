@@ -204,25 +204,27 @@ public class TerminalForm extends CustomComponent implements Disposable {
 						Agent agent = agentManager.getAgentByUUID(response.getUuid());
 						String host = agent == null ? String.format("Offline[%s]", response.getUuid()) :
 								agent.getHostname();
-						StringBuilder out =
-								new StringBuilder(host).append(" [").append(response.getPid())
-										.append("]").append(":\n");
+						StringBuilder out = new StringBuilder();
+								/*new StringBuilder(host).append(" [").append(response.getPid())
+										.append("]").append(":\n");*/
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
-							out.append(response.getStdOut().trim()).append("\n");
+							out.append(commandOutputTxtArea.prepareJQuery(response.getStdOut().trim(), false));
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
-							out.append(response.getStdErr().trim()).append("\n");
+							out.append(commandOutputTxtArea.prepareJQuery(response.getStdErr().trim(), true));
 						}
 						if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-								out.append("Exit code: ").append(response.getExitCode())
-										.append("\n\n");
-							} else {
-								out.append(response.getType()).append("\n\n");
+								out.append(commandOutputTxtArea.prepareJQuery(
+										"Exit code: " + response.getExitCode() +
+												" [" + response.getPid() + "]" +
+												" Host:" + host,
+										false));
 							}
 						}
 
 						output[0] += out.toString();
+						show(output[0]);
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -230,7 +232,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 				taskCount--;
 				if (taskCount == 0) {
 					indicator.setVisible(false);
-					show(output[0]);
 				}
 			}
 		});
