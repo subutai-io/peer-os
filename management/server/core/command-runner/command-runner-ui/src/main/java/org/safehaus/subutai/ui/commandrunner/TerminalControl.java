@@ -61,7 +61,7 @@ public class TerminalControl extends CssLayout {
 	public void setOutputPrompt(String output, boolean isError) {
 		String jquery = "var d = document.createElement('span');\n" +
 				"$(d).html('%s\\n');\n" +
-				"$('.jqconsole-output').last().append(d);";
+				"$('.jqconsole-output').last().append(d);\n";
 		if (isError) {
 			jquery += "$(d).css('color', 'red');";
 		}

@@ -158,7 +158,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		Set<Agent> agents = agentTree.getSelectedAgents();
 		if (agents.isEmpty()) {
 			agents = null;
-			show("Please, select nodes");
+			show("Please, select nodes", true);
 		}
 
 		return agents;
