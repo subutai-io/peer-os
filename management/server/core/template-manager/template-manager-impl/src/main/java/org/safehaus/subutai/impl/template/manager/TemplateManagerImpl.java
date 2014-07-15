@@ -28,6 +28,19 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
+        List<Template> parents = templateRegistry.getParentTemplates(templateName);
+        for(Template p : parents) {
+            boolean temp_exists = scriptExecutor.execute(a,
+                    ActionType.LIST_TEMPLATES, p.getTemplateName());
+            if(!temp_exists) {
+                boolean b = scriptExecutor.execute(a, ActionType.INSTALL_TEMPLATE,
+                        p.getTemplateName());
+                if(!b) {
+                    logger.error("Failed to install parent templates: " + p.getTemplateName());
+                    return false;
+                }
+            }
+        }
         return scriptExecutor.execute(a, ActionType.CLONE,
                 templateName, cloneName, " &");
         // TODO: script does not return w/o redirecting outputs!!!
@@ -91,6 +104,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         return checkParentTemplate(a, parentName);
     }
 
+    // TODO: replace with LIST_TEMPLATES action
     private boolean zfsIsTemplate(Agent a, String containerName) {
         String s = String.format(
                 "zfs list -t snapshot -o name -H | grep \"lxc/%s@template\"",
