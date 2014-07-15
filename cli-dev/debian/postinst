@@ -17,11 +17,18 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+# TODO: add complete -F _subutai-dev subutai line to end of subuta-cli.bash_completion script to enable 
+#       subutai-cli-dev bindings scritps.
+# sed -i '/complete -F _subutai-dev subutai/d' Desktop/a 
+# echo "complete -F _subutai-dev subutai" >> Desktop/a 
+
 
 case "$1" in
     configure)
 	# Add symlinks of subutai-cli-dev bindings under subutai bindings directory
 	ln -sf /usr/share/subutai-cli-dev/bindings/* /etc/subutai/bindings/
+    # invoke _subutai-dev function with complete command
+    echo "complete -F _subutai-dev subutai" >> /etc/bash_completion.d/subutai-cli.bash_completion
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
