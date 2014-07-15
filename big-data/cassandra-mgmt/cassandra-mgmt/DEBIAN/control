@@ -4,5 +4,5 @@ Section: devel
 Installed-Size: 100
 Maintainer: kiskis
 Architecture: amd64 
-Version: 1.0.8
-Description: This is a cassandra package of kiskis distribution.
+Version: 1.0.9
+Description: This is a subutai-management server cassandra package.
