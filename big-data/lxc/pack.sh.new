@@ -33,20 +33,6 @@ else
 
 fi
 
-#Editing lxc package
-cp $pattern/rootfs/etc/network/interfaces $pattern/rootfs/etc/network/interfaces.org
-#backup interfaces file
-#Giving static lxcbro ip address : 172.16.8.100
-echo "" > $pattern/rootfs/etc/network/interfaces
-echo "auto lo" >> $pattern/rootfs/etc/network/interfaces
-echo "iface lo inet loopback\n" >> $pattern/rootfs/etc/network/interfaces
-echo "auto eth0" >> $pattern/rootfs/etc/network/interfaces
-echo "iface eth0 inet static" >> $pattern/rootfs/etc/network/interfaces
-echo "address 172.16.8.100" >> $pattern/rootfs/etc/network/interfaces
-echo "netmask 255.255.248.0" >> $pattern/rootfs/etc/network/interfaces
-echo "gateway 172.16.8.1" >> $pattern/rootfs/etc/network/interfaces
-echo "dns-nameservers 8.8.8.8" >> $pattern/rootfs/etc/network/interfaces
-
 BRIDGE="br0"
 sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
 
@@ -58,15 +44,16 @@ cp $BASE/repo/deleter.py $LXCSOURCE/$pattern/rootfs/root/
 
 #start base-container
 sudo lxc-start -n $pattern -d
-sleep 10
-ssh-keygen -f "/root/.ssh/known_hosts" -R 172.16.8.100
-#connect base-container
+sleep 20
+containerIP=$(lxc-ls --fancy | grep $pattern | cut -d' ' -f5)
+echo $containerIP
+ssh-keygen -f "/root/.ssh/known_hosts" -R $containerIP
 
 #Read Root Passwords for Template LXC
 cd $BASE
 passwd=$(cat password.dat)
-/$BASE/presettings.exp.new 172.16.8.100 ubuntu ubuntu $passwd
-/$BASE/postsettings.exp.new 172.16.8.100 root  $passwd
+/$BASE/presettings.exp.new $containerIP ubuntu ubuntu $passwd
+/$BASE/postsettings.exp.new $containerIP root  $passwd
 
 cd $LXCSOURCE
 #removing logstash and jmxtrans deb
