@@ -235,6 +235,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	}
 
 	private void show(String notification) {
+		System.out.println(notification);
 		commandOutputTxtArea.setOutputPrompt(notification);
 //		Notification.show(notification);
 	}
