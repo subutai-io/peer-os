@@ -63,6 +63,6 @@ public class TerminalControl extends CssLayout {
 				"var d = document.createElement('span');\n" +
 						"$(d).html('%s\\n');\n" +
 						"$('.jqconsole-output').last().html(d);",
-				output.replaceAll("\n", "\\n")));
+				output.replaceAll("\\n", "\\\\n")));
 	}
 }
