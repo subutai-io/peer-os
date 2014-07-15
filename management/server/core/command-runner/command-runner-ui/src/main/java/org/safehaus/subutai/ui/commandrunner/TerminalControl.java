@@ -1,6 +1,7 @@
 package org.safehaus.subutai.ui.commandrunner;
 
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.JavaScriptFunction;
@@ -59,10 +60,15 @@ public class TerminalControl extends CssLayout {
 	}
 
 	public void setOutputPrompt(String output) {
-		JavaScript.getCurrent().execute(String.format(
-				"var d = document.createElement('span');\n" +
-						"$(d).html('%s\\n');\n" +
-						"$('.jqconsole-output').last().html(d);",
-				output));
+		try {
+			VaadinSession.getCurrent().getLockInstance().lock();
+			JavaScript.getCurrent().execute(String.format(
+					"var d = document.createElement('span');\n" +
+							"$(d).html('%s\\n');\n" +
+							"$('.jqconsole-output').last().html(d);",
+					output));
+		} finally {
+			VaadinSession.getCurrent().getLockInstance().unlock();
+		}
 	}
 }
