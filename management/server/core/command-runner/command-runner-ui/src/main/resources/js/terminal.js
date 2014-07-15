@@ -10,7 +10,3 @@ var startPrompt = function () {
     });
 };
 startPrompt();
-
-var d = document.createElement('span');
-$(d).html("Hello");
-$('.jqconsole-output').last().html(d)
