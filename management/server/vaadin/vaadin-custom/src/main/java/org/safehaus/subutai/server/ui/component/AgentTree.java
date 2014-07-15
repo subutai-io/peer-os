@@ -65,7 +65,7 @@ public final class AgentTree extends ConcurrentComponent
 				return description;
 			}
 		});
-		tree.setMultiSelect(false);
+		tree.setMultiSelect(true);
 		tree.setImmediate(true);
 		tree.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
