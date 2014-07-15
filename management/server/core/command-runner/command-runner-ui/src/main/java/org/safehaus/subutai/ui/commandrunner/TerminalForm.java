@@ -222,7 +222,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							}
 						}
 
-						output = out.toString();
+						JavaScript.getCurrent().execute(String.format(
+								"var d = document.createElement('span');\n" +
+										"$(d).html('%s\\n');\n" +
+										"$('.jqconsole-output').last().html(d);",
+								out.toString().trim()));
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
