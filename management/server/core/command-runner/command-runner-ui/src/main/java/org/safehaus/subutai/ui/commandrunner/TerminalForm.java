@@ -222,7 +222,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							}
 						}
 
-						show(out.toString());
+						try {
+							VaadinSession.getCurrent().getLockInstance().lock();
+							commandOutputTxtArea.setOutputPrompt(out.toString());
+						} finally {
+							VaadinSession.getCurrent().getLockInstance().unlock();
+						}
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -237,13 +242,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void show(String notification) {
 //		System.out.println(notification);
-		try {
-			VaadinSession.getCurrent().getLockInstance().lock();
-			commandOutputTxtArea.setOutputPrompt(notification);
-		} finally {
-			VaadinSession.getCurrent().getLockInstance().unlock();
-		}
-
 //		yNotification.show(notification);
 	}
 
