@@ -8,6 +8,7 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
@@ -236,7 +237,13 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void show(String notification) {
 //		System.out.println(notification);
-		commandOutputTxtArea.setOutputPrompt(notification);
+		try {
+			VaadinSession.getCurrent().getLockInstance().lock();
+			commandOutputTxtArea.setOutputPrompt(notification);
+		} finally {
+			VaadinSession.getCurrent().getLockInstance().unlock();
+		}
+
 //		yNotification.show(notification);
 	}
 
