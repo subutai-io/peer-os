@@ -98,5 +98,28 @@ This command reverts a promotion. Takes a single argument which must be the name
 .B \ rename
 This command changes the name of an instance container or a non-published template. Takes two arguments, the current name of the instance or template to rename, and the new name for the instance or template. The new name must be site wide unique. The current name must exist. Template renames should only be possible if the template has no child templates or instance containers.
 
+
+.SH DEV COMMAND SET
+
+Here is a list of available subcommands coming with
+.B subutai dev package.
+You need to install subutai-cli-dev debian package to be able to use these subcommands. These are packaged separately to prevent accidental use by users.
+
+.TP
+.B \ master_create
+Creates master template ... write more here
+
+.TP
+.B \ master_destroy
+Destroys master template ... write more here
+
+.TP
+.B \ master_export
+Exports master template ... write more here 
+
+.TP
+.B \ setup
+Setup master template ... write more here 
+
 .SH SEE ALSO
 .IR "www.safehaus.org"

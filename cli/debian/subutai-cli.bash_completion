@@ -39,4 +39,54 @@ _subutai()
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
     return 0
 }
+
+_subutai-dev()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="clone demote destroy export import list promote publish rename master_create master_destroy master_export setup"
+
+    case "${prev}" in
+        master_create)
+            ;;
+        master_destroy)
+            ;;
+        master_export)
+            ;;
+        setup)
+            ;;
+        clone)
+            ;;
+        demote)
+            ;;
+        destroy)
+            ;;
+        export)
+            ;;
+        import)
+            ;;
+        list)
+            args="-t[templates] -c[containers] -p[parents] -a[ancestry]"
+            COMPREPLY=( $(compgen -W "${args}" -- ${cur}))
+            return 0
+            ;;
+        promote)
+            args="-c[concert] -n[name]"
+            COMPREPLY=( $(compgen -W "${args}" ${cur}))
+            return 0
+            ;;
+        publish)
+            ;;
+        rename) 
+            ;;  
+        *)
+            ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+}
+
 complete -F _subutai subutai

@@ -20,6 +20,7 @@ public class Common {
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_AGENT_HOSTNAME = "management";
     public static final String GIT_REPO_URL = "git@10.10.10.1:/opt/git/project.git";
+    public static final String APT_REPO = "trusty";
     public static final String APT_REPO_PATH = "/repo/ksks/";
     public static final String TMP_DEB_PACKAGE_UNPACK_PATH = "/tmp";
     public static final String DEFAULT_LXC_ARCH = "amd64";

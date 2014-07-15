@@ -22,7 +22,8 @@ set -e
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
 	# Remove broken links under subutai bindings directory
-        find /etc/subutai/bindings/ -maxdepth 1 -follow  -type l -delete
+    find /etc/subutai/bindings/ -maxdepth 1 -follow  -type l -delete
+ 	sed -i '/complete -F _subutai-dev subutai/d' /etc/bash_completion.d/subutai-cli.bash_completion   
     ;;
 
     *)
