@@ -13,6 +13,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.fstracker.Listener;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
@@ -33,13 +35,27 @@ public class ShellCommands extends OsgiCommandSupport {
     private Listener listener;
 
     private ActiveMQConnectionFactory amqFactory;
+    private CommunicationManager communicationManager;
+    private CommandRunner commandRunner;
+
+    public void setCommunicationManager( CommunicationManager communicationManager ) {
+        this.communicationManager = communicationManager;
+    }
+
+
+    public void setCommandRunner(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
+    }
 
 
     @Override
     protected Object doExecute() {
 
 //        FSTrackerTest.sayHello();
-        testConnection();
+        //testConnection();
+
+        System.out.println( "communicationManager: " + communicationManager );
+        System.out.println( "commmandRunner: " + commandRunner );
 
         return null;
     }
@@ -56,7 +72,7 @@ public class ShellCommands extends OsgiCommandSupport {
         pooledConnectionFactory.start();
 
         try {
-            setupListener( pooledConnectionFactory );
+//            setupListener( pooledConnectionFactory );
             sendMessage( pooledConnectionFactory );
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,7 +83,8 @@ public class ShellCommands extends OsgiCommandSupport {
     public void sendMessage(PooledConnectionFactory pooledConnectionFactory) {
 
 
-        String uuid = "95d37e69-c118-4706-b65b-752a6aca9ad7";
+        String uuid = "cae85e27-6b0f-4a29-ab8f-4cbeba1dc07d";
+//        String uuid = "95d37e69-c118-4706-b65b-752a6aca9ad7";
 //        String uuid = "b4dcfcbe-7838-4d39-b08d-63008c4d8ab4";
 
             Connection connection = null;
@@ -117,18 +134,19 @@ public class ShellCommands extends OsgiCommandSupport {
                         + "}"
                         + "}";
 
+/*
 
-                /*json = "{"
+                json = "{"
                       + "\"command\": { "
                       + "\"source\": \"FS_TRACKER\", "
                       + "\"type\": \"INOTIFY_REQUEST\", "
                       + "\"uuid\": \"" + uuid + "\", "
                       + "\"taskUuid\": \"bcf198b8-05ca-11e4-b8fa-d1dcc525e0e4\", "
 //                      + "\"confPoints\":[\"/etc/ksks-agent\"] "
-                      + "\"confPoints\":[\"/opt\"] "
+                      + "\"confPoints\":[\"/opt/inotify-test\"] "
                       + "}"
                       + "}";
-                */
+*/
 
 /*
                 json = "{"

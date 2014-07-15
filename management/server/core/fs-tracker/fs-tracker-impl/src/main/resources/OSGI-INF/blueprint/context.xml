@@ -1,13 +1,16 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="aptRepositoryManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+  <reference id="communicationManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
+
+  <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="fs-tracker/cli">
       <action class="org.safehaus.subutai.impl.fstracker.ShellCommands">
+        <property name="communicationManager" ref="communicationManager" />
+        <property name="commandRunner" ref="commandRunner" />
       </action>
     </command>
   </command-bundle>
