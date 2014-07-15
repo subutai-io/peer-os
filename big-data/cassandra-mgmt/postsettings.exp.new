@@ -6,7 +6,6 @@ set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
 
-#Login phase to 172.16.1.101 static ip of base container
 spawn ssh "$user\@$ip"
 sleep 2
 expect "password:"
