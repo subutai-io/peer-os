@@ -106,7 +106,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
 
         Command command = commandRunner.createCommand( new RequestBuilder(
-                String.format( "reprepro includedeb precise %s%s", pathToPackageFile,
+                String.format( "reprepro includedeb %s %s%s", Common.APT_REPO, pathToPackageFile,
                         deleteSourcePackage ? String.format( " && rm -f %s", pathToPackageFile ) : "" ) )
                 .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
