@@ -18,7 +18,6 @@ import org.safehaus.subutai.shared.protocol.Disposable;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.Arrays;
@@ -205,8 +204,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 						String host = agent == null ? String.format("Offline[%s]", response.getUuid()) :
 								agent.getHostname();
 						StringBuilder out = new StringBuilder();
-								/*new StringBuilder(host).append(" [").append(response.getPid())
-										.append("]").append(":\n");*/
+
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
 							out.append(response.getStdOut()).append("\n");
 						}
@@ -214,16 +212,15 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							out.append("<span style='color:red'>" +
 											response.getStdErr() +
 											"</span>"
-							).append("\n");
+							);
 						}
-						if (response.isFinal()) {
+						/*if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-								out.append("Exit code: ").append(response.getExitCode())
-										.append("\n\n");
+								out.append("PID: " + response.getPid());
 							} else {
-								out.append(response.getType()).append("\n\n");
+								out.append(response.getType());
 							}
-						}
+						}*/
 
 						output[0] += out.toString();
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
