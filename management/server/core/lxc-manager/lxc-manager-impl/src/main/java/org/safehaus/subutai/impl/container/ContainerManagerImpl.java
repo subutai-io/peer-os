@@ -33,7 +33,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(int envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
@@ -117,7 +117,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         return res;
     }
 
-    private void saveNodeGroup(int envId, String templateName, Set<Agent> agents,
+    private void saveNodeGroup(UUID envId, String templateName, Set<Agent> agents,
             PlacementStrategyENUM... strategy) {
 
         String cql = "INSERT INTO nodes(uuid, env_id, info) VALUES(?, ?, ?)";
@@ -132,7 +132,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         group.setStrategy(EnumSet.of(strategy[0], strategy));
         for(Agent a : agents) {
             group.setInstanceId(a.getUuid());
-            dbManager.executeUpdate(cql, a.getUuid().toString(), envId, gson.toJson(group));
+            dbManager.executeUpdate(cql, a.getUuid().toString(),
+                    envId.toString(), gson.toJson(group));
         }
     }
 
