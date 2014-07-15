@@ -43,7 +43,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private ComboBox requestTypeCombo;
 	private Label indicator;
 	private VerticalLayout controls;
-	private String output;
 
 
 	public TerminalForm(final CommandRunner commandRunner, final AgentManager agentManager) {
@@ -222,11 +221,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							}
 						}
 
-						JavaScript.getCurrent().execute(String.format(
-								"var d = document.createElement('span');\n" +
-										"$(d).html('%s\\n');\n" +
-										"$('.jqconsole-output').last().html(d);",
-								out.toString().trim()));
+						show(out.toString());
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -240,8 +235,11 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	}
 
 	private void show(String notification) {
-//		System.out.println(notification);
-//		yNotification.show(notification);
+		if (notification != null) {
+			commandOutputTxtArea.setOutputPrompt(notification);
+		} else {
+			System.out.println("Notification null");
+		}
 	}
 
 	public void dispose() {
