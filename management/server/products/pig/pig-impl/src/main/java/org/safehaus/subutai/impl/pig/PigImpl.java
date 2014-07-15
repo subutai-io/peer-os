@@ -14,7 +14,6 @@ import org.safehaus.subutai.api.pig.Pig;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.pig.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.pig.handler.InstallOperationHandler;
-import org.safehaus.subutai.impl.pig.handler.UninstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import com.google.common.base.Preconditions;
@@ -87,10 +86,7 @@ public class PigImpl implements Pig {
 
     public UUID uninstallCluster( final String clusterName ) {
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
+        return null;
     }
 
 
