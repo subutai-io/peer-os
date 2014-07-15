@@ -208,10 +208,10 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								new StringBuilder(host).append(" [").append(response.getPid())
 										.append("]").append(":\n");
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
-							out.append(response.getStdOut()).append("\n");
+							out.append(response.getStdOut().trim()).append("\n");
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
-							out.append(response.getStdErr()).append("\n");
+							out.append(response.getStdErr().trim()).append("\n");
 						}
 						if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
