@@ -64,8 +64,6 @@ rm $LXCSOURCE/$pattern/rootfs/root/deleter.py
 
 #closing base container
 sudo lxc-stop -n $pattern
-#updating original interfaces file
-mv $pattern/rootfs/etc/network/interfaces.org $pattern/rootfs/etc/network/interfaces
 #updating gmond.conf file
 mv $BASE/repo/gmond.conf $pattern/rootfs/etc/ganglia/
 cd $BASE
