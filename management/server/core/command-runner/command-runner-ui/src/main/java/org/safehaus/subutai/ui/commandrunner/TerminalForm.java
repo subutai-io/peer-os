@@ -8,7 +8,6 @@ package org.safehaus.subutai.ui.commandrunner;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
@@ -44,6 +43,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private ComboBox requestTypeCombo;
 	private Label indicator;
 	private VerticalLayout controls;
+	private String output;
 
 
 	public TerminalForm(final CommandRunner commandRunner, final AgentManager agentManager) {
@@ -222,12 +222,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							}
 						}
 
-						try {
-							VaadinSession.getCurrent().getLockInstance().lock();
-							commandOutputTxtArea.setOutputPrompt(out.toString());
-						} finally {
-							VaadinSession.getCurrent().getLockInstance().unlock();
-						}
+						output = out.toString();
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
