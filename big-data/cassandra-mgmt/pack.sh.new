@@ -62,8 +62,6 @@ cd $LXCSOURCE
 
 #closing cassandra-mgmt
 sudo lxc-stop -n $pattern
-#updating original interfaces file
-mv $pattern/rootfs/etc/network/interfaces.org $pattern/rootfs/etc/network/interfaces
 
 cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
