@@ -121,7 +121,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( packageName ), "Package name is null or empty" );
 
         Command command = commandRunner.createCommand(
-                new RequestBuilder( String.format( "reprepro remove precise %s", packageName ) )
+                new RequestBuilder( String.format( "reprepro remove %s %s", Common.APT_REPO, packageName ) )
                         .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
         runCommand( command, agent, AptCommand.REMOVE_PACKAGE );
