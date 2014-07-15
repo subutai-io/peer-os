@@ -45,7 +45,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PigImpl>
                 Agent agent = manager.getAgentManager().getAgentByUUID( result.getAgentUUID() );
 
                 if ( result.getExitCode() != null && result.getExitCode() == 0 ) {
-                    if ( result.getStdOut().contains( "Package ksks-pig is not installed, so not removed" ) ) {
+                    if ( result.getStdOut().contains(
+                            String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) ) {
                         productOperation.addLog( String.format( "Pig is not installed, so not removed on node %s",
                                 agent == null ? result.getAgentUUID() : agent.getHostname() ) );
                     }
