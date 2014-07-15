@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.pig.handler;
 
 
-import com.google.common.base.Strings;
+import java.util.Iterator;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -11,7 +11,7 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
-import java.util.Iterator;
+import com.google.common.base.Strings;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
@@ -57,13 +57,12 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
 
         productOperation.addLog( "Checking prerequisites..." );
 
-        // Check installed ksks packages
+        // Check installed packages
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
-            productOperation
-                    .addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            productOperation.addLogFailed( "Failed to check presence of installed packages\nInstallation aborted" );
             return;
         }
 
@@ -71,13 +70,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl> {
             Agent node = it.next();
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( "ksks-pig" ) ) {
+            if ( result.getStdOut().contains( Config.PRODUCT_PACKAGE ) ) {
                 productOperation.addLog(
                         String.format( "Node %s already has Pig installed. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
             }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
+            else if ( !result.getStdOut().contains( org.safehaus.subutai.api.hadoop.Config.PRODUCT_PACKAGE ) ) {
                 productOperation.addLog(
                         String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                                 node.getHostname() ) );
