@@ -191,6 +191,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
 		final Command command = commandRunner.createCommand(requestBuilder, agents);
+		final String[] output = {""};
 		indicator.setVisible(true);
 		taskCount++;
 		executor.execute(new Runnable() {
@@ -221,7 +222,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							}
 						}
 
-						show(out.toString());
+						output[0] += out.toString();
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -229,6 +230,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 				taskCount--;
 				if (taskCount == 0) {
 					indicator.setVisible(false);
+					show(output[0]);
 				}
 			}
 		});
