@@ -167,22 +167,22 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private boolean validateInputs(String command) {
 
 		if (Strings.isNullOrEmpty(command)) {
-			show("Please, enter command");
+			show("Please, enter command", true);
 			return false;
 		}
 
 		if (Strings.isNullOrEmpty(timeoutTxtFld.getValue()) || !Util.isNumeric(timeoutTxtFld.getValue())) {
-			show("Please, enter integer timeout value");
+			show("Please, enter integer timeout value", true);
 			return false;
 		} else {
 			int timeout = Integer.valueOf(timeoutTxtFld.getValue());
 			if (timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC) {
-				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC);
+				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC, true);
 			}
 		}
 
 		if (Strings.isNullOrEmpty(workDirTxtFld.getValue())) {
-			show("Please, enter working directory");
+			show("Please, enter working directory", true);
 			return false;
 		}
 
@@ -208,23 +208,22 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								/*new StringBuilder(host).append(" [").append(response.getPid())
 										.append("]").append(":\n");*/
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
-							out.append(commandOutputTxtArea.prepareJQuery(response.getStdOut().trim(), false));
+							output[0] = response.getStdOut().trim();
+							show(output[0], false);
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
-							out.append(commandOutputTxtArea.prepareJQuery(response.getStdErr().trim(), true));
+							output[0] = response.getStdErr().trim();
+							show(output[0], true);
 						}
 						if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
-								out.append(commandOutputTxtArea.prepareJQuery(
-										"Exit code: " + response.getExitCode() +
-												" [" + response.getPid() + "]" +
-												" Host:" + host,
-										false));
+								output[0] = "Exit code: " + response.getExitCode() +
+										" [" + response.getPid() + "]" +
+										" Host:" + host;
+								show(output[0], false);
 							}
 						}
 
-						output[0] += out.toString();
-						show(output[0]);
 						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
@@ -237,8 +236,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		});
 	}
 
-	private void show(String notification) {
-		commandOutputTxtArea.setOutputPrompt(notification);
+	private void show(String notification, boolean isError) {
+		commandOutputTxtArea.setOutputPrompt(notification, isError);
 	}
 
 	public void dispose() {
