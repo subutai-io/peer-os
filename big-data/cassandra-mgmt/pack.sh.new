@@ -5,7 +5,7 @@ BASE=$(pwd)
 sh -c 'cd $BASE'
 echo $BASE
 cd ../workspace
-SOURCE=$(pwd)"/big-data/cassandra-mgmt/cassandra-mgmt"
+SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/cassandra-mgmt/cassandra-mgmt"
 TARGET="/var/lib/jenkins/Automation/Bigdata/cassandra-mgmt"
 kskssql="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/keyspace"
 echo $SOURCE
