@@ -45,7 +45,7 @@ cp $kskssql/kiskis.sql $LXCSOURCE/$pattern/rootfs/root/
 #start base-container
 sudo lxc-start -n $pattern -d
 sleep 20
-containerIP=$(lxc-ls --fancy | grep $pattern | cut -d' ' -f3)
+containerIP=$(lxc-ls --fancy | grep $pattern | cut -d' ' -f5)
 echo $containerIP
 ssh-keygen -f "/root/.ssh/known_hosts" -R $containerIP
 #Read Root Passwords for Template LXC
