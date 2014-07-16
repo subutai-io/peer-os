@@ -206,7 +206,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 						StringBuilder out = new StringBuilder();
 
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
-							out.append(response.getStdOut()).append("\n");
+							out.append(response.getStdOut());
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
 							out.append("<span style='color:red'>" +
