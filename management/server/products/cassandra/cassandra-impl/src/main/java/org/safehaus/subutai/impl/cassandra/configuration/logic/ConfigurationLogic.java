@@ -8,7 +8,7 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 /**
  * Created by bahadyr on 7/17/14.
  */
-public class Configurator {
+public class ConfigurationLogic {
 
     private ConfigManager configManager;
 
@@ -23,6 +23,14 @@ public class Configurator {
     }
 
     public void dst2() {
-        Object o = configManager.getConfiguration( "", ConfigTypeEnum.YAML );
+
+        Object o = configManager.getConfiguration( "/conf/cassandra.yaml", ConfigTypeEnum.YAML );
+
+
+
+
+
+
+
     }
 }

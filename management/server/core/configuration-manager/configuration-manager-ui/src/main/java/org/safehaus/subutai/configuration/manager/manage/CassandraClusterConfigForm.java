@@ -35,8 +35,8 @@ public class CassandraClusterConfigForm {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 //                updateTableData();
-                config = configManager.getCassandraConfig();
-                fillConfigForm( config );
+//                config = configManager.getCassandraConfig();
+//                fillConfigForm( config );
             }
         } );
 

@@ -6,6 +6,7 @@
 package org.safehaus.subutai.configuration.manager.impl;
 
 
+import org.safehaus.subutai.configuration.manager.api.Config;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigurationLoader;
@@ -20,44 +21,39 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class ConfigManagerImpl implements ConfigManager {
 
-
-//    public BundleContext bcontext;
-//    private Bundle bundle;
-
-
-//    public void start() {
-//        bundle = bcontext.getBundle();
-//    }
-
-
-    /*private String readFile( InputStream is ) throws IOException {
-        java.util.Scanner s = new java.util.Scanner( is ).useDelimiter( "\\A" );
-        return s.hasNext() ? s.next() : "";
-    }*/
-
-
-//    public void setBcontext( BundleContext bcontext ) {
-//        this.bcontext = bcontext;
-//    }
-
-
     @Override
-    public void injectConfiguration( final Object conf, final String path, final Agent agent ) {
+    public void injectConfiguration( Agent agent, Config config ) {
 
-
+        //TODO echo to given agent
+        ConfigurationLoader configurationLoader = null;
+        switch ( config.getConfigTypeEnum() ) {
+            case YAML: {
+                configurationLoader = new YamConfigurationlLoader();
+                break;
+            }
+            case PROPERTIES: {
+                configurationLoader = new PropertiesConfigurationLoader();
+                break;
+            }
+            case XML: {
+                configurationLoader = new XMLConfigurationLoader();
+                break;
+            }
+        }
+        configurationLoader.setConfiguration( agent, config );
     }
 
 
     @Override
-    public Object getConfiguration(String filepath, ConfigTypeEnum configTypeEnum) {
+    public Config getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum ) {
 
         ConfigurationLoader configurationLoader = null;
         switch ( configTypeEnum ) {
-            case YAML:{
+            case YAML: {
                 configurationLoader = new YamConfigurationlLoader();
                 break;
             }
-            case NAME_VALUE:{
+            case PROPERTIES: {
                 configurationLoader = new PropertiesConfigurationLoader();
                 break;
             }
@@ -67,6 +63,6 @@ public class ConfigManagerImpl implements ConfigManager {
             }
         }
 
-        return configurationLoader.getConfiguration();
+        return configurationLoader.getConfiguration( agent, configPathFilename );
     }
 }

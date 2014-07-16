@@ -1,9 +1,9 @@
 package org.safehaus.subutai.configuration.manager.impl.utils;
 
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.safehaus.subutai.configuration.manager.api.Config;
+import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -14,24 +14,27 @@ import org.apache.commons.configuration.XMLConfiguration;
  */
 public class XMLConfigurationLoader implements ConfigurationLoader {
 
+    //            String xmlConfig = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/core-site.xml";
 
-    public void loadConfig() {
+
+    @Override
+    public Config getConfiguration( Agent agent, String configPathFilename ) {
         try {
-            String xmlConfig = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/core-site.xml";
-            XMLConfiguration config = new XMLConfiguration( xmlConfig );
-            Document document = config.getDocument();
-            NodeList nodeList = document.getChildNodes();
-            Node node = document.getFirstChild();
-            System.out.println(node.getTextContent());
+            XMLConfiguration xmlConfiguration = new XMLConfiguration( configPathFilename );
+            //TODO XML to Config converter
+            Config config = new Config();
+            config.setPath( configPathFilename );
+            config.setConfigTypeEnum( ConfigTypeEnum.XML );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();
         }
+        return null;
     }
 
 
     @Override
-    public Object getConfiguration() {
-        return null;
+    public void setConfiguration( final Agent agent, Config config ) {
+        //TODO Read config from instance, set values from Config, inject Config
     }
 }
