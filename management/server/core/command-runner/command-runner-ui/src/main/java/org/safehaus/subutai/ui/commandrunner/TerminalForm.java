@@ -158,7 +158,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		Set<Agent> agents = agentTree.getSelectedAgents();
 		if (agents.isEmpty()) {
 			agents = null;
-			show("Please, select nodes");
+			show("Please, select nodes\\n");
 		}
 
 		return agents;
@@ -167,22 +167,22 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private boolean validateInputs(String command) {
 
 		if (Strings.isNullOrEmpty(command)) {
-			show("Please, enter command");
+			show("Please, enter command\\n");
 			return false;
 		}
 
 		if (Strings.isNullOrEmpty(timeoutTxtFld.getValue()) || !Util.isNumeric(timeoutTxtFld.getValue())) {
-			show("Please, enter integer timeout value");
+			show("Please, enter integer timeout value\\n");
 			return false;
 		} else {
 			int timeout = Integer.valueOf(timeoutTxtFld.getValue());
 			if (timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC) {
-				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC);
+				show("Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC + "\\n");
 			}
 		}
 
 		if (Strings.isNullOrEmpty(workDirTxtFld.getValue())) {
-			show("Please, enter working directory");
+			show("Please, enter working directory\\n");
 			return false;
 		}
 
