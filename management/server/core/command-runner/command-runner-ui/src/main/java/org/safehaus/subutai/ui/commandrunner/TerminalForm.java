@@ -137,7 +137,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	public void sendCommand(String command) {
 		Set<Agent> agents = checkAgents();
 		if (agents != null && validateInputs(command)) {
-			RequestBuilder requestBuilder = new RequestBuilder(programTxtFld.getValue());
+			RequestBuilder requestBuilder = new RequestBuilder(command);
 
 			if (requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST) {
 				requestBuilder.withPid(Integer.valueOf(programTxtFld.getValue()));
