@@ -1,10 +1,12 @@
 var timer;
+var timeout;
 var jqconsole = $('#terminal').jqconsole('Subutai Terminal\n', '$prompt');
 
 var timerPromt = function () {
     var output = $('.jqconsole-output').last().find('span').html();
     if (output !== "") {
         clearInterval(timer);
+        clearInterval(timeout);
         startPrompt();
     }
 }
@@ -17,8 +19,8 @@ var startPrompt = function () {
         callback(input);
         timer = setInterval(timerPromt, 2000);
 
-        var timeout = $('#timeout_txt').val() * 1000;
-        setTimeout(function () {
+        var timeoutSec = $('#timeout_txt').val() * 1000;
+        var timeout = setTimeout(function () {
             startPrompt();
         }, timeout);
     });
