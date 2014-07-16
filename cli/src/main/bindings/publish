@@ -20,7 +20,7 @@ function usage {
 #     - container parent MUST be present in the template registry
 # (2) generate delta images of all filesystems: 
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
-# (3) generate the tsar file deltas, and package info
+# (3) generate the debian file deltas, and package info
 
 function publish {
   local container="$1"
@@ -36,9 +36,12 @@ function publish {
     exit $?
   fi
 
-  if [ -f "$SUBUTAI_TMPDIR/$container.tsar" ]; then
-    msg_error "It seems the tsar file has already been generated"
-    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer tsar file first"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+
+  if [ -f $debian_file ]; then
+    msg_error "It seems the debian file has already been generated"
+    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
     exit 1
   fi
 
@@ -77,36 +80,9 @@ function publish {
   fi
 
   # ----------------------------------------------------------------------------
-  # (2) generate delta images of all filesystems: 
-  #     'pool/parent-partition@child' -> 'pool/child-partition@template'
+  # (2) Publish the template which has the debian package under $SUBUTAI_TMPDIR 
   # ----------------------------------------------------------------------------
 
-  tsar_root="$SUBUTAI_TMPDIR/$container"
-  deltas="$tsar_root/deltas"
-  mkdir -p $deltas
-  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
-  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
-  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
-  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
-
-
-  # ----------------------------------------------------------------------------
-  # (3) generate the tsar file from deltas, and package info
-  # ----------------------------------------------------------------------------
-
-  cp /var/lib/lxc/$container/config $tsar_root
-  cp /var/lib/lxc/$container/fstab  $tsar_root
-  cp /var/lib/lxc/$container/packages  $tsar_root
-
-  pushd . > /dev/null
-  cd $SUBUTAI_TMPDIR
-  tar -zcf $container.tsar $container
-
-  if [ $? -eq 0 -a -f "$container.tsar" ]; then
-    msg_ok "TSAR file successfully created: \"$container.tsar\""
-  fi
-
-  popd > /dev/null
 
 }
 

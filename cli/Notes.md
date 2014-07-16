@@ -31,7 +31,7 @@ git based configuration tracking.
 # Subutai Templates
 
 We MUST be very careful with our nomenclature and define what exactly a 
-template is and what a tsar file is and how this all works together.
+template is and what a debian package file is and how this all works together.
 
 An LXC container on the system is not by itself a template. To become a 
 template it MUST have a snapshot with the name 'template'. The master is
