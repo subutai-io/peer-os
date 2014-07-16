@@ -148,7 +148,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 			requestBuilder.withTimeout(Integer.valueOf(timeoutTxtFld.getValue()));
 			requestBuilder.withCwd(workDirTxtFld.getValue());
 
-			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
+//			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
 			createCommand(requestBuilder, agents);
 		}
 	}
@@ -223,7 +223,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 						}*/
 
 						output[0] += out.toString();
-						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
+//						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
 				});
 

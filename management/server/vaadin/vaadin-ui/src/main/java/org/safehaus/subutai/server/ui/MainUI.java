@@ -36,6 +36,7 @@ import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,7 +90,7 @@ public class MainUI extends UI {
 		root.addComponent(bg);
 
 		// For synchronization issue
-//		setPollInterval(Common.REFRESH_UI_SEC * 5000);
+		setPollInterval(Common.REFRESH_UI_SEC * 5000);
 
 		buildLoginView(false);
 	}
