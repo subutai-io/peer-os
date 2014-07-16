@@ -2,7 +2,7 @@ var timer;
 var jqconsole = $('#terminal').jqconsole('Subutai Terminal\n', '$prompt');
 
 var timerPromt = function () {
-    var output = $('.jqconsole-output').last().find('span').val();
+    var output = $('.jqconsole-output').last().find('span').html();
     if (output !== "") {
         clearInterval(timer);
         startPrompt();
