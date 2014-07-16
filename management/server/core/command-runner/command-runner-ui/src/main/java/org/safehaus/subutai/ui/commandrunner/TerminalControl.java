@@ -61,7 +61,7 @@ public class TerminalControl extends CssLayout {
 	public void setOutputPrompt(String output) {
 		String jquery = "var d = document.createElement('span');\n" +
 				"$(d).html('%s\\n');\n" +
-				"$('.jqconsole-output').last().append(d);\n";
+				"$('.jqconsole-output').last().html(d);";
 
 		JavaScript.getCurrent().execute(String.format(jquery, output.replaceAll("\\n", "\\\\n")));
 	}

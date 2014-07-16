@@ -125,11 +125,12 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 	private void initIndicator() {
 		indicator = new Label();
+		indicator.setId("terminal_indicator");
 		indicator.setIcon(new ThemeResource("img/spinner.gif"));
 		indicator.setContentMode(ContentMode.HTML);
 		indicator.setHeight(11, Unit.PIXELS);
 		indicator.setWidth(50, Unit.PIXELS);
-		indicator.setVisible(false);
+//		indicator.setVisible(false);
 		controls.addComponent(indicator);
 	}
 
