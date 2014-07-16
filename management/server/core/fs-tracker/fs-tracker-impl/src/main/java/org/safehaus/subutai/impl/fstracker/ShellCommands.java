@@ -15,12 +15,14 @@ import javax.jms.TextMessage;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.fstracker.Listener;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Request;
+import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
@@ -62,6 +64,18 @@ public class ShellCommands extends OsgiCommandSupport {
 
 
     protected Object doExecute() {
+        try {
+            doAction();
+            doExecute3();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    protected Object doExecute3() {
 
 
 //        FSTrackerTest.sayHello();
@@ -87,6 +101,8 @@ public class ShellCommands extends OsgiCommandSupport {
 
         Agent firstAgent = agentManager.getAgents().iterator().next();
 
+//        communicationManager.sendRequest( getRequest( firstAgent.getUuid() ) );
+
         org.safehaus.subutai.api.commandrunner.Command command = commandRunner.createCommand(
                 new RequestBuilder( "pwd" )
                         .withType( RequestType.INOTIFY_SHOW_REQUEST )
@@ -95,27 +111,52 @@ public class ShellCommands extends OsgiCommandSupport {
                 Sets.newHashSet( firstAgent ) );
 //                agentManager.getAgents() );
 
-//        commandRunner.runCommand( command );
-        commandRunner.runCommandAsync( command );
+        CommandCallback callback = new CommandCallback() {
+            public void onResponse( Response response, AgentResult agentResult,
+                                    org.safehaus.subutai.api.commandrunner.Command command ) {
+                System.out.println( ">> response: " + response );
+
+            }
+        };
+
+        //        commandRunner.runCommand( command );
+        commandRunner.runCommandAsync( command, callback );
 
         AgentResult agentResult = command.getResults().get( firstAgent.getUuid() );
-
-        System.out.println( "result: " + agentResult.getStdOut() );
-
+        System.out.println( "result: " + agentResult );
 
         return null;
+    }
+
+
+    public static Request getRequest( UUID agentUuid ) {
+        return new Request( "FS_TRACKER",
+                RequestType.INOTIFY_SHOW_REQUEST, // type
+                agentUuid, //                        !! agent uuid
+                UUID.randomUUID(), //                        !! task uuid
+                1, //                           !! request sequence number
+                "/", //                         cwd
+                "pwd", //                        program
+                OutputRedirection.RETURN, //    std output redirection
+                OutputRedirection.RETURN, //    std error redirection
+                null, //                        stdout capture file path
+                null, //                        stderr capture file path
+                "root", //                      runas
+                null, //                        arg
+                null, //                        env vars
+                null, 30 ); //
     }
 
 
     protected Object doExecute_() {
 
-        testConnection();
+//        testConnection();
 
         return null;
     }
 
 
-    private void testConnection() {
+    private void doAction() {
 
         ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "failover:tcp://localhost:61616" );
 
@@ -256,32 +297,13 @@ public class ShellCommands extends OsgiCommandSupport {
             TestMessageListener testMessageListener = new TestMessageListener();
             consumer.setMessageListener( testMessageListener );
 
-            Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
-            MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
-            advConsumer.setMessageListener( testMessageListener );
+//            Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
+//            MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
+//            advConsumer.setMessageListener( testMessageListener );
         }
         catch ( JMSException e ) {
             e.printStackTrace();
         }
-    }
-
-
-
-    public static Request getRequestTemplate( UUID uuid ) {
-        return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
-                uuid, //                        !! agent uuid
-                UUID.randomUUID(), //                        !! task uuid
-                1, //                           !! request sequence number
-                "/", //                         cwd
-                "pwd", //                        program
-                OutputRedirection.RETURN, //    std output redirection
-                OutputRedirection.RETURN, //    std error redirection
-                null, //                        stdout capture file path
-                null, //                        stderr capture file path
-                "root", //                      runas
-                null, //                        arg
-                null, //                        env vars
-                null, 30 ); //
     }
 
 

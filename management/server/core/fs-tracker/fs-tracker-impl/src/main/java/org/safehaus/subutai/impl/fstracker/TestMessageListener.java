@@ -29,7 +29,7 @@ class TestMessageListener implements MessageListener {
 
         try {
             if ( message instanceof BytesMessage ) {
-                System.out.println( ">> BytesMessage" );
+//                System.out.println( ">> BytesMessage" );
                 handleBytesMessage( (BytesMessage) message );
             }
             else if ( message instanceof ActiveMQMessage ) {
@@ -49,7 +49,7 @@ class TestMessageListener implements MessageListener {
         msg.readBytes( msg_bytes );
         String jsonCmd = new String( msg_bytes, "UTF-8" );
 
-        System.out.println( ">> jsonCmd: " + jsonCmd );
+        System.out.println( "inotify response: " + jsonCmd );
 
 
         /*if ( response != null ) {

@@ -240,10 +240,10 @@ public class CommunicationManagerImpl implements CommunicationManager {
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
 
-            Destination inotifyTopic = session.createTopic( "INOTIFY_TOPIC" );
-            MessageConsumer inotifyConsumer = session.createConsumer( inotifyTopic );
-            communicationMessageListener = new CommunicationMessageListener();
-            inotifyConsumer.setMessageListener( communicationMessageListener );
+//            Destination inotifyTopic = session.createTopic( "INOTIFY_TOPIC" );
+//            MessageConsumer inotifyConsumer = session.createConsumer( inotifyTopic );
+//            communicationMessageListener = new CommunicationMessageListener();
+//            inotifyConsumer.setMessageListener( communicationMessageListener );
         }
         catch ( JMSException ex ) {
             LOG.log( Level.SEVERE, "Error in setupListener", ex );
