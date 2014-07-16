@@ -6,17 +6,13 @@
 package org.safehaus.subutai.configuration.manager.impl;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
-import org.safehaus.subutai.configuration.manager.impl.utils.CassandraYamlLoader;
+import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.configuration.manager.impl.utils.ConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.utils.PropertiesConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.utils.XMLConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.utils.YamConfigurationlLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
-
-import org.apache.cassandra.config.Config;
-import org.apache.cassandra.exceptions.ConfigurationException;
 
 
 /**
@@ -25,13 +21,13 @@ import org.apache.cassandra.exceptions.ConfigurationException;
 public class ConfigManagerImpl implements ConfigManager {
 
 
-    public BundleContext bcontext;
-    private Bundle bundle;
+//    public BundleContext bcontext;
+//    private Bundle bundle;
 
 
-    public void start() {
-        bundle = bcontext.getBundle();
-    }
+//    public void start() {
+//        bundle = bcontext.getBundle();
+//    }
 
 
     /*private String readFile( InputStream is ) throws IOException {
@@ -40,9 +36,9 @@ public class ConfigManagerImpl implements ConfigManager {
     }*/
 
 
-    public void setBcontext( BundleContext bcontext ) {
-        this.bcontext = bcontext;
-    }
+//    public void setBcontext( BundleContext bcontext ) {
+//        this.bcontext = bcontext;
+//    }
 
 
     @Override
@@ -53,24 +49,24 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public Config getCassandraConfig() {
-        CassandraYamlLoader c = new CassandraYamlLoader();
-        Config config = null;
-        try {
-            InputStream is = bundle.getEntry( "cassandra.2.0.5/cassandra.yaml" ).openStream();
-            /*BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
-            String line = "";
-            while ( ( line = br.readLine() ) != null ) {
-                System.out.println( line );
-            }*/
-            config = c.loadConfig( is );
+    public Object getConfiguration(String filepath, ConfigTypeEnum configTypeEnum) {
+
+        ConfigurationLoader configurationLoader = null;
+        switch ( configTypeEnum ) {
+            case YAML:{
+                configurationLoader = new YamConfigurationlLoader();
+                break;
+            }
+            case NAME_VALUE:{
+                configurationLoader = new PropertiesConfigurationLoader();
+                break;
+            }
+            case XML: {
+                configurationLoader = new XMLConfigurationLoader();
+                break;
+            }
         }
-        catch ( ConfigurationException e ) {
-            e.printStackTrace();
-        }
-        catch ( IOException e ) {
-            e.printStackTrace();
-        }
-        return config;
+
+        return configurationLoader.getConfiguration();
     }
 }
