@@ -104,6 +104,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 	private void initTimeout() {
 		Label timeoutLbl = new Label("Timeout");
 		timeoutTxtFld = new TextField();
+		timeoutTxtFld.setId("timeout_txt");
 		timeoutTxtFld.setValue("30");
 		timeoutTxtFld.setWidth(30, Unit.PIXELS);
 		controls.addComponent(timeoutLbl);

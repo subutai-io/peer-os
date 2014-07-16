@@ -16,6 +16,11 @@ var startPrompt = function () {
         jqconsole.Write('', 'jqconsole-output');
         callback(input);
         timer = setInterval(timerPromt, 2000);
+
+        var timeout = $('#timeout_txt').val() * 1000;
+        setTimeout(function () {
+            startPrompt();
+        }, timeout);
     });
 };
 startPrompt();
