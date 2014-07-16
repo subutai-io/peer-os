@@ -1,7 +1,10 @@
 package org.safehaus.subutai.impl.pig;
 
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
@@ -9,16 +12,11 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.api.pig.Pig;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.impl.pig.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.impl.pig.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.pig.handler.InstallOperationHandler;
-import org.safehaus.subutai.impl.pig.handler.UninstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
 
 
 public class PigImpl implements Pig {
@@ -88,26 +86,13 @@ public class PigImpl implements Pig {
 
     public UUID uninstallCluster( final String clusterName ) {
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
+        return null;
     }
 
 
     public UUID destroyNode( final String clusterName, final String lxcHostname ) {
 
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
-
-
-    public UUID addNode( final String clusterName, final String lxcHostname ) {
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
 
         executor.execute( operationHandler );
 

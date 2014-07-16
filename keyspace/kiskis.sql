@@ -35,7 +35,7 @@ create INDEX on template_registry_info (parent);
 
 create table nodes (
   uuid      text,
-  env_id    int,
+  env_id    text,
   info      text,
   primary key (uuid)
 );

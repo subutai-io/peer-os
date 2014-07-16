@@ -4,7 +4,6 @@
 
 d = debian/subutai-cli-dev
 BINDINGS=/usr/share/subutai-cli-dev/bindings
-MANDIR=/usr/share/man/man1
 
 %:
 	dh $@
@@ -29,13 +28,8 @@ install: build
 	dh_installdirs
 	dh_install
 	mkdir -p ${d}${BINDINGS}
-	mkdir -p ${d}${MANDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
-	cp debian/subutai-cli-dev.manpage.1 ${d}${MANDIR}
-	gzip ${d}${MANDIR}/subutai-cli-dev.manpage.1
-
 	dh_link
-
 
 # build architecture-independent files
 binary-indep: build install
