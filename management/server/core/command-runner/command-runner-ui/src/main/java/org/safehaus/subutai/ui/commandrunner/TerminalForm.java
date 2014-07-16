@@ -130,7 +130,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		indicator.setContentMode(ContentMode.HTML);
 		indicator.setHeight(11, Unit.PIXELS);
 		indicator.setWidth(50, Unit.PIXELS);
-//		indicator.setVisible(false);
+		indicator.setVisible(false);
 		controls.addComponent(indicator);
 	}
 

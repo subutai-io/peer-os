@@ -55,7 +55,7 @@ public class TerminalControl extends CssLayout {
 
 	private void setInputPrompt() {
 		inputPrompt = String.format("%s@%s:%s#", username, machineName, currentPath);
-		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this).replace("$prompt", inputPrompt));
+//		JavaScript.getCurrent().execute(FileUtil.getContent("js/terminal.js", this).replace("$prompt", inputPrompt));
 	}
 
 	public void setOutputPrompt(String output) {
