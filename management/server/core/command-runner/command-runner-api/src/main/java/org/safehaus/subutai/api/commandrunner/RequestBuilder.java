@@ -27,32 +27,48 @@ public class RequestBuilder {
 
     //source of command
     private final String source = "COMMAND-RUNNER";
+
     //the same for all commands
     private final Integer requestSequenceNumber = 1;
+
     //the command to execute, e.g. ls
     private final String command;
+
     //current working directory
     private String cwd = "/";
+
     //type of command
     private RequestType type = RequestType.EXECUTE_REQUEST;
+
     //std out redirection
     private OutputRedirection outputRedirection = OutputRedirection.RETURN;
+
     //std err redirection
     private OutputRedirection errRedirection = OutputRedirection.RETURN;
+
     //command timeout interval
     private Integer timeout = 30;
+
     //file path for std out redirection if any
     private String stdOutPath;
+
     //file path for std err redirection if any
     private String stdErrPath;
+
     //user under which to run the command
     private String runAs = "root";
+
     //command arguments
     private List<String> cmdArgs;
+
     //environment variables
     private Map<String, String> envVars;
+
     //PID for terminate_request
     private int pid;
+
+    // Config points for inotify
+    private String[] confPoints;
 
 
     /**
@@ -169,9 +185,17 @@ public class RequestBuilder {
     }
 
 
+    public RequestBuilder withConfPoints( String confPoints[] ) {
+
+        this.confPoints = confPoints;
+
+        return this;
+    }
+
     public Request build( UUID agentUUID, UUID taskUUID ) {
 
         return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,
-                errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout );
+                errRedirection, stdOutPath, stdErrPath, runAs, cmdArgs, envVars, pid, timeout )
+                .setConfPoints( confPoints );
     }
 }

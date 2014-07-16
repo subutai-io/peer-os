@@ -30,6 +30,7 @@ public class Request implements Serializable {
     private Map<String, String> environment = null;
     private Integer pid = null;
     private Integer timeout = 30;
+    private String confPoints[];
 
     public Request(String source, RequestType type, UUID uuid, UUID taskUuid, Integer requestSequenceNumber, String workingDirectory, String program, OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath, String stdErrPath, String runAs, List<String> args, Map<String, String> environment, Integer pid, Integer timeout) {
 
@@ -123,6 +124,18 @@ public class Request implements Serializable {
     public Integer getPid() {
         return pid;
     }
+
+
+    public String[] getConfPoints() {
+        return confPoints;
+    }
+
+
+    public Request setConfPoints( String confPoints[] ) {
+        this.confPoints = confPoints;
+        return this;
+    }
+
 
     @Override
     public String toString() {

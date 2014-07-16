@@ -19,12 +19,14 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
+import org.safehaus.subutai.api.communicationmanager.ResponseListener;
 import org.safehaus.subutai.api.fstracker.Listener;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
+import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import org.apache.activemq.advisory.AdvisorySupport;
@@ -38,7 +40,7 @@ import com.google.common.collect.Sets;
 
 
 @Command( scope = "fs-tracker", name = "cli" )
-public class ShellCommands extends OsgiCommandSupport {
+public class ShellCommands extends OsgiCommandSupport implements ResponseListener {
 
     private Listener listener;
 
@@ -65,7 +67,7 @@ public class ShellCommands extends OsgiCommandSupport {
 
     protected Object doExecute() {
         try {
-            doAction();
+//            doAction();
             doExecute3();
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,34 +101,84 @@ public class ShellCommands extends OsgiCommandSupport {
 //                agentManager.getAgents() );
 
 
+        communicationManager.addListener( this );
+
         Agent firstAgent = agentManager.getAgents().iterator().next();
 
 //        communicationManager.sendRequest( getRequest( firstAgent.getUuid() ) );
 
-        org.safehaus.subutai.api.commandrunner.Command command = commandRunner.createCommand(
-                new RequestBuilder( "pwd" )
-                        .withType( RequestType.INOTIFY_SHOW_REQUEST )
-//                        .withType( RequestType.EXECUTE_REQUEST )
-                        .withTimeout( 60 ),
-                Sets.newHashSet( firstAgent ) );
-//                agentManager.getAgents() );
+        org.safehaus.subutai.api.commandrunner.Command command =
+//                doCancel( firstAgent )
+                doShow( firstAgent )
+//                doRequest( firstAgent )
+        ;
 
-        CommandCallback callback = new CommandCallback() {
-            public void onResponse( Response response, AgentResult agentResult,
-                                    org.safehaus.subutai.api.commandrunner.Command command ) {
-                System.out.println( ">> response: " + response );
+        commandRunner.runCommandAsync( command );
 
-            }
-        };
+//        CommandCallback callback = new CommandCallback() {
+//            public void onResponse( Response response, AgentResult agentResult,
+//                                    org.safehaus.subutai.api.commandrunner.Command command ) {
+//                System.out.println( ">> response: " + response );
+//
+//            }
+//        };
 
-        //        commandRunner.runCommand( command );
-        commandRunner.runCommandAsync( command, callback );
-
-        AgentResult agentResult = command.getResults().get( firstAgent.getUuid() );
-        System.out.println( "result: " + agentResult );
+//        commandRunner.runCommandAsync( command, callback );
+//        AgentResult agentResult = command.getResults().get( firstAgent.getUuid() );
+//        System.out.println( "result: " + agentResult );
 
         return null;
     }
+
+    private org.safehaus.subutai.api.commandrunner.Command doShow( Agent agent ) {
+         return commandRunner.createCommand(
+             new RequestBuilder( "pwd" )
+                     .withType( RequestType.INOTIFY_SHOW_REQUEST )
+                     .withTimeout( 60 ),
+             Sets.newHashSet( agent ) );
+    }
+
+    private org.safehaus.subutai.api.commandrunner.Command doRequest( Agent agent ) {
+
+        String confPoints[] = {
+                "/etc/ksks-agent",
+                "/etc/subutai/",
+//                "/etc/test1",
+//                "/opt/inotify-test",
+        };
+
+        return commandRunner.createCommand(
+                new RequestBuilder( "pwd" )
+                        .withType( RequestType.INOTIFY_REQUEST )
+                        .withTimeout( 60 )
+                        .withConfPoints( confPoints ),
+                Sets.newHashSet( agent ) );
+    }
+
+
+    private org.safehaus.subutai.api.commandrunner.Command doCancel( Agent agent ) {
+
+        String confPoints[] = {
+            "/etc/ksks-agent",
+        };
+
+        return commandRunner.createCommand(
+                new RequestBuilder( "pwd" )
+                        .withType( RequestType.INOTIFY_CANCEL_REQUEST )
+                        .withTimeout( 60 )
+                        .withConfPoints( confPoints ),
+                Sets.newHashSet( agent ) );
+    }
+
+
+    public void onResponse( Response response ) {
+        if ( response != null && response.getType() == ResponseType.INOTIFY_SHOW_RESPONSE ) {
+            System.out.println( "response: " + response );
+        }
+    }
+
+
+
 
 
     public static Request getRequest( UUID agentUuid ) {
@@ -158,22 +210,45 @@ public class ShellCommands extends OsgiCommandSupport {
 
     private void doAction() {
 
-        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "failover:tcp://localhost:61616" );
-
-        amqFactory.setCheckForDuplicates( true );
-
-        PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
-
-        pooledConnectionFactory.setMaxConnections( 2 );
-        pooledConnectionFactory.start();
+//        ActiveMQConnectionFactory amqFactory = new ActiveMQConnectionFactory( "failover:tcp://localhost:61616" );
+//        amqFactory.setCheckForDuplicates( true );
+//        PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory( amqFactory );
+//        pooledConnectionFactory.setMaxConnections( 2 );
+//        pooledConnectionFactory.start();
 
         try {
-            setupListener( pooledConnectionFactory );
+//            setupListener( pooledConnectionFactory );
+//            setupListener();
 //            sendMessage( pooledConnectionFactory );
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+
+
+    private void setupListener() {
+//        try {
+//            Connection connection = pooledConnectionFactory.createConnection();
+//            // Do not close this connection otherwise server listener will be closed
+//            connection.start();
+//            Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+////            Destination adminQueue = session.createTopic( "BROADCAST_TOPIC" );
+//            Destination adminQueue = session.createTopic( "INOTIFY_TOPIC" );
+//
+//            MessageConsumer consumer = session.createConsumer( adminQueue );
+//
+//            TestMessageListener testMessageListener = new TestMessageListener();
+//            consumer.setMessageListener( testMessageListener );
+//
+////            Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
+////            MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
+////            advConsumer.setMessageListener( testMessageListener );
+//        }
+//        catch ( JMSException e ) {
+//            e.printStackTrace();
+//        }
     }
 
 
