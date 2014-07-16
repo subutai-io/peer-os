@@ -3,10 +3,11 @@ var startPrompt = function () {
     // Start the prompt with history enabled.
     jqconsole.Prompt(true, function (input) {
         // Output input with the class jqconsole-output.
-        jqconsole.Write('', 'jqconsole-output');
-        callback(input);
-        // Restart the prompt.
-        startPrompt();
+        jqconsole.Write('Loading, please wait...', 'jqconsole-output');
+        $.when(callback(input)).then(startPrompt());
+        /*callback(input);
+         // Restart the prompt.
+         startPrompt();*/
     });
 };
 startPrompt();
