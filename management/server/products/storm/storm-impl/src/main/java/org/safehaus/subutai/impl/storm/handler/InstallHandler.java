@@ -137,47 +137,30 @@ public class InstallHandler extends AbstractHandler {
     }
 
     private boolean prepareNodes(Config config) throws LxcCreateException {
+        InstallHelper helper = new InstallHelper(manager);
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {
-            Agent nimbus = createNimbusContainer();
+            Agent nimbus = helper.createNimbusContainer();
             if(nimbus == null) {
                 po.addLogFailed("Failed to create nimbus node");
                 return false;
             }
             config.setNimbus(nimbus);
             // install Zookeeper on nimbus
-            InstallHelper h = new InstallHelper(manager);
-            boolean b = h.installZookeeper(nimbus);
+            boolean b = helper.installZookeeper(nimbus);
             if(!b) {
                 po.addLogFailed("Failed to install Zookeeper on nimbus");
                 return false;
             }
         }
         // create supervisor nodes
-        Set<Agent> set = createSupervisorContainers(config.getSupervisorsCount());
+        Set<Agent> set = helper.createSupervisorContainers(config.getSupervisorsCount());
         if(set.size() != config.getSupervisorsCount())
             po.addLog("Not all nodes created. Created nodes count: " + set.size());
 
         config.setSupervisors(set);
         config.setSupervisorsCount(set.size());
         return true;
-    }
-
-    private Set<Agent> createSupervisorContainers(int count) throws LxcCreateException {
-        Map<Agent, Set<Agent>> lxcs = manager.getLxcManager().createLxcs(count);
-        Set<Agent> res = new HashSet<>();
-        for(Set<Agent> s : lxcs.values()) res.addAll(s);
-        return res;
-    }
-
-    private Agent createNimbusContainer() throws LxcCreateException {
-        Map<Agent, Set<Agent>> map = manager.getLxcManager().createLxcs(1);
-        Collection<Set<Agent>> coll = map.values();
-        if(coll.size() > 0) {
-            Set<Agent> set = coll.iterator().next();
-            if(set.size() > 0) return set.iterator().next();
-        }
-        return null;
     }
 
 }
