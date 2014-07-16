@@ -20,6 +20,8 @@ public class XMLConfigurationLoader implements ConfigurationLoader {
     @Override
     public Config getConfiguration( Agent agent, String configPathFilename ) {
         try {
+            //TODO cat file from given agent, convert to required format, detect types and form a Config
+            //TODO convert text to XML object
             XMLConfiguration xmlConfiguration = new XMLConfiguration( configPathFilename );
             //TODO XML to Config converter
             Config config = new Config();

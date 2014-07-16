@@ -15,6 +15,8 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
 
     @Override
     public Config getConfiguration( final Agent agent, final String configPathFilename ) {
+
+        //TODO cat file from given agent, convert to required format, detect types and form a Config
         Yaml yaml = new Yaml();
         Object result = yaml.loadAs( configPathFilename, Object.class );
 
@@ -29,6 +31,17 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
 
     @Override
     public void setConfiguration( final Agent agent, Config config ) {
-        //TODO Read config from instance, set values from Config, inject Config
+        // TODO Read config from instance
+        ConfigurationInjector injector = new ConfigurationInjector();
+        String content = injector.catFile( agent, config.getPath() );
+
+        // TODO set values to yaml object from Config
+        Yaml yaml = new Yaml();
+        Object result = yaml.loadAs( content, Object.class );
+
+        String newContent = ""; // yaml to string
+
+        // TODO inject Config
+        injector.echoTextIntoAgent( agent, config.getPath(), newContent );
     }
 }

@@ -24,6 +24,8 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
     public Config getConfiguration( Agent agent, String configPathFilename ) {
 
         try {
+            //TODO cat file from given agent, convert to required format, detect types and form a Config
+            //TODO convert text to Properties object
             File configFile = new File( configPathFilename );
             PropertiesConfiguration configuration = new PropertiesConfiguration( configFile );
             //TODO properties to Config converter code
