@@ -31,68 +31,87 @@
 #     container
 
 #	
-#	NOTE: Debian package will be created under /tmp/debian folder
+#	NOTE: Debian package will be created under $SUBUTAI_TMPDIR directory
 #
 
 function deb_pkg {
   local lxc="$1"
+  
+  if [ -z "$lxc" ]; then
+    msg_error "lxc name not provided. Aborting ..."
+    exit 1
+  fi
+
   local tmp="$SUBUTAI_TMPDIR"
   local tmp_path="$tmp/$lxc"
-  debian_tmp_dir=$SUBUTAI_TMPDIR/$lxc-subutai-template
-  local md5sum_file=$debian_tmp_dir/DEBIAN/md5sums
-  output_dir=$debian_tmp_dir/$tmp_path
-
-  # ------------------------------------------------------------------------------
+  local debian_package_name=`get_debian_package_name $lxc`
+  local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  local debian_copy_dir=$debian_dir/$tmp_path
+  # ----------------------------------------------------------------------------
   # (1) create DEBIAN folder and copy required files.
-  # -----------------------------------------------------------------------------
-  mkdir -p $debian_tmp_dir
-  mkdir -p $debian_tmp_dir/DEBIAN
-  mkdir -p $output_dir
-  cp -r $tmp_path/* $output_dir
+  # ----------------------------------------------------------------------------
+  # Delete debian directory if exists and create it from scratch
+  rm -rf $debian_dir
+  mkdir -p $debian_dir/DEBIAN
+  
+  # Copy required files under relevant directories
+  mkdir -p $debian_copy_dir
+  cp -r $tmp_path/* $debian_copy_dir
 
-  # -----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # (2)  create control file of debian package
-  # -----------------------------------------------------------------------------
-  create_control_file $lxc
+  # ----------------------------------------------------------------------------
+  create_control_file $lxc $debian_dir
 
-  # -----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # (3) create postinst script of debian package
-  # -----------------------------------------------------------------------------
-  create_postinst_script $lxc
+  # ----------------------------------------------------------------------------
+  create_postinst_script $debian_dir
 
-  # -----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # (4) create debian package
-  # -----------------------------------------------------------------------------
-  dpkg-deb -z8 -Zgzip --build $debian_tmp_dir >> /dev/null
+  # ----------------------------------------------------------------------------
+  dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
 
-  # -----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # (5) remove copied directories for creating debian package
-  # -----------------------------------------------------------------------------		
-  rm -rf $debian_tmp_dir
+  # ----------------------------------------------------------------------------		
+  rm -rf $debian_dir
 
-  # -----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # (6) return path of newly generated debian package
-  # -----------------------------------------------------------------------------
-  echo "$debian_tmp_dir.deb"
+  # ----------------------------------------------------------------------------
+  echo "$debian_dir.deb"
 }
 
 
-
-# ----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Creates control file of debian package
-# ----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 function create_control_file {
+  local lxc=$1
+  local package_name=`get_package_name $lxc`
+  local debian_dir=$2
+  local architecture=`get_architecture`
+  local control_file=$debian_dir/DEBIAN/control
+  local dependency="subutai-cli (= $SUBUTAI_VERSION)"
+  
+  # Check if lxc is master. If not, put a dependency to the parent template 
+  lxc_assert $lxc "`usage`"
+  local parent=`zfs_get_parent $container`
+  local parent_package_name=`get_package_name $parent`
 
-  local packageName=$1-subutai-template  
-  local control_file=$debian_tmp_dir/DEBIAN/control
-
+  if [ "$lxc" != "master" ]; then
+    dependency="$dependency, $parent_package_name (= $SUBUTAI_VERSION)"
+  fi
+   
   # These properties are needed inside control file of debian package
-  local Package="$packageName" 
+  local Package="$package_name" 
   local Maintainer="subutai"
-  local Architecture="amd64"
+  local Architecture=$architecture
   local Version=$SUBUTAI_VERSION
-  local Depends="subutai-host-scripts (= $SUBUTAI_VERSION)" 
-  local Description="This is a Subutai delta image debian package"
+  local Depends=$dependency
+  local Description="This is a Subutai delta image debian package of $lxc template"
 
   # clean control file
   > $control_file
@@ -106,13 +125,41 @@ function create_control_file {
 }
 
 
-# ----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Creates postinst script of debian package
-# ----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 function create_postinst_script {
-  local postinst_file=$debian_tmp_dir/DEBIAN/postinst
+  local debian_dir=$1
+  local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
   chmod +x $postinst_file
+}
+
+
+function get_debian_package_name {
+  local lxc=$1
+  if [ -z "$lxc" ]; then
+    msg_error "lxc name not provided. Aborting ..."
+    exit 1
+  fi	
+  local package_name=`get_package_name $lxc`
+  local architecture=`get_architecture`
+  echo $package_name"_"$SUBUTAI_VERSION"_"$architecture
+}
+
+
+function get_package_name {
+  local lxc=$1
+  if [ -z "$lxc" ]; then
+    msg_error "lxc name not provided. Aborting ..."
+    exit 1
+  fi
+  echo $lxc"-subutai-template"
+}
+
+
+function get_architecture {
+  echo "amd64"
 }

@@ -10,7 +10,7 @@ function is_registered {
     
   
 # URGENT: this is a stub function and needs to be properly implemented
-# this function needs to take the supplied tsar file and upload and 
+# this function needs to take the supplied debian package file and upload and 
 # register it with the Subutai management server.
 function send_n_register {
   local debian_file=$1

@@ -23,8 +23,8 @@ function usage {
 # (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
 # (5) generate delta images of all filesystems: 
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
-# (6) generate the tsar file from deltas, and package info
-# (7) register and send tsar file to subutai management server
+# (6) generate the debian file from deltas, and package info
+# (7) register and send debian file to subutai management server
 
 function promote {
   OPTIND=0
@@ -187,36 +187,36 @@ function promote {
   zfs snapshot lxc-data/$lxc_template-home@template
   zfs hold keep lxc-data/$lxc_template-home@template
 
-
+  # STARTING FROM HERE, THIS FUNCTIONALITY IS OF EXPORT BINDING 
   # ---------------------------------------------------------------------------
   # (5) generate delta images of all filesystems: 
   #     'pool/parent-partition@child' -> 'pool/child-partition@template'
   # ---------------------------------------------------------------------------
 
-  deb_root="$SUBUTAI_TMPDIR/$lxc_template"
-  deltas="$deb_root/deltas"
-  mkdir -p $deltas
-  zfs send -I "lxc/$parent@template" "lxc/$lxc_template@template" > "$deltas/rootfs.delta"
-  zfs send -I "lxc/$parent-opt@template" "lxc/$lxc_template-opt@template" > "$deltas/opt.delta"
-  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$lxc_template-var@template" > "$deltas/var.delta"
-  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$lxc_template-home@template" > "$deltas/home.delta"
+#  debian_root="$SUBUTAI_TMPDIR/$lxc_template"
+#  deltas="$debian_root/deltas"
+#  mkdir -p $deltas
+#  zfs send -I "lxc/$parent@template" "lxc/$lxc_template@template" > "$deltas/rootfs.delta"
+#  zfs send -I "lxc/$parent-opt@template" "lxc/$lxc_template-opt@template" > "$deltas/opt.delta"
+#  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$lxc_template-var@template" > "$deltas/var.delta"
+#  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$lxc_template-home@template" > "$deltas/home.delta"
 
 
   # ---------------------------------------------------------------------------
-  # (6) generate the tsar file from git differential, and deltas
+  # (6) generate the debian file from git differential, and deltas
   # ---------------------------------------------------------------------------
 
-  cp /var/lib/lxc/$lxc_template/config "$deb_root"
-  cp /var/lib/lxc/$lxc_template/fstab  "$deb_root"
-  cp /var/lib/lxc/$lxc_template/packages  "$deb_root"
+#  cp /var/lib/lxc/$lxc_template/config "$debian_root"
+#  cp /var/lib/lxc/$lxc_template/fstab  "$debian_root"
+#  cp /var/lib/lxc/$lxc_template/packages  "$debian_root"
 
-  pkg=`deb_pkg $lxc_template`
+#  pkg=`deb_pkg $lxc_template`
 
   # ---------------------------------------------------------------------------
-  # (7) register and send tsar file to subutai management server
+  # (7) register and send debian file to subutai management server
   # ---------------------------------------------------------------------------
 
-  send_n_register $pkg
+#  send_n_register $pkg
 
 }
 

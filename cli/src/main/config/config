@@ -9,11 +9,11 @@ export SUBUTAI_VERSION=2.1.0
 # The Site Git Repository: set to have push take place on template creation
 export SUBUTAI_SITE_GIT=
 
-# A large area where some tsar file builds occur
+# A large area where some debian package builds occur
 export SUBUTAI_TMPDIR=/lxc-data/tmpdir
 
 # Default set of packages to install on all containers
-export SUBUTAI_PACKAGES=git
+export SUBUTAI_PACKAGES=subutai-mastertemplate-setup,git
 
 # The Subutai user to use for container's non-root user and will also
 # be used to make commits to git and possibly perform additional things
@@ -41,3 +41,6 @@ export SUBUTAI_CONFIG_PATH=/etc
 # which need to be tracked in 
 export SUBUTAI_APP_DATA_PATH=/var
 
+#Local repository has subutai packages
+export SUBUTAI_SITE_REPO=http://gw.intra.lan/ksks
+export SUBUTAI_OS_RELEASE_NAME=trusty
