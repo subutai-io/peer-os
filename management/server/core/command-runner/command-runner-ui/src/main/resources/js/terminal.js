@@ -19,10 +19,8 @@ var startPrompt = function () {
         callback(input);
         timer = setInterval(timerPromt, 2000);
 
-        var timeoutSec = $('#timeout_txt').val() * 1000;
-        var timeout = setTimeout(function () {
-            startPrompt();
-        }, timeout);
+        var timeoutSec = parseInt($('#timeout_txt').val()) * 1000;
+        timeout = setTimeout(startPrompt, timeoutSec);
     });
 };
 startPrompt();
