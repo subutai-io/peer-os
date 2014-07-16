@@ -6,11 +6,15 @@
   <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
+  <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="fs-tracker/cli">
       <action class="org.safehaus.subutai.impl.fstracker.ShellCommands">
         <property name="communicationManager" ref="communicationManager" />
         <property name="commandRunner" ref="commandRunner" />
+        <property name="agentManager" ref="agentManager" />
       </action>
     </command>
   </command-bundle>

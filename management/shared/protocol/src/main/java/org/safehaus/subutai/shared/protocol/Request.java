@@ -1,8 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.shared.protocol;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -14,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Dilshat
- */
+
 public class Request implements Serializable {
 
     private String source = null;
@@ -131,6 +126,10 @@ public class Request implements Serializable {
 
     @Override
     public String toString() {
-        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + ", pid=" + pid + ", timeout=" + timeout + '}';
+        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid
+                + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory
+                + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath
+                + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment
+                + ", pid=" + pid + ", timeout=" + timeout + '}';
     }
 }

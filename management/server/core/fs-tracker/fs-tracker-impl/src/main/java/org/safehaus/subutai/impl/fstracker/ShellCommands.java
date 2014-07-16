@@ -13,9 +13,13 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.fstracker.Listener;
+import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
@@ -28,6 +32,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 
+import com.google.common.collect.Sets;
+
 
 @Command( scope = "fs-tracker", name = "cli" )
 public class ShellCommands extends OsgiCommandSupport {
@@ -37,6 +43,7 @@ public class ShellCommands extends OsgiCommandSupport {
     private ActiveMQConnectionFactory amqFactory;
     private CommunicationManager communicationManager;
     private CommandRunner commandRunner;
+    private AgentManager agentManager;
 
     public void setCommunicationManager( CommunicationManager communicationManager ) {
         this.communicationManager = communicationManager;
@@ -48,17 +55,65 @@ public class ShellCommands extends OsgiCommandSupport {
     }
 
 
-    @Override
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+
     protected Object doExecute() {
+
 
 //        FSTrackerTest.sayHello();
         //testConnection();
 
-        System.out.println( "communicationManager: " + communicationManager );
-        System.out.println( "commmandRunner: " + commandRunner );
+//        System.out.println( "communicationManager: " + communicationManager );
+//        System.out.println( "commmandRunner: " + commandRunner );
+//        System.out.println( "agentManager: " + agentManager );
+
+        if ( agentManager.getAgents().isEmpty() ) {
+            System.out.println( "ERROR: No agents!" );
+            return null;
+        }
+
+//        testConnection();
+
+//        org.safehaus.subutai.api.commandrunner.Command command = commandRunner.createCommand(
+//                new RequestBuilder( "date" )
+//                        .withType( RequestType.INOTIFY_SHOW_REQUEST )
+//                        .withTimeout( 60 ),
+//                agentManager.getAgents() );
+
+
+        Agent firstAgent = agentManager.getAgents().iterator().next();
+
+        org.safehaus.subutai.api.commandrunner.Command command = commandRunner.createCommand(
+                new RequestBuilder( "pwd" )
+                        .withType( RequestType.INOTIFY_SHOW_REQUEST )
+//                        .withType( RequestType.EXECUTE_REQUEST )
+                        .withTimeout( 60 ),
+                Sets.newHashSet( firstAgent ) );
+//                agentManager.getAgents() );
+
+//        commandRunner.runCommand( command );
+        commandRunner.runCommandAsync( command );
+
+        AgentResult agentResult = command.getResults().get( firstAgent.getUuid() );
+
+        System.out.println( "result: " + agentResult.getStdOut() );
+
 
         return null;
     }
+
+
+    protected Object doExecute_() {
+
+        testConnection();
+
+        return null;
+    }
+
 
     private void testConnection() {
 
@@ -72,13 +127,14 @@ public class ShellCommands extends OsgiCommandSupport {
         pooledConnectionFactory.start();
 
         try {
-//            setupListener( pooledConnectionFactory );
-            sendMessage( pooledConnectionFactory );
+            setupListener( pooledConnectionFactory );
+//            sendMessage( pooledConnectionFactory );
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
 
     public void sendMessage(PooledConnectionFactory pooledConnectionFactory) {
 
