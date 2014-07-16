@@ -183,8 +183,8 @@ public class Manager {
             final Button destroyBtn = new Button( "Destroy" );
 
             table.addItem( new Object[] {
-                            agent.getHostname(), agent.getListIP().toString(), destroyBtn
-                    }, null );
+                    agent.getHostname(), agent.getListIP().toString(), destroyBtn
+            }, null );
 
             destroyBtn.addClickListener( new Button.ClickListener() {
                 @Override
@@ -231,14 +231,16 @@ public class Manager {
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && clustersInfo.size() > 0 ) {
-            for ( Config mongoClusterInfo : clustersInfo ) {
-                clusterCombo.addItem( mongoClusterInfo );
-                clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
+            for ( Config luceneClusterInfo : clustersInfo ) {
+                clusterCombo.addItem( luceneClusterInfo );
+                clusterCombo.setItemCaption( luceneClusterInfo,
+                        String.format( "%s (%s)", luceneClusterInfo.getClusterName(),
+                                luceneClusterInfo.getLuceneClusterName() ) );
             }
             if ( clusterInfo != null ) {
-                for ( Config mongoClusterInfo : clustersInfo ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( mongoClusterInfo );
+                for ( Config luceneClusterInfo : clustersInfo ) {
+                    if ( luceneClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+                        clusterCombo.setValue( luceneClusterInfo );
                         return;
                     }
                 }
