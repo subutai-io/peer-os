@@ -126,12 +126,15 @@ function master_create {
   fi
 
   lxc_wait_net master
+  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
+      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 
   if [ -n "$SUBUTAI_PACKAGES" ]; then
     lxc-attach -n master -- \
-        apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+         env DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --force-yes \
+           install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
   fi
 
   lxc-attach -n master -- apt-get -y autoclean

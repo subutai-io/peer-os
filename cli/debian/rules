@@ -32,12 +32,12 @@ install: build
 	dh_prep
 	dh_installdirs
 	dh_install
-	mkdir -p ${d}/${BINDINGS}
-	mkdir -p ${d}/${CONFDIR}
-	mkdir -p ${d}/${LIBDIR}
-	mkdir -p ${d}/${SCRIPTS}
-	mkdir -p ${d}/${MANDIR}
-	mkdir -p ${d}/${BASHCOMPDIR}
+	mkdir -p ${d}${BINDINGS}
+	mkdir -p ${d}${CONFDIR}
+	mkdir -p ${d}${LIBDIR}
+	mkdir -p ${d}${SCRIPTS}
+	mkdir -p ${d}${MANDIR}
+	mkdir -p ${d}${BASHCOMPDIR}
 	cp -a src/main/config/* ${d}${CONFDIR}
 	cp -a src/main/bindings/* ${d}${BINDINGS}
 	cp -a src/main/lib/* ${d}${LIBDIR}
