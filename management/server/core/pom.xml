@@ -30,5 +30,6 @@
     <module>template-registry</module>
     <module>configuration-manager</module>
     <module>template-manager</module>
+    <module>file-tracker</module>
   </modules>
 </project>

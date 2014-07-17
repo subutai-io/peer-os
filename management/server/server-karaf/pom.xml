@@ -857,6 +857,18 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                              <!-- File Tracker -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>file-tracker-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>file-tracker-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Configuration Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
