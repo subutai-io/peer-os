@@ -15,7 +15,11 @@ var startPrompt = function () {
     // Start the prompt with history enabled.
     jqconsole.Prompt(true, function (input) {
         if (input === "clear") {
-            jqconsole.Clear();
+            var terminal = $('.jqconsole');
+            var header = $(terminal).find('span').first().html();
+            var prompt = $(terminal).find('span').last().html();
+            $(terminal).html(header);
+            $(terminal).append(prompt);
         }
         // Output input with the class jqconsole-output.
         jqconsole.Write('', 'jqconsole-output');
