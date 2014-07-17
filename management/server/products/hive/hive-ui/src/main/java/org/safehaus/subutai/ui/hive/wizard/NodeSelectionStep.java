@@ -3,10 +3,7 @@ package org.safehaus.subutai.ui.hive.wizard;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
@@ -55,7 +52,8 @@ public class NodeSelectionStep extends Panel {
                         else if(slaves.contains(a))
                             caption += " [Slave node]";
                         serverNode.setItemCaption(a, caption);
-					}
+                    }
+                    filterNodes();
 					select.setContainerDataSource(new BeanItemContainer<>(
 									Agent.class, hadoopInfo.getAllNodes())
 					);
@@ -181,4 +179,18 @@ public class NodeSelectionStep extends Panel {
 		return cb;
 	}
 
+    private void filterNodes() {
+        Collection<Agent> items = (Collection<Agent>)serverNode.getItemIds();
+        final Set<Agent> set = new HashSet<>(items);
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Map<Agent, Boolean> map = HiveUI.getManager().isInstalled(set);
+                for(Map.Entry<Agent, Boolean> e : map.entrySet()) {
+                    if(e.getValue()) serverNode.removeItem(e.getKey());
+                }
+            }
+        }).start();
+    }
 }
