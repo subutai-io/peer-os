@@ -32,8 +32,7 @@ public class VerificationStep extends VerticalLayout {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Number of nodes", wizard.getConfig().getNumberOfNodes() + "");
+		cfgView.addStringCfg("Installation Name", wizard.getConfig().getClusterName());
 
 		Button install = new Button("Install");
 		install.addStyleName("default");
