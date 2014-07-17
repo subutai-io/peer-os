@@ -371,13 +371,13 @@
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
-        	<artifactId>commons-vfs2</artifactId>
-        	<version>${org.apache.commons.vfs2.version}</version>
+        <artifactId>commons-vfs2</artifactId>
+        <version>${org.apache.commons.vfs2.version}</version>
       </dependency>
       <dependency>
-      	<groupId>com.jcraft</groupId>
-      	<artifactId>jsch</artifactId>
-      	<version>${jsch.version}</version>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>${jsch.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-httpclient</groupId>
@@ -385,14 +385,14 @@
         <version>${org.apache.commons.httpclient.version}</version>
       </dependency>
       <dependency>
-      	<groupId>org.apache.jackrabbit</groupId>
-      	<artifactId>jackrabbit-webdav</artifactId>
-      	<version>${org.apache.jackrabbit.webdav.version}</version>
+        <groupId>org.apache.jackrabbit</groupId>
+        <artifactId>jackrabbit-webdav</artifactId>
+        <version>${org.apache.jackrabbit.webdav.version}</version>
       </dependency>
       <dependency>
-      	<groupId>org.apache.ant</groupId>
-      	<artifactId>ant</artifactId>
-      	<version>${org.apache.ant.version}</version>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>${org.apache.ant.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -513,6 +513,18 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>template-registry-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- FS Tracker -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>file-tracker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>file-tracker-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 

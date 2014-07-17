@@ -52,8 +52,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>fs-tracker-api</artifactId>
-      <version>${project.version}</version>
+      <artifactId>file-tracker-api</artifactId>
     </dependency>
 
   </dependencies>
