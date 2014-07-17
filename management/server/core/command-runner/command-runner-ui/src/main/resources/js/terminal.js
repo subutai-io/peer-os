@@ -2,7 +2,8 @@ var timer;
 var timeout;
 var jqconsole = $('#terminal').jqconsole('Subutai Terminal\n', '$prompt');
 jqconsole.RegisterShortcut('C', function () {
-    this.Reset();
+    $('.jqconsole .jqconsole-output').remove();
+    $('.jqconsole .jqconsole-old-prompt').remove();
 });
 
 var timerPromt = function () {
@@ -18,9 +19,8 @@ var startPrompt = function () {
     // Start the prompt with history enabled.
     jqconsole.Prompt(true, function (input) {
         if (input === "clear") {
-            /*$('.jqconsole .jqconsole-output').remove();
-             $('.jqconsole .jqconsole-old-prompt').remove();*/
-            this.Reset();
+            $('.jqconsole .jqconsole-output').remove();
+            $('.jqconsole .jqconsole-old-prompt').remove();
         }
         // Output input with the class jqconsole-output.
         jqconsole.Write('', 'jqconsole-output');
