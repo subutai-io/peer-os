@@ -18,15 +18,17 @@ import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import org.apache.activemq.command.ActiveMQMessage;
+import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
 
 
 /**
- * This class is used internally by CommunicationManagerImpl to notify response listener on new message.
+ * Used internally by CommunicationManagerImpl to notify a response listener on a new message.
  */
 class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
+
     private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
 
@@ -38,7 +40,6 @@ class CommunicationMessageListener implements MessageListener {
     @Override
     public void onMessage( Message message ) {
         try {
-
             if ( message instanceof BytesMessage ) {
                 BytesMessage msg = ( BytesMessage ) message;
 
@@ -46,6 +47,7 @@ class CommunicationMessageListener implements MessageListener {
                 msg.readBytes( msg_bytes );
                 String jsonCmd = new String( msg_bytes, "UTF-8" );
                 Response response = CommandJson.getResponse( jsonCmd );
+
                 if ( response != null ) {
                     if ( response.getType() != ResponseType.HEARTBEAT_RESPONSE ) {
                         LOG.log( Level.INFO, "\nReceived {0}",
@@ -61,6 +63,9 @@ class CommunicationMessageListener implements MessageListener {
                     LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
                 }
             }
+            else if ( message instanceof ActiveMQTextMessage ) {
+                ActiveMQTextMessage msg = ( ActiveMQTextMessage ) message;
+            }
             else if ( message instanceof ActiveMQMessage ) {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
 
@@ -72,6 +77,7 @@ class CommunicationMessageListener implements MessageListener {
                     notifyListeners( agentDisconnect );
                 }
             }
+
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in onMessage", ex );
@@ -110,10 +116,12 @@ class CommunicationMessageListener implements MessageListener {
      */
     public void addListener( ResponseListener listener ) {
         try {
-            listeners.add( listener );
+            if ( !listeners.contains( listener ) ) {
+                listeners.add( listener );
+            }
         }
         catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+            LOG.log( Level.SEVERE, "Error to add a listener:", ex );
         }
     }
 

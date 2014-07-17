@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.shared.protocol;
 
 import com.google.common.base.Preconditions;
@@ -9,12 +5,14 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @author Dilshat
- */
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+
 public class Response implements Serializable {
 
     private String source;
@@ -33,6 +31,13 @@ public class Response implements Serializable {
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
+
+    // inotify fields
+    private String confPoints[];
+    private String configPoint;
+    private String changeType;
+    private String dateTime;
+
 
     public String getParentHostName() {
         return parentHostName;
@@ -112,6 +117,27 @@ public class Response implements Serializable {
         return taskUuid;
     }
 
+
+    public String[] getConfPoints() {
+        return confPoints;
+    }
+
+
+    public String getChangeType() {
+        return changeType;
+    }
+
+
+    public String getConfigPoint() {
+        return configPoint;
+    }
+
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+
     public boolean isFinal() {
         return ResponseType.EXECUTE_RESPONSE_DONE.equals(type)
                 || ResponseType.EXECUTE_TIMEOUT.equals(type)
@@ -123,9 +149,38 @@ public class Response implements Serializable {
         return (ResponseType.EXECUTE_RESPONSE_DONE.equals(type) || ResponseType.TERMINATE_RESPONSE_DONE.equals(type)) && exitCode != null && exitCode == 0;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid
+// + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber
+// + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid="
+// + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc
+// + ", transportId=" + transportId + '}';
+//
+//    }
+
     @Override
     public String toString() {
-        return "Response{" + "source=" + source + ", type=" + type + ", exitCode=" + exitCode + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", responseSequenceNumber=" + responseSequenceNumber + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", pid=" + pid + ", macAddress=" + macAddress + ", hostname=" + hostname + ", ips=" + ips + ", isLxc=" + isLxc + ", transportId=" + transportId + '}';
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+        .append( "source", source )
+        .append( "type", type )
+        .append( "exitCode", exitCode )
+        .append( "uuid", uuid )
+        .append( "taskUuid", taskUuid )
+        .append( "requestSequenceNumber", requestSequenceNumber )
+        .append( "stdOut", stdOut )
+        .append( "stdErr", stdErr )
+        .append( "pid", pid )
+        .append( "macAddress", macAddress )
+        .append( "hostname", hostname )
+        .append( "ips", ips )
+        .append( "isLxc", isLxc )
+        .append( "transportId", transportId )
+        .append( "confPoints", confPoints )
+        .append( "changeType", changeType )
+        .append( "configPoint", configPoint )
+        .append( "dateTime", dateTime )
+        .toString();
     }
 
 }
