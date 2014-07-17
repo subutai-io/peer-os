@@ -22,6 +22,15 @@ public class NodeSelectionStep extends Panel {
         content.setSpacing(true);
         content.setMargin(true);
 
+        TextField clusterNameTxt = new TextField("Cluster name");
+        clusterNameTxt.setRequired(true);
+        clusterNameTxt.addValueChangeListener(new Property.ValueChangeListener() {
+
+            @Override
+            public void valueChange(Property.ValueChangeEvent e) {
+                wizard.getConfig().setClusterName(e.getProperty().getValue().toString().trim());
+            }
+        });
         zkClustersCombo = new ComboBox("Zookeeper cluster");
         masterNodeCombo = makeMasterNodeComboBox(wizard);
 
@@ -73,6 +82,8 @@ public class NodeSelectionStep extends Panel {
                     zkClustersCombo.setValue(zkc);
             }
         // set selected values
+        if(wizard.getConfig().getClusterName() != null)
+            clusterNameTxt.setValue(wizard.getConfig().getClusterName());
         if(wizard.getConfig().getNimbus() != null)
             masterNodeCombo.setValue(wizard.getConfig().getNimbus());
         if(wizard.getConfig().getSupervisorsCount() > 0)
@@ -114,6 +125,7 @@ public class NodeSelectionStep extends Panel {
         buttons.addComponent(back);
         buttons.addComponent(next);
 
+        content.addComponent(clusterNameTxt);
         content.addComponent(zkClustersCombo);
         content.addComponent(masterNodeCombo);
         content.addComponent(nodesCountCmb);
