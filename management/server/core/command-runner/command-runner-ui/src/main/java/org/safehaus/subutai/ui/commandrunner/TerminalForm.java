@@ -223,7 +223,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								out.append(response.getType());
 							}
 						}*/
-
+						System.out.println(output[0]);
 						output[0] += out.toString();
 //						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}

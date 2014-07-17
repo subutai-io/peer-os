@@ -17,6 +17,7 @@ var startPrompt = function () {
         if (input === "clear") {
             $('.jqconsole .jqconsole-output').remove();
             $('.jqconsole .jqconsole-old-prompt').remove();
+            startPrompt();
         } else {
             // Output input with the class jqconsole-output.
             jqconsole.Write('', 'jqconsole-output');
