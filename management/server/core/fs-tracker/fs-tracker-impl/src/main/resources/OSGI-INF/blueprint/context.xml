@@ -9,9 +9,16 @@
   <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
+  <bean id="fileTracker" class="org.safehaus.subutai.impl.fstracker.FSTrackerImpl"
+        init-method="init" destroy-method="destroy" scope="singleton">
+    <property name="agentManager" ref="agentManager" />
+  </bean>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="fs-tracker/cli">
       <action class="org.safehaus.subutai.impl.fstracker.ShellCommands">
+        <property name="fileTracker" ref="fileTracker" />
+
         <property name="communicationManager" ref="communicationManager" />
         <property name="commandRunner" ref="commandRunner" />
         <property name="agentManager" ref="agentManager" />

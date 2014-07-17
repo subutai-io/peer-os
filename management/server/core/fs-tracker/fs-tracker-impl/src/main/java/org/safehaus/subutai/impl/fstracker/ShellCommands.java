@@ -2,7 +2,6 @@ package org.safehaus.subutai.impl.fstracker;
 
 
 import java.util.UUID;
-import java.util.logging.Level;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -14,22 +13,19 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.api.fstracker.Listener;
+import org.safehaus.subutai.api.fstracker.FileTracker;
+import org.safehaus.subutai.api.fstracker.FileTrackerListener;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
@@ -42,7 +38,27 @@ import com.google.common.collect.Sets;
 @Command( scope = "fs-tracker", name = "cli" )
 public class ShellCommands extends OsgiCommandSupport implements ResponseListener {
 
-    private Listener listener;
+
+    private FileTracker fileTracker;
+
+
+    public void setFileTracker( FileTracker fileTracker ) {
+        this.fileTracker = fileTracker;
+    }
+
+
+    protected Object doExecute() {
+
+        System.out.println( "fileTracker: " +fileTracker );
+        fileTracker.addListener( null );
+
+        return null;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private FileTrackerListener listener;
 
     private ActiveMQConnectionFactory amqFactory;
     private CommunicationManager communicationManager;
@@ -65,7 +81,7 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
 
 
 
-    protected Object doExecute() {
+    protected Object doExecute4() {
         try {
 //            doAction();
             doExecute3();

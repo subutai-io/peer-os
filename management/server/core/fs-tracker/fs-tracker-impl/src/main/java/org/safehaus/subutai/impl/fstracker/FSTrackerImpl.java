@@ -1,25 +1,33 @@
 package org.safehaus.subutai.impl.fstracker;
 
 
-import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.fstracker.FileTracker;
+import org.safehaus.subutai.api.fstracker.FileTrackerListener;
 
-public class FSTrackerImpl {
 
-    private CommunicationManager communicationManager;
-    private CommandRunner commandRunner;
+public class FSTrackerImpl implements FileTracker {
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-    		this.commandRunner = commandRunner;
-    	}
+    private AgentManager agentManager;
 
-    public FSTrackerImpl( CommunicationManager communicationManager, CommandRunner commandRunner ) {
-        Preconditions.checkNotNull( communicationManager, "CommunicationManager is null" );
 
-        this.communicationManager = communicationManager;
-        this.commandRunner = commandRunner;
+    public void init() {
+        System.out.printf( "init" );
     }
 
 
+    public void destroy() {
+        System.out.printf( "destroy" );
+    }
+
+
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    @Override
+    public void addListener( final FileTrackerListener listener ) {
+        System.out.println( "addListener()" );
+    }
 }
