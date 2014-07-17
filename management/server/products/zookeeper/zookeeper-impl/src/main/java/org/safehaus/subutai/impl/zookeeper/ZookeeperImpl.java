@@ -1,5 +1,9 @@
 package org.safehaus.subutai.impl.zookeeper;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -9,11 +13,6 @@ import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.impl.zookeeper.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ZookeeperImpl implements Zookeeper {
 
@@ -61,7 +60,6 @@ public class ZookeeperImpl implements Zookeeper {
     public void destroy() {
         executor.shutdown();
     }
-
 
     public UUID installCluster(Config config) {
 
@@ -164,6 +162,13 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public Config getCluster(String clusterName) {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    }
+
+    @Override
+    public UUID install(String hostName) {
+        AbstractOperationHandler h = new SingleInstallation(this, hostName);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
 }

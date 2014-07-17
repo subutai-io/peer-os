@@ -5,9 +5,8 @@
  */
 package org.safehaus.subutai.api.zookeeper;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
-
 import java.util.UUID;
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 /**
  * @author dilshat
@@ -29,6 +28,8 @@ public interface Zookeeper extends ApiBase<Config> {
     public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue);
 
     public UUID removeProperty(String clusterName, String fileName, String propertyName);
+
+    public UUID install(String hostName);
 
 }
 

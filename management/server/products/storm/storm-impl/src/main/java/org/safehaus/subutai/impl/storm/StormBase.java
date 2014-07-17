@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
@@ -16,6 +17,7 @@ public abstract class StormBase implements Storm {
     protected Tracker tracker;
     protected DbManager dbManager;
     protected Zookeeper zookeeperManager;
+    protected LxcManager lxcManager;
 
     protected ExecutorService executor;
 
@@ -65,6 +67,14 @@ public abstract class StormBase implements Storm {
 
     public void setZookeeperManager(Zookeeper zookeeperManager) {
         this.zookeeperManager = zookeeperManager;
+    }
+
+    public LxcManager getLxcManager() {
+        return lxcManager;
+    }
+
+    public void setLxcManager(LxcManager lxcManager) {
+        this.lxcManager = lxcManager;
     }
 
 }
