@@ -1,17 +1,15 @@
 package org.safehaus.subutai.ui.storm.wizard;
 
 import com.vaadin.data.Property;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import java.util.*;
-import org.safehaus.subutai.api.zookeeper.Config;
+import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.storm.StormUI;
 
 public class NodeSelectionStep extends Panel {
-
-    private final ComboBox zkClustersCombo;
-    private final ComboBox masterNodeCombo;
 
     public NodeSelectionStep(final Wizard wizard) {
 
@@ -31,32 +29,53 @@ public class NodeSelectionStep extends Panel {
                 wizard.getConfig().setClusterName(e.getProperty().getValue().toString().trim());
             }
         });
-        zkClustersCombo = new ComboBox("Zookeeper cluster");
-        masterNodeCombo = makeMasterNodeComboBox(wizard);
 
-        zkClustersCombo.setImmediate(true);
-        zkClustersCombo.setTextInputAllowed(false);
-        zkClustersCombo.setRequired(true);
-        zkClustersCombo.setNullSelectionAllowed(false);
-        zkClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent e) {
-                masterNodeCombo.removeAllItems();
-                if(e.getProperty().getValue() != null) {
-                    Config zk;
-                    zk = (Config)e.getProperty().getValue();
-                    for(Agent a : zk.getNodes()) {
-                        masterNodeCombo.addItem(a);
-                        masterNodeCombo.setItemCaption(a, a.getHostname());
+        Component nimbusElem;
+        if(wizard.getConfig().isExternalZookeeper()) {
+            ComboBox zkClustersCombo = new ComboBox("Zookeeper cluster");
+            final ComboBox masterNodeCombo = makeMasterNodeComboBox(wizard);
+
+            zkClustersCombo.setImmediate(true);
+            zkClustersCombo.setTextInputAllowed(false);
+            zkClustersCombo.setRequired(true);
+            zkClustersCombo.setNullSelectionAllowed(false);
+            zkClustersCombo.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent e) {
+                    masterNodeCombo.removeAllItems();
+                    if(e.getProperty().getValue() != null) {
+                        Config zk;
+                        zk = (Config)e.getProperty().getValue();
+                        for(Agent a : zk.getNodes()) {
+                            masterNodeCombo.addItem(a);
+                            masterNodeCombo.setItemCaption(a, a.getHostname());
+                        }
+                        // do select if values exist
+                        if(wizard.getConfig().getNimbus() != null)
+                            masterNodeCombo.setValue(wizard.getConfig().getNimbus());
+
+                        wizard.getConfig().setClusterName(zk.getClusterName());
                     }
-                    // do select if values exist
-                    if(wizard.getConfig().getNimbus() != null)
-                        masterNodeCombo.setValue(wizard.getConfig().getNimbus());
-
-                    wizard.getConfig().setClusterName(zk.getClusterName());
                 }
+            });
+            List<org.safehaus.subutai.api.zookeeper.Config> zk_list = StormUI.getZookeeper().getClusters();
+            for(org.safehaus.subutai.api.zookeeper.Config zkc : zk_list) {
+                zkClustersCombo.addItem(zkc);
+                zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
+                if(zkc.getClusterName().equals(wizard.getConfig().getClusterName()))
+                    zkClustersCombo.setValue(zkc);
             }
-        });
+            if(wizard.getConfig().getNimbus() != null)
+                masterNodeCombo.setValue(wizard.getConfig().getNimbus());
+
+            HorizontalLayout hl = new HorizontalLayout(zkClustersCombo, masterNodeCombo);
+            nimbusElem = new Panel("Nimbus node", hl);
+            nimbusElem.setSizeUndefined();
+            nimbusElem.setStyleName("default");
+        } else {
+            String s = "<b>A new nimbus node will be created with Zookeeper instance installed</b>";
+            nimbusElem = new Label(s, ContentMode.HTML);
+        }
 
         ComboBox nodesCountCmb = new ComboBox("Number of supervisor nodes",
                 Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
@@ -72,20 +91,9 @@ public class NodeSelectionStep extends Panel {
             }
         });
 
-        List<Config> zk_list
-                = StormUI.getZookeeper().getClusters();
-        if(zk_list.size() > 0)
-            for(Config zkc : zk_list) {
-                zkClustersCombo.addItem(zkc);
-                zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
-                if(zkc.getClusterName().equals(wizard.getConfig().getClusterName()))
-                    zkClustersCombo.setValue(zkc);
-            }
         // set selected values
         if(wizard.getConfig().getClusterName() != null)
             clusterNameTxt.setValue(wizard.getConfig().getClusterName());
-        if(wizard.getConfig().getNimbus() != null)
-            masterNodeCombo.setValue(wizard.getConfig().getNimbus());
         if(wizard.getConfig().getSupervisorsCount() > 0)
             nodesCountCmb.setValue(wizard.getConfig().getSupervisorsCount());
 
@@ -95,13 +103,13 @@ public class NodeSelectionStep extends Panel {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
-
-                if(Util.isStringEmpty(wizard.getConfig().getClusterName()))
-                    show("Select Zookeeper cluster");
-                else if(wizard.getConfig().getNimbus() == null)
+                Config config = wizard.getConfig();
+                if(Util.isStringEmpty(config.getClusterName()))
+                    show("Enter cluster name");
+                else if(config.isExternalZookeeper() && config.getNimbus() == null)
                     show("Select master node");
-                else if(Util.isCollectionEmpty(wizard.getConfig().getSupervisors()))
-                    show("Select worker nodes");
+                else if(config.getSupervisorsCount() <= 0)
+                    show("Select supervisor nodes count");
                 else
                     wizard.next();
             }
@@ -126,8 +134,7 @@ public class NodeSelectionStep extends Panel {
         buttons.addComponent(next);
 
         content.addComponent(clusterNameTxt);
-        content.addComponent(zkClustersCombo);
-        content.addComponent(masterNodeCombo);
+        content.addComponent(nimbusElem);
         content.addComponent(nodesCountCmb);
         content.addComponent(buttons);
 
@@ -136,7 +143,7 @@ public class NodeSelectionStep extends Panel {
     }
 
     private ComboBox makeMasterNodeComboBox(final Wizard wizard) {
-        ComboBox cb = new ComboBox("Nimbus node");
+        ComboBox cb = new ComboBox("Nodes");
 
         cb.setImmediate(true);
         cb.setTextInputAllowed(false);
