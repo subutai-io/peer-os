@@ -1,10 +1,6 @@
 var timer;
 var timeout;
 var jqconsole = $('#terminal').jqconsole('Subutai Terminal\n', '$prompt');
-jqconsole.RegisterShortcut('C', function () {
-    $('.jqconsole .jqconsole-output').remove();
-    $('.jqconsole .jqconsole-old-prompt').remove();
-});
 
 var timerPromt = function () {
     var output = $('.jqconsole-output').last().find('span').html();
