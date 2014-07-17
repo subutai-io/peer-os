@@ -15,18 +15,6 @@
     <property name="communicationManager" ref="communicationManager" />
   </bean>
 
-  <!--<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="fs-tracker/cli">
-      <action class="org.safehaus.subutai.impl.filetracker.ShellCommands">
-        <property name="fileTracker" ref="fileTracker" />
-
-        <property name="communicationManager" ref="communicationManager" />
-        <property name="commandRunner" ref="commandRunner" />
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
--->
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
       <command name="fs-tracker/test">
         <action class="org.safehaus.subutai.impl.filetracker.CliTest">

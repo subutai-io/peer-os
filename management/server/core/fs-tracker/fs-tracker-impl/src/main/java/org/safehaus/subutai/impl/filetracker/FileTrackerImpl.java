@@ -1,14 +1,14 @@
 package org.safehaus.subutai.impl.filetracker;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import java.util.HashSet;
+
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
 import org.safehaus.subutai.api.fstracker.FileTracker;
-import org.safehaus.subutai.api.fstracker.FileTrackerListener;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
@@ -18,6 +18,8 @@ import com.google.common.collect.Sets;
 
 
 public class FileTrackerImpl implements FileTracker, ResponseListener {
+
+    private final HashSet<ResponseListener> listeners = new HashSet<>();
 
     private CommandRunner commandRunner;
 
@@ -45,20 +47,25 @@ public class FileTrackerImpl implements FileTracker, ResponseListener {
 
 
     @Override
-    public void addListener( FileTrackerListener listener ) {
+    public void addListener( ResponseListener listener ) {
+        listeners.add( listener );
+    }
 
+
+    @Override
+    public void removeListener( ResponseListener listener ) {
+        listeners.remove( listener );
     }
 
 
     @Override
     public void onResponse( Response response ) {
-        if ( response == null ) {
+        if ( response == null || response.getType() != ResponseType.INOTIFY_RESPONSE ) {
             return;
         }
 
-        if ( response.getType() == ResponseType.INOTIFY_RESPONSE
-                || response.getType() == ResponseType.INOTIFY_SHOW_RESPONSE ) {
-            System.out.println( "response: " + response );
+        for ( ResponseListener listener : listeners ) {
+            listener.onResponse( response );
         }
     }
 
