@@ -211,10 +211,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 							out.append(response.getStdOut());
 						}
 						if (!Strings.isNullOrEmpty(response.getStdErr())) {
-							out.append("<span style='color:red'>" +
-											response.getStdErr() +
-											"</span>"
-							);
+							out.append(response.getStdErr());
 						}
 						/*if (response.isFinal()) {
 							if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
@@ -223,7 +220,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 								out.append(response.getType());
 							}
 						}*/
-						System.out.println(output[0]);
 						output[0] += out.toString();
 //						getUI().setPollInterval(Common.REFRESH_UI_SEC * 60000);
 					}
@@ -231,6 +227,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 				taskCount--;
 				if (taskCount == 0) {
+					System.out.println(output[0]);
 					show(output[0]);
 					indicator.setVisible(false);
 				}

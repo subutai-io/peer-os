@@ -90,7 +90,7 @@ public class MainUI extends UI {
 		root.addComponent(bg);
 
 		// For synchronization issue
-		setPollInterval(Common.REFRESH_UI_SEC * 5000);
+		setPollInterval(Common.REFRESH_UI_SEC * 1000);
 
 		buildLoginView(false);
 	}
