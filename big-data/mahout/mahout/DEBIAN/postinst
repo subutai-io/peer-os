@@ -1,5 +1,3 @@
-#!/bin/sh
-
-tar -xpzf /opt/mahout.tar.gz -C /opt
-rm -rf /opt/mahout.tar.gz
+#!/bin/bash
+set -e
 

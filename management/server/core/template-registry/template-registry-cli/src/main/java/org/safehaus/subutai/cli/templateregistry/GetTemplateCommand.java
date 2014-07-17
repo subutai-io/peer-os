@@ -8,15 +8,21 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Strings;
+
 
 /**
  * CLI for TemplateRegistryManager.getTemplate command
  */
-@Command( scope = "registry", name = "get-template", description = "Get template by name" )
+@Command(scope = "registry", name = "get-template", description = "Get template by name")
 public class GetTemplateCommand extends OsgiCommandSupport {
     @Argument( index = 0, name = "template name", required = true, multiValued = false,
             description = "template name" )
     String templateName;
+    @Argument(index = 1, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64")
+    String lxcArch;
+
 
     private TemplateRegistryManager templateRegistryManager;
 
@@ -28,7 +34,9 @@ public class GetTemplateCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Template template = templateRegistryManager.getTemplate( templateName );
+        Template template = Strings.isNullOrEmpty( lxcArch ) ? templateRegistryManager.getTemplate( templateName ) :
+                            templateRegistryManager.getTemplate( templateName, lxcArch );
+
         if ( template != null ) {
             System.out.println( template );
         }

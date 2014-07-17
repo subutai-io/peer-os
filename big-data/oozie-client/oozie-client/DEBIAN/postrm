@@ -9,8 +9,5 @@ then
 fi
 # Remove Oozie Files and Folders
 if [ -d $OOZIE_CLIENT_HOME ]; then
-        echo $OOZIE_CLIENT_HOME "exists!"
         rm -r $OOZIE_CLIENT_HOME
-else
-        echo $OOZIE_CLIENT_HOME "does not exist!"
 fi

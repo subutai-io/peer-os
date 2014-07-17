@@ -12,15 +12,10 @@ usage()
         exit 1
 }
 xmlFileInitialContent="<?xml version=\"1.0\"?>\n\n<!-- Put site-specific property overrides in this file. -->\n\n<configuration>\n\n</configuration>"
-DEFAULT_STORM_HOME=/opt/storm-0.8.2
 initializeFiles()
 {
-	if [ "x$STORM_HOME" = "x" ];
-	then
-        	STORM_HOME=$DEFAULT_STORM_HOME
-	fi
-	if [ ! -d $STORM_HOME ]; then
-		mkdir -p $STORM_HOME/conf
+	if [ ! -d $stormConf ]; then
+		mkdir -p $stormConf
 	fi
 	if [ -f $fileName ]; then
         	:
@@ -32,11 +27,18 @@ initializeFiles()
 . /etc/profile
 add_prop="";
 
-if [ "x$STORM_HOME" = "x" ];
+if [[ $1 == "" || $2 == "" ]];
 then
-        STORM_HOME=$DEFAULT_STORM_HOME
+	usage
 fi
-yamlFile=$STORM_HOME/conf/storm.yaml
+stormConf="/etc/storm"
+if [[ "x$STORM_CONF_DIR" != "x" ]];
+then
+        stormConf=$STORM_CONF_DIR
+fi
+
+fileName="$stormConf/$2"
+yamlFile=$stormConf/storm.yaml
 initializeFiles
 
 do_add()
@@ -211,17 +213,6 @@ initializeNameList()
 	
 	echo $tagName "list:" $extractedNameList
 	
-
-	#let itemsCount=$(xmllint --xpath 'count(//configuration/property/name/text())' $fileName)
-	#echo "Count:" $itemsCount
-	#declare -a description=( )
-	#for (( i=1; i < $itemsCount; i++ )); do
-		#echo "In loop with" $i
-		#test2=$(xmllint --xpath '//configuration/property/name['$i']' $fileName)
-		#echo "Test2:" $test2 
- 		#description[$i]="$(xmllint --xpath '//configuration/properrty/name/text()' $fileName)"
-	#done
-	#echo ${description[@]}
 }
 initializeValueList()
 {
@@ -244,9 +235,9 @@ initializeVariables()
 {
 	if [ "x$1" = "x" ];
         then
-                fileName=$STORM_HOME/conf/storm.xml
+                fileName=$stormConf/storm.xml
         else
-		fileName=$STORM_HOME/conf/$1
+		fileName=$stormConf/$1
 	fi
         name_field=$2
 }

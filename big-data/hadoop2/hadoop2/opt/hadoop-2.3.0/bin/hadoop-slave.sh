@@ -20,7 +20,7 @@ then
 fi
 . /etc/profile
 
-file="${HADOOP_HOME}/conf/slaves"
+file="/etc/hadoop/slaves"
 
 if [[ "$1" == "rollback" ]];
 then

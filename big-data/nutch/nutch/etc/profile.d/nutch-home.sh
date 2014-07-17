@@ -1,3 +1,11 @@
-nutchHome="/opt/nutch-1.5"
+nutchHome="/opt/nutch-1.8"
 export NUTCH_HOME=$nutchHome
-export PATH=$PATH:$NUTCH_HOME/bin
+
+path_content=$(echo $PATH)
+pattern="$nutchHome/bin"
+if [[ $path_content != *$pattern* ]];
+then
+	export PATH=$PATH:$pattern
+fi
+
+

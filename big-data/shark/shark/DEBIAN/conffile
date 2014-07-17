@@ -1,3 +1,3 @@
-/opt/shark-0.9.0/conf/log4j.properties.template
-/opt/shark-0.9.0/conf/shark-env.sh.template
-/opt/shark-0.9.0/conf/shark-env.sh
+/etc/shark/log4j.properties.template
+/etc/shark/shark-env.sh.template
+/etc/shark/shark-env.sh

@@ -1,42 +1,36 @@
 package org.safehaus.subutai.impl.strategy;
 
 import java.util.*;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-public class BestServerStrategy extends LxcPlacementStrategy {
-
-    public static final String defaultNodeType = "default";
+public class BestServerStrategy extends RoundRobinStrategy {
 
     private Set<PlacementStrategyENUM> strategyFactors;
 
-    public BestServerStrategy(PlacementStrategyENUM... strategyFactors) {
+    public BestServerStrategy(int nodesCount, PlacementStrategyENUM... strategyFactors) {
+        super(nodesCount);
         this.strategyFactors = EnumSet.noneOf(PlacementStrategyENUM.class);
         this.strategyFactors.addAll(Arrays.asList(strategyFactors));
     }
 
     @Override
-    public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
-
+    protected List<Agent> sortServers(Map<Agent, ServerMetric> serverMetrics) {
         // using each startegy criteria, grade servers one by one
         Map<Agent, Integer> grades = new HashMap<>();
+        for(Agent a : serverMetrics.keySet()) grades.put(a, 0);
         for(PlacementStrategyENUM sf : strategyFactors) {
             try {
                 Agent a = getBestMatch(serverMetrics, MetricComparator.create(sf));
-                if(a != null) {
-                    Integer g = grades.get(a);
-                    grades.put(a, (g != null ? g : 0) + 1);
-                }
+                if(a != null) grades.put(a, grades.get(a) + 1);
             } catch(Exception ex) {
                 // comparator not defined for strategy
                 // TODO: log
             }
         }
 
-        // sort servers by their grades
+        // sort servers by their grades in decreasing order
         ArrayList<Map.Entry<Agent, Integer>> ls = new ArrayList<>(grades.entrySet());
         Collections.sort(ls, new Comparator<Map.Entry>() {
 
@@ -44,12 +38,13 @@ public class BestServerStrategy extends LxcPlacementStrategy {
             public int compare(Map.Entry o1, Map.Entry o2) {
                 Integer v1 = (Integer)o1.getValue();
                 Integer v2 = (Integer)o2.getValue();
-                return v1.compareTo(v2);
+                return -1 * v1.compareTo(v2);
             }
         });
 
-        Agent best = ls.get(ls.size() - 1).getKey();
-        addPlacementInfo(best, defaultNodeType, 1);
+        List<Agent> servers = new ArrayList<>();
+        for(Map.Entry<Agent, Integer> e : ls) servers.add(e.getKey());
+        return servers;
     }
 
     private Agent getBestMatch(Map<Agent, ServerMetric> serverMetrics, final MetricComparator mc) {
@@ -61,8 +56,7 @@ public class BestServerStrategy extends LxcPlacementStrategy {
             public int compare(Map.Entry o1, Map.Entry o2) {
                 int v1 = mc.getValue((ServerMetric)o1.getValue());
                 int v2 = mc.getValue((ServerMetric)o2.getValue());
-                if(v1 == v2) return 0;
-                return v1 < v2 ? -1 : 1;
+                return Integer.compare(v1, v2);
             }
         });
 

@@ -10,15 +10,20 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
+import com.google.common.base.Strings;
+
 
 /**
- * CLI for TemplateRegistryManager.getTemplate command
+ * CLI for TemplateRegistryManager.getParentTemplates command
  */
-@Command( scope = "registry", name = "get-parent-templates", description = "Get all parent templates" )
+@Command(scope = "registry", name = "get-parent-templates", description = "Get all parent templates")
 public class GetParentTemplatesCommand extends OsgiCommandSupport {
-    @Argument( index = 0, name = "child template name", required = true, multiValued = false,
-            description = "child template name" )
+    @Argument(index = 0, name = "child template name", required = true, multiValued = false,
+            description = "child template name")
     String childTemplateName;
+    @Argument( index = 1, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64" )
+    String lxcArch;
 
     private TemplateRegistryManager templateRegistryManager;
 
@@ -30,7 +35,10 @@ public class GetParentTemplatesCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        List<Template> templates = templateRegistryManager.getParentTemplates( childTemplateName );
+        List<Template> templates =
+                Strings.isNullOrEmpty( lxcArch ) ? templateRegistryManager.getParentTemplates( childTemplateName ) :
+                templateRegistryManager.getParentTemplates( childTemplateName, lxcArch );
+
         if ( !templates.isEmpty() ) {
             for ( Template template : templates ) {
                 System.out.println( template );

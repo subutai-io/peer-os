@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 
-//@Path( "registry" )
 public interface RestService {
 
     @GET
@@ -17,9 +16,21 @@ public interface RestService {
     public String getTemplate( @PathParam( "templateName" ) String templateName );
 
     @GET
+    @Path( "get_template/{templateName}/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String getTemplate( @PathParam( "templateName" ) String templateName,
+                               @PathParam( "lxcArch" ) String lxcArch );
+
+    @GET
     @Path( "get_parent_template/{childTemplateName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String getParentTemplate( @PathParam( "childTemplateName" ) String childTemplateName );
+
+    @GET
+    @Path( "get_parent_template/{childTemplateName}/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String getParentTemplate( @PathParam( "childTemplateName" ) String childTemplateName,
+                                     @PathParam( "lxcArch" ) String lxcArch );
 
     @GET
     @Path( "get_parent_templates/{childTemplateName}" )
@@ -27,9 +38,21 @@ public interface RestService {
     public String getParentTemplates( @PathParam( "childTemplateName" ) String childTemplateName );
 
     @GET
+    @Path( "get_parent_templates/{childTemplateName}/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String getParentTemplates( @PathParam( "childTemplateName" ) String childTemplateName,
+                                      @PathParam( "lxcArch" ) String lxcArch );
+
+    @GET
     @Path( "get_child_templates/{parentTemplateName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String getChildTemplates( @PathParam( "parentTemplateName" ) String parentTemplateName );
+
+    @GET
+    @Path( "get_child_templates/{parentTemplateName}/{lxcArch}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String getChildTemplates( @PathParam( "parentTemplateName" ) String parentTemplateName,
+                                     @PathParam( "lxcArch" ) String lxcArch );
 
     @GET
     @Path( "get_template_tree" )

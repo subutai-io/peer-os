@@ -9,7 +9,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
- * CLI for TemplateRegistryManager.getTemplate command
+ * CLI for TemplateRegistryManager.unregisterTemplate command
  */
 @Command( scope = "registry", name = "unregister-template", description = "Unregister template" )
 public class UnregisterTemplateCommand extends OsgiCommandSupport {

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+. /etc/lsb-release
+
+. $subutai_conf_base/config
+. $subutai_lib_base/bsfl
+init
+
+. $subutai_lib_base/reg_ops
+. $subutai_lib_base/zfs_ops
+. $subutai_lib_base/lxc_ops
+. $subutai_lib_base/git_ops
+. $subutai_lib_base/deb_ops
+
+# Function addmount:
+# -----------------------------------------------------------------------------
+# 
+# Usage: 
+# ======
+#
+# addmount master opt  lxc
+# addmount master var  lxc-data
+# addmount master home lxc-home
+#
+# Description:
+# =============
+#
+# Mainly used by the master creation process to:
+#
+# o Creates a zfs dataset for an LXC mount point
+# o Checks to make sure it is properly created and mounted
+# o Adds the LXC mount entries to the lxc configuration file of container
+# o Moves over data contained in the rootfs for the mount to the dataset
+# o Snapshots the newly created populated filesystems with @template
+
+function addmount {
+  local name=$1
+  local mount=$2
+  local zpool=$3
+  local dataset=$zpool/$name-$mount
+
+  echo Creating $dataset dataset for $mount mount entry
+  zfs create $dataset
+
+  if [ -z "`zfs list $dataset`" ]; then
+    echo Could not create $dataset dataset 
+    exit 1
+  else
+    echo Created $dataset dataset, adding $mount mount entry
+    echo lxc.mount.entry = /$dataset $mount none bind,rw 0 0 \
+         >> /var/lib/lxc/$name/config
+  fi
+  echo Copying $mount data from rootfs to new $dataset dataset
+  pushd .
+  local mountpath=/var/lib/lxc/$name/rootfs/$mount
+  cd $mountpath
+
+  if [ -n "`ls -A $mountpath`" ]; then
+    # We use tar to preserve permissions: do NOT use cp or mv
+    tar -c * | tar -x -C /$dataset
+    echo Deleting $mount contents from rootfs
+    rm -rf /var/lib/lxc/$name/rootfs/$mount/*
+  else
+    echo Nothing within $mountpath, abandoning copy
+  fi
+
+  popd
+
+  # Time to Snapshot and Apply Holds
+  zfs snapshot $dataset'@template'
+  zfs hold keep $dataset'@template'
+  return
+}
+

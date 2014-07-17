@@ -1,0 +1,346 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that replace lxc-xxx functionality with a mix of utility
+# functions.
+# ==========================================================================
+
+
+# simply check if running before stopping
+function lxc_stop {
+  local lxc="$1"
+  
+  if [ "$lxc" == "`lxc-ls --running | grep $lxc`" ]; then
+    lxc-stop -n $lxc
+  fi
+}
+
+
+# waits until the networking comes up on a container (arg $1)
+# if container is off starts it up and waits
+# sleeps for maximum of (arg $2) seconds: defaults to 10 seconds
+function lxc_wait_net {
+  local lxc="$1"
+  local waitmax="$2"
+
+  lxc-start -d -n $lxc
+  lxc-wait -n $lxc -s 'RUNNING' -t 5
+
+  if [ -z "$waitmax" ]; then
+    waitmax=10
+  fi
+
+  while [ $waitmax -gt 0 ]; do
+    sleep 1
+    ipv4=`lxc-ls -f | grep $lxc | awk '{print $3}'`
+
+    if [ "$ipv4" != "-" ]; then
+      msg_notice "    - container \"$lxc\" online with ip = $ipv4"
+      break
+    fi
+    
+    waitmax=`expr $waitmax - 1`
+  done
+}
+
+
+# --------------------------------------------------------------------------
+# function: assertion to check if an LXC container exists, exit on failure
+# --------------------------------------------------------------------------
+#
+# usage:
+# ------
+#    lxc_exists $lxc $usage
+
+function lxc_assert_no {
+  local lxc="$1"
+  local usage="$2"
+
+  if [ -z "$lxc" ]; then
+    msg_error "No value provided for container's name. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -n "`lxc-ls "$lxc" | grep "$lxc"`" ]; then
+    msg_error "Container \"$lxc\" exists. Aborting ..."
+    show_usage "$usage"
+  else
+    msg_info "    - check passed: container \"$lxc\" does NOT exist."
+  fi
+}
+
+
+function lxc_assert {
+  local lxc="$1"
+  local usage="$2"
+
+  if [ -z "$lxc" ]; then
+    msg_error "No value provided for container's name. Aborting ..."
+    show_usage "$usage"
+  fi
+
+  if [ -z "`lxc-ls "$lxc" | grep "$lxc"`" ]; then
+    msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
+    show_usage "$usage"
+  else
+    msg_info "    - check passed: container \"$lxc\" exists."
+  fi
+}
+
+
+# --------------------------------------------------------------------------
+# function: clones a parent dataset for a new child partition
+# --------------------------------------------------------------------------
+#
+# usage:
+# ------
+#    lxc-clone-ds $parent $child $partition $zpool $usage
+
+function lxc_clone_ds {
+  local parent="$1"
+  local child="$2"
+  local partition="$3"
+  local pool="$4"
+  local usage="$5"
+
+  local child_ds="$pool/$child-$partition"
+  local parent_snap="$pool/$parent-$partition@template"
+
+  zfs_assert_snap "$parent_snap" "$usage"
+  zfs clone "$parent_snap" "$child_ds"
+  msg_info "    - \"$child_ds\" cloned from \"$parent_snap\""
+}
+
+
+function lxc_new_mac {
+  local mac=`cat /etc/lxc/default.conf | grep lxc.network.hwaddr | awk '{print $3}'`
+  
+  local int=`expr $RANDOM % 255`
+  local hex=`printf '%x\n' "$int"`
+  local mac=`echo $mac | sed -e "s/xx/$hex/"`
+
+  int=`expr $RANDOM % 255`
+  hex=`printf '%x\n' "$int"`
+  mac=`echo $mac | sed -e "s/xx/$hex/"`
+
+  int=`expr $RANDOM % 255`
+  hex=`printf '%x\n' "$int"`
+  mac=`echo $mac | sed -e "s/xx/$hex/"`
+
+  echo $mac
+}
+
+
+# --------------------------------------------------------------------------
+# function lxc_clone: instead of lxc-clone we use our very own clone op
+# --------------------------------------------------------------------------
+#
+# usage:
+# ------
+#    lxc_clone $parent $child $usage
+#
+# execution plan:
+# ---------------
+# (1) perform sanity checks
+#       - check that child does NOT exist
+#       - check that parent does exist
+#       - check that parent is a template
+# (2) setup skeleton of new cloned child container
+#       - create home and rootfs
+#       - stream and filter config with var substitution
+# (3) zfs clone snapshots for child datasets
+# (4) alter hostname from /etc/hosts and /etc/hostname
+
+function lxc_clone {
+  # nice local names for args
+  local parent="$1"
+  local child="$2"
+  local usage="$3"
+
+  if [ -z "$parent" ]; then
+    msg_error "Parameters not provided. Aborting ..."
+    exit 1
+  fi
+
+  if [ -z "$child" ]; then
+    msg_error "Child parameter not provided. Aborting ..."
+    exit 1
+  fi
+
+  # keep it tight with convenience vars
+  local parent_home=/var/lib/lxc/$parent
+  local parent_conf=$parent_home/config
+  local child_home=/var/lib/lxc/$child
+  local child_rootfs=$child_home/rootfs
+  local child_conf=$child_home/config
+
+  # (1) perform sanity checks
+  lxc_assert_no $child "`usage`"
+  lxc_assert $parent "`usage`"
+
+  if [ "`zfs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is not a template"
+    exit 1
+  else
+    msg_info "    - parent \"$parent\" is a template"
+  fi
+
+  # (2) setup skeleton of new cloned child container
+  mkdir -p $child_rootfs
+  local mac=`lxc_new_mac`
+  cat $parent_conf | sed                                           \
+     -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
+     -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
+     -e "s/\/var\/lib\/lxc\/$parent\//\/var\/lib\/lxc\/$child\//g" \
+     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
+     -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
+     -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
+  cp $parent_home/fstab $child_home
+
+  # (3) zfs clone snapshots for child datasets
+  zfs clone lxc/$parent@template lxc/$child
+  zfs set mountpoint=$child_rootfs lxc/$child
+  lxc_clone_ds $parent $child opt lxc "$usage"
+  lxc_clone_ds $parent $child var lxc-data "$usage"
+  lxc_clone_ds $parent $child home lxc-data "$usage"
+
+  # (4) alter hostname from /etc/hosts and /etc/hostname
+  echo $child > $child_rootfs/etc/hostname
+  cat $parent_home/rootfs/etc/hosts | sed \
+    -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
+}
+
+
+function lxc_copy {
+  # nice local names for args
+  local parent="$1"
+  local child="$2"
+  local usage="$3"
+
+  if [ -z "$parent" ]; then
+    msg_error "Parameters not provided. Aborting ..."
+    exit 1
+  fi
+
+  if [ -z "$child" ]; then
+    msg_error "Child parameter not provided. Aborting ..."
+    exit 1
+  fi
+
+  # keep it tight with convenience vars
+  local parent_home=/var/lib/lxc/$parent
+  local parent_conf=$parent_home/config
+  local child_home=/var/lib/lxc/$child
+  local child_rootfs=$child_home/rootfs
+  local child_conf=$child_home/config
+
+  # (1) perform sanity checks
+  lxc_assert_no $child "`usage`"
+  lxc_assert $parent "`usage`"
+
+  if [ "`zfs_is_template $parent`" == "true" ]; then
+    msg_error "Parent \"$parent\" must not be a template for a copy op"
+    exit 1
+  else
+    msg_info "    - parent \"$parent\" is not a template"
+  fi
+
+  # (2) setup skeleton of new cloned child container
+  mkdir -p $child_rootfs
+  local mac=`lxc_new_mac`
+  cat $parent_conf | sed                                           \
+     -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
+     -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
+     -e "s/\/var\/lib\/lxc\/$parent\//\/var\/lib\/lxc\/$child\//g" \
+     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $child/"  \
+     -e "s/lxc\.network\.hwaddr.*/lxc\.network\.hwaddr = $mac/"    \
+     -e "s/$parent-/$child-/g" | grep -v subutai.git.uuid >> $child_conf
+  cp $parent_home/fstab $child_home
+
+  # (3) zfs clone child datasets
+  grand_parent="`zfs_get_parent $parent`"
+  zfs_copy_ds "lxc/$parent" "lxc/$child"
+  zfs set mountpoint="$child_rootfs" "lxc/$child"
+  zfs_copy_ds "lxc/$parent-opt" "lxc/$child-opt"
+  zfs_copy_ds "lxc-data/$parent-var" "lxc-data/$child-var"
+  zfs_copy_ds "lxc-data/$parent-home" "lxc-data/$child-home"
+
+  # (4) alter hostname from /etc/hosts and /etc/hostname
+  echo $child > $child_rootfs/etc/hostname
+  cat $parent_home/rootfs/etc/hosts | sed \
+    -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
+}
+
+
+function lxc_rename {
+  local src="$1"
+  local dst="$2"
+  local usage="$3"
+
+  if [ -z "$src" ]; then
+    msg_error "Parameters not provided for source container. Aborting ..."
+    exit 1
+  fi
+
+  if [ -z "$dst" ]; then
+    msg_error "Parameters not provided for destination container. Aborting ..."
+    exit 1
+  fi
+
+  # keep it tight with convenience vars
+  local src_home=/var/lib/lxc/$src
+  local src_conf=$src_home/config
+  local dst_home=/var/lib/lxc/$dst
+  local dst_rootfs=$dst_home/rootfs
+  local dst_conf=$dst_home/config
+
+  # (1) perform sanity checks
+  lxc_assert_no $dst "`usage`"
+  lxc_assert $src "`usage`"
+
+  if [ "`zfs_is_template $src`" == "true" ]; then
+    msg_error "Source \"$src\" must not be a template for a rename op"
+    exit 1
+  fi
+
+  # (2) setup skeleton of destination container
+  mkdir -p "$dst_rootfs"
+  cat "$src_conf" | sed                                           \
+     -e "s/lxc\.utsname.*/lxc\.utsname = $dst/"                   \
+     -e "s/\/var\/lib\/lxc\/$src\//\/var\/lib\/lxc\/$dst\//g"     \
+     -e "s/subutai\.git\.branch.*/subutai\.git\.branch = $dst/"   \
+     -e "s/$src-/$dst-/g" | grep -v subutai.git.uuid >> "$dst_conf"
+  cp "$src_home/fstab" "$dst_home"
+  
+  lxc_stop "$src"
+  
+  # umount all the partitions
+  umount "/lxc-data/$src-home"
+  umount "/lxc-data/$src-var"
+  umount "/lxc/$src-opt"
+  umount "/var/lib/lxc/$src/rootfs"
+  
+  # rename datasets and set mount point for rootfs
+  zfs rename "lxc-data/$src-home" "lxc-data/$dst-home"
+  zfs rename "lxc-data/$src-var"  "lxc-data/$dst-var"
+  zfs rename "lxc/$src-opt" "lxc/$dst-opt"
+  zfs rename "lxc/$src" "lxc/$dst"
+  zfs set mountpoint="$dst_rootfs" "lxc/$dst"
+
+  zfs mount "lxc/$dst"
+  zfs mount "lxc/$dst-opt"
+  zfs mount "lxc-data/$dst-home"
+  zfs mount "lxc-data/$dst-var"
+
+  # change the hostname
+  echo "$dst" > "$dst_rootfs/etc/hostname"
+  str_replace_in_file "$src" "$dst" "$dst_rootfs/etc/hosts"
+
+  # cleanup the old source, start up the new container, and adjust git
+  rm -rf "/var/lib/lxc/$src"
+  lxc_wait_net "$dst"
+  git_rename_branch "$src" "$dst"
+  lxc_stop "$dst"
+}
+
+

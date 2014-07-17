@@ -1,21 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
 # Exit on error
 set -e
 
-tar -xpzf /opt/oozie-3.3.2-distro.tar.gz -C /opt
-rm -rf /opt/oozie-3.3.2-distro.tar.gz
-tar -xpzf /opt/libext.tar.gz -C /opt/oozie-3.3.2
-rm -rf /opt/libext.tar.gz
-tar -xpzf /opt/ext-2.2.tar.gz -C /opt/oozie-3.3.2
-rm -rf /opt/ext-2.2.tar.gz
-
 . /etc/profile
+
 if [ "x$OOZIE_SERVER_HOME" = "x" ];
 then
         OOZIE_SERVER_HOME=/opt/oozie-3.3.2
 fi
 
-cd /opt  
+pushd /opt
 $OOZIE_SERVER_HOME/bin/oozie-setup.sh -extjs $OOZIE_SERVER_HOME/ext-2.2
 $OOZIE_SERVER_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
+if [ -f "oozie.sql" ]; then
+    rm oozie.sql
+fi
+popd
