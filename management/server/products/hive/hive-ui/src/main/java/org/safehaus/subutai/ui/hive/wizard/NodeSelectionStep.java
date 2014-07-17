@@ -3,15 +3,14 @@ package org.safehaus.subutai.ui.hive.wizard;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.ui.hive.HiveUI;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.ui.hive.HiveUI;
 
 public class NodeSelectionStep extends Panel {
 
@@ -42,10 +41,20 @@ public class NodeSelectionStep extends Panel {
 				serverNode.removeAllItems();
 				select.setValue(null);
 				if (event.getProperty().getValue() != null) {
-					Config hadoopInfo = (Config) event.getProperty().getValue();
+                    Config hadoopInfo = (Config)event.getProperty().getValue();
+                    List<Agent> slaves = hadoopInfo.getAllSlaveNodes();
 					for (Agent a : hadoopInfo.getAllNodes()) {
-						serverNode.addItem(a);
-						serverNode.setItemCaption(a, a.getHostname());
+                        serverNode.addItem(a);
+                        String caption = a.getHostname();
+                        if(hadoopInfo.getJobTracker().equals(a))
+                            caption += " [Job tracker]";
+                        else if(hadoopInfo.getNameNode().equals(a))
+                            caption += " [Name node]";
+                        else if(hadoopInfo.getSecondaryNameNode().equals(a))
+                            caption += " [Name node 2]";
+                        else if(slaves.contains(a))
+                            caption += " [Slave node]";
+                        serverNode.setItemCaption(a, caption);
 					}
 					select.setContainerDataSource(new BeanItemContainer<>(
 									Agent.class, hadoopInfo.getAllNodes())
