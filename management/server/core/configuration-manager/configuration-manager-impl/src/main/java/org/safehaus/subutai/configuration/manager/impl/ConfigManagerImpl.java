@@ -6,7 +6,6 @@
 package org.safehaus.subutai.configuration.manager.impl;
 
 
-import org.safehaus.subutai.configuration.manager.api.Config;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigurationLoader;
@@ -15,6 +14,8 @@ import org.safehaus.subutai.configuration.manager.impl.utils.XMLConfigurationLoa
 import org.safehaus.subutai.configuration.manager.impl.utils.YamConfigurationlLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.gson.JsonObject;
+
 
 /**
  * This is an implementation of LxcManager
@@ -22,20 +23,22 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public class ConfigManagerImpl implements ConfigManager {
 
     @Override
-    public void injectConfiguration( Agent agent, Config config ) {
+    public void injectConfiguration( Agent agent, JsonObject config ) {
 
         //TODO echo to given agent
         ConfigurationLoader configurationLoader = null;
-        switch ( config.getConfigTypeEnum() ) {
-            case YAML: {
+
+        String type = "";
+        switch ( type ) {
+            case "YAML": {
                 configurationLoader = new YamConfigurationlLoader();
                 break;
             }
-            case PROPERTIES: {
+            case "PROPERTIES": {
                 configurationLoader = new PropertiesConfigurationLoader();
                 break;
             }
-            case XML: {
+            case "XML": {
                 configurationLoader = new XMLConfigurationLoader();
                 break;
             }
@@ -45,7 +48,7 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public Config getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum ) {
 
         ConfigurationLoader configurationLoader = null;
         switch ( configTypeEnum ) {
