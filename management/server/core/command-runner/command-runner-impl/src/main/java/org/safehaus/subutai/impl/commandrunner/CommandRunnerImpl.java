@@ -146,6 +146,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
         Preconditions.checkNotNull( commandCallback, "Callback is null" );
+
         final CommandImpl commandImpl = ( CommandImpl ) command;
         Preconditions.checkArgument( commandExecutors.get( commandImpl.getCommandUUID() ) == null,
                 "" + "This command has been already queued for execution" );

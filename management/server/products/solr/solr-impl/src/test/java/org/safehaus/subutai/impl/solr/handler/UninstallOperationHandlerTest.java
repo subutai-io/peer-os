@@ -31,7 +31,7 @@ public class UninstallOperationHandlerTest {
 
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Cluster info deleted" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation info deleted" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED );
     }
 
@@ -42,7 +42,7 @@ public class UninstallOperationHandlerTest {
 
         operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Error while deleting cluster" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "Error while deleting installation" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
 }

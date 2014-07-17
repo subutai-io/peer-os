@@ -208,6 +208,7 @@ function lxc_clone {
   echo $child > $child_rootfs/etc/hostname
   cat $parent_home/rootfs/etc/hosts | sed \
     -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
+  echo "export PHY_HOST=`hostname`" >> $child_rootfs/etc/profile
 }
 
 

@@ -39,4 +39,5 @@
 
 
     <inherits name="com.vaadin.DefaultWidgetSet"/>
+    <inherits name="com.google.gwt.resources.Resources"/>
 </module>

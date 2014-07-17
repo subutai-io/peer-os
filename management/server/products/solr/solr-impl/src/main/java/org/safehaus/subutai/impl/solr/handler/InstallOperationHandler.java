@@ -37,7 +37,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
 
         if ( manager.getCluster( config.getClusterName() ) != null ) {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                    String.format( "Installation with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
             return;
         }
@@ -54,7 +54,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
             productOperation.addLog( "Lxc containers created successfully\nUpdating db..." );
 
             if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                productOperation.addLog( "Cluster info saved to DB\nInstalling Solr..." );
+                productOperation.addLog( "Installation info saved to DB\nInstalling Solr..." );
                 Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
                 manager.getCommandRunner().runCommand( installCommand );
 
@@ -73,11 +73,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
                 }
                 catch ( LxcDestroyException ex ) {
                     productOperation.addLogFailed(
-                            "Could not save cluster info to DB! Please see logs. Use LXC module to "
+                            "Could not save installation info to DB! Please see logs. Use LXC module to "
                                     + "cleanup\nInstallation aborted" );
                 }
                 productOperation.addLogFailed(
-                        "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+                        "Could not save installation info to DB! Please see logs\nInstallation aborted" );
             }
         }
         catch ( LxcCreateException ex ) {

@@ -185,14 +185,14 @@
       <version>${org.apache.commons.httpclient.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.jackrabbit</groupId>
-    	<artifactId>jackrabbit-webdav</artifactId>
-    	<version>${org.apache.jackrabbit.webdav.version}</version>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-webdav</artifactId>
+      <version>${org.apache.jackrabbit.webdav.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.ant</groupId>
-    	<artifactId>ant</artifactId>
-    	<version>${org.apache.ant.version}</version>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>${org.apache.ant.version}</version>
     </dependency>
 
     <dependency>
@@ -548,19 +548,19 @@
                   <version>${jsch.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>commons-httpclient</groupId>
-                  	<artifactId>commons-httpclient</artifactId>
-                  	<version>${org.apache.commons.httpclient.version}</version>
+                  <groupId>commons-httpclient</groupId>
+                  <artifactId>commons-httpclient</artifactId>
+                  <version>${org.apache.commons.httpclient.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>org.apache.jackrabbit</groupId>
-                  	<artifactId>jackrabbit-webdav</artifactId>
-                  	<version>${org.apache.jackrabbit.webdav.version}</version>
+                  <groupId>org.apache.jackrabbit</groupId>
+                  <artifactId>jackrabbit-webdav</artifactId>
+                  <version>${org.apache.jackrabbit.webdav.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>org.apache.ant</groupId>
-                  	<artifactId>ant</artifactId>
-                  	<version>${org.apache.ant.version}</version>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant</artifactId>
+                  <version>${org.apache.ant.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.yaml</groupId>
@@ -628,6 +628,18 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>tracker-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- FS Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -752,41 +764,41 @@
 
                 <!-- LXC Manager -->
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-ui</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-ui</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-api</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-api</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-impl</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-impl</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
 
                 <!-- Template Manager -->
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-api</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-api</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-impl</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-impl</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-cli</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-cli</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-rest</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-rest</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
 
                 <!--Network Manager -->
@@ -854,6 +866,18 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>environment-manager-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- File Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

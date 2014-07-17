@@ -28,7 +28,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
 
         if ( config == null ) {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -58,7 +58,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
             }
             else {
                 productOperation.addLogFailed(
-                        "Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
+                        "Error while updating installation info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
             }
         }
         catch ( LxcCreateException ex ) {
