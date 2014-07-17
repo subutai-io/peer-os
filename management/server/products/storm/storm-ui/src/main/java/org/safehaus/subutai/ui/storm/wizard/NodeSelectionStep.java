@@ -44,7 +44,8 @@ public class NodeSelectionStep extends Panel {
                 public void valueChange(Property.ValueChangeEvent e) {
                     masterNodeCombo.removeAllItems();
                     if(e.getProperty().getValue() != null) {
-                        org.safehaus.subutai.api.zookeeper.Config zk = e.getProperty().getValue();
+                        org.safehaus.subutai.api.zookeeper.Config zk
+                                = (org.safehaus.subutai.api.zookeeper.Config)e.getProperty().getValue();
                         for(Agent a : zk.getNodes()) {
                             masterNodeCombo.addItem(a);
                             masterNodeCombo.setItemCaption(a, a.getHostname());
