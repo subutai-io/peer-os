@@ -3,12 +3,12 @@ package org.safehaus.subutai.configuration.manager.impl.utils;
 
 import java.io.File;
 
-import org.safehaus.subutai.configuration.manager.api.Config;
-import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+
+import com.google.gson.JsonObject;
 
 
 /**
@@ -21,7 +21,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
     // Maps configuration into Config object
     @Override
-    public Config getConfiguration( Agent agent, String configPathFilename ) {
+    public JsonObject getConfiguration( Agent agent, String configPathFilename ) {
 
         try {
             //TODO cat file from given agent, convert to required format, detect types and form a Config
@@ -31,9 +31,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             //TODO properties to Config converter code
             //            return configuration;
             //            Object o = configuration.getProperty( "log4j.appender.DRFA.layout" );
-            Config config = new Config();
-            config.setPath( configPathFilename );
-            config.setConfigTypeEnum( ConfigTypeEnum.PROPERTIES );
+            JsonObject jsonObject = new JsonObject();
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();
@@ -43,7 +41,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public void setConfiguration( final Agent agent, Config config ) {
+    public void setConfiguration( final Agent agent, JsonObject config ) {
         //TODO Read config from instance, set values from Config, inject Config
     }
 }

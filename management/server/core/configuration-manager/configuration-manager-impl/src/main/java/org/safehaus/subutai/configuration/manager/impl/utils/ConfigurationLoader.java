@@ -1,8 +1,9 @@
 package org.safehaus.subutai.configuration.manager.impl.utils;
 
 
-import org.safehaus.subutai.configuration.manager.api.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import com.google.gson.JsonObject;
 
 
 /**
@@ -10,7 +11,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public interface ConfigurationLoader {
 
-    public Config getConfiguration( Agent agent, String configPathFilename );
+    public JsonObject getConfiguration( Agent agent, String configPathFilename );
 
-    public void setConfiguration( Agent agent, Config config );
+    public void setConfiguration( Agent agent, JsonObject config );
 }
