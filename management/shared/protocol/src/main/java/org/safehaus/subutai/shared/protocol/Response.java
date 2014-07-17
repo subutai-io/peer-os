@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.shared.protocol;
 
 import com.google.common.base.Preconditions;
@@ -9,6 +5,7 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,9 +13,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 
-/**
- * @author Dilshat
- */
 public class Response implements Serializable {
 
     private String source;
@@ -37,7 +31,13 @@ public class Response implements Serializable {
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
+
+    // inotify fields
     private String confPoints[];
+    private String configPoint;
+    private String changeType;
+    private String dateTime;
+
 
     public String getParentHostName() {
         return parentHostName;
@@ -123,6 +123,21 @@ public class Response implements Serializable {
     }
 
 
+    public String getChangeType() {
+        return changeType;
+    }
+
+
+    public String getConfigPoint() {
+        return configPoint;
+    }
+
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+
     public boolean isFinal() {
         return ResponseType.EXECUTE_RESPONSE_DONE.equals(type)
                 || ResponseType.EXECUTE_TIMEOUT.equals(type)
@@ -162,6 +177,9 @@ public class Response implements Serializable {
         .append( "isLxc", isLxc )
         .append( "transportId", transportId )
         .append( "confPoints", confPoints )
+        .append( "changeType", changeType )
+        .append( "configPoint", configPoint )
+        .append( "dateTime", dateTime )
         .toString();
     }
 

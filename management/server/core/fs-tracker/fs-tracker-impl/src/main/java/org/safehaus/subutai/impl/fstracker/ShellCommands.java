@@ -103,14 +103,14 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
 
         communicationManager.addListener( this );
 
-        Agent firstAgent = agentManager.getAgents().iterator().next();
+        Agent agent = agentManager.getAgentByUUID( UUID.fromString( "2a6dbdcd-daf9-40cb-9271-e6daed300325" ) );
 
 //        communicationManager.sendRequest( getRequest( firstAgent.getUuid() ) );
 
         org.safehaus.subutai.api.commandrunner.Command command =
-//                doCancel( firstAgent )
-                doShow( firstAgent )
-//                doRequest( firstAgent )
+//                doCancel( agent )
+//                doShow( agent )
+                doRequest( agent )
         ;
 
         commandRunner.runCommandAsync( command );
@@ -171,8 +171,15 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
     }
 
 
+//    Modify_file, Delete_File, Create_File, Create_Folder, Delete_Folder
+
     public void onResponse( Response response ) {
-        if ( response != null && response.getType() == ResponseType.INOTIFY_SHOW_RESPONSE ) {
+        if ( response == null ) {
+            return;
+        }
+
+        if ( response.getType() == ResponseType.INOTIFY_RESPONSE
+                || response.getType() == ResponseType.INOTIFY_SHOW_RESPONSE ) {
             System.out.println( "response: " + response );
         }
     }
