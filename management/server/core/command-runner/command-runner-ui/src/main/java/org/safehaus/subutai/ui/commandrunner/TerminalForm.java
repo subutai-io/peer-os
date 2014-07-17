@@ -227,7 +227,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 				taskCount--;
 				if (taskCount == 0) {
-					System.out.println(output[0]);
 					show(output[0]);
 					indicator.setVisible(false);
 				}
