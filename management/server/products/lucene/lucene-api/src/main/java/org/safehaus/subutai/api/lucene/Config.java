@@ -1,52 +1,67 @@
 package org.safehaus.subutai.api.lucene;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 
 public class Config implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Lucene";
+    public static final String PRODUCT_KEY = "Lucene";
 
-	private String clusterName = "";
+    private String clusterName = "";
+    private String luceneClusterName = "";
 
-	private Set<Agent> nodes = new HashSet<>();
-
-
-	@Override
-	public String getClusterName() {
-		return clusterName;
-	}
+    private Set<Agent> nodes = new HashSet<>();
 
 
-	public Config setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-		return this;
-	}
+    public String getLuceneClusterName() {
+        return luceneClusterName;
+    }
 
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public void setLuceneClusterName( final String luceneClusterName ) {
+        this.luceneClusterName = luceneClusterName;
+    }
 
 
-	public void setNodes(Set<Agent> nodes) {
-		this.nodes = nodes;
-	}
+    @Override
+    public String getClusterName() {
+        return clusterName;
+    }
 
 
-	@Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
-	}
+    public Config setClusterName( String clusterName ) {
+        this.clusterName = clusterName;
+        return this;
+    }
 
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
+    public Set<Agent> getNodes() {
+        return nodes;
+    }
+
+
+    public void setNodes( Set<Agent> nodes ) {
+        this.nodes = nodes;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Config{" +
+                "clusterName='" + clusterName + '\'' +
+                ", luceneClusterName='" + luceneClusterName + '\'' +
+                ", nodes=" + nodes +
+                '}';
+    }
+
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
 }
