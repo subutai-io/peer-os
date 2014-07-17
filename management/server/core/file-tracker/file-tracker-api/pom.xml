@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>fs-tracker-parent</artifactId>
+    <artifactId>file-tracker-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>fs-tracker-api</artifactId>
+  <artifactId>file-tracker-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai FS Modification Tracker Api</name>
+  <name>File Tracker Api</name>
 
   <dependencies>
     <dependency>
