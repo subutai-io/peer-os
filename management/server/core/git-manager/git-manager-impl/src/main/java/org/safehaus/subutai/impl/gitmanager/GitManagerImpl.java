@@ -1,6 +1,7 @@
 package org.safehaus.subutai.impl.gitmanager;
 
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -12,8 +13,10 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.gitmanager.GitBranch;
+import org.safehaus.subutai.api.gitmanager.GitChangedFile;
 import org.safehaus.subutai.api.gitmanager.GitCommand;
 import org.safehaus.subutai.api.gitmanager.GitException;
+import org.safehaus.subutai.api.gitmanager.GitFileStatus;
 import org.safehaus.subutai.api.gitmanager.GitManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.settings.Common;
@@ -44,6 +47,70 @@ public class GitManagerImpl implements GitManager {
 
 
     public void destroy() {}
+
+
+    @Override
+    public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1 )
+            throws GitException {
+        return diffBranches( host, repositoryRoot, branchName1, MASTER_BRANCH );
+    }
+
+
+    @Override
+    public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1,
+                                              final String branchName2 ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName1 ), "Branch name 1 is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
+
+        Command diffCommand = commandRunner.createCommand(
+                new RequestBuilder( String.format( "git diff --name-status %s %s", branchName1, branchName2 ) )
+                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+
+        runCommand( diffCommand, host, GitCommand.DIFF, false );
+
+        StringTokenizer lines = new StringTokenizer( diffCommand.getResults().get( host.getUuid() ).getStdOut(), "\n" );
+
+        List<GitChangedFile> gitChangedFiles = new ArrayList<>();
+
+        while ( lines.hasMoreTokens() ) {
+            String line = lines.nextToken();
+
+            if ( line != null ) {
+                String[] ss = line.split( "\\s+" );
+                if ( ss.length == 2 ) {
+                    gitChangedFiles.add( new GitChangedFile( convertStatus( ss[0] ), ss[1] ) );
+                }
+            }
+        }
+
+        return gitChangedFiles;
+    }
+
+
+    @Override
+    public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
+                            final String filePath ) throws GitException {
+        return diffFile( host, repositoryRoot, branchName1, MASTER_BRANCH, filePath );
+    }
+
+
+    @Override
+    public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
+                            final String branchName2, final String filePath ) throws GitException {
+        validateHostNRepoRoot( host, repositoryRoot );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName1 ), "Branch name 1 is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
+
+        Command diffCommand = commandRunner.createCommand(
+                new RequestBuilder( String.format( "git diff %s %s %s", branchName1, branchName2, filePath ) )
+                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+
+        runCommand( diffCommand, host, GitCommand.DIFF, false );
+
+        return diffCommand.getResults().get( host.getUuid() ).getStdOut();
+    }
 
 
     @Override
@@ -179,9 +246,9 @@ public class GitManagerImpl implements GitManager {
         validateHostNRepoRoot( host, targetDir );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), "Branch name is null or empty" );
 
-        Command cloneCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir ) )
-                        .withTimeout( 180 ), Sets.newHashSet( host ) );
+        Command cloneCommand = commandRunner.createCommand( new RequestBuilder(
+                String.format( "git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir ) )
+                .withTimeout( 180 ), Sets.newHashSet( host ) );
 
         runCommand( cloneCommand, host, GitCommand.CLONE );
     }
@@ -417,5 +484,27 @@ public class GitManagerImpl implements GitManager {
         }
 
         return stashes;
+    }
+
+
+    private GitFileStatus convertStatus( String status ) {
+        switch ( status ) {
+            case "M":
+                return GitFileStatus.MODIFIED;
+            case "C":
+                return GitFileStatus.COPIED;
+            case "R":
+                return GitFileStatus.RENAMED;
+            case "A":
+                return GitFileStatus.ADDED;
+            case "D":
+                return GitFileStatus.DELETED;
+            case "U":
+                return GitFileStatus.UNMERGED;
+            case "X":
+                return GitFileStatus.UNVERSIONED;
+            default:
+                return GitFileStatus.UNMODIFIED;
+        }
     }
 }

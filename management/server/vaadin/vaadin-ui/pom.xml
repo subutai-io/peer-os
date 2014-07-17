@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
+ * NovaForge(TM) is a web-based forge offering a Collaborative Development and
  * Project Management Environment.
  *
  * Copyright (C) 2007-2012  BULL SAS
@@ -54,6 +54,8 @@
                             com.vaadin.data.*;
                             com.vaadin.server.*;
                             com.vaadin.event.*;
+                            com.vaadin.client.*;
+                            com.google.gwt.*;
                         </Export-Package>
 
                         <!-- Package format version - do not change -->

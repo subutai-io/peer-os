@@ -10,6 +10,7 @@ import java.util.List;
 
 
 /**
+ * Class to work with templates registry, templates metadata
  */
 public interface TemplateRegistryManager {
 
@@ -29,6 +30,13 @@ public interface TemplateRegistryManager {
     public void unregisterTemplate( String templateName );
 
     /**
+     * Removes template entry from registry
+     *
+     * @param templateName - name of template to remove
+     */
+    public void unregisterTemplate( String templateName, String lxcArch );
+
+    /**
      * Returns template by name
      *
      * @param templateName - name of template
@@ -36,6 +44,15 @@ public interface TemplateRegistryManager {
      * @return - {@code Template}
      */
     public Template getTemplate( String templateName );
+
+    /**
+     * Returns template by name
+     *
+     * @param templateName - name of template
+     *
+     * @return - {@code Template}
+     */
+    public Template getTemplate( String templateName, String lxcArch );
 
     /**
      * Returns templates belonging to this parent
@@ -47,6 +64,15 @@ public interface TemplateRegistryManager {
     public List<Template> getChildTemplates( String parentTemplateName );
 
     /**
+     * Returns templates belonging to this parent
+     *
+     * @param parentTemplateName - parent template name
+     *
+     * @return - list of {@code Template}
+     */
+    public List<Template> getChildTemplates( String parentTemplateName, String lxcArch );
+
+    /**
      * Returns parent template
      *
      * @param childTemplateName - child template name
@@ -54,6 +80,15 @@ public interface TemplateRegistryManager {
      * @return -  {@code Template}
      */
     public Template getParentTemplate( String childTemplateName );
+
+    /**
+     * Returns parent template
+     *
+     * @param childTemplateName - child template name
+     *
+     * @return -  {@code Template}
+     */
+    public Template getParentTemplate( String childTemplateName, String lxcArch );
 
     /**
      * Returns templates in genealogical hierarchy
@@ -70,4 +105,13 @@ public interface TemplateRegistryManager {
      * @return - list of {@code Template}
      */
     public List<Template> getParentTemplates( String childTemplateName );
+
+    /**
+     * Returns list of all parent templates starting from MASTER
+     *
+     * @param childTemplateName - name of template whose parents to return
+     *
+     * @return - list of {@code Template}
+     */
+    public List<Template> getParentTemplates( String childTemplateName, String lxcArch );
 }

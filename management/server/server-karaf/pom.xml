@@ -120,6 +120,82 @@
             <version>${org.apache.cassandra.version}</version>
         </dependency>
         <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>${org.apache.commons.configuration.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>${org.apache.commons.jxpath.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${org.apache.commons.lang.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl</artifactId>
+            <version>${org.apache.commons.jexl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${org.apache.commons.beanutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${org.apache.commons.collections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${org.apache.commons.codec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>${org.apache.commons.digester.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>${org.jdom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>${org.apache.commons.vfs2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jsch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>${org.apache.commons.httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <version>${org.apache.jackrabbit.webdav.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${org.apache.ant.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-thrift</artifactId>
             <version>${org.apache.cassandra.version}</version>
@@ -431,6 +507,81 @@
                                     <artifactId>cassandra-thrift</artifactId>
                                     <version>${org.apache.cassandra.version}</version>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-configuration</groupId>
+                                    <artifactId>commons-configuration</artifactId>
+                                    <version>${org.apache.commons.configuration.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-digester</groupId>
+                                    <artifactId>commons-digester</artifactId>
+                                    <version>${org.apache.commons.digester.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-jxpath</groupId>
+                                    <artifactId>commons-jxpath</artifactId>
+                                    <version>${org.apache.commons.jxpath.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-lang</groupId>
+                                    <artifactId>commons-lang</artifactId>
+                                    <version>${org.apache.commons.lang.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.commons</groupId>
+                                    <artifactId>commons-jexl</artifactId>
+                                    <version>${org.apache.commons.jexl.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.jdom</groupId>
+                                    <artifactId>jdom</artifactId>
+                                    <version>${org.jdom.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.commons</groupId>
+                                    <artifactId>commons-vfs2</artifactId>
+                                    <version>${org.apache.commons.vfs2.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.jcraft</groupId>
+                                    <artifactId>jsch</artifactId>
+                                    <version>${jsch.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-httpclient</groupId>
+                                    <artifactId>commons-httpclient</artifactId>
+                                    <version>${org.apache.commons.httpclient.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.jackrabbit</groupId>
+                                    <artifactId>jackrabbit-webdav</artifactId>
+                                    <version>${org.apache.jackrabbit.webdav.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.ant</groupId>
+                                    <artifactId>ant</artifactId>
+                                    <version>${org.apache.ant.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.yaml</groupId>
+                                    <artifactId>snakeyaml</artifactId>
+                                    <version>${snakeyaml.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-beanutils</groupId>
+                                    <artifactId>commons-beanutils</artifactId>
+                                    <version>${org.apache.commons.beanutils.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-collections</groupId>
+                                    <artifactId>commons-collections</artifactId>
+                                    <version>${org.apache.commons.collections.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-codec</groupId>
+                                    <artifactId>commons-codec</artifactId>
+                                    <version>${org.apache.commons.codec.version}</version>
+                                </artifactItem>
 
                                 <!-- Vaadin - START -->
                                 <artifactItem>
@@ -616,6 +767,28 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Template Manager -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>template-manager-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!--Network Manager -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -697,21 +870,26 @@
                                 </artifactItem>
 
                                 <!-- Configuration Manager -->
-                                <!--<artifactItem>
-                                  <groupId>org.safehaus.subutai</groupId>
-                                  <artifactId>configuration-manager-api</artifactId>
-                                  <version>${project.version}</version>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>configuration-manager-api</artifactId>
+                                    <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                  <groupId>org.safehaus.subutai</groupId>
-                                  <artifactId>configuration-manager-impl</artifactId>
-                                  <version>${project.version}</version>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>configuration-manager-impl</artifactId>
+                                    <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                  <groupId>org.safehaus.subutai</groupId>
-                                  <artifactId>configuration-manager-cli</artifactId>
-                                  <version>${project.version}</version>
-                                </artifactItem>-->
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>configuration-manager-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>configuration-manager-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Core Modules - END -->
 

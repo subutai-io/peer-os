@@ -1,4 +1,2 @@
 #!/bin/sh
-
-tar -xpzf /opt/lucene-4.4.0.tgz -C /opt
-rm -rf /opt/lucene-4.4.0.tgz
+set -e

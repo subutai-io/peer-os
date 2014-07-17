@@ -2,9 +2,9 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
 
-  <bean id="configManager" scope="singleton" class="org.safehaus.subutai.impl.manager.ConfigManagerImpl">
+  <bean id="configManager" scope="singleton" class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
   </bean>
 
-  <service ref="configManager" interface="org.safehaus.subutai.api.manager.ConfigManager" />
+  <service ref="configManager" interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
 
 </blueprint>

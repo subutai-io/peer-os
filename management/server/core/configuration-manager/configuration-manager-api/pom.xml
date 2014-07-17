@@ -24,6 +24,16 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mgmt-shared-protocol</artifactId>
     </dependency>
+    <!--<dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
+      <version>7.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-server</artifactId>
+      <version>7.2.1</version>
+    </dependency>-->
   </dependencies>
 
   <build>

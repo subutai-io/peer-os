@@ -32,3 +32,13 @@ create table template_registry_info(
   primary key (template)
 );
 create INDEX on template_registry_info (parent);
+
+create table nodes (
+  uuid      text,
+  env_id    text,
+  info      text,
+  primary key (uuid)
+);
+create index on nodes(env_id);
+
+

@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
@@ -50,17 +50,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
 
-        Blueprint blueprint = blueprintParser.parseBlueprint( blueprintStr );
+        EnvironmentBlueprint blueprint = ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
         return build( blueprint );
     }
 
 
-    public boolean buildEnvironment( Blueprint blueprint ) {
+    public boolean buildEnvironment( EnvironmentBlueprint blueprint ) {
         return build( blueprint );
     }
 
 
-    private boolean build( Blueprint blueprint ) {
+    private boolean build( EnvironmentBlueprint blueprint ) {
         if ( blueprint != null ) {
             try {
                 Environment environment = environmentBuilder.build( blueprint );
@@ -117,15 +117,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        Blueprint blueprint = blueprintParser.parseBlueprint( blueprintStr );
+        EnvironmentBlueprint blueprint = ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
         boolean saveResult = environmentDAO.saveBlueprint( blueprint );
         return saveResult;
     }
 
 
     @Override
-    public List<Blueprint> getBlueprints() {
-        List<Blueprint> blueprints = environmentDAO.getBlueprints();
+    public List<EnvironmentBlueprint> getBlueprints() {
+        List<EnvironmentBlueprint> blueprints = environmentDAO.getBlueprints();
         return blueprints;
     }
 

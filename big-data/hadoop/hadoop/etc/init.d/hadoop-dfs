@@ -1,18 +1,22 @@
 #!/bin/bash
 # Starts, stops, restarts and shows status of hadoop NameNode, DataNodes and SecondaryNameNode.
 
+if [ "x$HADOOP_HOME" = "x" ];
+then
+  HADOOP_HOME=/opt/hadoop-1.2.1
+fi
 case "$1" in
 start)
-	start-stop-daemon --start --exec /opt/hadoop-1.2.1/bin/start-dfs.sh
+        start-stop-daemon --start --exec $HADOOP_HOME/bin/start-dfs.sh
 ;;
 
 stop)
-	start-stop-daemon --start --exec /opt/hadoop-1.2.1/bin/stop-dfs.sh
+        start-stop-daemon --start --exec $HADOOP_HOME/bin/stop-dfs.sh
 ;;
 
 restart)
-	$0 stop
-	$0 start
+        $0 stop
+        $0 start
 ;;
 
 status)

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-. /etc/subutai/config
-. /etc/subutai/funcs
-
-echo args="$@"
-
-

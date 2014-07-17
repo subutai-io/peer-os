@@ -1,0 +1,94 @@
+#!/bin/bash
+
+
+function usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Publishes the templates debian pkg to the site template registry
+  echo
+  echo "        "subutai export template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for exporting a template
+# -----------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - defer exports of master to the subutai-master-export script
+#     - template container MUST exist
+#     - container MUST be a template with the '@template' snapshot
+#     - container parent MUST be present in the template registry
+# (2) generate delta images of all filesystems: 
+#     'pool/parent-partition@child' -> 'pool/child-partition@template'
+# (3) generate the debian file deltas, and package info
+
+function publish {
+  local container="$1"
+
+  # ----------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ----------------------------------------------------------------------------
+
+  lxc_assert $container "`usage`"
+
+  if [ "$container" == "master" ]; then
+    subutai-master-export
+    exit $?
+  fi
+
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+
+  if [ -f $debian_file ]; then
+    msg_error "It seems the debian file has already been generated"
+    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
+    exit 1
+  fi
+
+  # check to make sure the container is a template
+  if [ "`zfs_is_template $container`" == "false" ]; then
+    msg_error "Container \"$container\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$container\" is a template"
+  fi
+
+  # check to make sure container is registered as a template
+  if [ "`is_registered $container`" == "false" ]; then
+    msg_error "Container \"$container\" NOT registered as template. Aborting ..."
+    exit 1
+    else
+    msg_info "    - check passed: \"$container\" is registered"
+  fi
+
+  parent=`zfs_get_parent $container`
+  lxc_assert $parent
+  # check to make sure the parent is a template
+  if [ "`zfs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
+  # ----------------------------------------------------------------------------
+  # (2) Publish the template which has the debian package under $SUBUTAI_TMPDIR 
+  # ----------------------------------------------------------------------------
+
+
+}
+
+
+function publish_description {
+  echo publish a template
+}
+
+

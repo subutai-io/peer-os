@@ -28,8 +28,8 @@
     <module>apt-repository-manager</module>
     <module>environment-manager</module>
     <module>template-registry</module>
+    <module>configuration-manager</module>
     <module>template-manager</module>
     <module>file-tracker</module>
-    <!--<module>configuration-manager</module>-->
   </modules>
 </project>

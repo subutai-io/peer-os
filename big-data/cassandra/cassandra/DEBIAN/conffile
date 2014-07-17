@@ -7,3 +7,5 @@
 /etc/cassandra/commitlog_archiving.properties
 /etc/cassandra/log4j-server.properties
 /etc/cassandra/log4j-tools.properties
+/etc/cassandra/logging.properties
+/etc/cassandra/metrics-reporter-config-sample.yaml

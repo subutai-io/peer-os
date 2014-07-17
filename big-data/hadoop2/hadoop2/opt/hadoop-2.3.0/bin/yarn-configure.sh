@@ -9,7 +9,7 @@ function usage() {
 }
 . /etc/profile
 #Paths to the configuration files
-yarn_site="${HADOOP_HOME}/conf/yarn-site.xml"
+yarn_site="/etc/hadoop/yarn-site.xml"
 
 if [[ "$1" == "rollback" ]];
 then

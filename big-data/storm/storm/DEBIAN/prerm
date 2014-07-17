@@ -1,0 +1,5 @@
+#!/bin/bash
+
+service storm-ui stop
+service storm-supervisor stop
+service storm-nimbus stop

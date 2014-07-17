@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function master_destroy {
+  echo WARNING: this destroys everything mercilessly
+  echo \<Return\> to continue, or Ctrl-C to exit
+  read
+
+  if [ -z "`zfs list lxc/master`" ]; then
+    echo No zfs dataset \'lxc/master\' found - aborting ...
+    exit 1
+  fi
+
+  zfs release keep lxc/master-opt@template
+  zfs destroy -r lxc/master-opt
+
+  zfs release keep lxc-data/master-var@template
+  zfs destroy -r lxc-data/master-var
+
+  zfs release keep lxc-data/master-home@template
+  zfs destroy -r lxc-data/master-home
+
+  zfs release keep lxc/master@template
+  zfs destroy -r lxc/master
+  lxc-destroy -n master
+  
+  # Remove relevant directories under $SUBUTAI_TMPDIR if any
+  local container="master"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+  rm -rf $debian_file
+  rm -rf $debian_root
+}
+
+
+function master_destroy_description {
+  echo destroys the master template
+}
+
+

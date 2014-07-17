@@ -1,22 +1,25 @@
 package org.safehaus.subutai.api.storm;
 
+import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
 
-import java.util.Set;
-
 public class Config implements ConfigBase {
 
-	public static final String PRODUCT_NAME = "Storm";
+    public static final String PRODUCT_NAME = "Storm";
 
     private String clusterName;
+    private int supervisorsCount;
+    private boolean externalZookeeper;
     private Agent nimbus; // master node
     private Set<Agent> supervisors; // worker nodes
 
+    @Override
     public String getClusterName() {
         return clusterName;
     }
 
+    @Override
     public String getProductName() {
         return PRODUCT_NAME;
     }
@@ -33,12 +36,28 @@ public class Config implements ConfigBase {
         this.nimbus = nimbus;
     }
 
+    public int getSupervisorsCount() {
+        return supervisorsCount;
+    }
+
+    public void setSupervisorsCount(int supervisorsCount) {
+        this.supervisorsCount = supervisorsCount;
+    }
+
     public Set<Agent> getSupervisors() {
         return supervisors;
     }
 
     public void setSupervisors(Set<Agent> supervisors) {
         this.supervisors = supervisors;
+    }
+
+    public boolean isExternalZookeeper() {
+        return externalZookeeper;
+    }
+
+    public void setExternalZookeeper(boolean externalZookeeper) {
+        this.externalZookeeper = externalZookeeper;
     }
 
 }

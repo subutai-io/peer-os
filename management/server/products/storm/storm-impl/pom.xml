@@ -73,6 +73,11 @@
             <artifactId>zookeeper-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>lxc-manager-api</artifactId>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     
 </project>

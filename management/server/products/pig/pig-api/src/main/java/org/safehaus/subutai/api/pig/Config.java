@@ -1,16 +1,18 @@
 package org.safehaus.subutai.api.pig;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Pig";
+    public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
 
     private String clusterName = "";
     private Set<Agent> nodes = new HashSet<>();

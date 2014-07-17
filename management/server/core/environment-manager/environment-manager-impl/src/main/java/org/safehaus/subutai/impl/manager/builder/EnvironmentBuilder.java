@@ -4,7 +4,7 @@ package org.safehaus.subutai.impl.manager.builder;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentNodeGroup;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
@@ -26,7 +26,7 @@ public class EnvironmentBuilder {
     }
 
 
-    public Environment build( final Blueprint blueprint ) throws EnvironmentBuildException {
+    public Environment build( final EnvironmentBlueprint blueprint ) throws EnvironmentBuildException {
         Environment environment = new Environment();
         environment.setName( blueprint.getName() );
         Set<EnvironmentNodeGroup> environmentNodeGroups = new HashSet<>();

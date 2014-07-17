@@ -1,58 +1,57 @@
-#!/bin/sh
-
+#!/bin/bash
 set -e
+. /var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/pack-funcs
 
-if ls | grep .deb ; then
-        rm  *.deb
-fi
+productName=sqoop
+downloadFileAndMakeChanges() {
+	initializeVariables $1
 
-rm -rf ksks-sqoop*/*
-cp -r ../workspace/big-data/sqoop/sqoop/* ksks-sqoop*/
-cd ksks-sqoop*
-mkdir opt
-wget -P opt http://archive.apache.org/dist/sqoop/1.4.3/sqoop-1.4.3.bin__hadoop-1.0.0.tar.gz
-tar -xvpf opt/*.tar.gz -C opt/
-rm -rf opt/*.tar.gz
-mv opt/* opt/sqoop-1.4.3
-cd -
-cp extraJar/*.jar ksks-sqoop*/opt/sqoop-1.4.3/lib
+	tempDirectory=$BASE/$fileName/opt
+	confDirectory=$BASE/$fileName/etc/sqoop
 
+	sqoopVersion=1.4.4
 
-fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+	# Create directories that are required for the debian package
+    mkdir -p $tempDirectory
+    mkdir -p $confDirectory
 
-lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+    # download sqoop
+	wget http://archive.apache.org/dist/sqoop/$sqoopVersion/sqoop-$sqoopVersion.bin__hadoop-1.0.0.tar.gz -P $tempDirectory
 
+	pushd $tempDirectory
+	# unpack tar file
+	tar -xzpf sqoop-*.tar.gz
 
-lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+	# remove tar file
+	rm sqoop-*.tar.gz
 
-version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+	# remane downloaded file -- remove hadoop-1 from file name -- 
+	mv sqoop-$sqoopVersion.bin__hadoop-1* sqoop-$sqoopVersion
 
-versionFirst=$(echo $version | awk -F"." '{print $1}')
-versionSecond=$(echo $version | awk -F"." '{print $2}')
+	# download ojdbc and mysql jar files and place them under sqoop/lib folder
+	# ojdbc 
+	wget http://www.java2s.com/Code/JarDownload/ojdbc6/ojdbc6.jar.zip -P $tempDirectory
+	unzip ojdbc6.jar.zip
+	cp ojdbc6.jar $tempDirectory/sqoop-$sqoopVersion/lib
+	rm -r ojdbc6.jar
+	rm -r ojdbc6.jar.zip
+	# mysql
+	wget http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.0.8.tar.gz -P $tempDirectory
+	tar -xzpf mysql-connector-java-5.0.8.tar.gz
+	pushd mysql-connector-java-5.0.8
+	cp mysql-connector-java-5.0.8-bin.jar $tempDirectory/sqoop-$sqoopVersion/lib
+	popd
+	rm -r mysql-connector-java-5.0.8.tar.gz 
+	rm -r mysql-connector-java-5.0.8
 
-
-
-versionThird=$(echo $version | awk -F"." '{print $3}')
-updatedVersion=$(echo `expr $versionThird + 1`)
-
-updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-updatedFileName="ksks-sqoop-"$updatedRelease"-amd64"
-
-replaceVersion="Version: $updatedRelease"
-sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
-
-{
-        mv $fileName $updatedFileName
-} || {
-        echo "Version not changed"
+	# move configuration files of sqoop under etc/
+	mv sqoop-*/conf/* $confDirectory/
+	popd
 }
-
-find ./$updatedFileName -name "*~" -print0 | xargs -0 rm -rf
-rm $updatedFileName/DEBIAN/md5sums
-md5sum `find ./$updatedFileName -type f | awk '/.\//{ print substr($0, 3) }'` >> $updatedFileName/DEBIAN/md5sums
-dpkg-deb -z8 -Zgzip --build $updatedFileName/
-
-cp *.deb ~/Automation/Bigdata/sqoop
-
+# 1) Get the sources which are downloaded from version control system
+#    to local machine to relevant directories to generate the debian package
+getSourcesToRelevantDirectories $productName
+# 2) Download tar file and make necessary changes
+downloadFileAndMakeChanges $productName
+# 3) Create the Debian package
+generateDebianPackage $productName
