@@ -17,17 +17,18 @@ var startPrompt = function () {
         if (input === "clear") {
             $('.jqconsole .jqconsole-output').remove();
             $('.jqconsole .jqconsole-old-prompt').remove();
-        }
-        // Output input with the class jqconsole-output.
-        jqconsole.Write('', 'jqconsole-output');
-        callback(input);
-        timer = setInterval(timerPromt, 500);
+        } else {
+            // Output input with the class jqconsole-output.
+            jqconsole.Write('', 'jqconsole-output');
+            callback(input);
+            timer = setInterval(timerPromt, 500);
 
-        var timeoutSec = parseInt($('#timeout_txt').val()) * 1000;
-        timeout = setTimeout(function () {
-            $('#terminal_indicator').parent().hide();
-            startPrompt();
-        }, timeoutSec);
+            var timeoutSec = parseInt($('#timeout_txt').val()) * 1000;
+            timeout = setTimeout(function () {
+                $('#terminal_indicator').parent().hide();
+                startPrompt();
+            }, timeoutSec);
+        }
     });
 };
 startPrompt();
