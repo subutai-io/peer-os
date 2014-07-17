@@ -116,10 +116,12 @@ class CommunicationMessageListener implements MessageListener {
      */
     public void addListener( ResponseListener listener ) {
         try {
-            listeners.add( listener );
+            if ( !listeners.contains( listener ) ) {
+                listeners.add( listener );
+            }
         }
         catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in addListener", ex );
+            LOG.log( Level.SEVERE, "Error to add a listener:", ex );
         }
     }
 

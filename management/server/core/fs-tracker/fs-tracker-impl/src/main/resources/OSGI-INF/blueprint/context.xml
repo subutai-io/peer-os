@@ -4,19 +4,20 @@
                interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
 
   <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
   <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
-  <bean id="fileTracker" class="org.safehaus.subutai.impl.fstracker.FSTrackerImpl"
+  <bean id="fileTracker" class="org.safehaus.subutai.impl.filetracker.FileTrackerImpl"
         init-method="init" destroy-method="destroy" scope="singleton">
-    <property name="agentManager" ref="agentManager" />
+    <property name="commandRunner" ref="commandRunner" />
+    <property name="communicationManager" ref="communicationManager" />
   </bean>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+  <!--<command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="fs-tracker/cli">
-      <action class="org.safehaus.subutai.impl.fstracker.ShellCommands">
+      <action class="org.safehaus.subutai.impl.filetracker.ShellCommands">
         <property name="fileTracker" ref="fileTracker" />
 
         <property name="communicationManager" ref="communicationManager" />
@@ -25,5 +26,14 @@
       </action>
     </command>
   </command-bundle>
+-->
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+      <command name="fs-tracker/test">
+        <action class="org.safehaus.subutai.impl.filetracker.CliTest">
+          <property name="agentManager" ref="agentManager" />
+          <property name="fileTracker" ref="fileTracker" />
+        </action>
+      </command>
+    </command-bundle>
 
 </blueprint>

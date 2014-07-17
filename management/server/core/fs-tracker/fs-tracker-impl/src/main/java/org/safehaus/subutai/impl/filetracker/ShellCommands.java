@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.fstracker;
+package org.safehaus.subutai.impl.filetracker;
 
 
 import java.util.UUID;
@@ -35,11 +35,19 @@ import org.apache.activemq.pool.PooledConnectionFactory;
 import com.google.common.collect.Sets;
 
 
+/**
+ * Needed mostly for testing FileTracker
+ */
 @Command( scope = "fs-tracker", name = "cli" )
 public class ShellCommands extends OsgiCommandSupport implements ResponseListener {
 
-
+    private AgentManager agentManager;
     private FileTracker fileTracker;
+
+
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
 
 
     public void setFileTracker( FileTracker fileTracker ) {
@@ -50,10 +58,15 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
     protected Object doExecute() {
 
         System.out.println( "fileTracker: " +fileTracker );
-        fileTracker.addListener( null );
+//        fileTracker.addListener( null );
+//        fileTracker.createConfigPoint( null, null );
+        System.out.println( "agentManager: " + agentManager );
 
         return null;
     }
+
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +76,6 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
     private ActiveMQConnectionFactory amqFactory;
     private CommunicationManager communicationManager;
     private CommandRunner commandRunner;
-    private AgentManager agentManager;
 
     public void setCommunicationManager( CommunicationManager communicationManager ) {
         this.communicationManager = communicationManager;
@@ -75,9 +87,7 @@ public class ShellCommands extends OsgiCommandSupport implements ResponseListene
     }
 
 
-    public void setAgentManager( AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
+
 
 
 

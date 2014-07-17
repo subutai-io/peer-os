@@ -1,24 +1,12 @@
-package org.safehaus.subutai.impl.fstracker;
+package org.safehaus.subutai.impl.filetracker;
 
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
-
 import org.apache.activemq.command.ActiveMQMessage;
-import org.apache.activemq.command.RemoveInfo;
 
 
 class TestMessageListener implements MessageListener {
