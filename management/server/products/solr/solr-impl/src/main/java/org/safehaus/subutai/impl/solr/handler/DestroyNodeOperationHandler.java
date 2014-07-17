@@ -25,7 +25,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( config == null ) {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -39,15 +39,10 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( !config.getNodes().contains( agent ) ) {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname, clusterName ) );
             return;
         }
 
-        if ( config.getNodes().size() == 1 ) {
-            productOperation.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
-            return;
-        }
 
         // Destroy lxc
         productOperation.addLog( "Destroying lxc container..." );
@@ -56,8 +51,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         if ( physicalAgent == null ) {
             productOperation.addLog(
                     String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                            agent.getHostname() )
-                                   );
+                            agent.getHostname() ) );
         }
         else {
             if ( !manager.getLxcManager().destroyLxcOnHost( physicalAgent, agent.getHostname() ) ) {
@@ -70,13 +64,11 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         // Update db
         productOperation.addLog( "Updating db..." );
-        config.getNodes().remove( agent );
 
-        if ( !manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        if ( !manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
             productOperation.addLogFailed(
-                    String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                            config.getClusterName() )
-                                         );
+                    String.format( "Error while updating installation info [%s] in DB. Check logs\nFailed",
+                            config.getClusterName() ) );
         }
         else {
             productOperation.addLogDone( "Done" );
