@@ -9,6 +9,8 @@
                interface="org.safehaus.subutai.api.monitor.Monitor" />
     <reference id="templateManager" availability="mandatory"
                interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
+    <reference id="templateRegistry" availability="mandatory"
+               interface ="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>    
 
@@ -26,6 +28,7 @@
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="templateManager" ref="templateManager"/>
+        <property name="templateRegistry" ref="templateRegistry"/>
         <property name="dbManager" ref="dbManager"/>
     </bean>
     
