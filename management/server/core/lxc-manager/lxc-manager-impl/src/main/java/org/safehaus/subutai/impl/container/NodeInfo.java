@@ -1,7 +1,6 @@
 package org.safehaus.subutai.impl.container;
 
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 
 class NodeInfo {
@@ -9,6 +8,7 @@ class NodeInfo {
     UUID envId;
     String templateName;
     Set<PlacementStrategyENUM> strategy;
+    List<String> products;
     UUID instanceId;
 
     public UUID getEnvId() {
@@ -33,6 +33,14 @@ class NodeInfo {
 
     public void setStrategy(Set<PlacementStrategyENUM> strategy) {
         this.strategy = strategy;
+    }
+
+    public List<String> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<String> products) {
+        this.products = products;
     }
 
     public UUID getInstanceId() {

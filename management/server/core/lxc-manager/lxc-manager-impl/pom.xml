@@ -54,6 +54,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>template-registry-api</artifactId>
+        </dependency>        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>db-manager-api</artifactId>
         </dependency>
     </dependencies>
