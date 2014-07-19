@@ -27,8 +27,7 @@
   </bean>
 
   <bean id="cassandra-configurator" scope="singleton"
-        class="org.safehaus.subutai.impl.cassandra.configuration.logic.ConfigurationLogic"
-        init-method="init" destroy-method="destroy">
+        class="org.safehaus.subutai.impl.cassandra.configuration.logic.ConfigurationLogic">
       <property name="configManager" ref="configManager"/>
   </bean>
 
