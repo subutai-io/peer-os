@@ -1,11 +1,11 @@
 package org.safehaus.subutai.api.elasticsearch;
 
 
-import java.util.UUID;
-
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
 
 public interface Elasticsearch {
 
-    public UUID startNode(String clusterName, String lxcHostname);
+    public AgentResult install( Agent agent );
 
 }

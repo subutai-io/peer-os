@@ -19,14 +19,17 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
-        </dependency>
-        <dependency>
           <groupId>org.apache.karaf.shell</groupId>
           <artifactId>org.apache.karaf.shell.console</artifactId>
         </dependency>
-
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>mgmt-shared-protocol</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>command-runner-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>elasticsearch-api</artifactId>

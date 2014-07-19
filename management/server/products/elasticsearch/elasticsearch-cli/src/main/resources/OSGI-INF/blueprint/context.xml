@@ -3,10 +3,14 @@
     <reference id="elasticsearch" availability="mandatory"
                interface="org.safehaus.subutai.api.elasticsearch.Elasticsearch"/>
 
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="elasticsearch/install">
+        <command name="elasticsearch:install">
             <action class="org.safehaus.subutai.cli.elasticsearch.InstallCommand">
                 <property name="elasticsearch" ref="elasticsearch"/>
+                <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
     </command-bundle>

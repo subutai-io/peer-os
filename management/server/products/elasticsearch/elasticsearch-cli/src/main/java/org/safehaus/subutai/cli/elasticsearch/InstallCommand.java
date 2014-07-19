@@ -1,7 +1,11 @@
 package org.safehaus.subutai.cli.elasticsearch;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
+import org.safehaus.subutai.shared.protocol.Agent;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
@@ -9,7 +13,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command( scope = "elasticsearch", name = "install" )
 public class InstallCommand extends OsgiCommandSupport {
 
+    @Argument(index = 0, name = "hostname", required = true, multiValued = false)
+    private String hostname = null;
+
     private Elasticsearch elasticsearch;
+
+    private AgentManager agentManager;
 
 
     public void setElasticsearch( Elasticsearch elasticsearch ) {
@@ -17,9 +26,20 @@ public class InstallCommand extends OsgiCommandSupport {
     }
 
 
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
     protected Object doExecute() {
 
-        System.out.println( "elasticsearch: " + elasticsearch );
+        AgentResult agentResult = elasticsearch.install( agentManager.getAgentByHostname( hostname ) );
+
+        System.out.println( "exitCode: " + agentResult.getExitCode() );
+        // error: 256
+
+        System.out.println( "stdOut: " + agentResult.getStdOut() );
+        System.out.println( "stdErr: " + agentResult.getStdErr() );
 
         return null;
     }
