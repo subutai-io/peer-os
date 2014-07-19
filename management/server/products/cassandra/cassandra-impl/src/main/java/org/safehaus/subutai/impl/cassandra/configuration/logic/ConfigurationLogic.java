@@ -20,6 +20,11 @@ public class ConfigurationLogic {
     }
 
 
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+
     public void doSomeTask() {
         configManager.injectConfiguration( null,null );
     }
