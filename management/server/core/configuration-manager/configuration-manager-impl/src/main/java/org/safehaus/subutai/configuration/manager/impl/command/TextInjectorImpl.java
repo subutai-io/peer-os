@@ -19,6 +19,12 @@ public class TextInjectorImpl implements TextInjector {
         this.commandRunner = commandRunner;
     }
 
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
     @Override
     public boolean echoTextIntoAgent( Agent agent, String path, String content ) {
         //TODO call echo command on given agent
@@ -27,15 +33,16 @@ public class TextInjectorImpl implements TextInjector {
 
         if ( catCommand.hasSucceeded() ) {
             //            po.addLog( "cat done" );
-            System.out.println("echo done!");
+            System.out.println( "echo done!" );
         }
         else {
             //            po.addLogFailed( String.format( "Installation failed, %s", catCommand.getAllErrors() ) );
-            System.out.println("echo failed!");
+            System.out.println( "echo failed!" );
             return false;
         }
         return true;
     }
+
 
     @Override
     public String catFile( Agent agent, String pathToFile ) {
@@ -45,12 +52,11 @@ public class TextInjectorImpl implements TextInjector {
 
         if ( catCommand.hasSucceeded() ) {
             //            po.addLog( "cat done" );
-            System.out.println("cat done!");
-
+            System.out.println( "cat done!" );
         }
         else {
             //            po.addLogFailed( String.format( "Installation failed, %s", catCommand.getAllErrors() ) );
-            System.out.println("cat failed!");
+            System.out.println( "cat failed!" );
             return "";
         }
         return "";
