@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>elasticsearch-parent</artifactId>
-    <name>ElasticSearch Parent</name>
+    <name>Subutai Elasticsearch Parent</name>
     <packaging>pom</packaging>
 
     <modules>

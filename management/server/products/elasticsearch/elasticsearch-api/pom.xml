@@ -11,7 +11,7 @@
 
     <artifactId>elasticsearch-api</artifactId>
     <packaging>bundle</packaging>
-    <name>ElasticSearch API</name>
+    <name>Subutai Elasticsearch API</name>
 
     <dependencies>
         <dependency>

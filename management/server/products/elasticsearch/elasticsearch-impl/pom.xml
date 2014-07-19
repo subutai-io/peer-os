@@ -11,7 +11,7 @@
 
     <artifactId>elasticsearch-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>ElasticSearch Impl</name>
+    <name>Subutai Elasticsearch Impl</name>
 
     <dependencies>
         <dependency>

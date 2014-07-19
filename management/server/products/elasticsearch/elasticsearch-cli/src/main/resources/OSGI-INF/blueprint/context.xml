@@ -1,13 +1,12 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-        >
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="flumeManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.elasticsearch.Flume"/>
+    <reference id="elasticsearch" availability="mandatory"
+               interface="org.safehaus.subutai.api.elasticsearch.Elasticsearch"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="flume/uninstall-cluster">
-            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
-                <!--<property name="flumeManager" ref="flumeManager"/>-->
+        <command name="elasticsearch/install">
+            <action class="org.safehaus.subutai.cli.elasticsearch.InstallCommand">
+                <property name="elasticsearch" ref="elasticsearch"/>
             </action>
         </command>
     </command-bundle>

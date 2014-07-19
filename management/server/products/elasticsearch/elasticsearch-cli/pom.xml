@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>elasticsearch-cli</artifactId>
-    <name>ElasticSearch CLI</name>
+    <name>Subutai Elasticsearch CLI</name>
     <packaging>bundle</packaging>
 
     <dependencies>
