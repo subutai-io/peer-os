@@ -67,7 +67,9 @@ cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
+rm $BASE/$fileName/opt/README.md
 cp -a -p $LXCSOURCE/$pattern/rootfs/var/lib/cassandra $BASE/$fileName/var/lib/
+cp -a -p $LXCSOURCE/$pattern/rootfs/opt/cassandra* $BASE/$fileName/opt/
 
 if ls *.deb ; then
         rm  *.deb
@@ -76,7 +78,6 @@ fi
 cd $BASE
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/etc $BASE/$fileName/
-cp -a $SOURCE/opt $BASE/$fileName/
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
@@ -118,7 +119,6 @@ dpkg-deb -z8 -Zgzip --build $packageName/
 chown jenkins:jenkins $packageName/DEBIAN/md5sums
 chmod -R 755 $packageName/DEBIAN/md5sums
 chown jenkins:jenkins $BASE/*.deb
-chmod -R 755 $BASE/*.deb
 
 sudo rm -rf $packageName/var/lib/*
 cp $packageName".deb" $TARGET/
