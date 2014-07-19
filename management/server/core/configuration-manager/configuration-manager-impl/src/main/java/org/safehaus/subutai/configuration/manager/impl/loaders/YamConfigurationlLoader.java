@@ -1,6 +1,7 @@
-package org.safehaus.subutai.configuration.manager.impl.utils;
+package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
+import org.safehaus.subutai.configuration.manager.impl.command.ConfigurationInjector;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.yaml.snakeyaml.Yaml;
 

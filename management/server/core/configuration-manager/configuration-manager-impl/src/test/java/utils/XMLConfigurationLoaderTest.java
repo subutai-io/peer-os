@@ -2,7 +2,7 @@ package utils;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.configuration.manager.impl.utils.XMLConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
 
 
 /**

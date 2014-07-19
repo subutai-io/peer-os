@@ -113,6 +113,10 @@
       <artifactId>ant</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -122,7 +126,10 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-runner-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

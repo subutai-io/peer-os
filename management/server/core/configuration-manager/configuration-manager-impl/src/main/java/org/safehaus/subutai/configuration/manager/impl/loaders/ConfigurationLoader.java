@@ -1,4 +1,4 @@
-package org.safehaus.subutai.configuration.manager.impl.utils;
+package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
 import org.safehaus.subutai.shared.protocol.Agent;

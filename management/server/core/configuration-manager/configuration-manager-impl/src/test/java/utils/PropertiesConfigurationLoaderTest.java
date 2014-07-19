@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.safehaus.subutai.configuration.manager.impl.utils.PropertiesConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.PropertiesConfigurationLoader;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,6 +20,11 @@ import com.google.gson.JsonObject;
 public class PropertiesConfigurationLoaderTest {
 
     @Test
+    public void convertStringToJson() {
+        System.out.println("convert");
+    }
+
+//    @Test
     public void test() {
         PropertiesConfigurationLoader loader = new PropertiesConfigurationLoader();
         //        Config o = loader.getConfiguration( null, null, null );

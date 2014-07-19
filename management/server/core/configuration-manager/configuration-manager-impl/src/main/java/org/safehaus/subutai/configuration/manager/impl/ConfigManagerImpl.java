@@ -8,10 +8,10 @@ package org.safehaus.subutai.configuration.manager.impl;
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
-import org.safehaus.subutai.configuration.manager.impl.utils.ConfigurationLoader;
-import org.safehaus.subutai.configuration.manager.impl.utils.PropertiesConfigurationLoader;
-import org.safehaus.subutai.configuration.manager.impl.utils.XMLConfigurationLoader;
-import org.safehaus.subutai.configuration.manager.impl.utils.YamConfigurationlLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.ConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.PropertiesConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.YamConfigurationlLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import com.google.gson.JsonObject;

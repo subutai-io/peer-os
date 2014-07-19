@@ -1,4 +1,4 @@
-package org.safehaus.subutai.configuration.manager.impl.utils;
+package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -37,4 +37,6 @@ public class XMLConfigurationLoader implements ConfigurationLoader {
     public void setConfiguration( final Agent agent, JsonObject config ) {
         //TODO Read config from instance, set values from Config, inject Config
     }
+
+
 }

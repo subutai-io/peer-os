@@ -6,13 +6,18 @@
         class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
     <property name="bcontext" ref="blueprintBundleContext"></property>
   </bean>-->
+  <service ref="configManager" interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+  <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
   <bean id="configManager" scope="singleton"
         init-method="start"
         class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
     <property name="bcontext" ref="blueprintBundleContext"></property>
   </bean>
-
-  <service ref="configManager" interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+  <bean id="configurationInjector" scope="singleton"
+        class="org.safehaus.subutai.configuration.manager.impl.command.ConfigurationInjector">
+    <property name="commandRunner" ref="commandRunner"></property>
+  </bean>
 
 </blueprint>
