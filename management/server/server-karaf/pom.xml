@@ -934,7 +934,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Cassandra-->
+                <!-- Cassandra -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>cassandra-api</artifactId>
@@ -961,7 +961,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--HBase-->
+                <!-- HBase -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hbase-api</artifactId>
@@ -988,7 +988,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Flume-->
+                <!-- Flume -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>flume-api</artifactId>
@@ -1042,7 +1042,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Hive-->
+                <!-- Hive -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hive-api</artifactId>
@@ -1069,7 +1069,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Hive Query-->
+                <!-- Hive Query -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hivequery-api</artifactId>
@@ -1091,7 +1091,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Lucene-->
+                <!-- Lucene -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>lucene-api</artifactId>
@@ -1118,7 +1118,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Mahout-->
+                <!-- Mahout -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mahout-api</artifactId>
@@ -1145,7 +1145,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--MongoDB-->
+                <!-- MongoDB -->
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>mongodb-api</artifactId>
@@ -1172,7 +1172,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Oozie-->
+                <!-- Oozie -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>oozie-api</artifactId>
@@ -1199,7 +1199,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Pig-->
+                <!-- Pig -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>pig-api</artifactId>
@@ -1226,7 +1226,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Presto-->
+                <!-- Presto -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>presto-api</artifactId>
@@ -1253,7 +1253,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Shark-->
+                <!-- Shark -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>shark-api</artifactId>
@@ -1280,7 +1280,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Spark-->
+                <!-- Spark -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>spark-api</artifactId>
@@ -1307,7 +1307,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Solr-->
+                <!-- Solr -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>solr-api</artifactId>
@@ -1334,7 +1334,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Sqoop-->
+                <!-- Sqoop -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>sqoop-api</artifactId>
@@ -1361,7 +1361,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Storm-->
+                <!-- Storm -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>storm-api</artifactId>
@@ -1377,9 +1377,8 @@
                   <artifactId>storm-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-                <!--Products Modules - END-->
 
-                <!--Zookeeper-->
+                <!-- Zookeeper -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>zookeeper-api</artifactId>
@@ -1405,6 +1404,24 @@
                   <artifactId>zookeeper-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+
+                <!-- ElasticSearch -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Products Modules - END -->
 
               </artifactItems>

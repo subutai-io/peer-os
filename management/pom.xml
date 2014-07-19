@@ -1212,7 +1212,26 @@
         <artifactId>hadoop-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- ElasticSearch -->
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-api</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-impl</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-cli</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+
       <!-- Products Modules - END -->
+
       <!--karaf-->
     </dependencies>
   </dependencyManagement>
