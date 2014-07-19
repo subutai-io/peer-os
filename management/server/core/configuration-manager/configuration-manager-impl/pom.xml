@@ -130,6 +130,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -143,7 +147,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.configuration.manager.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.configuration.maager.impl</Bundle-SymbolicName>
             <!--<Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>-->

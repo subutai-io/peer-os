@@ -1,7 +1,7 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
-import org.safehaus.subutai.configuration.manager.impl.command.ConfigurationInjector;
+import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.yaml.snakeyaml.Yaml;
 
@@ -32,7 +32,7 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
     @Override
     public void setConfiguration( final Agent agent, JsonObject config ) {
         // TODO Read config from instance
-        ConfigurationInjector injector = new ConfigurationInjector();
+        TextInjectorImpl injector = new TextInjectorImpl();
         String content = injector.catFile( agent, "" );
 
         // TODO set values to yaml object from Config

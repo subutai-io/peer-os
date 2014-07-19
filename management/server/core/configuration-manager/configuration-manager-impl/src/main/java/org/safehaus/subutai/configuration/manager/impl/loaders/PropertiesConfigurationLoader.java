@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
-import org.safehaus.subutai.configuration.manager.impl.command.ConfigurationInjector;
+import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigBuilder;
 import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -29,7 +29,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
     @Override
     public JsonObject getConfiguration( Agent agent, String configPathFilename ) {
 
-        ConfigurationInjector configurationInjector = new ConfigurationInjector();
+        TextInjectorImpl configurationInjector = new TextInjectorImpl();
         String content = configurationInjector.catFile( agent, configPathFilename );
 
         try {
