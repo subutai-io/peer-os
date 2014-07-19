@@ -4,6 +4,15 @@ function demote {
   echo unimplemented function binding $FUNCNAME
 }
 
+function demote_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Demotes a temlate back into a container instance.
+  echo
+  echo "        "subutai \[-qh\] demote template
+  echo
+  echo -----------------------------------------------------------------------
+}
+
 function demote_description {
   echo demotes a template back to an instance container
 }

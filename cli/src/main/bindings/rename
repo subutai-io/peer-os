@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-function usage {
+function rename_usage {
   echo -----------------------------------------------------------------------
   echo Usage: renames an instance container
   echo
-  echo "        "subutai rename oldname newname
+  echo "        "subutai \[-qh\] rename \[-n altname\] \[-c\] oldname newname
   echo
   echo -----------------------------------------------------------------------
 }

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-function export_usage {
+function register_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Exports a template as a debian pkg
+  echo Usage: Registers the template debian pkg with the site template registry
   echo
-  echo "        "subutai export template
+  echo "        "subutai register template
   echo
   echo -----------------------------------------------------------------------
 }
@@ -22,7 +22,7 @@ function export_usage {
 #     'pool/parent-partition@child' -> 'pool/child-partition@template'
 # (3) generate the debian file deltas, and package info
 
-function export {
+function publish {
   local container="$1"
 
   # ----------------------------------------------------------------------------
@@ -80,35 +80,15 @@ function export {
   fi
 
   # ----------------------------------------------------------------------------
-  # (2) generate delta images of all filesystems: 
-  #     'pool/parent-partition@child' -> 'pool/child-partition@template'
+  # (2) Publish the template which has the debian package under $SUBUTAI_TMPDIR 
   # ----------------------------------------------------------------------------
 
-  debian_root="$SUBUTAI_TMPDIR/$container"
-  deltas="$debian_root/deltas"
-  mkdir -p $deltas
-  zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
-  zfs send -I "lxc/$parent-opt@template" "lxc/$container-opt@template" > "$deltas/opt.delta"
-  zfs send -I "lxc-data/$parent-var@template" "lxc-data/$container-var@template" > "$deltas/var.delta"
-  zfs send -I "lxc-data/$parent-home@template" "lxc-data/$container-home@template" > "$deltas/home.delta"
 
-
-  # ----------------------------------------------------------------------------
-  # (3) generate the debian file from deltas, and package info
-  # ----------------------------------------------------------------------------
-
-  cp /var/lib/lxc/$container/config $debian_root
-  cp /var/lib/lxc/$container/fstab  $debian_root
-  cp /var/lib/lxc/$container/packages  $debian_root
-
-  pkg=`deb_pkg $container`
-  # Remove debian root directory after debian package generation
-  rm -rf $debian_root
 }
 
 
-function export_description {
-  echo export a template
+function register_description {
+  echo registers the template with the site registry
 }
 
 

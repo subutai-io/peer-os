@@ -1,10 +1,10 @@
 #!/bin/bash
 
-function usage {
+function destroy_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Destroy an existing container clone.
+  echo Usage: Destroy an existing container or template by name.
   echo
-  echo "        "subutai-clone-destory clone-name
+  echo "        "subutai \[-qh\] destory name
   echo
   echo -----------------------------------------------------------------------
 }
