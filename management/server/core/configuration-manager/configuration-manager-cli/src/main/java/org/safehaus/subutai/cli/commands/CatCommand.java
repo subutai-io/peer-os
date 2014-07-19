@@ -20,12 +20,18 @@ public class CatCommand extends OsgiCommandSupport {
     String hostname;
     @Argument( index = 1, name = "pathToFile", required = true, multiValued = false, description = "Path to file" )
     String pathToFile;
-    private AgentManager agentManager;
-    private TextInjector textInjector;
+
+    private static AgentManager agentManager;
+    private static TextInjector textInjector;
 
 
     public AgentManager getAgentManager() {
         return agentManager;
+    }
+
+
+    public TextInjector getTextInjector() {
+        return textInjector;
     }
 
 
