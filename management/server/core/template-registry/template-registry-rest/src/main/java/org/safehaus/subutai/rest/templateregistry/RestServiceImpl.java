@@ -127,7 +127,8 @@ public class RestServiceImpl implements RestService {
 
         for ( final Template template : templates ) {
             output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
-                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() );
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
+                  .append( TEMPLATES_DELIMITER );
         }
 
         return output.toString();
