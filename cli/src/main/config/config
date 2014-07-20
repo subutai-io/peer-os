@@ -46,9 +46,11 @@ export SUBUTAI_SITE_REPO=http://gw.intra.lan/ksks
 export SUBUTAI_OS_RELEASE_NAME=trusty
 
 # URL to REST services on management server
+export SUBUTAI_REST_IP=
+export SUBUTAI_REST_PORT=
+export SUBUTAI_REST_PATH=
 # Below are paths to specific actions, do not inclue leading and trailing
 # slashes in paths
-export SUBUTAI_REST_URL=http://172.16.1.146:8181/cxf
 export SUBUTAI_REST_REGISTER_PATH=template/import
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/get_template
 
