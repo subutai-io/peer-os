@@ -8,4 +8,12 @@ public interface Elasticsearch {
 
     public AgentResult install( Agent agent );
 
+    public AgentResult remove( Agent agent );
+
+    public AgentResult serviceStart( Agent agent );
+
+    public AgentResult serviceStop( Agent agent );
+
+    public AgentResult serviceStatus( Agent agent );
+
 }

@@ -18,7 +18,10 @@ public class ElasticsearchImpl implements Elasticsearch {
     public static final String REMOVE = "apt-get --force-yes --assume-yes purge ksks-elasticsearch";
 
     public static final String SERVICE_START = "service elasticsearch start";
+    // unrecognized: 256; success: 0;
+
     public static final String SERVICE_STOP = "service elasticsearch stop";
+    // success: 0;
 
     public static final String SERVICE_STATUS = "service elasticsearch status";
     // not running: 768; running: 0; unrecognized: 256
@@ -42,7 +45,59 @@ public class ElasticsearchImpl implements Elasticsearch {
     public AgentResult install( Agent agent ) {
 
         Command command = commandRunner.createCommand(
-                new RequestBuilder( CONFIG ),
+                new RequestBuilder( INSTALL ),
+                Sets.newHashSet( agent ) );
+
+        commandRunner.runCommand( command );
+
+        return command.getResults().get( agent.getUuid() );
+    }
+
+
+    @Override
+    public AgentResult remove( Agent agent ) {
+
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( REMOVE ),
+                Sets.newHashSet( agent ) );
+
+        commandRunner.runCommand( command );
+
+        return command.getResults().get( agent.getUuid() );
+    }
+
+
+    @Override
+    public AgentResult serviceStart( Agent agent ) {
+
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( SERVICE_START ),
+                Sets.newHashSet( agent ) );
+
+        commandRunner.runCommand( command );
+
+        return command.getResults().get( agent.getUuid() );
+    }
+
+
+    @Override
+    public AgentResult serviceStop( Agent agent ) {
+
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( SERVICE_STOP ),
+                Sets.newHashSet( agent ) );
+
+        commandRunner.runCommand( command );
+
+        return command.getResults().get( agent.getUuid() );
+    }
+
+
+    @Override
+    public AgentResult serviceStatus( Agent agent ) {
+
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( SERVICE_STATUS ),
                 Sets.newHashSet( agent ) );
 
         commandRunner.runCommand( command );

@@ -30,17 +30,67 @@ public class InstallCommand extends OsgiCommandSupport {
         this.agentManager = agentManager;
     }
 
-
+// status
     protected Object doExecute() {
 
-        AgentResult agentResult = elasticsearch.install( agentManager.getAgentByHostname( hostname ) );
+        AgentResult agentResult = elasticsearch.serviceStatus( agentManager.getAgentByHostname( hostname ) );
 
         System.out.println( "exitCode: " + agentResult.getExitCode() );
-        // error: 256
-
         System.out.println( "stdOut: " + agentResult.getStdOut() );
         System.out.println( "stdErr: " + agentResult.getStdErr() );
 
         return null;
     }
+
+
+//  stop
+//    protected Object doExecute() {
+//
+//        AgentResult agentResult = elasticsearch.serviceStop( agentManager.getAgentByHostname( hostname ) );
+//
+//        System.out.println( "exitCode: " + agentResult.getExitCode() );
+//        System.out.println( "stdOut: " + agentResult.getStdOut() );
+//        System.out.println( "stdErr: " + agentResult.getStdErr() );
+//
+//        return null;
+//    }
+
+
+//    start
+//    protected Object doExecute() {
+//
+//        AgentResult agentResult = elasticsearch.serviceStart( agentManager.getAgentByHostname( hostname ) );
+//
+//        System.out.println( "exitCode: " + agentResult.getExitCode() );
+//        System.out.println( "stdOut: " + agentResult.getStdOut() );
+//        System.out.println( "stdErr: " + agentResult.getStdErr() );
+//
+//        return null;
+//    }
+
+
+//    remove
+//    protected Object doExecute() {
+//
+//        AgentResult agentResult = elasticsearch.remove( agentManager.getAgentByHostname( hostname ) );
+//
+//        System.out.println( "exitCode: " + agentResult.getExitCode() );
+//        System.out.println( "stdOut: " + agentResult.getStdOut() );
+//        System.out.println( "stdErr: " + agentResult.getStdErr() );
+//
+//        return null;
+//    }
+
+
+//    install
+//    protected Object doExecute() {
+//
+//        AgentResult agentResult = elasticsearch.install( agentManager.getAgentByHostname( hostname ) );
+//        System.out.println( "exitCode: " + agentResult.getExitCode() );
+//        System.out.println( "stdOut: " + agentResult.getStdOut() );
+//        System.out.println( "stdErr: " + agentResult.getStdErr() );
+//
+//        return null;
+//    }
+
 }
