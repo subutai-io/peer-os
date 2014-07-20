@@ -2,18 +2,22 @@ package org.safehaus.subutai.impl.template.manager;
 
 enum ActionType {
 
-    SETUP("subutai-setup"),
-    CLONE("subutai-clone"),
-    CLONE_DESTROY("subutai-clone-destroy"),
-    EXPORT("subutai-export"),
-    IMPORT("subutai-import"),
-    TEMPLATE("subutai-template"),
+    SETUP("setup"),
+    CLONE("clone"),
+    DESTROY("destroy"),
+    RENAME("rename"),
+    EXPORT("export"),
+    IMPORT("import"),
+    PROMOTE("promote"),
     INSTALL_TEMPLATE("apt-get install", true),
-    LIST_TEMPLATES("subutai list -t"),
-    LIST_CONTAINERS("subutai list -c"),
-    LIST_CONT_TEMP("subutai list");
+    // list commands
+    LIST_TEMPLATES("list -t"),
+    LIST_CONTAINERS("list -c"),
+    LIST_CONT_TEMP("list"),
+    // gets generated debian package name for template. TODO: find a better way
+    GET_PACKAGE_NAME(". /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name", true);
 
-    private static final String PARENT_DIR = "/usr/bin/";
+    private static final String PARENT_DIR = "/usr/bin/subutai ";
     private final String script;
     private boolean standAloneCommand = false;
 
