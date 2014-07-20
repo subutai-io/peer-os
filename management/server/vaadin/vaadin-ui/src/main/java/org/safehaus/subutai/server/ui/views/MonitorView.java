@@ -11,13 +11,13 @@
 package org.safehaus.subutai.server.ui.views;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import org.safehaus.subutai.shared.protocol.Parameters;
+import org.safehaus.subutai.shared.protocol.Setting;
 
 public class MonitorView extends VerticalLayout implements View {
 
@@ -126,19 +126,27 @@ public class MonitorView extends VerticalLayout implements View {
 
 		addComponent(panel);
 
+		Gson gson = new Gson();
 		try {
-			JsonObject o = new JsonParser().parse(jsonString).getAsJsonObject();
-			System.out.println(o);
-
-			JsonElement parameters = o.get("parameters");
-			System.out.println(parameters.getAsJsonArray());
-
-			Gson gson = new Gson();
-			try {
-				Parameters param = gson.fromJson(jsonString, Parameters.class);
-				System.out.println(param.parameters.size());
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			Parameters param = gson.fromJson(jsonString, Parameters.class);
+			for (Setting field : param.parameters) {
+				if (field.uiType.equals("TextField")) {
+					TextField textField = new TextField();
+					textField.setCaption(field.label);
+					textField.setInputPrompt(field.tooltip);
+					if (field.value != null) {
+						textField.setValue(field.value);
+					}
+					panel.addComponent(textField);
+				} else {
+					TextArea textArea = new TextArea();
+					textArea.setCaption(field.label);
+					textArea.setInputPrompt(field.tooltip);
+					if (field.value != null) {
+						textArea.setValue(field.value);
+					}
+					panel.addComponent(textArea);
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
