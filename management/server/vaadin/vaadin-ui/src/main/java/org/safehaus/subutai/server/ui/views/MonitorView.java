@@ -10,6 +10,7 @@
 
 package org.safehaus.subutai.server.ui.views;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vaadin.navigator.View;
@@ -126,6 +127,9 @@ public class MonitorView extends VerticalLayout implements View {
 		try {
 			JsonObject o = new JsonParser().parse(jsonString).getAsJsonObject();
 			System.out.println(o);
+
+			JsonElement parameters = o.get("parameters");
+			System.out.println(parameters.getAsString());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
