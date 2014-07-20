@@ -8,6 +8,11 @@ function is_registered {
   echo `zfs_is_template $1`
 } 
     
+
+# TODO: stub function that returns registered templates
+function list_templates {
+  echo ""
+}
   
 # URGENT: this is a stub function and needs to be properly implemented
 # this function needs to take the supplied debian package file and upload and 
