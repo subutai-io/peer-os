@@ -144,8 +144,9 @@ function promote {
   # ---------------------------------------------------------------------------
 
   lxc_home=/var/lib/lxc/$lxc_template
-  echo `lxc-attach -n $lxc_template -- dpkg -l` > $lxc_home/packages
-  # TODO need to make sure that the command above does proper line termination
+  for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
+    echo "$debpkg" >> $lxc_home/packages
+  done
 
   # ---------------------------------------------------------------------------
   # (3) git operations
