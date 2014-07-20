@@ -11,8 +11,10 @@
 package org.safehaus.subutai.server.ui.views;
 
 import com.google.gson.Gson;
+import com.vaadin.data.Property;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -127,32 +129,63 @@ public class MonitorView extends VerticalLayout implements View {
 
 		addComponent(panel);
 
-		Gson gson = new Gson();
+		final Gson gson = new Gson();
 		try {
-			Parameters param = gson.fromJson(jsonString, Parameters.class);
-			for (Setting field : param.parameters) {
+			final Parameters param = gson.fromJson(jsonString, Parameters.class);
+			for (final Setting field : param.parameters) {
 				if (field.uiType.equals("TextField")) {
-					TextField textField = new TextField();
+					final TextField textField = new TextField();
 					textField.setWidth(100, Unit.PERCENTAGE);
 					textField.setCaption(field.label);
 					textField.setInputPrompt(field.tooltip);
+					textField.setDescription(field.tooltip);
+					textField.setImmediate(true);
 					if (field.value != null) {
 						textField.setValue(field.value);
 					}
 					panel.addComponent(textField);
+
+					textField.addValueChangeListener(new Property.ValueChangeListener() {
+						@Override
+						public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+							field.value = textField.getValue();
+						}
+					});
 				} else {
-					TextArea textArea = new TextArea();
+					final TextArea textArea = new TextArea();
 					textArea.setWidth(100, Unit.PERCENTAGE);
 					textArea.setCaption(field.label);
 					textArea.setInputPrompt(field.tooltip);
+					textArea.setDescription(field.tooltip);
+					textArea.setImmediate(true);
 					if (field.value != null) {
 						textArea.setValue(field.value);
 					}
 					panel.addComponent(textArea);
+
+					textArea.addValueChangeListener(new Property.ValueChangeListener() {
+						@Override
+						public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+							field.value = textArea.getValue();
+						}
+					});
 				}
 			}
+
+			Button button = new Button("Export");
+			button.addStyleName("default");
+			panel.addComponent(button);
+
+			button.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					System.out.println(gson.toJson(param));
+				}
+			});
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+
+
 	}
 }
