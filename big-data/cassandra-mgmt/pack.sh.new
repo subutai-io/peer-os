@@ -67,7 +67,6 @@ cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
-rm $BASE/$fileName/opt/README.md
 cp -a -p $LXCSOURCE/$pattern/rootfs/var/lib/cassandra $BASE/$fileName/var/lib/
 cp -a -p $LXCSOURCE/$pattern/rootfs/opt/cassandra* $BASE/$fileName/opt/
 
