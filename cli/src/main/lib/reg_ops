@@ -5,11 +5,20 @@
 # already. Since this functionality is not available I just stubbed it 
 # out with a call to zfs_is_template. 
 function is_registered {
-  echo `zfs_is_template $1`
+  local template=$1
+  local url="$SUBUTAI_REST_URL/$SUBUTAI_REST_GET_TEMPLATE_PATH/$template"
+
+  resp=`curl -XGET $url`
+  if [[ -n $resp && "$resp" == *$template* ]]; then 
+    echo true
+  else
+    echo false
+  fi
 } 
     
 
 # TODO: stub function that returns registered templates
+# will be completed when REST service will be available
 function list_templates {
   echo ""
 }
@@ -17,10 +26,22 @@ function list_templates {
 # URGENT: this is a stub function and needs to be properly implemented
 # this function needs to take the supplied debian package file and upload and 
 # register it with the Subutai management server.
+#
+# REST service receives Debian package, uploads it to repo, and registers it
+# in templates registry 
 function send_n_register {
   local debian_file=$1
+  local url="$SUBUTAI_REST_URL/$SUBUTAI_REST_REGISTER_PATH"
 
-  msg_ok "DEBIAN file $debian_file registered and sent to management server"
+  resp=`curl -XPOST -I $url --data-binary @$debian_file`
+
+  # catch HTTP status code 200
+  local ok="200 OK" 
+  if [[ "$resp" == *$ok* ]]; then
+    msg_ok "DEBIAN file $debian_file registered and sent to management server"
+  else
+    msg_error "Failed to register and send Debian file $debian_file"
+  fi
 } 
 
 
