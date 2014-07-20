@@ -1,9 +1,12 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
+  <reference id="monitor" availability="mandatory"
+             interface="org.safehaus.subutai.api.monitor.Monitor"/>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-      <command name="monitor:test">
-          <action class="org.safehaus.subutai.cli.monitor.TestCommand">
-              <!--<property name="agentManager" ref="agentManager"/>-->
+      <command name="monitor:all-metrics">
+          <action class="org.safehaus.subutai.cli.monitor.AllMetricsCommand">
+              <property name="monitor" ref="monitor"/>
           </action>
       </command>
   </command-bundle>
