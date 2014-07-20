@@ -64,7 +64,7 @@ public class MonitorImpl implements Monitor {
         JsonNode json = OBJECT_MAPPER.readTree(response);
         JsonNode hits = json.get("hits").get("hits");
 
-        ArrayList<JsonNode> nodes = new ArrayList<JsonNode>();
+        ArrayList<JsonNode> nodes = new ArrayList<>();
 
         for (int i = 0; i < hits.size(); i++) {
             JsonNode node = hits.get(i).get("_source");
@@ -78,7 +78,7 @@ public class MonitorImpl implements Monitor {
 
     private static Map<Date, Double> toMap(List<JsonNode> nodes) {
 
-        Map<Date, Double> values = new TreeMap<Date, Double>();
+        Map<Date, Double> values = new TreeMap<>();
 
         for (JsonNode node : nodes) {
             Date date = strToDate( node.get("@timestamp").asText() );

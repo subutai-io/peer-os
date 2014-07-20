@@ -826,6 +826,11 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>monitor-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
                   <artifactId>monitor-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>

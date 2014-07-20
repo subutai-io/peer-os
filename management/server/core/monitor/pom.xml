@@ -17,6 +17,7 @@
     <modules>
         <module>monitor-api</module>
         <module>monitor-impl</module>
+        <module>monitor-cli</module>
         <module>monitor-ui</module>
     </modules>
 

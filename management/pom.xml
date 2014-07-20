@@ -674,6 +674,11 @@
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
+        <artifactId>monitor-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>monitor-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
