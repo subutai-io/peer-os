@@ -97,6 +97,18 @@ public class RestServiceImpl implements RestService {
     }
 
 
+    @Override
+    public String listTemplates() {
+        return gson.toJson( templateRegistryManager.getAllTemplates() );
+    }
+
+
+    @Override
+    public String listTemplates( final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
+    }
+
+
     private void addChildren( TemplateTree tree, Template currentTemplate ) {
         List<Template> children = tree.getChildrenTemplates( currentTemplate );
         if ( !( children == null || children.isEmpty() ) ) {
