@@ -10,12 +10,14 @@
 
 package org.safehaus.subutai.server.ui.views;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.subutai.shared.protocol.Parameters;
 
 public class MonitorView extends VerticalLayout implements View {
 
@@ -130,6 +132,14 @@ public class MonitorView extends VerticalLayout implements View {
 
 			JsonElement parameters = o.get("parameters");
 			System.out.println(parameters.getAsJsonArray());
+
+			Gson gson = new Gson();
+			try {
+				Parameters param = gson.fromJson(jsonString, Parameters.class);
+				System.out.println(param.parameters.size());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

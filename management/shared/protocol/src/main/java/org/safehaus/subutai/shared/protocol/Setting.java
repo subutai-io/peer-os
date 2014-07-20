@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by daralbaev on 7/20/14.
  */
-public class SettingConfig {
+public class Setting {
 	@SerializedName ("file")
 	public String file;
 
