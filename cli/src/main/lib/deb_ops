@@ -72,6 +72,7 @@ function deb_pkg {
   # (4) create debian package
   # ----------------------------------------------------------------------------
   dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?"
 
   # ----------------------------------------------------------------------------
   # (5) remove copied directories for creating debian package
@@ -81,7 +82,13 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (6) return path of newly generated debian package
   # ----------------------------------------------------------------------------
-  echo "$debian_dir.deb"
+  
+  conf="/var/lib/lxc/$lxc/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
+  fi
 }
 
 
