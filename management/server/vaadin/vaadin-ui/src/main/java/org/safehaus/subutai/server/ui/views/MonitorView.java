@@ -129,7 +129,7 @@ public class MonitorView extends VerticalLayout implements View {
 			System.out.println(o);
 
 			JsonElement parameters = o.get("parameters");
-			System.out.println(parameters.getAsString());
+			System.out.println(parameters.getAsJsonArray());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
