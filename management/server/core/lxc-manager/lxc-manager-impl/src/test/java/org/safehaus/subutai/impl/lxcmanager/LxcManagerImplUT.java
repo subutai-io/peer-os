@@ -23,8 +23,8 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.monitor.Metric;
-import org.safehaus.subutai.api.monitor.Monitor;
+import org.safehaus.subutai.api.monitoring.Metric;
+import org.safehaus.subutai.api.monitoring.Monitor;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import static org.junit.Assert.assertFalse;

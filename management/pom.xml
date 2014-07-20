@@ -661,20 +661,25 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Monitor -->
+      <!-- Monitoring -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-api</artifactId>
+        <artifactId>monitoring-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-impl</artifactId>
+        <artifactId>monitoring-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-ui</artifactId>
+        <artifactId>monitoring-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>monitoring-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1212,7 +1217,26 @@
         <artifactId>hadoop-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- ElasticSearch -->
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-api</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-impl</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+      <dependency>
+       <groupId>org.safehaus.subutai</groupId>
+       <artifactId>elasticsearch-cli</artifactId>
+       <version>${project.version}</version>
+      </dependency>
+
       <!-- Products Modules - END -->
+
       <!--karaf-->
     </dependencies>
   </dependencyManagement>

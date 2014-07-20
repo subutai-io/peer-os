@@ -11,7 +11,7 @@
 
   <artifactId>file-tracker-api</artifactId>
   <packaging>bundle</packaging>
-  <name>File Tracker Api</name>
+  <name>Subutai File Tracker API</name>
 
   <dependencies>
     <dependency>
