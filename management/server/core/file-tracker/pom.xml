@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>file-tracker-parent</artifactId>
-  <name>File Tracker Parent</name>
+  <name>Subutai File Tracker Parent</name>
   <packaging>pom</packaging>
 
   <modules>
