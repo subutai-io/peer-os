@@ -631,18 +631,6 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- FS Tracker -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>file-tracker-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>file-tracker-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
                 <!-- Git Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -905,6 +893,23 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Config Point Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
