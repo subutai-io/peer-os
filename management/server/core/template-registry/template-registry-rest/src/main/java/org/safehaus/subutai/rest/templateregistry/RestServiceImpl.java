@@ -124,10 +124,14 @@ public class RestServiceImpl implements RestService {
     public String listTemplatesPlain( final String lxcArch ) {
         StringBuilder output = new StringBuilder();
         List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
-        for ( Template template : templates ) {
+
+        for ( int i = 0, templatesSize = templates.size(); i < templatesSize; i++ ) {
+            final Template template = templates.get( i );
             output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
-                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
-                  .append( TEMPLATES_DELIMITER );
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() );
+            if ( i < templatesSize - 1 ) {
+                output.append( TEMPLATES_DELIMITER );
+            }
         }
 
         return output.toString();
