@@ -69,4 +69,15 @@ public interface RestService {
     @Path( "list_templates/{lxcArch}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String listTemplates( @PathParam( "lxcArch" ) String lxcArch );
+
+
+    @GET
+    @Path( "list_templates_plain" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public String listTemplatesPlain();
+
+    @GET
+    @Path( "list_templates_plain/{lxcArch}" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public String listTemplatesPlain( @PathParam( "lxcArch" ) String lxcArch );
 }
