@@ -5,10 +5,10 @@
              interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
   <bean id="elasticsearch-impl" scope="singleton"
-      class="org.safehaus.subutai.impl.elasticsearch.ElasticsearchImpl">
+      class="org.safehaus.subutai.impl.elasticsearch.ElasticSearchImpl">
     <argument ref="commandRunner"/>
   </bean>
 
-  <service ref="elasticsearch-impl" interface="org.safehaus.subutai.api.elasticsearch.Elasticsearch"/>
+  <service ref="elasticsearch-impl" interface="org.safehaus.subutai.api.elasticsearch.ElasticSearch"/>
 
 </blueprint>
