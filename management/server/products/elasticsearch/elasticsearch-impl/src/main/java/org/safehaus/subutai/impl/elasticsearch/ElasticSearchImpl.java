@@ -5,13 +5,13 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
+import org.safehaus.subutai.api.elasticsearch.ElasticSearch;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import com.google.common.collect.Sets;
 
 
-public class ElasticsearchImpl implements Elasticsearch {
+public class ElasticSearchImpl implements ElasticSearch {
 
     public static final String INSTALL = "apt-get --force-yes --assume-yes install ksks-elasticsearch";
 
@@ -31,7 +31,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     private CommandRunner commandRunner;
 
 
-    public ElasticsearchImpl( CommandRunner commandRunner ) {
+    public ElasticSearchImpl( CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
     }
 
@@ -77,13 +77,10 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     private AgentResult runCommand( Agent agent, String commandLine ) {
 
-        Command command = commandRunner.createCommand(
-                new RequestBuilder( commandLine ),
-                Sets.newHashSet( agent ) );
+        Command command = commandRunner.createCommand( new RequestBuilder( commandLine ), Sets.newHashSet( agent ) );
 
         commandRunner.runCommand( command );
 
         return command.getResults().get( agent.getUuid() );
     }
-
 }

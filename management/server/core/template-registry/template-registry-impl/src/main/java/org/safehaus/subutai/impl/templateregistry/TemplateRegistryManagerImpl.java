@@ -183,4 +183,16 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Collections.reverse( parents );
         return parents;
     }
+
+
+    @Override
+    public List<Template> getAllTemplates() {
+        return null;
+    }
+
+
+    @Override
+    public List<Template> getAllTemplates( final String lxcArch ) {
+        return null;
+    }
 }
