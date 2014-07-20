@@ -661,25 +661,25 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Monitor -->
+      <!-- Monitoring -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-api</artifactId>
+        <artifactId>monitoring-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-impl</artifactId>
+        <artifactId>monitoring-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-cli</artifactId>
+        <artifactId>monitoring-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>monitor-ui</artifactId>
+        <artifactId>monitoring-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
