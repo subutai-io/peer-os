@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <!--<reference id="communicationService" availability="mandatory"
+             interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager" />
+-->
+  <bean id="configPointTracker" scope="singleton"
+        class="org.safehaus.subutai.impl.configpointtracker.ConfigPointTrackerImpl">
+    <!--<property name="communicationService" ref="communicationService" />-->
+  </bean>
+
+  <service ref="configPointTracker" interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
+</blueprint>

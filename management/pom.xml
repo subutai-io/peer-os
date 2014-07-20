@@ -726,7 +726,25 @@
         <artifactId>configuration-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!--Core Modules - END-->
+
+      <!-- Config Point Tracker -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Core Modules - END -->
 
       <!-- Products Modules - START -->
 

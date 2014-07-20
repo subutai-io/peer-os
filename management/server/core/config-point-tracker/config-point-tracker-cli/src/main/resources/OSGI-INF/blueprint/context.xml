@@ -1,0 +1,16 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+<!--
+  <reference id="gitManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.gitmanager.GitManager" />
+-->
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="conf-point-tracker:add">
+      <action class="org.safehaus.subutai.cli.configpointtracker.AddCommand">
+        <!--<property name="agentManager" ref="agentManager" />-->
+      </action>
+    </command>
+  </command-bundle>
+
+</blueprint>
