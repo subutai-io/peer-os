@@ -187,12 +187,20 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public List<Template> getAllTemplates() {
-        return null;
+        return getAllTemplates( Common.DEFAULT_LXC_ARCH );
     }
 
 
     @Override
     public List<Template> getAllTemplates( final String lxcArch ) {
-        return null;
+        List<Template> allTemplates = templateDAO.getAllTemplates();
+        List<Template> result = new ArrayList<>();
+
+        for ( Template template : allTemplates ) {
+            if ( template.getLxcArch().equalsIgnoreCase( lxcArch ) ) {
+                result.add( template );
+            }
+        }
+        return result;
     }
 }
