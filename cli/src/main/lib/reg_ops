@@ -8,6 +8,10 @@ function is_registered {
   local template=$1
   local url="$SUBUTAI_REST_URL/$SUBUTAI_REST_GET_TEMPLATE_PATH/$template"
 
+  if [ "$TEST_MODE" == "true" ]; then
+    echo true
+  fi
+
   resp=`curl -XGET $url`
   if [[ -n $resp && "$resp" == *$template* ]]; then 
     echo true
@@ -32,6 +36,11 @@ function list_templates {
 function send_n_register {
   local debian_file=$1
   local url="$SUBUTAI_REST_URL/$SUBUTAI_REST_REGISTER_PATH"
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo "${FUNCNAME[0]} called in TEST mode"
+    return
+  fi
 
   resp=`curl -XPOST -I $url --data-binary @$debian_file`
 
