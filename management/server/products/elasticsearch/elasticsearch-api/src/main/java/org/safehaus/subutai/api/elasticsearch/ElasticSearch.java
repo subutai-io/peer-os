@@ -16,4 +16,6 @@ public interface Elasticsearch {
 
     public AgentResult serviceStatus( Agent agent );
 
+    public AgentResult config( Agent agent, String param, String value );
+
 }

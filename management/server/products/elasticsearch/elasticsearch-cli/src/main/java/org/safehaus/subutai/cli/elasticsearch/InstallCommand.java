@@ -30,10 +30,12 @@ public class InstallCommand extends OsgiCommandSupport {
         this.agentManager = agentManager;
     }
 
-// status
+
+//    config
     protected Object doExecute() {
 
-        AgentResult agentResult = elasticsearch.serviceStatus( agentManager.getAgentByHostname( hostname ) );
+        AgentResult agentResult = elasticsearch.config( agentManager.getAgentByHostname( hostname ),
+                "cluster.name", "subutai_es_cluster" );
 
         System.out.println( "exitCode: " + agentResult.getExitCode() );
         System.out.println( "stdOut: " + agentResult.getStdOut() );
@@ -41,6 +43,19 @@ public class InstallCommand extends OsgiCommandSupport {
 
         return null;
     }
+
+
+// status
+//    protected Object doExecute() {
+//
+//        AgentResult agentResult = elasticsearch.serviceStatus( agentManager.getAgentByHostname( hostname ) );
+//
+//        System.out.println( "exitCode: " + agentResult.getExitCode() );
+//        System.out.println( "stdOut: " + agentResult.getStdOut() );
+//        System.out.println( "stdErr: " + agentResult.getStdErr() );
+//
+//        return null;
+//    }
 
 
 //  stop

@@ -26,7 +26,8 @@ public class ElasticsearchImpl implements Elasticsearch {
     public static final String SERVICE_STATUS = "service elasticsearch status";
     // not running: 768; running: 0; unrecognized: 256
 
-    public static final String CONFIG = "es-conf.sh index.number_of_shards 4";
+    public static final String CONFIG = "es-conf.sh %s %s";
+//    $ es-conf.sh cluster.name my_cluster
 //    $ es-conf.sh node.name my_node1
 //    $ es-conf.sh node.master true | false
 //    $ es-conf.sh node.data true | false
@@ -38,6 +39,22 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     public ElasticsearchImpl( CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
+    }
+
+
+    @Override
+    public AgentResult config( Agent agent, String param, String value ) {
+
+        String configCommand = String.format( CONFIG, param, value );
+        System.out.println( "configCommand: " + configCommand );
+
+        Command command = commandRunner.createCommand(
+                new RequestBuilder( configCommand ),
+                Sets.newHashSet( agent ) );
+
+        commandRunner.runCommand( command );
+
+        return command.getResults().get( agent.getUuid() );
     }
 
 
