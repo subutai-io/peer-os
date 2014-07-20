@@ -4,27 +4,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>file-tracker-parent</artifactId>
+    <artifactId>config-point-tracker-parent</artifactId>
     <groupId>org.safehaus.subutai</groupId>
     <version>2.0.0</version>
   </parent>
 
-  <artifactId>file-tracker-api</artifactId>
+  <artifactId>config-point-tracker-api</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai File Tracker API</name>
+  <name>Subutai Config Point Tracker API</name>
 
   <dependencies>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mgmt-shared-protocol</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>communication-manager-api</artifactId>
     </dependency>
   </dependencies>
 
@@ -39,7 +31,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.api.filetracker</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.api.config-point-tracker</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
