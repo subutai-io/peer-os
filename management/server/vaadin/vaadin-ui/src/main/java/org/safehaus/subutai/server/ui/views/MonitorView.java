@@ -117,7 +117,7 @@ public class MonitorView extends VerticalLayout implements View {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		setSizeFull();
-		addStyleName("timeline");
+		addStyleName("reports");
 
 		VerticalLayout panel = new VerticalLayout();
 		panel.setSizeFull();
@@ -132,6 +132,7 @@ public class MonitorView extends VerticalLayout implements View {
 			for (Setting field : param.parameters) {
 				if (field.uiType.equals("TextField")) {
 					TextField textField = new TextField();
+					textField.setWidth(100, Unit.PERCENTAGE);
 					textField.setCaption(field.label);
 					textField.setInputPrompt(field.tooltip);
 					if (field.value != null) {
@@ -140,6 +141,7 @@ public class MonitorView extends VerticalLayout implements View {
 					panel.addComponent(textField);
 				} else {
 					TextArea textArea = new TextArea();
+					textArea.setWidth(100, Unit.PERCENTAGE);
 					textArea.setCaption(field.label);
 					textArea.setInputPrompt(field.tooltip);
 					if (field.value != null) {
