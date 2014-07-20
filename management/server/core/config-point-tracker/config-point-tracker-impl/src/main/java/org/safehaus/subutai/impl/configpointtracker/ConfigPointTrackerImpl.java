@@ -28,4 +28,10 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker {
             points.add( path );
         }
     }
+
+
+    @Override
+    public Set<String> get( String templateName ) {
+        return configPoints.get( templateName );
+    }
 }

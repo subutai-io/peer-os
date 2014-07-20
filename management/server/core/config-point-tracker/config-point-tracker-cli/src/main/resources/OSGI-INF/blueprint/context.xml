@@ -11,4 +11,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="config-point-tracker:get">
+      <action class="org.safehaus.subutai.cli.configpointtracker.GetCommand">
+        <property name="configPointTracker" ref="configPointTracker" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>
