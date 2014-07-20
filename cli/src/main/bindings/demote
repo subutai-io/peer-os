@@ -52,18 +52,22 @@ function demote {
   local var_snap="lxc-data/$temp-var@template"
   zfs release keep "$var_snap"
   zfs destroy "$var_snap"
+  zfs set readonly=off "lxc-data/$temp-var"
 
   local home_snap="lxc-data/$temp-home@template"
   zfs release keep "$home_snap"
   zfs destroy "$home_snap"
+  zfs set readonly=off "lxc-data/$temp-home"
 
   local opt_snap="lxc/$temp-opt@template"
   zfs release keep "$opt_snap"
   zfs destroy "$opt_snap"
+  zfs set readonly=off "lxc/$temp-opt"
 
   local root_snap="lxc/$temp@template"
   zfs release keep "$root_snap"
   zfs destroy "$root_snap"
+  zfs set readonly=off "lxc/$temp"
 }
 
 
