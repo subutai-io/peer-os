@@ -31,6 +31,21 @@ public class ConfigPointTrackerImpl implements ConfigPointTracker {
 
 
     @Override
+    public void remove( String templateName, String... configPaths ) {
+
+        Set<String> points = configPoints.get( templateName );
+
+        if ( points == null ) {
+            return;
+        }
+
+        for ( String path : configPaths ) {
+            points.remove( path );
+        }
+    }
+
+
+    @Override
     public Set<String> get( String templateName ) {
         return configPoints.get( templateName );
     }
