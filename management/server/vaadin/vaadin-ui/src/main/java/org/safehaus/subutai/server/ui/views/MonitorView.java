@@ -120,6 +120,7 @@ public class MonitorView extends VerticalLayout implements View {
 		addStyleName("reports");
 
 		VerticalLayout panel = new VerticalLayout();
+		panel.addStyleName("dynamic-form");
 		panel.setSizeFull();
 		panel.setMargin(true);
 		panel.setSpacing(true);
