@@ -20,8 +20,8 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final String TEMPLATE_PARENT_DELIMITER = ":";
-    private static final String TEMPLATES_DELIMITER = ";";
+    private static final String TEMPLATE_PARENT_DELIMITER = " ";
+    private static final String TEMPLATES_DELIMITER = "\n";
 
     private static final Gson gson =
             new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
@@ -125,13 +125,9 @@ public class RestServiceImpl implements RestService {
         StringBuilder output = new StringBuilder();
         List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
 
-        for ( int i = 0, templatesSize = templates.size(); i < templatesSize; i++ ) {
-            final Template template = templates.get( i );
+        for ( final Template template : templates ) {
             output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
                     Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() );
-            if ( i < templatesSize - 1 ) {
-                output.append( TEMPLATES_DELIMITER );
-            }
         }
 
         return output.toString();
