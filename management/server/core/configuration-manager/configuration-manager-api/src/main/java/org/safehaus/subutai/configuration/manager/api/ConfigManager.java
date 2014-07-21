@@ -20,7 +20,7 @@ public interface ConfigManager {
 
     public JsonObject getConfiguration(Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum);
 
-    public JsonObject getConfigurationTemplate(String configPathFilename, ConfigTypeEnum configTypeEnum);
+    public JsonObject getConfigurationJson(String configPathFilename, ConfigTypeEnum configTypeEnum);
 
 
 }

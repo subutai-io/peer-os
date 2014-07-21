@@ -77,7 +77,7 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
-    public JsonObject getConfigurationTemplate( final String configPathFilename, final ConfigTypeEnum configTypeEnum ) {
+    public JsonObject getConfigurationJson( final String configPathFilename, final ConfigTypeEnum configTypeEnum ) {
         ConfigParser configParser = null;
         String content = FileUtil.getContent( configPathFilename, this );
         try {

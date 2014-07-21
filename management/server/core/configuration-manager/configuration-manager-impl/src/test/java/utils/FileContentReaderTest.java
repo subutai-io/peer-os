@@ -6,6 +6,7 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigParser;
 import org.safehaus.subutai.configuration.manager.impl.utils.FileContentReader;
 import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -19,20 +20,22 @@ import com.google.gson.JsonObject;
  */
 public class FileContentReaderTest {
 
-    @Test
+//    @Test
     public void test() {
         FileContentReader fileContentReader = new FileContentReader();
-        String filePath =
-                "/home/bahadyr/SUBUTAI/main/management/server/core/configuration-manager/configuration-manager-impl"
-                        + "/src/main/resources/flume_conf/flume-conf.properties";
-        String content = fileContentReader.readFile( filePath );
+        //        String filePath =
+        //                "/home/bahadyr/SUBUTAI/main/management/server/core/configuration-manager/configuration
+        // -manager-impl"
+        //                        + "/src/main/resources/flume_conf/flume-conf.properties";
+
+        String filePath = "cassandra_conf/cassandra.yaml";
+        String content = FileUtil.getContent( filePath, this );
 
         try {
             ConfigParser iniParser = new IniParser( content );
-
-            JsonObject cjo = iniParser.parserConfig(filePath, ConfigTypeEnum.PROPERTIES);
+            JsonObject cjo = iniParser.parserConfig( filePath, ConfigTypeEnum.PROPERTIES );
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println(gson.toJson( cjo ));
+            System.out.println( gson.toJson( cjo ) );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();

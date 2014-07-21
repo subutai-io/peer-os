@@ -86,9 +86,13 @@ public class XmlParser implements ConfigParser {
         List<JsonObject> fields = new ArrayList<>();
         while ( iterator.hasNext() ) {
             String key = iterator.next();
-            String value = ( String ) config.getProperty( key );
-            JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value );
-            fields.add( field );
+            Object value = config.getProperty( key );
+            if(value instanceof String) {
+                JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value.toString() );
+                fields.add( field );
+            } else if(value instanceof ArrayList) {
+                System.out.println(value.toString());
+            }
         }
 
         JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
