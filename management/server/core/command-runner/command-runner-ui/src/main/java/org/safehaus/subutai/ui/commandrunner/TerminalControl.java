@@ -1,5 +1,6 @@
 package org.safehaus.subutai.ui.commandrunner;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
@@ -63,6 +64,7 @@ public class TerminalControl extends CssLayout {
 				"$(d).html('%s');\n" +
 				"$('.jqconsole-output').last().html(d);";
 
-		JavaScript.getCurrent().execute(String.format(jquery, output.replaceAll("\\n", "\\\\n")));
+
+		JavaScript.getCurrent().execute(String.format(jquery, SafeHtmlUtils.htmlEscape(output.replaceAll("\\n", "\\\\n"))));
 	}
 }
