@@ -4,6 +4,7 @@ package org.safehaus.subutai.impl.manager.builder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -32,9 +33,11 @@ public class EnvironmentBuilder {
 
             Set<Agent> agentList;
             try {
-                agentList = containerManager.clone(environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1);
-            } catch(LxcCreateException ex) {
-                throw new EnvironmentBuildException(ex.toString());
+                agentList = containerManager
+                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
+            }
+            catch ( LxcCreateException ex ) {
+                throw new EnvironmentBuildException( ex.toString() );
             }
 
             environment.getAgents().addAll( agentList );
