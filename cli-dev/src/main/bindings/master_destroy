@@ -33,7 +33,13 @@ function master_destroy {
   # Remove relevant directories under $SUBUTAI_TMPDIR if any
   local container="master"
   local package_name=`get_package_name $container`
-  apt-get --assume-yes --force-yes purge $package_name
+
+  # Check if the package is installed
+  dpkg -s $package_name > /dev/null 2>&1
+  if [ $? = 0  ]; then
+    apt-get --assume-yes --force-yes purge $package_name
+  fi
+
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
 }
