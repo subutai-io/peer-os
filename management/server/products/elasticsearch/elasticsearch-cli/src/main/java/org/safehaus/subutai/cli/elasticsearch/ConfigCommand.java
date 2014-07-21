@@ -1,8 +1,9 @@
 package org.safehaus.subutai.cli.elasticsearch;
 
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
+import org.safehaus.subutai.api.elasticsearch.ElasticSearch;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -18,7 +19,7 @@ public class ConfigCommand extends AbstractCommand {
     private String value = null;
 
 
-    public void setElasticsearch( Elasticsearch elasticsearch ) {
+    public void setElasticsearch( ElasticSearch elasticsearch ) {
         this.elasticsearch = elasticsearch;
     }
 

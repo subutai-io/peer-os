@@ -120,6 +120,9 @@ function create_control_file {
   local Depends=$dependency
   local Description="This is a Subutai delta image debian package of $lxc template"
 
+  #chmod control directory
+  chmod 755 $debian_dir/DEBIAN
+
   # clean control file
   > $control_file
 
@@ -141,7 +144,7 @@ function create_postinst_script {
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  chmod +x $postinst_file
+  chmod 555 $postinst_file
 }
 
 

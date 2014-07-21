@@ -183,4 +183,24 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Collections.reverse( parents );
         return parents;
     }
+
+
+    @Override
+    public List<Template> getAllTemplates() {
+        return getAllTemplates( Common.DEFAULT_LXC_ARCH );
+    }
+
+
+    @Override
+    public List<Template> getAllTemplates( final String lxcArch ) {
+        List<Template> allTemplates = templateDAO.getAllTemplates();
+        List<Template> result = new ArrayList<>();
+
+        for ( Template template : allTemplates ) {
+            if ( template.getLxcArch().equalsIgnoreCase( lxcArch ) ) {
+                result.add( template );
+            }
+        }
+        return result;
+    }
 }
