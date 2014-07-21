@@ -193,7 +193,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             i = sequences.get( templateName );
         }
         while ( true ) {
-            String name = templateName + "-" + i.incrementAndGet();
+            String name = templateName + i.incrementAndGet();
             if ( !existingNames.contains( name ) ) {
                 return name;
             }
