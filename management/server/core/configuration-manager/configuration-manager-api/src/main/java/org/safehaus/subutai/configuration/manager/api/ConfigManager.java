@@ -8,12 +8,16 @@ package org.safehaus.subutai.configuration.manager.api;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.gson.JsonObject;
+
 
 /**
  *
  */
 public interface ConfigManager {
 
-    public void injectConfiguration(Object conf, String path, Agent agent);
+    public void injectConfiguration(Agent agent, JsonObject config);
+
+    public JsonObject getConfiguration(Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum);
 
 }
