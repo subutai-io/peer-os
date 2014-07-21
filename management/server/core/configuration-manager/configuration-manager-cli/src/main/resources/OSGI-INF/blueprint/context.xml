@@ -23,4 +23,12 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+      <command name="config/get-config-template">
+        <action class="org.safehaus.subutai.cli.commands.GetConfigTemplateCommand">
+          <property name="textInjector" ref="textInjector" />
+        </action>
+      </command>
+    </command-bundle>
+
 </blueprint>

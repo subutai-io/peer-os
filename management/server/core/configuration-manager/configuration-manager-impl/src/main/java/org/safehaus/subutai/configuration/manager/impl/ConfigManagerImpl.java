@@ -68,4 +68,12 @@ public class ConfigManagerImpl implements ConfigManager {
 
         return configurationLoader.getConfiguration( agent, configPathFilename );
     }
+
+
+    /*@Override
+    public JsonObject getConfigurationTemplate( final String configPathFilename, final ConfigTypeEnum configTypeEnum ) {
+        String content = FileUtil.getContent( configPathFilename, "Monitor" );
+        System.out.println(content);
+        return null;
+    }*/
 }
