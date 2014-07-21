@@ -33,7 +33,8 @@ public class TextInjectorImpl implements TextInjector {
 
         if ( catCommand.hasSucceeded() ) {
             //            po.addLog( "cat done" );
-            System.out.println( "echo done!" );
+            String config = catCommand.getResults().get( agent.getUuid() ).getStdOut();
+            System.out.println( config );
         }
         else {
             //            po.addLogFailed( String.format( "Installation failed, %s", catCommand.getAllErrors() ) );
@@ -52,6 +53,8 @@ public class TextInjectorImpl implements TextInjector {
 
         if ( catCommand.hasSucceeded() ) {
             //            po.addLog( "cat done" );
+            String config = catCommand.getResults().get( agent.getUuid() ).getStdOut();
+            System.out.println( config );
             System.out.println( "cat done!" );
         }
         else {
