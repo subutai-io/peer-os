@@ -33,6 +33,7 @@ public interface TemplateRegistryManager {
      * Removes template entry from registry
      *
      * @param templateName - name of template to remove
+     * @param lxcArch - lxc architecture
      */
     public void unregisterTemplate( String templateName, String lxcArch );
 
@@ -49,6 +50,7 @@ public interface TemplateRegistryManager {
      * Returns template by name
      *
      * @param templateName - name of template
+     * @param lxcArch - lxc architecture
      *
      * @return - {@code Template}
      */
@@ -67,6 +69,7 @@ public interface TemplateRegistryManager {
      * Returns templates belonging to this parent
      *
      * @param parentTemplateName - parent template name
+     * @param lxcArch - lxc architecture
      *
      * @return - list of {@code Template}
      */
@@ -85,6 +88,7 @@ public interface TemplateRegistryManager {
      * Returns parent template
      *
      * @param childTemplateName - child template name
+     * @param lxcArch - lxc architecture
      *
      * @return -  {@code Template}
      */
@@ -110,8 +114,26 @@ public interface TemplateRegistryManager {
      * Returns list of all parent templates starting from MASTER
      *
      * @param childTemplateName - name of template whose parents to return
+     * @param lxcArch - lxc architecture
      *
      * @return - list of {@code Template}
      */
     public List<Template> getParentTemplates( String childTemplateName, String lxcArch );
+
+
+    /**
+     * Returns list of all templates
+     *
+     * @return -list of {@code Template}
+     */
+    public List<Template> getAllTemplates();
+
+    /**
+     * Returns list of all templates of specified architecture
+     *
+     * @param lxcArch - lxc architecture
+     *
+     * @return - list of {@code Template}
+     */
+    public List<Template> getAllTemplates( String lxcArch );
 }

@@ -28,10 +28,6 @@
       <artifactId>configuration-manager-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>monitoring-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
     </dependency>
@@ -40,13 +36,12 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -55,10 +50,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cassandra</groupId>
-      <artifactId>cassandra-all</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
@@ -105,18 +96,35 @@
       <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
-    	<groupId>commons-httpclient</groupId>
-    	<artifactId>commons-httpclient</artifactId>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.apache.jackrabbit</groupId>
-    	<artifactId>jackrabbit-webdav</artifactId>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-webdav</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.apache.ant</groupId>
-    	<artifactId>ant</artifactId>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-runner-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>agent-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -131,6 +139,13 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.configuration.manager.impl</Bundle-SymbolicName>
+            <!--<Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>-->
+            <Import-Package>
+              org.apache.cassandra.config.*,
+              *
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>

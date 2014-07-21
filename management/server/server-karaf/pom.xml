@@ -145,6 +145,11 @@
       <version>${snakeyaml.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
+      <version>${yamlbeans.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
       <version>${org.apache.commons.beanutils.version}</version>
@@ -568,6 +573,11 @@
                   <version>${snakeyaml.version}</version>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>com.esotericsoftware.yamlbeans</groupId>
+                  <artifactId>yamlbeans</artifactId>
+                  <version>${yamlbeans.version}</version>
+                </artifactItem>
+                <artifactItem>
                   <groupId>commons-beanutils</groupId>
                   <artifactId>commons-beanutils</artifactId>
                   <version>${org.apache.commons.beanutils.version}</version>
@@ -628,18 +638,6 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>tracker-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
-                <!-- FS Tracker -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>file-tracker-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>file-tracker-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -905,6 +903,23 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Config Point Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

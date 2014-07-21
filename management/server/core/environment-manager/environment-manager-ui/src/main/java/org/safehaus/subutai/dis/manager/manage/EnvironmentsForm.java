@@ -57,7 +57,7 @@ public class EnvironmentsForm {
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    DetailsWindow detailsWindow = new EnvironmentDetails("Environment details");
+                    EnvironmentDetails detailsWindow = new EnvironmentDetails("Environment details");
                     detailsWindow.setContent( environment );
                     contentRoot.getUI().addWindow( detailsWindow );
                     detailsWindow.setVisible( true );

@@ -39,12 +39,36 @@ public interface TemplateManager {
     public boolean cloneDestroy(String hostName, String cloneName);
 
     /**
-     * Promotes a given clone into a new template.
+     * Renames an instance container.
+     *
+     * @param hostName the physical host name where container resides
+     * @param oldName current name of the container
+     * @param newName new name for the container
+     * @return <tt>true</tt> if successfully renamed; <tt>false</tt> otherwise
+     */
+    public boolean cloneRename(String hostName, String oldName, String newName);
+
+    /**
+     * Promotes a given clone into a template.
      *
      * @param hostName the physical host name
      * @param cloneName name of the clone to be converted
+     * @return <tt>true</tt> if promote successfully completed
      */
     public boolean promoteClone(String hostName, String cloneName);
+
+    /**
+     * Promotes a given clone into a template with given name. This method gives
+     * possibility to promote a copy of the clone instead of the clone itself.
+     *
+     * @param hostName the physical host name
+     * @param cloneName name of the clone to be converted
+     * @param newName new name for template
+     * @param copyit if set <tt>true</tt>, a copy of clone is made first and a
+     * copied clone is promoted to template
+     * @return <tt>true</tt> if promote successfully completed
+     */
+    public boolean promoteClone(String hostName, String cloneName, String newName, boolean copyit);
 
     public boolean importTemplate(String hostName, String templateName);
 

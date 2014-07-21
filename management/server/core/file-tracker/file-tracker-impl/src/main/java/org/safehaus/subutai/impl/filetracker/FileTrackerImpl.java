@@ -8,7 +8,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.api.fstracker.FileTracker;
+import org.safehaus.subutai.api.filetracker.FileTracker;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
