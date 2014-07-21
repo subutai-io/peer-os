@@ -71,7 +71,7 @@ function destroy {
   # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
   local container=$clone
   local package_name=`get_package_name $container`
-  apt-get purge $package_name
+  apt-get --assume-yes --force-yes purge $package_name
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
 }
