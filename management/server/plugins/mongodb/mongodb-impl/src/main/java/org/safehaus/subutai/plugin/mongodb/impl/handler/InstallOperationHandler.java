@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
@@ -37,7 +37,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     @Override
     public void run() {
         ClusterSetupStrategy clusterSetupStrategy =
-                manager.getSetupStrategy( po, manager.getAgentManager(), manager, manager.getCommandRunner(),
+                manager.getSetupStrategy( po, manager.getAgentManager(), manager.getCommandRunner(),
                         manager.getContainerManager(), config );
 
         try {

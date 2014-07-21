@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
@@ -164,11 +165,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                             agent.getHostname() ) );
         }
         else {
-            if ( !manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() ) ) {
-                po.addLog( "Could not destroy lxc container. Use LXC module to cleanup, skipping..." );
-            }
-            else {
+            try {
+                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
                 po.addLog( "Lxc container destroyed successfully" );
+            }
+            catch ( LxcDestroyException e ) {
+                po.addLog( String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
+                        e.getMessage() ) );
             }
         }
         //update db
