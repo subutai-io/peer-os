@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
-    <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
-    <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
-    <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.dbmanager.DbManager" />
+  <reference id="lxcManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.api.tracker.Tracker" />
+  <reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.container.ContainerManager" />
 
-    <bean id="mongo-impl" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.impl.MongoImpl"
-          init-method="init" destroy-method="destroy">
-        <argument ref="commandRunner"/>
-        <argument ref="agentManager"/>
-        <argument ref="dbManager"/>
-        <argument ref="lxcManager"/>
-        <argument ref="tracker"/>
-    </bean>
+  <bean id="mongo-impl" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.impl.MongoImpl"
+        init-method="init" destroy-method="destroy">
+    <argument ref="commandRunner" />
+    <argument ref="agentManager" />
+    <argument ref="dbManager" />
+    <argument ref="lxcManager" />
+    <argument ref="tracker" />
+    <argument ref="containerManager" />
+  </bean>
 
-    <service ref="mongo-impl" interface="org.safehaus.subutai.plugin.mongodb.api.Mongo"/>
+  <service ref="mongo-impl" interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />
 
 </blueprint>
