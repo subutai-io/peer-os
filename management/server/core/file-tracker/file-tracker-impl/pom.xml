@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>file-tracker-impl</artifactId>
-  <name>File Tracker Impl</name>
+  <name>Subutai File Tracker Impl</name>
   <packaging>bundle</packaging>
 
   <dependencies>
@@ -68,7 +68,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.fstracker.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.impl.filetracker</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

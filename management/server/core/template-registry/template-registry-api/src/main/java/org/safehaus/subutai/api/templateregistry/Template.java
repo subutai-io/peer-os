@@ -73,6 +73,10 @@ public class Template {
         this.packagesManifest = packagesManifest;
         this.templateName = lxcUtsname;
         this.parentTemplateName = subutaiParent;
+
+        if ( templateName.equalsIgnoreCase( parentTemplateName ) ) {
+            parentTemplateName = null;
+        }
     }
 
 

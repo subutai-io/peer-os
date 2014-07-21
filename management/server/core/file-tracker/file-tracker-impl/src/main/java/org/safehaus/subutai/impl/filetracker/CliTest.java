@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.filetracker;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.api.fstracker.FileTracker;
+import org.safehaus.subutai.api.filetracker.FileTracker;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 
@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Needed mostly for testing FileTracker
  */
-@Command( scope = "fs-tracker", name = "test" )
+@Command( scope = "file-tracker", name = "test" )
 public class CliTest extends OsgiCommandSupport implements ResponseListener {
 
     private static final String CONFIG_POINTS[] = {

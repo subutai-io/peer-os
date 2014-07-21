@@ -72,6 +72,7 @@ function deb_pkg {
   # (4) create debian package
   # ----------------------------------------------------------------------------
   dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?"
 
   # ----------------------------------------------------------------------------
   # (5) remove copied directories for creating debian package
@@ -81,7 +82,13 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (6) return path of newly generated debian package
   # ----------------------------------------------------------------------------
-  echo "$debian_dir.deb"
+  
+  conf="/var/lib/lxc/$lxc/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
+  fi
 }
 
 
@@ -94,7 +101,7 @@ function create_control_file {
   local debian_dir=$2
   local architecture=`get_architecture`
   local control_file=$debian_dir/DEBIAN/control
-  local dependency="subutai-cli (= $SUBUTAI_VERSION)"
+  local dependency="subutai-cli (>= $SUBUTAI_VERSION)"
   
   # Check if lxc is master. If not, put a dependency to the parent template 
   lxc_assert $lxc "`usage`"
@@ -113,8 +120,13 @@ function create_control_file {
   local Depends=$dependency
   local Description="This is a Subutai delta image debian package of $lxc template"
 
+  #chmod control directory
+  chmod 755 $debian_dir/DEBIAN
+
   # clean control file
   > $control_file
+  # Change permission of the control file
+  chmod 664 $control_file
 
   echo Package: $Package >> $control_file
   echo Maintainer: $Maintainer >> $control_file
@@ -134,7 +146,7 @@ function create_postinst_script {
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  chmod +x $postinst_file
+  chmod 555 $postinst_file
 }
 
 

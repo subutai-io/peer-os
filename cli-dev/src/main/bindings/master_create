@@ -101,10 +101,6 @@ function master_create {
     echo subutai.config.path = $config_path >> $config
   done
 
-  for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
-    echo subutai.app.data.path = $appdata_path >> $config
-  done
-
   # Add pre-start hook script entry
   echo lxc.hook.pre-start = $subutai_script_base/pre_start_hook >> $config
   echo subutai.parent = master >> $config

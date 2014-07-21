@@ -21,7 +21,7 @@
     <module>lxc-manager</module>
     <module>network-manager</module>
     <module>tracker</module>
-    <module>monitor</module>
+    <module>monitoring</module>
     <module>command-runner</module>
     <module>git-manager</module>
     <module>package-manager</module>
@@ -31,5 +31,6 @@
     <module>configuration-manager</module>
     <module>template-manager</module>
     <module>file-tracker</module>
+    <module>config-point-tracker</module>
   </modules>
 </project>
