@@ -145,6 +145,11 @@
       <version>${snakeyaml.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
+      <version>${yamlbeans.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
       <version>${org.apache.commons.beanutils.version}</version>
@@ -566,6 +571,11 @@
                   <groupId>org.yaml</groupId>
                   <artifactId>snakeyaml</artifactId>
                   <version>${snakeyaml.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.esotericsoftware.yamlbeans</groupId>
+                  <artifactId>yamlbeans</artifactId>
+                  <version>${yamlbeans.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-beanutils</groupId>

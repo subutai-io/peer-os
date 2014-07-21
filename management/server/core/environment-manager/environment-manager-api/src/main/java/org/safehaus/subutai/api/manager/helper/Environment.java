@@ -1,36 +1,65 @@
 package org.safehaus.subutai.api.manager.helper;
 
 
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class Environment extends Blueprint {
+public class Environment  {
 
-    private Set<EnvironmentNodeGroup> environmentNodeGroups;
     private String owner;
-    private Date creationDate;
+    private UUID uuid;
+    private Set<Agent> agents;
+    private String name;
 
 
-    public Set<EnvironmentNodeGroup> getEnvironmentNodeGroups() {
-        return environmentNodeGroups;
+        public String getName() {
+            return name;
+        }
+
+
+        public void setName( final String name ) {
+            this.name = name;
+        }
+
+
+    public Environment() {
+        this.uuid = UUID.randomUUID();
+        this.agents = new HashSet<>();
     }
 
 
-    public void setEnvironmentNodeGroups( final Set<EnvironmentNodeGroup> environmentNodeGroups ) {
-        this.environmentNodeGroups = environmentNodeGroups;
+    public UUID getUuid() {
+        return uuid;
+    }
+
+
+    public void setUuid( final UUID uuid ) {
+        this.uuid = uuid;
+    }
+
+
+    public Set<Agent> getAgents() {
+        return agents;
+    }
+
+
+    public void setAgents( final Set<Agent> agents ) {
+        this.agents = agents;
     }
 
 
     @Override
     public String toString() {
         return "Environment{" +
-                "environmentNodeGroups=" + environmentNodeGroups +
-                ", owner='" + owner + '\'' +
-                ", creationDate=" + creationDate +
+                "owner='" + owner + '\'' +
+                ", uuid=" + uuid +
                 '}';
     }
 }

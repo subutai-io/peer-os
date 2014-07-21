@@ -1,7 +1,6 @@
 package org.safehaus.subutai.dis.manager.window;
 
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
 
@@ -22,9 +21,8 @@ public class BlueprintDetails extends DetailsWindow {
     }
 
 
-    @Override
-    public void setContent( Blueprint blueprint ) {
-        String value = blueprintParser.parseEnvironmentBlueprint( ( EnvironmentBlueprint ) blueprint );
+    public void setContent( EnvironmentBlueprint blueprint ) {
+        String value = blueprintParser.parseEnvironmentBlueprint(  blueprint );
         TextArea area = getTextArea();
         area.setValue( value );
         verticalLayout.addComponent( area );

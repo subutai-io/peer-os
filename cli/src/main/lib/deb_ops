@@ -101,7 +101,7 @@ function create_control_file {
   local debian_dir=$2
   local architecture=`get_architecture`
   local control_file=$debian_dir/DEBIAN/control
-  local dependency="subutai-cli (= $SUBUTAI_VERSION)"
+  local dependency="subutai-cli (>= $SUBUTAI_VERSION)"
   
   # Check if lxc is master. If not, put a dependency to the parent template 
   lxc_assert $lxc "`usage`"
@@ -125,6 +125,8 @@ function create_control_file {
 
   # clean control file
   > $control_file
+  # Change permission of the control file
+  chmod 664 $control_file
 
   echo Package: $Package >> $control_file
   echo Maintainer: $Maintainer >> $control_file

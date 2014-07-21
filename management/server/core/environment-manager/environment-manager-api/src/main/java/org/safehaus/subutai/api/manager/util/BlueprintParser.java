@@ -1,7 +1,6 @@
 package org.safehaus.subutai.api.manager.util;
 
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 
@@ -18,7 +17,7 @@ public class BlueprintParser {
     Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
 
-    public EnvironmentBlueprint parseEnvironmentBlueprint( final String blueprintStr ) {
+    public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) {
         try {
             EnvironmentBlueprint blueprint = gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
             return blueprint;

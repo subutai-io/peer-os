@@ -8,10 +8,11 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.List;
 
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
@@ -27,6 +28,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private EnvironmentDAO environmentDAO;
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
+    private ContainerManager containerManager;
 
 
     private DbManager dbManager;
@@ -50,7 +52,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean buildEnvironment( String blueprintStr ) {
 
-        EnvironmentBlueprint blueprint = ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
+        EnvironmentBlueprint blueprint =
+                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
         return build( blueprint );
     }
 
@@ -63,7 +66,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private boolean build( EnvironmentBlueprint blueprint ) {
         if ( blueprint != null ) {
             try {
-                Environment environment = environmentBuilder.build( blueprint );
+                Environment environment = environmentBuilder.build( blueprint, containerManager );
                 boolean saveResult = environmentDAO.saveEnvironment( environment );
                 if ( !saveResult ) {
                     //rollback build action.
@@ -117,7 +120,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        EnvironmentBlueprint blueprint = ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprint( blueprintStr );
+        EnvironmentBlueprint blueprint =
+                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
         boolean saveResult = environmentDAO.saveBlueprint( blueprint );
         return saveResult;
     }
@@ -129,8 +133,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         return blueprints;
     }
 
+
     @Override
-    public boolean deleteBlueprint(String blueprintName) {
+    public boolean deleteBlueprint( String blueprintName ) {
         return environmentDAO.deleteBlueprint( blueprintName );
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
     }
 }

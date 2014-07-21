@@ -32,7 +32,7 @@
     </command-bundle>
     
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-        <command name="template/clone-destroy">
+        <command name="template/destroy">
             <action class="org.safehaus.subutai.cli.template.manager.CloneDestroy">
                 <property name="templateManager" ref="templateManager" />
             </action>
