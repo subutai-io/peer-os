@@ -11,7 +11,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxrs:server address="/mongodb" id="mongodbRestService">
+    <jaxrs:server address="/mongodb2" id="mongodbRestService">
         <jaxrs:serviceBeans>
             <ref component-id="mongodbRestServiceImpl"/>
         </jaxrs:serviceBeans>
