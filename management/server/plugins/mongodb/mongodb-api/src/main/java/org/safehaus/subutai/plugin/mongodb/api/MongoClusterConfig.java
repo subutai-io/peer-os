@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class MongoClusterConfig implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "MongoDB";
+    public static final String PRODUCT_KEY = "MongoDB2";
     private String clusterName = "";
     private String replicaSetName = "repl";
     private String domainName = "intra.lan";
