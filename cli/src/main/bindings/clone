@@ -2,11 +2,11 @@
 
 
 
-function usage {
+function clone_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Clone a new non-existant child from an existing parent container.
+  echo Usage: Clone a new container instance from a temlate.
   echo
-  echo "        "subutai clone parent child
+  echo "        "subutai \[-qh\] clone parent child
   echo
   echo -----------------------------------------------------------------------
 }

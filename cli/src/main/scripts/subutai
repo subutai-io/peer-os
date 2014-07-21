@@ -55,6 +55,12 @@ if [ ! -d $subutai_binding_base ]; then
 fi 
 
 function usage {
+  if [ -n "$1" ]; then
+    . "$subutai_binding_base/$1"
+    "$1"_usage
+    return 0
+  fi
+
   for binding in `ls $subutai_binding_base`; do 
     . $subutai_binding_base/$binding
     desc="$binding"_description
@@ -69,7 +75,7 @@ function usage {
       desc="no description available for subcommand $binding"
     fi
 
-    if [ `echo ${#binding}` -gt 9 ]; then
+    if [ `echo ${#binding}` -gt 7 ]; then
       echo -e "\t$binding\t- $desc"
     else
       echo -e "\t$binding\t\t- $desc"
@@ -114,7 +120,10 @@ while getopts ":qh" opt; do
       }
       ;;
     h)
-      usage
+      while [ -n "`echo $1 | grep -`" ]; do
+        shift
+      done
+      usage "$1" 
       exit
       ;;
     \?)

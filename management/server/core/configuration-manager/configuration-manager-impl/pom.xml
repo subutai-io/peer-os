@@ -29,7 +29,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>monitor-api</artifactId>
+      <artifactId>monitoring-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
@@ -42,6 +42,10 @@
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -133,6 +137,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
     </dependency>
   </dependencies>
 

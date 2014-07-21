@@ -7,7 +7,9 @@ import java.util.List;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -17,6 +19,9 @@ import com.google.gson.GsonBuilder;
  */
 
 public class RestServiceImpl implements RestService {
+
+    private static final String TEMPLATE_PARENT_DELIMITER = " ";
+    private static final String TEMPLATES_DELIMITER = "\n";
 
     private static final Gson gson =
             new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
@@ -94,6 +99,39 @@ public class RestServiceImpl implements RestService {
             }
         }
         return gson.toJson( uberTemplates );
+    }
+
+
+    @Override
+    public String listTemplates() {
+        return gson.toJson( templateRegistryManager.getAllTemplates() );
+    }
+
+
+    @Override
+    public String listTemplates( final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
+    }
+
+
+    @Override
+    public String listTemplatesPlain() {
+        return listTemplatesPlain( Common.DEFAULT_LXC_ARCH );
+    }
+
+
+    @Override
+    public String listTemplatesPlain( final String lxcArch ) {
+        StringBuilder output = new StringBuilder();
+        List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
+
+        for ( final Template template : templates ) {
+            output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
+                  .append( TEMPLATES_DELIMITER );
+        }
+
+        return output.toString();
     }
 
 

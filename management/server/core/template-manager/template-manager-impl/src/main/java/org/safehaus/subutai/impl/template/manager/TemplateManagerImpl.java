@@ -3,7 +3,6 @@ package org.safehaus.subutai.impl.template.manager;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -28,6 +27,19 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
+        List<Template> parents = templateRegistry.getParentTemplates(templateName);
+        for(Template p : parents) {
+            boolean temp_exists = scriptExecutor.execute(a,
+                    ActionType.LIST_TEMPLATES, p.getTemplateName());
+            if(!temp_exists) {
+                boolean b = scriptExecutor.execute(a, ActionType.IMPORT,
+                        p.getTemplateName());
+                if(!b) {
+                    logger.error("Failed to install parent templates: " + p.getTemplateName());
+                    return false;
+                }
+            }
+        }
         return scriptExecutor.execute(a, ActionType.CLONE,
                 templateName, cloneName, " &");
         // TODO: script does not return w/o redirecting outputs!!!
@@ -37,82 +49,79 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean cloneDestroy(String hostName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.CLONE_DESTROY, cloneName);
+        return scriptExecutor.execute(a, ActionType.DESTROY, cloneName);
+    }
+
+    @Override
+    public boolean cloneRename(String hostName, String oldName, String newName) {
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return scriptExecutor.execute(a, ActionType.RENAME, oldName, newName);
     }
 
     @Override
     public boolean promoteClone(String hostName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        return scriptExecutor.execute(a, ActionType.TEMPLATE, cloneName);
+        return scriptExecutor.execute(a, ActionType.PROMOTE, cloneName);
+    }
+
+    @Override
+    public boolean promoteClone(String hostName, String cloneName, String newName, boolean copyit) {
+        List<String> args = new ArrayList<>();
+        args.add(cloneName);
+        if(newName != null && newName.length() > 0) args.add("-n " + newName);
+        if(copyit) args.add("-c");
+        String[] arr = args.toArray(new String[args.size()]);
+
+        Agent a = agentManager.getAgentByHostname(hostName);
+        return scriptExecutor.execute(a, ActionType.PROMOTE, arr);
     }
 
     @Override
     public boolean importTemplate(String hostName, String templateName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        if(checkParentTemplate(a, templateName))
-            return scriptExecutor.execute(a, ActionType.IMPORT, templateName);
-        return false;
+        // check parents first
+        List<Template> parents = templateRegistry.getParentTemplates(templateName);
+        for(Template p : parents) {
+            boolean temp_exists = scriptExecutor.execute(a,
+                    ActionType.LIST_TEMPLATES, p.getTemplateName());
+            if(!temp_exists) {
+                boolean installed = scriptExecutor.execute(a,
+                        ActionType.IMPORT, p.getTemplateName());
+                if(!installed) {
+                    logger.error("Failed to install parent templates: " + p.getTemplateName());
+                    return false;
+                }
+            }
+        }
+        return scriptExecutor.execute(a, ActionType.IMPORT, templateName);
     }
 
     @Override
     public String exportTemplate(String hostName, String templateName) {
-        // check if registered as template
-        Template template = templateRegistry.getTemplate(templateName);
-        if(template == null) return null;
-
         Agent a = agentManager.getAgentByHostname(hostName);
         boolean b = scriptExecutor.execute(a, ActionType.EXPORT, templateName);
-        if(b) {
-            String filePath = getExportedPackageFilePath(a, templateName);
-            try {
-                repoManager.addPackageByPath(a, filePath, false);
-                return filePath;
-            } catch(AptRepoException ex) {
-                logger.error("Failed to add package to repo", ex);
-            }
-        }
+        if(b) return getExportedPackageFilePath(a, templateName);
         return null;
     }
 
-    private boolean checkParentTemplate(Agent a, String templateName) {
-        Template parent = templateRegistry.getParentTemplate(templateName);
-        if(parent == null) {
-            logger.error("Parent not defined for template {}", templateName);
-            return false;
-        }
-
-        String parentName = parent.getTemplateName();
-        if(parentName.equals(getMasterTemplateName())) return true;
-
-        if(!zfsIsTemplate(a, parentName)) {
-            boolean b = scriptExecutor.execute(a, ActionType.IMPORT, parentName);
-            if(!b) return false;
-        }
-        return checkParentTemplate(a, parentName);
-    }
-
-    private boolean zfsIsTemplate(Agent a, String containerName) {
-        String s = String.format(
-                "zfs list -t snapshot -o name -H | grep \"lxc/%s@template\"",
-                containerName);
-        Command cmd = commandRunner.createCommand(new RequestBuilder(s),
-                new HashSet<>(Arrays.asList(a)));
-        commandRunner.runCommand(cmd);
-
-        // exit status of grep is 0 if selected lines are found
-        return cmd.hasSucceeded();
-    }
-
     private String getExportedPackageFilePath(Agent a, String templateName) {
+        Set<Agent> set = new HashSet<>(Arrays.asList(a));
         Command cmd = commandRunner.createCommand(
-                new RequestBuilder("echo $SUBUTAI_TMPDIR"),
-                new HashSet<>(Arrays.asList(a)));
+                new RequestBuilder("echo $SUBUTAI_TMPDIR"), set);
         commandRunner.runCommand(cmd);
         AgentResult res = cmd.getResults().get(a.getUuid());
         if(res.getExitCode() != null && res.getExitCode() == 0) {
             String dir = res.getStdOut();
-            templateName = templateName + "-subutai-template.deb";
-            return Paths.get(dir, templateName).toString();
+            String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
+            cmd = commandRunner.createCommand(new RequestBuilder(s), set);
+            commandRunner.runCommand(cmd);
+            if(cmd.hasSucceeded()) {
+                res = cmd.getResults().get(a.getUuid());
+                return Paths.get(dir, res.getStdOut()).toString();
+            } else { // TODO: to be removed
+                templateName = templateName + "-subutai-template.deb";
+                return Paths.get(dir, templateName).toString();
+            }
         }
         return null;
     }

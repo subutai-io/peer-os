@@ -6,7 +6,7 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
     <reference id="monitor" availability="mandatory"
-               interface="org.safehaus.subutai.api.monitor.Monitor" />
+               interface="org.safehaus.subutai.api.monitoring.Monitor" />
     <reference id="templateManager" availability="mandatory"
                interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
     <reference id="templateRegistry" availability="mandatory"

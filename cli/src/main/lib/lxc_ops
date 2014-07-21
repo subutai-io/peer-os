@@ -188,7 +188,8 @@ function lxc_clone {
   # (2) setup skeleton of new cloned child container
   mkdir -p $child_rootfs
   local mac=`lxc_new_mac`
-  cat $parent_conf | sed                                           \
+  cat $parent_conf | grep -v subutai.template.package \
+      | sed                                           \
      -e "s/lxc\.utsname.*/lxc\.utsname = $child/"                  \
      -e "s/subutai\.parent.*/subutai\.parent = $parent/"           \
      -e "s/\/var\/lib\/lxc\/$parent\//\/var\/lib\/lxc\/$child\//g" \
@@ -208,6 +209,14 @@ function lxc_clone {
   echo $child > $child_rootfs/etc/hostname
   cat $parent_home/rootfs/etc/hosts | sed \
     -e "s/$parent/$child/g" > $child_rootfs/etc/hosts
+
+  if [ -n "`cat $child_rootfs/etc/profile | grep PHY_HOST`" ]; then
+    cat $child_rootfs/etc/profile | \
+      grep -v PHY_HOST >> $child_rootfs/etc/profile.new
+    rm $child_rootfs/etc/profile
+    mv $child_rootfs/etc/profile.new $child_rootfs/etc/profile
+  fi
+    
   echo "export PHY_HOST=`hostname`" >> $child_rootfs/etc/profile
 }
 

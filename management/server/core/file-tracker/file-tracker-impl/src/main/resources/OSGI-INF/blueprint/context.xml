@@ -16,12 +16,12 @@
   </bean>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-      <command name="fs-tracker/test">
-        <action class="org.safehaus.subutai.impl.filetracker.CliTest">
-          <property name="agentManager" ref="agentManager" />
-          <property name="fileTracker" ref="fileTracker" />
-        </action>
-      </command>
-    </command-bundle>
+    <command name="file-tracker/test">
+      <action class="org.safehaus.subutai.impl.filetracker.CliTest">
+        <property name="agentManager" ref="agentManager" />
+        <property name="fileTracker" ref="fileTracker" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>
