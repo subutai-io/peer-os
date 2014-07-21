@@ -8,8 +8,8 @@ package org.safehaus.subutai.ui.mongodb;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.mongodb.Config;
-import org.safehaus.subutai.api.mongodb.Mongo;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -71,11 +71,11 @@ public class MongoUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return MongoClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return MongoClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

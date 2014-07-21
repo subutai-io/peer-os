@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.mongodb.handler;
 
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.mongodb.Config;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;
 import org.safehaus.subutai.impl.mongodb.common.Commands;
@@ -21,7 +21,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
     public StopNodeOperationHandler(MongoImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation(MongoClusterConfig.PRODUCT_KEY,
                 String.format("Stopping node %s in %s", lxcHostname, clusterName));
 
     }
@@ -33,7 +33,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
 
     @Override
     public void run() {
-        Config config = manager.getCluster(clusterName);
+        MongoClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;

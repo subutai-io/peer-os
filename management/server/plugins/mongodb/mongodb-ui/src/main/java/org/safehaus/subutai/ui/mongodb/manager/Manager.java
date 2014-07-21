@@ -11,8 +11,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.mongodb.Config;
-import org.safehaus.subutai.api.mongodb.NodeType;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -41,7 +41,7 @@ public class Manager {
 	private final Label cfgSrvPort;
 	private final Label routerPort;
 	private final Label dataNodePort;
-	private Config config;
+	private MongoClusterConfig mongoClusterConfig;
 
 	public Manager() {
 
@@ -71,7 +71,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				mongoClusterConfig = (MongoClusterConfig ) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -130,14 +130,15 @@ public class Manager {
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (config != null) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
+				if ( mongoClusterConfig != null) {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", mongoClusterConfig
+                            .getClusterName()),
 							"Yes", "No");
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = MongoUI.getMongoManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							UUID trackID = MongoUI.getMongoManager().uninstallCluster( mongoClusterConfig.getClusterName());
+							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, MongoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -162,14 +163,15 @@ public class Manager {
 		addRouterBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (config != null) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add ROUTER to the %s cluster?", config.getClusterName()),
+				if ( mongoClusterConfig != null) {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add ROUTER to the %s cluster?", mongoClusterConfig
+                            .getClusterName()),
 							"Yes", "No");
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.ROUTER_NODE);
-							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							UUID trackID = MongoUI.getMongoManager().addNode( mongoClusterConfig.getClusterName(), NodeType.ROUTER_NODE);
+							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, MongoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -192,14 +194,15 @@ public class Manager {
 		addDataNodeBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (config != null) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add DATA_NODE to the %s cluster?", config.getClusterName()),
+				if ( mongoClusterConfig != null) {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add DATA_NODE to the %s cluster?", mongoClusterConfig
+                            .getClusterName()),
 							"Yes", "No");
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = MongoUI.getMongoManager().addNode(config.getClusterName(), NodeType.DATA_NODE);
-							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							UUID trackID = MongoUI.getMongoManager().addNode( mongoClusterConfig.getClusterName(), NodeType.DATA_NODE);
+							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, MongoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -318,7 +321,7 @@ public class Manager {
 					stopBtn.setEnabled(false);
 					destroyBtn.setEnabled(false);
 
-					MongoUI.getExecutor().execute(new CheckTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+					MongoUI.getExecutor().execute(new CheckTask( mongoClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
 						public void onComplete(NodeState state) {
 							synchronized (progressIcon) {
@@ -343,7 +346,7 @@ public class Manager {
 					stopBtn.setEnabled(false);
 					destroyBtn.setEnabled(false);
 
-					MongoUI.getExecutor().execute(new StartTask(nodeType, config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+					MongoUI.getExecutor().execute(new StartTask(nodeType, mongoClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
 						public void onComplete(NodeState state) {
 							synchronized (progressIcon) {
@@ -368,7 +371,7 @@ public class Manager {
 					stopBtn.setEnabled(false);
 					destroyBtn.setEnabled(false);
 
-					MongoUI.getExecutor().execute(new StopTask(config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+					MongoUI.getExecutor().execute(new StopTask( mongoClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
 						public void onComplete(NodeState state) {
 							synchronized (progressIcon) {
@@ -393,8 +396,8 @@ public class Manager {
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = MongoUI.getMongoManager().destroyNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							UUID trackID = MongoUI.getMongoManager().destroyNode( mongoClusterConfig.getClusterName(), agent.getHostname());
+							ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, MongoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -412,15 +415,15 @@ public class Manager {
 	}
 
 	private void refreshUI() {
-		if (config != null) {
-			populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
-			populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
-			populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
-			replicaSetName.setValue(config.getReplicaSetName());
-			domainName.setValue(config.getDomainName());
-			cfgSrvPort.setValue(config.getCfgSrvPort() + "");
-			routerPort.setValue(config.getRouterPort() + "");
-			dataNodePort.setValue(config.getDataNodePort() + "");
+		if ( mongoClusterConfig != null) {
+			populateTable(configServersTable, mongoClusterConfig.getConfigServers(), NodeType.CONFIG_NODE);
+			populateTable(routersTable, mongoClusterConfig.getRouterServers(), NodeType.ROUTER_NODE);
+			populateTable(dataNodesTable, mongoClusterConfig.getDataNodes(), NodeType.DATA_NODE);
+			replicaSetName.setValue( mongoClusterConfig.getReplicaSetName());
+			domainName.setValue( mongoClusterConfig.getDomainName());
+			cfgSrvPort.setValue( mongoClusterConfig.getCfgSrvPort() + "");
+			routerPort.setValue( mongoClusterConfig.getRouterPort() + "");
+			dataNodePort.setValue( mongoClusterConfig.getDataNodePort() + "");
 		} else {
 			configServersTable.removeAllItems();
 			routersTable.removeAllItems();
@@ -434,17 +437,17 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<Config> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
+		List<MongoClusterConfig> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
+		MongoClusterConfig clusterInfo = (MongoClusterConfig ) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-			for (Config mongoClusterInfo : mongoClusterInfos) {
+			for (MongoClusterConfig mongoClusterInfo : mongoClusterInfos) {
 				clusterCombo.addItem(mongoClusterInfo);
 				clusterCombo.setItemCaption(mongoClusterInfo,
 						mongoClusterInfo.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : mongoClusterInfos) {
+				for (MongoClusterConfig mongoClusterInfo : mongoClusterInfos) {
 					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(mongoClusterInfo);
 						return;

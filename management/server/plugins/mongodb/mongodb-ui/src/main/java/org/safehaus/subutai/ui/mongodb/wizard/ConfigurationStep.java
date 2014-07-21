@@ -30,11 +30,11 @@ public class ConfigurationStep extends VerticalLayout {
 		clusterNameTxtFld.setInputPrompt("Cluster name");
 		clusterNameTxtFld.setRequired(true);
 		clusterNameTxtFld.setMaxLength(20);
-		clusterNameTxtFld.setValue(wizard.getConfig().getClusterName());
+		clusterNameTxtFld.setValue(wizard.getMongoClusterConfig().getClusterName());
 		clusterNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				wizard.getConfig().setClusterName(event.getProperty().getValue().toString().trim());
+				wizard.getMongoClusterConfig().setClusterName(event.getProperty().getValue().toString().trim());
 			}
 		});
 
@@ -43,12 +43,12 @@ public class ConfigurationStep extends VerticalLayout {
 		cfgSrvsCombo.setImmediate(true);
 		cfgSrvsCombo.setTextInputAllowed(false);
 		cfgSrvsCombo.setNullSelectionAllowed(false);
-		cfgSrvsCombo.setValue(wizard.getConfig().getNumberOfConfigServers());
+		cfgSrvsCombo.setValue(wizard.getMongoClusterConfig().getNumberOfConfigServers());
 
 		cfgSrvsCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				wizard.getConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
+				wizard.getMongoClusterConfig().setNumberOfConfigServers((Integer) event.getProperty().getValue());
 			}
 		});
 
@@ -57,12 +57,12 @@ public class ConfigurationStep extends VerticalLayout {
 		routersCombo.setImmediate(true);
 		routersCombo.setTextInputAllowed(false);
 		routersCombo.setNullSelectionAllowed(false);
-		routersCombo.setValue(wizard.getConfig().getNumberOfRouters());
+		routersCombo.setValue(wizard.getMongoClusterConfig().getNumberOfRouters());
 
 		routersCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				wizard.getConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
+				wizard.getMongoClusterConfig().setNumberOfRouters((Integer) event.getProperty().getValue());
 			}
 		});
 
@@ -71,76 +71,76 @@ public class ConfigurationStep extends VerticalLayout {
 		dataNodesCombo.setImmediate(true);
 		dataNodesCombo.setTextInputAllowed(false);
 		dataNodesCombo.setNullSelectionAllowed(false);
-		dataNodesCombo.setValue(wizard.getConfig().getNumberOfDataNodes());
+		dataNodesCombo.setValue(wizard.getMongoClusterConfig().getNumberOfDataNodes());
 
 		dataNodesCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
+				wizard.getMongoClusterConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
 			}
 		});
 
 		TextField replicaSetName = new TextField("Enter replica set name");
-		replicaSetName.setInputPrompt(wizard.getConfig().getReplicaSetName());
+		replicaSetName.setInputPrompt(wizard.getMongoClusterConfig().getReplicaSetName());
 		replicaSetName.setMaxLength(20);
 		replicaSetName.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				String value = event.getProperty().getValue().toString().trim();
 				if (!Strings.isNullOrEmpty(value)) {
-					wizard.getConfig().setReplicaSetName(value);
+					wizard.getMongoClusterConfig().setReplicaSetName(value);
 				}
 			}
 		});
 
 		TextField cfgSrvPort = new TextField("Enter port for configuration servers");
-		cfgSrvPort.setInputPrompt(wizard.getConfig().getCfgSrvPort() + "");
+		cfgSrvPort.setInputPrompt(wizard.getMongoClusterConfig().getCfgSrvPort() + "");
 		cfgSrvPort.setMaxLength(5);
 		cfgSrvPort.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				String value = event.getProperty().getValue().toString().trim();
 				if (Util.isNumeric(value)) {
-					wizard.getConfig().setCfgSrvPort(Integer.parseInt(value));
+					wizard.getMongoClusterConfig().setCfgSrvPort(Integer.parseInt(value));
 				}
 			}
 		});
 
 		TextField routerPort = new TextField("Enter port for routers");
-		routerPort.setInputPrompt(wizard.getConfig().getRouterPort() + "");
+		routerPort.setInputPrompt(wizard.getMongoClusterConfig().getRouterPort() + "");
 		routerPort.setMaxLength(5);
 		routerPort.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				String value = event.getProperty().getValue().toString().trim();
 				if (Util.isNumeric(value)) {
-					wizard.getConfig().setRouterPort(Integer.parseInt(value));
+					wizard.getMongoClusterConfig().setRouterPort(Integer.parseInt(value));
 				}
 			}
 		});
 
 		TextField dataNodePort = new TextField("Enter port for data nodes");
-		dataNodePort.setInputPrompt(wizard.getConfig().getDataNodePort() + "");
+		dataNodePort.setInputPrompt(wizard.getMongoClusterConfig().getDataNodePort() + "");
 		dataNodePort.setMaxLength(5);
 		dataNodePort.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				String value = event.getProperty().getValue().toString().trim();
 				if (Util.isNumeric(value)) {
-					wizard.getConfig().setDataNodePort(Integer.parseInt(value));
+					wizard.getMongoClusterConfig().setDataNodePort(Integer.parseInt(value));
 				}
 			}
 		});
 
 		TextField domain = new TextField("Enter domain name");
-		domain.setInputPrompt(wizard.getConfig().getDomainName());
+		domain.setInputPrompt(wizard.getMongoClusterConfig().getDomainName());
 		domain.setMaxLength(20);
 		domain.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				String value = event.getProperty().getValue().toString().trim();
 				if (!Strings.isNullOrEmpty(value)) {
-					wizard.getConfig().setDomainName(value);
+					wizard.getMongoClusterConfig().setDomainName(value);
 				}
 			}
 		});
@@ -150,7 +150,7 @@ public class ConfigurationStep extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
+				if (Strings.isNullOrEmpty(wizard.getMongoClusterConfig().getClusterName())) {
 					show("Please provide cluster name");
 
 				} else {

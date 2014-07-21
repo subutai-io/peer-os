@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.api.mongodb;
+package org.safehaus.subutai.plugin.mongodb.api;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class MongoClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "MongoDB";
     private String clusterName = "";

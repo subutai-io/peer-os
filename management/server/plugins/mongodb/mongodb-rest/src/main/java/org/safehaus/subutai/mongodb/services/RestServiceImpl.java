@@ -1,6 +1,6 @@
 package org.safehaus.subutai.mongodb.services;
 
-import org.safehaus.subutai.api.mongodb.Mongo;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 
 /**
  * Created by bahadyr on 5/6/14.

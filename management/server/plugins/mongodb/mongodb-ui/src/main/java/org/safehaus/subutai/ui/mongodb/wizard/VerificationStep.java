@@ -7,11 +7,7 @@ package org.safehaus.subutai.ui.mongodb.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.mongodb.Config;
-import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.ui.mongodb.MongoUI;
 
-import java.util.UUID;
 
 /**
  * @author dilshat
@@ -32,30 +28,30 @@ public class VerificationStep extends VerticalLayout {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Replica Set Name", wizard.getConfig().getReplicaSetName());
-		cfgView.addStringCfg("Domain Name", wizard.getConfig().getDomainName());
-		cfgView.addStringCfg("Number of configuration servers", wizard.getConfig().getNumberOfConfigServers() + "");
-		cfgView.addStringCfg("Number of routers", wizard.getConfig().getNumberOfRouters() + "");
-		cfgView.addStringCfg("Number of data nodes", wizard.getConfig().getNumberOfDataNodes() + "");
-		cfgView.addStringCfg("Configuration servers port", wizard.getConfig().getCfgSrvPort() + "");
-		cfgView.addStringCfg("Routers port", wizard.getConfig().getRouterPort() + "");
-		cfgView.addStringCfg("Data nodes port", wizard.getConfig().getDataNodePort() + "");
+		cfgView.addStringCfg("Cluster Name", wizard.getMongoClusterConfig().getClusterName());
+		cfgView.addStringCfg("Replica Set Name", wizard.getMongoClusterConfig().getReplicaSetName());
+		cfgView.addStringCfg("Domain Name", wizard.getMongoClusterConfig().getDomainName());
+		cfgView.addStringCfg("Number of configuration servers", wizard.getMongoClusterConfig().getNumberOfConfigServers() + "");
+		cfgView.addStringCfg("Number of routers", wizard.getMongoClusterConfig().getNumberOfRouters() + "");
+		cfgView.addStringCfg("Number of data nodes", wizard.getMongoClusterConfig().getNumberOfDataNodes() + "");
+		cfgView.addStringCfg("Configuration servers port", wizard.getMongoClusterConfig().getCfgSrvPort() + "");
+		cfgView.addStringCfg("Routers port", wizard.getMongoClusterConfig().getRouterPort() + "");
+		cfgView.addStringCfg("Data nodes port", wizard.getMongoClusterConfig().getDataNodePort() + "");
 
 		Button install = new Button("Install");
 		install.addStyleName("default");
 		install.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, Config.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						wizard.init();
-					}
-				});
-				getUI().addWindow(window.getWindow());
+//				UUID trackID = MongoUI.getMongoManager().installCluster(wizard.getMongoClusterConfig());
+//				ProgressWindow window = new ProgressWindow(MongoUI.getExecutor(), MongoUI.getTracker(), trackID, MongoClusterConfig.PRODUCT_KEY);
+//				window.getWindow().addCloseListener(new Window.CloseListener() {
+//					@Override
+//					public void windowClose(Window.CloseEvent closeEvent) {
+//						wizard.init();
+//					}
+//				});
+//				getUI().addWindow(window.getWindow());
 			}
 		});
 

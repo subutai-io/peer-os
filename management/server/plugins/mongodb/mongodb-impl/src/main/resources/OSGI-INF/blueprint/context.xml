@@ -21,6 +21,6 @@
         <argument ref="tracker"/>
     </bean>
 
-    <service ref="mongo-impl" interface="org.safehaus.subutai.api.mongodb.Mongo"/>
+    <service ref="mongo-impl" interface="org.safehaus.subutai.plugin.mongodb.api.Mongo"/>
 
 </blueprint>
