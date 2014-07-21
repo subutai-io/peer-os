@@ -12,7 +12,13 @@ import org.safehaus.subutai.configuration.manager.impl.loaders.ConfigurationLoad
 import org.safehaus.subutai.configuration.manager.impl.loaders.PropertiesConfigurationLoader;
 import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
 import org.safehaus.subutai.configuration.manager.impl.loaders.YamConfigurationlLoader;
+import org.safehaus.subutai.configuration.manager.impl.utils.ConfigParser;
+import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
+import org.safehaus.subutai.configuration.manager.impl.utils.XmlParser;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.FileUtil;
+
+import org.apache.commons.configuration.ConfigurationException;
 
 import com.google.gson.JsonObject;
 
@@ -70,10 +76,30 @@ public class ConfigManagerImpl implements ConfigManager {
     }
 
 
-    /*@Override
+    @Override
     public JsonObject getConfigurationTemplate( final String configPathFilename, final ConfigTypeEnum configTypeEnum ) {
-        String content = FileUtil.getContent( configPathFilename, "Monitor" );
-        System.out.println(content);
+        ConfigParser configParser = null;
+        String content = FileUtil.getContent( configPathFilename, this );
+        try {
+            switch ( configTypeEnum ) {
+                case YAML: {
+                    configParser = new XmlParser( content );
+                    break;
+                }
+                case PROPERTIES: {
+                    configParser = new IniParser( content );
+                    break;
+                }
+                case XML: {
+                    configParser = new XmlParser( content );
+                    break;
+                }
+            }
+            return configParser.parserConfig(configPathFilename, configTypeEnum);
+        }
+        catch ( ConfigurationException e ) {
+            e.printStackTrace();
+        }
         return null;
-    }*/
+    }
 }

@@ -8,11 +8,14 @@ import org.apache.commons.configuration.tree.DefaultExpressionEngine;
 import org.apache.commons.configuration.tree.ExpressionEngine;
 import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 
+import com.google.gson.JsonObject;
+
+
 /**
  *
  * @author dilshat
  */
-public class XmlParser {
+public class XmlParser implements ConfigParser {
 
     private final XMLConfiguration config;
     private final ExpressionEngine defaultEngine = new DefaultExpressionEngine();
@@ -57,4 +60,9 @@ public class XmlParser {
         return str.toString();
     }
 
+
+    @Override
+    public JsonObject parserConfig() {
+        return null;
+    }
 }

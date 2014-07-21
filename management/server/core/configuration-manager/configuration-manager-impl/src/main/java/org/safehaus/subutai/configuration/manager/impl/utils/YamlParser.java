@@ -8,12 +8,14 @@ import java.util.Map;
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
+import com.google.gson.JsonObject;
+
 
 /**
  *
  * @author dilshat
  */
-public class YamlParser {
+public class YamlParser implements ConfigParser {
 
     private final Map yaml;
 
@@ -65,4 +67,9 @@ public class YamlParser {
         return str.toString();
     }
 
+
+    @Override
+    public JsonObject parserConfig() {
+        return null;
+    }
 }
