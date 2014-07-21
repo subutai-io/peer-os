@@ -34,22 +34,18 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) {
+    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) throws LxcCreateException {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
-        Iterator<Agent> it = metrics.keySet().iterator();
-        while(it.hasNext()) {
-            if(!hosts.contains(it.next())) it.remove();
+        if(hosts != null) {
+            Iterator<Agent> it = metrics.keySet().iterator();
+            while(it.hasNext())
+                if(!hosts.contains(it.next())) it.remove();
         }
 
         LxcPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
-        try {
-            st.calculatePlacement(metrics);
-        } catch(LxcCreateException ex) {
-            logger.error("Failed to calculate placement", ex);
-            return Collections.emptySet();
-        }
+        st.calculatePlacement(metrics);
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
         // clone specified number of instances and store their names
@@ -70,12 +66,18 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             if(a != null) clones.add(a);
         }
         try {
-            saveNodeGroup(envId, templateName, clones, strategy);
+            if(envId != null)
+                saveNodeGroup(envId, templateName, clones, strategy);
         } catch(Exception ex) {
             logger.error("Failed to save nodes info", ex);
         }
 
         return clones;
+    }
+
+    @Override
+    public Set<Agent> clone(String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategyENUM... strategy) throws LxcCreateException {
+        return clone(null, templateName, nodesCount, hosts, strategy);
     }
 
     @Override
