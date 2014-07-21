@@ -5,10 +5,19 @@
 # functions.
 # ==========================================================================
 
+function lxc_assert_name {
+  local lxc="$1"
+  if [ -n "`echo $lxc | grep '-'`" ]; then
+    msg_error "Arg \"$lxc\" contains illegal dash character."
+    exit 1
+  fi
+}
+
 
 # simply check if running before stopping
 function lxc_stop {
   local lxc="$1"
+  lxc_assert_name "$lxc"
   
   if [ "$lxc" == "`lxc-ls --running | grep $lxc`" ]; then
     lxc-stop -n $lxc
@@ -21,6 +30,8 @@ function lxc_stop {
 # sleeps for maximum of (arg $2) seconds: defaults to 10 seconds
 function lxc_wait_net {
   local lxc="$1"
+  lxc_assert_name "$lxc"
+
   local waitmax="$2"
 
   lxc-start -d -n $lxc
@@ -98,7 +109,11 @@ function lxc_assert {
 
 function lxc_clone_ds {
   local parent="$1"
+  lxc_assert_name "$parent"
+
   local child="$2"
+  lxc_assert_name "$child"
+
   local partition="$3"
   local pool="$4"
   local usage="$5"
@@ -154,7 +169,11 @@ function lxc_new_mac {
 function lxc_clone {
   # nice local names for args
   local parent="$1"
+  lxc_assert_name "$parent"
+
   local child="$2"
+  lxc_assert_name "$child"
+
   local usage="$3"
 
   if [ -z "$parent" ]; then
@@ -224,7 +243,11 @@ function lxc_clone {
 function lxc_copy {
   # nice local names for args
   local parent="$1"
+  lxc_assert_name "$parent"
+
   local child="$2"
+  lxc_assert_name "$child"
+
   local usage="$3"
 
   if [ -z "$parent" ]; then
@@ -284,7 +307,11 @@ function lxc_copy {
 
 function lxc_rename {
   local src="$1"
+  lxc_assert_name "$src"
+
   local dst="$2"
+  lxc_assert_name "$dst"
+
   local usage="$3"
 
   if [ -z "$src" ]; then
