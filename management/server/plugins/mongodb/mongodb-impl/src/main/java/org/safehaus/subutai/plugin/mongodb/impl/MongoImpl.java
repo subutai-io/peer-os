@@ -15,7 +15,6 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -48,8 +47,8 @@ public class MongoImpl implements Mongo {
     private ExecutorService executor;
 
 
-    public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager,
-                      LxcManager lxcManager, Tracker tracker, ContainerManager containerManager ) {
+    public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+                      ContainerManager containerManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
