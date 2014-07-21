@@ -13,8 +13,8 @@
              interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
-  <reference id="configManager" availability="mandatory"
-             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>
+  <!--<reference id="configManager" availability="mandatory"-->
+             <!--interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>-->
 
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.impl.cassandra.CassandraImpl"
         init-method="init" destroy-method="destroy">
@@ -26,10 +26,10 @@
     <property name="agentManager" ref="agentManager" />
   </bean>
 
-  <bean id="cassandra-configurator" scope="singleton"
+  <!--<bean id="cassandra-configurator" scope="singleton"
         class="org.safehaus.subutai.impl.cassandra.configuration.logic.ConfigurationLogic">
       <property name="configManager" ref="configManager"/>
-  </bean>
+  </bean>-->
 
   <service ref="cassandra-impl" interface="org.safehaus.subutai.api.cassandra.Cassandra" />
 
