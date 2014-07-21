@@ -1,10 +1,6 @@
 package org.safehaus.subutai.dis.manager.window;
 
 
-import org.safehaus.subutai.api.manager.helper.Blueprint;
-
-import com.vaadin.ui.Component;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -42,5 +38,5 @@ public abstract class DetailsWindow extends Window {
 
 
 
-    public abstract void setContent(Blueprint blueprint);
+//    public abstract void setContent(EnvironmentBlueprint blueprint);
 }

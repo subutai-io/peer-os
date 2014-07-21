@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
+  <!--<bean id="configManager" scope="singleton"
+        init-method="start"
+        class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
+    <property name="bcontext" ref="blueprintBundleContext"></property>
+  </bean>-->
+  <!--<service ref="textInjector" interface="org.safehaus.subutai.configuration.manager.api.TextInjector" />-->
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
 
-  <bean id="configManager" scope="singleton" class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
+  <bean id="configManager" scope="singleton"
+        class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
+    <!--<property name="bcontext" ref="blueprintBundleContext"></property>-->
   </bean>
 
-  <service ref="configManager" interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+  <bean id="configurationInjector" scope="singleton"
+        class="org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl">
+    <!--<property name="textInjector" ref="textInjector"></property>-->
+    <property name="commandRunner" ref="commandRunner" />
+  </bean>
 
 </blueprint>
