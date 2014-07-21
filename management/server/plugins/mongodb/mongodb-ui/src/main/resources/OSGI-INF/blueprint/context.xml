@@ -10,7 +10,7 @@
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
         
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.mongodb.MongoUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.ui.MongoUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager" />
         <argument ref="mongoManager"/>

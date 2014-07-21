@@ -16,7 +16,7 @@
             <ref component-id="mongodbRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.mongodb.services.RestServiceImpl">
+    <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.plugin.mongodb.rest.RestServiceImpl">
         <property name="mongodbManager" ref="mongodbManager"/>
     </bean>
     <reference id="mongodbManager" availability="mandatory"

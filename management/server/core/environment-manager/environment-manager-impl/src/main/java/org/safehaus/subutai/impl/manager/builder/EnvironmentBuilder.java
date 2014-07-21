@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
@@ -32,9 +33,11 @@ public class EnvironmentBuilder {
 
             Set<Agent> agentList;
             try {
-                agentList = containerManager.clone(environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1);
-            } catch(LxcCreateException ex) {
-                throw new EnvironmentBuildException(ex.toString());
+                agentList = containerManager
+                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
+            }
+            catch ( LxcCreateException ex ) {
+                throw new EnvironmentBuildException( ex.toString() );
             }
 
             environment.getAgents().addAll( agentList );
