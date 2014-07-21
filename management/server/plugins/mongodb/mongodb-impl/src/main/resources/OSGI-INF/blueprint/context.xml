@@ -7,8 +7,6 @@
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.api.dbmanager.DbManager" />
-  <reference id="lxcManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
   <reference id="tracker" availability="mandatory"
              interface="org.safehaus.subutai.api.tracker.Tracker" />
   <reference id="containerManager" availability="mandatory"
@@ -19,7 +17,6 @@
     <argument ref="commandRunner" />
     <argument ref="agentManager" />
     <argument ref="dbManager" />
-    <argument ref="lxcManager" />
     <argument ref="tracker" />
     <argument ref="containerManager" />
   </bean>

@@ -28,13 +28,6 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
  */
 public class Commands extends CommandsSingleton {
 
-    // INSTALLATION COMMANDS ===================================================
-    //    public static Command getInstallCommand( Set<Agent> agents ) {
-    //        return createCommand( "Install Mongo",
-    //                new RequestBuilder( "sleep 10 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo" )
-    //                        .withTimeout( 360 ), agents );
-    //    }
-
 
     public static Command getSetReplicaSetNameCommand( String replicaSetName, Set<Agent> agents ) {
         return createCommand( "Set replica set name", new RequestBuilder(
@@ -193,11 +186,7 @@ public class Commands extends CommandsSingleton {
 
 
     public static List<Command> getInstallationCommands( MongoClusterConfig config ) {
-        List<Command> commands = new ArrayList<Command>();
-
-        //        commands.add( getInstallCommand( config.getAllNodes() ) );
-        //
-        //        commands.add( getStopNodeCommand( config.getAllNodes() ) );
+        List<Command> commands = new ArrayList<>();
 
         commands.add( getAddIpHostToEtcHostsCommand( config.getDomainName(), config.getAllNodes() ) );
 
@@ -231,14 +220,10 @@ public class Commands extends CommandsSingleton {
 
     public static List<Command> getAddRouterCommands( MongoClusterConfig config, Agent newRouterAgent ) {
 
-        List<Command> commands = new ArrayList<Command>();
+        List<Command> commands = new ArrayList<>();
 
-        Set<Agent> clusterMembers = new HashSet<Agent>( config.getAllNodes() );
+        Set<Agent> clusterMembers = new HashSet<>( config.getAllNodes() );
         clusterMembers.add( newRouterAgent );
-
-        //        commands.add( getInstallCommand( Util.wrapAgentToSet( newRouterAgent ) ) );
-
-        //        commands.add( getStopNodeCommand( Util.wrapAgentToSet( newRouterAgent ) ) );
 
         commands.add( getAddIpHostToEtcHostsCommand( config.getDomainName(), clusterMembers ) );
 
@@ -256,14 +241,10 @@ public class Commands extends CommandsSingleton {
 
     public static List<Command> getAddDataNodeCommands( MongoClusterConfig config, Agent newDataNodeAgent ) {
 
-        List<Command> commands = new ArrayList<Command>();
+        List<Command> commands = new ArrayList<>();
 
-        Set<Agent> clusterMembers = new HashSet<Agent>( config.getAllNodes() );
+        Set<Agent> clusterMembers = new HashSet<>( config.getAllNodes() );
         clusterMembers.add( newDataNodeAgent );
-
-        //        commands.add( getInstallCommand( Util.wrapAgentToSet( newDataNodeAgent ) ) );
-
-        //        commands.add( getStopNodeCommand( Util.wrapAgentToSet( newDataNodeAgent ) ) );
 
         commands.add( getAddIpHostToEtcHostsCommand( config.getDomainName(), clusterMembers ) );
 

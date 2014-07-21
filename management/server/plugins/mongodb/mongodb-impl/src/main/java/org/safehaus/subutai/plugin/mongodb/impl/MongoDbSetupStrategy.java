@@ -13,10 +13,11 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
-import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
-import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.NodeType;
+import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
+import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
@@ -35,7 +36,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     private AgentManager agentManager;
     private ProductOperation po;
     private MongoClusterConfig config;
-    private static final String templateName = "mongodb";
+    public static final String TEMPLATE_NAME = "mongodb";
 
 
     /*@todo add parameter validation logic*/
@@ -49,16 +50,20 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         this.commandRunner = commandRunner;
         this.po = po;
         this.config = config;
+    }
 
-        //        config.setCfgSrvPort( cfgSrvPort );
-        //        config.setRouterPort( routerPort );
-        //        config.setDataNodePort( dataNodePort );
-        //        config.setClusterName( clusterName );
-        //        config.setReplicaSetName( replicaSetName );
-        //        config.setDomainName( domainName );
-        //        config.setNumberOfDataNodes( numberOfDataNodes );
-        //        config.setNumberOfConfigServers( numberOfConfigServers );
-        //        config.setNumberOfRouters( numberOfRouters );
+
+    public static PlacementStrategyENUM getStrategyByNodeType( NodeType nodeType ) {
+        switch ( nodeType ) {
+            case CONFIG_NODE:
+                return PlacementStrategyENUM.MORE_RAM;
+            case ROUTER_NODE:
+                return PlacementStrategyENUM.MORE_CPU;
+            case DATA_NODE:
+                return PlacementStrategyENUM.MORE_HDD;
+            default:
+                return PlacementStrategyENUM.ROUND_ROBIN;
+        }
     }
 
 
@@ -77,18 +82,18 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
             po.addLog( String.format( "Creating %d config servers...", config.getNumberOfConfigServers() ) );
             Set<Agent> cfgServers = containerManager
-                    .clone( templateName, config.getNumberOfConfigServers(), agentManager.getPhysicalAgents(),
-                            PlacementStrategyENUM.MORE_CPU );
+                    .clone( TEMPLATE_NAME, config.getNumberOfConfigServers(), agentManager.getPhysicalAgents(),
+                            getStrategyByNodeType( NodeType.CONFIG_NODE ) );
 
             po.addLog( String.format( "Creating %d routers...", config.getNumberOfRouters() ) );
             Set<Agent> routers = containerManager
-                    .clone( templateName, config.getNumberOfRouters(), agentManager.getPhysicalAgents(),
-                            PlacementStrategyENUM.MORE_RAM );
+                    .clone( TEMPLATE_NAME, config.getNumberOfRouters(), agentManager.getPhysicalAgents(),
+                            getStrategyByNodeType( NodeType.ROUTER_NODE ) );
 
             po.addLog( String.format( "Creating %d data nodes...", config.getNumberOfDataNodes() ) );
             Set<Agent> dataNodes = containerManager
-                    .clone( templateName, config.getNumberOfDataNodes(), agentManager.getPhysicalAgents(),
-                            PlacementStrategyENUM.MORE_HDD );
+                    .clone( TEMPLATE_NAME, config.getNumberOfDataNodes(), agentManager.getPhysicalAgents(),
+                            getStrategyByNodeType( NodeType.DATA_NODE ) );
 
 
             config.setConfigServers( cfgServers );

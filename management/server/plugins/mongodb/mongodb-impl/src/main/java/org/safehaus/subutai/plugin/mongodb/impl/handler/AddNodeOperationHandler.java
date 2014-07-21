@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,6 +14,7 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
+import org.safehaus.subutai.plugin.mongodb.impl.MongoDbSetupStrategy;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
@@ -63,9 +63,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
             po.addLog( "Creating lxc container" );
 
-            Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs( 1 );
+            Set<Agent> agents = manager.getContainerManager().clone( MongoDbSetupStrategy.TEMPLATE_NAME, 1, null,
+                    MongoDbSetupStrategy.getStrategyByNodeType( nodeType ) );
 
-            Agent agent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+            Agent agent = agents.iterator().next();
 
             if ( nodeType == NodeType.DATA_NODE ) {
                 config.getDataNodes().add( agent );

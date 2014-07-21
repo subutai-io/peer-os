@@ -71,7 +71,7 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
      */
     public UUID checkNode( String clusterName, String lxcHostName );
 
-    public ClusterSetupStrategy getSetupStrategy( ProductOperation po, AgentManager agentManager, Mongo mongoManager,
+    public ClusterSetupStrategy getSetupStrategy( ProductOperation po, AgentManager agentManager,
                                                   CommandRunner commandRunner, ContainerManager containerManager,
                                                   MongoClusterConfig config );
 }

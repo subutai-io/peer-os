@@ -65,8 +65,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         final NodeType nodeType = config.getNodeType( agent );
         if ( nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1 ) {
             po.addLogFailed(
-                    "This is the last configuration server in the cluster. Please, destroy cluster instead\nOperation" +
-                            " aborted" );
+                    "This is the last configuration server in the cluster. Please, destroy cluster instead\nOperation"
+                            + " aborted" );
             return;
         }
         else if ( nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1 ) {
@@ -164,7 +164,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
                             agent.getHostname() ) );
         }
         else {
-            if ( !manager.getLxcManager().destroyLxcOnHost( physicalAgent, agent.getHostname() ) ) {
+            if ( !manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() ) ) {
                 po.addLog( "Could not destroy lxc container. Use LXC module to cleanup, skipping..." );
             }
             else {

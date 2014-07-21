@@ -17,6 +17,9 @@ import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
+import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
+import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.CheckNodeOperationHandler;
@@ -25,9 +28,6 @@ import org.safehaus.subutai.plugin.mongodb.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.mongodb.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.api.Mongo;
-import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
-import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
@@ -43,7 +43,6 @@ public class MongoImpl implements Mongo {
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
-    private LxcManager lxcManager;
     private Tracker tracker;
     private ContainerManager containerManager;
     private ExecutorService executor;
@@ -54,7 +53,6 @@ public class MongoImpl implements Mongo {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
-        this.lxcManager = lxcManager;
         this.tracker = tracker;
         this.containerManager = containerManager;
 
@@ -79,11 +77,6 @@ public class MongoImpl implements Mongo {
 
     public DbManager getDbManager() {
         return dbManager;
-    }
-
-
-    public LxcManager getLxcManager() {
-        return lxcManager;
     }
 
 
@@ -188,9 +181,9 @@ public class MongoImpl implements Mongo {
 
     @Override
     public ClusterSetupStrategy getSetupStrategy( final ProductOperation po, final AgentManager agentManager,
-                                                  final Mongo mongoManager, final CommandRunner commandRunner,
+                                                  final CommandRunner commandRunner,
                                                   final ContainerManager containerManager,
                                                   final MongoClusterConfig config ) {
-        return new MongoDbSetupStrategy( po, agentManager, mongoManager, commandRunner, containerManager, config );
+        return new MongoDbSetupStrategy( po, agentManager, this, commandRunner, containerManager, config );
     }
 }

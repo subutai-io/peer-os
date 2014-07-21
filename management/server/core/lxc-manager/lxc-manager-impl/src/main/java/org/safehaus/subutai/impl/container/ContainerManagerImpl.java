@@ -22,6 +22,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
@@ -184,6 +185,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                 new HashSet<>( Arrays.asList( physicalHost ) ) );
         commandRunner.runCommand( comm );
         return comm.hasSucceeded();
+    }
+
+
+    @Override
+    public void cloneDestroy( final String hostName, final String cloneName ) throws LxcDestroyException {
+        boolean result = templateManager.cloneDestroy( hostName, cloneName );
+        if ( !result ) {
+            throw new LxcDestroyException( String.format( "Error destroying container %s", cloneName ) );
+        }
     }
 
 
