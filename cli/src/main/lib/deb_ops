@@ -122,6 +122,8 @@ function create_control_file {
 
   # clean control file
   > $control_file
+  # Change permission of the control file
+  chmod 664 $control_file
 
   echo Package: $Package >> $control_file
   echo Maintainer: $Maintainer >> $control_file
