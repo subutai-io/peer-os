@@ -8,5 +8,5 @@ package org.safehaus.subutai.shared.protocol;
  */
 public interface ClusterSetupStrategy {
 
-    public ConfigBase setup();
+    public ConfigBase setup() throws ClusterSetupException;
 }
