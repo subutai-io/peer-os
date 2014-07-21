@@ -20,5 +20,5 @@
         <property name="mongodbManager" ref="mongodbManager"/>
     </bean>
     <reference id="mongodbManager" availability="mandatory"
-               interface="org.safehaus.subutai.plugin.mongodb.api.Mongo"/>
+               interface="org.safehaus.subutai.api.mongodb.Mongo"/>
 </blueprint>
