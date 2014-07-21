@@ -35,8 +35,8 @@ function master_destroy {
   local package_name=`get_package_name $container`
 
   # Check if the package is installed
-  dpkg -s $package_name
-  if [ $stat = 0  ]; then
+  dpkg -s $package_name > /dev/null 2>&1
+  if [ $? = 0  ]; then
     apt-get --assume-yes --force-yes purge $package_name
   fi
 
