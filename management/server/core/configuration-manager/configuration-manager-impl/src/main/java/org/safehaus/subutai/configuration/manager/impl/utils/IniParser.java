@@ -64,9 +64,9 @@ public class IniParser implements ConfigParser {
 
 
     @Override
-    public JsonObject parserConfig(String pathToConfig, ConfigTypeEnum configTypeEnum) {
+    public JsonObject parserConfig( String pathToConfig, ConfigTypeEnum configTypeEnum ) {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig , configTypeEnum );
+        JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
 
         Iterator<String> iterator = config.getKeys();
         List<JsonObject> fields = new ArrayList<>();
