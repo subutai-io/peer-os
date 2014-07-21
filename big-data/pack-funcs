@@ -1,112 +1,115 @@
 #!/bin/bash
 set -e
 usage() {
-	echo "Usage: initializeVariables {product_name}"
-        echo "Usage: getSourcesToRelevantDirectories {product_name}"
-        echo "Usage: generateDebianPackage {product_name}"
-
-	echo "Example: generateDebianPackage hadoop"
-	exit 1
+  echo "Usage: initializeVariables {product_name}"
+  echo "Usage: getSourcesToRelevantDirectories {product_name}"
+  echo "Usage: generateDebianPackage {product_name}"
+  echo "Example: generateDebianPackage hadoop"
+  exit 1
 }
 
 
 initializeVariables() {
-	if [[ $1 == "" ]];
-	then
-        	usage
-	fi
-	productName=$1
-	productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
-	BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
-	SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
-	TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
+  if [[ $1 == "" ]]; then
+    usage
+  fi
+  productName=$1
+  productNameUppercase="$(tr '[:lower:]' '[:upper:]' <<< ${productName:0:1})${productName:1}"
+  BASE=/var/lib/jenkins/jobs/master.bigdata.$productName/$productNameUppercase
+  SOURCE="/var/lib/jenkins/jobs/master.get_branch_repo/workspace/big-data/$productName/$productName"
+  TARGET="/var/lib/jenkins/Automation/Bigdata/$productName"
 
-	pushd $BASE
-        if ls *.deb ; then
-                rm  *.deb
-        fi
-        fileName=`ls | grep ksks | awk '{print $1}' | head -1`
-	if [[ $fileName == "" ]];
-	then
-		fileName="ksks-$productName"
-		mkdir -p $fileName
-	fi
-	popd
+  pushd $BASE
+  if ls *.deb ; then
+    rm  *.deb
+  fi
+  fileName=`ls | grep ksks | awk '{print $1}' | head -1`
+  if [[ $fileName == "" ]]; then
+    fileName="ksks-$productName"
+    mkdir -p $fileName
+  fi
+  popd
 }
 
 
 getSourcesToRelevantDirectories() {
-	initializeVariables $1
-	pushd $BASE
-	# Clear the previous contents of the directory
-        if [ -d $BASE/$fileName ]; then
-                rm -r $BASE/$fileName
-        fi
-	mkdir $BASE/$fileName
-	# Copy the sources that are pulled from the version control system
-        cp -a -r $SOURCE/* $BASE/$fileName
-	popd
+  initializeVariables $1
+  pushd $BASE
+  # Clear the previous contents of the directory
+  if [ -d $BASE/$fileName ]; then
+    rm -r $BASE/$fileName
+  fi
+  mkdir $BASE/$fileName
+  # Copy the sources that are pulled from the version control system
+  cp -a -r $SOURCE/* $BASE/$fileName
+  popd
 }
 
 
 generateDebianPackage() {
-	updatePackageContent $1
-        pushd $BASE
-	generateMD5Sum $1
-	dpkg-deb -z8 -Zgzip --build $packageName/
-	cp $packageName".deb" $TARGET/
-	popd
+  updatePackageContent $1
+  pushd $BASE
+  generateMD5Sum $1
+  dpkg-deb -z8 -Zgzip --build $packageName/
+  cp $packageName".deb" $TARGET/
+  popd
 }
+
 
 generateDebianPackageWithoutMD5() {
-        updatePackageContent $1
-        pushd $BASE
-        dpkg-deb -z8 -Zgzip --build $packageName/
-        cp $packageName".deb" $TARGET/
-        popd
+  updatePackageContent $1
+  pushd $BASE
+  dpkg-deb -z8 -Zgzip --build $packageName/
+  cp $packageName".deb" $TARGET/
+  popd
 }
+
 
 updatePackageContent() {
-	initializeVariables $1
-        pushd $BASE
+  initializeVariables $1
+  pushd $BASE
 
-        lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
-        lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
-        lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
-        linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
+  lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
+  lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
+  lineVersion=$(sed $lineNumberVersion!d $fileName/DEBIAN/control)
+  linePackage=$(sed $lineNumberPackage!d $fileName/DEBIAN/control)
 
-        version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
-        package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
+  version=$(echo $lineVersion | awk -F":" '{split($2,a," ");print a[1]}')
+  package=$(echo $linePackage | awk -F":" '{split($2,a," ");print a[1]}')
 
-        versionFirst=$(echo $version | awk -F"." '{print $1}')
-        versionSecond=$(echo $version | awk -F"." '{print $2}')
-        versionThird=$(echo $version | awk -F"." '{print $3}')
+  versionFirst=$(echo $version | awk -F"." '{print $1}')
+  versionSecond=$(echo $version | awk -F"." '{print $2}')
+  versionThird=$(echo $version | awk -F"." '{print $3}')
 
-        # Increment the least significant version by 1
-        #updatedVersion=$(echo `expr $versionThird + 1`)
-        updatedVersion=$versionThird
+  # Increment the least significant version by 1
+  #updatedVersion=$(echo `expr $versionThird + 1`)
+  updatedVersion=$versionThird
 
-        updatedRelease=$versionFirst.$versionSecond.$updatedVersion
-        replaceVersion="Version: $updatedRelease"
+  updatedRelease=$versionFirst.$versionSecond.$updatedVersion
+  replaceVersion="Version: $updatedRelease"
 
-        packageName=$package-$updatedRelease
+  packageName=$package-$updatedRelease
 
-        # Update control file with the incremented version
-        sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
+  # Update control file with the incremented version
+  sed -i $fileName/DEBIAN/control -e $lineNumberVersion's!.*!'"$replaceVersion"'!'
 
-        if [ "$fileName" != "$packageName" ] ;then
-                mv $fileName $packageName
-        fi
+  if [ "$fileName" != "$packageName" ] ;then
+    mv $fileName $packageName
+  fi
 
-        find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
-        if [ -f "$packageName/DEBIAN/md5sums" ]; then
-               rm $packageName/DEBIAN/md5sums
-        fi
-	popd
+  find ./$packageName -name "*~" -print0 | xargs -0 rm -rf
+  if [ -f "$packageName/DEBIAN/md5sums" ]; then
+    rm $packageName/DEBIAN/md5sums
+  fi
+  popd
 }
+
+
 generateMD5Sum() {
-	initializeVariables $1
-        pushd $BASE
-        md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
-	popd
+  initializeVariables $1
+  pushd $BASE
+  md5sum `find ./$packageName -type f | awk '/.\//{ print substr($0, 3) }'` >> $packageName/DEBIAN/md5sums
+  popd
 }
+
+

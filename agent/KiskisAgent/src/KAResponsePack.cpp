@@ -74,7 +74,6 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
  */
 string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,string parenthostname)
 {	//Creating Registration Message
-	clear();
 	this->setType("REGISTRATION_REQUEST");
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);

@@ -12,7 +12,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
     public UninstallOperationHandler( SolrImpl manager, String clusterName ) {
         super( manager, clusterName );
         productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
+                String.format( "Destroying installation %s", clusterName ) );
     }
 
 
@@ -21,7 +21,8 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
         Config config = manager.getCluster( clusterName );
 
         if ( config == null ) {
-            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            productOperation.addLogFailed(
+                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -38,10 +39,10 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
         productOperation.addLog( "Updating db..." );
 
         if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
-            productOperation.addLogDone( "Cluster info deleted from DB\nDone" );
+            productOperation.addLogDone( "Installation info deleted from DB\nDone" );
         }
         else {
-            productOperation.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+            productOperation.addLogFailed( "Error while deleting installation info from DB. Check logs.\nFailed" );
         }
     }
 }

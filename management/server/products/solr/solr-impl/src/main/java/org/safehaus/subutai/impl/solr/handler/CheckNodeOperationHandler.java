@@ -28,7 +28,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( config == null ) {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
@@ -42,7 +42,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( !config.getNodes().contains( node ) ) {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname, clusterName ) );
             return;
         }
 

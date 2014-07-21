@@ -22,6 +22,14 @@ function master_destroy {
   zfs release keep lxc/master@template
   zfs destroy -r lxc/master
   lxc-destroy -n master
+  
+  # Remove relevant directories under $SUBUTAI_TMPDIR if any
+  local container="master"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+  rm -rf $debian_file
+  rm -rf $debian_root
 }
 
 

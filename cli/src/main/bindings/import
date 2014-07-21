@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-function usage {
+function import_usage {
   echo -----------------------------------------------------------------------
   echo Usage: Imports a registered Subutai template
   echo
@@ -13,7 +13,7 @@ function usage {
 
 # Plan for importing a template
 # ----------------------------------------------------------------------------
-# (1) Expand out the tsar file
+# (1) Install the debian package 
 # (2) perform sanity checks first
 #     - a container with the same name MUST NOT already exist
 #     - the template name MUST be in the template registry
@@ -28,19 +28,16 @@ function import {
 
   if [ -z "$container"  ]; then
     msg_error "Expecting single parameter for the container to import"
-    show_usage "`usage`"
-  fi
-
-  if [ "$container" == "master" ]; then
-    msg_error "Use subutai-master-create with tsar file to import the master."
-    exit 1
+    show_usage "`import_usage`"
   fi
 
   # ----------------------------------------------------------------------------
-  # (1) Expand out the tsar file
+  # (1) Install the debian package
   # ----------------------------------------------------------------------------
 
-  debian_file="$SUBUTAI_TMPDIR/$container"-subutai-template.deb
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
 
   if [ ! -f "$debian_file" ]; then
     msg_error "Could not find template file \"$debian_file\". Aborting ..."
@@ -49,7 +46,14 @@ function import {
 
   pushd . > /dev/null
   cd $SUBUTAI_TMPDIR
-  dpkg -i $container-subutai-template.deb
+  dpkg -i $debian_file
+  if [ $? -eq 0 ]; then
+    msg_ok "Debian package of $package_name is installed succesfully"
+  else
+    msg_error "Debian package of $package_name could not be installed, removing"
+    apt-get --assume-yes --force-yes purge $package_name
+    exit 1
+  fi
   popd > /dev/null
 
   # ----------------------------------------------------------------------------
@@ -62,16 +66,15 @@ function import {
   lxc_assert_no $container
 
   # check to make sure container is registered as a template
-  # TODO: enable when this works
-  #if [ "`is_registered $container`" == "false" ]; then
-  #  msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
-  #  exit 1
-  #else 
-  #  msg_info "    - check passed: \"$container\" is registered"
-  #fi
+  if [ "`is_registered $container`" == "false" ]; then
+    msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+    exit 1
+  else 
+    msg_info "    - check passed: \"$container\" is registered"
+  fi
 
-  tsar_dir=$SUBUTAI_TMPDIR/$container
-  config=$tsar_dir/config
+  debian_root=$SUBUTAI_TMPDIR/$container
+  config=$debian_root/config
   parent=`cat $config | grep subutai.parent | awk '{print $3}'`
 
   lxc_assert $parent
@@ -96,13 +99,13 @@ function import {
   lxc_home=/var/lib/lxc/$container
   lxc_rootfs=$lxc_home/rootfs
   lxc_config=$lxc_home/config
-  deltas=$tsar_dir/deltas
+  deltas=$debian_root/deltas
 
   mkdir -p $lxc_rootfs
   echo lxc_rootfs = $lxc_rootfs
   cp $config $lxc_home;
-  cp $tsar_dir/fstab $lxc_home;
-  cp $tsar_dir/packages $lxc_home;
+  cp $debian_root/fstab $lxc_home;
+  cp $debian_root/packages $lxc_home;
 
   zfs recv lxc/$container < $deltas/rootfs.delta
   zfs set mountpoint=$lxc_rootfs lxc/$container

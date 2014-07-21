@@ -12,6 +12,7 @@ import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.manager.helper.*;
+import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.slf4j.Logger;
@@ -130,11 +131,23 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                 PlacementStrategyFactory.getDefaultStrategyType()
             };
         group.setStrategy(EnumSet.of(strategy[0], strategy));
+        group.setProducts(generatePacksDiff(templateName));
         for(Agent a : agents) {
             group.setInstanceId(a.getUuid());
             dbManager.executeUpdate(cql, a.getUuid().toString(),
                     envId.toString(), gson.toJson(group));
         }
+    }
+
+    private List<String> generatePacksDiff(String template) {
+        Template t = templateRegistry.getTemplate(template);
+        String templatePacks = t.getPackagesManifest();
+
+        Template p = templateRegistry.getParentTemplate(template);
+        String parentPacks = p.getPackagesManifest();
+
+        PackageDiff pdiff = new PackageDiff();
+        return pdiff.getDiff(parentPacks, templatePacks);
     }
 
 }

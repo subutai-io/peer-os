@@ -5,17 +5,17 @@
  */
 package org.safehaus.subutai.api.pig;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.shared.protocol.ApiBase;
+
 
 /**
  * @author dilshat
  */
 public interface Pig extends ApiBase<Config> {
 
-    public UUID addNode(String clusterName, String lxcHostname);
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
-
+    public UUID destroyNode( String clusterName, String lxcHostname );
 }

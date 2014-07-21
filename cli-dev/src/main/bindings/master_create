@@ -12,22 +12,32 @@ function master_create {
   # ---------------------------------------------------------------------------
   # Two modes: import and create
 
-  tsar_file=$SUBUTAI_TMPDIR/master.tsar
-  tsar_dir=$SUBUTAI_TMPDIR/master
-  config=$tsar_dir/config
-  fstab=$tsar_dir/fstab
-  deltas=$tsar_dir/deltas
+  local container="master"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
+  debian_root=$SUBUTAI_TMPDIR/$container
+  config=$debian_root/config
+  fstab=$debian_root/fstab
+  deltas=$debian_root/deltas
 
-  if [ -f "$tsar_file" ]; then
-    msg_info "Using available TSAR file for import: $tsar_file"
+  if [ -f "$debian_file" ]; then
+    msg_info "Using available debian file for import: $debian_file"
 
-    if [ -d "$tsar_dir" ]; then
-      rm -rf $tsar_dir
+    if [ -d "$debian_root" ]; then
+      rm -rf $debian_root
     fi
 
     pushd . >> /dev/null
     cd $SUBUTAI_TMPDIR
-    tar -zxvf $tsar_file
+    dpkg -i $debian_file
+    if [ $? -eq 0 ]; then
+      msg_ok "Debian package of $container is installed succesfully"
+    else
+      msg_error "Debian package of $container could not be installed, removing"
+      apt-get --assume-yes --force-yes purge $package_name
+      exit 1
+    fi
     popd >> /dev/null
 
     lxc_home=/var/lib/lxc/master
@@ -35,7 +45,7 @@ function master_create {
     mkdir -p $lxc_rootfs
     cp $config $lxc_home
     cp $fstab $lxc_home
-    cp $tsar_dir/packages $lxc_home
+    cp $debian_root/packages $lxc_home
 
     zfs recv lxc/master < $deltas/rootfs.delta
     zfs hold keep lxc/master@template
@@ -74,7 +84,8 @@ function master_create {
       msg_error "Delta generation for opt failed"
     fi
 
-    msg_ok "Master import from TSAR file successful"
+    msg_ok "Master import from debian package is successful"
+    rm -rf $debian_root
     exit 0
   fi
 
@@ -88,10 +99,6 @@ function master_create {
   config=/var/lib/lxc/master/config
   for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
     echo subutai.config.path = $config_path >> $config
-  done
-
-  for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
-    echo subutai.app.data.path = $appdata_path >> $config
   done
 
   # Add pre-start hook script entry
@@ -115,12 +122,15 @@ function master_create {
   fi
 
   lxc_wait_net master
+  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
+      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 
   if [ -n "$SUBUTAI_PACKAGES" ]; then
     lxc-attach -n master -- \
-        apt-get -y install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
+         env DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --force-yes \
+           install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
   fi
 
   lxc-attach -n master -- apt-get -y autoclean

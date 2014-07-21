@@ -28,7 +28,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( config == null ) {
             productOperation.addLogFailed(
-                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 

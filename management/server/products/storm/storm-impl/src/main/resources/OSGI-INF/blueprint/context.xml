@@ -11,6 +11,8 @@
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="zookeeperManager" availability="mandatory"
                interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
+    <reference id="lxcManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>    
     
     <bean id="storm-impl" scope="singleton" class="org.safehaus.subutai.impl.storm.StormImpl"
           init-method="init" destroy-method="destroy">
@@ -19,6 +21,7 @@
         <property name="tracker" ref="tracker" />
         <property name="dbManager" ref="dbManager" />
         <property name="zookeeperManager" ref="zookeeperManager" />
+        <property name="lxcManager" ref="lxcManager"/>
     </bean>    
        
     <service ref="storm-impl" interface="org.safehaus.subutai.api.storm.Storm"/>

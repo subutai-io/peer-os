@@ -44,12 +44,6 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             return;
         }
 
-        if ( config.getNodes().size() == 1 ) {
-            productOperation.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
-            return;
-        }
-
         productOperation.addLog( "Uninstalling Pig..." );
         Command uninstallCommand = manager.getCommands().getUninstallCommand( Util.wrapAgentToSet( agent ) );
         manager.getCommandRunner().runCommand( uninstallCommand );
@@ -57,7 +51,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
         if ( uninstallCommand.hasCompleted() ) {
             AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
             if ( result.getExitCode() != null && result.getExitCode() == 0 ) {
-                if ( result.getStdOut().contains( "Package ksks-pig is not installed, so not removed" ) ) {
+                if ( result.getStdOut().contains(
+                        String.format( "Package %s is not installed, so not removed", Config.PRODUCT_PACKAGE ) ) ) {
                     productOperation.addLog(
                             String.format( "Pig is not installed, so not removed on node %s", agent.getHostname() ) );
                 }
@@ -73,7 +68,10 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImp
             config.getNodes().remove( agent );
             productOperation.addLog( "Updating db..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+
+            if ( config.getNodes().isEmpty() ?
+                 manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) :
+                 manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
                 productOperation.addLogDone( "Cluster info update in DB\nDone" );
             }
             else {

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-function usage {
+function destroy_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Destroy an existing container clone.
+  echo Usage: Destroy an existing container or template by name.
   echo
-  echo "        "subutai-clone-destory clone-name
+  echo "        "subutai \[-qh\] destory name
   echo
   echo -----------------------------------------------------------------------
 }
@@ -25,6 +25,7 @@ function destroy {
   # (4) destroy all snapshots on clones's rootfs
   # (5) lxc-destroy the clone
   # (6) destroy mounted partitions
+  # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
   # ----------------------------------------------------------------------------
 
   # (1) check that clone exists first: turn off if on
@@ -66,7 +67,14 @@ function destroy {
   remove-mount $clone $parent home lxc-data
 
   msg_ok "Destruction of \"$clone\" completed successfully"
-
+  
+  # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
+  local container=$clone
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+  rm -rf $debian_file
+  rm -rf $debian_root
 }
 
 

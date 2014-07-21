@@ -35,20 +35,6 @@ else
 
 fi
 
-#Editing lxc package
-cp $pattern/rootfs/etc/network/interfaces $pattern/rootfs/etc/network/interfaces.org
-#backup interfaces file
-#Giving static lxcbro ip address : 172.16.8.101
-echo "" > $pattern/rootfs/etc/network/interfaces
-echo "auto lo" >> $pattern/rootfs/etc/network/interfaces
-echo "iface lo inet loopback\n" >> $pattern/rootfs/etc/network/interfaces
-echo "auto eth0" >> $pattern/rootfs/etc/network/interfaces
-echo "iface eth0 inet static" >> $pattern/rootfs/etc/network/interfaces
-echo "address 172.16.8.101" >> $pattern/rootfs/etc/network/interfaces
-echo "netmask 255.255.248.0" >> $pattern/rootfs/etc/network/interfaces
-echo "gateway 172.16.8.1" >> $pattern/rootfs/etc/network/interfaces
-echo "dns-nameservers 8.8.8.8" >> $pattern/rootfs/etc/network/interfaces
-
 BRIDGE="br0"
 sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
 
@@ -58,13 +44,15 @@ cp $kskssql/kiskis.sql $LXCSOURCE/$pattern/rootfs/root/
 
 #start base-container
 sudo lxc-start -n $pattern -d
-sleep 10
-ssh-keygen -f "/root/.ssh/known_hosts" -R 172.16.8.101
+sleep 20
+containerIP=$(lxc-ls --fancy | grep $pattern | cut -d' ' -f5)
+echo $containerIP
+ssh-keygen -f "/root/.ssh/known_hosts" -R $containerIP
 #Read Root Passwords for Template LXC
 cd $BASE
 passwd=$(cat password.dat)
-/$BASE/presettings.exp.new 172.16.8.101 ubuntu ubuntu $passwd
-/$BASE/postsettings.exp.new 172.16.8.101 root $passwd
+/$BASE/presettings.exp.new $containerIP ubuntu ubuntu $passwd
+/$BASE/postsettings.exp.new $containerIP root $passwd
 
 #removing cassandra-mgmt and kiskis.sql
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-cassandra-mgmt-1.0.8-amd64.deb
@@ -74,14 +62,13 @@ cd $LXCSOURCE
 
 #closing cassandra-mgmt
 sudo lxc-stop -n $pattern
-#updating original interfaces file
-mv $pattern/rootfs/etc/network/interfaces.org $pattern/rootfs/etc/network/interfaces
 
 cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a -p $LXCSOURCE/$pattern/rootfs/var/lib/cassandra $BASE/$fileName/var/lib/
+cp -a -p $LXCSOURCE/$pattern/rootfs/opt/cassandra* $BASE/$fileName/opt/
 
 if ls *.deb ; then
         rm  *.deb
@@ -90,7 +77,6 @@ fi
 cd $BASE
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/etc $BASE/$fileName/
-cp -a $SOURCE/opt $BASE/$fileName/
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
@@ -132,7 +118,6 @@ dpkg-deb -z8 -Zgzip --build $packageName/
 chown jenkins:jenkins $packageName/DEBIAN/md5sums
 chmod -R 755 $packageName/DEBIAN/md5sums
 chown jenkins:jenkins $BASE/*.deb
-chmod -R 755 $BASE/*.deb
 
 sudo rm -rf $packageName/var/lib/*
 cp $packageName".deb" $TARGET/

@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.impl.communicationmanager;
 
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -21,6 +16,8 @@ import org.safehaus.subutai.api.communicationmanager.CommandJson;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.enums.RequestType;
 import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,7 +25,8 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
  */
 class CommandProducer implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
+//    private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandProducer.class.getName() );
     private final Request command;
     private final CommunicationManagerImpl communicationManagerImpl;
     private final boolean isBroadcast;
@@ -65,14 +63,18 @@ class CommandProducer implements Runnable {
                                       DeliveryMode.NON_PERSISTENT );
             producer.setTimeToLive( communicationManagerImpl.getAmqMaxMessageToAgentTtlSec() * 1000 );
             String json = CommandJson.getJson( command );
+
             if ( !RequestType.HEARTBEAT_REQUEST.equals( command.getType() ) ) {
-                LOG.log( Level.INFO, "\nSending: {0}", json );
+//                LOG.log( Level.INFO, "\nSending: {0}", json );
+                LOG.info( "\nSending: {}", json );
             }
+
             TextMessage message = session.createTextMessage( json );
             producer.send( message );
         }
-        catch ( JMSException ex ) {
-            LOG.log( Level.SEVERE, "Error in CommandProducer.run", ex );
+        catch ( JMSException e ) {
+//            LOG.log( Level.SEVERE, "Error in CommandProducer.run", ex );
+            LOG.error( "Error to send a message: ", e );
         }
         finally {
             if ( producer != null ) {

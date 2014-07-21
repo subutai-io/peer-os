@@ -185,14 +185,14 @@
       <version>${org.apache.commons.httpclient.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.jackrabbit</groupId>
-    	<artifactId>jackrabbit-webdav</artifactId>
-    	<version>${org.apache.jackrabbit.webdav.version}</version>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-webdav</artifactId>
+      <version>${org.apache.jackrabbit.webdav.version}</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.ant</groupId>
-    	<artifactId>ant</artifactId>
-    	<version>${org.apache.ant.version}</version>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>${org.apache.ant.version}</version>
     </dependency>
 
     <dependency>
@@ -548,19 +548,19 @@
                   <version>${jsch.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>commons-httpclient</groupId>
-                  	<artifactId>commons-httpclient</artifactId>
-                  	<version>${org.apache.commons.httpclient.version}</version>
+                  <groupId>commons-httpclient</groupId>
+                  <artifactId>commons-httpclient</artifactId>
+                  <version>${org.apache.commons.httpclient.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>org.apache.jackrabbit</groupId>
-                  	<artifactId>jackrabbit-webdav</artifactId>
-                  	<version>${org.apache.jackrabbit.webdav.version}</version>
+                  <groupId>org.apache.jackrabbit</groupId>
+                  <artifactId>jackrabbit-webdav</artifactId>
+                  <version>${org.apache.jackrabbit.webdav.version}</version>
                 </artifactItem>
                 <artifactItem>
-                  	<groupId>org.apache.ant</groupId>
-                  	<artifactId>ant</artifactId>
-                  	<version>${org.apache.ant.version}</version>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant</artifactId>
+                  <version>${org.apache.ant.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.yaml</groupId>
@@ -752,41 +752,41 @@
 
                 <!-- LXC Manager -->
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-ui</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-ui</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-api</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-api</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>lxc-manager-impl</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>lxc-manager-impl</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
 
                 <!-- Template Manager -->
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-api</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-api</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-impl</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-impl</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-cli</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-cli</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>org.safehaus.subutai</groupId>
-                    <artifactId>template-manager-rest</artifactId>
-                    <version>${project.version}</version>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>template-manager-rest</artifactId>
+                  <version>${project.version}</version>
                 </artifactItem>
 
                 <!--Network Manager -->
@@ -801,20 +801,25 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Monitor -->
+                <!-- Monitoring -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>monitor-api</artifactId>
+                  <artifactId>monitoring-api</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>monitor-impl</artifactId>
+                  <artifactId>monitoring-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>monitor-ui</artifactId>
+                  <artifactId>monitoring-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>monitoring-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -857,6 +862,18 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- File Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>file-tracker-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Configuration Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -876,6 +893,23 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>configuration-manager-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Config Point Tracker -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>config-point-tracker-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -910,7 +944,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Cassandra-->
+                <!-- Cassandra -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>cassandra-api</artifactId>
@@ -937,7 +971,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--HBase-->
+                <!-- HBase -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hbase-api</artifactId>
@@ -964,7 +998,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Flume-->
+                <!-- Flume -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>flume-api</artifactId>
@@ -1018,7 +1052,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Hive-->
+                <!-- Hive -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hive-api</artifactId>
@@ -1045,7 +1079,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Hive Query-->
+                <!-- Hive Query -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hivequery-api</artifactId>
@@ -1067,7 +1101,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Lucene-->
+                <!-- Lucene -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>lucene-api</artifactId>
@@ -1094,7 +1128,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Mahout-->
+                <!-- Mahout -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mahout-api</artifactId>
@@ -1121,7 +1155,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--MongoDB-->
+                <!-- MongoDB -->
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>mongodb-api</artifactId>
@@ -1148,7 +1182,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Oozie-->
+                <!-- Oozie -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>oozie-api</artifactId>
@@ -1175,7 +1209,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Pig-->
+                <!-- Pig -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>pig-api</artifactId>
@@ -1202,7 +1236,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Presto-->
+                <!-- Presto -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>presto-api</artifactId>
@@ -1229,7 +1263,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Shark-->
+                <!-- Shark -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>shark-api</artifactId>
@@ -1256,7 +1290,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Spark-->
+                <!-- Spark -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>spark-api</artifactId>
@@ -1283,7 +1317,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Solr-->
+                <!-- Solr -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>solr-api</artifactId>
@@ -1310,7 +1344,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Sqoop-->
+                <!-- Sqoop -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>sqoop-api</artifactId>
@@ -1337,7 +1371,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!--Storm-->
+                <!-- Storm -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>storm-api</artifactId>
@@ -1353,9 +1387,8 @@
                   <artifactId>storm-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-                <!--Products Modules - END-->
 
-                <!--Zookeeper-->
+                <!-- Zookeeper -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>zookeeper-api</artifactId>
@@ -1381,6 +1414,24 @@
                   <artifactId>zookeeper-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+
+                <!-- ElasticSearch -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Products Modules - END -->
 
               </artifactItems>

@@ -1,9 +1,14 @@
+.v-loading-indicator {
+    height: 0px !important;
+    width: 0px !important;
+}
+
 .v-assistive-device-only {
+    left: -2000px;
+    overflow: hidden;
     position: absolute;
     top: -2000px;
-    left: -2000px;
     width: 10px;
-    overflow: hidden;
 }
 
 .v-vaadin-version:after {
@@ -11,11 +16,11 @@
 }
 
 .v-generated-body {
-    width: 100%;
-    height: 100%;
     border: 0;
+    height: 100%;
     margin: 0;
     overflow: hidden;
+    width: 100%;
 }
 
 .v-modal-window-open {
@@ -24,9 +29,9 @@
 
 .v-debug-console {
     background: #fff;
-    opacity: 0.9;
     border: 1px solid #000;
     font-family: sans-serif;
+    opacity: 0.9;
 }
 
 .v-debug-console-caption {
@@ -52,62 +57,62 @@
 
 @font-face {
     font-family: "vdebugfont";
+    font-style: normal;
+    font-weight: normal;
     src: url(../base/debug/fonts/font.eot);
     src: url(../base/debug/fonts/font.eot?#iefix) format("embedded-opentype"), url(../base/debug/fonts/font.woff) format("woff"), url(../base/debug/fonts/font.ttf) format("truetype"), url(../base/debug/fonts/font.svg#fontawesome) format("svg");
-    font-weight: normal;
-    font-style: normal;
 }
 
 .v-debugwindow [data-icon]:before, .v-debugwindow-menu [data-icon]:before {
-    font-family: "vdebugfont";
     content: attr(data-icon);
-    speak: none;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
+    font-family: "vdebugfont";
     font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 1;
+    speak: none;
+    text-transform: none;
     vertical-align: text-bottom;
+    webkit-font-smoothing: antialiased;
 }
 
 .v-debugwindow {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-opacity: 0.8;
-    -webkit-opacity: 0.8;
-    opacity: 0.8;
     color: #666;
     font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
     font-size: 13px;
+    moz-box-sizing: border-box;
+    moz-opacity: 0.8;
+    opacity: 0.8;
+    webkit-box-sizing: border-box;
+    webkit-opacity: 0.8;
 }
 
 .v-debugwindow .v-debugwindow-handle {
-    position: absolute;
-    bottom: 0;
     background-color: #fff;
-    -moz-opacity: 0;
-    -webkit-opacity: 0;
+    bottom: 0;
+    moz-opacity: 0;
     opacity: 0;
+    position: absolute;
+    webkit-opacity: 0;
     z-index: 1000;
 }
 
 .v-debugwindow .v-debugwindow-handle-sw {
-    width: 7px;
     height: 7px;
+    width: 7px;
 }
 
 .v-debugwindow .v-debugwindow-handle-se {
+    height: 14px;
     right: 0;
     width: 14px;
-    height: 14px;
 }
 
 .v-debugwindow:hover {
-    -moz-opacity: 1;
-    -webkit-opacity: 1;
+    moz-opacity: 1;
     opacity: 1;
+    webkit-opacity: 1;
 }
 
 .v-debugwindow * {
@@ -127,62 +132,62 @@
 }
 
 .v-debugwindow-head {
-    text-align: right;
     background-color: transparent;
+    text-align: right;
 }
 
 .v-debugwindow-tabs {
-    display: inline-block;
     background-color: #fff;
+    display: inline-block;
 }
 
 .v-debugwindow-tab, .v-debugwindow-controls > * {
-    width: 2em;
-    border: none;
-    margin: 0;
-    line-height: 1.5em;
     background-color: #fff;
+    border: none;
     color: #666;
+    line-height: 1.5em;
+    margin: 0;
+    width: 2em;
 }
 
 .v-debugwindow-tab {
-    position: relative;
-    top: 1px;
-    border-width: 1px 0 1px 1px;
-    border-style: solid;
     border-color: #666;
     border-radius: 2px 2px 0 0;
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
+    position: relative;
+    top: 1px;
 }
 
 .v-debugwindow-tab-selected {
-    color: #666;
     background-color: #fff;
     border-bottom: 1px solid #fff;
+    color: #666;
 }
 
 .v-debugwindow-controls {
-    position: relative;
-    top: 1px;
-    display: inline-block;
     background-color: #fff;
     border: 1px solid #666;
     border-radius: 2px 2px 0 0;
+    display: inline-block;
+    position: relative;
+    top: 1px;
 }
 
 .v-debugwindow-section-head {
-    text-align: left;
     background-color: #fff;
     border: 1px solid #666;
     border-bottom: 1px solid #999;
     box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
-    min-height: 1.5em;
     line-height: 1.5em;
+    min-height: 1.5em;
     padding-left: 5px;
+    text-align: left;
 }
 
 .v-debugwindow-button {
-    border: none;
     background-color: transparent;
+    border: none;
     color: #666;
 }
 
@@ -192,27 +197,27 @@
 }
 
 .v-debugwindow-button-active {
-    color: #666;
     box-shadow: 1px 1px 3px 0 inset;
+    color: #666;
 }
 
 .v-debugwindow-content {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
     background-color: #fff;
     border: 1px solid #666;
     border-top: none;
+    box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+    box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .v-debugwindow-menu {
     background-color: #fff;
-    padding: 4px;
     border: 1px solid #999;
-    border-top: none;
     border-radius: 0 0 5px 5px;
+    border-top: none;
     box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+    padding: 4px;
 }
 
 .v-debugwindow-menu-content {
@@ -241,8 +246,8 @@
 }
 
 .v-debugwindow-row.SEVERE {
-    color: #550000;
     background-color: #FFC5C5;
+    color: #550000;
 }
 
 .v-debugwindow-row.WARNING {
@@ -276,14 +281,14 @@
 }
 
 .v-debugwindow-log .v-debugwindow-reset {
-    color: #fff;
     background-color: #4C92ED;
+    color: #fff;
     padding: 4px;
 }
 
 .v-debugwindow-log .v-debugwindow-time {
-    text-align: right;
     color: #999;
+    text-align: right;
 }
 
 .v-debugwindow-log .v-debugwindow-message {
@@ -314,46 +319,46 @@
 
 @font-face {
     font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 300;
     src: url(fonts/OpenSans-Light-webfont.eot);
     src: url(fonts/OpenSans-Light-webfont.eot?#iefix) format("embedded-opentype"), url(fonts/OpenSans-Light-webfont.woff) format("woff"), url(fonts/OpenSans-Light-webfont.ttf) format("truetype"), url(fonts/OpenSans-Light-webfont.svg#OpenSansLight) format("svg");
-    font-weight: 300;
-    font-style: normal;
 }
 
 @font-face {
     font-family: "Open Sans";
+    font-style: normal;
+    font-weight: normal;
     src: url(fonts/OpenSans-Regular-webfont.eot);
     src: url(fonts/OpenSans-Regular-webfont.eot?#iefix) format("embedded-opentype"), url(fonts/OpenSans-Regular-webfont.woff) format("woff"), url(fonts/OpenSans-Regular-webfont.ttf) format("truetype"), url(fonts/OpenSans-Regular-webfont.svg#OpenSansRegular) format("svg");
-    font-weight: normal;
-    font-style: normal;
 }
 
 @font-face {
     font-family: "Open Sans";
+    font-style: normal;
+    font-weight: 600;
     src: url(fonts/OpenSans-Semibold-webfont.eot);
     src: url(fonts/OpenSans-Semibold-webfont.eot?#iefix) format("embedded-opentype"), url(fonts/OpenSans-Semibold-webfont.woff) format("woff"), url(fonts/OpenSans-Semibold-webfont.ttf) format("truetype"), url(fonts/OpenSans-Semibold-webfont.svg#OpenSansSemibold) format("svg");
-    font-weight: 600;
-    font-style: normal;
 }
 
 @font-face {
     font-family: "fontello";
+    font-style: normal;
+    font-weight: normal;
     src: url(icons/fontello.eot);
     src: url(icons/fontello.eot?#iefix) format("embedded-opentype"), url(icons/fontello.woff) format("woff"), url(icons/fontello.ttf) format("truetype"), url(icons/fontello.svg#fontello) format("svg");
-    font-weight: normal;
-    font-style: normal;
 }
 
 [class^="icon-"] > .v-button-wrap:before, [class*=" icon-"] > .v-button-wrap:before, [class^="icon-"].v-nativebutton:before, [class*=" icon-"].v-nativebutton:before, [class^="icon-"].v-label:before, [class*=" icon-"].v-label:before, [class*="-icon-"].v-menubar-menuitem:before {
+    display: inline-block;
     font-family: "fontello";
     font-style: normal;
     font-weight: normal;
-    speak: none;
-    display: inline-block;
-    text-decoration: inherit;
-    text-align: center;
     line-height: 1;
     margin-right: 0.4em;
+    speak: none;
+    text-align: center;
+    text-decoration: inherit;
     vertical-align: 1px;
 }
 
@@ -479,101 +484,101 @@
 
 @-webkit-keyframes move-up {
     0% {
-        -webkit-transform: translateX(100%);
+        webkit-transform: translateX(100%);
     }
 }
 
 @-moz-keyframes move-up {
     0% {
-        -moz-transform: translateX(100%);
+        moz-transform: translateX(100%);
     }
 }
 
 @-ms-keyframes move-up {
     0% {
-        -ms-transform: translateX(100%);
+        ms-transform: translateX(100%);
     }
 }
 
 @-o-keyframes move-up {
     0% {
-        -o-transform: translateX(100%);
+        o-transform: translateX(100%);
     }
 }
 
 @-webkit-keyframes move-right {
     0% {
-        -webkit-transform: translateX(-100%);
+        webkit-transform: translateX(-100%);
     }
 }
 
 @-moz-keyframes move-right {
     0% {
-        -moz-transform: translateX(-100%);
+        moz-transform: translateX(-100%);
     }
 }
 
 @-ms-keyframes move-right {
     0% {
-        -ms-transform: translateX(-100%);
+        ms-transform: translateX(-100%);
     }
 }
 
 @-o-keyframes move-right {
     0% {
-        -o-transform: translateX(-100%);
+        o-transform: translateX(-100%);
     }
 }
 
 @-webkit-keyframes move-up-100 {
     0% {
-        -webkit-transform: translateY(100px);
         opacity: 0;
+        webkit-transform: translateY(100px);
     }
 }
 
 @-moz-keyframes move-up-100 {
     0% {
-        -moz-transform: translateY(100px);
+        moz-transform: translateY(100px);
         opacity: 0;
     }
 }
 
 @-ms-keyframes move-up-100 {
     0% {
-        -ms-transform: translateY(100px);
+        ms-transform: translateY(100px);
         opacity: 0;
     }
 }
 
 @-o-keyframes move-up-100 {
     0% {
-        -o-transform: translateY(100px);
         opacity: 0;
+        o-transform: translateY(100px);
     }
 }
 
 @-webkit-keyframes pull-down {
     0% {
-        -webkit-transform: translateY(-50%);
+        webkit-transform: translateY(-50%);
     }
 }
 
 @-moz-keyframes pull-down {
     0% {
-        -moz-transform: translateY(-50%);
+        moz-transform: translateY(-50%);
     }
 }
 
 @-ms-keyframes pull-down {
     0% {
-        -ms-transform: translateY(-50%);
+        ms-transform: translateY(-50%);
     }
 }
 
 @-o-keyframes pull-down {
     0% {
-        -o-transform: translateY(-50%);
+        o-transform: translateY(-50%);
     }
 }
 
@@ -645,27 +650,36 @@
     }
 }
 
+.dashboard .terminal_submit {
+    display: none !important;
+}
+
+.dashboard .terminal {
+    background-color: #000000;
+    color: #ffffff !important;
+}
+
 .dashboard .v-widget {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    text-align: left;
     display: inline-block;
-    white-space: normal;
-    vertical-align: bottom;
     font-size: 14px;
     line-height: normal;
+    moz-box-sizing: border-box;
+    text-align: left;
+    vertical-align: bottom;
+    webkit-box-sizing: border-box;
+    white-space: normal;
 }
 
 .dashboard .v-absolutelayout-wrapper {
-    position: absolute;
     overflow: hidden;
+    position: absolute;
 }
 
 .dashboard .v-absolutelayout-margin, .dashboard .v-absolutelayout-canvas {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-absolutelayout.v-has-height > div, .dashboard .v-absolutelayout.v-has-height > div > div {
@@ -677,24 +691,24 @@
 }
 
 .dashboard .v-accordion {
-    position: relative;
+    font-size: 0;
     outline: none;
     overflow: visible;
+    position: relative;
     text-align: left;
-    font-size: 0;
 }
 
 .dashboard .v-accordion-item {
-    position: relative;
     display: inline-block;
+    position: relative;
     width: 100%;
 }
 
 .dashboard .v-accordion-item-caption {
-    overflow: visible;
-    white-space: nowrap;
     background: #eee;
     border-bottom: 1px solid #ddd;
+    overflow: visible;
+    white-space: nowrap;
 }
 
 .dashboard .v-accordion-item-caption .v-caption {
@@ -720,29 +734,29 @@
 }
 
 .dashboard .v-button {
-    display: inline-block;
-    zoom: 1;
-    text-align: center !important;
-    text-decoration: none;
-    border: 2px outset #ddd;
     background: #eee;
-    cursor: pointer;
-    white-space: nowrap;
-    margin: 0;
-    padding: 0.2em 1em;
+    border: 2px outset #ddd;
+    box-sizing: border-box;
     color: inherit;
+    cursor: pointer;
+    display: inline-block;
     font: inherit;
     font-size: 14px;
+    khtml-user-select: none;
     line-height: normal;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    margin: 0;
+    moz-box-sizing: border-box;
+    moz-user-select: none;
+    ms-user-select: none;
+    padding: 0.2em 1em;
+    text-align: center !important;
+    text-decoration: none;
     user-select: none;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+    webkit-box-sizing: border-box;
+    webkit-touch-callout: none;
+    webkit-user-select: none;
+    white-space: nowrap;
+    zoom: 1;
 }
 
 .dashboard .v-button.v-disabled {
@@ -750,35 +764,35 @@
 }
 
 .dashboard .v-button-wrap, .dashboard .v-button-caption {
+    color: inherit;
+    font: inherit;
+    line-height: normal;
     vertical-align: baseline;
     white-space: nowrap;
-    font: inherit;
-    color: inherit;
-    line-height: normal;
 }
 
 .dashboard .v-button .v-icon {
-    vertical-align: middle;
-    margin-right: 3px;
     border: none;
+    margin-right: 3px;
+    vertical-align: middle;
 }
 
 .dashboard .v-button .v-errorindicator {
     display: inline-block;
-    zoom: 1;
-    vertical-align: middle;
     float: none;
+    vertical-align: middle;
+    zoom: 1;
 }
 
 .dashboard .v-button-link {
-    border: none;
-    text-align: left !important;
     background: transparent;
-    padding: 0;
+    border: none;
     color: inherit;
-    -khtml-user-select: text;
-    -moz-user-select: text;
-    -ie-user-select: text;
+    ie-user-select: text;
+    khtml-user-select: text;
+    moz-user-select: text;
+    padding: 0;
+    text-align: left !important;
     user-select: text;
 }
 
@@ -787,68 +801,68 @@
 }
 
 .dashboard .v-button-link .v-button-caption {
-    text-decoration: underline;
     color: inherit;
     text-align: left;
+    text-decoration: underline;
 }
 
 .dashboard .v-nativebutton .v-icon {
-    vertical-align: middle;
-    margin-right: 3px;
     border: none;
+    margin-right: 3px;
+    vertical-align: middle;
 }
 
 .dashboard .v-nativebutton .v-errorindicator {
     display: inline-block;
-    zoom: 1;
-    vertical-align: middle;
     float: none;
+    vertical-align: middle;
+    zoom: 1;
 }
 
 .dashboard .v-nativebutton-link {
-    border: none;
-    text-align: left !important;
     background: transparent;
-    padding: 0;
+    border: none;
     color: inherit;
-    -khtml-user-select: text;
-    -moz-user-select: text;
-    -ie-user-select: text;
+    ie-user-select: text;
+    khtml-user-select: text;
+    moz-user-select: text;
+    padding: 0;
+    text-align: left !important;
     user-select: text;
 }
 
 .dashboard .v-nativebutton-link .v-nativebutton-caption {
-    text-decoration: underline;
     color: inherit;
     text-align: left;
+    text-decoration: underline;
 }
 
 .dashboard .v-nativebutton {
-    text-align: center !important;
-    cursor: pointer;
-    white-space: nowrap;
-    margin: 0;
     color: inherit;
+    cursor: pointer;
     font: inherit;
     line-height: normal;
+    margin: 0;
+    text-align: center !important;
+    white-space: nowrap;
 }
 
 .dashboard .v-nativebutton .v-nativebutton-caption {
+    color: inherit;
+    font: inherit;
     vertical-align: middle;
     white-space: nowrap;
-    font: inherit;
-    color: inherit;
 }
 
 .dashboard .v-nativebutton .v-icon {
-    vertical-align: middle;
     margin-right: 3px;
+    vertical-align: middle;
 }
 
 .dashboard .v-nativebutton .v-errorindicator {
     display: inline-block;
-    zoom: 1;
     float: none;
+    zoom: 1;
 }
 
 .v-ie .dashboard .v-nativebutton {
@@ -875,9 +889,9 @@
 }
 
 .dashboard .v-checkbox .v-errorindicator {
-    float: none;
     display: inline;
     display: inline-block;
+    float: none;
     zoom: 1;
 }
 
@@ -886,9 +900,9 @@
 }
 
 .dashboard .v-caption {
+    font-size: 14px;
     overflow: hidden;
     white-space: nowrap;
-    font-size: 14px;
 }
 
 .dashboard .v-errorindicator {
@@ -902,10 +916,10 @@
 }
 
 .dashboard .v-caption .v-captiontext {
+    color: #ffffff;
     display: inline-block;
     overflow: hidden;
     vertical-align: middle;
-    color: #ffffff;
 }
 
 .dashboard .v-caption .v-required-field-indicator {
@@ -919,10 +933,10 @@
 .dashboard .v-colorpicker-button-color {
     border: 1px solid silver;
     float: left;
-    width: 10px;
     height: 10px;
-    margin-top: 2px;
     margin-right: 5px;
+    margin-top: 2px;
+    width: 10px;
 }
 
 .dashboard .v-colorpicker-area {
@@ -959,8 +973,8 @@
 }
 
 .dashboard .v-colorpicker-popup .resize-button {
-    border: 0px solid silver;
     background: url(../base/colorpicker/images/resizebg.png);
+    border: 0px solid silver;
     margin-top: 5px;
 }
 
@@ -977,10 +991,10 @@
 }
 
 .dashboard .v-colorpicker-gradient {
-    width: 220px;
     height: 220px;
-    padding-left: 10px;
     margin-top: 0px;
+    padding-left: 10px;
+    width: 220px;
 }
 
 .dashboard .v-colorpicker-gradient .v-colorpicker-gradient-clicklayer {
@@ -990,9 +1004,9 @@
 }
 
 .dashboard .v-colorpicker-popup .rgb-gradient .v-colorpicker-gradient-background {
-    width: 220px;
-    height: 220px;
     background: url(../base/colorpicker/images/gradient2.png);
+    height: 220px;
+    width: 220px;
 }
 
 .dashboard .v-colorpicker-popup .hsv-gradient .v-colorpicker-gradient-foreground {
@@ -1005,15 +1019,15 @@
 }
 
 .dashboard .v-colorpicker-popup .v-colorpicker-gradient-higherbox {
-    border-left: 1px solid white;
     border-bottom: 1px solid white;
+    border-left: 1px solid white;
 }
 
 .dashboard .v-colorpicker-popup .rgb-sliders {
-    width: 227px;
-    padding-left: 10px;
     color: #444444;
+    padding-left: 10px;
     text-shadow: 0 1px 0 #FFFFFF;
+    width: 227px;
 }
 
 .dashboard .v-colorpicker-popup .rgb-sliders .red .v-slider-base {
@@ -1029,18 +1043,18 @@
 }
 
 .dashboard .v-colorpicker-popup .hsv-sliders {
-    padding-left: 10px;
     color: #444444;
+    padding-left: 10px;
     text-shadow: 0 1px 0 #FFFFFF;
 }
 
 .dashboard .v-colorpicker-popup .hue-slider {
-    height: 10px;
-    border: 0px solid silver;
-    background-image: url(../base/colorpicker/images/slider_hue_bg.png);
     background-color: transparent;
-    background-repeat: no-repeat;
+    background-image: url(../base/colorpicker/images/slider_hue_bg.png);
     background-position: 0 3px;
+    background-repeat: no-repeat;
+    border: 0px solid silver;
+    height: 10px;
     margin-top: 0px;
 }
 
@@ -1049,28 +1063,28 @@
 }
 
 .dashboard .v-colorpicker-popup .hue-slider .v-slider-base {
+    background-color: transparent;
     border: 0px none;
     height: 0px;
-    background-color: transparent;
 }
 
 .dashboard .v-colorpicker-popup .v-colorpicker-preview {
+    margin-bottom: 0px;
     margin-top: 5px;
     padding-left: 11px;
     padding-right: 10px;
-    margin-bottom: 0px;
 }
 
 .dashboard .v-colorpicker-popup .v-absolutelayout-wrapper {
-    width: 100%;
     height: 100%;
+    width: 100%;
 }
 
 .dashboard .v-colorpicker-popup .v-colorpicker-preview-textfield {
     background: none;
     overflow: hidden;
-    overflow-y: hidden;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .dashboard .v-colorpicker-popup .v-textfield-dark {
@@ -1116,20 +1130,20 @@
 }
 
 .dashboard .v-calendar-header-day {
-    text-align: center;
     color: #666;
     font-size: 12px;
     line-height: normal;
+    text-align: center;
 }
 
 .dashboard .v-calendar-header-week .v-calendar-header-day:hover {
-    cursor: pointer;
     color: #222;
+    cursor: pointer;
 }
 
 .dashboard .v-calendar-header-day-today {
-    font-weight: bold;
     color: #444;
+    font-weight: bold;
 }
 
 .dashboard .v-calendar-header-month td:first-child {
@@ -1137,26 +1151,26 @@
 }
 
 .dashboard .v-calendar-header-week .v-calendar-back, .dashboard .v-calendar-header-week .v-calendar-next {
-    border: none;
-    padding: 0;
-    margin: 0;
-    height: 12px;
-    width: 12px;
-    overflow: hidden;
     background: transparent url(../base/calendar/img/arrows.png) no-repeat 50% 0;
-    opacity: 0.3;
-    filter: alpha(opacity=30);
+    border: none;
     cursor: default;
+    filter: alpha(opacity=30);
+    height: 12px;
+    margin: 0;
+    opacity: 0.3;
+    overflow: hidden;
+    padding: 0;
+    width: 12px;
 }
 
 .dashboard .v-calendar-header-week .v-calendar-back:hover, .dashboard .v-calendar-header-week .v-calendar-next:hover {
-    opacity: 0.6;
     filter: alpha(opacity=60);
+    opacity: 0.6;
 }
 
 .dashboard .v-calendar-header-week .v-calendar-back:active, .dashboard .v-calendar-header-week .v-calendar-next:active {
-    opacity: 1;
     filter: alpha(opacity=100);
+    opacity: 1;
 }
 
 .dashboard .v-calendar-header-week .v-calendar-next {
@@ -1168,20 +1182,20 @@
 }
 
 .dashboard .v-calendar-week-numbers {
-    width: 20px;
     border-right: 1px solid #ccc;
+    width: 20px;
 }
 
 .dashboard .v-calendar-week-number {
-    border: none;
     background: transparent;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    opacity: 0.5;
-    width: 20px;
-    text-align: center;
+    border: none;
     border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    margin: 0;
+    opacity: 0.5;
+    padding: 0;
+    text-align: center;
+    width: 20px;
 }
 
 .dashboard .v-calendar-week-number:hover {
@@ -1211,39 +1225,39 @@
 }
 
 .dashboard .v-calendar-day-number {
+    font-size: 12px;
     height: 18px;
     line-height: 18px;
-    font-size: 12px;
-    text-align: right;
     padding-right: 3px;
+    text-align: right;
     white-space: nowrap;
 }
 
 .dashboard .v-calendar-day-number:hover {
     cursor: pointer;
-    opacity: 0.6;
     filter: alpha(opacity=60);
+    opacity: 0.6;
 }
 
 .dashboard .v-calendar-month .v-calendar-spacer, .dashboard .v-calendar-month .v-calendar-bottom-spacer, .dashboard .v-calendar-month .v-calendar-bottom-spacer-empty {
-    height: 15px;
     font-size: 11px;
+    height: 15px;
 }
 
 .dashboard .v-calendar-month .v-calendar-bottom-spacer:hover {
     cursor: pointer;
-    opacity: 0.6;
     filter: alpha(opacity=60);
+    opacity: 0.6;
 }
 
 .dashboard .v-calendar-event {
-    line-height: 14px;
-    font-size: 11px;
-    padding: 0 0 0 4px;
     cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11px;
+    line-height: 14px;
     outline: none;
+    overflow: hidden;
+    padding: 0 0 0 4px;
+    text-overflow: ellipsis;
 }
 
 .dashboard .v-calendar-event-month {
@@ -1271,22 +1285,22 @@
 }
 
 .dashboard .v-calendar-event-start {
-    -webkit-border-top-left-radius: 6px;
-    -webkit-border-bottom-left-radius: 6px;
-    -moz-border-radius-topleft: 6px;
-    -moz-border-radius-bottomleft: 6px;
-    border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
     margin-left: 0;
+    moz-border-radius-bottomleft: 6px;
+    moz-border-radius-topleft: 6px;
+    webkit-border-bottom-left-radius: 6px;
+    webkit-border-top-left-radius: 6px;
 }
 
 .dashboard .v-calendar-event-end {
-    -webkit-border-top-right-radius: 6px;
-    -webkit-border-bottom-right-radius: 6px;
-    -moz-border-radius-topright: 6px;
-    -moz-border-radius-bottomright: 6px;
-    border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+    border-top-right-radius: 6px;
+    moz-border-radius-bottomright: 6px;
+    moz-border-radius-topright: 6px;
+    webkit-border-bottom-right-radius: 6px;
+    webkit-border-top-right-radius: 6px;
 }
 
 .dashboard .v-calendar-week-wrapper {
@@ -1298,17 +1312,17 @@
 }
 
 .dashboard .v-calendar-time {
-    padding: 0 8px 7px 0;
-    margin-top: -7px;
-    text-align: right;
-    font-size: 11px;
-    color: #666;
     border-right: 1px solid #ccc;
+    color: #666;
+    font-size: 11px;
+    margin-top: -7px;
+    padding: 0 8px 7px 0;
+    text-align: right;
 }
 
 .dashboard .v-calendar-weekly-longevents {
-    border-left: 1px solid #ccc;
     border-bottom: 2px solid #bbb;
+    border-left: 1px solid #ccc;
     margin-left: 50px;
 }
 
@@ -1352,63 +1366,63 @@
 }
 
 .dashboard .v-calendar-week-wrapper .v-calendar-event {
-    padding: 0;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     margin-top: -1px;
+    moz-border-radius: 4px;
+    padding: 0;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-calendar-event-caption {
-    position: absolute;
-    z-index: 1;
-    top: 2px;
     left: 4px;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
     line-height: normal;
+    overflow: hidden;
+    position: absolute;
+    text-overflow: ellipsis;
+    top: 2px;
+    width: 100%;
+    z-index: 1;
 }
 
 .dashboard .v-calendar-event-content {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    border: 1px solid #777;
     background: #eee;
-    opacity: 0.8;
+    border: 1px solid #777;
+    border-radius: 4px;
     filter: alpha(opacity=80);
     height: 14px;
+    moz-border-radius: 4px;
+    opacity: 0.8;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-calendar-current-time {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    overflow: hidden;
     background: #5a6c86;
-    opacity: 0.6;
     filter: alpha(opacity=60);
+    height: 1px;
+    left: 0;
+    opacity: 0.6;
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
     z-index: 2;
 }
 
 .dashboard .v-calendar-event-resizetop {
-    position: absolute;
     cursor: n-resize;
     height: 5%;
     min-height: 3px;
+    position: absolute;
     top: 0;
     width: 100%;
     z-index: 1;
 }
 
 .dashboard .v-calendar-event-resizebottom {
-    position: absolute;
+    bottom: 0;
     cursor: s-resize;
     height: 5%;
     min-height: 3px;
-    bottom: 0;
+    position: absolute;
     width: 100%;
     z-index: 1;
 }
@@ -1469,22 +1483,22 @@
 
 body .dashboard.v-app .v-app-loading {
     background-image: url(img/spinner.gif);
-    background-repeat: no-repeat;
     background-position: 50%;
-    width: 0px;
+    background-repeat: no-repeat;
     height: 0px;
+    width: 0px;
 }
 
 .dashboard .v-ui {
     height: 100%;
-    width: 100%;
     outline: none;
     position: relative;
+    width: 100%;
 }
 
 .dashboard .v-ui.v-ui-embedded {
-    margin-top: -1px;
     border-top: 1px solid transparent;
+    margin-top: -1px;
 }
 
 .dashboard .v-ui:active, .dashboard .v-ui:focus {
@@ -1496,9 +1510,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-disabled {
-    opacity: 0.3;
-    filter: alpha(opacity=30);
     cursor: default;
+    filter: alpha(opacity=30);
+    opacity: 0.3;
 }
 
 .dashboard .v-disabled * {
@@ -1518,27 +1532,27 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-required-field-indicator {
-    padding-left: 2px;
     color: red;
+    padding-left: 2px;
 }
 
 .dashboard .v-form fieldset {
     border: none;
-    padding: 0;
-    margin: 0;
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .dashboard .v-form-content {
-    height: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    height: 100%;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-tooltip {
-    cursor: default;
     background: #fff;
+    cursor: default;
 }
 
 .dashboard .v-tooltip-text {
@@ -1554,11 +1568,11 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-contextmenu .gwt-MenuItem {
-    cursor: pointer;
-    vertical-align: middle;
-    padding: 0;
     border: 0;
+    cursor: pointer;
     margin: 0;
+    padding: 0;
+    vertical-align: middle;
 }
 
 .dashboard .v-contextmenu .gwt-MenuItem div {
@@ -1596,15 +1610,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-loading-indicator, .dashboard .v-loading-indicator-delay, .dashboard .v-loading-indicator-wait {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 30000;
-    width: 0px;
-    height: 0px;
     background: transparent url(img/spinner.gif);
+    height: 0px;
     margin-right: 5px;
     margin-top: 5px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 0px;
+    z-index: 30000;
 }
 
 .dashboard .v-loading-indicator-delay {
@@ -1624,11 +1638,11 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-drag-element {
-    z-index: 60000;
-    position: absolute !important;
-    opacity: 0.5;
-    filter: alpha(opacity=50);
     cursor: default;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+    position: absolute !important;
+    z-index: 60000;
 }
 
 .dashboard .v-clip {
@@ -1636,22 +1650,22 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-scrollable {
-    overflow: auto;
     font-size: 0;
     line-height: normal;
+    overflow: auto;
 }
 
 .v-ios.v-webkit .dashboard .v-scrollable {
-    -webkit-overflow-scrolling: touch;
+    webkit-overflow-scrolling: touch;
 }
 
 .v-ios5.v-webkit .dashboard .v-scrollable {
-    -webkit-overflow-scrolling: none;
+    webkit-overflow-scrolling: none;
 }
 
 .dashboard.v-overlay-container {
-    width: 0;
     height: 0;
+    width: 0;
 }
 
 .dashboard .v-vertical.v-margin-top, .dashboard .v-horizontal.v-margin-top {
@@ -1697,8 +1711,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-spacing {
-    width: 6px;
     height: 6px;
+    width: 6px;
 }
 
 .dashboard .v-vertical, .dashboard .v-horizontal {
@@ -1710,31 +1724,31 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-layout.v-vertical > .v-expand, .dashboard .v-layout.v-horizontal > .v-expand {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
-    width: 100%;
     height: 100%;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
+    width: 100%;
 }
 
 .dashboard .v-slot, .dashboard .v-spacing {
     display: inline-block;
-    white-space: normal;
     vertical-align: top;
+    white-space: normal;
 }
 
 .dashboard .v-vertical > .v-slot:after {
-    display: inline-block;
     clear: both;
-    width: 0;
+    display: inline-block;
     height: 0;
-    overflow: hidden;
     line-height: 0;
+    overflow: hidden;
+    width: 0;
 }
 
 .dashboard .v-vertical > .v-slot, .dashboard .v-vertical > .v-expand > .v-slot {
-    display: block;
     clear: both;
+    display: block;
 }
 
 .dashboard .v-horizontal > .v-slot, .dashboard .v-horizontal > .v-expand > .v-slot {
@@ -1746,9 +1760,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-vertical > .v-spacing, .dashboard .v-vertical > .v-expand > .v-spacing {
-    width: 0;
-    display: block;
     clear: both;
+    display: block;
+    width: 0;
 }
 
 .dashboard .v-horizontal > .v-spacing, .dashboard .v-horizontal > .v-expand > .v-spacing {
@@ -1847,9 +1861,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-csslayout-margin, .dashboard .v-csslayout-container {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-has-width > .v-csslayout-margin, .dashboard .v-has-width > .v-csslayout-margin > .v-csslayout-container {
@@ -1885,8 +1899,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield {
-    white-space: nowrap;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .dashboard .v-datefield-textfield {
@@ -1898,19 +1912,17 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield-button {
-    cursor: pointer;
-    vertical-align: middle;
-
-    width: 24px;
-    height: 23px;
     background: transparent;
+    background-image: url(img/datefield/popup-btn.png);
     border: none;
-    padding: 0;
-    background-image: url(img/datefield/popup-btn.png); /** sprite-ref: verticals */
-    cursor: pointer;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
     border-radius: 0;
+    cursor: pointer;
+    height: 23px;
+    moz-border-radius: 0;
+    padding: 0;
+    vertical-align: middle;
+    webkit-border-radius: 0;
+    width: 24px;
 }
 
 .dashboard .v-has-width > input.v-datefield-textfield {
@@ -1931,8 +1943,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield-calendarpanel td {
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 .dashboard .v-datefield-calendarpanel:focus {
@@ -1949,8 +1961,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield-calendarpanel-weeknumber {
-    color: #999;
     border-right: 1px solid #ddd;
+    color: #999;
     font-size: 11.7px;
 }
 
@@ -1976,9 +1988,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield-calendarpanel-day-selected {
-    cursor: default;
     background: #333;
     color: #fff;
+    cursor: default;
 }
 
 .dashboard .v-datefield-calendarpanel-day-focused {
@@ -2002,14 +2014,14 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-datefield-popupcalendar input.v-datefield-textfield {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-inline-datefield {
-    white-space: nowrap;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .dashboard .v-inline-datefield-textfield {
@@ -2043,8 +2055,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-inline-datefield-calendarpanel td {
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 .dashboard .v-inline-datefield-calendarpanel:focus {
@@ -2061,8 +2073,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-inline-datefield-calendarpanel-weeknumber {
-    color: #999;
     border-right: 1px solid #ddd;
+    color: #999;
     font-size: 11.7px;
 }
 
@@ -2088,9 +2100,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-inline-datefield-calendarpanel-day-selected {
-    cursor: default;
     background: #333;
     color: #fff;
+    cursor: default;
 }
 
 .dashboard .v-inline-datefield-calendarpanel-day-focused {
@@ -2114,43 +2126,43 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-inline-datefield-popupcalendar input.v-inline-datefield-textfield {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-ddwrapper {
-    padding: 2px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
+    moz-border-radius: 4px;
+    padding: 2px;
     position: relative;
+    webkit-border-radius: 4px;
 }
 
 .dashboard [draggable=true] {
-    -khtml-user-drag: element;
-    -webkit-user-drag: element;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
+    khtml-user-drag: element;
+    khtml-user-select: none;
+    webkit-user-drag: element;
+    webkit-user-select: none;
 }
 
 .v-ie .dashboard .v-ddwrapper a.drag-start {
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
     background-color: cyan;
+    bottom: 0;
+    display: block;
     filter: alpha(opacity=0);
+    height: 100%;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100%;
 }
 
 .dashboard .v-ddwrapper-over {
-    border: 2px solid #1d9dff;
     background-color: #bcdcff;
+    border: 2px solid #1d9dff;
     padding: 0;
 }
 
@@ -2159,53 +2171,53 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .no-box-drag-hints .v-ddwrapper-over {
-    border: none;
     background-color: transparent;
+    border: none;
     padding: 2px;
 }
 
 .dashboard.v-app .v-ddwrapper-over-top, .dashboard .v-window .v-ddwrapper-over-top, .dashboard .v-popupview-popup .v-ddwrapper-over-top {
-    border: none;
-    border-top: 2px solid #1d9dff;
     background-color: transparent;
+    border: none;
+    border-radius: 0;
+    border-top: 2px solid #1d9dff;
+    moz-border-radius: 0;
     padding: 2px;
     padding-top: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
+    webkit-border-radius: 0;
 }
 
 .dashboard.v-app .v-ddwrapper-over-bottom, .dashboard .v-window .v-ddwrapper-over-bottom, .dashboard .v-popupview-popup .v-ddwrapper-over-bottom {
+    background-color: transparent;
     border: none;
     border-bottom: 2px solid #1d9dff;
-    background-color: transparent;
+    border-radius: 0;
+    moz-border-radius: 0;
     padding: 2px;
     padding-bottom: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
+    webkit-border-radius: 0;
 }
 
 .dashboard.v-app .v-ddwrapper-over-left, .dashboard .v-window .v-ddwrapper-over-left, .dashboard .v-popupview-popup .v-ddwrapper-over-left {
+    background-color: transparent;
     border: none;
     border-left: 2px solid #1d9dff;
-    background-color: transparent;
+    border-radius: 0;
+    moz-border-radius: 0;
     padding: 2px;
     padding-left: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
+    webkit-border-radius: 0;
 }
 
 .dashboard.v-app .v-ddwrapper-over-right, .dashboard .v-window .v-ddwrapper-over-right, .dashboard .v-popupview-popup .v-ddwrapper-over-right {
-    border: none;
-    border-right: 2px solid #1d9dff;
     background-color: transparent;
+    border: none;
+    border-radius: 0;
+    border-right: 2px solid #1d9dff;
+    moz-border-radius: 0;
     padding: 2px;
     padding-right: 0;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
+    webkit-border-radius: 0;
 }
 
 .dashboard .v-ddwrapper, .dashboard .v-ddwrapper-over, .dashboard.v-app .v-ddwrapper-over-top, .dashboard .v-window .v-ddwrapper-over-top, .dashboard .v-popupview-popup .v-ddwrapper-over-top, .dashboard.v-app .v-ddwrapper-over-bottom, .dashboard .v-window .v-ddwrapper-over-bottom, .dashboard .v-popupview-popup .v-ddwrapper-over-bottom, .dashboard.v-app .v-ddwrapper-over-left, .dashboard .v-window .v-ddwrapper-over-left, .dashboard .v-popupview-popup .v-ddwrapper-over-left, .dashboard.v-app .v-ddwrapper-over-right, .dashboard .v-window .v-ddwrapper-over-right, .dashboard .v-popupview-popup .v-ddwrapper-over-right {
@@ -2213,13 +2225,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-ddwrapper-over-top:before, .dashboard .v-ddwrapper-over-bottom:after, .dashboard .v-ddwrapper-over-left:before, .dashboard .v-ddwrapper-over-right:before {
+    background: transparent url(../base/common/img/drag-slot-dot.png) no-repeat;
     display: block;
+    height: 6px;
+    margin-left: -2px;
+    margin-top: -4px;
     position: absolute;
     width: 6px;
-    height: 6px;
-    margin-top: -4px;
-    margin-left: -2px;
-    background: transparent url(../base/common/img/drag-slot-dot.png) no-repeat;
 }
 
 .dashboard .v-ddwrapper-over-bottom:after {
@@ -2228,37 +2240,37 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-ddwrapper-over-left:before, .dashboard .v-ddwrapper-over-right:before {
     background-position: 0 -6px;
-    margin-top: -2px;
     margin-left: -4px;
+    margin-top: -2px;
 }
 
 .dashboard .v-ddwrapper-over-right:before {
-    position: relative;
-    margin-bottom: -4px;
-    margin-right: -4px;
-    margin-left: 0;
-    width: auto;
     background-position: 100% -6px;
+    margin-bottom: -4px;
+    margin-left: 0;
+    margin-right: -4px;
+    position: relative;
+    width: auto;
 }
 
 .dashboard .no-horizontal-drag-hints .v-ddwrapper-over-left {
-    padding-left: 2px;
     border-left: none;
+    padding-left: 2px;
 }
 
 .dashboard .no-horizontal-drag-hints .v-ddwrapper-over-right {
-    padding-right: 2px;
     border-right: none;
+    padding-right: 2px;
 }
 
 .dashboard .no-vertical-drag-hints .v-ddwrapper-over-top {
-    padding-top: 2px;
     border-top: none;
+    padding-top: 2px;
 }
 
 .dashboard .no-vertical-drag-hints .v-ddwrapper-over-bottom {
-    padding-bottom: 2px;
     border-bottom: none;
+    padding-bottom: 2px;
 }
 
 .dashboard .no-horizontal-drag-hints .v-ddwrapper-over-left:before, .dashboard .no-horizontal-drag-hints .v-ddwrapper-over-right:before, .dashboard .no-vertical-drag-hints .v-ddwrapper-over-top:before, .dashboard .no-vertical-drag-hints .v-ddwrapper-over-bottom:after {
@@ -2351,9 +2363,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-gridlayout-spacing-on {
+    overflow: hidden;
     padding-left: 6px;
     padding-top: 6px;
-    overflow: hidden;
 }
 
 .dashboard .v-gridlayout-spacing, .dashboard .v-gridlayout-spacing-off {
@@ -2378,8 +2390,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-link a {
-    vertical-align: middle;
     text-decoration: none;
+    vertical-align: middle;
 }
 
 .dashboard .v-link span {
@@ -2392,8 +2404,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-link img {
-    vertical-align: middle;
     border: none;
+    vertical-align: middle;
 }
 
 .dashboard .v-loginform {
@@ -2407,16 +2419,16 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-menubar {
     display: inline-block;
-    white-space: nowrap;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .dashboard .v-menubar .v-menubar-menuitem {
     cursor: default;
-    vertical-align: middle;
-    white-space: nowrap;
     display: inline;
     display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
     zoom: 1;
 }
 
@@ -2437,8 +2449,8 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .v-menubar-submenu .v-menubar-menuitem {
     cursor: default;
     display: block;
-    position: relative;
     padding-right: 1.5em;
+    position: relative;
 }
 
 .dashboard .v-menubar-submenu .v-menubar-menuitem-caption {
@@ -2456,11 +2468,11 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-menubar-submenu .v-menubar-submenu-indicator {
     display: block;
+    font-size: 11.7px;
+    height: 1em;
     position: absolute;
     right: 0;
     width: 1em;
-    height: 1em;
-    font-size: 11.7px;
 }
 
 .dashboard .v-menubar-menuitem-disabled, .dashboard .v-menubar span.v-menubar-menuitem-disabled:hover, .dashboard .v-menubar span.v-menubar-menuitem-disabled:focus, .dashboard .v-menubar span.v-menubar-menuitem-disabled:active {
@@ -2476,13 +2488,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-menubar-separator span {
+    border-top: 1px solid #ddd;
     display: block;
-    text-indent: -9999px;
     font-size: 1px;
     line-height: 1px;
-    border-top: 1px solid #ddd;
     margin: 3px 0 2px;
     overflow: hidden;
+    text-indent: -9999px;
 }
 
 .dashboard .v-menubar .v-icon, .dashboard .v-menubar-submenu .v-icon {
@@ -2509,9 +2521,9 @@ body .dashboard.v-app .v-app-loading {
     background: #999;
     color: #fff;
     cursor: pointer;
+    max-width: 85%;
     overflow: hidden;
     padding: 1em;
-    max-width: 85%;
 }
 
 .dashboard .v-Notification h1, .dashboard .v-Notification p, .dashboard .v-Notification-error h1, .dashboard .v-Notification-error p, .dashboard .v-Notification-warning h1, .dashboard .v-Notification-warning p {
@@ -2537,8 +2549,8 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-Notification-system {
     background-color: red;
-    opacity: 0.7;
     filter: alpha(opacity=70);
+    opacity: 0.7;
 }
 
 .dashboard .v-Notification-system h1 {
@@ -2567,13 +2579,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-orderedlayout-spacing-on, .dashboard .v-horizontallayout-spacing-on, .dashboard .v-verticallayout-spacing-on {
-    padding-top: 6px;
     padding-left: 6px;
+    padding-top: 6px;
 }
 
 .dashboard .v-orderedlayout-spacing-off, .dashboard .v-horizontallayout-spacing-off, .dashboard .v-verticallayout-spacing-off {
-    padding-top: 0;
     padding-left: 0;
+    padding-top: 0;
 }
 
 .dashboard .v-horizontallayout-slot, .dashboard .v-verticallayout-slot {
@@ -2586,8 +2598,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-panel-caption .v-errorindicator {
-    float: none;
     display: inline;
+    float: none;
 }
 
 .dashboard .v-panel-caption .v-icon {
@@ -2600,9 +2612,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-panel-caption {
-    white-space: nowrap;
-    overflow: hidden;
     font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .dashboard .v-panel-nocaption {
@@ -2610,9 +2622,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-panel-content {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-panel.v-has-width > .v-panel-content {
@@ -2634,9 +2646,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-popupview-loading {
-    width: 30px;
-    height: 30px;
     background: transparent url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+    height: 30px;
+    width: 30px;
 }
 
 .dashboard .v-progressbar {
@@ -2644,22 +2656,22 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-progressbar-wrapper {
-    height: 7px;
     border: 1px solid #ddd;
+    height: 7px;
 }
 
 .dashboard .v-progressbar-indicator {
-    height: 7px;
     background: #ddd;
+    height: 7px;
 }
 
 .dashboard div.v-progressbar-indeterminate {
-    height: 20px;
-    width: 20px;
     background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
     border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
+    height: 20px;
+    moz-border-radius: 4px;
+    webkit-border-radius: 4px;
+    width: 20px;
 }
 
 .dashboard .v-progressbar-indeterminate .v-progressbar-wrapper, .dashboard .v-progressbar-indeterminate .v-progressbar-indicator, .dashboard .v-progressbar-indeterminate-disabled .v-progressbar-wrapper, .dashboard .v-progressbar-indeterminate-disabled .v-progressbar-indicator {
@@ -2667,9 +2679,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard div.v-progressbar-indeterminate-disabled {
+    background: transparent;
     height: 20px;
     width: 20px;
-    background: transparent;
 }
 
 .dashboard .v-progressindicator {
@@ -2677,22 +2689,22 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-progressindicator-wrapper {
-    height: 7px;
     border: 1px solid #ddd;
+    height: 7px;
 }
 
 .dashboard .v-progressindicator-indicator {
-    height: 7px;
     background: #ddd;
+    height: 7px;
 }
 
 .dashboard div.v-progressindicator-indeterminate {
-    height: 20px;
-    width: 20px;
     background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
     border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
+    height: 20px;
+    moz-border-radius: 4px;
+    webkit-border-radius: 4px;
+    width: 20px;
 }
 
 .dashboard .v-progressindicator-indeterminate .v-progressindicator-wrapper, .dashboard .v-progressindicator-indeterminate .v-progressindicator-indicator, .dashboard .v-progressindicator-indeterminate-disabled .v-progressindicator-wrapper, .dashboard .v-progressindicator-indeterminate-disabled .v-progressindicator-indicator {
@@ -2700,9 +2712,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard div.v-progressindicator-indeterminate-disabled {
+    background: transparent;
     height: 20px;
     width: 20px;
-    background: transparent;
 }
 
 .dashboard .v-select {
@@ -2715,9 +2727,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-select-optiongroup .v-icon {
+    margin: 0 2px;
     vertical-align: middle;
     white-space: nowrap;
-    margin: 0 2px;
 }
 
 .v-ie .dashboard .v-select-optiongroup .v-select-option {
@@ -2762,9 +2774,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-select-twincol .v-textfield {
+    clear: left;
     display: block;
     float: left;
-    clear: left;
 }
 
 .dashboard .v-select-twincol .v-button {
@@ -2776,10 +2788,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect {
-    white-space: nowrap;
-    text-align: left;
     display: inline-block;
     padding-right: 1em;
+    text-align: left;
+    white-space: nowrap;
 }
 
 .dashboard .v-filterselect .v-icon {
@@ -2787,12 +2799,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard.v-app .v-filterselect-input, .dashboard .v-window .v-filterselect-input, .dashboard .v-popupview-popup .v-filterselect-input {
-    margin: 0;
-    float: left;
-    -webkit-border-radius: 0px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    float: left;
+    margin: 0;
+    moz-box-sizing: border-box;
+    webkit-border-radius: 0px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-filterselect-prompt .v-filterselect-input {
@@ -2801,12 +2813,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-button {
-    display: inline-block;
-    cursor: pointer;
-    width: 1em;
-    margin-right: -1em;
-    height: 1em;
     background: transparent url(../base/common/img/sprites.png) no-repeat -5px -8px;
+    cursor: pointer;
+    display: inline-block;
+    height: 1em;
+    margin-right: -1em;
+    width: 1em;
 }
 
 .dashboard .v-filterselect.v-readonly .v-filterselect-button {
@@ -2823,8 +2835,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-suggestmenu table {
-    border-collapse: collapse;
     border: none;
+    border-collapse: collapse;
     vertical-align: top;
 }
 
@@ -2847,18 +2859,18 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-nextpage, .dashboard .v-filterselect-nextpage-off, .dashboard .v-filterselect-prevpage-off, .dashboard .v-filterselect-prevpage {
-    width: 100%;
     background: #aaa;
-    text-align: center;
-    overflow: hidden;
     cursor: pointer;
+    overflow: hidden;
+    text-align: center;
+    width: 100%;
 }
 
 .dashboard .v-filterselect-nextpage-off, .dashboard .v-filterselect-prevpage-off {
     color: #666;
-    opacity: 0.5;
-    filter: alpha(opacity=50);
     cursor: default;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
 }
 
 .dashboard .v-filterselect-nextpage-off span, .dashboard .v-filterselect-prevpage-off span {
@@ -2866,8 +2878,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-status {
-    white-space: nowrap;
     text-align: center;
+    white-space: nowrap;
 }
 
 .dashboard .v-filterselect-no-input .v-filterselect-input {
@@ -2879,93 +2891,93 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-shadow .top-left {
-    position: absolute;
-    overflow: hidden;
-    top: -3px;
-    left: -5px;
-    width: 10px;
-    height: 10px;
     background: transparent url(../base/shadow/img/top-left.png);
+    height: 10px;
+    left: -5px;
+    overflow: hidden;
+    position: absolute;
+    top: -3px;
+    width: 10px;
 }
 
 .dashboard .v-shadow .top {
-    position: absolute;
-    overflow: hidden;
-    top: -3px;
-    left: 5px;
-    height: 10px;
-    right: 5px;
     background: transparent url(../base/shadow/img/top.png);
+    height: 10px;
+    left: 5px;
+    overflow: hidden;
+    position: absolute;
+    right: 5px;
+    top: -3px;
 }
 
 .dashboard .v-shadow .top-right {
-    position: absolute;
-    overflow: hidden;
-    top: -3px;
-    right: -5px;
-    width: 10px;
-    height: 10px;
     background: transparent url(../base/shadow/img/top-right.png);
+    height: 10px;
+    overflow: hidden;
+    position: absolute;
+    right: -5px;
+    top: -3px;
+    width: 10px;
 }
 
 .dashboard .v-shadow .left {
-    position: absolute;
-    overflow: hidden;
-    top: 7px;
-    left: -5px;
-    width: 10px;
-    bottom: 3px;
     background: transparent url(../base/shadow/img/left.png);
+    bottom: 3px;
+    left: -5px;
+    overflow: hidden;
+    position: absolute;
+    top: 7px;
+    width: 10px;
 }
 
 .dashboard .v-shadow .center {
-    position: absolute;
-    overflow: hidden;
-    top: 7px;
-    left: 5px;
-    bottom: 3px;
-    right: 5px;
     background: transparent url(../base/shadow/img/center.png);
+    bottom: 3px;
+    left: 5px;
+    overflow: hidden;
+    position: absolute;
+    right: 5px;
+    top: 7px;
 }
 
 .dashboard .v-shadow .right {
-    position: absolute;
-    overflow: hidden;
-    top: 7px;
-    right: -5px;
-    width: 10px;
-    bottom: 3px;
     background: transparent url(../base/shadow/img/right.png);
+    bottom: 3px;
+    overflow: hidden;
+    position: absolute;
+    right: -5px;
+    top: 7px;
+    width: 10px;
 }
 
 .dashboard .v-shadow .bottom-left {
-    position: absolute;
-    overflow: hidden;
-    bottom: -7px;
-    left: -5px;
-    width: 10px;
-    height: 10px;
     background: transparent url(../base/shadow/img/bottom-left.png);
+    bottom: -7px;
+    height: 10px;
+    left: -5px;
+    overflow: hidden;
+    position: absolute;
+    width: 10px;
 }
 
 .dashboard .v-shadow .bottom {
-    position: absolute;
-    overflow: hidden;
-    bottom: -7px;
-    left: 5px;
-    right: 5px;
-    height: 10px;
     background: transparent url(../base/shadow/img/bottom.png);
+    bottom: -7px;
+    height: 10px;
+    left: 5px;
+    overflow: hidden;
+    position: absolute;
+    right: 5px;
 }
 
 .dashboard .v-shadow .bottom-right {
-    position: absolute;
-    overflow: hidden;
+    background: transparent url(../base/shadow/img/bottom-right.png);
     bottom: -7px;
+    height: 10px;
+    overflow: hidden;
+    position: absolute;
     right: -5px;
     width: 10px;
-    height: 10px;
-    background: transparent url(../base/shadow/img/bottom-right.png);
 }
 
 .dashboard .v-slider {
@@ -2973,56 +2985,56 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-slider-base {
-    height: 2px;
-    border-top: 1px solid #ddd;
     background: #eee;
     border-left: 1px solid #ddd;
     border-right: 1px solid #eee;
+    border-top: 1px solid #ddd;
+    height: 2px;
 }
 
 .dashboard .v-slider-handle {
     background: #aaa;
-    width: 12px;
+    font-size: 0;
     height: 12px;
     margin-top: -5px;
-    font-size: 0;
+    width: 12px;
 }
 
 .dashboard .v-slider-vertical {
-    width: 2px;
-    height: auto;
-    margin: 0 5px;
     border: none;
     border-left: 1px solid #cccfd0;
     border-right: 1px solid #cccfd0;
+    height: auto;
+    margin: 0 5px;
+    width: 2px;
 }
 
 .dashboard .v-slider-vertical .v-slider-base {
-    width: 2px;
     border-bottom: 1px solid #eee;
     border-right: none;
+    width: 2px;
 }
 
 .dashboard .v-slider-vertical .v-slider-handle {
-    width: 12px;
-    height: 12px;
     font-size: 0;
+    height: 12px;
     margin-left: -5px;
+    width: 12px;
 }
 
 .dashboard .v-slider-feedback {
-    padding: 2px 5px;
     background: #444;
-    color: #fff;
-    font-size: 11px;
-    line-height: 13px;
-    font-weight: bold;
-    font-family: Arial, Helvetica, sans-serif;
     border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 13px;
     margin: -2px 0 0 2px;
+    moz-border-radius: 4px;
+    padding: 2px 5px;
     text-shadow: 0 1px 0 #000;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-splitpanel-horizontal, .dashboard .v-splitpanel-vertical {
@@ -3034,13 +3046,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-splitpanel-hsplitter div {
-    width: 6px;
+    background: #ddd;
+    bottom: 0;
+    cursor: col-resize;
+    cursor: e-resize;
     position: absolute;
     top: 0;
-    bottom: 0;
-    background: #ddd;
-    cursor: e-resize;
-    cursor: col-resize;
+    width: 6px;
 }
 
 .dashboard .v-disabled .v-splitpanel-hsplitter div {
@@ -3052,10 +3064,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-splitpanel-vsplitter div {
-    height: 6px;
     background: #ddd;
-    cursor: s-resize;
     cursor: row-resize;
+    cursor: s-resize;
+    height: 6px;
 }
 
 .dashboard .v-disabled .v-splitpanel-vsplitter div {
@@ -3068,18 +3080,18 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-header-wrap {
-    overflow: hidden;
+    background: #efefef;
     border: 1px solid #aaa;
     border-bottom: none;
-    background: #efefef;
+    overflow: hidden;
 }
 
 .dashboard .v-table-header table, .dashboard .v-table-table {
-    border-spacing: 0;
+    border: 0;
     border-collapse: separate;
+    border-spacing: 0;
     margin: 0;
     padding: 0;
-    border: 0;
 }
 
 .dashboard .v-table-table {
@@ -3099,23 +3111,23 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-footer-wrap {
-    overflow: hidden;
+    background: #efefef;
     border: 1px solid #aaa;
     border-top: none;
-    background: #efefef;
+    overflow: hidden;
 }
 
 .dashboard .v-table-footer table {
-    border-spacing: 0;
+    border: 0;
     border-collapse: collapse;
+    border-spacing: 0;
     margin: 0;
     padding: 0;
-    border: 0;
 }
 
 .dashboard .v-table-footer td {
-    padding: 0;
     border-right: 1px solid #aaa;
+    padding: 0;
 }
 
 .dashboard .v-table-footer-cell {
@@ -3124,20 +3136,20 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-table-footer-container {
     float: right;
-    padding-right: 6px;
     overflow: hidden;
+    padding-right: 6px;
     white-space: nowrap;
 }
 
 .dashboard .v-table-resizer {
-    display: block;
-    height: 1.2em;
-    float: right;
     background: #aaa;
-    cursor: e-resize;
     cursor: col-resize;
-    width: 1px;
+    cursor: e-resize;
+    display: block;
+    float: right;
+    height: 1.2em;
     overflow: hidden;
+    width: 1px;
 }
 
 .dashboard .v-table.v-disabled .v-table-resizer {
@@ -3145,9 +3157,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-caption-container {
+    margin-left: 6px;
     overflow: hidden;
     white-space: nowrap;
-    margin-left: 6px;
 }
 
 .dashboard .v-table-caption-container-align-right {
@@ -3155,15 +3167,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-sort-indicator {
-    width: 0px;
-    height: 1.2em;
     float: right;
+    height: 1.2em;
+    width: 0px;
 }
 
 .dashboard .v-table-header-cell-asc .v-table-sort-indicator, .dashboard .v-table-header-cell-desc .v-table-sort-indicator {
-    width: 16px;
-    height: 1.2em;
     float: right;
+    height: 1.2em;
+    width: 16px;
 }
 
 .dashboard .v-table-header-cell-asc .v-table-sort-indicator {
@@ -3198,9 +3210,9 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .v-table-row, .dashboard .v-table-row-odd {
     background: #fff;
     border: 0;
+    cursor: pointer;
     margin: 0;
     padding: 0;
-    cursor: pointer;
 }
 
 .dashboard .v-table-generated-row {
@@ -3217,15 +3229,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-cell-content {
-    white-space: nowrap;
+    border-right: 1px solid #aaa;
     overflow: hidden;
     padding: 0 6px;
-    border-right: 1px solid #aaa;
+    white-space: nowrap;
 }
 
 .dashboard .v-table-cell-wrapper {
-    white-space: nowrap;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .dashboard .v-table-cell-wrapper-align-center {
@@ -3237,13 +3249,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-column-selector {
-    float: right;
     background: transparent url(../base/common/img/sprites.png) no-repeat 4px -37px;
-    margin: -1.2em 0 0 0;
-    height: 1.2em;
-    width: 14px;
-    position: relative;
     cursor: pointer;
+    float: right;
+    height: 1.2em;
+    margin: -1.2em 0 0 0;
+    position: relative;
+    width: 14px;
 }
 
 .dashboard .v-table.v-disabled .v-table-column-selector {
@@ -3251,12 +3263,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-focus-slot-left {
+    background: transparent;
     border-left: 2px solid #999;
+    border-right: 1px solid #aaa;
     float: none;
     margin-bottom: -1.2em;
     width: auto;
-    background: transparent;
-    border-right: 1px solid #aaa;
 }
 
 .dashboard .v-table-focus-slot-right {
@@ -3265,12 +3277,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-header-drag {
-    position: absolute;
     background: #efefef;
     border: 1px solid #eee;
-    opacity: 0.9;
     filter: alpha(opacity=90);
     margin-top: 20px;
+    opacity: 0.9;
+    position: absolute;
     z-index: 30000;
 }
 
@@ -3279,9 +3291,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-scrollposition {
-    width: 160px;
     background: #eee;
     border: 1px solid #aaa;
+    width: 160px;
 }
 
 .dashboard .v-table-scrollposition span {
@@ -3298,13 +3310,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-focus .v-table-cell-content {
-    border-top: 1px dotted #0066bd;
     border-bottom: 1px dotted #0066bd;
+    border-top: 1px dotted #0066bd;
 }
 
 .dashboard .v-table-focus .v-table-cell-wrapper {
-    margin-top: -1px;
     margin-bottom: -1px;
+    margin-top: -1px;
 }
 
 .dashboard .v-off {
@@ -3336,13 +3348,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-row-drag-top .v-table-cell-content:first-child:before, .dashboard .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+    background: transparent url(../base/common/img/drag-slot-dot.png);
     display: block;
+    height: 6px;
+    margin-left: -6px;
+    margin-top: -4px;
     position: absolute;
     width: 6px;
-    height: 6px;
-    margin-top: -4px;
-    margin-left: -6px;
-    background: transparent url(../base/common/img/drag-slot-dot.png);
 }
 
 .v-ff .dashboard .v-table-row-drag-bottom .v-table-cell-content:first-child:after, .v-ie .dashboard .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
@@ -3355,13 +3367,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-tabs {
-    empty-cells: hide;
-    border-collapse: collapse;
-    margin: 0;
-    padding: 0;
     border: 0;
-    width: 100%;
+    border-collapse: collapse;
+    empty-cells: hide;
+    margin: 0;
     overflow: hidden;
+    padding: 0;
+    width: 100%;
 }
 
 .dashboard .v-tabsheet-tabitemcell:focus {
@@ -3379,8 +3391,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-spacertd div {
-    border-left: 1px solid #aaa;
     border-bottom: 1px solid #aaa;
+    border-left: 1px solid #aaa;
     height: 1em;
     padding: 0.2em 0;
 }
@@ -3390,9 +3402,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-scroller {
-    white-space: nowrap;
-    text-align: right;
     margin-top: -1em;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .dashboard .v-disabled .v-tabsheet-scroller {
@@ -3400,16 +3412,16 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-scrollerPrev, .dashboard .v-tabsheet-scrollerNext, .dashboard .v-tabsheet-scrollerPrev-disabled, .dashboard .v-tabsheet-scrollerNext-disabled {
-    border: 1px solid #aaa;
     background: #fff;
-    width: 12px;
-    height: 1em;
+    border: 1px solid #aaa;
     cursor: pointer;
+    height: 1em;
+    width: 12px;
 }
 
 .dashboard .v-tabsheet-scrollerPrev-disabled, .dashboard .v-tabsheet-scrollerNext-disabled {
-    opacity: 0.5;
     cursor: default;
+    opacity: 0.5;
 }
 
 .dashboard .v-tabsheet-tabs .v-caption, .dashboard .v-tabsheet-tabs .v-caption span {
@@ -3417,20 +3429,20 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-caption-close {
+    cursor: pointer;
     display: inline;
     display: inline-block;
-    zoom: 1;
-    width: 16px;
-    height: 16px;
-    text-align: center;
     font-weight: bold;
-    cursor: pointer;
-    vertical-align: middle;
+    height: 16px;
+    khtml-user-select: none;
+    moz-user-select: none;
+    ms-user-select: none;
+    text-align: center;
     user-select: none;
-    -khtml-user-select: none;
-    -ms-user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
+    vertical-align: middle;
+    webkit-user-select: none;
+    width: 16px;
+    zoom: 1;
 }
 
 .dashboard .v-tabsheet .v-disabled .v-tabsheet-caption-close {
@@ -3458,8 +3470,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-tabitem-selected {
-    cursor: default;
     border-bottom-color: #fff;
+    cursor: default;
 }
 
 .dashboard .v-tabsheet-tabitem-selected .v-caption {
@@ -3468,14 +3480,14 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-tabsheet-content {
     border: 1px solid #aaa;
-    border-top: none;
     border-bottom: none;
+    border-top: none;
     position: relative;
 }
 
 .dashboard .v-tabsheet-deco {
-    height: 1px;
     background: #aaa;
+    height: 1px;
     overflow: hidden;
 }
 
@@ -3530,21 +3542,21 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-richtextarea .gwt-HTML {
-    height: 100%;
     font-size: 14px;
+    height: 100%;
 }
 
 .dashboard .v-richtextarea .gwt-RichTextToolbar {
-    white-space: nowrap;
     background: #959595 url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x 0 -42px;
     border-bottom: 1px solid #7d7d7d;
-    padding: 2px;
     overflow: hidden;
+    padding: 2px;
+    white-space: nowrap;
 }
 
 .dashboard .v-richtextarea .gwt-RichTextToolbar-top {
-    padding-bottom: 1px;
     overflow: hidden;
+    padding-bottom: 1px;
     white-space: normal;
 }
 
@@ -3555,15 +3567,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton, .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton {
-    float: left;
-    display: inline;
-    width: 22px;
-    height: 21px;
-    overflow: hidden;
     background: transparent url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x;
     cursor: pointer;
+    display: inline;
+    float: left;
+    height: 21px;
     margin-right: 2px;
+    overflow: hidden;
     text-align: center;
+    width: 22px;
 }
 
 .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down, .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down, .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down-hovering, .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down-hovering {
@@ -3571,8 +3583,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-richtextarea .gwt-RichTextToolbar .gwt-ListBox {
-    width: 24.5%;
     margin-right: 2px;
+    width: 24.5%;
 }
 
 .dashboard .v-richtextarea-readonly {
@@ -3580,9 +3592,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tree {
-    text-align: left;
-    padding: 1px 0;
     outline: none;
+    padding: 1px 0;
+    text-align: left;
 }
 
 .dashboard .v-tree-node {
@@ -3640,12 +3652,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tree .v-tree-node-drag-top:before, .dashboard .v-tree .v-tree-node-drag-bottom:after, .dashboard .v-tree .v-tree-node-caption-drag-center:after {
+    background: transparent url(../base/common/img/drag-slot-dot.png);
     display: block;
-    position: absolute;
-    width: 6px;
     height: 6px;
     margin-top: -4px;
-    background: transparent url(../base/common/img/drag-slot-dot.png);
+    position: absolute;
+    width: 6px;
 }
 
 .dashboard .v-tree .v-tree-node-drag-bottom:after {
@@ -3669,12 +3681,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tree .v-tree-node-caption-drag-center div {
+    background-color: #bcdcff;
     border: 2px solid #1d9dff;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     margin: -2px 2px -2px -2px;
-    background-color: #bcdcff;
+    moz-border-radius: 4px;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-tree .v-tree-node-caption-drag-center div {
@@ -3730,13 +3742,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-treetable-treespacer {
-    display: inline-block;
     background: transparent;
+    display: inline-block;
     height: 10px;
-    width: 18px;
-    position: absolute;
     left: 0;
+    position: absolute;
     top: 5px;
+    width: 18px;
 }
 
 .dashboard .v-treetable-node-closed {
@@ -3762,8 +3774,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-treetable .v-table-body .v-table-table .v-table-row-animating {
-    zoom: 1;
     z-index: 1;
+    zoom: 1;
 }
 
 .dashboard .v-treetable .v-table-body .v-table-table .v-table-row-animating, .dashboard .v-treetable .v-table-body .v-table-table .v-table-row-animating .v-table-cell-content {
@@ -3776,9 +3788,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard div.v-treetable-animation-clone-wrapper {
+    background-color: #fff;
     position: absolute;
     z-index: 2;
-    background-color: #fff;
 }
 
 .dashboard div.v-treetable-animation-clone-wrapper table.v-treetable-animation-clone {
@@ -3794,9 +3806,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-upload-immediate {
-    position: relative;
     margin: 0;
     overflow: hidden;
+    position: relative;
 }
 
 .v-ff .dashboard .v-upload-immediate, .v-op .dashboard .v-upload-immediate {
@@ -3804,23 +3816,23 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-upload-immediate input {
-    opacity: 0;
+    background: transparent;
+    border: none;
     filter: alpha(opacity=0);
-    z-index: 2;
+    height: 21px;
+    opacity: 0;
     position: absolute;
     right: 0;
-    height: 21px;
     text-align: right;
-    border: none;
-    background: transparent;
+    z-index: 2;
 }
 
 .dashboard .v-upload-immediate button {
-    position: relative;
     left: 0;
+    position: relative;
+    text-align: left;
     top: 0;
     width: 100%;
-    text-align: left;
 }
 
 .dashboard .v-window {
@@ -3828,9 +3840,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-contents {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-window.v-has-width > div.popupContent, .dashboard .v-window.v-has-width .v-window-wrap, .dashboard .v-window.v-has-width .v-window-contents, .dashboard .v-window.v-has-width .v-window-contents > div {
@@ -3842,12 +3854,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-outerheader {
-    padding: 0.3em 1em;
-    height: 1.6em;
-    position: relative;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    height: 1.6em;
+    moz-box-sizing: border-box;
+    padding: 0.3em 1em;
+    position: relative;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-window-outerheader, .dashboard .v-window-draggingCurtain {
@@ -3856,18 +3868,18 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-window-header {
     font-weight: bold;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ie-user-select: none;
+    ie-user-select: none;
+    khtml-user-select: none;
+    moz-user-select: none;
     user-select: none;
 }
 
 .dashboard div.v-window-header {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    -ms-text-overflow: ellipsis;
+    ms-text-overflow: ellipsis;
     overflow: hidden;
     padding: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dashboard .v-window-header .v-icon {
@@ -3879,20 +3891,20 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-footer {
-    overflow: hidden;
-    zoom: 1;
-    height: 10px;
-    position: relative;
     cursor: move;
+    height: 10px;
+    overflow: hidden;
+    position: relative;
+    zoom: 1;
 }
 
 .dashboard .v-window-resizebox {
-    width: 10px;
-    height: 10px;
     background: #ddd;
+    height: 10px;
     overflow: hidden;
     position: absolute;
     right: 0;
+    width: 10px;
 }
 
 .dashboard .v-window-resizebox, .dashboard .v-window-resizingCurtain {
@@ -3909,13 +3921,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-closebox, .dashboard .v-window-restorebox, .dashboard .v-window-maximizebox {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1em;
-    height: 1em;
     cursor: pointer;
+    height: 1em;
     overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 1em;
 }
 
 .dashboard .v-window-maximizebox, .dashboard .v-window-restorebox {
@@ -3935,14 +3947,14 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-modalitycurtain {
-    top: 0;
-    left: 0;
     background: #999;
+    filter: alpha(opacity=50);
+    height: 100%;
+    left: 0;
     opacity: 0.5;
     position: fixed;
+    top: 0;
     width: 100%;
-    height: 100%;
-    filter: alpha(opacity=50);
 }
 
 .dashboard .v-shadow-window {
@@ -3950,123 +3962,123 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-shadow-window .top-left {
-    position: absolute;
-    overflow: hidden;
-    top: -10px;
-    left: -15px;
-    width: 28px;
-    height: 28px;
     background: transparent url(../base/window/img/shadow/top-left.png);
+    height: 28px;
+    left: -15px;
+    overflow: hidden;
+    position: absolute;
+    top: -10px;
+    width: 28px;
 }
 
 .dashboard .v-shadow-window .top {
-    position: absolute;
-    overflow: hidden;
-    top: -10px;
-    left: 13px;
-    height: 28px;
-    right: 13px;
     background: transparent url(../base/window/img/shadow/top.png);
+    height: 28px;
+    left: 13px;
+    overflow: hidden;
+    position: absolute;
+    right: 13px;
+    top: -10px;
 }
 
 .dashboard .v-shadow-window .top-right {
-    position: absolute;
-    overflow: hidden;
-    top: -10px;
-    right: -15px;
-    width: 28px;
-    height: 28px;
     background: transparent url(../base/window/img/shadow/top-right.png);
+    height: 28px;
+    overflow: hidden;
+    position: absolute;
+    right: -15px;
+    top: -10px;
+    width: 28px;
 }
 
 .dashboard .v-shadow-window .left {
-    position: absolute;
-    overflow: hidden;
-    top: 18px;
-    left: -15px;
-    width: 28px;
-    bottom: 10px;
     background: transparent url(../base/window/img/shadow/left.png);
+    bottom: 10px;
+    left: -15px;
+    overflow: hidden;
+    position: absolute;
+    top: 18px;
+    width: 28px;
 }
 
 .dashboard .v-shadow-window .center {
-    position: absolute;
-    overflow: hidden;
-    top: 18px;
-    left: 13px;
-    bottom: 10px;
-    right: 13px;
     background: transparent url(../base/window/img/shadow/center.png);
+    bottom: 10px;
+    left: 13px;
+    overflow: hidden;
+    position: absolute;
+    right: 13px;
+    top: 18px;
 }
 
 .dashboard .v-shadow-window .right {
-    position: absolute;
-    overflow: hidden;
-    top: 18px;
-    right: -15px;
-    width: 28px;
-    bottom: 10px;
     background: transparent url(../base/window/img/shadow/right.png);
+    bottom: 10px;
+    overflow: hidden;
+    position: absolute;
+    right: -15px;
+    top: 18px;
+    width: 28px;
 }
 
 .dashboard .v-shadow-window .bottom-left {
-    position: absolute;
-    overflow: hidden;
-    bottom: -18px;
-    left: -15px;
-    width: 28px;
-    height: 28px;
     background: transparent url(../base/window/img/shadow/bottom-left.png);
+    bottom: -18px;
+    height: 28px;
+    left: -15px;
+    overflow: hidden;
+    position: absolute;
+    width: 28px;
 }
 
 .dashboard .v-shadow-window .bottom {
-    position: absolute;
-    overflow: hidden;
-    bottom: -18px;
-    left: 13px;
-    right: 13px;
-    height: 28px;
     background: transparent url(../base/window/img/shadow/bottom.png);
+    bottom: -18px;
+    height: 28px;
+    left: 13px;
+    overflow: hidden;
+    position: absolute;
+    right: 13px;
 }
 
 .dashboard .v-shadow-window .bottom-right {
-    position: absolute;
-    overflow: hidden;
+    background: transparent url(../base/window/img/shadow/bottom-right.png);
     bottom: -18px;
+    height: 28px;
+    overflow: hidden;
+    position: absolute;
     right: -15px;
     width: 28px;
-    height: 28px;
-    background: transparent url(../base/window/img/shadow/bottom-right.png);
 }
 
 .dashboard .v-loading-indicator, .dashboard .v-loading-indicator-delay, .dashboard .v-loading-indicator-wait {
-    top: 50%;
-    left: 50%;
-    right: auto;
-    width: 44px;
-    height: 44px;
-    margin-top: -22px;
-    margin-left: -22px;
     background: transparent url(img/spinner.png);
-    -webkit-animation: spinner 1s steps(12, end) 0 infinite;
-    -moz-animation-name: spinner;
-    -moz-animation-duration: 1s;
-    -moz-animation-timing-function: steps(12, end);
-    -moz-animation-iteration-count: infinite;
-    -o-animation-name: spinner;
-    -o-animation-duration: 1s;
-    -o-animation-timing-function: steps(12, end);
-    -o-animation-iteration-count: infinite;
-    -ms-animation: spinner 1s steps(12, end) 0 infinite;
+    height: 44px;
+    left: 50%;
+    margin-left: -22px;
+    margin-top: -22px;
+    moz-animation-duration: 1s;
+    moz-animation-iteration-count: infinite;
+    moz-animation-name: spinner;
+    moz-animation-timing-function: steps(12, end);
+    ms-animation: spinner 1s steps(12, end) 0 infinite;
+    o-animation-duration: 1s;
+    o-animation-iteration-count: infinite;
+    o-animation-name: spinner;
+    o-animation-timing-function: steps(12, end);
+    right: auto;
+    top: 50%;
+    webkit-animation: spinner 1s steps(12, end) 0 infinite;
+    width: 44px;
 }
 
 .v-ie .dashboard .v-loading-indicator, .v-ie .dashboard .v-loading-indicator-delay, .v-ie .dashboard .v-loading-indicator-wait, .v-op .dashboard .v-loading-indicator, .v-op .dashboard .v-loading-indicator-delay, .v-op .dashboard .v-loading-indicator-wait {
     background-image: url(img/spinner.gif);
-    opacity: 0.8;
-    filter: alpha(opacity=80);
     display: none;
-    width: 0px;
+    filter: alpha(opacity=80);
     height: 0px;
+    opacity: 0.8;
+    width: 0px;
 }
 
 .dashboard .v-widget {
@@ -4092,8 +4104,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-caption {
-    font-size: 13px;
     color: #6c737a;
+    font-size: 13px;
 }
 
 .dashboard .v-caption-on-top .v-caption {
@@ -4101,8 +4113,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-drag-element {
-    opacity: 0.7;
     cursor: move;
+    opacity: 0.7;
 }
 
 .dashboard .v-drag-element * {
@@ -4110,40 +4122,40 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-drag-element.v-widget {
-    border: 2px solid #2d90f3;
     background: #fff;
-    padding: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
+    border: 2px solid #2d90f3;
     border-radius: 4px;
-    max-width: 50%;
     max-height: 50%;
+    max-width: 50%;
+    moz-border-radius: 4px;
+    padding: 4px;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-icon, .dashboard .v-embbedded img {
-    -ms-interpolation-mode: bicubic;
+    ms-interpolation-mode: bicubic;
 }
 
 .dashboard .v-contextmenu, .dashboard .v-menubar-popup, .dashboard .v-filterselect-suggestpopup, .dashboard .v-datefield-popup, .dashboard .v-popupview-popup, .dashboard .v-tooltip, .dashboard .v-window.dialog, .dashboard .v-Notification-tray {
+    animation: fade-in 160ms ease-out;
     background: #343638;
     background: rgba(52, 54, 56, 0.92);
-    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 0.3em;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     color: #fff;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-    padding: 4px;
-    -webkit-border-radius: 0.3em;
-    -moz-border-radius: 0.3em;
-    border-radius: 0.3em;
-    border: none;
     min-width: 10em;
-    -webkit-animation: fade-in 160ms ease-out;
-    -moz-animation: fade-in 160ms ease-out;
-    -ms-animation: fade-in 160ms ease-out;
-    -o-animation: fade-in 160ms ease-out;
-    animation: fade-in 160ms ease-out;
+    moz-animation: fade-in 160ms ease-out;
+    moz-border-radius: 0.3em;
+    moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    ms-animation: fade-in 160ms ease-out;
+    o-animation: fade-in 160ms ease-out;
     opacity: 1;
+    padding: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    webkit-animation: fade-in 160ms ease-out;
+    webkit-border-radius: 0.3em;
+    webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .v-tooltip, .dashboard .v-window.dialog {
@@ -4156,8 +4168,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-contextmenu table, .dashboard .v-filterselect-suggestpopup table, .dashboard .v-menubar-submenu {
-    width: 100%;
     background: transparent;
+    width: 100%;
 }
 
 .dashboard .v-filterselect-suggestpopup table {
@@ -4169,20 +4181,20 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-contextmenu .gwt-MenuItem, .dashboard .v-menubar-popup .v-menubar-menuitem, .dashboard .v-filterselect-suggestpopup .gwt-MenuItem {
-    padding: 0.1em 0.6em;
-    -webkit-border-radius: 0.2em;
-    -moz-border-radius: 0.2em;
     border-radius: 0.2em;
+    moz-border-radius: 0.2em;
+    padding: 0.1em 0.6em;
+    webkit-border-radius: 0.2em;
 }
 
 .dashboard .v-contextmenu .gwt-MenuItem-selected, .dashboard .v-menubar-popup .v-menubar-menuitem-selected, .dashboard .v-filterselect-suggestpopup .gwt-MenuItem-selected {
-    text-shadow: 0 0.1em 0.1em rgba(0, 0, 0, 0.3);
     background: #6ba7e4;
     background: -moz-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    background: -ms-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    background: -o-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #75b0e7), color-stop(100%, #5f9de1));
     background: -webkit-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
-    background: -o-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
-    background: -ms-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    text-shadow: 0 0.1em 0.1em rgba(0, 0, 0, 0.3);
 }
 
 .dashboard .v-contextmenu .gwt-MenuItem-selected div {
@@ -4194,13 +4206,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-contextmenu .v-off div:before, .dashboard .v-contextmenu .v-on div:before {
-    display: inline;
     content: "\2713";
+    display: inline;
     font-family: "fontello";
     font-style: normal;
     font-weight: normal;
-    speak: none;
     margin-right: 0.5em;
+    speak: none;
 }
 
 .dashboard .v-contextmenu .v-off {
@@ -4224,26 +4236,26 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-button {
-    color: #5a6066;
-    padding: 0.3em 1.4em;
-    line-height: 1;
-    letter-spacing: -0.03em;
-    text-shadow: 0 0.1em 0 rgba(255, 255, 255, 0.75);
-    -webkit-border-radius: 0.25em;
-    -moz-border-radius: 0.25em;
-    border-radius: 0.25em;
-    border: 0.1em solid #b3b4b5;
-    border-top-color: #d4d4d6;
-    border-bottom-color: #989b9c;
-    -webkit-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
-    -moz-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
-    box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
     background: #f2f2f3;
     background: -moz-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
+    background: -ms-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
+    background: -o-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(5%, #fafafa), color-stop(94%, #eaebec), color-stop(100%, #e2e3e4));
     background: -webkit-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
-    background: -o-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
-    background: -ms-linear-gradient(top, #ffffff 0%, #fafafa 5%, #eaebec 94%, #e2e3e4 100%);
+    border: 0.1em solid #b3b4b5;
+    border-bottom-color: #989b9c;
+    border-radius: 0.25em;
+    border-top-color: #d4d4d6;
+    box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
+    color: #5a6066;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    moz-border-radius: 0.25em;
+    moz-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
+    padding: 0.3em 1.4em;
+    text-shadow: 0 0.1em 0 rgba(255, 255, 255, 0.75);
+    webkit-border-radius: 0.25em;
+    webkit-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
 }
 
 .v-webkit .dashboard .v-button {
@@ -4251,29 +4263,29 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-has-height.v-button:before {
-    display: inline-block;
     content: "";
-    vertical-align: middle;
+    display: inline-block;
     height: 100%;
+    vertical-align: middle;
     width: 0;
 }
 
 .dashboard .v-button:focus {
-    outline: none;
     border-color: #69a5e4;
+    outline: none;
 }
 
 .dashboard .v-button:active, .dashboard .v-pressed.v-button {
-    border-color: #9fa0a2;
-    border-top-color: #b1b1b3;
-    border-bottom-color: #bfc0c1;
     background: #e2e4e4;
     background: -moz-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
+    background: -ms-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
+    background: -o-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cecfd0), color-stop(5%, #e7e8e9), color-stop(94%, #dcdee0), color-stop(100%, #e4e5e6));
     background: -webkit-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
-    background: -o-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
-    background: -ms-linear-gradient(top, #cecfd0 0%, #e7e8e9 5%, #dcdee0 94%, #e4e5e6 100%);
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    border-bottom-color: #bfc0c1;
+    border-color: #9fa0a2;
+    border-top-color: #b1b1b3;
+    webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .dashboard .wide.v-button {
@@ -4282,61 +4294,61 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .default.v-button {
-    color: #fff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
-    font-weight: bold;
-    -webkit-font-smoothing: antialiased;
-    border-color: #216ec6;
-    border-top-color: #2875ce;
-    border-bottom-color: #37679d;
     background: #499bea;
     background: -moz-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
+    background: -ms-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
+    background: -o-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #4fa8f7), color-stop(6%, #499bea), color-stop(100%, #207ce5));
     background: -webkit-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
-    background: -o-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
-    background: -ms-linear-gradient(top, #4fa8f7 0%, #499bea 6%, #207ce5 100%);
+    border-bottom-color: #37679d;
+    border-color: #216ec6;
+    border-top-color: #2875ce;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    webkit-font-smoothing: antialiased;
 }
 
 .dashboard .default.v-button:focus {
-    xborder-color: #207ce5;
-    -webkit-box-shadow: 0 0 4px #207ce5;
-    -moz-box-shadow: 0 0 4px #207ce5;
     box-shadow: 0 0 4px #207ce5;
+    moz-box-shadow: 0 0 4px #207ce5;
+    webkit-box-shadow: 0 0 4px #207ce5;
+    xborder-color: #207ce5;
 }
 
 .dashboard .default.v-button:active, .dashboard .v-pressed.v-button.default {
-    border-color: #1c64b1;
-    border-top-color: #346d9f;
-    border-bottom-color: #3c81be;
     background: #3d80bf;
     background: -moz-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
+    background: -ms-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
+    background: -o-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #3d80bf), color-stop(8%, #408ac9), color-stop(100%, #1a6abf));
     background: -webkit-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
-    background: -o-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
-    background: -ms-linear-gradient(top, #3d80bf 0%, #408ac9 6%, #1a6abf 100%);
-    -webkit-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
-    -moz-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
+    border-bottom-color: #3c81be;
+    border-color: #1c64b1;
+    border-top-color: #346d9f;
     box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
+    moz-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
+    webkit-box-shadow: 0 0 0 2px rgba(49, 50, 51, 0.07);
 }
 
 .dashboard .small.v-button {
-    padding: 0.1em 1.2em;
     font-size: 13px;
+    padding: 0.1em 1.2em;
 }
 
 .dashboard .link.v-button, .dashboard .link.v-button:active, .dashboard .link.v-pressed.v-button, .dashboard .link.v-button:focus {
     background: transparent;
     border: none;
-    font-weight: inherit;
+    box-shadow: none;
     color: #349aff;
     font-size: inherit;
-    line-height: inherit;
+    font-weight: inherit;
     letter-spacing: 0;
+    line-height: inherit;
+    moz-box-shadow: none;
     padding: 0;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
     text-shadow: inherit;
+    webkit-box-shadow: none;
 }
 
 .dashboard .icon-only.v-button {
@@ -4353,11 +4365,11 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .borderless.v-button {
-    border: none !important;
     background: transparent !important;
-    -webkit-box-shadow: none;
-    -mox-box-shadow: none;
+    border: none !important;
     box-shadow: none;
+    mox-box-shadow: none;
+    webkit-box-shadow: none;
 }
 
 .dashboard .v-filterselect {
@@ -4365,14 +4377,14 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     background: transparent;
     border: none;
-    padding: 0 1.5em 0 0;
-    margin: 0;
     font-size: inherit;
+    margin: 0;
+    moz-appearance: none;
+    padding: 0 1.5em 0 0;
+    webkit-appearance: none;
     width: 100% !important;
 }
 
@@ -4381,15 +4393,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-button {
+    background: transparent;
+    border: 1px solid;
+    border-color: #646E77 transparent transparent;
+    border-width: 0.5em 0.45em;
+    height: 0;
     position: absolute;
     right: 1.5em;
-    width: 0;
-    height: 0;
-    border: 1px solid;
-    border-width: 0.5em 0.45em;
-    border-color: #646E77 transparent transparent;
     top: 0.8em;
-    background: transparent;
+    width: 0;
 }
 
 .dashboard .v-filterselect-suggestpopup {
@@ -4413,13 +4425,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-filterselect-prevpage-off span, .dashboard .v-filterselect-prevpage span, .dashboard .v-filterselect-nextpage-off span, .dashboard .v-filterselect-nextpage span {
-    width: 0;
-    height: 0;
     border: 1px solid;
-    border-width: 0.5em 0.45em;
     border-color: transparent transparent #aaa;
-    overflow: hidden;
+    border-width: 0.5em 0.45em;
     display: inline-block;
+    height: 0;
+    overflow: hidden;
+    width: 0;
 }
 
 .dashboard .v-filterselect-nextpage-off span, .dashboard .v-filterselect-nextpage span {
@@ -4445,19 +4457,19 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-label.h1 {
     font-size: 36px;
-    line-height: 1;
     font-weight: 300;
-    -webkit-font-smoothing: antialiased;
     letter-spacing: -0.05em;
+    line-height: 1;
+    webkit-font-smoothing: antialiased;
 }
 
 .dashboard .v-label.h2 {
     color: #404346;
     font-size: 22px;
-    line-height: 1;
     font-weight: normal;
+    line-height: 1;
     padding: 0.5em 0;
-    -webkit-font-smoothing: antialiased;
+    webkit-font-smoothing: antialiased;
 }
 
 .dashboard .v-label.light {
@@ -4465,84 +4477,84 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-label.h4 {
+    color: #349aff;
     font-weight: bold;
     text-transform: uppercase;
-    color: #349aff;
 }
 
 .dashboard .v-Notification {
     background: #000000;
     background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
+    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0.45)), color-stop(100%, rgba(45, 45, 45, 0.45)));
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
-    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0.45) 0%, rgba(45, 45, 45, 0.45) 100%);
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    font-size: 18px;
-    line-height: 1.4;
-    font-weight: normal;
-    padding: 1em 2em;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
-    -webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1.4;
+    moz-border-radius: 2px;
+    moz-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    padding: 1em 2em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    webkit-border-radius: 2px;
+    webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 
 .dashboard .v-Notification h1 {
-    font-size: inherit;
     color: #fff;
+    font-size: inherit;
     font-weight: normal;
 }
 
 .dashboard .v-Notification h1, .dashboard .v-Notification p {
-    margin: 0;
     display: inline-block;
+    margin: 0;
     vertical-align: middle;
 }
 
 .dashboard .v-Notification h1 + p {
-    margin-left: 2em;
     color: #d5d5d5;
+    margin-left: 2em;
     max-width: 28em;
 }
 
 .dashboard .v-Notification-system {
-    background: -webkit-linear-gradient(bottom, rgba(76, 76, 76, 0) 0%, rgba(76, 76, 76, 0.9) 60%, rgba(76, 76, 76, 1) 95%, rgba(52, 52, 52, 1) 100%);
-    width: 100%;
-    max-width: 100%;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-    font-size: 14px;
-    text-align: center;
-    padding-bottom: 3em;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    -webkit-animation: pull-down 300ms ease-in-out;
-    -moz-animation: pull-down 300ms ease-in-out;
-    -ms-animation: pull-down 300ms ease-in-out;
-    -o-animation: pull-down 300ms ease-in-out;
     animation: pull-down 300ms ease-in-out;
+    background: -webkit-linear-gradient(bottom, rgba(76, 76, 76, 0) 0%, rgba(76, 76, 76, 0.9) 60%, rgba(76, 76, 76, 1) 95%, rgba(52, 52, 52, 1) 100%);
+    box-shadow: none;
+    font-size: 14px;
+    max-width: 100%;
+    moz-animation: pull-down 300ms ease-in-out;
+    moz-box-shadow: none;
+    ms-animation: pull-down 300ms ease-in-out;
+    o-animation: pull-down 300ms ease-in-out;
+    padding-bottom: 3em;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    webkit-animation: pull-down 300ms ease-in-out;
+    webkit-box-shadow: none;
+    width: 100%;
 }
 
 .dashboard .v-Notification-system h1 {
+    color: #fff;
     display: inline-block;
     font-size: 14px;
-    margin-right: 3em;
-    vertical-align: top;
     line-height: 1;
     margin-bottom: 1em;
-    color: #fff;
+    margin-right: 3em;
+    vertical-align: top;
 }
 
 .dashboard .v-Notification-system p {
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    line-height: 1.3;
     color: #ececec;
+    display: inline-block;
+    line-height: 1.3;
+    text-align: left;
+    vertical-align: top;
 }
 
 .dashboard .v-Notification-tray {
@@ -4565,13 +4577,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-header-wrap, .dashboard .v-table-footer-wrap {
-    border: 0.1em solid #d4d5d5;
     background: #f4f4f4;
     background: -moz-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
+    background: -ms-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
+    background: -o-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f9f9f9), color-stop(100%, #f0f0f0));
     background: -webkit-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
-    background: -o-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
-    background: -ms-linear-gradient(top, #f9f9f9 0%, #f0f0f0 100%);
+    border: 0.1em solid #d4d5d5;
 }
 
 .dashboard .v-table-header-wrap {
@@ -4592,37 +4604,37 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-footer-container {
-    padding: 0.1em 0 0.1em 6px;
+    color: #979699;
     float: none;
     font-size: 13px;
-    color: #979699;
+    padding: 0.1em 0 0.1em 6px;
     text-shadow: 0 0.1em rgba(255, 255, 255, 0.7);
 }
 
 .dashboard .v-table-footer td:first-child .v-table-footer-container {
-    padding-left: 14px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    padding-left: 14px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-table-footer td:last-child .v-table-footer-container {
-    padding-right: 6px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    padding-right: 6px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-table-caption-container {
+    border-left: 1px solid #e5e8e8;
     font-size: 13px;
     font-weight: 600;
     line-height: 1;
-    text-shadow: 0 0.1em rgba(255, 255, 255, 0.7);
-    padding-top: 0.6em;
+    margin-left: 0;
     padding-bottom: 0.6em;
     padding-left: 6px;
-    margin-left: 0;
-    border-left: 1px solid #e5e8e8;
+    padding-top: 0.6em;
+    text-shadow: 0 0.1em rgba(255, 255, 255, 0.7);
 }
 
 .dashboard .v-table-caption-container-align-right {
@@ -4636,16 +4648,16 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-header td:last-child .v-table-caption-container {
-    padding-right: 4px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    padding-right: 4px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-table-resizer {
+    background: transparent;
     font-size: 13px;
     height: 1.8em;
-    background: transparent;
     width: 4px;
 }
 
@@ -4656,8 +4668,8 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .v-table-cell-content {
     border: none;
     border-left: 1px solid #e5e8e8;
-    padding-top: 0.2em;
     padding-bottom: 0.2em;
+    padding-top: 0.2em;
 }
 
 .dashboard .v-table-cell-content:first-child {
@@ -4665,17 +4677,17 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table-cell-content:first-child .v-table-cell-wrapper {
-    padding-left: 8px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    padding-left: 8px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-table-cell-content:last-child .v-table-cell-wrapper {
-    padding-right: 14px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
+    moz-box-sizing: border-box;
+    padding-right: 14px;
+    webkit-box-sizing: border-box;
 }
 
 .dashboard .v-table-body {
@@ -4687,13 +4699,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table .v-selected {
-    text-shadow: 0 0.1em 0.1em rgba(0, 0, 0, 0.3);
     background: #6ba7e4;
     background: -moz-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    background: -ms-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    background: -o-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #75b0e7), color-stop(100%, #5f9de1));
     background: -webkit-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
-    background: -o-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
-    background: -ms-linear-gradient(top, #75b0e7 0%, #5f9de1 100%);
+    text-shadow: 0 0.1em 0.1em rgba(0, 0, 0, 0.3);
 }
 
 .dashboard .v-table .v-selected + .v-selected {
@@ -4706,19 +4718,19 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-table-header-cell-asc .v-table-sort-indicator, .dashboard .v-table-header-cell-desc .v-table-sort-indicator {
     background: transparent;
-    width: 0.5em;
-    height: 1.8em;
     font-size: 13px;
+    height: 1.8em;
     line-height: 2;
     text-shadow: 0 0.1em rgba(255, 255, 255, 0.7);
+    width: 0.5em;
 }
 
 .dashboard .v-table-header-cell-asc .v-table-sort-indicator:before, .dashboard .v-table-header-cell-desc .v-table-sort-indicator:before {
+    display: inline-block;
     font-family: "fontello";
     font-style: normal;
     font-weight: normal;
     speak: none;
-    display: inline-block;
 }
 
 .dashboard .v-table-header-cell-asc .v-table-sort-indicator:before {
@@ -4747,8 +4759,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table.plain .v-table-caption-container {
-    padding-top: 0.4em;
     padding-bottom: 0.8em;
+    padding-top: 0.4em;
 }
 
 .dashboard .v-table.plain .v-table-row, .dashboard .v-table.plain .v-table-row-odd {
@@ -4756,10 +4768,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-table.plain .v-table-cell-content {
-    border-left-color: transparent;
     border-bottom: 1px solid #eee;
-    padding-top: 0.3em;
+    border-left-color: transparent;
     padding-bottom: 0.3em;
+    padding-top: 0.3em;
 }
 
 .dashboard .v-table.plain .v-table-caption-container {
@@ -4768,9 +4780,9 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-tabsheet {
     border: 1px solid #d3d6d6;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
+    moz-border-radius: 4px;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .v-tabsheet-tabcontainer, .dashboard .v-tabsheet-content {
@@ -4788,10 +4800,10 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .v-tabsheet-tabcontainer {
     background: #e6e7e8;
     background: -moz-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
+    background: -ms-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
+    background: -o-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #e6e6e7));
     background: -webkit-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
-    background: -o-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
-    background: -ms-linear-gradient(top, #f5f5f5 0%, #e6e6e7 100%);
 }
 
 .dashboard .v-tabsheet-tabs {
@@ -4800,13 +4812,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-tabitemcell {
+    border: 1px solid #d3d6d6;
+    border-bottom-color: #cfd1d1;
+    border-width: 0 1px 1px 0;
     color: #979699;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
     font-size: 13px;
     line-height: 1;
-    border: 1px solid #d3d6d6;
-    border-width: 0 1px 1px 0;
-    border-bottom-color: #cfd1d1;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .dashboard .v-tabsheet-tabitem {
@@ -4823,8 +4835,8 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-tabsheet-tabitemcell-selected {
     background: #fff;
-    color: #404346;
     border-bottom-width: 0;
+    color: #404346;
 }
 
 .dashboard .v-tabsheet-tabitemcell .v-caption {
@@ -4832,8 +4844,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-tabitemcell .v-captiontext {
-    vertical-align: baseline;
     color: inherit;
+    vertical-align: baseline;
 }
 
 .dashboard .v-tabsheet-tabitem {
@@ -4842,43 +4854,43 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .v-tabsheet-spacertd div {
     border: none;
-    font-size: 13px;
-    line-height: 1;
-    height: 1.4em;
     border-bottom: 0.1em solid #cfd1d1;
+    font-size: 13px;
+    height: 1.4em;
+    line-height: 1;
 }
 
 .dashboard .v-tabsheet-content:before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1em;
-    z-index: 10;
     background: -moz-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    background: -o-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(255, 255, 255, 1)), color-stop(100%, rgba(255, 255, 255, 0)));
     background: -webkit-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    background: -o-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    background: -ms-linear-gradient(top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    content: "";
+    display: block;
+    height: 1em;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
 }
 
 .dashboard .v-tabsheet-borderless {
     border: none;
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
     border-radius: 0;
+    moz-border-radius: 0;
+    webkit-border-radius: 0;
 }
 
 .dashboard .v-tabsheet-caption-close {
-    margin: -2px 0 0 5px;
+    border-radius: 2px;
+    color: #db5020;
     font-size: 16px;
     font-weight: normal;
-    color: #db5020;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
+    margin: -2px 0 0 5px;
+    moz-border-radius: 2px;
+    webkit-border-radius: 2px;
 }
 
 .dashboard .v-tabsheet-caption-close:hover {
@@ -4891,8 +4903,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-tabsheet-tabs-small .v-tabsheet-tabitem .v-caption {
-    padding: 0.5em 1.2em;
     font-size: 12px;
+    padding: 0.5em 1.2em;
 }
 
 .dashboard .v-tabsheet-content-small::before {
@@ -4900,17 +4912,17 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-textfield, .dashboard .v-filterselect {
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    border: 1px solid #c9c8c7;
-    border-top-color: #d8d7d6;
     background: #fff;
+    border: 1px solid #c9c8c7;
+    border-radius: 3px;
+    border-top-color: #d8d7d6;
     box-shadow: 0 0 0 2px rgba(51, 50, 49, 0.07);
-    font: inherit;
     color: inherit;
+    font: inherit;
     line-height: 1;
     margin: 0;
+    moz-border-radius: 3px;
+    webkit-border-radius: 3px;
 }
 
 .dashboard input.v-widget.v-textfield, .dashboard .v-filterselect {
@@ -4922,8 +4934,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-textfield:focus, .dashboard .v-filterselect-focus {
-    outline: none;
     border-color: #69a5e4;
+    outline: none;
 }
 
 .dashboard input.v-textfield-prompt, .dashboard .v-filterselect-prompt .v-filterselect-input {
@@ -4931,8 +4943,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard input.v-widget.v-textfield.small, .dashboard .v-filterselect.small {
-    padding: 0.15em 0.2em;
     font-size: 12px;
+    padding: 0.15em 0.2em;
 }
 
 .v-webkit .dashboard input.v-textfield.small, .v-webkit .dashboard .v-filterselect.small {
@@ -4940,15 +4952,15 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window {
-    -webkit-animation: fade-in 160ms ease-out;
-    -moz-animation: fade-in 160ms ease-out;
-    -ms-animation: fade-in 160ms ease-out;
-    -o-animation: fade-in 160ms ease-out;
     animation: fade-in 160ms ease-out;
-    opacity: 1;
-    -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    moz-animation: fade-in 160ms ease-out;
+    moz-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    ms-animation: fade-in 160ms ease-out;
+    o-animation: fade-in 160ms ease-out;
+    opacity: 1;
+    webkit-animation: fade-in 160ms ease-out;
+    webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .v-shadow-window {
@@ -4960,24 +4972,24 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-closebox:before {
-    font-family: arial, sans-serif;
     content: "\00D7";
+    font-family: arial, sans-serif;
 }
 
 .dashboard .v-window-closebox {
     background: #343638;
+    border-radius: 2px;
     color: #ddd;
     font-size: 16px;
     font-weight: normal;
-    line-height: 20px;
-    text-align: center;
-    width: 20px;
     height: 20px;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    top: 10px;
+    line-height: 20px;
+    moz-border-radius: 2px;
     right: 10px;
+    text-align: center;
+    top: 10px;
+    webkit-border-radius: 2px;
+    width: 20px;
 }
 
 .dashboard .v-window-closebox:hover {
@@ -4985,26 +4997,26 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-window-closebox:active {
-    color: #ddd;
     background: #000;
+    color: #ddd;
 }
 
 .dashboard .v-window-modalitycurtain {
-    opacity: 0.7;
-    filter: alpha(opacity=70);
     background: #353637;
     background: -moz-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
+    background: -ms-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
+    background: -o-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #4c4d4e), color-stop(100%, #1b1c1c));
     background: -webkit-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
-    background: -o-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
-    background: -ms-radial-gradient(center, ellipse cover, #4c4d4e 0%, #1b1c1c 100%);
+    filter: alpha(opacity=70);
+    opacity: 0.7;
 }
 
 .dashboard .v-window-outerheader {
-    padding: 0.5em 20px;
-    height: 1.7em;
-    font-weight: 300;
     font-size: 20px;
+    font-weight: 300;
+    height: 1.7em;
+    padding: 0.5em 20px;
 }
 
 .dashboard .v-window-header {
@@ -5017,10 +5029,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .dialog.v-window .v-window-header {
-    text-align: center;
     color: #fff;
     font-size: 16px;
     font-weight: 400;
+    text-align: center;
 }
 
 .dashboard .v-window .footer {
@@ -5038,29 +5050,29 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .cover .v-image {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
-    -webkit-user-drag: none;
+    webkit-user-drag: none;
 }
 
 .dashboard .catalog .v-csslayout {
+    cursor: pointer;
     display: inline-block;
     position: relative;
     vertical-align: top;
-    cursor: pointer;
 }
 
 .dashboard .catalog .v-image {
-    width: 100px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     height: 145px;
+    moz-border-radius: 2px;
+    moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
     position: absolute;
     top: 10px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    overflow: hidden;
+    webkit-border-radius: 2px;
+    webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    width: 100px;
 }
 
 .dashboard .catalog .v-csslayout:hover .v-image {
@@ -5072,50 +5084,50 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .catalog .v-csslayout:before, .dashboard .cover:before {
+    background: url(img/poster-gloss.png);
     content: "";
     display: block;
-    position: absolute;
-    top: 10px;
-    right: 32px;
-    width: 66px;
     height: 128px;
-    background: url(img/poster-gloss.png);
+    position: absolute;
+    right: 32px;
+    top: 10px;
+    width: 66px;
     z-index: 2;
 }
 
 .dashboard .cover:before {
-    top: 0;
     right: 0;
+    top: 0;
     z-index: 2;
 }
 
 .dashboard .catalog .v-csslayout .v-caption {
-    position: relative;
-    padding-top: 160px;
-    width: 120px;
-    white-space: normal;
-    font-size: 12px;
-    padding-right: 1em;
-    padding-bottom: 1em;
     cursor: pointer;
+    font-size: 12px;
+    padding-bottom: 1em;
+    padding-right: 1em;
+    padding-top: 160px;
+    position: relative;
+    white-space: normal;
+    width: 120px;
 }
 
 .dashboard .catalog.v-layout {
 }
 
 .dashboard .schedule .tray {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    z-index: 9;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border-top: 1px solid #cdcecf;
     background: #dfe0e1;
     background: -moz-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
+    background: -ms-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
+    background: -o-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d8d9da), color-stop(10%, #e6e7e8), color-stop(100%, #e0e1e2));
     background: -webkit-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
-    background: -o-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
-    background: -ms-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
+    border-top: 1px solid #cdcecf;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    z-index: 9;
 }
 
 .dashboard .v-calendar-weekly-longevents {
@@ -5139,13 +5151,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .schedule .v-calendar-event-caption {
-    left: 14px;
-    right: 0;
-    width: auto;
+    color: #fff;
     font-size: 12px;
     font-weight: 600;
-    color: #fff;
+    left: 14px;
+    right: 0;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    width: auto;
 }
 
 .dashboard .schedule .v-calendar-event-caption span {
@@ -5161,20 +5173,20 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .schedule .v-calendar-header-day {
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
     color: #349aff;
-    -webkit-font-smoothing: antialiased;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    webkit-font-smoothing: antialiased;
 }
 
 .dashboard .schedule .v-calendar-event-content {
     background-repeat: repeat-x, no-repeat;
     background-size: auto, cover;
     border: 1px solid #000;
-    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .dashboard .timeline .h1 {
@@ -5195,10 +5207,10 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .timeline .v-timeline-widget-display .gwt-HTML {
     left: 0 !important;
-    width: 100%;
+    margin-top: -0.5em;
     text-align: center;
     top: 40% !important;
-    margin-top: -0.5em;
+    width: 100%;
 }
 
 .dashboard .timeline .v-timeline-widget-display-bottombar {
@@ -5206,10 +5218,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .timeline .v-timeline-widget-legend-value {
-    font-size: 12px;
-    line-height: 16px;
     color: #979699;
+    font-size: 12px;
     height: 18px !important;
+    line-height: 16px;
 }
 
 .dashboard .timeline .v-timeline-widget-legend-label {
@@ -5218,27 +5230,27 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .help-overlay.timeline-add {
     left: 500px !important;
-    top: 100px !important;
     max-width: 20em;
+    top: 100px !important;
 }
 
 .dashboard .help-overlay.timeline-clear {
-    top: 100px !important;
     left: auto !important;
     right: 80px !important;
+    top: 100px !important;
 }
 
 .dashboard .help-overlay.timeline-browse {
-    top: auto !important;
     bottom: 80px;
+    top: auto !important;
 }
 
 .dashboard .reports .drafts {
+    moz-user-select: none;
+    ms-user-select: none;
     padding-bottom: 100px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
+    webkit-user-select: none;
 }
 
 .dashboard .reports .drafts .v-slot {
@@ -5246,40 +5258,39 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .create {
-    padding: 0 10px 0 10px;
     margin: 10px;
-    /*background: #eee;*/
+    padding: 0 10px 0 10px;
 }
 
 .dashboard .reports .create .v-slot {
-    border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.05);
-    width: 160px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     height: 200px;
     padding: 0;
+    width: 160px;
 }
 
 .dashboard .reports .drafts .h1 {
     color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .dashboard .reports .draft-thumb {
     cursor: pointer;
-    overflow: visible;
     height: 216px;
-    position: relative;
+    overflow: visible;
     padding: 10px;
+    position: relative;
 }
 
 .dashboard .reports .draft-thumb .v-label {
-    display: block !important;
     color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    display: block !important;
+    line-height: 18px;
     padding-top: 1em;
     text-align: center;
-    line-height: 18px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .dashboard .v-label {
@@ -5296,9 +5307,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .draft-thumb .v-image {
-    -webkit-box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.5);
     box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.5);
+    moz-box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.5);
+    webkit-box-shadow: 0 2px 7px 1px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .reports .draft-thumb .v-image:hover {
@@ -5307,19 +5318,19 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .palette {
-    position: fixed;
     color: #fff;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     padding: 14px;
+    position: fixed;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     width: 17%;
 }
 
 .dashboard .reports .palette .help {
-    font-size: 12px;
     color: #cfd1d3;
     display: block;
-    white-space: normal;
+    font-size: 12px;
     padding-top: 1em;
+    white-space: normal;
     width: 140px;
 }
 
@@ -5333,9 +5344,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .palette .v-image {
-    width: 75px;
     height: 47px;
     margin: 2em 0 0.3em 0;
+    width: 75px;
 }
 
 .dashboard .reports .palette .v-label {
@@ -5347,26 +5358,26 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .canvas-layout {
-    min-height: 29cm;
     background: #fff;
-    padding: 1.5cm 1.5cm 3cm 1.5cm;
-    -webkit-box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    min-height: 29cm;
+    moz-box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    padding: 1.5cm 1.5cm 3cm 1.5cm;
+    webkit-box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .reports .canvas .title {
+    border: 1px solid transparent;
+    box-shadow: none;
+    color: #404346;
+    cursor: pointer;
     font-size: 24px;
     font-weight: 600;
-    border: 1px solid transparent;
-    color: #404346;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
     margin-bottom: 1cm;
+    moz-box-shadow: none;
+    text-align: center;
+    webkit-box-shadow: none;
+    width: 100%;
 }
 
 .dashboard .reports .canvas .title:hover {
@@ -5374,9 +5385,9 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .canvas .title:focus {
-    cursor: text;
-    border-color: #eee;
     background: transparent;
+    border-color: #eee;
+    cursor: text;
 }
 
 .dashboard .reports .canvas .placeholder {
@@ -5384,28 +5395,28 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .canvas .placeholder .v-label {
-    min-height: 10cm;
-    line-height: 5cm;
     color: #979699;
     font-size: 18px;
+    line-height: 5cm;
+    min-height: 10cm;
 }
 
 .dashboard .reports .v-tabsheet-content::before {
     background: -moz-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
+    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0.3)), color-stop(100%, rgba(0, 0, 0, 0)));
     background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
-    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 100%);
     height: 0.5em;
 }
 
 .dashboard .reports .v-tabsheet-content {
     background: #75787c;
     background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
+    background-image: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
+    background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(255, 255, 255, 0.2)), color-stop(100%, rgba(255, 255, 255, 0))), url(img/dark-canvas-bg.jpg);
     background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
-    background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
-    background-image: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), url(img/dark-canvas-bg.jpg);
 }
 
 .dashboard .reports .v-timeline-widget-display-hscale-left {
@@ -5415,13 +5426,13 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .canvas .v-ddwrapper {
-    padding-top: 20px;
     padding-bottom: 20px;
+    padding-top: 20px;
 }
 
 .dashboard .reports .text-editor {
-    position: relative;
     overflow: visible;
+    position: relative;
 }
 
 .dashboard .reports .text-editor:hover {
@@ -5433,11 +5444,11 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .text-editor .v-button {
-    position: absolute;
-    top: 50%;
-    margin-top: -12px;
-    right: -20px;
     display: none;
+    margin-top: -12px;
+    position: absolute;
+    right: -20px;
+    top: 50%;
 }
 
 .dashboard .text-editor .v-button-wrap:before {
@@ -5450,28 +5461,28 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .reports .text-editor.edit .v-button {
     display: inline-block;
-    position: static;
     margin-top: 3px;
+    position: static;
 }
 
 .dashboard .delete-button {
-    width: 19px;
-    height: 19px;
-    border: 1px solid #a3a7ab;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
     background: #73767a;
+    border: 1px solid #a3a7ab;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     color: #fff;
+    cursor: default;
     font: inherit;
     font-size: 16px;
+    height: 19px;
     line-height: 1;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    moz-border-radius: 2px;
+    moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     text-align: center;
-    cursor: default;
-    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+    webkit-border-radius: 2px;
+    webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    width: 19px;
 }
 
 .dashboard .delete-button:hover {
@@ -5487,10 +5498,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .draft-thumb .delete-button {
-    position: absolute;
-    top: 1px;
-    right: 1px;
     display: none;
+    position: absolute;
+    right: 1px;
+    top: 1px;
 }
 
 .dashboard .draft-thumb:hover .delete-button {
@@ -5498,8 +5509,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .help-overlay.palette {
-    top: 200px !important;
     left: 200px !important;
+    top: 200px !important;
 }
 
 .dashboard .help-overlay.reorder {
@@ -5507,29 +5518,29 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .reports .transaction {
-    position: relative;
-    float: left;
-    width: 47%;
-    margin-right: 2.5%;
-    margin-top: 10px;
     background: #eee;
     border: 1px solid #e0e0e0;
+    float: left;
+    margin-right: 2.5%;
+    margin-top: 10px;
+    position: relative;
+    width: 47%;
 }
 
 .dashboard .reports .transaction .time, .dashboard .reports .transaction .seats {
-    font-size: 12px;
     color: #9fa2a6;
-    position: absolute;
-    top: 5px;
+    font-size: 12px;
     left: 5px;
     line-height: normal;
+    position: absolute;
+    top: 5px;
 }
 
 .dashboard .reports .transaction .movie-title {
     font-size: 16px;
     font-weight: 300;
-    white-space: normal;
     padding: 40px 5px 5px;
+    white-space: normal;
 }
 
 .dashboard .reports .transaction .seats {
@@ -5557,29 +5568,29 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .login-bg {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    animation: fade-in 160ms ease-out;
     background: #353637;
     background: -moz-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
+    background: -ms-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
+    background: -o-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #4c4d4e), color-stop(100%, #303131));
     background: -webkit-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
-    background: -o-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
-    background: -ms-radial-gradient(center, ellipse cover, #4c4d4e 0%, #303131 100%);
+    content: "";
+    height: 100%;
+    left: 0;
+    moz-animation: fade-in 160ms ease-out;
+    moz-transition: opacity 300ms linear;
+    ms-animation: fade-in 160ms ease-out;
+    o-animation: fade-in 160ms ease-out;
     opacity: 0;
-    -webkit-transition: opacity 300ms linear;
-    -moz-transition: opacity 300ms linear;
-    transition: opacity 300ms linear;
-    -webkit-animation: fade-in 160ms ease-out;
-    -moz-animation: fade-in 160ms ease-out;
-    -ms-animation: fade-in 160ms ease-out;
-    -o-animation: fade-in 160ms ease-out;
-    animation: fade-in 160ms ease-out;
     opacity: 1;
+    position: absolute;
+    top: 0;
+    transition: opacity 300ms linear;
+    webkit-animation: fade-in 160ms ease-out;
+    webkit-transition: opacity 300ms linear;
+    width: 100%;
+    z-index: 1;
 }
 
 .dashboard .main-view, .dashboard .login-layout {
@@ -5588,20 +5599,20 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard div.login-panel {
-    -webkit-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
-    -moz-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
-    -o-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
+    moz-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
+    o-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
+    webkit-animation: move-up-100 800ms cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .dashboard .login-panel {
     background: #fff;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    moz-border-radius: 4px;
+    moz-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     padding: 1em 1em 2em;
+    webkit-border-radius: 4px;
+    webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .login-panel .labels, .dashboard .login-panel .fields {
@@ -5613,10 +5624,10 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .login-panel .h2 {
-    padding: 0;
-    font-size: 20px;
     color: #c4cacf;
+    font-size: 20px;
     letter-spacing: -0.05em;
+    padding: 0;
 }
 
 .dashboard .login-panel .error {
@@ -5626,18 +5637,18 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-animate-reveal {
+    moz-animation: reveal 100ms ease-in-out;
+    o-animation: reveal 100ms ease-in-out;
     opacity: 1;
-    -webkit-animation: reveal 100ms ease-in-out;
-    -moz-animation: reveal 100ms ease-in-out;
-    -o-animation: reveal 100ms ease-in-out;
+    webkit-animation: reveal 100ms ease-in-out;
 }
 
 .dashboard .v-animate-hide {
+    moz-animation: hide 300ms ease-in-out;
+    o-animation: hide 300ms ease-in-out;
     opacity: 0;
+    webkit-animation: hide 300ms ease-in-out;
     z-index: 0;
-    -webkit-animation: hide 300ms ease-in-out;
-    -moz-animation: hide 300ms ease-in-out;
-    -o-animation: hide 300ms ease-in-out;
 }
 
 .dashboard .login .login-bg {
@@ -5646,52 +5657,52 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .sidebar {
     background: #414243 url(img/sidebar-gradient.png) repeat-y top right;
-    position: relative;
     left: 0;
-    -webkit-animation: move-right 300ms ease-in-out;
-    -moz-animation: move-right 700ms ease-out;
-    -o-animation: move-right 500ms ease-out;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    moz-animation: move-right 700ms ease-out;
+    moz-user-select: none;
+    ms-user-select: none;
+    o-animation: move-right 500ms ease-out;
+    position: relative;
     user-select: none;
+    webkit-animation: move-right 300ms ease-in-out;
+    webkit-user-select: none;
 }
 
 .dashboard .sidebar .branding {
     border-bottom: 1px solid #353637;
     position: relative;
-    -webkit-font-smoothing: antialiased;
+    webkit-font-smoothing: antialiased;
 }
 
 .dashboard .sidebar .branding .v-label {
-    position: relative;
-    z-index: 2;
-    white-space: normal;
+    color: #fff;
+    display: block !important;
     font-size: 16px;
     line-height: 1.1;
-    color: #fff;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
-    display: block !important;
     padding: 0.8em 0.8em 1.2em;
+    position: relative;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+    white-space: normal;
+    z-index: 2;
 }
 
 .dashboard .sidebar .branding .v-label span {
-    font-size: 13px;
     color: #d0d1d3;
     display: block;
+    font-size: 13px;
 }
 
 .dashboard .sidebar .branding .v-image {
-    position: absolute;
-    z-index: 1;
-    top: 0;
     left: 0;
+    position: absolute;
+    top: 0;
     width: 100%;
+    z-index: 1;
 }
 
 .dashboard .sidebar .menu {
-    overflow: auto;
     height: 100%;
+    overflow: auto;
 }
 
 .dashboard .sidebar .menu .v-ddwrapper {
@@ -5703,47 +5714,47 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .sidebar .menu .v-ddwrapper-over {
-    padding: 0;
-    border: 2px solid #2d90f3;
     background: transparent;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
+    border: 2px solid #2d90f3;
     border-radius: 4px;
+    moz-border-radius: 4px;
+    padding: 0;
+    webkit-border-radius: 4px;
 }
 
 .dashboard .sidebar .menu .v-nativebutton {
-    -webkit-appearance: none;
-    display: block;
-    padding: 10px 14px 10px;
-    width: 100%;
+    background: transparent;
     border: none;
-    margin: 0;
-    position: relative;
-    border-top: 1px solid #4b4c4d;
-    border-top-color: rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid #353637;
     border-bottom-color: rgba(0, 0, 0, 0.18);
-    background: transparent;
+    border-top: 1px solid #4b4c4d;
+    border-top-color: rgba(255, 255, 255, 0.05);
     color: #888a8c;
+    display: block;
     font-weight: normal;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    margin: 0;
+    padding: 10px 14px 10px;
+    position: relative;
     text-align: center;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    webkit-appearance: none;
+    width: 100%;
 }
 
 .dashboard .sidebar .menu:after {
-    content: "";
-    display: block;
     border-top: 1px solid #4b4c4d;
     border-top-color: rgba(255, 255, 255, 0.05);
+    content: "";
+    display: block;
     height: 0;
 }
 
 .dashboard .sidebar .menu .v-nativebutton-caption {
+    display: block;
     font-size: 12px;
     font-weight: 600;
-    text-transform: uppercase;
-    display: block;
     margin: 0.2em 0 0 0;
+    text-transform: uppercase;
 }
 
 .dashboard .sidebar .menu .v-nativebutton:focus {
@@ -5763,15 +5774,15 @@ body .dashboard.v-app .v-app-loading {
 .v-webkit .dashboard .menu .v-nativebutton:before {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e8e8e8), color-stop(100%, #d3d3d3));
     background: -webkit-linear-gradient(top, #fff 0%, #777 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    moz-transition: opacity ease-in-out 200ms;
+    ms-transition: opacity ease-in-out 200ms;
     opacity: 0.5;
-    -webkit-transition: opacity ease-in-out 200ms;
-    -moz-transition: opacity ease-in-out 200ms;
-    -ms-transition: opacity ease-in-out 200ms;
-    -o-transition: opacity ease-in-out 200ms;
+    o-transition: opacity ease-in-out 200ms;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
     transition: opacity ease-in-out 200ms;
+    webkit-background-clip: text;
+    webkit-text-fill-color: transparent;
+    webkit-transition: opacity ease-in-out 200ms;
 }
 
 .v-webkit .dashboard .menu .v-nativebutton:hover:before, .v-webkit .dashboard .menu .v-nativebutton:focus:before {
@@ -5783,61 +5794,61 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .sidebar .menu .v-nativebutton.selected {
-    color: #e1e1e1;
-    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
-    border-top-color: #262729;
-    border-bottom-color: #2b2c2e;
     background: #333537;
     background: -moz-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
+    background: -ms-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
+    background: -o-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2d2f30), color-stop(10%, #333537), color-stop(90%, #333537), color-stop(100%, #2d2f30));
     background: -webkit-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
-    background: -o-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
-    background: -ms-linear-gradient(top, #2d2f30 0%, #333537 10%, #333537 90%, #2d2f30 100%);
-    -webkit-transition: none;
+    border-bottom-color: #2b2c2e;
+    border-top-color: #262729;
+    color: #e1e1e1;
+    text-shadow: 0 2px 2px rgba(0, 0, 0, 0.5);
+    webkit-transition: none;
 }
 
 .v-webkit .dashboard .menu .v-nativebutton.selected:before {
-    text-shadow: none;
     opacity: 1;
+    text-shadow: none;
 }
 
 .dashboard .badge, .dashboard .notifications .v-button-caption {
+    background: #f16433;
+    background: -moz-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
+    background: -ms-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
+    background: -o-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #faa290), color-stop(14%, #f77b62), color-stop(87%, #ec3120), color-stop(100%, #ce2314));
+    background: -webkit-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
+    border-radius: 2px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    color: #fff;
     display: inline-block;
     font-size: 11px;
     line-height: 1;
-    color: #fff;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    moz-border-radius: 2px;
+    moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     padding: 0.1em 0.4em 0.2em;
-    background: #f16433;
-    background: -moz-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #faa290), color-stop(14%, #f77b62), color-stop(87%, #ec3120), color-stop(100%, #ce2314));
-    background: -webkit-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
-    background: -o-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
-    background: -ms-linear-gradient(top, #faa290 0%, #f77b62 14%, #ec3120 87%, #ce2314 100%);
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    webkit-border-radius: 2px;
+    webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard .menu .v-nativebutton .badge {
     position: absolute;
-    top: 6px;
     right: 8px;
+    top: 6px;
 }
 
 .dashboard .sidebar .user {
-    display: block;
-    border-top: 1px solid #303132;
     background: #3b3c3d;
     background-color: rgba(0, 0, 0, 0.1);
-    color: #898c8e;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-top: 1px solid #303132;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    color: #898c8e;
+    display: block;
+    moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .dashboard .sidebar .user > .v-slot {
@@ -5850,32 +5861,32 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .sidebar .user .v-image {
-    width: 34px;
-    height: 34px;
     border-right: 1px solid #313132;
+    height: 34px;
+    width: 34px;
 }
 
 .dashboard .sidebar .user .v-label {
-    white-space: normal;
+    color: inherit;
     font-size: 12px;
-    line-height: 14px;
     font-weight: 600;
+    height: 34px;
+    line-height: 14px;
     max-width: 50px;
     overflow: visible;
     padding: 2px 8px;
-    height: 34px;
-    color: inherit;
-    -webkit-font-smoothing: antialiased;
+    webkit-font-smoothing: antialiased;
+    white-space: normal;
 }
 
 .dashboard .sidebar .user .v-nativebutton, .dashboard .sidebar .user .v-menubar {
-    -webkit-appearance: none;
+    background: transparent;
     border: none;
     border-top: 1px solid #303132;
-    background: transparent;
-    width: 100%;
-    padding: 0;
     color: inherit;
+    padding: 0;
+    webkit-appearance: none;
+    width: 100%;
 }
 
 .dashboard .sidebar .user .v-nativebutton:focus {
@@ -5891,17 +5902,17 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .sidebar .user .v-nativebutton:before, .dashboard .sidebar .user .v-menubar-menuitem:before {
+    border-top: 1px solid #434445;
+    display: block;
     font-size: 16px;
     margin: 0;
-    display: block;
-    border-top: 1px solid #434445;
     padding: 0.3em 0 0.4em;
 }
 
 .dashboard .sidebar .user .v-menubar-menuitem {
     border-right: 1px solid #434445;
-    display: block !important;
     cursor: pointer;
+    display: block !important;
 }
 
 .dashboard .sidebar .user .icon-cancel {
@@ -5910,12 +5921,12 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .layout-panel {
     background: #fff;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.07);
-    -moz-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.07);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.07);
+    moz-border-radius: 4px;
+    moz-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.07);
+    webkit-border-radius: 4px;
+    webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(0, 0, 0, 0.07);
 }
 
 .v-ie8 .dashboard .layout-panel {
@@ -5923,12 +5934,12 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .main-view {
-    -webkit-animation: fade-in 160ms ease-out;
-    -moz-animation: fade-in 160ms ease-out;
-    -ms-animation: fade-in 160ms ease-out;
-    -o-animation: fade-in 160ms ease-out;
     animation: fade-in 160ms ease-out;
+    moz-animation: fade-in 160ms ease-out;
+    ms-animation: fade-in 160ms ease-out;
+    o-animation: fade-in 160ms ease-out;
     opacity: 1;
+    webkit-animation: fade-in 160ms ease-out;
 }
 
 .dashboard .view-content {
@@ -5940,49 +5951,48 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .help-overlay {
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-    -webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-    padding: 15px 20px;
+    animation: fade-in 160ms ease-out;
+    animation-delay: 2000ms;
+    animation-duration: 1500ms;
+    animation-fill-mode: forwards;
     background: #464646;
     background-color: rgba(40, 40, 40, 0.85);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
     color: #a6a9aa;
-    font: $ font;
     font-size: 12px;
-    -webkit-animation: fade-in 160ms ease-out;
-    -moz-animation: fade-in 160ms ease-out;
-    -ms-animation: fade-in 160ms ease-out;
-    -o-animation: fade-in 160ms ease-out;
-    animation: fade-in 160ms ease-out;
-    opacity: 1;
-    opacity: 0;
-    -webkit-animation-duration: 1500ms;
-    -moz-animation-duration: 1500ms;
-    -ms-animation-duration: 1500ms;
-    -o-animation-duration: 1500ms;
-    animation-duration: 1500ms;
-    -webkit-animation-delay: 2000ms;
-    -moz-animation-delay: 2000ms;
-    -ms-animation-delay: 2000ms;
-    -o-animation-delay: 2000ms;
-    animation-delay: 2000ms;
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    -ms-animation-fill-mode: forwards;
-    -o-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
     max-width: 50em;
+    moz-animation: fade-in 160ms ease-out;
+    moz-animation-delay: 2000ms;
+    moz-animation-duration: 1500ms;
+    moz-animation-fill-mode: forwards;
+    moz-border-radius: 2px;
+    moz-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    ms-animation: fade-in 160ms ease-out;
+    ms-animation-delay: 2000ms;
+    ms-animation-duration: 1500ms;
+    ms-animation-fill-mode: forwards;
+    o-animation: fade-in 160ms ease-out;
+    o-animation-delay: 2000ms;
+    o-animation-duration: 1500ms;
+    o-animation-fill-mode: forwards;
+    opacity: 0;
+    opacity: 1;
+    padding: 15px 20px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+    webkit-animation: fade-in 160ms ease-out;
+    webkit-animation-delay: 2000ms;
+    webkit-animation-duration: 1500ms;
+    webkit-animation-fill-mode: forwards;
+    webkit-border-radius: 2px;
+    webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard .help-overlay .v-window-outerheader {
-    padding: 0;
     color: #fff;
     font-size: 14px;
     line-height: 1;
+    padding: 0;
 }
 
 .dashboard .help-overlay .v-window-header {
@@ -6004,8 +6014,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .help-overlay.login {
-    top: auto !important;
     bottom: 20px;
+    top: auto !important;
 }
 
 .dashboard .dashboard-view .v-horizontallayout {
@@ -6013,8 +6023,8 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .dashboard-view .v-spacing {
-    width: 20px;
     height: 20px;
+    width: 20px;
 }
 
 .dashboard .dashboard-view .toolbar .v-spacing {
@@ -6022,30 +6032,30 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .dashboard-view .v-csslayout {
-    padding: 50px 20px 0;
     overflow: auto;
+    padding: 50px 20px 0;
     position: relative;
 }
 
 .dashboard .dashboard-view .v-caption {
-    font-weight: 600;
-    font-size: 13px;
-    color: #349aff;
-    text-transform: uppercase;
-    padding: 0 20px;
-    line-height: 38px;
     border-bottom: 1px solid #eee;
-    position: absolute;
-    top: 0;
+    color: #349aff;
+    font-size: 13px;
+    font-weight: 600;
     left: 0;
+    line-height: 38px;
+    padding: 0 20px;
+    position: absolute;
     right: 0;
+    text-transform: uppercase;
+    top: 0;
 }
 
 .dashboard .dashboard-view .configure {
     position: absolute;
-    z-index: 1;
-    top: 9px;
     right: 5px;
+    top: 9px;
+    z-index: 1;
 }
 
 .dashboard .dashboard-view .notes {
@@ -6053,22 +6063,22 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .dashboard-view .notes .v-caption {
-    color: #fff;
-    text-shadow: 0 1px 1px #000;
     background: #5d6167;
     background: -moz-linear-gradient(top, #5d6167 0%, #393939 100%);
+    background: -ms-linear-gradient(top, #5d6167 0%, #393939 100%);
+    background: -o-linear-gradient(top, #5d6167 0%, #393939 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #5d6167), color-stop(100%, #393939));
     background: -webkit-linear-gradient(top, #5d6167 0%, #393939 100%);
-    background: -o-linear-gradient(top, #5d6167 0%, #393939 100%);
-    background: -ms-linear-gradient(top, #5d6167 0%, #393939 100%);
+    color: #fff;
+    text-shadow: 0 1px 1px #000;
 }
 
 .dashboard .dashboard-view .notes .v-textarea {
-    border: none;
-    padding: 20px 20px 0;
-    line-height: 20px;
     background: #fffdf2 url(img/notes-bg.png) repeat;
+    border: none;
     color: #545145;
+    line-height: 20px;
+    padding: 20px 20px 0;
 }
 
 .dashboard .dashboard-view .notes .v-textarea:focus {
@@ -6081,21 +6091,21 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .dashboard-view .toolbar {
+    background: transparent;
     padding: 20px;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-    background: transparent;
 }
 
 .dashboard .dashboard-view .toolbar .v-button {
-    position: relative;
     font-size: 16px;
+    position: relative;
 }
 
 .dashboard .dashboard-view .toolbar .notifications.unread .v-button-caption {
     display: block;
     position: absolute;
-    top: 2px;
     right: 3px;
+    top: 2px;
 }
 
 .dashboard .dashboard-view .h1 {
@@ -6105,16 +6115,16 @@ body .dashboard.v-app .v-app-loading {
 .dashboard .dashboard-view {
     background: #dfe0e1;
     background: -moz-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
+    background: -ms-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
+    background: -o-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d8d9da), color-stop(10%, #e6e7e8), color-stop(100%, #e0e1e2));
     background: -webkit-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
-    background: -o-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
-    background: -ms-linear-gradient(top, #d8d9da 0%, #e6e7e8 10%, #e0e1e2 100%);
 }
 
 .dashboard .notifications.v-window {
-    margin-top: 45px !important;
-    margin-left: -193px !important;
     font-size: 13px;
+    margin-left: -193px !important;
+    margin-top: 45px !important;
 }
 
 .dashboard .notifications.v-window .v-widget {
@@ -6122,35 +6132,35 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .notifications.v-window::before {
-    content: "";
-    position: absolute;
-    top: -14px;
-    right: 80px;
     border: 7px solid #fff;
-    width: 0;
-    height: 0;
-    border-top-color: transparent;
     border-left-color: transparent;
     border-right-color: transparent;
+    border-top-color: transparent;
+    content: "";
+    height: 0;
     margin-left: -7px;
+    position: absolute;
+    right: 80px;
+    top: -14px;
+    width: 0;
 }
 
 .dashboard .notifications.v-window .v-window-outerheader {
-    font-size: 16px;
     color: #f16433;
+    font-size: 16px;
     line-height: 25px;
     padding-left: 14px;
 }
 
 .dashboard .notifications.v-window .v-label span {
-    font-size: 12px;
     color: #979699;
+    font-size: 12px;
 }
 
 .dashboard .notifications.v-window .v-label hr {
-    height: 0;
     border: none;
     border-top: 1px solid #ddd;
+    height: 0;
     margin: 0 -12px 12px;
 }
 
@@ -6164,4 +6174,215 @@ body .dashboard.v-app .v-app-loading {
 
 .dashboard .edit-dashboard .v-formlayout .v-formlayout-captioncell {
     vertical-align: middle;
+}
+
+#terminal {
+    background-color: black;
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.jqconsole {
+    color: #d3d3d3;
+}
+
+.jqconsole-ansi-bold {
+    font-weight: bold !important;
+}
+
+.jqconsole-ansi-lighter {
+    font-weight: lighter !important;
+}
+
+.jqconsole-ansi-italic {
+    font-style: italic !important;
+}
+
+.jqconsole-ansi-underline {
+    text-decoration: underline !important;
+}
+
+@-webkit-keyframes blinker {
+    from {
+        opacity: 1.0;
+    }
+    to {
+        opacity: 0.0;
+    }
+}
+
+@-moz-keyframes blinker {
+    from {
+        opacity: 1.0;
+    }
+    to {
+        opacity: 0.0;
+    }
+}
+
+@-ms-keyframes blinker {
+    from {
+        opacity: 1.0;
+    }
+    to {
+        opacity: 0.0;
+    }
+}
+
+@-o-keyframes blinker {
+    from {
+        opacity: 1.0;
+    }
+    to {
+        opacity: 0.0;
+    }
+}
+
+.jqconsole-ansi-blink {
+    moz-animation-duration: 1s;
+    moz-animation-iteration-count: infinite;
+    moz-animation-name: blinker;
+    moz-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    ms-animation-duration: 1s;
+    ms-animation-iteration-count: infinite;
+    ms-animation-name: blinker;
+    ms-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    o-animation-duration: 1s;
+    o-animation-iteration-count: infinite;
+    o-animation-name: blinker;
+    o-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    webkit-animation-duration: 1s;
+    webkit-animation-iteration-count: infinite;
+    webkit-animation-name: blinker;
+    webkit-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+}
+
+.jqconsole-ansi-blink-rapid {
+    moz-animation-duration: 0.5s;
+    moz-animation-iteration-count: infinite;
+    moz-animation-name: blinker;
+    moz-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    ms-animation-duration: 0.5s;
+    ms-animation-iteration-count: infinite;
+    ms-animation-name: blinker;
+    ms-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    o-animation-duration: 0.5s;
+    o-animation-iteration-count: infinite;
+    o-animation-name: blinker;
+    o-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+    webkit-animation-duration: 0.5s;
+    webkit-animation-iteration-count: infinite;
+    webkit-animation-name: blinker;
+    webkit-animation-timing-function: cubic-bezier(1.0, 0, 0, 1.0);
+}
+
+.jqconsole-ansi-hidden {
+    visibility: hidden !important;
+}
+
+.jqconsole-ansi-line-through {
+    text-decoration: line-through;
+}
+
+.jqconsole-ansi-fonts-1 {
+}
+
+.jqconsole-ansi-fonts-2 {
+}
+
+.jqconsole-ansi-fonts-3 {
+}
+
+.jqconsole-ansi-fonts-4 {
+}
+
+.jqconsole-ansi-fonts-5 {
+}
+
+.jqconsole-ansi-fonts-6 {
+}
+
+.jqconsole-ansi-fonts-7 {
+}
+
+.jqconsole-ansi-fonts-8 {
+}
+
+.jqconsole-ansi-fonts-9 {
+}
+
+.jqconsole-ansi-fraktur {
+}
+
+.jqconsole-ansi-color-black {
+    color: black !important;
+}
+
+.jqconsole-ansi-color-red {
+    color: red !important;
+}
+
+.jqconsole-ansi-color-green {
+    color: green !important;
+}
+
+.jqconsole-ansi-color-yellow {
+    color: yellow !important;
+}
+
+.jqconsole-ansi-color-blue {
+    color: blue !important;
+}
+
+.jqconsole-ansi-color-magenta {
+    color: magenta !important;
+}
+
+.jqconsole-ansi-color-cyan {
+    color: cyan !important;
+}
+
+.jqconsole-ansi-color-white {
+    color: white !important;
+}
+
+.jqconsole-ansi-background-color-black {
+    background-color: black !important;
+}
+
+.jqconsole-ansi-background-color-red {
+    background-color: red !important;
+}
+
+.jqconsole-ansi-background-color-green {
+    background-color: green !important;
+}
+
+.jqconsole-ansi-background-color-yellow {
+    background-color: yellow !important;
+}
+
+.jqconsole-ansi-background-color-blue {
+    background-color: blue !important;
+}
+
+.jqconsole-ansi-background-color-magenta {
+    background-color: magenta !important;
+}
+
+.jqconsole-ansi-background-color-cyan {
+    background-color: cyan !important;
+}
+
+.jqconsole-ansi-background-color-white {
+    background-color: white !important;
+}
+
+.jqconsole-ansi-framed {
+    border: 1px solid !important;
+}
+
+.jqconsole-ansi-overline {
+    text-decoration: overline !important;
 }
