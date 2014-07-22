@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.templateregistry.Template;
@@ -29,7 +27,6 @@ import com.google.common.base.Strings;
  * This is an implementation of TemplateRegistryManager
  */
 public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
-    private static final Logger LOG = Logger.getLogger( TemplateRegistryManagerImpl.class.getName() );
 
     private final TemplateDAO templateDAO;
 
@@ -42,7 +39,6 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public void registerTemplate( final String configFile, final String packagesFile ) {
-        LOG.log( Level.WARNING, String.format( "Config=%s\nPackages=%s", configFile, packagesFile ) );
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
