@@ -1,7 +1,7 @@
 #!/bin/bash
-set -e
 
 #------------------------------------------------------
+#(0) check if there is a change inside cli directory
 #(1) read the version number
 #(2) increment the patch version number (X) in the memory and in the file
 #(3) commit and push with incremented patch version number (X+1)
@@ -9,10 +9,43 @@ set -e
 #------------------------------------------------------
 
 #------------------------------------------------------
+#(0) check if there is a change inside cli directory
+#------------------------------------------------------
+
+# This function returns 0 if variable is empty, 1 if not empty
+function isChanged {
+
+  variable=$1
+  if [ -n "$variable" ]; then
+    echo "There is a change"
+    return 0
+  else
+    echo "There is NO change"
+    return 1
+  fi
+}
+
+# Switch to root .git directory to see changes properly
+pushd ..
+changelogFile="debian/changelog"
+cli_git_status=$(git status | grep "cli/")
+isChanged $cli_git_status
+isCommitNecessary=$?
+echo "commit necessary:" $isCommitNecessary
+if [ $isCommitNecessary = "1" ]; then
+  echo "Commit is not necessary, exiting without any version update"
+  git chechout -- $changelogFile 
+  exit 0
+else
+  echo "Updating the version"
+fi
+
+popd
+
+
+#------------------------------------------------------
 # (1) read the version number
 #------------------------------------------------------
-changelogFile="debian/changelog"
-
 versionLineNumber=$(sed -n '/subutai-cli (/=' $changelogFile)
 versionLineContent=$(sed $versionLineNumber!d $changelogFile)
 version=$(echo $versionLineContent | awk -F" " '{split($2,a," ");print a[1]}')
@@ -41,8 +74,8 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #------------------------------------------------------
 #(3) commit and push with incremented patch version number (X+1)
 #------------------------------------------------------
-git add $changelogFile
-git commit -m "subutai-cli package version change"
+git add .
+git commit -m "subutai-cli package version change and related commits"
 git push
 isSuccesful=$?
 
