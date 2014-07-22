@@ -9,16 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mongodb-plugin-parent</artifactId>
-    <name>Subutai MongoDB Parent</name>
-    <description>Subutai MongoDB Parent</description>
+    <artifactId>zookeeper-plugin-parent</artifactId>
+    <name>Subutai Zookeeper Parent</name>
+    <description>Subutai Zookeeper Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>mongodb-api</module>
-        <module>mongodb-impl</module>
-        <module>mongodb-ui</module>
-        <module>mongodb-cli</module>
-        <module>mongodb-rest</module>
+        <module>zookeeper-api</module>
+        <module>zookeeper-impl</module>
+        <module>zookeeper-ui</module>
+        <module>zookeeper-cli</module>
+        <module>zookeeper-rest</module>
     </modules>
 </project>
