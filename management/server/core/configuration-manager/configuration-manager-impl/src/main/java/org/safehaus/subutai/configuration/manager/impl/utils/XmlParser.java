@@ -86,7 +86,8 @@ public class XmlParser implements ConfigParser {
         for ( HierarchicalConfiguration property : properties ) {
             String key = property.getString( "name" );
             String value = property.getString( "value" );
-            JsonObject field = configBuilder.buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
+            JsonObject field =
+                    configBuilder.buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
             fields.add( field );
         }
 
