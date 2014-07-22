@@ -66,7 +66,7 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (3) create postinst script of debian package
   # ----------------------------------------------------------------------------
-  create_postinst_script $debian_dir
+  create_postinst_script $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
   # (4) create debian package
@@ -120,9 +120,6 @@ function create_control_file {
   local Depends=$dependency
   local Description="This is a Subutai delta image debian package of $lxc template"
 
-  #chmod control directory
-  chmod 755 $debian_dir/DEBIAN
-
   # clean control file
   > $control_file
   # Change permission of the control file
@@ -141,11 +138,15 @@ function create_control_file {
 # Creates postinst script of debian package
 # -----------------------------------------------------------------------------
 function create_postinst_script {
-  local debian_dir=$1
+  local lxc=$1
+  local package_name=`get_package_name $lxc`
+  local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
+  export APT_GET_INVOCATION="true"
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
+  echo "subutai import $package_name" >> $postinst_file
   chmod 555 $postinst_file
 }
 
