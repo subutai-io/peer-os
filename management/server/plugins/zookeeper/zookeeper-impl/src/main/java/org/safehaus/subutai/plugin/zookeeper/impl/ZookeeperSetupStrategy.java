@@ -19,6 +19,8 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.Response;
 
+import com.google.common.base.Strings;
+
 
 /**
  * This is a zk cluster setup strategy.
@@ -26,7 +28,6 @@ import org.safehaus.subutai.shared.protocol.Response;
 public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
 
     public static final String TEMPLATE_NAME = "zookeeper";
-    public static final String DATA_DIRECTORY = "/var/zookeeper";
     private final ZookeeperClusterConfig config;
     private final ContainerManager containerManager;
     private final CommandRunner commandRunner;
@@ -100,8 +101,15 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private String prepareConfiguration() {
+    private String prepareConfiguration() throws ClusterSetupException {
         String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", this );
+
+        if ( Strings.isNullOrEmpty( zooCfgFile ) ) {
+            throw new ClusterSetupException( "Zoo.cfg resource is missing" );
+        }
+
+        zooCfgFile = zooCfgFile
+                .replace( "$" + ConfigParams.DATA_DIR.getPlaceHolder(), ConfigParams.DATA_DIR.getParamValue() );
 
         return null;
     }
