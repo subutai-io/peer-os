@@ -53,7 +53,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategyENUM getStrategyByNodeType( NodeType nodeType ) {
+    public static PlacementStrategyENUM getNodePlacementStrategyByNodeType( NodeType nodeType ) {
         switch ( nodeType ) {
             case CONFIG_NODE:
                 return PlacementStrategyENUM.MORE_RAM;
@@ -83,17 +83,17 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
             po.addLog( String.format( "Creating %d config servers...", config.getNumberOfConfigServers() ) );
             Set<Agent> cfgServers = containerManager
                     .clone( TEMPLATE_NAME, config.getNumberOfConfigServers(), agentManager.getPhysicalAgents(),
-                            getStrategyByNodeType( NodeType.CONFIG_NODE ) );
+                            getNodePlacementStrategyByNodeType( NodeType.CONFIG_NODE ) );
 
             po.addLog( String.format( "Creating %d routers...", config.getNumberOfRouters() ) );
             Set<Agent> routers = containerManager
                     .clone( TEMPLATE_NAME, config.getNumberOfRouters(), agentManager.getPhysicalAgents(),
-                            getStrategyByNodeType( NodeType.ROUTER_NODE ) );
+                            getNodePlacementStrategyByNodeType( NodeType.ROUTER_NODE ) );
 
             po.addLog( String.format( "Creating %d data nodes...", config.getNumberOfDataNodes() ) );
             Set<Agent> dataNodes = containerManager
                     .clone( TEMPLATE_NAME, config.getNumberOfDataNodes(), agentManager.getPhysicalAgents(),
-                            getStrategyByNodeType( NodeType.DATA_NODE ) );
+                            getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
 
 
             config.setConfigServers( cfgServers );
@@ -105,6 +105,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
             //continue installation here
 
             installMongoCluster();
+
+            //@todo add containers destroyal in case of failure
         }
         catch ( LxcCreateException ex ) {
             throw new ClusterSetupException( ex.getMessage() );
@@ -115,11 +117,9 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private void installMongoCluster() {
+    private void installMongoCluster() throws ClusterSetupException {
 
         List<Command> installationCommands = Commands.getInstallationCommands( config );
-
-        boolean installationOK = true;
 
         for ( Command command : installationCommands ) {
             po.addLog( String.format( "Running command: %s", command.getDescription() ) );
@@ -167,17 +167,9 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                 po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
             }
             else {
-                po.addLog( String.format( "Command %s failed: %s", command.getDescription(), command.getAllErrors() ) );
-                installationOK = false;
-                break;
+                throw new ClusterSetupException(
+                        String.format( "Command %s failed: %s", command.getDescription(), command.getAllErrors() ) );
             }
-        }
-
-        if ( installationOK ) {
-            po.addLogDone( "Installation succeeded" );
-        }
-        else {
-            po.addLogFailed( "Installation failed" );
         }
     }
 }

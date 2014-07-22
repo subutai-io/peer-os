@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mongodb-mongodb-parent</artifactId>
+    <artifactId>mongodb-plugin-parent</artifactId>
     <name>Subutai MongoDB Parent</name>
     <description>Subutai MongoDB Parent</description>
     <packaging>pom</packaging>
