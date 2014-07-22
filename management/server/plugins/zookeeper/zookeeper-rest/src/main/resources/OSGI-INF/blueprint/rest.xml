@@ -11,7 +11,7 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxrs:server address="/zookeeper" id="zookeeperRestService">
+    <jaxrs:server address="/zookeeper2" id="zookeeperRestService">
         <jaxrs:serviceBeans>
             <ref component-id="zookeeperRestServiceImpl"/>
         </jaxrs:serviceBeans>
