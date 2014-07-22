@@ -9,10 +9,10 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.hadoop.api.Config;
+import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 
 import java.util.*;
 

@@ -9,10 +9,10 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-plugin-impl</artifactId>
+    <artifactId>hadoop-plugin-ui</artifactId>
+    <name>Subutai Hadoop UI</name>
+    <description>Subutai Hadoop UI</description>
     <packaging>bundle</packaging>
-    <name>Subutai Hadoop</name>
-    <description>Subutai Hadoop</description>
 
     <dependencies>
         <dependency>
@@ -20,17 +20,26 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
+            <artifactId>tracker-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-custom</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -38,45 +47,25 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hadoop-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>tracker-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>db-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lxc-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>network-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>command-runner-api</artifactId>
+            <artifactId>hadoop-plugin-api</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.hadoop.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.hadoop.ui</Bundle-SymbolicName>
+                        <Export-Package>
+                            {local-packages};version=${project.version};-noimport:=true
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>
