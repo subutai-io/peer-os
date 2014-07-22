@@ -17,10 +17,8 @@ function isChanged {
 
   variable=$1
   if [ -n "$variable" ]; then
-    echo "There is a change"
     return 0
   else
-    echo "There is NO change"
     return 1
   fi
 }
@@ -31,13 +29,9 @@ changelogFile="debian/changelog"
 cli_git_status=$(git status | grep "cli/")
 isChanged $cli_git_status
 isCommitNecessary=$?
-echo "commit necessary:" $isCommitNecessary
 if [ $isCommitNecessary = "1" ]; then
-  echo "Commit is not necessary, exiting without any version update"
   git chechout -- $changelogFile 
   exit 0
-else
-  echo "Updating the version"
 fi
 
 popd
@@ -76,15 +70,16 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #------------------------------------------------------
 git add .
 git commit -m "Auto commit while building subutai-cli package"
-git push
 isSuccesful=$?
+git push
+isSuccesful=`expr $? + $isSuccesful`
 
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
 if [ $isSuccesful = 0 ]; then
-  echo "Push is succesful, generating the debian package"
+  echo "commit and push is succesful, generating the debian package"
 else
-  echo "Push is not succesful, please fix the errors first!"
+  echo "commit or push is not succesful, please fix the errors first!"
   exit 1
 fi
