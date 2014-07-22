@@ -9,7 +9,7 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-rest</artifactId>
+    <artifactId>hadoop-plugin-rest</artifactId>
     <name>Subutai Hadoop REST</name>
     <description>Subutai Hadoop REST</description>
     <packaging>bundle</packaging>

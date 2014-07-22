@@ -9,7 +9,7 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-cli</artifactId>
+    <artifactId>hadoop-plugin-cli</artifactId>
     <name>Subutai Hadoop CLI</name>
     <description>Subutai Hadoop CLI</description>
     <packaging>bundle</packaging>

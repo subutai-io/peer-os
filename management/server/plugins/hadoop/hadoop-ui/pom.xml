@@ -9,7 +9,7 @@
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-ui</artifactId>
+    <artifactId>hadoop-plugin-ui</artifactId>
     <name>Subutai Hadoop UI</name>
     <description>Subutai Hadoop UI</description>
     <packaging>bundle</packaging>
