@@ -75,7 +75,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #(3) commit and push with incremented patch version number (X+1)
 #------------------------------------------------------
 git add .
-git commit -m "subutai-cli package version change and related commits"
+git commit -m "Auto commit while building subutai-cli package"
 git push
 isSuccesful=$?
 
