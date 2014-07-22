@@ -6,32 +6,25 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.mongodb.Mongo;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.CheckNodeOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.plugin.mongodb.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.mongodb.impl.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**

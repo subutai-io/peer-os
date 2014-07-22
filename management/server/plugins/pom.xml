@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>hadoop</module>
         <module>mongodb</module>
     </modules>
 
