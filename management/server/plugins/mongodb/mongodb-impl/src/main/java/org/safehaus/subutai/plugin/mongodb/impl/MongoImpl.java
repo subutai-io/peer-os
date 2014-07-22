@@ -179,10 +179,10 @@ public class MongoImpl implements Mongo {
 
 
     @Override
-    public ClusterSetupStrategy getSetupStrategy( final ProductOperation po, final AgentManager agentManager,
-                                                  final CommandRunner commandRunner,
-                                                  final ContainerManager containerManager,
-                                                  final MongoClusterConfig config ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( final ProductOperation po, final AgentManager agentManager,
+                                                         final CommandRunner commandRunner,
+                                                         final ContainerManager containerManager,
+                                                         final MongoClusterConfig config ) {
         return new MongoDbSetupStrategy( po, agentManager, this, commandRunner, containerManager, config );
     }
 }

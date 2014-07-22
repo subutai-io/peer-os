@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -23,6 +23,7 @@ import org.safehaus.subutai.plugin.zookeeper.impl.handler.StartNodeOperationHand
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
@@ -32,17 +33,17 @@ public class ZookeeperImpl implements Zookeeper {
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
-    private LxcManager lxcManager;
+    private ContainerManager containerManager;
     private ExecutorService executor;
 
 
     public ZookeeperImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                          LxcManager lxcManager ) {
+                          ContainerManager containerManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
-        this.lxcManager = lxcManager;
+        this.containerManager = containerManager;
 
         Commands.init( commandRunner );
     }
@@ -68,8 +69,8 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public LxcManager getLxcManager() {
-        return lxcManager;
+    public ContainerManager getContainerManager() {
+        return containerManager;
     }
 
 
@@ -167,6 +168,14 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, final ProductOperation po,
+                                                         final ContainerManager containerManager,
+                                                         final CommandRunner commandRunner ) {
+        return new ZookeeperSetupStrategy( config, po, containerManager, commandRunner );
+    }
+
+
     public UUID addNode( String clusterName ) {
 
         AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
@@ -196,11 +205,5 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ZookeeperClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy() {
-        return null;
     }
 }

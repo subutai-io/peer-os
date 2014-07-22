@@ -37,13 +37,19 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     @Override
     public void run() {
         ClusterSetupStrategy clusterSetupStrategy =
-                manager.getSetupStrategy( po, manager.getAgentManager(), manager.getCommandRunner(),
+                manager.getClusterSetupStrategy( po, manager.getAgentManager(), manager.getCommandRunner(),
                         manager.getContainerManager(), config );
 
         try {
             MongoClusterConfig finalConfig = ( MongoClusterConfig ) clusterSetupStrategy.setup();
 
-            manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig );
+            if ( manager.getDbManager()
+                        .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
+                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
+            }
+            else {
+                po.addLogFailed( "Failed to save cluster information to database" );
+            }
         }
         catch ( ClusterSetupException e ) {
             po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
