@@ -32,7 +32,7 @@ function register {
   lxc_assert $container "`usage`"
 
   if [ "$container" == "master" ]; then
-    subutai-master-export
+    subutai master_export
     exit $?
   fi
 
