@@ -497,8 +497,9 @@ public class Manager {
 	}
 
 	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getSlaveNodes(), config.getMasterNode());
+        if (config != null) {
+			populateTable( nodesTable, config.getSlaveNodes(), config.getMasterNode() );
+            checkAllNodesStatus();
 		} else {
 			nodesTable.removeAllItems();
 		}
