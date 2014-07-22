@@ -12,7 +12,7 @@ function is_registered {
     echo true
   fi
 
-  resp=`curl -XGET $url`
+  resp=`curl -s -XGET $url`
 
   # response should contain quoted template name
   if [[ -n "$resp" && "$resp" == *\"$template\"* ]]; then 
@@ -54,7 +54,7 @@ function send_n_register {
     return
   fi
 
-  curl -XPOST $url --data-binary @$debian_file
+  curl -s -XPOST $url --data-binary @$debian_file
 
   check_status "Sending Debian file $debian_file to management server" "$?"
 } 
