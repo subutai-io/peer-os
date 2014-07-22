@@ -236,7 +236,12 @@ function lxc_clone {
     mv $child_rootfs/etc/profile.new $child_rootfs/etc/profile
   fi
     
+  # adding physical hostname to cloned instance or template   
   echo "export PHY_HOST=`hostname`" >> $child_rootfs/etc/profile
+  # removing the agent uuid of the cloned instance template
+  if [ -z "$child_rootfs/etc/ksks-agent/config/uuid.txt" ]; then
+    echo "" > $child_rootfs/etc/ksks-agent/config/uuid.txt
+  fi
 }
 
 
