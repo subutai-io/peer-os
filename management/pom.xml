@@ -896,6 +896,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- MongoDB 2 -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Lucene -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>

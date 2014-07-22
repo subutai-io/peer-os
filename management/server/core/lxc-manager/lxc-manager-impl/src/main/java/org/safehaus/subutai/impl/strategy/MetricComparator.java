@@ -1,18 +1,20 @@
 package org.safehaus.subutai.impl.strategy;
 
+
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 
+
 abstract class MetricComparator {
 
-    static MetricComparator create(PlacementStrategyENUM st) {
+    static MetricComparator create( PlacementStrategyENUM st ) {
         MetricComparator mc = null;
         // TODO: add missing case clauses
-        switch(st) {
+        switch ( st ) {
             case MORE_HDD:
                 mc = new MetricComparator() {
                     @Override
-                    public int getValue(ServerMetric m) {
+                    public int getValue( ServerMetric m ) {
                         return m.getFreeHddMb();
                     }
                 };
@@ -20,7 +22,7 @@ abstract class MetricComparator {
             case MORE_RAM:
                 mc = new MetricComparator() {
                     @Override
-                    int getValue(ServerMetric m) {
+                    int getValue( ServerMetric m ) {
                         return m.getFreeRamMb();
                     }
                 };
@@ -28,22 +30,26 @@ abstract class MetricComparator {
             case MORE_CPU:
                 mc = new MetricComparator() {
                     @Override
-                    int getValue(ServerMetric m) {
+                    int getValue( ServerMetric m ) {
                         return m.getCpuLoadPercent();
                     }
+
 
                     @Override
                     boolean isLessBetter() {
                         return true;
                     }
                 };
+                break;
             default:
-                throw new AssertionError(st.name());
+                throw new AssertionError( st.name() );
         }
         return mc;
     }
 
-    abstract int getValue(ServerMetric m);
+
+    abstract int getValue( ServerMetric m );
+
 
     boolean isLessBetter() {
         return false;
