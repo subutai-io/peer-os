@@ -24,8 +24,8 @@ public class ConfigBuilderTest {
         ConfigBuilder configBuilder = new ConfigBuilder();
         JsonObject jo = configBuilder.getConfigJsonObject("test", ConfigTypeEnum.PROPERTIES);
 
-        JsonObject field1 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", "value" );
-        JsonObject field2 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", "value" );
+        JsonObject field1 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", true, "value" );
+        JsonObject field2 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", true, "value" );
 
         List<JsonObject> fields = new ArrayList<>();
         fields.add( field1 );

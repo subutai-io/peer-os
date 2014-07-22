@@ -44,7 +44,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             while ( iterator.hasNext() ) {
                 String key = iterator.next();
                 String value = iniParser.getStringProperty( key );
-                JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value );
+                JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", true, value );
                 fields.add( field );
             }
             JsonObject cjo = configBuilder.addJsonArrayToConfig( jo, fields );

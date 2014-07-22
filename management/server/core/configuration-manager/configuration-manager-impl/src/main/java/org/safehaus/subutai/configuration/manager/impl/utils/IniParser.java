@@ -12,8 +12,6 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 
@@ -73,12 +71,11 @@ public class IniParser implements ConfigParser {
         while ( iterator.hasNext() ) {
             String key = iterator.next();
             String value = ( String ) config.getProperty( key );
-            JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value );
+            JsonObject field = configBuilder.buildFieldJsonObject( key.trim(), "", "", "", true, value.trim() );
             fields.add( field );
         }
 
         JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         return njo;
     }
