@@ -39,6 +39,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public void registerTemplate( final String configFile, final String packagesFile ) {
+
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( packagesFile ), "Packages file contents is null or empty" );
@@ -60,13 +61,12 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             String lxcUtsname = properties.getProperty( "lxc.utsname" );
             String lxcArch = properties.getProperty( "lxc.arch" );
             String subutaiConfigPath = properties.getProperty( "subutai.config.path" );
-            String subutaiAppdataPath = properties.getProperty( "subutai.app.data.path" );
             String subutaiParent = properties.getProperty( "subutai.parent" );
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
-            return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiAppdataPath, subutaiParent,
-                    subutaiGitBranch, subutaiGitUuid, packagesFile );
+            return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
+                    subutaiGitUuid, packagesFile );
         }
         catch ( IOException e ) {
             throw new RuntimeException( String.format( "Error parsing template configuration %s", e ) );

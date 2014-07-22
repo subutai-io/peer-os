@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class ZookeeperClusterConfig implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Zookeeper";
+    public static final String PRODUCT_KEY = "Zookeeper2";
     private String clusterName = "";
     private String zkName = "";
     private int numberOfNodes = 3;
