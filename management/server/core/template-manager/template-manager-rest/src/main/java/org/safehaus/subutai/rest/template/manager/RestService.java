@@ -1,5 +1,6 @@
 package org.safehaus.subutai.rest.template.manager;
 
+import java.io.InputStream;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,7 +20,7 @@ public interface RestService {
     @Path("import")
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
     @Produces({MediaType.TEXT_PLAIN})
-    public String importTemplate(byte[] input);
+    public Response importTemplate(InputStream in);
 
     @GET
     @Path("export/{template}")

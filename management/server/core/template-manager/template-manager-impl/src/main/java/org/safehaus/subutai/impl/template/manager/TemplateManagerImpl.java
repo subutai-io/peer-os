@@ -67,9 +67,9 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean promoteClone(String hostName, String cloneName, String newName, boolean copyit) {
         List<String> args = new ArrayList<>();
-        args.add(cloneName);
         if(newName != null && newName.length() > 0) args.add("-n " + newName);
         if(copyit) args.add("-c");
+        args.add(cloneName);
         String[] arr = args.toArray(new String[args.size()]);
 
         Agent a = agentManager.getAgentByHostname(hostName);
