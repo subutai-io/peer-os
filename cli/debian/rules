@@ -9,7 +9,6 @@ LIBDIR=/usr/share/subutai-cli/subutai/lib
 SCRIPTS=/usr/bin
 MANDIR=/usr/share/man/man1
 BASHCOMPDIR=/etc/bash_completion.d/
-
 %:
 	dh $@
 

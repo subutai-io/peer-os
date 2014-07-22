@@ -40,8 +40,8 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
         blueprintManager = new BlueprintLoadForm(environmentManager);
-        environmentForm = new EnvironmentsForm(environmentManager);
         blueprintsForm = new BlueprintsForm(environmentManager);
+        environmentForm = new EnvironmentsForm(environmentManager);
         sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
         sheet.addTab( blueprintsForm.getContentRoot(), "Blueprints" );
         sheet.addTab( environmentForm.getContentRoot(), "Environments" );

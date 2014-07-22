@@ -141,6 +141,7 @@
     <org.apache.commons.httpclient.version>3.1</org.apache.commons.httpclient.version>
     <org.apache.jackrabbit.webdav.version>2.8.0</org.apache.jackrabbit.webdav.version>
     <org.apache.ant.version>1.8.2</org.apache.ant.version>
+    <yamlbeans.version>1.08</yamlbeans.version>
   </properties>
 
   <dependencyManagement>
@@ -453,6 +454,11 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.esotericsoftware.yamlbeans</groupId>
+        <artifactId>yamlbeans</artifactId>
+        <version>${yamlbeans.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
@@ -887,6 +893,33 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mongodb-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- MongoDB 2 -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mongodb-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

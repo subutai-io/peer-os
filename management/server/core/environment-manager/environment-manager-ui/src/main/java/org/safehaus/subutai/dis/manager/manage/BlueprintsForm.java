@@ -6,7 +6,6 @@ import java.util.List;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
-import org.safehaus.subutai.dis.manager.window.DetailsWindow;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
@@ -60,7 +59,7 @@ public class BlueprintsForm {
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    DetailsWindow details = new BlueprintDetails("Blueprint details");
+                    BlueprintDetails details = new BlueprintDetails("Blueprint details");
                     details.setContent( blueprint );
                     contentRoot.getUI().addWindow( details );
                     details.setVisible( true );

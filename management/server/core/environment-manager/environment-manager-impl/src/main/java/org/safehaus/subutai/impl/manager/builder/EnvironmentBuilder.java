@@ -1,16 +1,19 @@
 package org.safehaus.subutai.impl.manager.builder;
 
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentNodeGroup;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
-import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
@@ -18,40 +21,36 @@ import org.safehaus.subutai.impl.manager.exception.NodeGroupBuildException;
  */
 public class EnvironmentBuilder {
 
-    NodeGroupBuilder nodeGroupBuilder;
 
-
-    public EnvironmentBuilder() {
-        this.nodeGroupBuilder = new NodeGroupBuilder();
-    }
-
-
-    public Environment build( final EnvironmentBlueprint blueprint ) throws EnvironmentBuildException {
+    public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
+            throws EnvironmentBuildException {
         Environment environment = new Environment();
         environment.setName( blueprint.getName() );
-        Set<EnvironmentNodeGroup> environmentNodeGroups = new HashSet<>();
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
+            PlacementStrategyENUM e1 = nodeGroup.getPlacementStrategyENUM();
+            Collection<Agent> hosts = new HashSet<Agent>();
+            int nodeCount = 3;
+
+            Set<Agent> agentList;
             try {
-                EnvironmentNodeGroup environmentNodeGroup = nodeGroupBuilder.build( nodeGroup );
-                environmentNodeGroups.add( environmentNodeGroup );
+                agentList = containerManager
+                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
             }
-            catch ( NodeGroupBuildException e ) {
-//                e.printStackTrace();
-                //rollback action
-                System.out.println(e.getMessage());
+            catch ( LxcCreateException ex ) {
+                throw new EnvironmentBuildException( ex.toString() );
             }
-            finally {
-                throw new EnvironmentBuildException( "Error occured while building nodeGroup" );
-            }
+
+            environment.getAgents().addAll( agentList );
         }
-        environment.setEnvironmentNodeGroups( environmentNodeGroups );
+
         return environment;
     }
 
 
     public void destroy( final Environment environment ) throws EnvironmentInstanceDestroyException {
-        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
-            nodeGroupBuilder.destroy( nodeGroup );
-        }
+        //TODO destroy environment code goes here
+        //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
+        //            nodeGroupBuilder.destroy( nodeGroup );
+        //        }
     }
 }

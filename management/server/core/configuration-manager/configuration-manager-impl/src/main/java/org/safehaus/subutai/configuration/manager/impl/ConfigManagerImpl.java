@@ -7,8 +7,14 @@ package org.safehaus.subutai.configuration.manager.impl;
 
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
+import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.configuration.manager.impl.loaders.ConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.PropertiesConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.YamConfigurationlLoader;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.gson.JsonObject;
 
 
 /**
@@ -16,11 +22,50 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class ConfigManagerImpl implements ConfigManager {
 
+    @Override
+    public void injectConfiguration( Agent agent, JsonObject config ) {
+
+        //TODO echo to given agent
+        ConfigurationLoader configurationLoader = null;
+
+        String type = "";
+        switch ( type ) {
+            case "YAML": {
+                configurationLoader = new YamConfigurationlLoader();
+                break;
+            }
+            case "PROPERTIES": {
+                configurationLoader = new PropertiesConfigurationLoader();
+                break;
+            }
+            case "XML": {
+                configurationLoader = new XMLConfigurationLoader();
+                break;
+            }
+        }
+        configurationLoader.setConfiguration( agent, config );
+    }
+
 
     @Override
-    public void injectConfiguration( final Object conf, final String path, final Agent agent ) {
+    public JsonObject getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum ) {
 
+        ConfigurationLoader configurationLoader = null;
+        switch ( configTypeEnum ) {
+            case YAML: {
+                configurationLoader = new YamConfigurationlLoader();
+                break;
+            }
+            case PROPERTIES: {
+                configurationLoader = new PropertiesConfigurationLoader();
+                break;
+            }
+            case XML: {
+                configurationLoader = new XMLConfigurationLoader();
+                break;
+            }
+        }
 
-
+        return configurationLoader.getConfiguration( agent, configPathFilename );
     }
 }
