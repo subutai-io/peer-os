@@ -11,8 +11,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.mongodb.Mongo;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
@@ -32,150 +32,150 @@ import java.util.concurrent.Executors;
  */
 public class MongoImpl implements Mongo {
 
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ContainerManager containerManager;
-    private ExecutorService executor;
+	private CommandRunner commandRunner;
+	private AgentManager agentManager;
+	private DbManager dbManager;
+	private Tracker tracker;
+	private ContainerManager containerManager;
+	private ExecutorService executor;
 
 
-    public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      ContainerManager containerManager ) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-        this.containerManager = containerManager;
+	public MongoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+	                 ContainerManager containerManager) {
+		this.commandRunner = commandRunner;
+		this.agentManager = agentManager;
+		this.dbManager = dbManager;
+		this.tracker = tracker;
+		this.containerManager = containerManager;
 
-        Commands.init( commandRunner );
-    }
-
-
-    public ContainerManager getContainerManager() {
-        return containerManager;
-    }
+		Commands.init(commandRunner);
+	}
 
 
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public ContainerManager getContainerManager() {
+		return containerManager;
+	}
 
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
+	public AgentManager getAgentManager() {
+		return agentManager;
+	}
 
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public DbManager getDbManager() {
+		return dbManager;
+	}
 
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
 
-    public void destroy() {
-        executor.shutdown();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
 
-    public UUID installCluster( MongoClusterConfig config ) {
-
-        Preconditions.checkNotNull( config, "Configuration is null" );
-
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
+	public void destroy() {
+		executor.shutdown();
+	}
 
 
-    public UUID addNode( final String clusterName, final NodeType nodeType ) {
+	public UUID installCluster(MongoClusterConfig config) {
 
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, nodeType );
+		Preconditions.checkNotNull(config, "Configuration is null");
 
-        executor.execute( operationHandler );
+		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-        return operationHandler.getTrackerId();
-    }
+		executor.execute(operationHandler);
 
-
-    public UUID uninstallCluster( final String clusterName ) {
-
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
 
-    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+	public UUID addNode(final String clusterName, final NodeType nodeType) {
 
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, nodeType);
 
-        executor.execute( operationHandler );
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
-
-
-    public List<MongoClusterConfig> getClusters() {
-
-        return dbManager.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class );
-    }
+		return operationHandler.getTrackerId();
+	}
 
 
-    @Override
-    public MongoClusterConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class );
-    }
+	public UUID uninstallCluster(final String clusterName) {
+
+		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+
+		executor.execute(operationHandler);
+
+		return operationHandler.getTrackerId();
+	}
 
 
-    public UUID startNode( final String clusterName, final String lxcHostname ) {
+	public UUID destroyNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostname );
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
 
-        executor.execute( operationHandler );
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
-
-
-    public UUID stopNode( final String clusterName, final String lxcHostname ) {
-
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostname );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
 
-    public UUID checkNode( final String clusterName, final String lxcHostname ) {
+	public List<MongoClusterConfig> getClusters() {
 
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
+		return dbManager.getInfo(MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class);
+	}
 
 
-    @Override
-    public ClusterSetupStrategy getSetupStrategy( final ProductOperation po, final AgentManager agentManager,
-                                                  final CommandRunner commandRunner,
-                                                  final ContainerManager containerManager,
-                                                  final MongoClusterConfig config ) {
-        return new MongoDbSetupStrategy( po, agentManager, this, commandRunner, containerManager, config );
-    }
+	@Override
+	public MongoClusterConfig getCluster(String clusterName) {
+		return dbManager.getInfo(MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class);
+	}
+
+
+	public UUID startNode(final String clusterName, final String lxcHostname) {
+
+		AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname);
+
+		executor.execute(operationHandler);
+
+		return operationHandler.getTrackerId();
+	}
+
+
+	public UUID stopNode(final String clusterName, final String lxcHostname) {
+
+		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname);
+
+		executor.execute(operationHandler);
+
+		return operationHandler.getTrackerId();
+	}
+
+
+	public UUID checkNode(final String clusterName, final String lxcHostname) {
+
+		AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
+
+		executor.execute(operationHandler);
+
+		return operationHandler.getTrackerId();
+	}
+
+
+	@Override
+	public ClusterSetupStrategy getSetupStrategy(final ProductOperation po, final AgentManager agentManager,
+	                                             final CommandRunner commandRunner,
+	                                             final ContainerManager containerManager,
+	                                             final MongoClusterConfig config) {
+		return new MongoDbSetupStrategy(po, agentManager, this, commandRunner, containerManager, config);
+	}
 }
