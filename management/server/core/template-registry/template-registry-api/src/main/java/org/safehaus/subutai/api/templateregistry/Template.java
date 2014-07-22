@@ -46,8 +46,8 @@ public class Template {
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
-                     final String subutaiAppdataPath, final String subutaiParent, final String subutaiGitBranch,
-                     final String subutaiGitUuid, final String packagesManifest ) {
+                     final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
+                     final String packagesManifest ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
         Preconditions
