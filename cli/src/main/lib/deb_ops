@@ -91,7 +91,7 @@ function deb_pkg {
     msg_info "debian package $debian_dir.deb generated..."
     echo "$debian_dir.deb"
   fi
-  $debian_file=`echo $propline | awk '{print $3}'`
+  debian_file=`echo $propline | awk '{print $3}'`
   msg_info "debian package $debian_file generated..."
   echo $debian_file
 }
