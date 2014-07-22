@@ -7,7 +7,8 @@ package org.safehaus.subutai.plugin.zookeeper.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
@@ -51,7 +52,7 @@ public class VerificationStep extends Panel {
 			public void buttonClick(Button.ClickEvent event) {
 				UUID trackID = ZookeeperUI.getManager().installCluster(wizard.getConfig());
 
-				ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

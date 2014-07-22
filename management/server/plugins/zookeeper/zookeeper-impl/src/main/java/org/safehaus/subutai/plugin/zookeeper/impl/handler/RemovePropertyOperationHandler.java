@@ -4,8 +4,8 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -26,7 +26,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
         super(manager, clusterName);
         this.fileName = fileName;
         this.propertyName = propertyName;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Removing property %s from file %s", propertyName, fileName));
     }
 
@@ -41,7 +41,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Zoo
             po.addLogFailed("Malformed arguments\nOperation aborted");
             return;
         }
-        final Config config = manager.getCluster(clusterName);
+        final ZookeeperClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;

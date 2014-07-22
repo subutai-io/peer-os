@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -79,11 +79,11 @@ public class ZookeeperUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return ZookeeperClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return ZookeeperClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

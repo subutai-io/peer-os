@@ -12,7 +12,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -35,7 +36,7 @@ public class Manager {
 	private final GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table nodesTable;
-	private Config config;
+	private ZookeeperClusterConfig config;
 
 	public Manager() {
 		contentRoot = new GridLayout();
@@ -63,7 +64,7 @@ public class Manager {
 
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				config = (ZookeeperClusterConfig ) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -129,7 +130,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = ZookeeperUI.getManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -163,7 +164,7 @@ public class Manager {
 							@Override
 							public void buttonClick(Button.ClickEvent clickEvent) {
 								UUID trackID = ZookeeperUI.getManager().addNode(config.getClusterName());
-								ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+								ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 								window.getWindow().addCloseListener(new Window.CloseListener() {
 									@Override
 									public void windowClose(Window.CloseEvent closeEvent) {
@@ -228,7 +229,7 @@ public class Manager {
 						show("Please, specify property name to remove");
 					} else {
 						UUID trackID = ZookeeperUI.getManager().removeProperty(config.getClusterName(), fileName, propertyName);
-						ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+						ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 						window.getWindow().addCloseListener(new Window.CloseListener() {
 							@Override
 							public void windowClose(Window.CloseEvent closeEvent) {
@@ -265,7 +266,7 @@ public class Manager {
 						show("Please, specify property value to set");
 					} else {
 						UUID trackID = ZookeeperUI.getManager().addProperty(config.getClusterName(), fileName, propertyName, propertyValue);
-						ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+						ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 						window.getWindow().addCloseListener(new Window.CloseListener() {
 							@Override
 							public void windowClose(Window.CloseEvent closeEvent) {
@@ -441,7 +442,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = ZookeeperUI.getManager().destroyNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID, ZookeeperClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -467,17 +468,17 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<Config> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
+		List<ZookeeperClusterConfig> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
+		ZookeeperClusterConfig clusterInfo = (ZookeeperClusterConfig ) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-			for (Config mongoClusterInfo : mongoClusterInfos) {
+			for (ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos) {
 				clusterCombo.addItem(mongoClusterInfo);
 				clusterCombo.setItemCaption(mongoClusterInfo,
 						mongoClusterInfo.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : mongoClusterInfos) {
+				for (ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos) {
 					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(mongoClusterInfo);
 						return;

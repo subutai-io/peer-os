@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -24,7 +24,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
     public DestroyNodeOperationHandler(ZookeeperImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Destroying %s in %s", lxcHostname, clusterName));
     }
 
@@ -35,7 +35,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
 
     @Override
     public void run() {
-        final Config config = manager.getCluster(clusterName);
+        final ZookeeperClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
@@ -110,7 +110,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
 
         //update db
         po.addLog("Updating db...");
-        if (!manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+        if (!manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config)) {
             po.addLogFailed(String.format("Error while updating cluster info [%s] in DB. Check logs\nFailed",
                     config.getClusterName()));
         } else {

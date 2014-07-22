@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -17,7 +17,7 @@ public class SingleInstallation extends AbstractOperationHandler<ZookeeperImpl> 
         super(manager, null);
         this.hostName = hostName;
         this.productOperation = manager.getTracker().createProductOperation(
-                Config.PRODUCT_KEY, "Installing on " + hostName);
+                ZookeeperClusterConfig.PRODUCT_KEY, "Installing on " + hostName);
     }
 
     @Override

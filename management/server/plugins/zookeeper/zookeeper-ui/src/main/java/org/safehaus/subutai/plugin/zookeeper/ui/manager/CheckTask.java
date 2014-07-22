@@ -5,7 +5,7 @@
  */
 package org.safehaus.subutai.plugin.zookeeper.ui.manager;
 
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
@@ -35,7 +35,7 @@ public class CheckTask implements Runnable {
 		NodeState state = NodeState.UNKNOWN;
 		long start = System.currentTimeMillis();
 		while (!Thread.interrupted()) {
-			ProductOperationView po = ZookeeperUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			ProductOperationView po = ZookeeperUI.getTracker().getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID);
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getLog().contains(NodeState.STOPPED.toString())) {

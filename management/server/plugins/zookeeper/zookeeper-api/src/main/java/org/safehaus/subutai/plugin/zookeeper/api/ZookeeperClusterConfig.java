@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class ZookeeperClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Zookeeper";
     private String clusterName = "";

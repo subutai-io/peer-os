@@ -11,7 +11,7 @@ import org.safehaus.subutai.shared.protocol.ApiBase;
 /**
  * @author dilshat
  */
-public interface Zookeeper extends ApiBase<Config> {
+public interface Zookeeper extends ApiBase<ZookeeperClusterConfig> {
 
     public UUID startNode(String clusterName, String lxcHostname);
 

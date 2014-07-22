@@ -7,7 +7,9 @@ package org.safehaus.subutai.plugin.zookeeper.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+
 
 /**
  * @author dilshat
@@ -16,7 +18,7 @@ public class Wizard {
 
 	private final GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private ZookeeperClusterConfig config = new ZookeeperClusterConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -42,11 +44,11 @@ public class Wizard {
 
 	protected void init() {
 		step = 1;
-		config = new Config();
+		config = new ZookeeperClusterConfig();
 		putForm();
 	}
 
-	public Config getConfig() {
+	public ZookeeperClusterConfig getConfig() {
 		return config;
 	}
 

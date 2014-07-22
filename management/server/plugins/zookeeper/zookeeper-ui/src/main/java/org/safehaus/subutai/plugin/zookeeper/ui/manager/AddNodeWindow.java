@@ -9,7 +9,8 @@ import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -27,7 +28,7 @@ public class AddNodeWindow extends Window {
 	private final Label indicator;
 	private volatile boolean track = true;
 
-	public AddNodeWindow(final Config config, Set<Agent> nodes) {
+	public AddNodeWindow(final ZookeeperClusterConfig config, Set<Agent> nodes) {
 		super("Add New Node");
 		setModal(true);
 
@@ -74,7 +75,7 @@ public class AddNodeWindow extends Window {
 
 					public void run() {
 						while (track) {
-							ProductOperationView po = ZookeeperUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+							ProductOperationView po = ZookeeperUI.getTracker().getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID);
 							if (po != null) {
 								setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
 								if (po.getState() != ProductOperationState.RUNNING) {

@@ -6,8 +6,8 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -23,12 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;
-    private final Config config;
+    private final ZookeeperClusterConfig config;
 
-    public InstallOperationHandler(ZookeeperImpl manager, Config config) {
+    public InstallOperationHandler(ZookeeperImpl manager, ZookeeperClusterConfig config) {
         super(manager, config.getClusterName());
         this.config = config;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
+        po = manager.getTracker().createProductOperation(
+                ZookeeperClusterConfig.PRODUCT_KEY, String.format("Installing %s", ZookeeperClusterConfig.PRODUCT_KEY));
     }
 
     @Override
@@ -114,7 +115,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         po.addLog("Updating db...");
         //save to db
-        if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+        if (manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config)) {
             po.addLog("Cluster info saved to DB\nInstalling Zookeeper...");
 
             //install
@@ -130,7 +131,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
                 if (updateSettingsCommand.hasSucceeded()) {
 
-                    po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
+                    po.addLog(String.format("Settings updated\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY));
                     //start all nodes
                     Command startCommand = Commands.getStartCommand(config.getNodes());
                     final AtomicInteger count = new AtomicInteger();
@@ -146,9 +147,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                     });
 
                     if (count.get() == config.getNodes().size()) {
-                        po.addLogDone(String.format("Starting %s succeeded\nDone", Config.PRODUCT_KEY));
+                        po.addLogDone(String.format("Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY));
                     } else {
-                        po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startCommand.getAllErrors()));
+                        po.addLogFailed(String.format("Starting %s failed, %s", ZookeeperClusterConfig.PRODUCT_KEY, startCommand.getAllErrors()));
                     }
                 } else {
                     po.addLogFailed(String.format(
@@ -177,9 +178,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                 config.getNodes().addAll(entry.getValue());
             }
             po.addLog("Lxc containers created successfully\nUpdating db...");
-            if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+            if (manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config)) {
 
-                po.addLog(String.format("Cluster info saved to DB\nInstalling %s...", Config.PRODUCT_KEY));
+                po.addLog(String.format("Cluster info saved to DB\nInstalling %s...", ZookeeperClusterConfig.PRODUCT_KEY));
 
                 //install
                 Command installCommand = Commands.getInstallCommand(config.getNodes());
@@ -194,7 +195,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
                     if (updateSettingsCommand.hasSucceeded()) {
 
-                        po.addLog(String.format("Settings updated\nStarting %s...", Config.PRODUCT_KEY));
+                        po.addLog(String.format("Settings updated\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY));
                         //start all nodes
                         Command startCommand = Commands.getStartCommand(config.getNodes());
                         final AtomicInteger count = new AtomicInteger();
@@ -210,9 +211,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                         });
 
                         if (count.get() == config.getNodes().size()) {
-                            po.addLogDone(String.format("Starting %s succeeded\nDone", Config.PRODUCT_KEY));
+                            po.addLogDone(String.format("Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY));
                         } else {
-                            po.addLogFailed(String.format("Starting %s failed, %s", Config.PRODUCT_KEY, startCommand.getAllErrors()));
+                            po.addLogFailed(String.format("Starting %s failed, %s", ZookeeperClusterConfig.PRODUCT_KEY, startCommand.getAllErrors()));
                         }
                     } else {
                         po.addLogFailed(String.format(

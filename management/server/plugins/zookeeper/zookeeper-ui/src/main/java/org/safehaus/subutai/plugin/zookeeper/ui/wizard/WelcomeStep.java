@@ -8,7 +8,8 @@ package org.safehaus.subutai.plugin.zookeeper.ui.wizard;
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 
@@ -26,7 +27,8 @@ public class WelcomeStep extends Panel {
 		grid.setMargin(true);
 		grid.setSizeFull();
 
-		Label welcomeMsg = new Label(String.format("<center><h2>Welcome to %s Installation Wizard!</h2>", Config.PRODUCT_KEY));
+		Label welcomeMsg = new Label(String.format("<center><h2>Welcome to %s Installation Wizard!</h2>",
+                ZookeeperClusterConfig.PRODUCT_KEY));
 		welcomeMsg.setContentMode(ContentMode.HTML);
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 

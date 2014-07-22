@@ -9,7 +9,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddPropertyOperationHandler;
@@ -70,7 +70,7 @@ public class ZookeeperImpl implements Zookeeper {
         executor.shutdown();
     }
 
-    public UUID installCluster(Config config) {
+    public UUID installCluster(ZookeeperClusterConfig config) {
 
         AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
@@ -162,15 +162,15 @@ public class ZookeeperImpl implements Zookeeper {
         return operationHandler.getTrackerId();
     }
 
-    public List<Config> getClusters() {
+    public List<ZookeeperClusterConfig> getClusters() {
 
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+        return dbManager.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class);
 
     }
 
     @Override
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    public ZookeeperClusterConfig getCluster(String clusterName) {
+        return dbManager.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class);
     }
 
     @Override

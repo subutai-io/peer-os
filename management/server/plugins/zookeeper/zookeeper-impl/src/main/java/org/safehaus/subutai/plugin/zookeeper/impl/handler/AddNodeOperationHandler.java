@@ -4,8 +4,8 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -27,7 +27,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     public AddNodeOperationHandler(ZookeeperImpl manager, String clusterName) {
         super(manager, clusterName);
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Adding node to %s", clusterName));
 
     }
@@ -35,7 +35,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
     public AddNodeOperationHandler(ZookeeperImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Adding node to %s", clusterName));
 
     }
@@ -47,7 +47,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     @Override
     public void run() {
-        final Config config = manager.getCluster(clusterName);
+        final ZookeeperClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
@@ -60,7 +60,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         }
     }
 
-    private void addOverHadoop(final Config config) {
+    private void addOverHadoop(final ZookeeperClusterConfig config) {
 
         po.addLog("Installing over a hadoop cluster node...");
 
@@ -101,7 +101,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         config.getNodes().add(lxcAgent);
 
-        po.addLog(String.format("Installing %s...", Config.PRODUCT_KEY));
+        po.addLog(String.format("Installing %s...", ZookeeperClusterConfig.PRODUCT_KEY));
 
         //install
         Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
@@ -110,7 +110,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         if (installCommand.hasCompleted()) {
             po.addLog("Installation succeeded\nUpdating db...");
             //update db
-            if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+            if (manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, config)) {
                 po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                 //update settings
@@ -154,7 +154,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     }
 
-    private void addStandalone(final Config config) {
+    private void addStandalone(final ZookeeperClusterConfig config) {
         try {
 
             //create lxc
@@ -166,7 +166,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
             config.getNodes().add(lxcAgent);
 
-            po.addLog(String.format("Lxc container created successfully\nInstalling %s...", Config.PRODUCT_KEY));
+            po.addLog(String.format("Lxc container created successfully\nInstalling %s...", ZookeeperClusterConfig.PRODUCT_KEY));
 
             //install
             Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
@@ -175,7 +175,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             if (installCommand.hasCompleted()) {
                 po.addLog("Installation succeeded\nUpdating db...");
                 //update db
-                if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+                if (manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, config)) {
                     po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                     //update settings

@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.zookeeper.api.Config;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -22,7 +22,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
     public StopNodeOperationHandler(ZookeeperImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format("Stopping node %s in %s", lxcHostname, clusterName));
     }
 
@@ -33,7 +33,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
 
     @Override
     public void run() {
-        Config config = manager.getCluster(clusterName);
+        ZookeeperClusterConfig config = manager.getCluster(clusterName);
         if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
