@@ -7,7 +7,7 @@ package org.safehaus.subutai.hadoop.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.hadoop.api.Config;
 import org.safehaus.subutai.hadoop.ui.HadoopUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 

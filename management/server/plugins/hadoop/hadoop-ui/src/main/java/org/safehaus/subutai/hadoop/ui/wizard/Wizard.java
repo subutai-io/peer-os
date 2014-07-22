@@ -2,7 +2,7 @@ package org.safehaus.subutai.hadoop.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.hadoop.api.Config;
 
 /**
  * Created by daralbaev on 09.04.14.
