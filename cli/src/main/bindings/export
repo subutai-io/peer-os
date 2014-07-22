@@ -45,6 +45,14 @@ function export {
     exit 1
   fi
 
+  # check to make sure the container is a template
+  if [ "`zfs_is_template $container`" == "false" ]; then
+    msg_error "Container \"$container\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$container\" is a template"
+  fi
+
   parent=`zfs_get_parent $container`
   lxc_assert $parent
   # check to make sure the parent is a template
