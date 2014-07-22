@@ -53,4 +53,5 @@ export SUBUTAI_REST_PATH=cxf
 # slashes in paths
 export SUBUTAI_REST_REGISTER_PATH=template/import
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/get_template
+export SUBUTAI_REST_LIST_TEMPLATES=registry/list_templates_plain
 
