@@ -5,31 +5,34 @@
  */
 package org.safehaus.subutai.plugin.zookeeper.api;
 
+
 import java.util.UUID;
+
 import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+
 
 /**
  * @author dilshat
  */
 public interface Zookeeper extends ApiBase<ZookeeperClusterConfig> {
 
-    public UUID startNode(String clusterName, String lxcHostname);
+    public UUID startNode( String clusterName, String lxcHostname );
 
-    public UUID stopNode(String clusterName, String lxcHostname);
+    public UUID stopNode( String clusterName, String lxcHostname );
 
-    public UUID checkNode(String clusterName, String lxcHostname);
+    public UUID checkNode( String clusterName, String lxcHostname );
 
-    public UUID addNode(String clusterName);
+    public UUID addNode( String clusterName );
 
-    public UUID addNode(String clusterName, String lxcHostname);
+    public UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+    public UUID destroyNode( String clusterName, String lxcHostname );
 
-    public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue);
+    public UUID addProperty( String clusterName, String fileName, String propertyName, String propertyValue );
 
-    public UUID removeProperty(String clusterName, String fileName, String propertyName);
+    public UUID removeProperty( String clusterName, String fileName, String propertyName );
 
-    public UUID install(String hostName);
-
+    public ClusterSetupStrategy getClusterSetupStrategy();
 }
 
