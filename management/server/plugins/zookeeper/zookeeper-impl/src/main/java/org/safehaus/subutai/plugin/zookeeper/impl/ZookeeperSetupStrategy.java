@@ -16,6 +16,7 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.Response;
 
 
@@ -96,5 +97,12 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
         }
 
         return config;
+    }
+
+
+    private String prepareConfiguration() {
+        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", this );
+
+        return null;
     }
 }

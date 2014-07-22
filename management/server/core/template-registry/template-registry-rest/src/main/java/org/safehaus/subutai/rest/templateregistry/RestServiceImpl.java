@@ -40,6 +40,13 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public void registerTemplate( final String configFilePath, final String packagesFilePath ) {
+
+        templateRegistryManager.registerTemplate( configFilePath, packagesFilePath );
+    }
+
+
+    @Override
     public String getTemplate( final String templateName, final String lxcArch ) {
         return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
     }

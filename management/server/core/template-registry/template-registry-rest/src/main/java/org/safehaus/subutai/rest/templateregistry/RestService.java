@@ -5,6 +5,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 
@@ -14,6 +15,11 @@ public interface RestService {
     @Path( "get_template/{templateName}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String getTemplate( @PathParam( "templateName" ) String templateName );
+
+    @GET
+    @Path( "register_template" )
+    public void registerTemplate( @QueryParam( "config" ) String configFilePath,
+                                  @QueryParam( "packages" ) String packagesFilePath );
 
     @GET
     @Path( "get_template/{templateName}/{lxcArch}" )
