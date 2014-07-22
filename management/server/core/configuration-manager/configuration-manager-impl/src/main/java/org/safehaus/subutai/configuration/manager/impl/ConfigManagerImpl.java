@@ -54,6 +54,18 @@ public class ConfigManagerImpl implements ConfigManager {
 
 
     @Override
+    public String getProperty( final JsonObject config, final String path ) {
+        return null;
+    }
+
+
+    @Override
+    public void setProperty( final JsonObject config, final String path, final String value ) {
+
+    }
+
+
+    @Override
     public JsonObject getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum ) {
 
         ConfigurationLoader configurationLoader = null;
@@ -95,7 +107,7 @@ public class ConfigManagerImpl implements ConfigManager {
                     break;
                 }
             }
-            return configParser.parserConfig(configPathFilename, configTypeEnum);
+            return configParser.parserConfig( configPathFilename, configTypeEnum );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();

@@ -71,7 +71,8 @@ public class IniParser implements ConfigParser {
         while ( iterator.hasNext() ) {
             String key = iterator.next();
             String value = ( String ) config.getProperty( key );
-            JsonObject field = configBuilder.buildFieldJsonObject( key.trim(), "", "", "", true, value.trim() );
+            JsonObject field = configBuilder
+                    .buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
             fields.add( field );
         }
 

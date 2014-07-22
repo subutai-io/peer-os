@@ -16,11 +16,13 @@ import com.google.gson.JsonObject;
  */
 public interface ConfigManager {
 
-    public void injectConfiguration(Agent agent, JsonObject config);
+    public void injectConfiguration( Agent agent, JsonObject config );
 
-    public JsonObject getConfiguration(Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum);
+    public String getProperty( JsonObject config, String path );
 
-    public JsonObject getConfigurationJson(String configPathFilename, ConfigTypeEnum configTypeEnum);
+    public void setProperty( JsonObject config, String path, String value );
 
+    public JsonObject getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum );
 
+    public JsonObject getConfigurationJson( String configPathFilename, ConfigTypeEnum configTypeEnum );
 }
