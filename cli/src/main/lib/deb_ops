@@ -151,8 +151,11 @@ function create_postinst_script {
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  echo "export APT_GET_INVOCATION=true" >> $postinst_file
-  echo "subutai import $lxc" >> $postinst_file
+  # Check if the template is master
+  if [ $lxc != "master" ]; then
+    echo "export APT_GET_INVOCATION=true" >> $postinst_file
+    echo "subutai import $lxc" >> $postinst_file
+  fi
   chmod 755 $postinst_file
 }
 

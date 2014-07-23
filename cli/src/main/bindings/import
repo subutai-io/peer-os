@@ -31,6 +31,9 @@ function import {
     show_usage "`import_usage`"
   fi
 
+  if [ "$container" = "master" ];then
+    subutai master_create
+  fi
   # ----------------------------------------------------------------------------
   # (1) Install the debian package if subutai import not called during a debian package installation
   # ----------------------------------------------------------------------------
