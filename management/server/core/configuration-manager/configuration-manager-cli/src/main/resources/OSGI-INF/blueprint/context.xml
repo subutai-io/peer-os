@@ -6,8 +6,17 @@
              interface="org.safehaus.subutai.configuration.manager.api.TextInjector" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="configuration/cat">
+    <command name="config/cat">
       <action class="org.safehaus.subutai.cli.commands.CatCommand">
+        <property name="agentManager" ref="agentManager" />
+        <property name="textInjector" ref="textInjector" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="config/echo">
+      <action class="org.safehaus.subutai.cli.commands.EchoCommand">
         <property name="agentManager" ref="agentManager" />
         <property name="textInjector" ref="textInjector" />
       </action>

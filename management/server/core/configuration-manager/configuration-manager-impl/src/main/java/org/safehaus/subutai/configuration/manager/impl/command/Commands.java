@@ -29,7 +29,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getEchoCommand( Agent agent, String filePath, String content ) {
 
-        return createCommand( new RequestBuilder( "echo " + " " + content + " " + filePath )
+        return createCommand( new RequestBuilder( "echo " + " '" + content + "' > " + filePath )
                         .withTimeout( 90 )
                         .withStdOutRedirection(OutputRedirection.CAPTURE_AND_RETURN ),
                 Sets.newHashSet( agent ) );

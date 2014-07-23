@@ -1192,6 +1192,33 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- MongoDB 2 -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Oozie -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
