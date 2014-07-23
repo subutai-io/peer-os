@@ -42,7 +42,7 @@ function git_child_branch {
 
   lxc-wait -n $child -s RUNNING
   o=`lxc-attach -n $child -- git -C / checkout -b $child 2>&1`
-  check_status "New child container branch \"$child\" created" "$?"
+  check_status "    - new child container branch \"$child\" created" "$?"
 }
 
 

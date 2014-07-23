@@ -1,6 +1,16 @@
 #!/bin/bash
 
 
+function list_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: List containers and/or temlates.
+  echo
+  echo "        "subutai \[-qh\] list \[-tcpa\] \[name_list\]
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
 function get_ancestor_list {
   contemp="$1"
   ancestor_list=

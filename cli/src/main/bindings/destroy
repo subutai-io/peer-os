@@ -1,10 +1,10 @@
 #!/bin/bash
 
-function usage {
+function destroy_usage {
   echo -----------------------------------------------------------------------
-  echo Usage: Destroy an existing container clone.
+  echo Usage: Destroy an existing container or template by name.
   echo
-  echo "        "subutai-clone-destory clone-name
+  echo "        "subutai \[-qh\] destory name
   echo
   echo -----------------------------------------------------------------------
 }
@@ -70,10 +70,15 @@ function destroy {
   
   # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
   local container=$clone
-  local debian_package_name=`get_debian_package_name $container`
-  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
+  
+  # Check if the package is installed
+  dpkg -s $package_name > /dev/null 2>&1
+  if [ $? = 0  ]; then
+    apt-get --assume-yes --force-yes purge $package_name
+  fi
+
   local debian_root="$SUBUTAI_TMPDIR/$container"
-  rm -rf $debian_file
   rm -rf $debian_root
 }
 

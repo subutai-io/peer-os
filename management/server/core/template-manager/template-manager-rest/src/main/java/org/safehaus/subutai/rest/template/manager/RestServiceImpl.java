@@ -53,18 +53,21 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public String importTemplate(byte[] input) {
+    public Response importTemplate(InputStream in) {
         Path path;
         try {
             path = Files.createTempFile("subutai-template-", ".deb");
             try(OutputStream os = new FileOutputStream(path.toFile())) {
-                os.write(input);
+                int len;
+                byte[] buf = new byte[1024];
+                while((len = in.read(buf)) > 0)
+                    os.write(buf, 0, len);
             }
             logger.info("Payload saved to " + path.toString());
         } catch(IOException ex) {
             String m = "Failed to write payload data to file";
             logger.error(m, ex);
-            return m;
+            return Response.serverError().build();
         }
 
         Agent mgmt = agentManager.getAgentByHostname(managementHostName);
@@ -81,16 +84,17 @@ public class RestServiceImpl implements RestService {
         } catch(AptRepoException ex) {
             String m = "Failed to process deb package";
             logger.error(m, ex);
-            return m;
+            return Response.serverError().build();
         } catch(Exception ex) {
             String m = "Import of package failed";
             logger.error(m, ex);
-            return m;
+            return Response.serverError().build();
         } finally {
             // clean up
             path.toFile().delete();
         }
-        return "Template package successfully imported.";
+        logger.info("Template package successfully imported.");
+        return Response.ok().build();
     }
 
     @Override

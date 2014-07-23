@@ -14,6 +14,10 @@ public class PromoteClone extends OsgiCommandSupport {
     private String hostName;
     @Argument(index = 1, required = true)
     private String cloneName;
+    @Argument(index = 2, description = "new name for template")
+    private String newName;
+    @Argument(index = 3, description = "specify 'true' to copy clone first")
+    private String copyit;
 
     public TemplateManager getTemplateManager() {
         return templateManager;
@@ -25,7 +29,8 @@ public class PromoteClone extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        boolean b = templateManager.promoteClone(hostName, cloneName);
+        boolean b = templateManager.promoteClone(hostName, cloneName, newName,
+                Boolean.parseBoolean(copyit));
         if(b) System.out.println("Clone successfully promoted to a template");
         else System.out.println("Failed to promote clone");
         return null;

@@ -29,6 +29,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.server.ui.util.HelpManager;
@@ -43,318 +44,321 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 
-@Theme("dashboard")
-@SuppressWarnings("serial")
-@Title("Subutai")
+@Theme ("dashboard")
+@SuppressWarnings ("serial")
+@Title ("Subutai")
 
 public class MainUI extends UI {
 
-    private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
-    private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<MainUI>();
+	private static final Logger LOG = Logger.getLogger(MainUI.class.getName());
+	private static final ThreadLocal<MainUI> threadLocal = new ThreadLocal<>();
 
-    private CssLayout root = new CssLayout();
-    private CssLayout menu = new CssLayout();
-    private CssLayout content = new CssLayout();
-    private VerticalLayout loginLayout;
-    private HelpManager helpManager;
-    private Navigator nav;
+	private CssLayout root = new CssLayout();
+	private CssLayout menu = new CssLayout();
+	private CssLayout content = new CssLayout();
+	private VerticalLayout loginLayout;
+	private HelpManager helpManager;
+	private Navigator nav;
 
-    private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
-    private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
-        {
-            put("/modules", ModulesView.class);
-            put("/monitor", MonitorView.class);
-        }
-    };
+	private String username = "administrator";
 
-    @Override
-    protected void init(VaadinRequest request) {
-        setInstance(this);
-        helpManager = new HelpManager(this);
+	private HashMap<String, Button> viewNameToMenuButton = new HashMap<>();
+	private HashMap<String, Class<? extends View>> routes = new HashMap<String, Class<? extends View>>() {
+		{
+			put("/modules", ModulesView.class);
+			put("/monitor", MonitorView.class);
+		}
+	};
 
-        setLocale(Locale.US);
+	@Override
+	protected void init(VaadinRequest request) {
+		setInstance(this);
+		helpManager = new HelpManager(this);
+		VaadinService.getCurrentRequest().getWrappedSession().setAttribute("username", username);
 
-        setContent(root);
-        root.addStyleName("root");
-        root.setSizeFull();
+		setLocale(Locale.US);
 
-        // Unfortunate to use an actual widget here, but since CSS generated
-        // elements can't be transitioned yet, we must
-        Label bg = new Label();
-        bg.setSizeUndefined();
-        bg.addStyleName("login-bg");
-        root.addComponent(bg);
+		setContent(root);
+		root.addStyleName("root");
+		root.setSizeFull();
 
-        // For synchronization issue
-        setPollInterval(Common.REFRESH_UI_SEC * 1000);
+		// Unfortunate to use an actual widget here, but since CSS generated
+		// elements can't be transitioned yet, we must
+		Label bg = new Label();
+		bg.setSizeUndefined();
+		bg.addStyleName("login-bg");
+		root.addComponent(bg);
 
-        buildLoginView(false);
-    }
+		// For synchronization issue
+		setPollInterval(Common.REFRESH_UI_SEC * 1000);
 
-    private void buildLoginView(boolean exit) {
-        if (exit) {
-            root.removeAllComponents();
-        }
-        helpManager.closeAll();
-        HelpOverlay w = helpManager
-                .addOverlay(
-                        "Welcome to the Subutai",
-                        "<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
-                        "login");
-        w.center();
-        addWindow(w);
+		buildLoginView(false);
+	}
 
-        addStyleName("login");
+	private void buildLoginView(boolean exit) {
+		if (exit) {
+			root.removeAllComponents();
+		}
+		helpManager.closeAll();
+		HelpOverlay w = helpManager
+				.addOverlay(
+						"Welcome to the Subutai",
+						"<p>No username or password is required, just click the ‘Sign In’ button to continue.</p>",
+						"login");
+		w.center();
+		addWindow(w);
 
-        loginLayout = new VerticalLayout();
-        loginLayout.setSizeFull();
-        loginLayout.addStyleName("login-layout");
-        root.addComponent(loginLayout);
+		addStyleName("login");
 
-        final CssLayout loginPanel = new CssLayout();
-        loginPanel.addStyleName("login-panel");
+		loginLayout = new VerticalLayout();
+		loginLayout.setSizeFull();
+		loginLayout.addStyleName("login-layout");
+		root.addComponent(loginLayout);
 
-        HorizontalLayout labels = new HorizontalLayout();
-        labels.setWidth("100%");
-        labels.setMargin(true);
-        labels.addStyleName("labels");
-        loginPanel.addComponent(labels);
+		final CssLayout loginPanel = new CssLayout();
+		loginPanel.addStyleName("login-panel");
 
-        Label welcome = new Label("Welcome");
-        welcome.setSizeUndefined();
-        welcome.addStyleName("h4");
-        labels.addComponent(welcome);
-        labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
+		HorizontalLayout labels = new HorizontalLayout();
+		labels.setWidth("100%");
+		labels.setMargin(true);
+		labels.addStyleName("labels");
+		loginPanel.addComponent(labels);
 
-        Label title = new Label("Subutai");
-        title.setSizeUndefined();
-        title.addStyleName("h2");
-        title.addStyleName("light");
-        labels.addComponent(title);
-        labels.setComponentAlignment(title, Alignment.MIDDLE_RIGHT);
+		Label welcome = new Label("Welcome");
+		welcome.setSizeUndefined();
+		welcome.addStyleName("h4");
+		labels.addComponent(welcome);
+		labels.setComponentAlignment(welcome, Alignment.MIDDLE_LEFT);
 
-        HorizontalLayout fields = new HorizontalLayout();
-        fields.setSpacing(true);
-        fields.setMargin(true);
-        fields.addStyleName("fields");
+		Label title = new Label("Subutai");
+		title.setSizeUndefined();
+		title.addStyleName("h2");
+		title.addStyleName("light");
+		labels.addComponent(title);
+		labels.setComponentAlignment(title, Alignment.MIDDLE_RIGHT);
 
-        final TextField username = new TextField("Username");
-        username.focus();
-        fields.addComponent(username);
+		HorizontalLayout fields = new HorizontalLayout();
+		fields.setSpacing(true);
+		fields.setMargin(true);
+		fields.addStyleName("fields");
 
-        final PasswordField password = new PasswordField("Password");
-        fields.addComponent(password);
+		final TextField username = new TextField("Username");
+		username.focus();
+		fields.addComponent(username);
 
-        final Button signin = new Button("Sign In");
-        signin.addStyleName("default");
-        fields.addComponent(signin);
-        fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
+		final PasswordField password = new PasswordField("Password");
+		fields.addComponent(password);
 
-        final ShortcutListener enter = new ShortcutListener("Sign In",
-                ShortcutAction.KeyCode.ENTER, null) {
-            @Override
-            public void handleAction(Object sender, Object target) {
-                signin.click();
-            }
-        };
+		final Button signin = new Button("Sign In");
+		signin.addStyleName("default");
+		fields.addComponent(signin);
+		fields.setComponentAlignment(signin, Alignment.BOTTOM_LEFT);
 
-        signin.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (username.getValue() != null
-                        && username.getValue().equals("")
-                        && password.getValue() != null
-                        && password.getValue().equals("")) {
-                    signin.removeShortcutListener(enter);
-                    buildMainView();
-                } else {
-                    if (loginPanel.getComponentCount() > 2) {
-                        // Remove the previous error message
-                        loginPanel.removeComponent(loginPanel.getComponent(2));
-                    }
-                    // Add new error message
-                    Label error = new Label(
-                            "Wrong username or password. <span>Hint: try empty values</span>",
-                            ContentMode.HTML);
-                    error.addStyleName("error");
-                    error.setSizeUndefined();
-                    error.addStyleName("light");
-                    // Add animation
-                    error.addStyleName("v-animate-reveal");
-                    loginPanel.addComponent(error);
-                    username.focus();
-                }
-            }
-        });
+		final ShortcutListener enter = new ShortcutListener("Sign In",
+				ShortcutAction.KeyCode.ENTER, null) {
+			@Override
+			public void handleAction(Object sender, Object target) {
+				signin.click();
+			}
+		};
 
-        signin.addShortcutListener(enter);
+		signin.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				if (username.getValue() != null
+						&& username.getValue().equals("")
+						&& password.getValue() != null
+						&& password.getValue().equals("")) {
+					signin.removeShortcutListener(enter);
+					buildMainView();
+				} else {
+					if (loginPanel.getComponentCount() > 2) {
+						// Remove the previous error message
+						loginPanel.removeComponent(loginPanel.getComponent(2));
+					}
+					// Add new error message
+					Label error = new Label(
+							"Wrong username or password. <span>Hint: try empty values</span>",
+							ContentMode.HTML);
+					error.addStyleName("error");
+					error.setSizeUndefined();
+					error.addStyleName("light");
+					// Add animation
+					error.addStyleName("v-animate-reveal");
+					loginPanel.addComponent(error);
+					username.focus();
+				}
+			}
+		});
 
-        loginPanel.addComponent(fields);
+		signin.addShortcutListener(enter);
 
-        loginLayout.addComponent(loginPanel);
-        loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
-    }
+		loginPanel.addComponent(fields);
 
-    private void buildMainView() {
-        nav = new Navigator(this, content);
+		loginLayout.addComponent(loginPanel);
+		loginLayout.setComponentAlignment(loginPanel, Alignment.MIDDLE_CENTER);
+	}
 
-        for (String route : routes.keySet()) {
-            nav.addView(route, routes.get(route));
-        }
+	private void buildMainView() {
+		nav = new Navigator(this, content);
 
-        helpManager.closeAll();
-        removeStyleName("login");
-        root.removeComponent(loginLayout);
+		for (String route : routes.keySet()) {
+			nav.addView(route, routes.get(route));
+		}
 
-        root.addComponent(new HorizontalLayout() {
-            {
-                setSizeFull();
-                addStyleName("main-view");
-                addComponent(new VerticalLayout() {
-                    // Sidebar
-                    {
-                        addStyleName("sidebar");
-                        setWidth(140, Unit.PIXELS);
-                        setHeight("100%");
+		helpManager.closeAll();
+		removeStyleName("login");
+		root.removeComponent(loginLayout);
 
-                        // Branding element
-                        addComponent(new CssLayout() {
-                            {
-                                addStyleName("branding");
-                                setHeight(140, Unit.PIXELS);
-                                addComponent(new Image(null, new ThemeResource(
-                                        "img/subutai.png")));
-                            }
-                        });
+		root.addComponent(new HorizontalLayout() {
+			{
+				setSizeFull();
+				addStyleName("main-view");
+				addComponent(new VerticalLayout() {
+					// Sidebar
+					{
+						addStyleName("sidebar");
+						setWidth(140, Unit.PIXELS);
+						setHeight("100%");
 
-                        // Main menu
-                        addComponent(menu);
-                        setExpandRatio(menu, 1);
+						// Branding element
+						addComponent(new CssLayout() {
+							{
+								addStyleName("branding");
+								setHeight(140, Unit.PIXELS);
+								addComponent(new Image(null, new ThemeResource(
+										"img/subutai.png")));
+							}
+						});
 
-                        // User menu
-                        addComponent(new VerticalLayout() {
-                            {
-                                setSizeUndefined();
-                                addStyleName("user");
-                                Image profilePic = new Image(
-                                        null,
-                                        new ThemeResource("img/profile-pic.png"));
-                                profilePic.setWidth("34px");
-                                addComponent(profilePic);
-                                Label userName = new Label("Administrator");
-                                userName.setSizeUndefined();
-                                addComponent(userName);
+						// Main menu
+						addComponent(menu);
+						setExpandRatio(menu, 1);
 
-                                MenuBar.Command cmd = new MenuBar.Command() {
-                                    @Override
-                                    public void menuSelected(
-                                            MenuBar.MenuItem selectedItem) {
-                                        Notification
-                                                .show("Not implemented in this demo");
-                                    }
-                                };
-                                MenuBar settings = new MenuBar();
-                                MenuBar.MenuItem settingsMenu = settings.addItem("",
-                                        null);
-                                settingsMenu.setStyleName("icon-cog");
-                                settingsMenu.addItem("Settings", cmd);
-                                settingsMenu.addItem("Preferences", cmd);
-                                settingsMenu.addSeparator();
-                                settingsMenu.addItem("My Account", cmd);
-                                addComponent(settings);
+						// User menu
+						addComponent(new VerticalLayout() {
+							{
+								setSizeUndefined();
+								addStyleName("user");
+								Image profilePic = new Image(
+										null,
+										new ThemeResource("img/profile-pic.png"));
+								profilePic.setWidth("34px");
+								addComponent(profilePic);
+								Label userName = new Label(username);
+								userName.setSizeUndefined();
+								addComponent(userName);
 
-                                Button exit = new NativeButton("Exit");
-                                exit.addStyleName("icon-cancel");
-                                exit.setDescription("Sign Out");
-                                addComponent(exit);
-                                exit.addClickListener(new Button.ClickListener() {
-                                    @Override
-                                    public void buttonClick(Button.ClickEvent event) {
-                                        buildLoginView(true);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-                // Content
-                addComponent(content);
-                content.setSizeFull();
-                content.addStyleName("view-content");
-                setExpandRatio(content, 1);
-            }
-        });
+								MenuBar.Command cmd = new MenuBar.Command() {
+									@Override
+									public void menuSelected(
+											MenuBar.MenuItem selectedItem) {
+										Notification
+												.show("Not implemented in this demo");
+									}
+								};
+								MenuBar settings = new MenuBar();
+								MenuBar.MenuItem settingsMenu = settings.addItem("",
+										null);
+								settingsMenu.setStyleName("icon-cog");
+								settingsMenu.addItem("Settings", cmd);
+								settingsMenu.addItem("Preferences", cmd);
+								settingsMenu.addSeparator();
+								settingsMenu.addItem("My Account", cmd);
+								addComponent(settings);
 
-        menu.removeAllComponents();
+								Button exit = new NativeButton("Exit");
+								exit.addStyleName("icon-cancel");
+								exit.setDescription("Sign Out");
+								addComponent(exit);
+								exit.addClickListener(new Button.ClickListener() {
+									@Override
+									public void buttonClick(Button.ClickEvent event) {
+										buildLoginView(true);
+									}
+								});
+							}
+						});
+					}
+				});
+				// Content
+				addComponent(content);
+				content.setSizeFull();
+				content.addStyleName("view-content");
+				setExpandRatio(content, 1);
+			}
+		});
 
-        for (final String view : new String[]{"modules", "monitor"}) {
-            Button b = new NativeButton(view.substring(0, 1).toUpperCase()
-                    + view.substring(1).replace('-', ' '));
-            b.addStyleName("icon-" + view);
-            b.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    clearMenuSelection();
-                    event.getButton().addStyleName("selected");
-                    if (!nav.getState().equals("/" + view))
-                        nav.navigateTo("/" + view);
-                }
-            });
+		menu.removeAllComponents();
 
-            menu.addComponent(b);
-            viewNameToMenuButton.put("/" + view, b);
-        }
-        menu.addStyleName("menu");
-        menu.setHeight("100%");
+		for (final String view : new String[] {"modules", "monitor"}) {
+			Button b = new NativeButton(view.substring(0, 1).toUpperCase()
+					+ view.substring(1).replace('-', ' '));
+			b.addStyleName("icon-" + view);
+			b.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					clearMenuSelection();
+					event.getButton().addStyleName("selected");
+					if (!nav.getState().equals("/" + view))
+						nav.navigateTo("/" + view);
+				}
+			});
 
-        String f = Page.getCurrent().getUriFragment();
-        if (f != null && f.startsWith("!")) {
-            f = f.substring(1);
-        }
-        if (f == null || f.equals("") || f.equals("/")) {
-            nav.navigateTo("/modules");
-            menu.getComponent(0).addStyleName("selected");
-            helpManager.showHelpFor(ModulesView.class);
-        } else {
-            nav.navigateTo(f);
-            helpManager.showHelpFor(routes.get(f));
-            viewNameToMenuButton.get(f).addStyleName("selected");
-        }
+			menu.addComponent(b);
+			viewNameToMenuButton.put("/" + view, b);
+		}
+		menu.addStyleName("menu");
+		menu.setHeight("100%");
 
-        nav.addViewChangeListener(new ViewChangeListener() {
+		String f = Page.getCurrent().getUriFragment();
+		if (f != null && f.startsWith("!")) {
+			f = f.substring(1);
+		}
+		if (f == null || f.equals("") || f.equals("/")) {
+			nav.navigateTo("/modules");
+			menu.getComponent(0).addStyleName("selected");
+			helpManager.showHelpFor(ModulesView.class);
+		} else {
+			nav.navigateTo(f);
+			helpManager.showHelpFor(routes.get(f));
+			viewNameToMenuButton.get(f).addStyleName("selected");
+		}
 
-            @Override
-            public boolean beforeViewChange(ViewChangeListener.ViewChangeEvent event) {
-                helpManager.closeAll();
-                return true;
-            }
+		nav.addViewChangeListener(new ViewChangeListener() {
 
-            @Override
-            public void afterViewChange(ViewChangeListener.ViewChangeEvent event) {
-                View newView = event.getNewView();
-                helpManager.showHelpFor(newView);
-            }
-        });
-    }
+			@Override
+			public boolean beforeViewChange(ViewChangeListener.ViewChangeEvent event) {
+				helpManager.closeAll();
+				return true;
+			}
 
-    private void clearMenuSelection() {
-        for (Iterator<Component> it = menu.iterator(); it.hasNext(); ) {
-            Component next = it.next();
-            if (next instanceof NativeButton) {
-                next.removeStyleName("selected");
-            } else if (next instanceof DragAndDropWrapper) {
-                // Wow, this is ugly (even uglier than the rest of the code)
-                ((DragAndDropWrapper) next).iterator().next()
-                        .removeStyleName("selected");
-            }
-        }
-    }
+			@Override
+			public void afterViewChange(ViewChangeListener.ViewChangeEvent event) {
+				View newView = event.getNewView();
+				helpManager.showHelpFor(newView);
+			}
+		});
+	}
 
-    private static MainUI getInstance() {
-        return threadLocal.get();
-    }
+	private void clearMenuSelection() {
+		for (Iterator<Component> it = menu.iterator(); it.hasNext(); ) {
+			Component next = it.next();
+			if (next instanceof NativeButton) {
+				next.removeStyleName("selected");
+			} else if (next instanceof DragAndDropWrapper) {
+				// Wow, this is ugly (even uglier than the rest of the code)
+				((DragAndDropWrapper) next).iterator().next()
+						.removeStyleName("selected");
+			}
+		}
+	}
 
-    private static void setInstance(MainUI application) {
-        threadLocal.set(application);
-    }
+	private static MainUI getInstance() {
+		return threadLocal.get();
+	}
+
+	private static void setInstance(MainUI application) {
+		threadLocal.set(application);
+	}
 }

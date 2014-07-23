@@ -226,10 +226,11 @@ public class CommunicationManagerImpl implements CommunicationManager {
      */
     private void setupListener() {
         try {
+            // Do not close this connection otherwise server listener will be closed
             Connection connection = pooledConnectionFactory.createConnection();
-            //do not close this connection otherwise server listener will be closed
             connection.start();
             Session session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+
             Destination adminQueue = session.createTopic( this.amqServiceTopic );
             MessageConsumer consumer = session.createConsumer( adminQueue );
             communicationMessageListener = new CommunicationMessageListener();
@@ -238,6 +239,11 @@ public class CommunicationManagerImpl implements CommunicationManager {
             Destination advisoryDestination = AdvisorySupport.getConnectionAdvisoryTopic();
             MessageConsumer advConsumer = session.createConsumer( advisoryDestination );
             advConsumer.setMessageListener( communicationMessageListener );
+
+            // inotify topic
+            Destination inotifyTopic = session.createTopic( "INOTIFY_TOPIC" );
+            MessageConsumer inotifyConsumer = session.createConsumer( inotifyTopic );
+            inotifyConsumer.setMessageListener( communicationMessageListener );
         }
         catch ( JMSException ex ) {
             LOG.log( Level.SEVERE, "Error in setupListener", ex );

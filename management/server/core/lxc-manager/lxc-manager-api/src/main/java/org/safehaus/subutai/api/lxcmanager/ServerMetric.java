@@ -9,7 +9,7 @@ package org.safehaus.subutai.api.lxcmanager;
 import java.util.Collections;
 import java.util.Map;
 
-import org.safehaus.subutai.api.monitor.Metric;
+import org.safehaus.subutai.api.monitoring.Metric;
 
 
 /**

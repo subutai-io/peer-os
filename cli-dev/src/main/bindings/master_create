@@ -101,10 +101,6 @@ function master_create {
     echo subutai.config.path = $config_path >> $config
   done
 
-  for appdata_path in `echo "$SUBUTAI_APP_DATA_PATH" | sed -e "s/\:/ /g"`; do
-    echo subutai.app.data.path = $appdata_path >> $config
-  done
-
   # Add pre-start hook script entry
   echo lxc.hook.pre-start = $subutai_script_base/pre_start_hook >> $config
   echo subutai.parent = master >> $config
@@ -128,6 +124,8 @@ function master_create {
   lxc_wait_net master
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
       >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
+  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
+      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list 
   lxc-attach -n master -- apt-get update
   lxc-attach -n master -- apt-get -y dist-upgrade
 

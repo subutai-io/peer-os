@@ -1,8 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.shared.protocol;
+
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -14,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Dilshat
- */
+
 public class Request implements Serializable {
 
     private String source = null;
@@ -35,6 +30,7 @@ public class Request implements Serializable {
     private Map<String, String> environment = null;
     private Integer pid = null;
     private Integer timeout = 30;
+    private String confPoints[];
 
     public Request(String source, RequestType type, UUID uuid, UUID taskUuid, Integer requestSequenceNumber, String workingDirectory, String program, OutputRedirection stdOut, OutputRedirection stdErr, String stdOutPath, String stdErrPath, String runAs, List<String> args, Map<String, String> environment, Integer pid, Integer timeout) {
 
@@ -129,8 +125,24 @@ public class Request implements Serializable {
         return pid;
     }
 
+
+    public String[] getConfPoints() {
+        return confPoints;
+    }
+
+
+    public Request setConfPoints( String confPoints[] ) {
+        this.confPoints = confPoints;
+        return this;
+    }
+
+
     @Override
     public String toString() {
-        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment + ", pid=" + pid + ", timeout=" + timeout + '}';
+        return "Request{" + "source=" + source + ", type=" + type + ", uuid=" + uuid + ", taskUuid=" + taskUuid
+                + ", requestSequenceNumber=" + requestSequenceNumber + ", workingDirectory=" + workingDirectory
+                + ", program=" + program + ", stdOut=" + stdOut + ", stdErr=" + stdErr + ", stdOutPath=" + stdOutPath
+                + ", stdErrPath=" + stdErrPath + ", runAs=" + runAs + ", args=" + args + ", environment=" + environment
+                + ", pid=" + pid + ", timeout=" + timeout + '}';
     }
 }
