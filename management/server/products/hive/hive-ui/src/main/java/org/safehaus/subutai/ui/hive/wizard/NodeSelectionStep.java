@@ -1,7 +1,6 @@
 package org.safehaus.subutai.ui.hive.wizard;
 
 import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.subutai.api.hadoop.Config;
@@ -13,7 +12,6 @@ public class NodeSelectionStep extends Panel {
 
 	private final ComboBox hadoopClusters;
 	private final ComboBox serverNode;
-	private final TwinColSelect select;
 
 	public NodeSelectionStep(final Wizard wizard) {
 
@@ -26,7 +24,6 @@ public class NodeSelectionStep extends Panel {
 
 		hadoopClusters = new ComboBox("Hadoop cluster");
 		serverNode = makeServerNodeComboBox(wizard);
-		select = makeClientNodeSelector(wizard);
 
 		hadoopClusters.setImmediate(true);
 		hadoopClusters.setTextInputAllowed(false);
@@ -36,7 +33,6 @@ public class NodeSelectionStep extends Panel {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				serverNode.removeAllItems();
-				select.setValue(null);
 				if (event.getProperty().getValue() != null) {
                     Config hadoopInfo = (Config)event.getProperty().getValue();
                     List<Agent> slaves = hadoopInfo.getAllSlaveNodes();
@@ -55,14 +51,9 @@ public class NodeSelectionStep extends Panel {
                     }
                     serverNode.setValue(hadoopInfo.getNameNode());
                     filterNodes();
-					select.setContainerDataSource(new BeanItemContainer<>(
-									Agent.class, hadoopInfo.getAllNodes())
-					);
 					// do select if values exist
 					if (wizard.getConfig().getServer() != null)
 						serverNode.setValue(wizard.getConfig().getServer());
-					if (!Util.isCollectionEmpty(wizard.getConfig().getClients()))
-						select.setValue(wizard.getConfig().getClients());
 
 					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
 				}
@@ -117,7 +108,6 @@ public class NodeSelectionStep extends Panel {
 
 		content.addComponent(hadoopClusters);
 		content.addComponent(serverNode);
-		content.addComponent(select);
 		content.addComponent(buttons);
 
 		setContent(layout);
@@ -126,32 +116,6 @@ public class NodeSelectionStep extends Panel {
 
 	private void show(String notification) {
 		Notification.show(notification);
-	}
-
-	private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
-		TwinColSelect tcs = new TwinColSelect("Client nodes");
-		tcs.setItemCaptionPropertyId("hostname");
-		tcs.setRows(7);
-		tcs.setMultiSelect(true);
-		tcs.setImmediate(true);
-		tcs.setLeftColumnCaption("Available Nodes");
-		tcs.setRightColumnCaption("Selected Nodes");
-		tcs.setWidth(100, Unit.PERCENTAGE);
-		tcs.setRequired(true);
-		if (!Util.isCollectionEmpty(wizard.getConfig().getClients())) {
-			tcs.setValue(wizard.getConfig().getClients());
-		}
-		tcs.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				if (event.getProperty().getValue() != null) {
-					Set<Agent> clients = new HashSet();
-					clients.addAll((Collection) event.getProperty().getValue());
-					wizard.getConfig().setClients(clients);
-				}
-			}
-		});
-		return tcs;
 	}
 
 	private ComboBox makeServerNodeComboBox(final Wizard wizard) {
@@ -163,17 +127,13 @@ public class NodeSelectionStep extends Panel {
 		cb.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				Agent serverNode = (Agent) event.getProperty().getValue();
-				wizard.getConfig().setServer(serverNode);
+                Agent hiveMaster = (Agent)event.getProperty().getValue();
+                wizard.getConfig().setServer(hiveMaster);
 
 				Config hci = (Config) hadoopClusters.getValue();
-				select.removeAllItems();
-				for (Agent a : hci.getAllNodes()) {
-					if (a.equals(serverNode)) continue;
-					select.addItem(a);
-					select.setItemCaption(a, a.getHostname());
-				}
-			}
+                wizard.getConfig().getClients().addAll(hci.getAllNodes());
+                wizard.getConfig().getClients().remove(hiveMaster);
+            }
 		});
 		if (wizard.getConfig().getServer() != null)
 			cb.setValue(wizard.getConfig().getServer());
