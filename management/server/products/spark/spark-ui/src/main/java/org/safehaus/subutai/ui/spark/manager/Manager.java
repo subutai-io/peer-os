@@ -239,7 +239,8 @@ public class Manager {
 			progressIcon.setVisible(false);
 
 			table.addItem(new Object[] {
-							agent.getHostname(),
+							agent.getHostname()
+                                    + String.format( " (%s)", agent.getListIP().get( 0 ) ),
 							checkBtn,
 							startBtn,
 							stopBtn,
@@ -416,7 +417,8 @@ public class Manager {
 		progressIcon.setVisible(false);
 
 		table.addItem(new Object[] {
-						MASTER_PREFIX + master.getHostname(),
+						MASTER_PREFIX + master.getHostname()
+                                + String.format( " (%s)", master.getListIP().get( 0 ) ),
 						checkBtn,
 						startBtn,
 						stopBtn,
@@ -452,6 +454,11 @@ public class Manager {
 		startBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
+
+                if ( !stopBtn.isEnabled() ) {
+                    Notification.show( "Node already started" );
+                }
+
 				progressIcon.setVisible(true);
 				startBtn.setEnabled(false);
 				stopBtn.setEnabled(false);
@@ -475,6 +482,11 @@ public class Manager {
 		stopBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
+
+                if ( !startBtn.isEnabled() ) {
+                    Notification.show( "Node already stopped" );
+                }
+
 				progressIcon.setVisible(true);
 				startBtn.setEnabled(false);
 				stopBtn.setEnabled(false);
@@ -497,8 +509,9 @@ public class Manager {
 	}
 
 	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getSlaveNodes(), config.getMasterNode());
+        if (config != null) {
+			populateTable( nodesTable, config.getSlaveNodes(), config.getMasterNode() );
+            checkAllNodesStatus();
 		} else {
 			nodesTable.removeAllItems();
 		}
