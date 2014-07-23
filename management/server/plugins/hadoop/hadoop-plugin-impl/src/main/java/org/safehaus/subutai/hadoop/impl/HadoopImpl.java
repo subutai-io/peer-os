@@ -2,8 +2,8 @@ package org.safehaus.subutai.hadoop.impl;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.hadoop.api.Config;
@@ -12,7 +12,9 @@ import org.safehaus.subutai.hadoop.impl.operation.Adding;
 import org.safehaus.subutai.hadoop.impl.operation.Deletion;
 import org.safehaus.subutai.hadoop.impl.operation.Installation;
 import org.safehaus.subutai.hadoop.impl.operation.configuration.*;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,13 +26,29 @@ import java.util.concurrent.Executors;
  */
 public class HadoopImpl implements Hadoop {
 	public static final String MODULE_NAME = "Hadoop";
+
 	private static CommandRunner commandRunner;
-	private AgentManager agentManager;
-	private DbManager dbManager;
-	private Tracker tracker;
-	private LxcManager lxcManager;
-	private NetworkManager networkManager;
-	private ExecutorService executor;
+	private static AgentManager agentManager;
+	private static DbManager dbManager;
+	private static Tracker tracker;
+	private static ContainerManager containerManager;
+	private static NetworkManager networkManager;
+	private static ExecutorService executor;
+
+	public HadoopImpl(AgentManager agentManager,
+	                  Tracker tracker,
+	                  CommandRunner commandRunner,
+	                  DbManager dbManager,
+	                  NetworkManager networkManager,
+	                  ContainerManager containerManager) {
+
+		HadoopImpl.agentManager = agentManager;
+		HadoopImpl.tracker = tracker;
+		HadoopImpl.commandRunner = commandRunner;
+		HadoopImpl.dbManager = dbManager;
+		HadoopImpl.networkManager = networkManager;
+		HadoopImpl.containerManager = containerManager;
+	}
 
 	public void init() {
 		executor = Executors.newCachedThreadPool();
@@ -45,51 +63,27 @@ public class HadoopImpl implements Hadoop {
 		return commandRunner;
 	}
 
-	public void setCommandRunner(CommandRunner commandRunner) {
-		HadoopImpl.commandRunner = commandRunner;
-	}
-
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
-
-	public void setDbManager(DbManager dbManager) {
-		this.dbManager = dbManager;
-	}
-
-	public void setTracker(Tracker tracker) {
-		this.tracker = tracker;
-	}
-
-	public void setLxcManager(LxcManager lxcManager) {
-		this.lxcManager = lxcManager;
-	}
-
-	public void setNetworkManager(NetworkManager networkManager) {
-		this.networkManager = networkManager;
-	}
-
-	public DbManager getDbManager() {
+	public static DbManager getDbManager() {
 		return dbManager;
 	}
 
-	public Tracker getTracker() {
+	public static Tracker getTracker() {
 		return tracker;
 	}
 
-	public LxcManager getLxcManager() {
-		return lxcManager;
+	public static ContainerManager getContainerManager() {
+		return containerManager;
 	}
 
-	public NetworkManager getNetworkManager() {
+	public static NetworkManager getNetworkManager() {
 		return networkManager;
 	}
 
-	public ExecutorService getExecutor() {
+	public static ExecutorService getExecutor() {
 		return executor;
 	}
 
-	public AgentManager getAgentManager() {
+	public static AgentManager getAgentManager() {
 		return agentManager;
 	}
 
@@ -191,5 +185,12 @@ public class HadoopImpl implements Hadoop {
 	@Override
 	public Config getCluster(String clusterName) {
 		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+	}
+
+	@Override
+	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, AgentManager agentManager,
+	                                                    CommandRunner commandRunner, ContainerManager containerManager,
+	                                                    Config config) {
+		return new HadoopDbSetupStrategy(po, this, containerManager, config);
 	}
 }

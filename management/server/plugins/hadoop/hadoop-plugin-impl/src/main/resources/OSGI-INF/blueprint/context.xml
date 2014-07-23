@@ -9,19 +9,19 @@
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
-    <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.container.ContainerManager"/>
     <reference id="networkManager" availability="mandatory"
                interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
 
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.hadoop.impl.HadoopImpl"
           init-method="init" destroy-method="destroy">
-        <property name="commandRunner" ref="commandRunner"/>
-        <property name="tracker" ref="tracker"/>
-        <property name="agentManager" ref="agentManager"/>
-        <property name="dbManager" ref="dbManager"/>
-        <property name="lxcManager" ref="lxcManager"/>
-        <property name="networkManager" ref="networkManager"/>
+        <argument ref="agentManager"/>
+        <argument ref="tracker"/>
+        <argument ref="commandRunner"/>
+        <argument ref="dbManager"/>
+        <argument ref="networkManager"/>
+        <argument ref="containerManager"/>
     </bean>
 
     <service ref="hadoop-impl" interface="org.safehaus.subutai.hadoop.api.Hadoop"/>

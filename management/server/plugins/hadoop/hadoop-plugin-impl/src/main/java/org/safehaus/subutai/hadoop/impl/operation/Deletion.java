@@ -4,8 +4,8 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.hadoop.api.Config;
 import org.safehaus.subutai.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.Agent;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -43,7 +43,9 @@ public class Deletion {
 				po.addLog("Destroying lxc containers...");
 
 				try {
-					parent.getLxcManager().destroyLxcs(new HashSet<>(config.getAllNodes()));
+					for (Agent agent : config.getAllNodes()) {
+						HadoopImpl.getContainerManager().cloneDestroy(agent.getParentHostName(), agent.getHostname());
+					}
 					po.addLog("Lxc containers successfully destroyed");
 				} catch (LxcDestroyException ex) {
 					po.addLog(String.format("%s, skipping...", ex.getMessage()));

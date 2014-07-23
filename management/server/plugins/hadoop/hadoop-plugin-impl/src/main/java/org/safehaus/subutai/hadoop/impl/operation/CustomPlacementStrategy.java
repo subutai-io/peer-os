@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class CustomPlacementStrategy extends LxcPlacementStrategy {
+public class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 	public static final String MASTER_NODE_TYPE = "master";
 	public static final String SLAVE_NODE_TYPE = "slave";
