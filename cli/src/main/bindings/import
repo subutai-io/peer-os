@@ -40,6 +40,7 @@ function import {
   # ----------------------------------------------------------------------------
   msg_info "APT_GET_INVOCATION:" $APT_GET_INVOCATION
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+        msg_info "subutai import called from command line"
     local debian_package_name=`get_debian_package_name $container`
     local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
     local package_name=`get_package_name $container`
