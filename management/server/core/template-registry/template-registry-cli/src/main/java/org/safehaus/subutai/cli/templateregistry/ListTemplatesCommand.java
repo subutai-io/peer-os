@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
-import org.safehaus.subutai.api.templateregistry.TemplateTree;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -16,20 +18,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
  */
 @Command( scope = "registry", name = "list-templates", description = "List templates" )
 public class ListTemplatesCommand extends OsgiCommandSupport {
+    @Argument( index = 0, name = "lxc arch", required = false, multiValued = false,
+            description = "lxc arch, default = amd64" )
+    String lxcArch;
 
     private TemplateRegistryManager templateRegistryManager;
-
-
-    private void listFamily( int level, TemplateTree tree, Template currentTemplate ) {
-        System.out.println(
-                String.format( "%" + ( level > 0 ? level : "" ) + "s %s", "", currentTemplate.getTemplateName() ) );
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( !( children == null || children.isEmpty() ) ) {
-            for ( Template child : children ) {
-                listFamily( level + 1, tree, child );
-            }
-        }
-    }
 
 
     public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager ) {
@@ -40,12 +33,14 @@ public class ListTemplatesCommand extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
 
-        TemplateTree tree = templateRegistryManager.getTemplateTree();
-        List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null ) {
-            for ( Template template : uberTemplates ) {
-                listFamily( 0, tree, template );
-            }
+        List<Template> templates = Strings.isNullOrEmpty( lxcArch ) ? templateRegistryManager.getAllTemplates() :
+                                   templateRegistryManager.getAllTemplates( lxcArch );
+
+
+        for ( Template template : templates ) {
+            System.out.println( String.format( "%s %s", template.getTemplateName(),
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" :
+                    template.getParentTemplateName() ) );
         }
 
         return null;

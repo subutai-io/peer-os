@@ -145,6 +145,11 @@
       <version>${snakeyaml.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.esotericsoftware.yamlbeans</groupId>
+      <artifactId>yamlbeans</artifactId>
+      <version>${yamlbeans.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
       <version>${org.apache.commons.beanutils.version}</version>
@@ -566,6 +571,11 @@
                   <groupId>org.yaml</groupId>
                   <artifactId>snakeyaml</artifactId>
                   <version>${snakeyaml.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.esotericsoftware.yamlbeans</groupId>
+                  <artifactId>yamlbeans</artifactId>
+                  <version>${yamlbeans.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-beanutils</groupId>
@@ -1182,6 +1192,33 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- MongoDB 2 -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mongodb-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Oozie -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -1412,6 +1449,33 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>zookeeper-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Zookeeper 2-->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>zookeeper-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>zookeeper-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>zookeeper-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>zookeeper-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>zookeeper-plugin-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
