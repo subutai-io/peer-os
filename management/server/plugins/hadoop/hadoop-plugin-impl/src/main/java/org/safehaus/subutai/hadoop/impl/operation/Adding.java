@@ -4,12 +4,13 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.hadoop.api.Config;
+import org.safehaus.subutai.hadoop.api.NodeType;
+import org.safehaus.subutai.hadoop.impl.HadoopDbSetupStrategy;
 import org.safehaus.subutai.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.hadoop.impl.operation.common.AddNodeOperation;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,13 +45,13 @@ public class Adding {
 
 				try {
 					po.addLog(String.format("Creating %d lxc container...", 1));
-					Map<Agent, Set<Agent>> lxcAgentsMap = parent.getLxcManager().createLxcs(1);
+					Set<Agent> cfgServers = HadoopImpl.getContainerManager()
+							.clone(HadoopDbSetupStrategy.TEMPLATE_NAME, 3, HadoopImpl.getAgentManager().getPhysicalAgents(),
+									HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType(NodeType.SLAVE_NODE));
 					Agent agent = null;
 
-					for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
-						for (Agent a : entry.getValue()) {
-							agent = a;
-						}
+					for (Agent a : cfgServers) {
+						agent = a;
 					}
 					po.addLog("Lxc containers created successfully\nConfiguring network...");
 

@@ -1,8 +1,5 @@
 package org.safehaus.subutai.hadoop.api;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ApiBase;
@@ -47,7 +44,5 @@ public interface Hadoop extends ApiBase<Config> {
 
 	public UUID unblockTaskTracker(Config config, Agent agent);
 
-	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, AgentManager agentManager,
-	                                                    CommandRunner commandRunner, ContainerManager containerManager,
-	                                                    Config config);
+	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, Config config);
 }

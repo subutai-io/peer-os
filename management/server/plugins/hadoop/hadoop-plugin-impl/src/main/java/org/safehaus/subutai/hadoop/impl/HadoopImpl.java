@@ -188,9 +188,7 @@ public class HadoopImpl implements Hadoop {
 	}
 
 	@Override
-	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, AgentManager agentManager,
-	                                                    CommandRunner commandRunner, ContainerManager containerManager,
-	                                                    Config config) {
+	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, Config config) {
 		return new HadoopDbSetupStrategy(po, this, containerManager, config);
 	}
 }

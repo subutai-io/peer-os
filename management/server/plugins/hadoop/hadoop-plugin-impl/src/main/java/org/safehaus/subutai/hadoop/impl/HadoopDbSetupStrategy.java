@@ -1,6 +1,7 @@
 package org.safehaus.subutai.hadoop.impl;
 
 
+import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
@@ -83,40 +84,42 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 	@Override
 	public Config setup() throws ClusterSetupException {
 
+		if (config == null ||
+				Strings.isNullOrEmpty(config.getClusterName()) ||
+				Strings.isNullOrEmpty(config.getDomainName())) {
+			po.addLogFailed("Malformed configuration\nHadoop installation aborted");
+		} else {
+			//check if mongo cluster with the same name already exists
+			if (hadoopManager.getCluster(config.getClusterName()) != null) {
+				po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted",
+						config.getClusterName()));
+			} else {
+				try {
+					po.addLog(String.format("Creating %d master servers...", 3));
+					Set<Agent> cfgServers = containerManager
+							.clone(TEMPLATE_NAME, 3, HadoopImpl.getAgentManager().getPhysicalAgents(),
+									getNodePlacementStrategyByNodeType(NodeType.MASTER_NODE));
 
-		//check if mongo cluster with the same name already exists
-		if (hadoopManager.getCluster(config.getClusterName()) != null) {
-			throw new ClusterSetupException(
-					String.format("Cluster with name '%s' already exists\nInstallation aborted",
-							config.getClusterName()));
+					po.addLog(String.format("Creating %d slave nodes...", config.getCountOfSlaveNodes()));
+					Set<Agent> dataNodes = containerManager
+							.clone(TEMPLATE_NAME, config.getCountOfSlaveNodes(), HadoopImpl.getAgentManager().getPhysicalAgents(),
+									getNodePlacementStrategyByNodeType(NodeType.SLAVE_NODE));
+
+					setMasterNodes(cfgServers);
+					setSlaveNodes(dataNodes);
+
+					po.addLog("Lxc containers created successfully");
+
+					//continue installation here
+
+					installHadoopCluster();
+
+					//@todo add containers destroyal in case of failure
+				} catch (LxcCreateException ex) {
+					po.addLogFailed(ex.getMessage());
+				}
+			}
 		}
-
-		try {
-
-			po.addLog(String.format("Creating %d master servers...", 3));
-			Set<Agent> cfgServers = containerManager
-					.clone(TEMPLATE_NAME, 3, HadoopImpl.getAgentManager().getPhysicalAgents(),
-							getNodePlacementStrategyByNodeType(NodeType.MASTER_NODE));
-
-			po.addLog(String.format("Creating %d slave nodes...", config.getCountOfSlaveNodes()));
-			Set<Agent> dataNodes = containerManager
-					.clone(TEMPLATE_NAME, config.getCountOfSlaveNodes(), HadoopImpl.getAgentManager().getPhysicalAgents(),
-							getNodePlacementStrategyByNodeType(NodeType.SLAVE_NODE));
-
-			setMasterNodes(cfgServers);
-			setSlaveNodes(dataNodes);
-
-			po.addLog("Lxc containers created successfully");
-
-			//continue installation here
-
-			installHadoopCluster();
-
-			//@todo add containers destroyal in case of failure
-		} catch (LxcCreateException ex) {
-			throw new ClusterSetupException(ex.getMessage());
-		}
-
 
 		return config;
 	}
