@@ -1,23 +1,32 @@
 package org.safehaus.subutai.api.hive;
 
+import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
-
-import java.util.Set;
 
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Hive";
     private String clusterName = "";
+    private String hadoopClusterName = "";
     private Agent server;
     private Set<Agent> clients;
 
+    @Override
     public String getClusterName() {
         return clusterName;
     }
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
     }
 
     @Override

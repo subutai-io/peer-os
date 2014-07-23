@@ -354,17 +354,12 @@ public class Manager {
 		List<Config> clustersInfo = HiveUI.getManager().getClusters();
 		if (clustersInfo != null && clustersInfo.size() > 0) {
 			for (Config ci : clustersInfo) {
-				clusterCombo.addItem(ci);
-				clusterCombo.setItemCaption(ci, ci.getClusterName());
-			}
-			if (current != null) {
-				for (Config ci : clustersInfo) {
-					if (ci.getClusterName().equals(current.getClusterName())) {
-						clusterCombo.setValue(ci);
-						return;
-					}
-				}
-			}
+                clusterCombo.addItem(ci);
+                String cap = String.format("%s [%s]", ci.getClusterName(),
+                        ci.getHadoopClusterName());
+                clusterCombo.setItemCaption(ci, cap);
+            }
+            clusterCombo.setValue(current);
 		}
 	}
 

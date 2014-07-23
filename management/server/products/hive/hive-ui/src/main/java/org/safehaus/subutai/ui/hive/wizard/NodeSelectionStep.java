@@ -22,6 +22,16 @@ public class NodeSelectionStep extends Panel {
 		content.setSpacing(true);
 		content.setMargin(true);
 
+        TextField nameTxt = new TextField("Cluster name");
+        nameTxt.setRequired(true);
+        nameTxt.addValueChangeListener(new Property.ValueChangeListener() {
+
+            @Override
+            public void valueChange(Property.ValueChangeEvent e) {
+                wizard.getConfig().setClusterName(e.getProperty().getValue().toString().trim());
+            }
+        });
+
 		hadoopClusters = new ComboBox("Hadoop cluster");
 		serverNode = makeServerNodeComboBox(wizard);
 
@@ -56,7 +66,7 @@ public class NodeSelectionStep extends Panel {
                     else
                         serverNode.setValue(hadoopInfo.getNameNode());
 
-					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+                    wizard.getConfig().setHadoopClusterName(hadoopInfo.getClusterName());
 				}
 			}
 		});
@@ -76,16 +86,17 @@ public class NodeSelectionStep extends Panel {
 		next.addStyleName("default");
 		next.addClickListener(new Button.ClickListener() {
 			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
-					show("Select Hadoop cluster");
-				} else if (wizard.getConfig().getServer() == null) {
-					show("Select server node");
-				} else if (Util.isCollectionEmpty(wizard.getConfig().getClients())) {
-					show("Select client nodes");
-				} else {
-					wizard.next();
-				}
+            public void buttonClick(Button.ClickEvent clickEvent) {
+				if (Util.isStringEmpty(wizard.getConfig().getClusterName()))
+                    show("Enter name for Hive installation");
+                else if(Util.isStringEmpty(wizard.getConfig().getHadoopClusterName()))
+                    show("Select Hadoop cluster");
+                else if(wizard.getConfig().getServer() == null)
+                    show("Select server node");
+                else if(Util.isCollectionEmpty(wizard.getConfig().getClients()))
+                    show("Select client nodes");
+                else
+                    wizard.next();
 			}
 		});
 
@@ -107,6 +118,7 @@ public class NodeSelectionStep extends Panel {
 		buttons.addComponent(back);
 		buttons.addComponent(next);
 
+        content.addComponent(nameTxt);
 		content.addComponent(hadoopClusters);
 		content.addComponent(serverNode);
 		content.addComponent(buttons);
