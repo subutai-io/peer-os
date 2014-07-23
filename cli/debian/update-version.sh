@@ -14,26 +14,27 @@
 
 # This function returns 0 if variable is empty, 1 if not empty
 function isChanged {
-
-  variable=$1
-  if [ -n "$variable" ]; then
+  if [ -n "$1" ]; then
     return 0
   else
     return 1
+  fi
+}
+function checkIfCommitNecessary {
+  local changelogFile=$1
+  cli_git_status=$(git status | grep "cli/")
+  isChanged $cli_git_status
+  isCommitNecessary=$?
+  if [ $isCommitNecessary = "1" ]; then
+    git chechout -- $changelogFile
+    exit 0
   fi
 }
 
 # Switch to root .git directory to see changes properly
 pushd ..
 changelogFile="debian/changelog"
-cli_git_status=$(git status | grep "cli/")
-isChanged $cli_git_status
-isCommitNecessary=$?
-if [ $isCommitNecessary = "1" ]; then
-  git chechout -- $changelogFile 
-  exit 0
-fi
-
+checkIfCommitNecessary $changelogFile
 popd
 
 
