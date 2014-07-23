@@ -4,6 +4,7 @@ import org.safehaus.subutai.hadoop.api.Config;
 import org.safehaus.subutai.hadoop.impl.HadoopDbSetupStrategy;
 import org.safehaus.subutai.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 
 import java.util.UUID;
 
@@ -26,6 +27,11 @@ public class Installation {
 			@Override
 			public void run() {
 				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, HadoopImpl.getContainerManager(), config);
+				try {
+					strategy.setup();
+				} catch (ClusterSetupException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
