@@ -49,17 +49,16 @@ function import {
       exit 1
     fi
 
-    pushd . > /dev/null
     cd $SUBUTAI_TMPDIR
     dpkg -i $debian_file
     if [ $? -eq 0 ]; then
       msg_ok "Debian package of $package_name is installed succesfully"
+      exit 0
     else
       msg_error "Debian package of $package_name could not be installed, removing"
-      apt-get --assume-yes --force-yes purge $package_name
+      subutai destroy $container
       exit 1
     fi
-    popd > /dev/null
   else
     msg_info "subutai import called while installing template from the debian package"
   fi
