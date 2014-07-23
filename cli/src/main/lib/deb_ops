@@ -131,6 +131,8 @@ function create_control_file {
   chmod 664 $control_file
 
   echo Package: $Package >> $control_file
+  echo "Priority: optional" >> $control_file
+  echo "Section: devel" >> $control_file
   echo Maintainer: $Maintainer >> $control_file
   echo Architecture: $Architecture >> $control_file
   echo Version: $Version >> $control_file
