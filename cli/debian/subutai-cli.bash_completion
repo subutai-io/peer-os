@@ -67,7 +67,9 @@ _subutai-dev()
             ;;
         master_export)
             ;;
-        setup)
+        master_import)
+	    ;;
+	setup)
             ;;
         clone | demote | destroy | publish)
             localArgs=$(subutai -q list -t)
