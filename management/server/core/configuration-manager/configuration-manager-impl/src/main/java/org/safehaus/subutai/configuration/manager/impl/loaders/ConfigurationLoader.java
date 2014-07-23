@@ -13,5 +13,5 @@ public interface ConfigurationLoader {
 
     public JsonObject getConfiguration( Agent agent, String configPathFilename );
 
-    public void setConfiguration( Agent agent, JsonObject config );
+    public boolean setConfiguration( Agent agent, String configFilePath, String jsonObjectConfig);
 }

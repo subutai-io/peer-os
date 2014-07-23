@@ -12,6 +12,7 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
@@ -34,6 +35,7 @@ public class IniParser implements ConfigParser {
     }
 
 
+    //    @Override
     public Object getProperty( String propertyName ) {
         return config.getString( propertyName );
     }
@@ -71,13 +73,23 @@ public class IniParser implements ConfigParser {
         while ( iterator.hasNext() ) {
             String key = iterator.next();
             String value = ( String ) config.getProperty( key );
-            JsonObject field = configBuilder
-                    .buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
+            JsonObject field =
+                    configBuilder.buildFieldJsonObject( key.trim(), key.trim(), true, "textfield", true, value.trim() );
             fields.add( field );
         }
 
         JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
 
         return njo;
+    }
+
+
+    public void setValuesFromJsonObject( JsonObject jsonObject ) {
+        JsonArray jsonArray = jsonObject.getAsJsonArray( "configFields" );
+        for ( int i = 0; i < jsonArray.size(); i++ ) {
+            JsonObject jo = ( JsonObject ) jsonArray.get( i );
+            String fieldName = jo.getAsJsonPrimitive( "fieldName" ).getAsString();
+            String value = jo.getAsJsonPrimitive( "value" ).getAsString();
+        }
     }
 }

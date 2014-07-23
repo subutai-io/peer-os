@@ -11,4 +11,8 @@ import com.google.gson.JsonObject;
  */
 public interface ConfigParser {
     JsonObject parserConfig(String pathToConfig, ConfigTypeEnum configTypeEnum);
+
+//    public void setProperty( String path, String value );
+
+//    public Object getProperty( String path );
 }

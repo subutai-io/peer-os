@@ -27,7 +27,7 @@ public class ConfigurationLogicImpl implements ConfigurationLogic {
 
 
     public void doSomeTask() {
-        configManager.injectConfiguration( null, null );
+        configManager.injectConfiguration( null, null, null, null );
     }
 
 
