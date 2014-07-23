@@ -63,20 +63,15 @@ public class Commands extends CommandsSingleton {
     }
 
 
-    public static Command getUpdateSettingsCommand( String zkName, Set<Agent> agents ) {
-        StringBuilder zkNames = new StringBuilder();
-        int id = 0;
-        for ( Agent agent : agents ) {
-            zkNames.append( agent.getHostname() ).append( ++id ).append( " " );
-        }
-
+    public static Command getConfigureClusterCommand( Set<Agent> agents, String myIdFilePath, String zooCfgFileContents,
+                                                      String zooCfgFilePath ) {
         Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
 
-        id = 0;
+        int id = 0;
         for ( Agent agent : agents ) {
             requestBuilders.add( new AgentRequestBuilder( agent,
-                    String.format( ". /etc/profile && zookeeper-conf.sh %s && zookeeper-setID.sh %s", zkNames,
-                            ++id ) ) );
+                    String.format( "echo '%s' > %s && echo '%s' > %s", ++id, myIdFilePath, zooCfgFileContents,
+                            zooCfgFilePath ) ) );
         }
 
         return createCommand( requestBuilders );
