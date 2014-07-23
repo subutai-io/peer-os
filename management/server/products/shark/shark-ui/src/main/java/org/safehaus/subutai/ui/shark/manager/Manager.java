@@ -236,6 +236,9 @@ public class Manager {
 
 	public void refreshClustersInfo() {
 		List<Config> clustersInfo = SharkUI.getSharkManager().getClusters();
+
+        System.out.println( ">> " + clustersInfo );
+
 		Config clusterInfo = (Config) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (clustersInfo != null && clustersInfo.size() > 0) {
