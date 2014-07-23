@@ -64,9 +64,10 @@ function deb_pkg {
   create_control_file $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
-  # (3) create postinst script of debian package
+  # (3) create postinst and postrm script of debian package
   # ----------------------------------------------------------------------------
   create_postinst_script $lxc $debian_dir
+  create_postrm_script $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
   # (4) create debian package
@@ -143,7 +144,6 @@ function create_control_file {
 # -----------------------------------------------------------------------------
 function create_postinst_script {
   local lxc=$1
-  local package_name=`get_package_name $lxc`
   local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
@@ -155,6 +155,25 @@ function create_postinst_script {
     echo "subutai import $lxc" >> $postinst_file
   fi
   chmod 755 $postinst_file
+}
+
+
+# -----------------------------------------------------------------------------
+# Creates postinst script of debian package
+# -----------------------------------------------------------------------------
+function create_postrm_script {
+  local lxc=$1
+  local debian_dir=$2
+  local postrm_file=$debian_dir/DEBIAN/postrm
+  echo "#!/bin/bash"  >> $postrm_file
+  echo "set -e"  >> $postrm_file
+  echo ""  >> $postrm_file
+  # Check if the template is master
+  if [ $lxc != "master" ]; then
+    echo "export APT_GET_INVOCATION=true" >> $postrm_file
+    echo "subutai destroy $lxc" >> $postrm_file
+  fi
+  chmod 755 $postrm_file
 }
 
 
