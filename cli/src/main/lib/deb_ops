@@ -164,7 +164,7 @@ function create_postinst_script {
 function create_postrm_script {
   local lxc=$1
   local debian_dir=$2
-  local postrm_file=$debian_dir/DEBIAN/postrm
+  local postrm_file=$debian_dir/DEBIAN/prerm
   echo "#!/bin/bash"  >> $postrm_file
   echo ""  >> $postrm_file
   # Check if the template is master

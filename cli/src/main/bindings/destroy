@@ -89,6 +89,7 @@ function destroy {
   # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
+  exit 0
 }
 
 
