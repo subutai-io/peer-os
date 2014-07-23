@@ -169,9 +169,7 @@ public class ZookeeperImpl implements Zookeeper {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, final ProductOperation po,
-                                                         final ContainerManager containerManager,
-                                                         final CommandRunner commandRunner ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po ) {
         return new ZookeeperSetupStrategy( config, po, containerManager, commandRunner );
     }
 

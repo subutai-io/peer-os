@@ -10,10 +10,13 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
+import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
@@ -136,17 +139,26 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() ) {
-                po.addLog( "Installation succeeded\nUpdating settings..." );
+                po.addLog( "Installation succeeded\nConfiguring cluster..." );
 
-                //update settings
-                Command updateSettingsCommand =
-                        Commands.getUpdateSettingsCommand( config.getZkName(), config.getNodes() );
-                manager.getCommandRunner().runCommand( updateSettingsCommand );
+                Command configureClusterCommand;
+                try {
+                    configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+                            ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+                }
+                catch ( ClusterConfigurationException e ) {
+                    po.addLogFailed( String.format( "Error configuring cluster %s", e.getMessage() ) );
+                    return;
+                }
 
-                if ( updateSettingsCommand.hasSucceeded() ) {
+                manager.getCommandRunner().runCommand( configureClusterCommand );
+
+                if ( configureClusterCommand.hasSucceeded() ) {
 
                     po.addLog(
-                            String.format( "Settings updated\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
+                            String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
                     //start all nodes
                     Command startCommand = Commands.getStartCommand( config.getNodes() );
                     final AtomicInteger count = new AtomicInteger();
@@ -172,8 +184,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                 }
                 else {
                     po.addLogFailed( String.format(
-                            "Failed to update settings, %s\nPlease update settings manually and restart the cluster",
-                            updateSettingsCommand.getAllErrors() ) );
+                            "Failed to configure cluster, %s\nPlease configure cluster manually and restart it",
+                            configureClusterCommand.getAllErrors() ) );
                 }
             }
             else {
@@ -191,9 +203,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
      */
     private void installStandalone() {
 
-        ClusterSetupStrategy clusterSetupStrategy =
-                manager.getClusterSetupStrategy( config, po, manager.getContainerManager(),
-                        manager.getCommandRunner() );
+        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {
             ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
