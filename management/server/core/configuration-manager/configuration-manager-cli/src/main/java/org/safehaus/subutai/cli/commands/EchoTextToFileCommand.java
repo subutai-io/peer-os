@@ -21,7 +21,7 @@ public class EchoTextToFileCommand extends OsgiCommandSupport {
     @Argument( index = 0, name = "hostname", required = true, multiValued = false, description = "Path to file" )
     String hostname;
     @Argument( index = 1, name = "json", required = true, multiValued = false, description = "Path to file" )
-    String jsonObjectConfigString;
+    String json;
     @Argument( index = 2, name = "pathToFile", required = true, multiValued = false, description = "Path to file" )
     String pathToFile;
     @Argument( index = 3, name = "type", required = true, multiValued = false, description = "Configuration type" )
@@ -56,7 +56,7 @@ public class EchoTextToFileCommand extends OsgiCommandSupport {
 
 
         boolean result = configManager
-                .injectConfiguration( agent, pathToFile, jsonObjectConfigString, ConfigTypeEnum.valueOf( type ) );
+                .injectConfiguration( agent, pathToFile, json, ConfigTypeEnum.valueOf( type ) );
 
         System.out.println( result );
 
