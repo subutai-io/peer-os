@@ -39,7 +39,7 @@ function import {
   # (1) Install the debian package if subutai import not called during a debian package installation
   # ----------------------------------------------------------------------------
   msg_info "APT_GET_INVOCATION:" $APT_GET_INVOCATION
-  if [ ! $APT_GET_INVOCATION = "true" ]; then
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     local debian_package_name=`get_debian_package_name $container`
     local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
     local package_name=`get_package_name $container`
