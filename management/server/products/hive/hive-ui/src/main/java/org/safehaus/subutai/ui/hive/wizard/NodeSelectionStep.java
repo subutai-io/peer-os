@@ -49,11 +49,12 @@ public class NodeSelectionStep extends Panel {
                             caption += " [Slave node]";
                         serverNode.setItemCaption(a, caption);
                     }
-                    serverNode.setValue(hadoopInfo.getNameNode());
                     filterNodes();
-					// do select if values exist
-					if (wizard.getConfig().getServer() != null)
-						serverNode.setValue(wizard.getConfig().getServer());
+                    // do select if already done; o/w select name node
+                    if(wizard.getConfig().getServer() != null)
+                        serverNode.setValue(wizard.getConfig().getServer());
+                    else
+                        serverNode.setValue(hadoopInfo.getNameNode());
 
 					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
 				}
