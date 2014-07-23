@@ -239,7 +239,8 @@ public class Manager {
 			progressIcon.setVisible(false);
 
 			table.addItem(new Object[] {
-							agent.getHostname(),
+							agent.getHostname()
+                                    + String.format( " (%s)", agent.getListIP().get( 0 ) ),
 							checkBtn,
 							startBtn,
 							stopBtn,
@@ -416,7 +417,8 @@ public class Manager {
 		progressIcon.setVisible(false);
 
 		table.addItem(new Object[] {
-						MASTER_PREFIX + master.getHostname(),
+						MASTER_PREFIX + master.getHostname()
+                                + String.format( " (%s)", master.getListIP().get( 0 ) ),
 						checkBtn,
 						startBtn,
 						stopBtn,
