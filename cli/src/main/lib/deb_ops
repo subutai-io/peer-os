@@ -91,6 +91,71 @@ function deb_pkg {
   fi
 }
 
+# ----------------------------------------------------------------------------
+# Similiar to deb_pkg function expect it specialized for master debian package
+# ----------------------------------------------------------------------------
+function deb_pkg_master {
+  local lxc="$1"
+
+  if [ -z "$lxc" ]; then
+    msg_error "lxc name not provided. Aborting ..."
+    exit 1
+  fi
+
+  local tmp="$SUBUTAI_TMPDIR"
+  local tmp_path="$tmp/$lxc"
+  local debian_package_name=`get_debian_package_name $lxc`
+  local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  local debian_copy_dir=$debian_dir/$tmp_path
+  # ----------------------------------------------------------------------------
+  # (1) create DEBIAN folder and copy required files.
+  # ----------------------------------------------------------------------------
+  # Delete debian directory if exists and create it from scratch
+  rm -rf $debian_dir
+  mkdir -p $debian_dir/DEBIAN
+
+  # Copy required files under relevant directories
+  mkdir -p $debian_copy_dir
+  cp -r $tmp_path/* $debian_copy_dir
+
+  # ----------------------------------------------------------------------------
+  # (2)  create control file of debian package
+  # ----------------------------------------------------------------------------
+  create_control_file $lxc $debian_dir
+
+  # ----------------------------------------------------------------------------
+  # (3) create preinst script of master debian package
+  # ----------------------------------------------------------------------------
+  create_preinst_script_master $debian_dir
+
+  # ----------------------------------------------------------------------------
+  # (4) create postinst script of master debian package
+  # ----------------------------------------------------------------------------
+  create_postinst_script_master $debian_dir
+
+  # ----------------------------------------------------------------------------
+  # (5) create debian package
+  # ----------------------------------------------------------------------------
+  dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?"
+
+  # ----------------------------------------------------------------------------
+  # (6) remove copied directories for creating debian package
+  # ----------------------------------------------------------------------------                
+  rm -rf $debian_dir
+
+  # ----------------------------------------------------------------------------
+  # (7) return path of newly generated debian package
+  # ----------------------------------------------------------------------------
+
+  conf="/var/lib/lxc/$lxc/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
+  fi
+}
+
 
 # -----------------------------------------------------------------------------
 # Creates control file of debian package
@@ -138,6 +203,30 @@ function create_control_file {
   echo Description: $Description >> $control_file
 }
 
+# -----------------------------------------------------------------------------
+# Creates postinst script of masterdebian package
+# -----------------------------------------------------------------------------
+function create_postinst_script_master {
+  local debian_dir=$1
+  local postinst_file=$debian_dir/DEBIAN/postinst
+  echo "#!/bin/bash"  >> $postinst_file
+  echo "subutai master_import"  >> $postinst_file
+  echo ""  >> $postinst_file
+  chmod 555 $postinst_file
+}
+
+# -----------------------------------------------------------------------------
+# Creates pretinst script of master debian package
+# -----------------------------------------------------------------------------
+function create_preinst_script_master {
+  local debian_dir=$1
+  local preinst_file=$debian_dir/DEBIAN/preinst
+  echo "#!/bin/bash"  >> $preinst_file
+  echo "mkdir -p /lxc-data/tmpdir" >> $preinst_file
+  echo "cp /var/cache/apt/archives/master-subutai-template*.deb $SUBUTAI_TMPDIR"  >> $preinst_file
+  echo ""  >> $preinst_file
+  chmod 555 $preinst_file
+}
 
 # -----------------------------------------------------------------------------
 # Creates postinst script of debian package
