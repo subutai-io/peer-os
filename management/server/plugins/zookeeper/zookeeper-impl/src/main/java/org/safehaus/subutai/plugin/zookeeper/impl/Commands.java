@@ -34,6 +34,15 @@ public class Commands extends CommandsSingleton {
     }
 
 
+    public static Command getUninstallCommand( Set<Agent> agents ) {
+        return createCommand(
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-zookeeper" ).withTimeout( 90 )
+                                                                                             .withStdOutRedirection(
+                                                                                                     OutputRedirection.NO ),
+                agents );
+    }
+
+
     public static Command getStartCommand( Set<Agent> agents ) {
         return createCommand( new RequestBuilder( "service zookeeper start" ).withTimeout( 15 ), agents );
     }
@@ -84,7 +93,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents ) {
         return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
-                                propertyName ) ), agents );
+                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
+                agents );
     }
 }

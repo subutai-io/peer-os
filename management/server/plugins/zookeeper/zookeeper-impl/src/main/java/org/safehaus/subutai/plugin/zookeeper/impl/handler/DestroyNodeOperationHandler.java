@@ -16,6 +16,8 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 
+import com.google.common.collect.Sets;
+
 
 /**
  * Created by dilshat on 5/7/14.
@@ -65,23 +67,47 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             return;
         }
 
-        //destroy lxc
-        po.addLog( "Destroying lxc container..." );
-        Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
-        if ( physicalAgent == null ) {
-            po.addLog(
-                    String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                            agent.getHostname() ) );
+        if ( config.isStandalone() ) {
+            //destroy lxc
+            po.addLog( "Destroying lxc container..." );
+            Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
+            if ( physicalAgent == null ) {
+                po.addLog( String.format(
+                        "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
+                        agent.getHostname() ) );
+            }
+            else {
+
+                try {
+                    manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
+                    po.addLog( "Lxc container destroyed successfully" );
+                }
+                catch ( LxcDestroyException e ) {
+                    po.addLog(
+                            String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
+                                    e.getMessage() ) );
+                }
+            }
         }
         else {
+            //just uninstall Zookeeper
+            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 
-            try {
-                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
-                po.addLog( "Lxc container destroyed successfully" );
+            Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+            manager.getCommandRunner().runCommand( uninstallCommand );
+
+            if ( uninstallCommand.hasCompleted() ) {
+                if ( uninstallCommand.hasSucceeded() ) {
+                    po.addLog( "Cluster successfully uninstalled" );
+                }
+                else {
+                    po.addLog( String.format( "Uninstallation failed, %s, skipping...",
+                            uninstallCommand.getAllErrors() ) );
+                }
             }
-            catch ( LxcDestroyException e ) {
-                po.addLog( String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
-                        e.getMessage() ) );
+            else {
+                po.addLogFailed( "Uninstallation failed, command timed out" );
+                return;
             }
         }
 
@@ -118,9 +144,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         }
         else {
             po.addLog( String.format(
-                            "Settings update failed, %s\nPlease update settings manually and restart the cluster, " +
-                                    "skipping...",
-                            updateSettingsCommand.getAllErrors() ) );
+                    "Settings update failed, %s\nPlease update settings manually and restart the cluster, "
+                            + "skipping...", updateSettingsCommand.getAllErrors() ) );
         }
 
         //update db
