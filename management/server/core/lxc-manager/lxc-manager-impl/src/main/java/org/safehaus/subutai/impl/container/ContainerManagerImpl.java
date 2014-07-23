@@ -278,6 +278,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
+    //@todo use command chaining on the same physical server for parallel node destruction instead of multithreaded
+    // approach
+    //
+    //use parallel thread only for multiple physical servers
     public void cloneDestroyByHostname( Map<Agent, Set<String>> agentFamilies ) throws LxcDestroyException {
         if ( agentFamilies == null || agentFamilies.isEmpty() ) {
             throw new LxcDestroyException( "AgentFamilies is null or empty" );
