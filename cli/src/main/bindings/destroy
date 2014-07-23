@@ -13,7 +13,7 @@ function destroy {
   local clone="$1"
 
   if [ "$clone" == "master" ]; then
-    msg_error "Use subutai-master-destroy instead of subutai-clone-destroy"
+    msg_error "Use subutai master_destroy instead of subutai destroy"
     exit 1
   fi
 
