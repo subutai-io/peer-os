@@ -452,6 +452,11 @@ public class Manager {
 		startBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
+
+                if ( !stopBtn.isEnabled() ) {
+                    Notification.show( "Node already started" );
+                }
+
 				progressIcon.setVisible(true);
 				startBtn.setEnabled(false);
 				stopBtn.setEnabled(false);
@@ -475,6 +480,11 @@ public class Manager {
 		stopBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
+
+                if ( !startBtn.isEnabled() ) {
+                    Notification.show( "Node already stopped" );
+                }
+
 				progressIcon.setVisible(true);
 				startBtn.setEnabled(false);
 				stopBtn.setEnabled(false);
