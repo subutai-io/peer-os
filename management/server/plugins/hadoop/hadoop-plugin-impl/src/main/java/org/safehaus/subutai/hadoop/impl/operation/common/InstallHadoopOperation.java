@@ -22,7 +22,7 @@ public class InstallHadoopOperation {
 		this.config = config;
 		commandList = new ArrayList<>();
 
-		commandList.add(Commands.getInstallCommand(config));
+//		commandList.add(Commands.getInstallCommand(config));
 		commandList.add(Commands.getClearMastersCommand(config));
 		commandList.add(Commands.getClearSlavesCommand(config));
 		commandList.add(Commands.getSetMastersCommand(config));
