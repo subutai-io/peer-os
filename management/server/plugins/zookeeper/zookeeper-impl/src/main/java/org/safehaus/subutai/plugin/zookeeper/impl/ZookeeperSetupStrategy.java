@@ -14,6 +14,7 @@ import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -59,8 +60,10 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
 
             po.addLog( "Lxc containers created successfully\nConfiguring cluster..." );
 
-            Command configureClusterCommand =
-                    Commands.getUpdateSettingsCommand( config.getZkName(), config.getNodes() );
+            Command configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+                    ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                    prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+
             commandRunner.runCommand( configureClusterCommand );
 
             if ( configureClusterCommand.hasSucceeded() ) {
@@ -96,21 +99,41 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
         catch ( LxcCreateException ex ) {
             throw new ClusterSetupException( ex.getMessage() );
         }
+        catch ( ClusterConfigurationException e ) {
+            throw new ClusterSetupException( e.getMessage() );
+        }
 
         return config;
     }
 
 
-    private String prepareConfiguration() throws ClusterSetupException {
-        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", this );
+    //temporary workaround until we get full configuration injection working
+    public static String prepareConfiguration( Set<Agent> nodes ) throws ClusterConfigurationException {
+        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", ZookeeperSetupStrategy.class );
 
         if ( Strings.isNullOrEmpty( zooCfgFile ) ) {
-            throw new ClusterSetupException( "Zoo.cfg resource is missing" );
+            throw new ClusterConfigurationException( "Zoo.cfg resource is missing" );
         }
 
         zooCfgFile = zooCfgFile
                 .replace( "$" + ConfigParams.DATA_DIR.getPlaceHolder(), ConfigParams.DATA_DIR.getParamValue() );
 
-        return null;
+        /*
+        1=zookeeper1:2888:3888
+        2=zookeeper2:2888:3888
+        3=zookeeper3:2888:3888
+         */
+
+        StringBuilder serversBuilder = new StringBuilder();
+        int id = 0;
+        for ( Agent agent : nodes ) {
+            serversBuilder.append( ++id ).append( "=" ).append( agent.getHostname() )
+                          .append( ConfigParams.PORTS.getParamValue() ).append( "\n" );
+        }
+
+        zooCfgFile = zooCfgFile.replace( "$" + ConfigParams.SERVERS.getPlaceHolder(), serversBuilder.toString() );
+
+
+        return zooCfgFile;
     }
 }

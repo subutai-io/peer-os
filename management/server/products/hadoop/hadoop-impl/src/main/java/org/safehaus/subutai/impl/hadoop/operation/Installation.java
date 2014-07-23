@@ -78,21 +78,24 @@ public class Installation {
                     setSlaveNodes(nodes.get(CustomPlacementStrategy.SLAVE_NODE_TYPE));
                     po.addLog("Lxc containers created successfully\nConfiguring network...");
 
-                    if (parent.getNetworkManager().configHostsOnAgents(config.getAllNodes(), config.getDomainName()) &&
-                            parent.getNetworkManager().configSshOnAgents(config.getAllNodes())) {
-                        po.addLog("Cluster network configured");
+                    if ( parent.getNetworkManager().configHostsOnAgents( config.getAllNodes(), config.getDomainName() )
+                            && parent.getNetworkManager().configSshOnAgents( config.getAllNodes() ) ) {
 
-                        po.addLog("Hadoop installation started");
+                        po.addLog( "Cluster network configured" );
+                        po.addLog( "Hadoop installation started" );
 
-                        InstallHadoopOperation installOperation = new InstallHadoopOperation(config);
-                        for (Command command : installOperation.getCommandList()) {
-                            po.addLog((String.format("%s started...", command.getDescription())));
-                            HadoopImpl.getCommandRunner().runCommand(command);
+                        InstallHadoopOperation installOperation = new InstallHadoopOperation( config );
 
-                            if (command.hasSucceeded()) {
-                                po.addLogDone(String.format("%s succeeded", command.getDescription()));
-                            } else {
-                                po.addLogFailed(String.format("%s failed, %s", command.getDescription(), command.getAllErrors()));
+                        for ( Command command : installOperation.getCommandList() ) {
+                            po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+                            HadoopImpl.getCommandRunner().runCommand( command );
+
+                            if ( command.hasSucceeded() ) {
+                                po.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
+                            }
+                            else {
+                                po.addLogFailed( String.format( "%s failed, %s", command.getDescription(),
+                                        command.getAllErrors() ) );
                             }
                         }
 

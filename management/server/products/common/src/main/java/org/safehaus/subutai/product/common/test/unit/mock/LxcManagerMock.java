@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
@@ -108,6 +109,12 @@ public class LxcManagerMock implements LxcManager {
     @Override
     public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy )
             throws LxcCreateException {
+        return null;
+    }
+
+
+    @Override
+    public AgentManager getAgentManager() {
         return null;
     }
 }
