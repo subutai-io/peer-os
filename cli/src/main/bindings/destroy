@@ -21,11 +21,12 @@ function destroy {
   # ----------------------------------------------------------------------------
   # (1) check that clone exists first, and find its parent
   # (2) check if the clone has dependent child and abort if so
-  # (3) release all holds on clone's rootfs snapshots
-  # (4) destroy all snapshots on clones's rootfs
-  # (5) lxc-destroy the clone
-  # (6) destroy mounted partitions
-  # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
+  # (3) Remove the debian package if installed and allow destroy binding to be invoked from post removal scripts
+  # (4) release all holds on clone's rootfs snapshots
+  # (5) destroy all snapshots on clones's rootfs
+  # (6) lxc-destroy the clone
+  # (7) destroy mounted partitions
+  # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   # ----------------------------------------------------------------------------
 
   # (1) check that clone exists first: turn off if on
@@ -46,8 +47,25 @@ function destroy {
     msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
     exit 1
   fi
+  # (3) Remove the debian package if installed
+  # and allow destroy binding to be invoked from post removal scripts
 
-  # (3) & (4) release all holds on clone's rootfs snaps and delete snaps
+  local container=$clone
+  local package_name=`get_package_name $container`
+
+  msg_info "APT_GET_INVOCATION:" $APT_GET_INVOCATION
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai destroy called from command line"
+    # Check if the package is installed
+    dpkg -s $package_name > /dev/null 2>&1
+    if [ $? = 0  ]; then
+      apt-get --assume-yes --force-yes purge $package_name
+    fi
+  else
+    msg_info "subutai destroy called while removing template via package-manager"
+  fi
+
+  # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
   for snap in `zfs list -t snapshot -o name -H | grep $clone@`; do
     for hold in `zfs holds -r $snap | grep $snap | awk '{print $2}'`; do
       zfs release $hold $snap
@@ -58,26 +76,17 @@ function destroy {
     msg_info "    - \"$snap\" snapshot destroyed"
   done
 
-  # (5) lxc-destroy the clone
+  # (6) lxc-destroy the clone
   lxc-destroy -n $clone
 
-  # (6) destroy mounted partitions 
+  # (7) destroy mounted partitions 
   remove-mount $clone $parent opt lxc
   remove-mount $clone $parent var lxc-data
   remove-mount $clone $parent home lxc-data
 
   msg_ok "Destruction of \"$clone\" completed successfully"
   
-  # (7) remove relevant directories under $SUBUTAI_TMPDIR if any
-  local container=$clone
-  local package_name=`get_package_name $container`
-  
-  # Check if the package is installed
-  dpkg -s $package_name > /dev/null 2>&1
-  if [ $? = 0  ]; then
-    apt-get --assume-yes --force-yes purge $package_name
-  fi
-
+  # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
 }
