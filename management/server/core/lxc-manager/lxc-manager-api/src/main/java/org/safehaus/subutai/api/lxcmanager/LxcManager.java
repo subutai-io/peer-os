@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -141,4 +142,7 @@ public interface LxcManager {
      */
     public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy )
             throws LxcCreateException;
+
+
+    public AgentManager getAgentManager();
 }
