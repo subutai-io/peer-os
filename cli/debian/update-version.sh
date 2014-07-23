@@ -26,7 +26,7 @@ function checkIfCommitNecessary {
   isChanged $cli_git_status
   isCommitNecessary=$?
   if [ $isCommitNecessary = "1" ]; then
-    git chechout -- $changelogFile
+    git checkout -- $changelogFile
     exit 0
   fi
 }
