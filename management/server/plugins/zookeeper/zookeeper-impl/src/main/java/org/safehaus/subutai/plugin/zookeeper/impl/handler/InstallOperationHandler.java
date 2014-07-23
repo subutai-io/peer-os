@@ -203,9 +203,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
      */
     private void installStandalone() {
 
-        ClusterSetupStrategy clusterSetupStrategy =
-                manager.getClusterSetupStrategy( config, po, manager.getContainerManager(),
-                        manager.getCommandRunner() );
+        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {
             ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
