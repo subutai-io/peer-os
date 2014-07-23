@@ -41,4 +41,13 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="config/echo-text-to-file">
+      <action class="org.safehaus.subutai.cli.commands.EchoTextToFileCommand">
+        <property name="agentManager" ref="agentManager" />
+        <property name="configManager" ref="configManager" />
+      </action>
+    </command>
+  </command-bundle>
+
 </blueprint>

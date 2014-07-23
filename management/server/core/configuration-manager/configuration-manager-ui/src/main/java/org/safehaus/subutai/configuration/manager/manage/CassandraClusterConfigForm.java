@@ -16,8 +16,6 @@ public class CassandraClusterConfigForm {
     private VerticalLayout contentRoot;
     private Table table;
     private ConfigManager configManager;
-    private Config config;
-
 
     public CassandraClusterConfigForm( final ConfigManager configManager ) {
         this.configManager = configManager;

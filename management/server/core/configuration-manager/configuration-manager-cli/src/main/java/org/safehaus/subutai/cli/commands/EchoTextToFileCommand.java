@@ -14,7 +14,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "config", name = "echo-to-file",
+@Command( scope = "config", name = "echo-text-to-file",
         description = "Echo text into a file" )
 public class EchoTextToFileCommand extends OsgiCommandSupport {
 

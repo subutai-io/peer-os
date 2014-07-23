@@ -40,7 +40,7 @@ public class GetConfigJsonCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
 
-        JsonObject jsonObject = configManager.getConfigurationJson( pathToFile, ConfigTypeEnum.valueOf( type ) );
+        JsonObject jsonObject = configManager.getJsonObjectFromResources( pathToFile, ConfigTypeEnum.valueOf( type ) );
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
