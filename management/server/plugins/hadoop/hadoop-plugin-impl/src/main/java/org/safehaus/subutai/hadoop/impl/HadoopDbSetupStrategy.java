@@ -45,6 +45,8 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 		switch (nodeType) {
 			case MASTER_NODE:
 				return PlacementStrategyENUM.MORE_RAM;
+			case SLAVE_NODE:
+				return PlacementStrategyENUM.MORE_HDD;
 			default:
 				return PlacementStrategyENUM.ROUND_ROBIN;
 		}
