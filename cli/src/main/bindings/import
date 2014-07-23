@@ -51,6 +51,12 @@ function import {
     fi
 
     cd $SUBUTAI_TMPDIR
+    dpkg -s $package_name > /dev/null 2>&1
+    if [ $? = 0  ]; then
+      msg_error "Template $container seems already installed, please destroy first"
+      exit 1
+    fi
+
     dpkg -i $debian_file
     if [ $? -eq 0 ]; then
       msg_ok "Debian package of $package_name is installed succesfully"
