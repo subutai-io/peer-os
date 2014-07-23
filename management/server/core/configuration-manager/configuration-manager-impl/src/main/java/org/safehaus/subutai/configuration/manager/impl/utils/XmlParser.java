@@ -82,6 +82,10 @@ public class XmlParser implements ConfigParser {
 
         List<HierarchicalConfiguration> properties = config.configurationsAt( "property" );
         config.setDelimiterParsingDisabled( false );
+
+        String s = getConventionalProperty("general.classpaths");
+        System.out.println(s);
+
         List<JsonObject> fields = new ArrayList<>();
         for ( HierarchicalConfiguration property : properties ) {
             String key = property.getString( "name" );

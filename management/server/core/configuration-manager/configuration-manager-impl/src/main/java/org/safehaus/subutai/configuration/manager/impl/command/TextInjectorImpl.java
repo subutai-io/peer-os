@@ -29,12 +29,11 @@ public class TextInjectorImpl implements TextInjector {
     @Override
     public boolean echoTextIntoAgent( Agent agent, String path, String content ) {
         //TODO call echo command on given agent
-        Command catCommand = Commands.getEchoCommand( agent, path, content );
-        commandRunner.runCommand( catCommand );
+        Command command = Commands.getEchoCommand( agent, path, content );
+        commandRunner.runCommand( command );
 
-        if ( catCommand.hasSucceeded() ) {
-            //            po.addLog( "cat done" );
-            String config = catCommand.getResults().get( agent.getUuid() ).getStdOut();
+        if ( command.hasSucceeded() ) {
+            String config = command.getResults().get( agent.getUuid() ).getStdOut();
             System.out.println( config );
         }
         else {
