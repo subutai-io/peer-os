@@ -53,6 +53,7 @@ public class NodeSelectionStep extends Panel {
                             caption += " [Slave node]";
                         serverNode.setItemCaption(a, caption);
                     }
+                    serverNode.setValue(hadoopInfo.getNameNode());
                     filterNodes();
 					select.setContainerDataSource(new BeanItemContainer<>(
 									Agent.class, hadoopInfo.getAllNodes())

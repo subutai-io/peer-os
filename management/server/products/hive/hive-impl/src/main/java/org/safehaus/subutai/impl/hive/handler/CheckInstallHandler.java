@@ -38,7 +38,7 @@ public class CheckInstallHandler {
     public Map<Agent, Boolean> check(Product product, Collection<Agent> nodes) {
         String s = Commands.make(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(s), new HashSet<Agent>(nodes));
+                new RequestBuilder(s), new HashSet<>(nodes));
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded()) {
