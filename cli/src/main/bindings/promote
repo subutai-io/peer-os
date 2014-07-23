@@ -93,12 +93,12 @@ function promote {
   fi
 
   # check to make sure container is NOT registered as a template
-  if [ "`is_registered $lxc`" == "true" ]; then
-    msg_error "A template with name \"$lxc\" is registered. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: \"$lxc\" is NOT registered"
-  fi
+  #if [ "`is_registered $lxc`" == "true" ]; then
+  #  msg_error "A template with name \"$lxc\" is registered. Aborting ..."
+  #  exit 1
+  #else
+  #  msg_info "    - check passed: \"$lxc\" is NOT registered"
+  #fi
 
   parent=`zfs_get_parent $lxc`
   lxc_assert $parent
