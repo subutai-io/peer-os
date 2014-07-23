@@ -89,9 +89,10 @@ function deb_pkg {
   if [ -z "$propline" ]; then
     echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
     msg_info "debian package $debian_dir.deb generated..."
-    echo "$debian_dir.deb"
+    debian_file=$debian_dir".deb"
+  else
+    debian_file=`echo $propline | awk '{print $3}'`
   fi
-  debian_file=`echo $propline | awk '{print $3}'`
   msg_info "debian package $debian_file generated..."
   echo $debian_file
 }
@@ -147,12 +148,12 @@ function create_postinst_script {
   local package_name=`get_package_name $lxc`
   local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
-  export APT_GET_INVOCATION="true"
   echo "#!/bin/bash"  >> $postinst_file
   echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  echo "subutai import $package_name" >> $postinst_file
-  chmod 555 $postinst_file
+  echo "export APT_GET_INVOCATION=true" >> $postinst_file
+  echo "subutai import $lxc" >> $postinst_file
+  chmod 755 $postinst_file
 }
 
 
