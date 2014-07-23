@@ -71,8 +71,8 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (4) create debian package
   # ----------------------------------------------------------------------------
-  dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
-  check_status "Template \"$lxc\" Debian package generation" "$?"
+  dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
 
   # ----------------------------------------------------------------------------
   # (5) remove copied directories for creating debian package
@@ -88,12 +88,10 @@ function deb_pkg {
 
   if [ -z "$propline" ]; then
     echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
-    msg_info "debian package $debian_dir.deb generated..."
     debian_file=$debian_dir".deb"
   else
     debian_file=`echo $propline | awk '{print $3}'`
   fi
-  msg_info "debian package $debian_file generated..."
   echo $debian_file
 }
 
@@ -110,7 +108,7 @@ function create_control_file {
   local dependency="subutai-cli (>= $SUBUTAI_VERSION)"
   
   # Check if lxc is master. If not, put a dependency to the parent template 
-  lxc_assert $lxc "`usage`"
+  lxc_assert $lxc "`usage`" > /dev/null
   local parent=`zfs_get_parent $container`
   local parent_package_name=`get_package_name $parent`
 

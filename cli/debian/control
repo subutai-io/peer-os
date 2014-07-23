@@ -7,7 +7,7 @@ Standards-Version: 3.9.4
 Homepage: http://www.safehaus.org
 
 Package: subutai-cli
-Architecture: amd64
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, git, awk, sed, grep, coreutils, build-essential, packaging-dev, lxc, lxc-templates, curl
 Description: Subutai LXC container running server host scripts that enable 
  the creation of Subutai controlled LXC container templates and instance 
