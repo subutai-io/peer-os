@@ -86,8 +86,8 @@ if [ $isStatusEmpty = "false" ]; then
   git add .
   git commit -m "Auto commit while building subutai-cli package"
   isSuccesful=$?
-#else
-#  isSuccesful=0
+else
+  isSuccesful=0
 fi
 git push
 isSuccesful=`expr $? + $isSuccesful`
