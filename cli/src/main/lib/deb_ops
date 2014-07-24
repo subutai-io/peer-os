@@ -198,6 +198,8 @@ function create_prerm_script {
   # Check if the template is master
   if [ $lxc != "master" ]; then
     echo "subutai destroy $lxc" >> $prerm_file
+  else
+    echo "subutai master_destroy" >> $prerm_file
   fi
   chmod 755 $prerm_file
 }
