@@ -6,11 +6,6 @@
 # out with a call to zfs_is_template. 
 function is_registered {
  
-  ### REMOVE THIS CODE BLOCK WHEN REGISTER WORKS ###
-  echo "true"
-  exit 0
-  ### END OF CODE BLOCK ### 
-  
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
 
