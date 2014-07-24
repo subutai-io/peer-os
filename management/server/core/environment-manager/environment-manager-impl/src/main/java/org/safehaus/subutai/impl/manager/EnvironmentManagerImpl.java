@@ -14,6 +14,7 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
@@ -29,22 +30,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
-
-
+    private TemplateRegistryManager templateRegistryManager;
     private DbManager dbManager;
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public EnvironmentManagerImpl( final ContainerManager containerManager,
+                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager ) {
+        this.containerManager = containerManager;
+        this.templateRegistryManager = templateRegistryManager;
         this.dbManager = dbManager;
         this.environmentDAO = new EnvironmentDAO( dbManager );
-    }
-
-
-    public EnvironmentManagerImpl() {
-        this.environmentBuilder = new EnvironmentBuilder();
         this.blueprintParser = new BlueprintParser();
     }
-
 
     /**
      * Builds an environment by provided blueprint description
