@@ -150,7 +150,6 @@ public class Template {
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-                ", packagesManifest='" + packagesManifest + '\'' +
                 ", products=" + products +
                 '}';
     }
