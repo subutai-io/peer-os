@@ -68,6 +68,9 @@ require_clean_work_tree () {
 
 
 changelogFile="debian/changelog"
+# Ignore changes inside changelog file
+git checkout -- $changelogFile > /dev/null 2>&1
+
 #------------------------------------------------------
 #(0) exit if there are uncommitted or unstaged files
 #------------------------------------------------------
