@@ -38,7 +38,7 @@ function exitIfNoChange {
   echo isStatusEmpty: $isStatusEmpty
   echo isDiffEmpty: $isDiffEmpty
   if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
-    git checkout -- $changelogFile > /dev/null
+    git checkout -- $changelogFile > /dev/null 2>&1
     echo "No change is made on debian package"
     exit 0
   fi
