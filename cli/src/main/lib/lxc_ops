@@ -91,7 +91,7 @@ function lxc_assert {
   fi
 
   lxc-info -n $lxc
-  if [ $? == 0 ]; then
+  if [ $? != 0 ]; then
     msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
     show_usage "$usage"
   else
