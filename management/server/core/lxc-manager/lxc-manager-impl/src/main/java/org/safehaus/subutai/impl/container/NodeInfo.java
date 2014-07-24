@@ -8,7 +8,7 @@ class NodeInfo {
     UUID envId;
     String templateName;
     Set<PlacementStrategyENUM> strategy;
-    List<String> products;
+    Set<String> products;
     UUID instanceId;
 
     public UUID getEnvId() {
@@ -35,11 +35,11 @@ class NodeInfo {
         this.strategy = strategy;
     }
 
-    public List<String> getProducts() {
+    public Set<String> getProducts() {
         return products;
     }
 
-    public void setProducts(List<String> products) {
+    public void setProducts(Set<String> products) {
         this.products = products;
     }
 
