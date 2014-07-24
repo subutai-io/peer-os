@@ -4,6 +4,10 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -13,11 +17,6 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.flume.FlumeUI;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public class Manager {
 
@@ -177,8 +176,10 @@ public class Manager {
 			stopBtn.setEnabled(true);
 			startBtn.setEnabled(true);
 
-			table.addItem(new Object[] {agent.getHostname(),
-					startBtn, stopBtn, destroyBtn}, null);
+            String ip = agent.getListIP() != null && agent.getListIP().size() > 0
+                    ? agent.getListIP().get(0) : "";
+            table.addItem(new Object[]{agent.getHostname(), ip,
+           					startBtn, stopBtn, destroyBtn}, null);
 
 			startBtn.addClickListener(new Button.ClickListener() {
 				@Override
@@ -294,6 +295,7 @@ public class Manager {
 	private Table createTableTemplate(String caption) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
+        table.addContainerProperty("IP address", String.class, null);
 		table.addContainerProperty("Start", Button.class, null);
 		table.addContainerProperty("Stop", Button.class, null);
 		table.addContainerProperty("Destroy", Button.class, null);
