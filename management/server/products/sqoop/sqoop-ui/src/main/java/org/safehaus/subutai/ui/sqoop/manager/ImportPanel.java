@@ -143,7 +143,8 @@ public class ImportPanel extends ImportExportBase {
 			default:
 				throw new AssertionError(type.name());
 		}
-		ls.add(buttons);
+        ls.add(buttons);
+        ls.add(optionalParams);
 
 		addComponents(ls);
 	}
@@ -157,7 +158,8 @@ public class ImportPanel extends ImportExportBase {
 		s.setConnectionString(connStringField.getValue());
 		s.setTableName(tableField.getValue());
 		s.setUsername(usernameField.getValue());
-		s.setPassword(passwordField.getValue());
+        s.setPassword(passwordField.getValue());
+        s.setOptionalParameters(optionalParams.getValue());
 		switch (type) {
 			case HDFS:
 				s.addParameter(ImportParameter.IMPORT_ALL_TABLES,

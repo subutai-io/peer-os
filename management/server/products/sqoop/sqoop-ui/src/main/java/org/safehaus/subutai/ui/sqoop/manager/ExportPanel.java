@@ -76,7 +76,8 @@ public class ExportPanel extends ImportExportBase {
 		ls.add(usernameField);
 		ls.add(passwordField);
 		ls.add(hdfsPathField);
-		ls.add(buttons);
+        ls.add(buttons);
+        ls.add(optionalParams);
 
 		addComponents(ls);
 	}
@@ -90,7 +91,8 @@ public class ExportPanel extends ImportExportBase {
 		s.setTableName(tableField.getValue());
 		s.setUsername(usernameField.getValue());
 		s.setPassword(passwordField.getValue());
-		s.setHdfsPath(hdfsPathField.getValue());
+        s.setHdfsPath(hdfsPathField.getValue());
+        s.setOptionalParameters(optionalParams.getValue());
 		return s;
 	}
 

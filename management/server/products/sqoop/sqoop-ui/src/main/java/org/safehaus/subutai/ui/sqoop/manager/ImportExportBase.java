@@ -16,7 +16,8 @@ public abstract class ImportExportBase extends VerticalLayout {
 	AbstractTextField connStringField = UIUtil.getTextField("Connection string:", 300);
 	AbstractTextField tableField = UIUtil.getTextField("Table name:", 300);
 	AbstractTextField usernameField = UIUtil.getTextField("Username:", 300);
-	AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
+    AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
+    AbstractTextField optionalParams = UIUtil.getTextField("Optional parameters:", 300);
 	TextArea logTextArea = UIUtil.getTextArea("Logs:", 600, 200);
 
 	protected String clusterName;
@@ -49,7 +50,8 @@ public abstract class ImportExportBase extends VerticalLayout {
 		fields.add(connStringField);
 		fields.add(tableField);
 		fields.add(usernameField);
-		fields.add(passwordField);
+        fields.add(passwordField);
+        fields.add(optionalParams);
 		fields.add(logTextArea);
 	}
 
