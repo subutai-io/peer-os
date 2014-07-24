@@ -36,7 +36,7 @@ function git_init_master {
 function git_child_branch {
   local child="$1"
 
-  if [ -z `lxc-ls --running $child` ]; then
+  if [ -z "`lxc-info -n $child | grep RUNNING`" ]; then
     lxc-start -d -n $child
   fi
 
@@ -51,7 +51,7 @@ function git_child_branch {
 function git_add_commit { 
   local lxc="$1"
 
-  if [ -z `lxc-ls --running $lxc` ]; then
+  if [ -z "`lxc-info -n $lxc | grep RUNNING`" ]; then
     lxc-start -d -n $lxc
   fi
 
@@ -67,7 +67,7 @@ function git_add_commit {
 function git_remote_push {
   local lxc="$1"
   
-  if [ -z `lxc-ls --running $lxc` ]; then
+  if [ -z "`lxc-info -n $lxc | grep RUNNING`" ]; then
     lxc-start -d -n $lxc
   fi
 
@@ -81,7 +81,7 @@ function git_rename_branch {
   local oldname="$1"
   local newname="$2"
 
-  if [ -z `lxc-ls --running $newname` ]; then
+  if [ -z "`lxc-info -n $newname | grep RUNNING`" ]; then
     lxc-start -d -n $newname
   fi
 

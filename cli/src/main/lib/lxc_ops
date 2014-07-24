@@ -19,7 +19,7 @@ function lxc_stop {
   local lxc="$1"
   lxc_assert_name "$lxc"
   
-  if [ "$lxc" == "`lxc-ls --running | grep $lxc`" ]; then
+  if [ "State:          RUNNING" == "`lxc-info -n $lxc | grep State`" ]; then
     lxc-stop -n $lxc
   fi
 }
@@ -71,8 +71,8 @@ function lxc_assert_no {
     msg_error "No value provided for container's name. Aborting ..."
     show_usage "$usage"
   fi
-
-  if [ -n "`lxc-ls "$lxc" | grep "$lxc"`" ]; then
+  lxc-info -n $lxc > /dev/null 2>&1
+  if [ $? == 0 ]; then
     msg_error "Container \"$lxc\" exists. Aborting ..."
     show_usage "$usage"
   else
@@ -90,7 +90,8 @@ function lxc_assert {
     show_usage "$usage"
   fi
 
-  if [ -z "`lxc-ls "$lxc" | grep "$lxc"`" ]; then
+  lxc-info -n $lxc > /dev/null 2>&1
+  if [ $? != 0 ]; then
     msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
     show_usage "$usage"
   else

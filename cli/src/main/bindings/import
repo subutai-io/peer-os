@@ -13,7 +13,7 @@ function import_usage {
 
 # Plan for importing a template
 # ----------------------------------------------------------------------------
-# (1) Install the debian package 
+# (1) Install the debian package if subutai import not called during a debian package installation
 # (2) perform sanity checks first
 #     - a container with the same name MUST NOT already exist
 #     - the template name MUST be in the template registry
@@ -31,31 +31,44 @@ function import {
     show_usage "`import_usage`"
   fi
 
-  # ----------------------------------------------------------------------------
-  # (1) Install the debian package
-  # ----------------------------------------------------------------------------
-
-  local debian_package_name=`get_debian_package_name $container`
-  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-  local package_name=`get_package_name $container`
-
-  if [ ! -f "$debian_file" ]; then
-    msg_error "Could not find template file \"$debian_file\". Aborting ..."
-    exit 1
+  if [ "$container" = "master" ];then
+    subutai master_create
+    exit $?
   fi
+  # ----------------------------------------------------------------------------
+  # (1) Install the debian package if subutai import not called during a debian package installation
+  # ----------------------------------------------------------------------------
+  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai import called from command line"
+    local debian_package_name=`get_debian_package_name $container`
+    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+    local package_name=`get_package_name $container`
 
-  pushd . > /dev/null
-  cd $SUBUTAI_TMPDIR
-  dpkg -i $debian_file
-  if [ $? -eq 0 ]; then
-    msg_ok "Debian package of $package_name is installed succesfully"
+    if [ ! -f "$debian_file" ]; then
+      msg_error "Could not find template file \"$debian_file\". Aborting ..."
+      exit 1
+    fi
+
+    cd $SUBUTAI_TMPDIR
+    dpkg -s $package_name > /dev/null 2>&1
+    if [ $? = 0  ]; then
+      msg_error "Template $container seems already installed, please destroy first"
+      exit 1
+    fi
+
+    dpkg -i $debian_file
+    if [ $? -eq 0 ]; then
+      msg_ok "Debian package of $package_name is installed succesfully"
+      exit 0
+    else
+      msg_error "Debian package of $package_name could not be installed, removing"
+      subutai destroy $container
+      exit 1
+    fi
   else
-    msg_error "Debian package of $package_name could not be installed, removing"
-    apt-get --assume-yes --force-yes purge $package_name
-    exit 1
+    msg_info "subutai import called while installing template from the debian package"
   fi
-  popd > /dev/null
-
   # ----------------------------------------------------------------------------
   # (2) perform sanity checks first
   #     - a container with the same name MUST NOT already exist

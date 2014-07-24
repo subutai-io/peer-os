@@ -14,6 +14,12 @@ function demote_usage {
 function demote {
   local temp="$1"
 
+  #check for master	
+  if [ $temp == "master" ]; then
+    msg_error "Master templated cannot be demoted. Aborting ..."
+    exit 1
+  fi
+
   # check to make sure we have a template name - usage if not
   if [ -z "$temp" ]; then
     msg_error "Template argument not provided. Aborting ..."

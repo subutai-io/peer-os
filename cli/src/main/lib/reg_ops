@@ -5,6 +5,7 @@
 # already. Since this functionality is not available I just stubbed it 
 # out with a call to zfs_is_template. 
 function is_registered {
+  
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
 
