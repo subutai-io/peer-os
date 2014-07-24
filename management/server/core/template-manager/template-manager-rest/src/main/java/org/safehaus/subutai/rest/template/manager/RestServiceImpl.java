@@ -53,7 +53,7 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public Response importTemplate(InputStream in) {
+    public Response importTemplate(InputStream in, String configDir) {
         Path path;
         try {
             path = Files.createTempFile("subutai-template-", ".deb");
@@ -75,10 +75,13 @@ public class RestServiceImpl implements RestService {
         try {
             aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
 
+            Path p = Paths.get(configDir, "config");
             List<String> conf = aptRepoManager.readFileContents(mgmt,
-                    path.toString(), Arrays.asList("config"));
+                    path.toString(), Arrays.asList(p.toString()));
+
+            p = Paths.get(configDir, "packages");
             List<String> pack = aptRepoManager.readFileContents(mgmt,
-                    path.toString(), Arrays.asList("packages"));
+                    path.toString(), Arrays.asList(p.toString()));
 
             templateRegistry.registerTemplate(mergeLines(conf), mergeLines(pack));
 
