@@ -2,14 +2,13 @@ package org.safehaus.subutai.ui.sqoop.manager;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.DataSourceType;
 import org.safehaus.subutai.api.sqoop.setting.ImportParameter;
 import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class ImportPanel extends ImportExportBase {
 
@@ -44,6 +43,7 @@ public class ImportPanel extends ImportExportBase {
 				Button btn = UIUtil.getButton(dst.toString(), 100);
 				btn.addClickListener(new Button.ClickListener() {
 
+                    @Override
 					public void buttonClick(Button.ClickEvent event) {
 						setType(dst);
 					}
@@ -53,6 +53,7 @@ public class ImportPanel extends ImportExportBase {
 			Button btn = UIUtil.getButton("Cancel", 100);
 			btn.addClickListener(new Button.ClickListener() {
 
+                @Override
 				public void buttonClick(Button.ClickEvent event) {
 					detachFromParent();
 				}
@@ -70,7 +71,8 @@ public class ImportPanel extends ImportExportBase {
 		super.init();
 		chkImportAllTables.addValueChangeListener(new Property.ValueChangeListener() {
 
-			public void valueChange(Property.ValueChangeEvent e) {
+            @Override
+            public void valueChange(Property.ValueChangeEvent e) {
 				String v = e.getProperty().getValue().toString();
 				tableField.setEnabled(!Boolean.parseBoolean(v));
 			}
@@ -80,6 +82,7 @@ public class ImportPanel extends ImportExportBase {
 		buttons.addComponent(UIUtil.getButton("Import", 120,
 				new Button.ClickListener() {
 
+                    @Override
 					public void buttonClick(Button.ClickEvent event) {
 						clearLogMessages();
 						if (!checkFields()) return;
@@ -90,6 +93,7 @@ public class ImportPanel extends ImportExportBase {
 						OperationWatcher watcher = new OperationWatcher(trackId);
 						watcher.setCallback(new OperationCallback() {
 
+                            @Override
 							public void onComplete() {
 								setFieldsEnabled(true);
 							}
@@ -100,13 +104,14 @@ public class ImportPanel extends ImportExportBase {
 				}));
 		buttons.addComponent(UIUtil.getButton("Back", 120, new Button.ClickListener() {
 
+            @Override
 			public void buttonClick(Button.ClickEvent event) {
 				reset();
 				setType(null);
 			}
 		}));
 
-		List<Component> ls = new ArrayList<Component>();
+		List<Component> ls = new ArrayList<>();
 		ls.add(UIUtil.getLabel("<h1>Sqoop Import</h1>", 100, Unit.PERCENTAGE));
 		ls.add(UIUtil.getLabel("<h1>" + type.toString() + "</h1>", 200));
 		ls.add(connStringField);
@@ -149,10 +154,10 @@ public class ImportPanel extends ImportExportBase {
 		s.setType(type);
 		s.setClusterName(clusterName);
 		s.setHostname(agent.getHostname());
-		s.setConnectionString(connStringField.getValue().toString());
-		s.setTableName(tableField.getValue().toString());
-		s.setUsername(usernameField.getValue().toString());
-		s.setPassword(passwordField.getValue().toString());
+		s.setConnectionString(connStringField.getValue());
+		s.setTableName(tableField.getValue());
+		s.setUsername(usernameField.getValue());
+		s.setPassword(passwordField.getValue());
 		switch (type) {
 			case HDFS:
 				s.addParameter(ImportParameter.IMPORT_ALL_TABLES,

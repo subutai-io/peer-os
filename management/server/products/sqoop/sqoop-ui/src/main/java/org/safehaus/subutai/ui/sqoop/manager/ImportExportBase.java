@@ -1,16 +1,15 @@
 package org.safehaus.subutai.ui.sqoop.manager;
 
 import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.setting.CommonSetting;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public abstract class ImportExportBase extends VerticalLayout {
 
@@ -102,7 +101,7 @@ public abstract class ImportExportBase extends VerticalLayout {
 	void appendLogMessage(String m) {
 		if (m != null && m.length() > 0) {
 			logTextArea.setValue(logTextArea.getValue() + "\n" + m);
-			logTextArea.setCursorPosition(logTextArea.getValue().toString().length());
+			logTextArea.setCursorPosition(logTextArea.getValue().length());
 		}
 	}
 
@@ -128,6 +127,7 @@ public abstract class ImportExportBase extends VerticalLayout {
 			this.callback = callback;
 		}
 
+        @Override
 		public void run() {
 			String m = "";
 			while (true) {
