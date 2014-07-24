@@ -194,7 +194,7 @@ public class Manager {
 			destroyBtn.addStyleName("default");
 
 			table.addItem(new Object[] {
-							agent.getHostname(),
+							agent.getHostname() + String.format( " [%s]", agent.getListIP().get(0) ),
 							destroyBtn
 					},
 					null
@@ -236,6 +236,7 @@ public class Manager {
 
 	public void refreshClustersInfo() {
 		List<Config> clustersInfo = SharkUI.getSharkManager().getClusters();
+
 		Config clusterInfo = (Config) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (clustersInfo != null && clustersInfo.size() > 0) {

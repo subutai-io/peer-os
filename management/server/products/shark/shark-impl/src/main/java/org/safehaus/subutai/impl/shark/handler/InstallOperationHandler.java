@@ -1,5 +1,6 @@
 package org.safehaus.subutai.impl.shark.handler;
 
+
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -12,9 +13,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl> {
     private final ProductOperation po;
     private final Config config;
@@ -33,6 +32,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
 
     @Override
     public void run() {
+
         if (Strings.isNullOrEmpty(config.getClusterName())) {
             po.addLogFailed("Malformed configuration\nInstallation aborted");
             return;
@@ -51,8 +51,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         }
 
         Config config = new Config();
-        config.setClusterName(config.getClusterName());
-        config.setNodes(sparkConfig.getAllNodes());
+        config.setClusterName( this.config.getClusterName() );
+        config.setNodes( sparkConfig.getAllNodes() );
 
         for (Agent node : config.getNodes()) {
             if (manager.getAgentManager().getAgentByHostname(node.getHostname()) == null) {
@@ -85,8 +85,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
         }
 
         po.addLog("Updating db...");
-        //save to db
-        if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+        boolean dbSaveSuccess = manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config);
+
+        if ( dbSaveSuccess ) {
             po.addLog("Cluster info saved to DB\nInstalling Shark...");
 
             Command installCommand = Commands.getInstallCommand(config.getNodes());
