@@ -229,3 +229,12 @@ function get_package_name {
 function get_architecture {
   echo "amd64"
 }
+
+
+function is_package_installed {
+  if [ -z "$1" ]; then
+    msg_error "package name is not provided. Aborting ..."
+    exit 1
+  fi
+  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^i'
+}

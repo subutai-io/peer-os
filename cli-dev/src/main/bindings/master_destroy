@@ -15,7 +15,7 @@ function master_destroy {
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     msg_info "subutai master_destroy called from command line"
     # Check if the package is installed
-    dpkg -s $package_name > /dev/null 2>&1
+    is_package_installed $package_name
     if [ $? = 0  ]; then
       apt-get --assume-yes --force-yes purge $package_name
       exit $?
