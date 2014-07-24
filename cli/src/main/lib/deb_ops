@@ -131,12 +131,12 @@ function deb_pkg_master {
   # ----------------------------------------------------------------------------
   # (3) create preinst script of master debian package
   # ----------------------------------------------------------------------------
-  create_preinst_script_master $debian_dir
+  create_preinst_script_master $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
   # (4) create postinst script of master debian package
   # ----------------------------------------------------------------------------
-  create_postinst_script_master $debian_dir
+  create_postinst_script_master $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
   # (5) create debian package
@@ -209,7 +209,8 @@ function create_control_file {
 # Creates postinst script of masterdebian package
 # -----------------------------------------------------------------------------
 function create_postinst_script_master {
-  local debian_dir=$1
+  local lxc=$1
+  local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
   echo "subutai master_import"  >> $postinst_file
@@ -221,11 +222,18 @@ function create_postinst_script_master {
 # Creates pretinst script of master debian package
 # -----------------------------------------------------------------------------
 function create_preinst_script_master {
-  local debian_dir=$1
+  local lxc=$1
+  local debian_package_name=`get_debian_package_name $lxc`
+  local debian_dir=$2
   local preinst_file=$debian_dir/DEBIAN/preinst
+  local archive_directory=/var/cache/apt/archives/
   echo "#!/bin/bash"  >> $preinst_file
   echo "mkdir -p /lxc-data/tmpdir" >> $preinst_file
-  echo "cp /var/cache/apt/archives/master-subutai-template*.deb $SUBUTAI_TMPDIR"  >> $preinst_file
+  # Copy master debian package from archive_directory 
+  # under $SUBUTAI_TMPDIR directory
+  echo "if [ -f $archive_directory/$debian_package_name".deb" ]; then"
+  echo "  cp $archive_directory/$debian_package_name".deb" $SUBUTAI_TMPDIR"  >> $preinst_file
+  echo "fi"
   echo ""  >> $preinst_file
   chmod 755 $preinst_file
 }
