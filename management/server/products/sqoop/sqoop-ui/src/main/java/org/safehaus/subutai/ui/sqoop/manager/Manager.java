@@ -90,45 +90,9 @@ public class Manager {
 
 		});
 
-		Button addNodeBtn = new Button("Add Node");
-		addNodeBtn.addStyleName("default");
-		addNodeBtn.addClickListener(new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
-				if (config == null) {
-                    show("Select Sqoop installation");
-					return;
-				}
-
-				org.safehaus.subutai.api.hadoop.Config hci = SqoopUI.getHadoopManager().getCluster(config.getClusterName());
-				if (hci == null) {
-					show("Hadoop cluster info not found");
-					return;
-				}
-
-				Set<Agent> set = new HashSet<>(hci.getAllNodes());
-				set.removeAll(config.getNodes());
-				if (set.isEmpty()) {
-					show("All nodes in Hadoop cluster have Sqoop installed");
-					return;
-				}
-
-				AddNodeWindow addNodeWindow = new AddNodeWindow(config, set);
-				contentRoot.getUI().addWindow(addNodeWindow);
-				addNodeWindow.addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						refreshClustersInfo();
-					}
-				});
-			}
-		});
-
 		controlsContent.addComponent(clusterCombo);
 		controlsContent.addComponent(refreshClustersBtn);
 		controlsContent.addComponent(destroyClusterBtn);
-		controlsContent.addComponent(addNodeBtn);
 
 		contentRoot.addComponent(controlsContent, 0, 0);
 		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
