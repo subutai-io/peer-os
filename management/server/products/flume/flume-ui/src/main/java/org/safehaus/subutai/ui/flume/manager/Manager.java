@@ -92,9 +92,10 @@ public class Manager {
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (config != null) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s cluster?", config.getClusterName()),
-							"Yes", "No");
+                if(config != null) {
+                    String m = "Are you sure to delete Flume nodes installed on Hadoop cluster '%s'?";
+                    ConfirmationDialog alert = new ConfirmationDialog(String.format(m, config.getClusterName()),
+                     							"Yes", "No");
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
@@ -238,9 +239,10 @@ public class Manager {
 
 			destroyBtn.addClickListener(new Button.ClickListener() {
 				@Override
-				public void buttonClick(Button.ClickEvent clickEvent) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to add node to the %s node?", agent.getHostname()),
-							"Yes", "No");
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    String m = "Are you sure to remove Flume from node '%s'?";
+                    ConfirmationDialog alert = new ConfirmationDialog(String.format(m, agent.getHostname()),
+                     							"Yes", "No");
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
