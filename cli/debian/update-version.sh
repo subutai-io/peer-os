@@ -1,16 +1,14 @@
 #!/bin/bash
 
 #------------------------------------------------------
-#(0) check if there is a change inside cli directory
-#(1) read the version number
-#(2) increment the patch version number (X) in the memory and in the file
-#(3) commit and push with incremented patch version number (X+1)
-#(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
+#(0) exit if there are uncommitted or unstaged files
+#(1) check if there are local commits, return if there is no commit
+#(2) read the version number
+#(3) increment the patch version number (X) in the memory and in the file
+#(4) commit and push with incremented patch version number (X+1)
+#(5) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
 
-#------------------------------------------------------
-#(0) check if there is a change inside cli directory
-#------------------------------------------------------
 
 # This function returns true if variable is empty, false if not empty
 function isEmpty {
@@ -32,7 +30,7 @@ function exitIfNoChange {
   git_diff=$(git diff origin/$branch_name..HEAD)
   isDiffEmpty=$(isEmpty $git_diff)
   echo "isDiffEmpty: $isDiffEmpty"
-  echo "Checking if there is a change for branch: $branch_name"
+  echo "Checking if there are local commits for branch: $branch_name"
   if [ $isDiffEmpty = "true" ]; then
     echo "No change is made on debian package"
     exit 0
@@ -70,15 +68,18 @@ require_clean_work_tree () {
 
 
 changelogFile="debian/changelog"
-# Switch to root .git directory to see changes properly
-pushd ..
+#------------------------------------------------------
+#(0) exit if there are uncommitted or unstaged files
+#------------------------------------------------------
 require_clean_work_tree
+#------------------------------------------------------
+#(1) check if there are local commits, return if there is no commit
+#------------------------------------------------------
 exitIfNoChange $changelogFile
-popd
 
 #----------------UPDATE_VERSION-----------------------
 #------------------------------------------------------
-# (1) read the version number
+# (2) read the version number
 #------------------------------------------------------
 versionLineNumber=$(sed -n '/subutai-cli (/=' $changelogFile)
 versionLineContent=$(sed $versionLineNumber!d $changelogFile)
@@ -98,7 +99,7 @@ updatedPatch=$(echo `expr $versionPatch + 1`)
 
 
 #------------------------------------------------------
-#(2) increment the patch version number (X) in the memory and in the file
+#(3) increment the patch version number (X) in the memory and in the file
 #------------------------------------------------------
 updatedVersion=$versionFirst.$versionSecond.$versionThird-$updatedPatch
 echo "Updated version:" $updatedVersion
@@ -106,7 +107,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 
 
 #------------------------------------------------------
-#(3) commit and push with incremented patch version number (X+1) if there are uncommitted changes
+#(4) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
 git add .
 git commit -m "Auto commit while building subutai-cli package"
@@ -115,7 +116,7 @@ git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
 
 #------------------------------------------------------
-#(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
+#(5) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
 if [ $isSuccesful != 0 ]; then
   echo "Commit or push is not succesful, please fix the errors first!"
