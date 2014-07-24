@@ -34,6 +34,8 @@ function exitIfNoChange {
   # Check if there are local commits not pushed
   git_diff=$(git diff origin/$branch_name..HEAD)
   isDiffEmpty=$(isEmpty $git_diff)
+  echo "isStatusEmpty: $isStatusEmpty"
+  echo "isDiffEmpty: $isDiffEmpty"
   echo "Checking if there is a change for branch: $branch_name"
   if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
     git checkout -- $changelogFile > /dev/null 2>&1
