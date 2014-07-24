@@ -45,6 +45,9 @@ export SUBUTAI_APP_DATA_PATH=/var
 export SUBUTAI_SITE_REPO=http://gw.intra.lan/ksks
 export SUBUTAI_OS_RELEASE_NAME=trusty
 
+#Apt-Proxy settings
+export SUBUTAI_APT_PROXY=http://gw.intra.lan:9999/ubuntu
+
 # URL to REST services on management server
 export SUBUTAI_REST_IP=
 export SUBUTAI_REST_PORT=

@@ -62,6 +62,7 @@ public class RestServiceImpl implements RestService {
                 byte[] buf = new byte[1024];
                 while((len = in.read(buf)) > 0)
                     os.write(buf, 0, len);
+                os.flush();
             }
             logger.info("Payload saved to " + path.toString());
         } catch(IOException ex) {
