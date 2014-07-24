@@ -28,8 +28,6 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 	private ContainerManager containerManager;
 	private ProductOperation po;
 	private Config config;
-	public static final String TEMPLATE_NAME = "hadoop";
-
 
 	/*@todo add parameter validation logic*/
 	public HadoopDbSetupStrategy(ProductOperation po, Hadoop hadoopManager, ContainerManager containerManager,
@@ -99,12 +97,12 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 				try {
 					po.addLog(String.format("Creating %d master servers...", 3));
 					Set<Agent> cfgServers = containerManager
-							.clone(TEMPLATE_NAME, 3, HadoopImpl.getAgentManager().getPhysicalAgents(),
+							.clone(Config.TEMPLATE_NAME, 3, HadoopImpl.getAgentManager().getPhysicalAgents(),
 									getNodePlacementStrategyByNodeType(NodeType.MASTER_NODE));
 
 					po.addLog(String.format("Creating %d slave nodes...", config.getCountOfSlaveNodes()));
 					Set<Agent> dataNodes = containerManager
-							.clone(TEMPLATE_NAME, config.getCountOfSlaveNodes(), HadoopImpl.getAgentManager().getPhysicalAgents(),
+							.clone(Config.TEMPLATE_NAME, config.getCountOfSlaveNodes(), HadoopImpl.getAgentManager().getPhysicalAgents(),
 									getNodePlacementStrategyByNodeType(NodeType.SLAVE_NODE));
 
 					setMasterNodes(cfgServers);

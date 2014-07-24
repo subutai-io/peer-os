@@ -15,7 +15,8 @@ import java.util.Set;
  * Created by daralbaev on 02.04.14.
  */
 public class Config implements ConfigBase {
-	public static final String PRODUCT_KEY = "Hadoop";
+	public static String TEMPLATE_NAME = "hadoop";
+	public static final String PRODUCT_KEY = "Hadoop2";
 	public static final String PRODUCT_PACKAGE = (Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
 	public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
 
@@ -175,6 +176,9 @@ public class Config implements ConfigBase {
 		this.blockedAgents = blockedAgents;
 	}
 
+	public static void setTemplateName(String TEMPLATE_NAME) {
+		Config.TEMPLATE_NAME = TEMPLATE_NAME;
+	}
 
 	@Override
 	public String toString() {
