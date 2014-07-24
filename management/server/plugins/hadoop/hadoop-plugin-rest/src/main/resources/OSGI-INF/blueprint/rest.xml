@@ -11,14 +11,14 @@
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxrs:server address="/hadoop" id="hadoopRestService">
+    <jaxrs:server address="/hadoop2" id="hadoopRestService">
         <jaxrs:serviceBeans>
             <ref component-id="hadoopRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.hadoop.services.RestServiceImpl">
+    <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.plugin.hadoop.rest.RestServiceImpl">
         <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.subutai.hadoop.api.Hadoop"/>
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
 </blueprint>

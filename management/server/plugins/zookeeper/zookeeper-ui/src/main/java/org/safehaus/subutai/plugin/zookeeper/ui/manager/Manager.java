@@ -12,7 +12,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.hadoop.api.Config;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -175,7 +175,7 @@ public class Manager {
 							}
 						});
 					} else {
-						Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
+						HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
 						if (info != null) {
 							Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());

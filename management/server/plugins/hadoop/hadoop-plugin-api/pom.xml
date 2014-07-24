@@ -36,7 +36,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.hadoop.api</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.hadoop.api</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
