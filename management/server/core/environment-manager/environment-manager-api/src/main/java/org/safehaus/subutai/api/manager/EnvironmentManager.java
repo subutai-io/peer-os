@@ -8,8 +8,9 @@ package org.safehaus.subutai.api.manager;
 
 import java.util.List;
 
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 
 
 /**
@@ -23,6 +24,8 @@ public interface EnvironmentManager {
     public boolean buildEnvironment( String blueprintStr );
 
     public boolean buildEnvironment( EnvironmentBlueprint blueprint );
+
+    public Environment buildEnvironmentAndReturn( EnvironmentBlueprint blueprint ) throws EnvironmentBuildException;
 
 
     /**

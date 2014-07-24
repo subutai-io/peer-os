@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.manager.exception;
+package org.safehaus.subutai.api.manager.exception;
 
 
 /**
