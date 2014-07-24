@@ -49,11 +49,11 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response registerTemplateDummy(String templateName) {
-        String config = "lxc.utsname = master\n"
+        String config = "lxc.utsname = " + templateName + "\n"
                 + "lxc.arch    = amd64\n"
                 + "subutai.config.path     = /etc\n"
                 + "subutai.app.data.path   = /var\n"
-                + "subutai.parent          = " + (templateName.equals("master") ? "" : templateName) + "\n"
+                + "subutai.parent          = " + (templateName.equals("master") ? "" : "master") + "\n"
                 + "subutai.git.branch      = " + templateName + "-branch\n"
                 +"subutai.git.uuid        = 1234567890QWERTYUIOP\n";
         String packs = "Desired=Unknown/Install/Remove/Purge/Hold\n"
