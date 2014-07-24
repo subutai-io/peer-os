@@ -109,6 +109,8 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #------------------------------------------------------
 #(4) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
+echo "Current directory:" $(pwd)
+exit 1
 git add .
 git commit -m "Auto commit while building subutai-cli package"
 isSuccesful=$?
