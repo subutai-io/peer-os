@@ -54,7 +54,7 @@ function send_n_register {
     return
   fi
 
-  curl -s -XPOST $url --data-binary @$debian_file
+  curl -f -s -XPOST $url --data-binary @$debian_file
 
   check_status "Sending Debian file $debian_file to management server" "$?"
 } 
