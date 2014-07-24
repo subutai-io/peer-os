@@ -14,10 +14,10 @@
 
 # This function returns true if variable is empty, false if not empty
 function isEmpty {
-  if [ -n "$1" ]; then
+  if [ -z "$1" ]; then
     echo "true"
   else
-    return "false"
+    echo "false"
   fi
 }
 
@@ -34,7 +34,9 @@ function exitIfNoChange {
   # Check if there are local commits not pushed
   git_diff=$(git diff origin/$branch_name..HEAD)
   isDiffEmpty=$(isEmpty $git_diff)
-  
+  echo checking is there is a change for branch $branch_name 
+  echo isStatusEmpty: $isStatusEmpty
+  echo isDiffEmpty: $isDiffEmpty
   if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
     git checkout -- $changelogFile
     echo "No change is made on debian package"
@@ -80,7 +82,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #------------------------------------------------------
 #(3) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
-if [ $isStatusEmpty = "true" ]; then
+if [ $isStatusEmpty = "false" ]; then
   git add .
   git commit -m "Auto commit while building subutai-cli package"
   isSuccesful=$?
