@@ -86,11 +86,11 @@ if [ $isStatusEmpty = "false" ]; then
   git add .
   git commit -m "Auto commit while building subutai-cli package"
   isSuccesful=$?
-  git push
-  isSuccesful=`expr $? + $isSuccesful`
-else
-  isSuccesful=0
+#else
+#  isSuccesful=0
 fi
+git push
+isSuccesful=`expr $? + $isSuccesful`
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
