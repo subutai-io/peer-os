@@ -788,6 +788,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Accumulo2 -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>accumulo-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>accumulo-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>accumulo-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>accumulo-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>accumulo-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Presto -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1296,21 +1323,48 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Hadoop 2 -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hadoop-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hadoop-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hadoop-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hadoop-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hadoop-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- ElasticSearch -->
       <dependency>
-       <groupId>org.safehaus.subutai</groupId>
-       <artifactId>elasticsearch-api</artifactId>
-       <version>${project.version}</version>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-api</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-       <groupId>org.safehaus.subutai</groupId>
-       <artifactId>elasticsearch-impl</artifactId>
-       <version>${project.version}</version>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-impl</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-       <groupId>org.safehaus.subutai</groupId>
-       <artifactId>elasticsearch-cli</artifactId>
-       <version>${project.version}</version>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-cli</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- Products Modules - END -->
