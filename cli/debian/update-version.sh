@@ -12,32 +12,43 @@
 #(0) check if there is a change inside cli directory
 #------------------------------------------------------
 
-# This function returns 0 if variable is empty, 1 if not empty
-function isChanged {
+# This function returns true if variable is empty, false if not empty
+function isEmpty {
   if [ -n "$1" ]; then
-    return 0
+    echo "true"
   else
-    return 1
+    return "false"
   fi
 }
-function checkIfCommitNecessary {
+
+
+function exitIfNoChange {
   local changelogFile=$1
-  cli_git_status=$(git status | grep "cli/")
-  isChanged $cli_git_status
-  isCommitNecessary=$?
-  if [ $isCommitNecessary = "1" ]; then
+  branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+  branch_name="(unnamed branch)"     # detached HEAD
+  branch_name=${branch_name##refs/heads/}
+  # Check if there are uncommitted changes
+  git_status=$(git status | grep "cli/")
+  isStatusEmpty=$(isEmpty $git_status)
+  
+  # Check if there are local commits not pushed
+  git_diff=$(git diff origin/$branch_name..HEAD)
+  isDiffEmpty=$(isEmpty $git_diff)
+  
+  if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
     git checkout -- $changelogFile
+    echo "No change is made on debian package"
     exit 0
   fi
 }
 
+changelogFile="debian/changelog"
 # Switch to root .git directory to see changes properly
 pushd ..
-changelogFile="debian/changelog"
-checkIfCommitNecessary $changelogFile
+exitIfNoChange $changelogFile
 popd
 
-
+#----------------UPDATE_VERSION-----------------------
 #------------------------------------------------------
 # (1) read the version number
 #------------------------------------------------------
@@ -67,14 +78,17 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 
 
 #------------------------------------------------------
-#(3) commit and push with incremented patch version number (X+1)
+#(3) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
-git add .
-git commit -m "Auto commit while building subutai-cli package"
-isSuccesful=$?
-git push
-isSuccesful=`expr $? + $isSuccesful`
-
+if [ $isStatusEmpty = "true" ]; then
+  git add .
+  git commit -m "Auto commit while building subutai-cli package"
+  isSuccesful=$?
+  git push
+  isSuccesful=`expr $? + $isSuccesful`
+else
+  isSuccesful=0
+fi
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
