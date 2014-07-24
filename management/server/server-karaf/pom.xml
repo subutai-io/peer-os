@@ -1089,6 +1089,33 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Hadoop 2-->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hadoop-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hadoop-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hadoop-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hadoop-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hadoop-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Hive -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>

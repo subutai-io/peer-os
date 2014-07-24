@@ -18,6 +18,7 @@
     <module>mongodb</module>
     <module>zookeeper</module>
     <module>accumulo</module>
+    <module>hadoop</module>
   </modules>
 
 </project>

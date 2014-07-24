@@ -11,8 +11,8 @@
 
     <artifactId>hadoop-plugin-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Hadoop</name>
-    <description>Subutai Hadoop</description>
+    <name>Subutai Hadoop Impl</name>
+    <description>Subutai Hadoop Impl</description>
 
     <dependencies>
         <dependency>
@@ -73,7 +73,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.hadoop.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.hadoop.impl</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

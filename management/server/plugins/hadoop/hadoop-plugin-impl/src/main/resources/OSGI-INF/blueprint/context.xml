@@ -14,7 +14,7 @@
     <reference id="networkManager" availability="mandatory"
                interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
 
-    <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.hadoop.impl.HadoopImpl"
+    <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="tracker"/>
@@ -24,6 +24,6 @@
         <argument ref="containerManager"/>
     </bean>
 
-    <service ref="hadoop-impl" interface="org.safehaus.subutai.hadoop.api.Hadoop"/>
+    <service ref="hadoop-impl" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
 
 </blueprint>
