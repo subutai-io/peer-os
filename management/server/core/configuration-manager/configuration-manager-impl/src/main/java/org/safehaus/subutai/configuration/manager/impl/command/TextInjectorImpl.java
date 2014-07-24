@@ -5,6 +5,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.configuration.manager.api.TextInjector;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
 
 /**
@@ -28,12 +29,11 @@ public class TextInjectorImpl implements TextInjector {
     @Override
     public boolean echoTextIntoAgent( Agent agent, String path, String content ) {
         //TODO call echo command on given agent
-        Command catCommand = Commands.getEchoCommand( agent, path, content );
-        commandRunner.runCommand( catCommand );
+        Command command = Commands.getEchoCommand( agent, path, content );
+        commandRunner.runCommand( command );
 
-        if ( catCommand.hasSucceeded() ) {
-            //            po.addLog( "cat done" );
-            String config = catCommand.getResults().get( agent.getUuid() ).getStdOut();
+        if ( command.hasSucceeded() ) {
+            String config = command.getResults().get( agent.getUuid() ).getStdOut();
             System.out.println( config );
         }
         else {
@@ -63,5 +63,12 @@ public class TextInjectorImpl implements TextInjector {
             return "";
         }
         return "";
+    }
+
+
+    @Override
+    public String getConfigTemplate( final String path ) {
+        String content = FileUtil.getContent( path, this );
+        return content;
     }
 }

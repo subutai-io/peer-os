@@ -1,0 +1,108 @@
+#!/bin/bash
+
+
+function master_import {
+  # Check for Master Existence
+  # ---------------------------------------------------------------------------
+
+  lxc_assert_no master
+  zfs_assert_nods "lxc/master"
+
+  # Create the container
+  # ---------------------------------------------------------------------------
+
+  local container="master"
+  debian_root=$SUBUTAI_TMPDIR/$container
+  config=$debian_root/config
+  fstab=$debian_root/fstab
+  deltas=$debian_root/deltas
+  
+  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai master_import called from command line"
+    local debian_package_name=`get_debian_package_name $container`
+    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+    local package_name=`get_package_name $container`
+
+    if [ ! -f "$debian_file" ]; then
+      msg_error "Could not find template file \"$debian_file\". Aborting ..."
+      exit 1
+    fi
+
+    pushd $SUBUTAI_TMPDIR > /dev/null
+    is_package_installed $package_name
+    if [ $? = 0  ]; then
+      msg_error "Template $container seems already installed, please destroy first"
+      exit 1
+    fi
+
+    dpkg -i $debian_file
+    if [ $? -eq 0 ]; then
+      msg_ok "Debian package of $package_name is installed succesfully"
+      exit 0
+    else
+      msg_error "Debian package of $package_name could not be installed, removing"
+      subutai master_destroy
+      exit 1
+    fi
+    popd
+  else
+    msg_info "subutai master_import called while installing master from the debian package"
+  fi
+
+
+  lxc_home=/var/lib/lxc/master
+  lxc_rootfs=$lxc_home/rootfs
+  mkdir -p $lxc_rootfs
+  cp $config $lxc_home
+  cp $fstab $lxc_home
+  cp $debian_root/packages $lxc_home
+
+  zfs recv lxc/master < $deltas/rootfs.delta
+  zfs hold keep lxc/master@template
+  zfs set mountpoint=$lxc_rootfs lxc/master
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for rootfs"
+  else
+    msg_error "Delta import for rootfs failed"
+  fi
+
+  zfs recv lxc/master-opt < $deltas/opt.delta
+  zfs hold keep lxc/master-opt@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for opt"
+  else
+    msg_error "Delta import for opt failed"
+  fi
+
+  zfs recv lxc-data/master-var < $deltas/var.delta
+  zfs hold keep lxc-data/master-var@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/var.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for var"
+  else
+    msg_error "Delta import for var failed"
+  fi
+ 
+  zfs recv lxc-data/master-home < $deltas/home.delta
+  zfs hold keep lxc-data/master-home@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/home.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for home"
+  else
+    msg_error "Delta generation for opt failed"
+  fi
+
+  msg_ok "Master import from debian package is successful"
+  rm -rf $debian_root
+  exit 0
+}
+
+
+function master_import_description {
+  echo imports master template
+}
+
+

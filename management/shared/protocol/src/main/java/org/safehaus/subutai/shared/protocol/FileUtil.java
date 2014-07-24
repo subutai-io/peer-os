@@ -37,7 +37,7 @@ public class FileUtil {
 
         try {
             String currentPath = System.getProperty( "user.dir" ) + "/res/" + fileName;
-            InputStream inputStream = getClassLoader( object ).getResourceAsStream( "img/" + fileName );
+            InputStream inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
             OutputStream outputStream = new FileOutputStream( new File( currentPath ) );
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -63,9 +63,9 @@ public class FileUtil {
     }
 
 
-    private static URLClassLoader getClassLoader( Object object ) {
+    private static URLClassLoader getClassLoader( Class clazz ) {
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
-        URL url = object.getClass().getProtectionDomain().getCodeSource().getLocation();
+        URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
         URLClassLoader classLoader =
                 new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
 
@@ -79,9 +79,9 @@ public class FileUtil {
     }
 
 
-    private static String readFile( String filePath, Object object ) throws IOException {
+    private static String readFile( String filePath, Class clazz ) throws IOException {
 
-        InputStream is = getClassLoader( object ).getResourceAsStream( filePath );
+        InputStream is = getClassLoader( clazz ).getResourceAsStream( filePath );
         String s = streamToString( is );
         is.close();
 
@@ -90,10 +90,19 @@ public class FileUtil {
 
 
     public static String getContent( String filePath, Object object ) {
+
+        if ( object != null ) {
+            return getContent( filePath, object.getClass() );
+        }
+        return null;
+    }
+
+
+    public static String getContent( String filePath, Class clazz ) {
         String content = "";
 
         try {
-            content = readFile( filePath, object );
+            content = readFile( filePath, clazz );
         }
         catch ( Exception e ) {
             log.log( Level.SEVERE, "Error while reading file: " + e );

@@ -10,84 +10,6 @@ function master_create {
 
   # Create the container
   # ---------------------------------------------------------------------------
-  # Two modes: import and create
-
-  local container="master"
-  local debian_package_name=`get_debian_package_name $container`
-  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-  local package_name=`get_package_name $container`
-  debian_root=$SUBUTAI_TMPDIR/$container
-  config=$debian_root/config
-  fstab=$debian_root/fstab
-  deltas=$debian_root/deltas
-
-  if [ -f "$debian_file" ]; then
-    msg_info "Using available debian file for import: $debian_file"
-
-    if [ -d "$debian_root" ]; then
-      rm -rf $debian_root
-    fi
-
-    pushd . >> /dev/null
-    cd $SUBUTAI_TMPDIR
-    dpkg -i $debian_file
-    if [ $? -eq 0 ]; then
-      msg_ok "Debian package of $container is installed succesfully"
-    else
-      msg_error "Debian package of $container could not be installed, removing"
-      apt-get --assume-yes --force-yes purge $package_name
-      exit 1
-    fi
-    popd >> /dev/null
-
-    lxc_home=/var/lib/lxc/master
-    lxc_rootfs=$lxc_home/rootfs
-    mkdir -p $lxc_rootfs
-    cp $config $lxc_home
-    cp $fstab $lxc_home
-    cp $debian_root/packages $lxc_home
-
-    zfs recv lxc/master < $deltas/rootfs.delta
-    zfs hold keep lxc/master@template
-    zfs set mountpoint=$lxc_rootfs lxc/master
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for rootfs"
-    else
-      msg_error "Delta import for rootfs failed"
-    fi
-
-    zfs recv lxc/master-opt < $deltas/opt.delta
-    zfs hold keep lxc/master-opt@template
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for opt"
-    else
-      msg_error "Delta import for opt failed"
-    fi
-
-    zfs recv lxc-data/master-var < $deltas/var.delta
-    zfs hold keep lxc-data/master-var@template
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for var"
-    else
-      msg_error "Delta import for var failed"
-    fi
-  
-    zfs recv lxc-data/master-home < $deltas/home.delta
-    zfs hold keep lxc-data/master-home@template
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for home"
-    else
-      msg_error "Delta generation for opt failed"
-    fi
-
-    msg_ok "Master import from debian package is successful"
-    rm -rf $debian_root
-    exit 0
-  fi
 
   lxc-create -n master            \
    -t ubuntu                      \
@@ -120,7 +42,14 @@ function master_create {
     echo "$SUBUTAI_APT_MIRROR archive.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
     echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
   fi
-
+  
+  # Configuration for apt-proxy
+  if [ -n "$SUBUTAI_APT_PROXY" ]; then
+    echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
+       > /etc/apt/sources.list
+    echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
+       >> /etc/apt/sources.list
+  fi
   lxc_wait_net master
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
       >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list

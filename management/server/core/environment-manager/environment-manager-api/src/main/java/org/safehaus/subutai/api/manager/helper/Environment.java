@@ -5,33 +5,36 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-
 
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class Environment  {
+public class Environment {
 
     private String owner;
     private UUID uuid;
-    private Set<Agent> agents;
+    private Set<Node> nodes;
     private String name;
 
 
-        public String getName() {
-            return name;
-        }
+    public String getName() {
+        return name;
+    }
 
 
-        public void setName( final String name ) {
-            this.name = name;
-        }
+    public void setName( final String name ) {
+        this.name = name;
+    }
 
 
     public Environment() {
         this.uuid = UUID.randomUUID();
-        this.agents = new HashSet<>();
+        this.nodes = new HashSet<>();
+    }
+
+
+    public Set<Node> getNodes() {
+        return nodes;
     }
 
 
@@ -45,13 +48,8 @@ public class Environment  {
     }
 
 
-    public Set<Agent> getAgents() {
-        return agents;
-    }
-
-
-    public void setAgents( final Set<Agent> agents ) {
-        this.agents = agents;
+    public void setNodes( final Set<Node> nodes ) {
+        this.nodes = nodes;
     }
 
 
@@ -60,6 +58,8 @@ public class Environment  {
         return "Environment{" +
                 "owner='" + owner + '\'' +
                 ", uuid=" + uuid +
+                ", nodes=" + nodes +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

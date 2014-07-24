@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+    <reference id="tracker" availability="mandatory"
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+    <reference id="dbManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+    <reference id="zkManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper"/>
+
+    <bean id="accumulo-impl" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl"
+          init-method="init" destroy-method="destroy">
+        <argument ref="commandRunner"/>
+        <argument ref="agentManager"/>
+        <argument ref="dbManager"/>
+        <argument ref="tracker"/>
+        <argument ref="hadoopManager"/>
+        <argument ref="zkManager"/>
+    </bean>
+
+    <service ref="accumulo-impl" interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo"/>
+
+</blueprint>

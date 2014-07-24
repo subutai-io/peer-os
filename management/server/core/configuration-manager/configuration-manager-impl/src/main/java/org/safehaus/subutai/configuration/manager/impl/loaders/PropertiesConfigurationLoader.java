@@ -14,6 +14,8 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
@@ -44,7 +46,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
             while ( iterator.hasNext() ) {
                 String key = iterator.next();
                 String value = iniParser.getStringProperty( key );
-                JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value );
+                JsonObject field = configBuilder.buildFieldJsonObject( key, "", true, "", true, value );
                 fields.add( field );
             }
             JsonObject cjo = configBuilder.addJsonArrayToConfig( jo, fields );
@@ -59,15 +61,32 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
     }
 
 
-    private void parseConfigurationText( String configText ) {
-
-
-    }
-
-
     @Override
-    public void setConfiguration( final Agent agent, JsonObject config ) {
+    public boolean setConfiguration( final Agent agent, String configFilePath, String jsonObjectConfig ) {
         //TODO Read config from instance, set values from Config, inject Config
+        //        JsonObject jsonObject = getConfiguration( agent, "" );
+        TextInjectorImpl configurationInjector = new TextInjectorImpl();
+        String content = configurationInjector.catFile( agent, configFilePath );
+        Gson gson = new Gson();
+
+        try {
+            IniParser iniParser = new IniParser( content );
+            JsonObject config = gson.fromJson( jsonObjectConfig, JsonObject.class );
+            JsonArray jsonArray2 = config.getAsJsonArray( "configFields" );
+            for ( int i = 0; i < jsonArray2.size(); i++ ) {
+                JsonObject jo1 = ( JsonObject ) jsonArray2.get( i );
+                String fieldName = jo1.getAsJsonPrimitive( "fieldName" ).getAsString();
+                String value = jo1.getAsJsonPrimitive( "value" ).getAsString();
+                iniParser.setProperty( fieldName, value );
+            }
+
+            configurationInjector.echoTextIntoAgent( agent, configFilePath, content );
+        }
+        catch ( ConfigurationException e ) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 

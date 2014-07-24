@@ -64,15 +64,17 @@ function deb_pkg {
   create_control_file $lxc $debian_dir
 
   # ----------------------------------------------------------------------------
-  # (3) create postinst script of debian package
+  # (3) create postinst and postrm script of debian package
   # ----------------------------------------------------------------------------
-  create_postinst_script $debian_dir
-
+  create_preinst_script $lxc $debian_dir
+  create_postinst_script $lxc $debian_dir
+  create_prerm_script $lxc $debian_dir
+  
   # ----------------------------------------------------------------------------
   # (4) create debian package
   # ----------------------------------------------------------------------------
-  dpkg-deb -z8 -Zgzip --build $debian_dir >> /dev/null
-  check_status "Template \"$lxc\" Debian package generation" "$?"
+  dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
 
   # ----------------------------------------------------------------------------
   # (5) remove copied directories for creating debian package
@@ -88,7 +90,11 @@ function deb_pkg {
 
   if [ -z "$propline" ]; then
     echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
+    debian_file=$debian_dir".deb"
+  else
+    debian_file=`echo $propline | awk '{print $3}'`
   fi
+  echo $debian_file
 }
 
 
@@ -104,7 +110,7 @@ function create_control_file {
   local dependency="subutai-cli (>= $SUBUTAI_VERSION)"
   
   # Check if lxc is master. If not, put a dependency to the parent template 
-  lxc_assert $lxc "`usage`"
+  lxc_assert $lxc "`usage`" > /dev/null
   local parent=`zfs_get_parent $container`
   local parent_package_name=`get_package_name $parent`
 
@@ -120,15 +126,14 @@ function create_control_file {
   local Depends=$dependency
   local Description="This is a Subutai delta image debian package of $lxc template"
 
-  #chmod control directory
-  chmod 755 $debian_dir/DEBIAN
-
   # clean control file
   > $control_file
   # Change permission of the control file
   chmod 664 $control_file
 
   echo Package: $Package >> $control_file
+  echo "Priority: optional" >> $control_file
+  echo "Section: devel" >> $control_file
   echo Maintainer: $Maintainer >> $control_file
   echo Architecture: $Architecture >> $control_file
   echo Version: $Version >> $control_file
@@ -138,15 +143,64 @@ function create_control_file {
 
 
 # -----------------------------------------------------------------------------
+# Creates pretinst script of master debian package
+# -----------------------------------------------------------------------------
+function create_preinst_script {
+  local lxc=$1
+  local debian_package_name=`get_debian_package_name $lxc`
+  local debian_dir=$2
+  local preinst_file=$debian_dir/DEBIAN/preinst
+  local archive_directory=/var/cache/apt/archives/
+  echo "#!/bin/bash"  >> $preinst_file
+  if [ $lxc == "master" ]; then
+    echo "mkdir -p /lxc-data/tmpdir" >> $preinst_file
+    # Copy master debian package from archive_directory 
+    # under $SUBUTAI_TMPDIR directory
+    echo "if [ -f $archive_directory/$debian_package_name".deb" ]; then" >> $preinst_file
+    echo "  cp $archive_directory/$debian_package_name".deb" $SUBUTAI_TMPDIR"  >> $preinst_file
+    echo "fi" >> $preinst_file
+  fi
+  echo ""  >> $preinst_file
+  chmod 755 $preinst_file
+}
+
+# -----------------------------------------------------------------------------
 # Creates postinst script of debian package
 # -----------------------------------------------------------------------------
 function create_postinst_script {
-  local debian_dir=$1
+  local lxc=$1
+  local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
-  echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
-  chmod 555 $postinst_file
+  echo "export APT_GET_INVOCATION=true" >> $postinst_file
+  # Check if the template is master
+  if [ $lxc != "master" ]; then
+    echo "subutai import $lxc" >> $postinst_file
+  else
+    echo "subutai master_import"  >> $postinst_file
+  fi
+  chmod 755 $postinst_file
+}
+
+
+# -----------------------------------------------------------------------------
+# Creates postinst script of debian package
+# -----------------------------------------------------------------------------
+function create_prerm_script {
+  local lxc=$1
+  local debian_dir=$2
+  local prerm_file=$debian_dir/DEBIAN/prerm
+  echo "#!/bin/bash"  >> $prerm_file
+  echo ""  >> $prerm_file
+  echo "export APT_GET_INVOCATION=true" >> $prerm_file
+  # Check if the template is master
+  if [ $lxc != "master" ]; then
+    echo "subutai destroy $lxc" >> $prerm_file
+  else
+    echo "subutai master_destroy" >> $prerm_file
+  fi
+  chmod 755 $prerm_file
 }
 
 
@@ -174,4 +228,13 @@ function get_package_name {
 
 function get_architecture {
   echo "amd64"
+}
+
+
+function is_package_installed {
+  if [ -z "$1" ]; then
+    msg_error "package name is not provided. Aborting ..."
+    exit 1
+  fi
+  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^i'
 }

@@ -8,9 +8,6 @@ package org.safehaus.subutai.plugin.mongodb.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
@@ -71,7 +68,5 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
      */
     public UUID checkNode( String clusterName, String lxcHostName );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, AgentManager agentManager,
-                                                         CommandRunner commandRunner, ContainerManager containerManager,
-                                                         MongoClusterConfig config );
+    public ClusterSetupStrategy getClusterSetupStrategy( MongoClusterConfig config, ProductOperation po );
 }

@@ -6,6 +6,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+import java.util.*;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -15,8 +16,6 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.hive.HiveUI;
-
-import java.util.*;
 
 public class Manager {
 
@@ -121,7 +120,7 @@ public class Manager {
 					return;
 				}
 
-				Set<Agent> set = new HashSet<Agent>(hci.getAllNodes());
+				Set<Agent> set = new HashSet<>(hci.getAllNodes());
 				set.remove(config.getServer());
 				set.removeAll(config.getClients());
 				if (set.isEmpty()) {
@@ -179,7 +178,7 @@ public class Manager {
 			stopBtn.addStyleName("default");
 			final Button restartBtn = new Button("Restart");
 			restartBtn.addStyleName("default");
-			final Button destroyBtn = !server ? new Button("Destroy") : null;
+			final Button destroyBtn = new Button("Destroy");
 			destroyBtn.addStyleName("default");
 			final Embedded icon = new Embedded("", new ThemeResource(
 					"img/spinner.gif"));
@@ -190,12 +189,13 @@ public class Manager {
 			icon.setVisible(false);
 
 			final List items = new ArrayList();
-			items.add(agent.getHostname());
-			items.add(checkBtn);
-			items.add(startBtn);
-			items.add(stopBtn);
-			items.add(restartBtn);
-			if (destroyBtn != null) {
+            items.add(agent.getHostname());
+            if(server) {
+                items.add(checkBtn);
+                items.add(startBtn);
+                items.add(stopBtn);
+                items.add(restartBtn);
+            } else {
 				items.add(destroyBtn);
 				destroyBtn.addClickListener(new Button.ClickListener() {
 					@Override
@@ -238,6 +238,7 @@ public class Manager {
 							config.getClusterName(), agent.getHostname());
 					HiveUI.getExecutor().execute(new Runnable() {
 
+                        @Override
 						public void run() {
 							ProductOperationView po = null;
 							while (po == null || po.getState() == ProductOperationState.RUNNING) {
@@ -353,29 +354,25 @@ public class Manager {
 		List<Config> clustersInfo = HiveUI.getManager().getClusters();
 		if (clustersInfo != null && clustersInfo.size() > 0) {
 			for (Config ci : clustersInfo) {
-				clusterCombo.addItem(ci);
-				clusterCombo.setItemCaption(ci, ci.getClusterName());
-			}
-			if (current != null) {
-				for (Config ci : clustersInfo) {
-					if (ci.getClusterName().equals(current.getClusterName())) {
-						clusterCombo.setValue(ci);
-						return;
-					}
-				}
-			}
+                clusterCombo.addItem(ci);
+                String cap = String.format("%s [%s]", ci.getClusterName(),
+                        ci.getHadoopClusterName());
+                clusterCombo.setItemCaption(ci, cap);
+            }
+            clusterCombo.setValue(current);
 		}
 	}
 
 	private Table createTableTemplate(String caption, boolean server) {
 		final Table table = new Table(caption);
 		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Check", Button.class, null);
-		table.addContainerProperty("Start", Button.class, null);
-		table.addContainerProperty("Stop", Button.class, null);
-		table.addContainerProperty("Restart", Button.class, null);
-		if (!server)
-			table.addContainerProperty("Destroy", Button.class, null);
+        if(server) {
+            table.addContainerProperty("Check", Button.class, null);
+            table.addContainerProperty("Start", Button.class, null);
+            table.addContainerProperty("Stop", Button.class, null);
+            table.addContainerProperty("Restart", Button.class, null);
+        } else
+            table.addContainerProperty("Destroy", Button.class, null);
 		table.addContainerProperty("Status", Embedded.class, null);
 		table.setSizeFull();
 

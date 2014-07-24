@@ -1,18 +1,20 @@
 package org.safehaus.subutai.impl.manager.builder;
 
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
-import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
@@ -21,26 +23,45 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class EnvironmentBuilder {
 
+    private final TemplateRegistryManager templateRegistryManager;
+    private final AgentManager agentManager;
 
+
+    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager,
+                               final AgentManager agentManager ) {
+        this.templateRegistryManager = templateRegistryManager;
+        this.agentManager = agentManager;
+    }
+
+
+    //@todo Baha handle all exceptional situations like if physical agent is not connected, if template is not found etc
     public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
             throws EnvironmentBuildException {
         Environment environment = new Environment();
         environment.setName( blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            PlacementStrategyENUM e1 = nodeGroup.getPlacementStrategyENUM();
-            Collection<Agent> hosts = new HashSet<Agent>();
-            int nodeCount = 3;
+            PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategy();
+            int nodeCount = nodeGroup.getNumberOfNodes();
 
-            Set<Agent> agentList;
+            Set<Node> nodes = new HashSet<>();
+            Set<Agent> physicalAgents = new HashSet<>();
+            for ( String host : nodeGroup.getPhysicalNodes() ) {
+                physicalAgents.add( agentManager.getAgentByHostname( host ) );
+            }
             try {
-                agentList = containerManager
-                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, hosts, e1 );
+                Set<Agent> agents = containerManager
+                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, physicalAgents,
+                                placementStrategy );
+
+                for ( Agent agent : agents ) {
+                    nodes.add( new Node( agent, templateRegistryManager.getTemplate( nodeGroup.getTemplateName() ) ) );
+                }
             }
             catch ( LxcCreateException ex ) {
                 throw new EnvironmentBuildException( ex.toString() );
             }
 
-            environment.getAgents().addAll( agentList );
+            environment.getNodes().addAll( nodes );
         }
 
         return environment;

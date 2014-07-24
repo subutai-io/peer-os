@@ -5,6 +5,7 @@
 # already. Since this functionality is not available I just stubbed it 
 # out with a call to zfs_is_template. 
 function is_registered {
+ 
   local template=$1
   local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
 
@@ -12,7 +13,7 @@ function is_registered {
     echo true
   fi
 
-  resp=`curl -XGET $url`
+  resp=`curl -s -XGET $url`
 
   # response should contain quoted template name
   if [[ -n "$resp" && "$resp" == *\"$template\"* ]]; then 
@@ -23,10 +24,20 @@ function is_registered {
 } 
     
 
-# TODO: stub function that returns registered templates
-# will be completed when REST service will be available
-function list_templates {
-  echo ""
+# returns registered templates
+# accepts parameter "parents" which include templates' parents
+function list_reg_templates {
+  local parents="$1"
+  local url=`build_rest_url $SUBUTAI_REST_LIST_TEMPLATES`
+  IFS=$'\n'
+  for i in `curl -s $url` 
+  do
+    if [ "$parents" == "parents" ]; then
+      echo $i | tr " " "\t"
+    else
+      echo "$i" | awk '{print $1}'
+    fi
+  done
 }
   
 # URGENT: this is a stub function and needs to be properly implemented
@@ -37,6 +48,7 @@ function list_templates {
 # in templates registry 
 function send_n_register {
   local debian_file=$1
+  local config_dir=$2
   local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
 
   if [ "$TEST_MODE" == "true" ]; then
@@ -44,7 +56,7 @@ function send_n_register {
     return
   fi
 
-  curl -XPOST $url --data-binary @$debian_file
+  curl -f -s -XPOST $url -F file=@$debian_file -F config_dir=$config_dir
 
   check_status "Sending Debian file $debian_file to management server" "$?"
 } 

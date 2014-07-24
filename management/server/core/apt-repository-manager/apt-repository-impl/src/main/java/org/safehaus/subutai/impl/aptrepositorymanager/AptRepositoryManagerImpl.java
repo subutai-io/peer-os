@@ -6,26 +6,18 @@
 package org.safehaus.subutai.impl.aptrepositorymanager;
 
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import org.safehaus.subutai.api.aptrepositorymanager.AptCommand;
-import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
-import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
-import org.safehaus.subutai.api.aptrepositorymanager.PackageInfo;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import org.safehaus.subutai.api.aptrepositorymanager.*;
+import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
@@ -105,11 +97,13 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( packageFile.exists(), "Package file does not exist" );
         Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
 
+        Path pathToDebPack = Paths.get(Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
+                packageFile.getName());
         Command command = commandRunner.createCommand( new RequestBuilder(
                 //reprepro includedeb trusty amd64/trusty/*.deb
                 String.format( "cp %s %s && reprepro includedeb %s %s%s", pathToPackageFile,
                         Common.APT_REPO_PATH + Common.APT_REPO_AMD64_PACKAGES_SUBPATH, Common.APT_REPO,
-                        packageFile.getName(),
+                        pathToDebPack,
                         deleteSourcePackage ? String.format( " && rm -f %s", pathToPackageFile ) : "" ) )
                 .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 

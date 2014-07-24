@@ -2,7 +2,7 @@ package org.safehaus.subutai.dis.manager.window;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.api.manager.helper.Node;
 
 import com.vaadin.ui.TextArea;
 
@@ -21,9 +21,9 @@ public class EnvironmentDetails extends DetailsWindow {
     public void setContent( final Environment blueprint ) {
         StringBuilder sb = new StringBuilder();
         sb.append( blueprint.getName() ).append( "\n" );
-        if ( blueprint.getAgents() != null ) {
-                for ( Agent agent : blueprint.getAgents() ) {
-                    sb.append( agent.getHostname() ).append( "\n" );
+        if ( blueprint.getNodes() != null ) {
+                for ( Node node : blueprint.getNodes() ) {
+                    sb.append( node.getAgent().getHostname() ).append( "\n" );
             }
         }
 

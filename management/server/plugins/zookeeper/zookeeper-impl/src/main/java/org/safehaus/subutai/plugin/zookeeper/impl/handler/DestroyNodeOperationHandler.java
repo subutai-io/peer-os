@@ -8,13 +8,19 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
+import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.Response;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -65,35 +71,71 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             return;
         }
 
-        //destroy lxc
-        po.addLog( "Destroying lxc container..." );
-        Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
-        if ( physicalAgent == null ) {
-            po.addLog(
-                    String.format( "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
-                            agent.getHostname() ) );
-        }
-        else {
-
-            try {
-                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
-                po.addLog( "Lxc container destroyed successfully" );
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
+            //destroy lxc
+            po.addLog( "Destroying lxc container..." );
+            Agent physicalAgent = manager.getAgentManager().getAgentByHostname( agent.getParentHostName() );
+            if ( physicalAgent == null ) {
+                po.addLog( String.format(
+                        "Could not determine physical parent of %s. Use LXC module to cleanup, skipping...",
+                        agent.getHostname() ) );
             }
-            catch ( LxcDestroyException e ) {
-                po.addLog( String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
-                        e.getMessage() ) );
+            else {
+
+                try {
+                    manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
+                    po.addLog( "Lxc container destroyed successfully" );
+                }
+                catch ( LxcDestroyException e ) {
+                    po.addLog(
+                            String.format( "Could not destroy lxc container %s. Use LXC module to cleanup, skipping...",
+                                    e.getMessage() ) );
+                }
+            }
+        }
+        else if(config.getSetupType() == SetupType.OVER_HADOOP) {
+            //just uninstall Zookeeper
+            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+
+            Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
+            manager.getCommandRunner().runCommand( uninstallCommand );
+
+            if ( uninstallCommand.hasCompleted() ) {
+                if ( uninstallCommand.hasSucceeded() ) {
+                    po.addLog( "Cluster successfully uninstalled" );
+                }
+                else {
+                    po.addLog( String.format( "Uninstallation failed, %s, skipping...",
+                            uninstallCommand.getAllErrors() ) );
+                }
+            }
+            else {
+                po.addLogFailed( "Uninstallation failed, command timed out" );
+                return;
             }
         }
 
         config.getNodes().remove( agent );
 
-        //update settings
-        po.addLog( "Updating settings..." );
-        Command updateSettingsCommand = Commands.getUpdateSettingsCommand( config.getZkName(), config.getNodes() );
-        manager.getCommandRunner().runCommand( updateSettingsCommand );
+        //reconfiguring cluster
+        po.addLog( "Reconfiguring cluster..." );
 
-        if ( updateSettingsCommand.hasSucceeded() ) {
-            po.addLog( "Settings updated\nRestarting cluster..." );
+        Command configureClusterCommand;
+        try {
+            configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+                    ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                    ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                    ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+        }
+        catch ( ClusterConfigurationException e ) {
+            po.addLogFailed( String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
+            return;
+        }
+
+        manager.getCommandRunner().runCommand( configureClusterCommand );
+
+        if ( configureClusterCommand.hasSucceeded() ) {
+            po.addLog( "Cluster reconfigured\nRestarting cluster..." );
             //restart all other nodes with new configuration
             Command restartCommand = Commands.getRestartCommand( config.getNodes() );
             final AtomicInteger count = new AtomicInteger();
@@ -118,9 +160,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         }
         else {
             po.addLog( String.format(
-                            "Settings update failed, %s\nPlease update settings manually and restart the cluster, " +
-                                    "skipping...",
-                            updateSettingsCommand.getAllErrors() ) );
+                    "Cluster reconfiguration failed, %s\nPlease reconfigure cluster manually and restart the it, "
+                            + "skipping...", configureClusterCommand.getAllErrors() ) );
         }
 
         //update db

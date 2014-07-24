@@ -43,7 +43,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getStartAllCommand(Agent masterNode) {
         return createCommand(
-                new RequestBuilder("service spark-all start").withTimeout(360),
+                new RequestBuilder("service spark-all start &").withTimeout(360),
                 Util.wrapAgentToSet(masterNode));
     }
 

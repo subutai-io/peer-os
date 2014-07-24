@@ -1,11 +1,10 @@
 package org.safehaus.subutai.impl.hive;
 
+import java.util.*;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.impl.hive.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
-import java.util.List;
-import java.util.UUID;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class HiveImpl extends HiveBase {
 
@@ -73,6 +72,12 @@ public class HiveImpl extends HiveBase {
     @Override
     public Config getCluster(String clusterName) {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    }
+
+    @Override
+    public Map<Agent, Boolean> isInstalled(Set<Agent> nodes) {
+        CheckInstallHandler h = new CheckInstallHandler(this);
+        return h.check(Product.HIVE, nodes);
     }
 
 }

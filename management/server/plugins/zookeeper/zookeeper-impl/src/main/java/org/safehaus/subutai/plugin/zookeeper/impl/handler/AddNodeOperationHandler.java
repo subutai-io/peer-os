@@ -9,17 +9,18 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
+import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.Util;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -59,10 +60,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
 
-        if ( config.isStandalone() ) {
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
             addStandalone( config );
         }
-        else {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             addOverHadoop( config );
         }
     }
@@ -122,15 +123,25 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Installation succeeded\nUpdating db..." );
             //update db
             if ( manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, config ) ) {
-                po.addLog( "Cluster info updated in DB\nUpdating settings..." );
+                po.addLog( "Cluster info updated in DB\nReconfiguring cluster..." );
 
-                //update settings
-                Command updateSettingsCommand =
-                        Commands.getUpdateSettingsCommand( config.getZkName(), config.getNodes() );
-                manager.getCommandRunner().runCommand( updateSettingsCommand );
+                //reconfigure cluster
+                Command configureClusterCommand;
+                try {
+                    configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+                            ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+                }
+                catch ( ClusterConfigurationException e ) {
+                    po.addLogFailed( String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
+                    return;
+                }
 
-                if ( updateSettingsCommand.hasSucceeded() ) {
-                    po.addLog( "Settings updated\nRestarting cluster..." );
+                manager.getCommandRunner().runCommand( configureClusterCommand );
+
+                if ( configureClusterCommand.hasSucceeded() ) {
+                    po.addLog( "Cluster reconfigured\nRestarting cluster..." );
                     //restart all nodes
                     Command restartCommand = Commands.getRestartCommand( config.getNodes() );
                     final AtomicInteger count = new AtomicInteger();
@@ -154,8 +165,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
                 }
                 else {
                     po.addLogFailed( String.format(
-                            "Settings update failed, %s.\nPlease update settings manually and restart the " + "cluster",
-                            updateSettingsCommand.getAllErrors() ) );
+                            "Cluster reconfiguration failed, %s.\nPlease reconfigure cluster manually and restart it",
+                            configureClusterCommand.getAllErrors() ) );
                 }
             }
             else {
@@ -182,61 +193,60 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
             config.getNodes().add( agent );
 
-            po.addLog( String.format( "Lxc container created successfully\nInstalling %s...",
+            po.addLog( String.format( "Lxc container created successfully\nUpdating db...",
                     ZookeeperClusterConfig.PRODUCT_KEY ) );
 
-            //install
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
-            manager.getCommandRunner().runCommand( installCommand );
+            //update db
+            if ( manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, config ) ) {
+                po.addLog( "Cluster info updated in DB\nReconfiguring cluster..." );
 
-            if ( installCommand.hasCompleted() ) {
-                po.addLog( "Installation succeeded\nUpdating db..." );
-                //update db
-                if ( manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, config ) ) {
-                    po.addLog( "Cluster info updated in DB\nUpdating settings..." );
+                //reconfigure cluster
+                Command configureClusterCommand;
+                try {
+                    configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+                            ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+                }
+                catch ( ClusterConfigurationException e ) {
+                    po.addLogFailed( String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
+                    return;
+                }
 
-                    //update settings
-                    Command updateSettingsCommand =
-                            Commands.getUpdateSettingsCommand( config.getZkName(), config.getNodes() );
-                    manager.getCommandRunner().runCommand( updateSettingsCommand );
+                manager.getCommandRunner().runCommand( configureClusterCommand );
 
-                    if ( updateSettingsCommand.hasSucceeded() ) {
-                        po.addLog( "Settings updated\nRestarting cluster..." );
-                        //restart all nodes
-                        Command restartCommand = Commands.getRestartCommand( config.getNodes() );
-                        final AtomicInteger count = new AtomicInteger();
-                        manager.getCommandRunner().runCommand( restartCommand, new CommandCallback() {
-                            @Override
-                            public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                                if ( agentResult.getStdOut().contains( "STARTED" ) ) {
-                                    if ( count.incrementAndGet() == config.getNodes().size() ) {
-                                        stop();
-                                    }
+                if ( configureClusterCommand.hasSucceeded() ) {
+                    po.addLog( "Cluster reconfigured\nRestarting cluster..." );
+                    //restart all nodes
+                    Command restartCommand = Commands.getRestartCommand( config.getNodes() );
+                    final AtomicInteger count = new AtomicInteger();
+                    manager.getCommandRunner().runCommand( restartCommand, new CommandCallback() {
+                        @Override
+                        public void onResponse( Response response, AgentResult agentResult, Command command ) {
+                            if ( agentResult.getStdOut().contains( "STARTED" ) ) {
+                                if ( count.incrementAndGet() == config.getNodes().size() ) {
+                                    stop();
                                 }
                             }
-                        } );
-                        if ( count.get() == config.getNodes().size() ) {
-                            po.addLogDone( "Cluster restarted successfully\nDone" );
                         }
-                        else {
-                            po.addLogFailed(
-                                    String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
-                        }
+                    } );
+                    if ( count.get() == config.getNodes().size() ) {
+                        po.addLogDone( "Cluster restarted successfully\nDone" );
                     }
                     else {
-                        po.addLogFailed( String.format(
-                                "Settings update failed, %s.\nPlease update settings manually and restart the"
-                                        + " cluster", updateSettingsCommand.getAllErrors() ) );
+                        po.addLogFailed(
+                                String.format( "Failed to restart cluster, %s", restartCommand.getAllErrors() ) );
                     }
                 }
                 else {
-                    po.addLogFailed(
-                            "Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
+                    po.addLogFailed( String.format(
+                            "Cluster reconfiguration failed, %s.\nPlease reconfigure cluster manually and restart it",
+                            configureClusterCommand.getAllErrors() ) );
                 }
             }
             else {
-                po.addLogFailed( String.format( "Installation failed, %s\nUse LXC Module to cleanup",
-                        installCommand.getAllErrors() ) );
+                po.addLogFailed(
+                        "Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
             }
         }
         catch ( LxcCreateException ex ) {

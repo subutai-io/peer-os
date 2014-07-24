@@ -16,8 +16,13 @@ import com.google.gson.JsonObject;
  */
 public interface ConfigManager {
 
-    public void injectConfiguration(Agent agent, JsonObject config);
+    public boolean injectConfiguration( Agent agent, String configFilePath, String config, ConfigTypeEnum configTypeEnum );
 
-    public JsonObject getConfiguration(Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum);
+    public String getProperty( JsonObject config, String key, ConfigTypeEnum configTypeEnum );
 
+    public void setProperty( JsonObject config, String key, String value, ConfigTypeEnum configTypeEnum  );
+
+    public JsonObject getConfiguration( Agent agent, String configPathFilename, ConfigTypeEnum configTypeEnum );
+
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum );
 }

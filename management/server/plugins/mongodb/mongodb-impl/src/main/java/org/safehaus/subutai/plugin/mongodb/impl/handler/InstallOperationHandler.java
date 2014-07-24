@@ -36,9 +36,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     @Override
     public void run() {
-        ClusterSetupStrategy clusterSetupStrategy =
-                manager.getClusterSetupStrategy( po, manager.getAgentManager(), manager.getCommandRunner(),
-                        manager.getContainerManager(), config );
+        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {
             MongoClusterConfig finalConfig = ( MongoClusterConfig ) clusterSetupStrategy.setup();

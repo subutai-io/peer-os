@@ -4,12 +4,18 @@
   <service ref="environmentManager" interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
   <reference id="dbManager" availability="mandatory" interface="org.safehaus.subutai.api.dbmanager.DbManager" />
-  <reference id="containerManager" availability="mandatory" interface="org.safehaus.subutai.api.container.ContainerManager" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+  <reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.container.ContainerManager" />
+  <reference id="templateRegistryManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
 
   <bean id="environmentManager" scope="singleton" class="org.safehaus.subutai.impl.manager.EnvironmentManagerImpl">
-    <property name="dbManager" ref="dbManager" />
-    <property name="containerManager" ref="containerManager" />
+    <argument ref="containerManager" />
+    <argument ref="templateRegistryManager" />
+    <argument ref="dbManager" />
+    <argument ref="agentManager" />
   </bean>
-
 
 </blueprint>

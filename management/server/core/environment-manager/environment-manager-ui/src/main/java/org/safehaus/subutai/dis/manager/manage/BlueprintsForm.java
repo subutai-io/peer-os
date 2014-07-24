@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.dis.manager.EnvironmentManagerUI;
 import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
 
 import com.vaadin.ui.Button;
@@ -18,7 +19,6 @@ public class BlueprintsForm {
     private VerticalLayout contentRoot;
     private Table environmentsTable;
     private EnvironmentManager environmentManager;
-
 
 
     public BlueprintsForm( EnvironmentManager environmentManager ) {
@@ -59,7 +59,7 @@ public class BlueprintsForm {
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    BlueprintDetails details = new BlueprintDetails("Blueprint details");
+                    BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
                     details.setContent( blueprint );
                     contentRoot.getUI().addWindow( details );
                     details.setVisible( true );
@@ -70,7 +70,13 @@ public class BlueprintsForm {
             buildEnvironmentButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    environmentManager.buildEnvironment( blueprint );
+                    EnvironmentManagerUI.getExecutor().execute( new Runnable() {
+                        @Override
+                        public void run() {
+
+                            environmentManager.buildEnvironment( blueprint );
+                        }
+                    } );
                 }
             } );
 
