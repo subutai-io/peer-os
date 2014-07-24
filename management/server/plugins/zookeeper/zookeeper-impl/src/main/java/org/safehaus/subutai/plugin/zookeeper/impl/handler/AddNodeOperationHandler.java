@@ -9,6 +9,7 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
@@ -59,10 +60,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
 
-        if ( config.isStandalone() ) {
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
             addStandalone( config );
         }
-        else {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             addOverHadoop( config );
         }
     }

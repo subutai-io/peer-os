@@ -11,6 +11,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddNodeOperationHandler;
@@ -171,6 +172,14 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po ) {
         return new ZookeeperSetupStrategy( config, po, containerManager, commandRunner );
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final HadoopClusterConfig hadoopConfig,
+                                                         final ZookeeperClusterConfig zkConfig,
+                                                         final ProductOperation po ) {
+        return null;
     }
 
 

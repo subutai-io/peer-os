@@ -5,10 +5,12 @@
  */
 package org.safehaus.subutai.plugin.zookeeper.api;
 
+
+import java.util.Set;
+
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
 
-import java.util.Set;
 
 /**
  * @author dilshat
@@ -16,65 +18,76 @@ import java.util.Set;
 public class ZookeeperClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Zookeeper2";
+    public String templateName = "zookeeper";
     private String clusterName = "";
     private String zkName = "";
     private int numberOfNodes = 3;
     private Set<Agent> nodes;
-    private boolean isStandalone;
+    private SetupType setupType;
 
-    public boolean isStandalone() {
-        return isStandalone;
+
+    public SetupType getSetupType() {
+        return setupType;
     }
 
-    public void setStandalone(boolean isStandalone) {
-        this.isStandalone = isStandalone;
+
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
     }
+
+
+    public void setTemplateName( String templateName ) {
+        this.templateName = templateName;
+    }
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
 
     public String getZkName() {
         return zkName;
     }
 
-    public void setZkName(String zkName) {
+
+    public void setZkName( String zkName ) {
         this.zkName = zkName;
     }
+
 
     public String getClusterName() {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public void setClusterName( String clusterName ) {
         this.clusterName = clusterName;
     }
+
 
     @Override
     public String getProductName() {
         return PRODUCT_KEY;
     }
 
+
     public int getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+
+    public void setNumberOfNodes( int numberOfNodes ) {
         this.numberOfNodes = numberOfNodes;
     }
+
 
     public Set<Agent> getNodes() {
         return nodes;
     }
 
-    public void setNodes(Set<Agent> nodes) {
-        this.nodes = nodes;
-    }
 
-    @Override
-    public String toString() {
-        return "Config{" +
-                "clusterName='" + clusterName + '\'' +
-                ", zkName='" + zkName + '\'' +
-                ", numberOfNodes=" + numberOfNodes +
-                ", nodes=" + nodes +
-                ", isStandalone=" + isStandalone +
-                '}';
+    public void setNodes( Set<Agent> nodes ) {
+        this.nodes = nodes;
     }
 }

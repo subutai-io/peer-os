@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
@@ -51,8 +52,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
     public void run() {
         if ( Strings.isNullOrEmpty( config.getZkName() ) || Strings.isNullOrEmpty( config.getClusterName() )
                 //either number of nodes to create or hadoop cluster nodes must be present
-                || ( config.isStandalone() && config.getNumberOfNodes() <= 0 ) || ( !config.isStandalone() && Util
-                .isCollectionEmpty( config.getNodes() ) ) ) {
+                || ( config.getSetupType() == SetupType.STANDALONE && config.getNumberOfNodes() <= 0 ) || (
+                config.getSetupType() == SetupType.OVER_HADOOP && Util.isCollectionEmpty( config.getNodes() ) ) ) {
             po.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
@@ -63,10 +64,10 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
 
-        if ( config.isStandalone() ) {
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
             installStandalone();
         }
-        else {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             installOverHadoop();
         }
     }

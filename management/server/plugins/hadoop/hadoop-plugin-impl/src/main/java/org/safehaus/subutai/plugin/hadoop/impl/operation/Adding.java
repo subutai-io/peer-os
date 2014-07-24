@@ -40,7 +40,8 @@ public class Adding {
             @Override
             public void run() {
 
-                hadoopClusterConfig = parent.getDbManager().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class );
+                hadoopClusterConfig = parent.getDbManager().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
+                        HadoopClusterConfig.class );
                 if ( hadoopClusterConfig == null ||
                         Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ) ||
                         Strings.isNullOrEmpty( hadoopClusterConfig.getDomainName() ) ) {
@@ -50,9 +51,11 @@ public class Adding {
 
                 try {
                     po.addLog( String.format( "Creating %d lxc container...", 1 ) );
-                    Set<Agent> cfgServers = HadoopImpl.getContainerManager().clone( HadoopClusterConfig.TEMPLATE_NAME, 3,
-                            HadoopImpl.getAgentManager().getPhysicalAgents(),
-                            HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.SLAVE_NODE ) );
+                    Set<Agent> cfgServers = HadoopImpl.getContainerManager()
+                                                      .clone( hadoopClusterConfig.getTemplateName(), 3,
+                                                              HadoopImpl.getAgentManager().getPhysicalAgents(),
+                                                              HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType(
+                                                                      NodeType.SLAVE_NODE ) );
                     Agent agent = null;
 
                     for ( Agent a : cfgServers ) {
@@ -60,9 +63,9 @@ public class Adding {
                     }
                     po.addLog( "Lxc containers created successfully\nConfiguring network..." );
 
-                    if ( parent.getNetworkManager()
-                               .configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent, hadoopClusterConfig.getDomainName() ) && parent
-                            .getNetworkManager().configSshOnAgents( hadoopClusterConfig.getAllNodes(), agent ) ) {
+                    if ( parent.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
+                            hadoopClusterConfig.getDomainName() ) && parent.getNetworkManager().configSshOnAgents(
+                            hadoopClusterConfig.getAllNodes(), agent ) ) {
                         po.addLog( "Cluster network configured" );
 
                         AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
@@ -82,8 +85,9 @@ public class Adding {
                         hadoopClusterConfig.getTaskTrackers().add( agent );
                         hadoopClusterConfig.getDataNodes().add( agent );
 
-                        if ( parent.getDbManager().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                hadoopClusterConfig ) ) {
+                        if ( parent.getDbManager()
+                                   .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                           hadoopClusterConfig ) ) {
                             po.addLog( "Cluster info saved to DB" );
                         }
                         else {
