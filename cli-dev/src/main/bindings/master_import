@@ -10,158 +10,99 @@ function master_import {
 
   # Create the container
   # ---------------------------------------------------------------------------
-  # Two modes: import and create
 
   local container="master"
-  local debian_package_name=`get_debian_package_name $container`
-  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-  local package_name=`get_package_name $container`
   debian_root=$SUBUTAI_TMPDIR/$container
   config=$debian_root/config
   fstab=$debian_root/fstab
   deltas=$debian_root/deltas
+  
+  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai master_import called from command line"
+    local debian_package_name=`get_debian_package_name $container`
+    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+    local package_name=`get_package_name $container`
 
-  if [ -f "$debian_file" ]; then
-    msg_info "Using available debian file for import: $debian_file"
-
-
-    pushd . >> /dev/null
-    cd $SUBUTAI_TMPDIR
-    if [ $? -eq 0 ]; then
-      msg_ok "Debian package of $container is installed succesfully"
-    else
-      msg_error "Debian package of $container could not be installed, removing"
-      apt-get --assume-yes --force-yes purge $package_name
+    if [ ! -f "$debian_file" ]; then
+      msg_error "Could not find template file \"$debian_file\". Aborting ..."
       exit 1
     fi
-    popd >> /dev/null
 
-    lxc_home=/var/lib/lxc/master
-    lxc_rootfs=$lxc_home/rootfs
-    mkdir -p $lxc_rootfs
-    cp $config $lxc_home
-    cp $fstab $lxc_home
-    cp $debian_root/packages $lxc_home
-
-    zfs recv lxc/master < $deltas/rootfs.delta
-    zfs hold keep lxc/master@template
-    zfs set mountpoint=$lxc_rootfs lxc/master
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for rootfs"
-    else
-      msg_error "Delta import for rootfs failed"
+    pushd $SUBUTAI_TMPDIR > /dev/null
+    dpkg -s $package_name > /dev/null 2>&1
+    if [ $? = 0  ]; then
+      msg_error "Template $container seems already installed, please destroy first"
+      exit 1
     fi
 
-    zfs recv lxc/master-opt < $deltas/opt.delta
-    zfs hold keep lxc/master-opt@template
+    dpkg -i $debian_file
     if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for opt"
+      msg_ok "Debian package of $package_name is installed succesfully"
+      exit 0
     else
-      msg_error "Delta import for opt failed"
+      msg_error "Debian package of $package_name could not be installed, removing"
+      subutai master_destroy
+      exit 1
     fi
-
-    zfs recv lxc-data/master-var < $deltas/var.delta
-    zfs hold keep lxc-data/master-var@template
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for var"
-    else
-      msg_error "Delta import for var failed"
-    fi
-  
-    zfs recv lxc-data/master-home < $deltas/home.delta
-    zfs hold keep lxc-data/master-home@template
-    if [ $? -eq 0 ]; then
-      size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-      msg_ok "Imported $size delta for home"
-    else
-      msg_error "Delta generation for opt failed"
-    fi
-
-    msg_ok "Master import from debian package is successful"
-    rm -rf $debian_root
-    exit 0
+    popd
+  else
+    msg_info "subutai master_import called while installing master from the debian package"
   fi
 
-  lxc-create -n master            \
-   -t ubuntu                      \
-   -B zfs --                      \
-   -u $SUBUTAI_USER               \
-   -S $SUBUTAI_AUTH_KEY 
 
-  # Add config and app data paths to the config file
-  config=/var/lib/lxc/master/config
-  for config_path in `echo "$SUBUTAI_CONFIG_PATH" | sed -e "s/\:/ /g"`; do
-    echo subutai.config.path = $config_path >> $config
-  done
+  lxc_home=/var/lib/lxc/master
+  lxc_rootfs=$lxc_home/rootfs
+  mkdir -p $lxc_rootfs
+  cp $config $lxc_home
+  cp $fstab $lxc_home
+  cp $debian_root/packages $lxc_home
 
-  # Add pre-start hook script entry
-  echo lxc.hook.pre-start = $subutai_script_base/pre_start_hook >> $config
-  echo subutai.parent = master >> $config
-  echo subutai.git.branch = master >> $config
-
-  # (0) Start it up, update, dist-upgrade, shutdown
-  # (1) Backup rootfs contents and delete contents
-  # (2) Take created snapshot and hold
-  # (3) Recover from backup of rootfs
-  # (4) Delete backup
-  # (5) Setup git repository in / and control /etc
-  # (6) Tag template snapshot and hold
-
-  # (0)
-
-  if [ -n "$SUBUTAI_APT_MIRROR" ]; then
-    echo "$SUBUTAI_APT_MIRROR archive.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
-    echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
-  fi
-
-  lxc_wait_net master
-  echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
-  echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" \
-      >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list 
-  lxc-attach -n master -- apt-get update
-  lxc-attach -n master -- apt-get -y dist-upgrade
-
-  if [ -n "$SUBUTAI_PACKAGES" ]; then
-    lxc-attach -n master -- \
-         env DEBIAN_FRONTEND=noninteractive apt-get --assume-yes --force-yes \
-           install `echo $SUBUTAI_PACKAGES | sed -e "s/,/ /"`
-  fi
-
-  lxc-attach -n master -- apt-get -y autoclean
-  lxc-attach -n master -- apt-get -y autoremove
-
-  echo "dpkg -l" | lxc-attach -n master > /var/lib/lxc/master/packages
-
-  lxc-stop -n master
-  lxc-wait -n master -s 'STOPPED'
-  sleep 2
-
-  # (5) setup git repository in / and control /etc
-  git_init_master
-
-  # (6)
-  echo Taking @template snapshot of master\'s rootfs
-  zfs snapshot lxc/master@template
+  zfs recv lxc/master < $deltas/rootfs.delta
   zfs hold keep lxc/master@template
+  zfs set mountpoint=$lxc_rootfs lxc/master
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for rootfs"
+  else
+    msg_error "Delta import for rootfs failed"
+  fi
 
-  # Handle all other mountpoints
-  # ---------------------------------------------------------------------------
-  # Using the addmount function almost the same operations as we did above on 
-  # the rootfs are handled: whatever existing data that was found inside the 
-  # mount point on the rootfs are moved over to the new dataset once created
-  # snapshots with holds are taken.
+  zfs recv lxc/master-opt < $deltas/opt.delta
+  zfs hold keep lxc/master-opt@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for opt"
+  else
+    msg_error "Delta import for opt failed"
+  fi
 
-  addmount master opt lxc
-  addmount master home lxc-data
-  addmount master var lxc-data
+  zfs recv lxc-data/master-var < $deltas/var.delta
+  zfs hold keep lxc-data/master-var@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/var.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for var"
+  else
+    msg_error "Delta import for var failed"
+  fi
+ 
+  zfs recv lxc-data/master-home < $deltas/home.delta
+  zfs hold keep lxc-data/master-home@template
+  if [ $? -eq 0 ]; then
+    size=`ls -lh $deltas/home.delta | awk '{print $5}'`
+    msg_ok "Imported $size delta for home"
+  else
+    msg_error "Delta generation for opt failed"
+  fi
+
+  msg_ok "Master import from debian package is successful"
+  rm -rf $debian_root
+  exit 0
 }
 
+
 function master_import_description {
-  echo creates a new master from scratch
+  echo imports master template
 }
 
 
