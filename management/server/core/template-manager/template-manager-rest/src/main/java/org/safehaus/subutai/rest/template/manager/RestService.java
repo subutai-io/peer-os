@@ -4,6 +4,7 @@ import java.io.InputStream;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 public interface RestService {
 
@@ -18,9 +19,10 @@ public interface RestService {
 
     @POST
     @Path("import")
-    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
     @Produces({MediaType.TEXT_PLAIN})
-    public Response importTemplate(InputStream in);
+    public Response importTemplate(@Multipart("file") InputStream in,
+            @Multipart("config_dir") String configDir);
 
     @GET
     @Path("export/{template}")

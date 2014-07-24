@@ -7,14 +7,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,10 +51,12 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     // number sequences for template names used for new clone name generation
     private ConcurrentMap<String, AtomicInteger> sequences;
+    private ExecutorService executor;
 
 
     public void init() {
         sequences = new ConcurrentHashMap<>();
+        executor = Executors.newCachedThreadPool();
     }
 
 
@@ -197,6 +206,135 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
+    @Override
+    public void cloneDestroyByHostname( final Set<String> cloneNames ) throws LxcDestroyException {
+        if ( cloneNames == null || cloneNames.isEmpty() ) {
+            throw new LxcDestroyException( "Clone names is empty or null" );
+        }
+
+        Set<Agent> lxcAgents = new HashSet<>();
+        for ( String lxcHostname : cloneNames ) {
+            if ( lxcHostname != null ) {
+                Agent lxcAgent = agentManager.getAgentByHostname( lxcHostname );
+                if ( lxcAgent == null ) {
+                    throw new LxcDestroyException( String.format( "Lxc %s is not connected", lxcHostname ) );
+                }
+                lxcAgents.add( lxcAgent );
+            }
+        }
+
+        cloneDestroy( lxcAgents );
+    }
+
+
+    public void cloneDestroy( Set<Agent> lxcAgents ) throws LxcDestroyException {
+        if ( lxcAgents == null || lxcAgents.isEmpty() ) {
+            throw new LxcDestroyException( "LxcAgents is null or empty" );
+        }
+
+        Map<Agent, Set<Agent>> families = new HashMap<>();
+        for ( Agent lxcAgent : lxcAgents ) {
+            if ( lxcAgent != null ) {
+                Agent parentAgent = agentManager.getAgentByHostname( lxcAgent.getParentHostName() );
+                if ( parentAgent == null ) {
+                    throw new LxcDestroyException(
+                            String.format( "Physical parent of %s is not connected", lxcAgent.getHostname() ) );
+                }
+                Set<Agent> lxcChildren = families.get( parentAgent );
+                if ( lxcChildren == null ) {
+                    lxcChildren = new HashSet<>();
+                    families.put( parentAgent, lxcChildren );
+                }
+                lxcChildren.add( lxcAgent );
+            }
+        }
+
+        cloneDestroy( families );
+    }
+
+
+    public void cloneDestroy( Map<Agent, Set<Agent>> agentFamilies ) throws LxcDestroyException {
+        Map<Agent, Set<String>> families = new HashMap<>();
+
+        for ( Map.Entry<Agent, Set<Agent>> entry : agentFamilies.entrySet() ) {
+            Agent physicalAgent = entry.getKey();
+            if ( physicalAgent != null ) {
+                Set<Agent> lxcChildren = entry.getValue();
+                Set<String> lxcHostnames = families.get( physicalAgent );
+                if ( lxcHostnames == null ) {
+                    lxcHostnames = new HashSet<>();
+                    families.put( physicalAgent, lxcHostnames );
+                }
+
+                for ( Agent lxcAgent : lxcChildren ) {
+                    if ( lxcAgent != null ) {
+                        lxcHostnames.add( lxcAgent.getHostname() );
+                    }
+                }
+            }
+        }
+
+        cloneDestroyByHostname( families );
+    }
+
+
+    //@todo use command chaining on the same physical server for parallel node destruction instead of multithreaded
+    // approach
+    //
+    //use parallel thread only for multiple physical servers
+    public void cloneDestroyByHostname( Map<Agent, Set<String>> agentFamilies ) throws LxcDestroyException {
+        if ( agentFamilies == null || agentFamilies.isEmpty() ) {
+            throw new LxcDestroyException( "AgentFamilies is null or empty" );
+        }
+
+        List<ContainerInfo> lxcInfos = new ArrayList<>();
+        for ( Map.Entry<Agent, Set<String>> family : agentFamilies.entrySet() ) {
+            Agent physicalAgent = family.getKey();
+            if ( physicalAgent != null ) {
+                Set<String> children = family.getValue();
+
+                for ( String lxcAgentHostname : children ) {
+                    if ( lxcAgentHostname != null ) {
+                        ContainerInfo lxcInfo = new ContainerInfo( physicalAgent, lxcAgentHostname );
+                        lxcInfos.add( lxcInfo );
+                    }
+                }
+            }
+        }
+
+        if ( !lxcInfos.isEmpty() ) {
+
+            CompletionService<ContainerInfo> completer = new ExecutorCompletionService<>( executor );
+            //launch destroy commands
+            for ( ContainerInfo lxcInfo : lxcInfos ) {
+                completer.submit( new ContainerActor( lxcInfo, this, ContainerAction.DESTROY ) );
+            }
+
+            //wait for completion
+            try {
+                for ( ContainerInfo ignored : lxcInfos ) {
+                    Future<ContainerInfo> future = completer.take();
+                    future.get();
+                }
+            }
+            catch ( InterruptedException | ExecutionException e ) {
+            }
+
+            boolean result = true;
+            for ( ContainerInfo lxcInfo : lxcInfos ) {
+                result &= lxcInfo.isResult();
+            }
+
+            if ( !result ) {
+                throw new LxcDestroyException( "Not all lxcs destroyed. Use LXC module to cleanup" );
+            }
+        }
+        else {
+            throw new LxcDestroyException( "Empty child lxcs provided" );
+        }
+    }
+
+
     private String nextHostName( String templateName, Set<String> existingNames ) {
         AtomicInteger i = sequences.putIfAbsent( templateName, new AtomicInteger() );
         if ( i == null ) {
@@ -240,22 +378,11 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             };
         }
         group.setStrategy( EnumSet.of( strategy[0], strategy ) );
-        group.setProducts( generatePacksDiff( templateName ) );
+        Template template = templateRegistry.getTemplate( templateName );
+        group.setProducts( template.getProducts() );
         for ( Agent a : agents ) {
             group.setInstanceId( a.getUuid() );
             dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), gson.toJson( group ) );
         }
-    }
-
-
-    private List<String> generatePacksDiff( String template ) {
-        Template t = templateRegistry.getTemplate( template );
-        String templatePacks = t.getPackagesManifest();
-
-        Template p = templateRegistry.getParentTemplate( template );
-        String parentPacks = p.getPackagesManifest();
-
-        PackageDiff pdiff = new PackageDiff();
-        return pdiff.getDiff( parentPacks, templatePacks );
     }
 }

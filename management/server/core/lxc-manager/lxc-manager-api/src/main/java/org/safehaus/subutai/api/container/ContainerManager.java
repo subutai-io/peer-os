@@ -25,4 +25,6 @@ public interface ContainerManager {
     public boolean attachAndExecute( Agent physicalHost, String cloneName, String cmd, long t, TimeUnit unit );
 
     public void cloneDestroy( String hostName, String cloneName ) throws LxcDestroyException;
+
+    public void cloneDestroyByHostname( Set<String> cloneNames ) throws LxcDestroyException;
 }

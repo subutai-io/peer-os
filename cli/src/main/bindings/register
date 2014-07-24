@@ -86,7 +86,7 @@ function register {
   pkg="`cat /var/lib/lxc/$container/config | \
      grep subutai.template.package | awk '{print $3}'`"
   
-  send_n_register $pkg  
+  send_n_register $pkg $SUBUTAI_TMPDIR/$container 
 }
 
 

@@ -16,7 +16,7 @@
     <modules>
         <module>core</module>
         <module>vaadin</module>
-	<module>plugins</module>
+        <module>plugins</module>
         <module>products</module>
         <module>server-karaf</module>
     </modules>

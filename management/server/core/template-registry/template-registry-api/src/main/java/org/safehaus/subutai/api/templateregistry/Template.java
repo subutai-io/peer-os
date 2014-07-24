@@ -3,6 +3,7 @@ package org.safehaus.subutai.api.templateregistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -43,6 +44,8 @@ public class Template {
     private String packagesManifest;
     @Expose
     private List<Template> children;
+    @Expose
+    private Set<String> products;
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
@@ -52,6 +55,7 @@ public class Template {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
@@ -77,6 +81,16 @@ public class Template {
             this.children = new ArrayList<>();
         }
         this.children.addAll( children );
+    }
+
+
+    public Set<String> getProducts() {
+        return products;
+    }
+
+
+    public void setProducts( final Set<String> products ) {
+        this.products = products;
     }
 
 
@@ -136,6 +150,7 @@ public class Template {
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", products=" + products +
                 '}';
     }
 }

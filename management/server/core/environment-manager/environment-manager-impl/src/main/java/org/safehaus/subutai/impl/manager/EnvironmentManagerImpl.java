@@ -8,17 +8,18 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.List;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
-import org.safehaus.subutai.impl.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.impl.manager.exception.EnvironmentInstanceDestroyException;
 
 
 /**
@@ -30,18 +31,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
-    private TemplateRegistryManager templateRegistryManager;
-    private DbManager dbManager;
 
 
     public EnvironmentManagerImpl( final ContainerManager containerManager,
-                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager ) {
+                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager,
+                                   final AgentManager agentManager ) {
         this.containerManager = containerManager;
-        this.templateRegistryManager = templateRegistryManager;
-        this.dbManager = dbManager;
         this.environmentDAO = new EnvironmentDAO( dbManager );
         this.blueprintParser = new BlueprintParser();
+        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager );
     }
+
 
     /**
      * Builds an environment by provided blueprint description
@@ -60,6 +60,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
+    @Override
+    public Environment buildEnvironmentAndReturn( final EnvironmentBlueprint blueprint )
+            throws EnvironmentBuildException {
+        return environmentBuilder.build( blueprint, containerManager );
+    }
+
+
     private boolean build( EnvironmentBlueprint blueprint ) {
         if ( blueprint != null ) {
             try {
@@ -75,12 +82,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             catch ( EnvironmentBuildException e ) {
                 System.out.println( e.getMessage() );
             }
-            finally {
-                Environment e = new Environment();
-                e.setName( blueprint.getName() );
-                environmentDAO.saveEnvironment( e );
-                return false;
+            catch ( EnvironmentInstanceDestroyException e ) {
+                System.out.println( e.getMessage() );
             }
+            //            finally {
+            //                Environment e = new Environment();
+            //                e.setName( blueprint.getName() );
+            //                environmentDAO.saveEnvironment( e );
+            //                return false;
+            //            }
         }
         return false;
     }
