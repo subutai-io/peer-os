@@ -34,9 +34,7 @@ function exitIfNoChange {
   # Check if there are local commits not pushed
   git_diff=$(git diff origin/$branch_name..HEAD)
   isDiffEmpty=$(isEmpty $git_diff)
-  echo checking is there is a change for branch $branch_name 
-  echo isStatusEmpty: $isStatusEmpty
-  echo isDiffEmpty: $isDiffEmpty
+  echo "Checking if there is a change for branch: $branch_name"
   if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
     git checkout -- $changelogFile > /dev/null 2>&1
     echo "No change is made on debian package"
@@ -94,9 +92,7 @@ fi
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
-if [ $isSuccesful = 0 ]; then
-  echo "commit and push is succesful, generating the debian package"
-else
-  echo "commit or push is not succesful, please fix the errors first!"
+if [ $isSuccesful != 0 ]; then
+  echo "Commit or push is not succesful, please fix the errors first!"
   exit 1
 fi
