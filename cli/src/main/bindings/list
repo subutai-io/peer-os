@@ -115,15 +115,15 @@ function list_registered_templates {
     echo -e "TEMPLATE"
     echo -e "--------"
   elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
-    echo -e "TEMPLATE\tPARENTS"
+    echo -e "TEMPLATE\tPARENT"
     echo -e "--------\t-------"
   fi
 
   for template in $templates; do
     local t=`echo -e "$template" | cut -f 1`
-    local p=`echo -e "$template" | cut -f 2`
+    local p=`echo -e "$template" | cut -s -f 2`
     if [ "parents" == "$mode" ]; then
-      echo -e "$t\t$p"
+      echo -e "$t\t\t$p"
     else
       echo "$t"
     fi
