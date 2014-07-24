@@ -90,7 +90,7 @@ if [ $isStatusEmpty = "false" ]; then
 else
   isSuccesful=0
 fi
-git push
+git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
