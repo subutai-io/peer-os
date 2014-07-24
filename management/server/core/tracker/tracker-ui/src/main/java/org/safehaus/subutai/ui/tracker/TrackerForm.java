@@ -165,18 +165,23 @@ public class TrackerForm extends CustomComponent {
 	}
 
 	private void getLimitCombo() {
-		limitCombo = new ComboBox("Show last", Arrays.asList(10, 50, 100));
-		limitCombo.setImmediate(true);
+        limitCombo = new ComboBox( "Show last", Arrays.asList( "10", "50", "100", "ALL" ) );
+        limitCombo.setImmediate(true);
 		limitCombo.setTextInputAllowed(false);
 		limitCombo.setNullSelectionAllowed(false);
 		limitCombo.setValue(limit);
 		limitCombo.addValueChangeListener(new Property.ValueChangeListener() {
-
 			public void valueChange(Property.ValueChangeEvent event) {
-				limit = (Integer) event.getProperty().getValue();
+                onLimitValueChange( ( String ) event.getProperty().getValue() );
 			}
 		});
 	}
+
+
+    private void onLimitValueChange(String value) {
+        limit = "ALL".equals( value ) ? Integer.MAX_VALUE : Integer.parseInt( value );
+    }
+
 
 	public void startTracking() {
 		if (!track) {

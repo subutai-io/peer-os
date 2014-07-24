@@ -21,36 +21,81 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
     private final Map<String, Integer> nodesCount;
 
+
     public CustomPlacementStrategy(int masterNodes, int slaveNodes) {
         this.nodesCount = new HashMap<>();
         this.nodesCount.put(MASTER_NODE_TYPE, masterNodes);
         this.nodesCount.put(SLAVE_NODE_TYPE, slaveNodes);
     }
 
-    public static Map<String, Set<Agent>> getNodes(LxcManager lxcManager,
-            int masterNodes, int slaveNodes) throws LxcCreateException {
 
-        LxcPlacementStrategy strategy = new CustomPlacementStrategy(
-                masterNodes, slaveNodes);
-        Map<String, Map<Agent, Set<Agent>>> nodes
-                = lxcManager.createLxcsByStrategy(strategy);
+    private static Map<String, Set<Agent>> getFromExistingAgents( LxcManager lxcManager ) throws LxcCreateException {
 
-        // collect nodes by types regardless of parent nodes
+        Set<Agent> agents = lxcManager.getAgentManager().getAgents();
+
+        if ( agents.isEmpty() || agents.size() < 5 ) {
+            throw new LxcCreateException( "Not enough agents" );
+        }
+
+        HashSet<Agent> masterNodeAgents = new HashSet<>();
+        HashSet<Agent> slaveNodeAgents = new HashSet<>();
+        int i = 1;
+
+        for ( Agent agent : agents ) {
+            if ( i <= 3 ) {
+                masterNodeAgents.add( agent );
+            } else {
+                slaveNodeAgents.add( agent );
+            }
+
+            i++;
+        }
+
+        Map<String, Set<Agent>> agentMap = new HashMap<>();
+        agentMap.put( MASTER_NODE_TYPE, masterNodeAgents );
+        agentMap.put( SLAVE_NODE_TYPE, slaveNodeAgents );
+
+        return agentMap;
+    }
+
+
+    public static Map<String, Set<Agent>> getNodes( LxcManager lxcManager, int masterNodes, int slaveNodes )
+            throws LxcCreateException {
+
+        // Dump method used for testing
+//        if ( true ) {
+//            return getFromExistingAgents( lxcManager );
+//        }
+
+        LxcPlacementStrategy strategy = new CustomPlacementStrategy( masterNodes, slaveNodes );
+        Map<String, Map<Agent, Set<Agent>>> nodes = lxcManager.createLxcsByStrategy( strategy );
+
+        // Collect nodes by types regardless of parent nodes
         Map<String, Set<Agent>> res = new HashMap<>();
-        for(String type : new String[]{MASTER_NODE_TYPE, SLAVE_NODE_TYPE}) {
-            Map<Agent, Set<Agent>> map = nodes.get(type);
-            if(map == null)
-                throw new LxcCreateException("No nodes for type " + type);
+
+        for ( String type : new String[] { MASTER_NODE_TYPE, SLAVE_NODE_TYPE } ) {
+            Map<Agent, Set<Agent>> map = nodes.get( type );
+            if ( map == null ) {
+                throw new LxcCreateException( "No nodes for type " + type );
+            }
 
             Set<Agent> all = new HashSet<>();
-            for(Set<Agent> children : map.values()) all.addAll(children);
+            for ( Set<Agent> children : map.values() ) {
+                all.addAll( children );
+            }
 
-            Set<Agent> set = res.get(type);
-            if(set != null) set.addAll(all);
-            else res.put(type, all);
+            Set<Agent> set = res.get( type );
+            if ( set != null ) {
+                set.addAll( all );
+            }
+            else {
+                res.put( type, all );
+            }
         }
+
         return res;
     }
+
 
     @Override
     public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> metrics) {

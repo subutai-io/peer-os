@@ -1058,6 +1058,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Zookeeper 2-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>zookeeper-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>zookeeper-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>zookeeper-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>zookeeper-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>zookeeper-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- HBase -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
