@@ -24,6 +24,8 @@ function isEmpty {
 
 function exitIfNoChange {
   local changelogFile=$1
+  # Ignore changes in this file before decision
+  git checkout -- $changelogFile > /dev/null 2>&1
   branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
   branch_name="(unnamed branch)"     # detached HEAD
   branch_name=${branch_name##refs/heads/}
