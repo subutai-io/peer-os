@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.impl.lxcmanager;
 
 
@@ -41,15 +36,16 @@ import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
-/**
- * This is an implementation of LxcManager
- */
 public class LxcManagerImpl implements LxcManager {
+
+    private static Logger LOG = LoggerFactory.getLogger( LxcManagerImpl.class );
 
     private final Pattern p = Pattern.compile( "load average: (.*)" );
     private final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT = 10000;
@@ -79,6 +75,12 @@ public class LxcManagerImpl implements LxcManager {
 
     public void destroy() {
         executor.shutdown();
+    }
+
+
+    @Override
+    public AgentManager getAgentManager() {
+        return agentManager;
     }
 
 
@@ -629,8 +631,11 @@ public class LxcManagerImpl implements LxcManager {
      */
     public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy )
             throws LxcCreateException {
+
+
+
         if ( strategy == null ) {
-            throw new LxcCreateException( "Lxc placement strategy is null" );
+            throw new LxcCreateException( "LXC placement strategy is null" );
         }
 
         strategy.calculatePlacement( getPhysicalServerMetrics() );
@@ -638,7 +643,7 @@ public class LxcManagerImpl implements LxcManager {
 
         //check placement info
         if ( placementNodes.isEmpty() ) {
-            throw new LxcCreateException( "Lxc placement strategy returned empty set" );
+            throw new LxcCreateException( "LXC placement nodes are empty" );
         }
 
         //create lxcs here

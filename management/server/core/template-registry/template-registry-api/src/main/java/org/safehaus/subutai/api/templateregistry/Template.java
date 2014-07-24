@@ -29,9 +29,6 @@ public class Template {
     //path to cfg files tracked by subutai
     @Expose
     private String subutaiConfigPath;
-    //path to app data files tracked by subutai
-    @Expose
-    private String subutaiAppdataPath;
     //name of parent template
     @Expose
     private String subutaiParent;
@@ -49,16 +46,12 @@ public class Template {
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
-                     final String subutaiAppdataPath, final String subutaiParent, final String subutaiGitBranch,
-                     final String subutaiGitUuid, final String packagesManifest ) {
+                     final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
+                     final String packagesManifest ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiAppdataPath ),
-                "Missing subutai.app.data.path parameter" );
-        //        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ),
-        // "Missing subutai.parent parameter" ); // parent might be null
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
@@ -66,7 +59,6 @@ public class Template {
         this.lxcArch = lxcArch;
         this.lxcUtsname = lxcUtsname;
         this.subutaiConfigPath = subutaiConfigPath;
-        this.subutaiAppdataPath = subutaiAppdataPath;
         this.subutaiParent = subutaiParent;
         this.subutaiGitBranch = subutaiGitBranch;
         this.subutaiGitUuid = subutaiGitUuid;
@@ -100,11 +92,6 @@ public class Template {
 
     public String getSubutaiConfigPath() {
         return subutaiConfigPath;
-    }
-
-
-    public String getSubutaiAppdataPath() {
-        return subutaiAppdataPath;
     }
 
 
@@ -146,7 +133,6 @@ public class Template {
                 ", lxcArch='" + lxcArch + '\'' +
                 ", lxcUtsname='" + lxcUtsname + '\'' +
                 ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
-                ", subutaiAppdataPath='" + subutaiAppdataPath + '\'' +
                 ", subutaiParent='" + subutaiParent + '\'' +
                 ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +

@@ -1,12 +1,16 @@
 package org.safehaus.subutai.rest.templateregistry;
 
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Strings;
@@ -36,6 +40,21 @@ public class RestServiceImpl implements RestService {
     @Override
     public String getTemplate( final String templateName ) {
         return gson.toJson( templateRegistryManager.getTemplate( templateName ) );
+    }
+
+
+    @Override
+    public Response registerTemplate( final String configFilePath, final String packagesFilePath ) {
+        try {
+
+            templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
+                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ) );
+
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( Throwable e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+        }
     }
 
 
