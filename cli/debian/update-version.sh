@@ -9,7 +9,7 @@
 #(5) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit
 #------------------------------------------------------
 
-
+package_name="subutai-cli"
 # This function returns true if variable is empty, false if not empty
 function isEmpty {
   if [ -z "$1" ]; then
@@ -84,7 +84,7 @@ exitIfNoChange $changelogFile
 #------------------------------------------------------
 # (2) read the version number
 #------------------------------------------------------
-versionLineNumber=$(sed -n '/subutai-cli (/=' $changelogFile)
+versionLineNumber=$(sed -n '/'$package_name' (/=' $changelogFile)
 versionLineContent=$(sed $versionLineNumber!d $changelogFile)
 version=$(echo $versionLineContent | awk -F" " '{split($2,a," ");print a[1]}')
 firstParanthesisIndex=$(echo `expr index $version "\("`)
@@ -113,7 +113,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #(4) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
 git add .
-git commit -m "Auto commit while building subutai-cli package"
+git commit -m "Auto commit while building $package_name package"
 isSuccesful=$?
 git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
