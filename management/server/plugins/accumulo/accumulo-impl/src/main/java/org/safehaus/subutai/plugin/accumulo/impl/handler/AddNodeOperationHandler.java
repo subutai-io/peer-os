@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -31,7 +31,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         this.nodeType = nodeType;
-        po = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node %s of type %s to %s", lxcHostname, nodeType, clusterName ) );
     }
 
@@ -52,8 +52,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
             po.addLogFailed( "Only tracer or slave node can be added" );
             return;
         }
-        Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -64,11 +64,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        if ( nodeType == NodeType.TRACER && config.getTracers().contains( lxcAgent ) ) {
+        if ( nodeType == NodeType.TRACER && accumuloClusterConfig.getTracers().contains( lxcAgent ) ) {
             po.addLogFailed( String.format( "Agent %s already belongs to tracers\nOperation aborted", lxcHostname ) );
             return;
         }
-        else if ( nodeType.isSlave() && config.getSlaves().contains( lxcAgent ) ) {
+        else if ( nodeType.isSlave() && accumuloClusterConfig.getSlaves().contains( lxcAgent ) ) {
             po.addLogFailed( String.format( "Agent %s already belongs to slaves\nOperation aborted", lxcHostname ) );
             return;
         }
@@ -98,49 +98,50 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         boolean install = !result.getStdOut().contains( "ksks-accumulo" );
 
         org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-                manager.getHadoopManager().getCluster( config.getClusterName() );
+                manager.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
 
         if ( hadoopConfig == null ) {
             po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
         if ( !hadoopConfig.getAllNodes().contains( lxcAgent ) ) {
             po.addLogFailed( String.format( "Node '%s' does not belong to Hadoop cluster %s\nInstallation aborted",
-                    lxcAgent.getHostname(), config.getClusterName() ) );
+                    lxcAgent.getHostname(), accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
-        ZookeeperClusterConfig zkConfig = manager.getZkManager().getCluster( config.getClusterName() );
+        ZookeeperClusterConfig zkConfig = manager.getZkManager().getCluster( accumuloClusterConfig.getClusterName() );
 
         if ( zkConfig == null ) {
             po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
         if ( !zkConfig.getNodes().contains( lxcAgent ) ) {
             po.addLogFailed( String.format( "Node '%s' does not belong to Zookeeper cluster %s\nInstallation aborted",
-                    lxcAgent.getHostname(), config.getClusterName() ) );
+                    lxcAgent.getHostname(), accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
 
         if ( nodeType.isSlave() ) {
-            config.getSlaves().add( lxcAgent );
+            accumuloClusterConfig.getSlaves().add( lxcAgent );
         }
         else {
-            config.getTracers().add( lxcAgent );
+            accumuloClusterConfig.getTracers().add( lxcAgent );
         }
 
         po.addLog( "Updating DB..." );
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        if ( manager.getDbManager().saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
+                accumuloClusterConfig ) ) {
 
             po.addLog( "Cluster info updated in DB" );
 
             if ( install ) {
-                po.addLog( String.format( "Installing %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname() ) );
+                po.addLog( String.format( "Installing %s on %s node...", AccumuloClusterConfig.PRODUCT_KEY, lxcAgent.getHostname() ) );
 
                 Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
                 manager.getCommandRunner().runCommand( installCommand );
@@ -158,10 +159,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
             Command addNodeCommand;
             if ( nodeType.isSlave() ) {
-                addNodeCommand = Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+                addNodeCommand = Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                        .getSlaves() );
             }
             else {
-                addNodeCommand = Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+                addNodeCommand = Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                        .getTracers() );
             }
             manager.getCommandRunner().runCommand( addNodeCommand );
 
@@ -169,7 +172,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                 po.addLog( "Node registration succeeded\nSetting master node..." );
 
                 Command setMasterNodeCommand =
-                        Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ), config.getMasterNode() );
+                        Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getMasterNode() );
                 manager.getCommandRunner().runCommand( setMasterNodeCommand );
 
                 if ( setMasterNodeCommand.hasSucceeded() ) {
@@ -177,7 +180,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                     po.addLog( "Setting master node succeeded\nSetting GC node..." );
 
                     Command setGcNodeCommand =
-                            Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ), config.getGcNode() );
+                            Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getGcNode() );
                     manager.getCommandRunner().runCommand( setGcNodeCommand );
 
                     if ( setGcNodeCommand.hasSucceeded() ) {
@@ -185,7 +188,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                         po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
                         Command setMonitorCommand =
-                                Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ), config.getMonitor() );
+                                Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getMonitor() );
                         manager.getCommandRunner().runCommand( setMonitorCommand );
 
                         if ( setMonitorCommand.hasSucceeded() ) {
@@ -193,10 +196,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                             po.addLog( "Setting monitor node succeeded\nSetting tracers/slaves..." );
 
                             Command setTracersSlavesCommand = nodeType.isSlave() ? Commands.getAddTracersCommand(
-                                    Util.wrapAgentToSet( lxcAgent ), config.getTracers() ) :
+                                    Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getTracers() ) :
                                                               Commands.getAddSlavesCommand(
                                                                       Util.wrapAgentToSet( lxcAgent ),
-                                                                      config.getSlaves() );
+                                                                      accumuloClusterConfig.getSlaves() );
 
                             manager.getCommandRunner().runCommand( setTracersSlavesCommand );
 
@@ -213,7 +216,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                                     po.addLog( "Setting ZK cluster succeeded\nRestarting cluster..." );
 
                                     Command restartClusterCommand =
-                                            Commands.getRestartCommand( config.getMasterNode() );
+                                            Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
                                     manager.getCommandRunner().runCommand( restartClusterCommand );
 
                                     if ( restartClusterCommand.hasSucceeded() ) {

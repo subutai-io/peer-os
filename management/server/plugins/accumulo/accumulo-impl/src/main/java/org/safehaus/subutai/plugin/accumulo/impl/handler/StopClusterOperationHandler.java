@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -22,7 +22,7 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
         super( manager, clusterName );
 
         po = manager.getTracker()
-                    .createProductOperation( Config.PRODUCT_KEY, String.format( "Stopping cluster %s", clusterName ) );
+                    .createProductOperation( AccumuloClusterConfig.PRODUCT_KEY, String.format( "Stopping cluster %s", clusterName ) );
     }
 
 
@@ -34,21 +34,21 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
 
     @Override
     public void run() {
-        Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null ) {
+        if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() ) == null ) {
             po.addLogFailed( String.format( "Master node '%s' is not connected\nOperation aborted",
-                    config.getMasterNode().getHostname() ) );
+                    accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }
 
         po.addLog( "Stopping cluster..." );
 
-        Command stopCommand = Commands.getStopCommand( config.getMasterNode() );
+        Command stopCommand = Commands.getStopCommand( accumuloClusterConfig.getMasterNode() );
         manager.getCommandRunner().runCommand( stopCommand );
 
         if ( stopCommand.hasSucceeded() ) {

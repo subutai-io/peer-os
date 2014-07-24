@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -21,15 +21,15 @@ import com.google.common.base.Strings;
  * Created by dilshat on 5/6/14.
  */
 public class InstallOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
-    private final Config config;
+    private final AccumuloClusterConfig accumuloClusterConfig;
     private final ProductOperation po;
 
 
-    public InstallOperationHandler( AccumuloImpl manager, Config config ) {
-        super( manager, config.getClusterName() );
-        this.config = config;
+    public InstallOperationHandler( AccumuloImpl manager, AccumuloClusterConfig accumuloClusterConfig ) {
+        super( manager, accumuloClusterConfig.getClusterName() );
+        this.accumuloClusterConfig = accumuloClusterConfig;
         po = manager.getTracker()
-                    .createProductOperation( Config.PRODUCT_KEY, String.format( "Installing %s", Config.PRODUCT_KEY ) );
+                    .createProductOperation( AccumuloClusterConfig.PRODUCT_KEY, String.format( "Installing %s", AccumuloClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -41,46 +41,48 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
     @Override
     public void run() {
-        if ( config.getMasterNode() == null || config.getGcNode() == null || config.getMonitor() == null || Strings
-                .isNullOrEmpty( config.getClusterName() ) || Util.isCollectionEmpty( config.getTracers() ) || Util
-                .isCollectionEmpty( config.getSlaves() ) ) {
+        if ( accumuloClusterConfig.getMasterNode() == null || accumuloClusterConfig.getGcNode() == null || accumuloClusterConfig
+                .getMonitor() == null || Strings
+                .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || Util.isCollectionEmpty( accumuloClusterConfig
+                .getTracers() ) || Util
+                .isCollectionEmpty( accumuloClusterConfig.getSlaves() ) ) {
             po.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
 
-        if ( manager.getCluster( config.getClusterName() ) != null ) {
+        if ( manager.getCluster( accumuloClusterConfig.getClusterName() ) != null ) {
             po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
         org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-                manager.getHadoopManager().getCluster( config.getClusterName() );
+                manager.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
 
         if ( hadoopConfig == null ) {
             po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
-        if ( !hadoopConfig.getAllNodes().containsAll( config.getAllNodes() ) ) {
+        if ( !hadoopConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) ) {
             po.addLogFailed( String.format( "Not all supplied nodes belong to Hadoop cluster %s \nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
-        ZookeeperClusterConfig zkConfig = manager.getZkManager().getCluster( config.getClusterName() );
+        ZookeeperClusterConfig zkConfig = manager.getZkManager().getCluster( accumuloClusterConfig.getClusterName() );
 
         if ( zkConfig == null ) {
             po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+                    accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
-        if ( !zkConfig.getNodes().containsAll( config.getAllNodes() ) ) {
+        if ( !zkConfig.getNodes().containsAll( accumuloClusterConfig.getAllNodes() ) ) {
             po.addLogFailed(
                     String.format( "Not all supplied nodes belong to Zookeeper cluster %s \nInstallation aborted",
-                            config.getClusterName() ) );
+                            accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
@@ -88,7 +90,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
         po.addLog( "Checking prerequisites..." );
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getAllNodes() );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
@@ -96,7 +98,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        for ( Agent node : config.getAllNodes() ) {
+        for ( Agent node : accumuloClusterConfig.getAllNodes() ) {
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
             if ( result.getStdOut().contains( "ksks-accumulo" ) ) {
@@ -117,50 +119,56 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
 
         po.addLog( "Updating db..." );
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        if ( manager.getDbManager().saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
+                accumuloClusterConfig ) ) {
 
             po.addLog( "Cluster info saved to DB\nInstalling Accumulo..." );
 
             //install
-            Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+            Command installCommand = Commands.getInstallCommand( accumuloClusterConfig.getAllNodes() );
             manager.getCommandRunner().runCommand( installCommand );
 
             if ( installCommand.hasSucceeded() ) {
                 po.addLog( "Installation succeeded\nSetting master node..." );
 
-                Command setMasterCommand = Commands.getAddMasterCommand( config.getAllNodes(), config.getMasterNode() );
+                Command setMasterCommand = Commands.getAddMasterCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                        .getMasterNode() );
                 manager.getCommandRunner().runCommand( setMasterCommand );
 
                 if ( setMasterCommand.hasSucceeded() ) {
                     po.addLog( "Setting master node succeeded\nSetting GC node..." );
-                    Command setGCNodeCommand = Commands.getAddGCCommand( config.getAllNodes(), config.getGcNode() );
+                    Command setGCNodeCommand = Commands.getAddGCCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                            .getGcNode() );
                     manager.getCommandRunner().runCommand( setGCNodeCommand );
                     if ( setGCNodeCommand.hasSucceeded() ) {
                         po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
                         Command setMonitorCommand =
-                                Commands.getAddMonitorCommand( config.getAllNodes(), config.getMonitor() );
+                                Commands.getAddMonitorCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                                        .getMonitor() );
                         manager.getCommandRunner().runCommand( setMonitorCommand );
 
                         if ( setMonitorCommand.hasSucceeded() ) {
                             po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
 
                             Command setTracersCommand =
-                                    Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+                                    Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                                            .getTracers() );
                             manager.getCommandRunner().runCommand( setTracersCommand );
 
                             if ( setTracersCommand.hasSucceeded() ) {
                                 po.addLog( "Setting tracers succeeded\nSetting slaves..." );
 
                                 Command setSlavesCommand =
-                                        Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+                                        Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
+                                                .getSlaves() );
                                 manager.getCommandRunner().runCommand( setSlavesCommand );
 
                                 if ( setSlavesCommand.hasSucceeded() ) {
                                     po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
 
                                     Command setZkClusterCommand =
-                                            Commands.getBindZKClusterCommand( config.getAllNodes(),
+                                            Commands.getBindZKClusterCommand( accumuloClusterConfig.getAllNodes(),
                                                     zkConfig.getNodes() );
                                     manager.getCommandRunner().runCommand( setZkClusterCommand );
 
@@ -168,15 +176,16 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                                         po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
 
                                         Command initCommand =
-                                                Commands.getInitCommand( config.getInstanceName(), config.getPassword(),
-                                                        config.getMasterNode() );
+                                                Commands.getInitCommand( accumuloClusterConfig.getInstanceName(), accumuloClusterConfig
+                                                        .getPassword(),
+                                                        accumuloClusterConfig.getMasterNode() );
                                         manager.getCommandRunner().runCommand( initCommand );
 
                                         if ( initCommand.hasSucceeded() ) {
                                             po.addLog( "Initialization succeeded\nStarting cluster..." );
 
                                             Command startClusterCommand =
-                                                    Commands.getStartCommand( config.getMasterNode() );
+                                                    Commands.getStartCommand( accumuloClusterConfig.getMasterNode() );
                                             manager.getCommandRunner().runCommand( startClusterCommand );
 
                                             if ( startClusterCommand.hasSucceeded() ) {

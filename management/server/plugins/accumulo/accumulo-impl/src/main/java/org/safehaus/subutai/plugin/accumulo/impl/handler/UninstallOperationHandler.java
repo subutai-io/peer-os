@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -20,7 +20,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
 
     public UninstallOperationHandler( AccumuloImpl manager, String clusterName ) {
         super( manager, clusterName );
-        po = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Uninstalling cluster %s", clusterName ) );
     }
 
@@ -33,15 +33,15 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
 
     @Override
     public void run() {
-        Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         po.addLog( "Uninstalling cluster..." );
 
-        Command uninstallCommand = Commands.getUninstallCommand( config.getAllNodes() );
+        Command uninstallCommand = Commands.getUninstallCommand( accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( uninstallCommand );
 
         if ( uninstallCommand.hasCompleted() ) {
@@ -54,7 +54,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
 
             po.addLog( "Removing Accumulo from HDFS..." );
 
-            Command removeAccumuloFromHDFSCommand = Commands.getRemoveAccumuloFromHFDSCommand( config.getMasterNode() );
+            Command removeAccumuloFromHDFSCommand = Commands.getRemoveAccumuloFromHFDSCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( removeAccumuloFromHDFSCommand );
 
             if ( removeAccumuloFromHDFSCommand.hasSucceeded() ) {
@@ -66,7 +66,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
             }
 
             po.addLog( "Updating db..." );
-            if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
+            if ( manager.getDbManager().deleteInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName() ) ) {
                 po.addLogDone( "Cluster info deleted from DB\nDone" );
             }
             else {

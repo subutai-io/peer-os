@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.accumulo.ui.manager;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
@@ -36,7 +36,7 @@ public class CheckTask implements Runnable {
 
         long start = System.currentTimeMillis();
         while ( !Thread.interrupted() ) {
-            ProductOperationView po = AccumuloUI.getTracker().getProductOperation( Config.PRODUCT_KEY, trackID );
+            ProductOperationView po = AccumuloUI.getTracker().getProductOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID );
             if ( po != null ) {
                 if ( po.getState() != ProductOperationState.RUNNING ) {
                     completeEvent.onComplete( po.getLog() );

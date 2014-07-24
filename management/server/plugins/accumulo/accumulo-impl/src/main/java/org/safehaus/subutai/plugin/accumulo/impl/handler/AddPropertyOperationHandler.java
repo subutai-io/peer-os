@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -27,7 +27,7 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
         super( manager, clusterName );
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
-        po = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Adding property %s=%s", propertyName, propertyValue ) );
     }
 
@@ -44,8 +44,8 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
             po.addLogFailed( "Malformed arguments\nOperation aborted" );
             return;
         }
-        final Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        final AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -53,13 +53,13 @@ public class AddPropertyOperationHandler extends AbstractOperationHandler<Accumu
         po.addLog( "Adding property..." );
 
         Command addPropertyCommand =
-                Commands.getAddPropertyCommand( propertyName, propertyValue, config.getAllNodes() );
+                Commands.getAddPropertyCommand( propertyName, propertyValue, accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( addPropertyCommand );
 
         if ( addPropertyCommand.hasSucceeded() ) {
             po.addLog( "Property added successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = Commands.getRestartCommand( config.getMasterNode() );
+            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() ) {
                 po.addLogDone( "Cluster restarted successfully" );

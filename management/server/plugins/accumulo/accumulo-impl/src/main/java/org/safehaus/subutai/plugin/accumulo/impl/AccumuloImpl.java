@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
@@ -93,11 +93,11 @@ public class AccumuloImpl implements Accumulo {
     }
 
 
-    public UUID installCluster( final Config config ) {
+    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig ) {
 
-        Preconditions.checkNotNull( config, "Configuration is null" );
+        Preconditions.checkNotNull( accumuloClusterConfig, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, accumuloClusterConfig );
 
         executor.execute( operationHandler );
 
@@ -115,14 +115,14 @@ public class AccumuloImpl implements Accumulo {
     }
 
 
-    public List<Config> getClusters() {
+    public List<AccumuloClusterConfig> getClusters() {
 
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
+        return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, AccumuloClusterConfig.class );
     }
 
 
-    public Config getCluster( String clusterName ) {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+    public AccumuloClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
     }
 
 

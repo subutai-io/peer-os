@@ -10,7 +10,8 @@ import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
@@ -31,7 +32,7 @@ public class AddNodeWindow extends Window {
 	private volatile boolean track = true;
 
 
-	public AddNodeWindow(final Config config, Set<Agent> nodes, final NodeType nodeType) {
+	public AddNodeWindow(final AccumuloClusterConfig accumuloClusterConfig, Set<Agent> nodes, final NodeType nodeType) {
 		super("Add New Node");
 		setModal(true);
 
@@ -73,13 +74,13 @@ public class AddNodeWindow extends Window {
 				showProgress();
 				Agent agent = (Agent) hadoopNodes.getValue();
 				final UUID trackID = AccumuloUI.getAccumuloManager()
-						.addNode(config.getClusterName(), agent.getHostname(), nodeType);
+						.addNode( accumuloClusterConfig.getClusterName(), agent.getHostname(), nodeType);
 				AccumuloUI.getExecutor().execute(new Runnable() {
 
 					public void run() {
 						while (track) {
 							ProductOperationView po =
-									AccumuloUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+									AccumuloUI.getTracker().getProductOperation( AccumuloClusterConfig.PRODUCT_KEY, trackID);
 							if (po != null) {
 								setOutput(
 										po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());

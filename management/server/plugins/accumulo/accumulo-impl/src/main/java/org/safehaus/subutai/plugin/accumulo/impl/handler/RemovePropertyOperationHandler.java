@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -24,7 +24,7 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
     public RemovePropertyOperationHandler( AccumuloImpl manager, String clusterName, String propertyName ) {
         super( manager, clusterName );
         this.propertyName = propertyName;
-        po = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Removing property %s", propertyName ) );
     }
 
@@ -41,21 +41,21 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
             po.addLogFailed( "Malformed arguments\nOperation aborted" );
             return;
         }
-        final Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        final AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         po.addLog( "Removing property..." );
 
-        Command removePropertyCommand = Commands.getRemovePropertyCommand( propertyName, config.getAllNodes() );
+        Command removePropertyCommand = Commands.getRemovePropertyCommand( propertyName, accumuloClusterConfig.getAllNodes() );
         manager.getCommandRunner().runCommand( removePropertyCommand );
 
         if ( removePropertyCommand.hasSucceeded() ) {
             po.addLog( "Property removed successfully\nRestarting cluster..." );
 
-            Command restartClusterCommand = Commands.getRestartCommand( config.getMasterNode() );
+            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
             if ( restartClusterCommand.hasSucceeded() ) {
                 po.addLogDone( "Cluster restarted successfully" );

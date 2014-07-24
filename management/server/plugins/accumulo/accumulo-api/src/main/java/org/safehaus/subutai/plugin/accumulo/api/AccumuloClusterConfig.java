@@ -16,9 +16,9 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class AccumuloClusterConfig implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Accumulo";
+    public static final String PRODUCT_KEY = "Accumulo2";
     private String clusterName = "";
     private String instanceName = "";
     private String password = "";

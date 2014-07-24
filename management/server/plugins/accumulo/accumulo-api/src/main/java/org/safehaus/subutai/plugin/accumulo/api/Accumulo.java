@@ -14,7 +14,7 @@ import org.safehaus.subutai.shared.protocol.ApiBase;
 /**
  * @author dilshat
  */
-public interface Accumulo extends ApiBase<Config> {
+public interface Accumulo extends ApiBase<AccumuloClusterConfig> {
 
     public UUID startCluster( String clusterName );
 

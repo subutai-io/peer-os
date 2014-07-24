@@ -85,7 +85,7 @@ public class ConfigurationStep extends Panel {
         }
 
         //try to find hadoop cluster info based on one saved in the configuration
-        Config info = AccumuloUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        Config info = AccumuloUI.getHadoopManager().getCluster( wizard.getAccumuloClusterConfig().getClusterName() );
 
         //select if saved found
         if ( info != null ) {
@@ -102,7 +102,7 @@ public class ConfigurationStep extends Panel {
         if ( hadoopClustersCombo.getValue() != null ) {
             Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
 
-            wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+            wizard.getAccumuloClusterConfig().setClusterName( hadoopInfo.getClusterName() );
 
             setComboDS( masterNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
             setComboDS( gcNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
@@ -122,23 +122,23 @@ public class ConfigurationStep extends Panel {
                     setComboDS( monitorNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
                     setTwinSelectDS( tracersSelect, filterAgents( hadoopInfo, zkClusters ) );
                     setTwinSelectDS( slavesSelect, filterAgents( hadoopInfo, zkClusters ) );
-                    wizard.getConfig().reset();
-                    wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+                    wizard.getAccumuloClusterConfig().reset();
+                    wizard.getAccumuloClusterConfig().setClusterName( hadoopInfo.getClusterName() );
                 }
             }
         } );
 
         //restore master node if back button is pressed
-        if ( wizard.getConfig().getMasterNode() != null ) {
-            masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+        if ( wizard.getAccumuloClusterConfig().getMasterNode() != null ) {
+            masterNodeCombo.setValue( wizard.getAccumuloClusterConfig().getMasterNode() );
         }
         //restore gc node if back button is pressed
-        if ( wizard.getConfig().getGcNode() != null ) {
-            gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+        if ( wizard.getAccumuloClusterConfig().getGcNode() != null ) {
+            gcNodeCombo.setValue( wizard.getAccumuloClusterConfig().getGcNode() );
         }
         //restore monitor node if back button is pressed
-        if ( wizard.getConfig().getMonitor() != null ) {
-            monitorNodeCombo.setValue( wizard.getConfig().getMonitor() );
+        if ( wizard.getAccumuloClusterConfig().getMonitor() != null ) {
+            monitorNodeCombo.setValue( wizard.getAccumuloClusterConfig().getMonitor() );
         }
 
         //add value change handler
@@ -147,17 +147,17 @@ public class ConfigurationStep extends Panel {
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
                     Agent masterNode = ( Agent ) event.getProperty().getValue();
-                    wizard.getConfig().setMasterNode( masterNode );
+                    wizard.getAccumuloClusterConfig().setMasterNode( masterNode );
                     Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( masterNode );
                     gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
                     setComboDS( gcNodeCombo, hadoopNodes );
-                    if ( !masterNode.equals( wizard.getConfig().getGcNode() ) ) {
-                        gcNodeCombo.setValue( wizard.getConfig().getGcNode() );
+                    if ( !masterNode.equals( wizard.getAccumuloClusterConfig().getGcNode() ) ) {
+                        gcNodeCombo.setValue( wizard.getAccumuloClusterConfig().getGcNode() );
                     }
                     else {
-                        wizard.getConfig().setGcNode( null );
+                        wizard.getAccumuloClusterConfig().setGcNode( null );
                     }
                     gcNodeCombo.addValueChangeListener( gcNodeComboChangeListener );
                 }
@@ -170,17 +170,17 @@ public class ConfigurationStep extends Panel {
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
                     Agent gcNode = ( Agent ) event.getProperty().getValue();
-                    wizard.getConfig().setGcNode( gcNode );
+                    wizard.getAccumuloClusterConfig().setGcNode( gcNode );
                     Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( gcNode );
                     masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
                     setComboDS( masterNodeCombo, hadoopNodes );
-                    if ( !gcNode.equals( wizard.getConfig().getMasterNode() ) ) {
-                        masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
+                    if ( !gcNode.equals( wizard.getAccumuloClusterConfig().getMasterNode() ) ) {
+                        masterNodeCombo.setValue( wizard.getAccumuloClusterConfig().getMasterNode() );
                     }
                     else {
-                        wizard.getConfig().setMasterNode( null );
+                        wizard.getAccumuloClusterConfig().setMasterNode( null );
                     }
                     masterNodeCombo.addValueChangeListener( masterNodeComboChangeListener );
                 }
@@ -193,34 +193,34 @@ public class ConfigurationStep extends Panel {
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
                     Agent monitor = ( Agent ) event.getProperty().getValue();
-                    wizard.getConfig().setMonitor( monitor );
+                    wizard.getAccumuloClusterConfig().setMonitor( monitor );
                 }
             }
         } );
 
         //restore tracers if back button is pressed
-        if ( !Util.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
-            tracersSelect.setValue( wizard.getConfig().getTracers() );
+        if ( !Util.isCollectionEmpty( wizard.getAccumuloClusterConfig().getTracers() ) ) {
+            tracersSelect.setValue( wizard.getAccumuloClusterConfig().getTracers() );
         }
         //restore slaves if back button is pressed
-        if ( !Util.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
-            slavesSelect.setValue( wizard.getConfig().getSlaves() );
+        if ( !Util.isCollectionEmpty( wizard.getAccumuloClusterConfig().getSlaves() ) ) {
+            slavesSelect.setValue( wizard.getAccumuloClusterConfig().getSlaves() );
         }
 
 
-        instanceNameTxtFld.setValue( wizard.getConfig().getInstanceName() );
+        instanceNameTxtFld.setValue( wizard.getAccumuloClusterConfig().getInstanceName() );
         instanceNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setInstanceName( event.getProperty().getValue().toString().trim() );
+                wizard.getAccumuloClusterConfig().setInstanceName( event.getProperty().getValue().toString().trim() );
             }
         } );
 
-        passwordTxtFld.setValue( wizard.getConfig().getPassword() );
+        passwordTxtFld.setValue( wizard.getAccumuloClusterConfig().getPassword() );
         passwordTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setPassword( event.getProperty().getValue().toString().trim() );
+                wizard.getAccumuloClusterConfig().setPassword( event.getProperty().getValue().toString().trim() );
             }
         } );
 
@@ -231,7 +231,7 @@ public class ConfigurationStep extends Panel {
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
                     Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-                    wizard.getConfig().setTracers( agentList );
+                    wizard.getAccumuloClusterConfig().setTracers( agentList );
                 }
             }
         } );
@@ -241,7 +241,7 @@ public class ConfigurationStep extends Panel {
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
                     Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
-                    wizard.getConfig().setSlaves( agentList );
+                    wizard.getAccumuloClusterConfig().setSlaves( agentList );
                 }
             }
         } );
@@ -254,28 +254,28 @@ public class ConfigurationStep extends Panel {
             @Override
             public void buttonClick( Button.ClickEvent event ) {
 
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                if ( Strings.isNullOrEmpty( wizard.getAccumuloClusterConfig().getClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );
                 }
-                else if ( wizard.getConfig().getMasterNode() == null ) {
+                else if ( wizard.getAccumuloClusterConfig().getMasterNode() == null ) {
                     show( "Please, select master node" );
                 }
-                else if ( Strings.isNullOrEmpty( wizard.getConfig().getInstanceName() ) ) {
+                else if ( Strings.isNullOrEmpty( wizard.getAccumuloClusterConfig().getInstanceName() ) ) {
                     show( "Please, specify instance name" );
                 }
-                else if ( Strings.isNullOrEmpty( wizard.getConfig().getPassword() ) ) {
+                else if ( Strings.isNullOrEmpty( wizard.getAccumuloClusterConfig().getPassword() ) ) {
                     show( "Please, specify password" );
                 }
-                else if ( wizard.getConfig().getGcNode() == null ) {
+                else if ( wizard.getAccumuloClusterConfig().getGcNode() == null ) {
                     show( "Please, select gc node" );
                 }
-                else if ( wizard.getConfig().getMonitor() == null ) {
+                else if ( wizard.getAccumuloClusterConfig().getMonitor() == null ) {
                     show( "Please, select monitor" );
                 }
-                else if ( Util.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
+                else if ( Util.isCollectionEmpty( wizard.getAccumuloClusterConfig().getTracers() ) ) {
                     show( "Please, select tracer(s)" );
                 }
-                else if ( Util.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
+                else if ( Util.isCollectionEmpty( wizard.getAccumuloClusterConfig().getSlaves() ) ) {
                     show( "Please, select slave(s)" );
                 }
                 else {

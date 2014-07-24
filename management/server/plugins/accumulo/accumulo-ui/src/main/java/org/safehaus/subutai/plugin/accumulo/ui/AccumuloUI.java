@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.accumulo.ui;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
@@ -99,11 +99,11 @@ public class AccumuloUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return AccumuloClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return AccumuloClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

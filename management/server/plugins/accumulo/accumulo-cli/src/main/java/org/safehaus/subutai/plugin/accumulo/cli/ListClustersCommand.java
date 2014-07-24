@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.accumulo.cli;
 import java.util.List;
 
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -30,10 +30,10 @@ public class ListClustersCommand extends OsgiCommandSupport {
 
 
     protected Object doExecute() {
-        List<Config> configList = accumuloManager.getClusters();
-        if ( !configList.isEmpty() ) {
-            for ( Config config : configList ) {
-                System.out.println( config.getClusterName() );
+        List<AccumuloClusterConfig> accumuloClusterConfigList = accumuloManager.getClusters();
+        if ( !accumuloClusterConfigList.isEmpty() ) {
+            for ( AccumuloClusterConfig accumuloClusterConfig : accumuloClusterConfigList ) {
+                System.out.println( accumuloClusterConfig.getClusterName() );
             }
         }
         else {

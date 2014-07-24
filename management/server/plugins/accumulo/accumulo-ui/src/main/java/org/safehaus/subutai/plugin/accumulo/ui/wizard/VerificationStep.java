@@ -8,7 +8,8 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
@@ -35,17 +36,17 @@ public class VerificationStep extends Panel {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Instance name", wizard.getConfig().getInstanceName());
-		cfgView.addStringCfg("Password", wizard.getConfig().getPassword());
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Master node", wizard.getConfig().getMasterNode().getHostname());
-		cfgView.addStringCfg("GC node", wizard.getConfig().getGcNode().getHostname());
-		cfgView.addStringCfg("Monitor node", wizard.getConfig().getMonitor().getHostname());
-		for (Agent agent : wizard.getConfig().getTracers()) {
+		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
+		cfgView.addStringCfg("Instance name", wizard.getAccumuloClusterConfig().getInstanceName());
+		cfgView.addStringCfg("Password", wizard.getAccumuloClusterConfig().getPassword());
+		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
+		cfgView.addStringCfg("Master node", wizard.getAccumuloClusterConfig().getMasterNode().getHostname());
+		cfgView.addStringCfg("GC node", wizard.getAccumuloClusterConfig().getGcNode().getHostname());
+		cfgView.addStringCfg("Monitor node", wizard.getAccumuloClusterConfig().getMonitor().getHostname());
+		for (Agent agent : wizard.getAccumuloClusterConfig().getTracers()) {
 			cfgView.addStringCfg("Tracers", agent.getHostname());
 		}
-		for (Agent agent : wizard.getConfig().getSlaves()) {
+		for (Agent agent : wizard.getAccumuloClusterConfig().getSlaves()) {
 			cfgView.addStringCfg("Slaves", agent.getHostname());
 		}
 
@@ -56,8 +57,9 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent event) {
 
-				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getAccumuloClusterConfig());
+				ProgressWindow window = new ProgressWindow(AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
+                        AccumuloClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

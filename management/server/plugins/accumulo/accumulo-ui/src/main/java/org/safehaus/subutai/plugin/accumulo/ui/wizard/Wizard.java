@@ -8,7 +8,8 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 
 /**
@@ -18,7 +19,7 @@ public class Wizard {
 
 	private final GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private AccumuloClusterConfig accumuloClusterConfig = new AccumuloClusterConfig();
 
 
 	public Wizard() {
@@ -76,12 +77,12 @@ public class Wizard {
 
 	protected void init() {
 		step = 1;
-		config = new Config();
+		accumuloClusterConfig = new AccumuloClusterConfig();
 		putForm();
 	}
 
 
-	public Config getConfig() {
-		return config;
+	public AccumuloClusterConfig getAccumuloClusterConfig() {
+		return accumuloClusterConfig;
 	}
 }

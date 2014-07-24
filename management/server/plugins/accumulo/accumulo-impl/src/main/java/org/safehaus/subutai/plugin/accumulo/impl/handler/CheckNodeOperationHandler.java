@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
@@ -23,7 +23,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
     public CheckNodeOperationHandler( AccumuloImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Checking node %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -36,8 +36,8 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
 
     @Override
     public void run() {
-        Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
+        AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
+        if ( accumuloClusterConfig == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
@@ -48,7 +48,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
                     String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
-        if ( !config.getAllNodes().contains( node ) ) {
+        if ( !accumuloClusterConfig.getAllNodes().contains( node ) ) {
             po.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;

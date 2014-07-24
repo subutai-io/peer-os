@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.plugin.accumulo.api.Config;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -56,7 +56,7 @@ public class Manager {
     private final Pattern tracerPattern = Pattern.compile( ".*(Tracer.+?g).*" );
     private final Pattern loggerPattern = Pattern.compile( ".*(Logger.+?g).*" );
     private final Pattern tabletServerPattern = Pattern.compile( ".*(Tablet Server.+?g).*" );
-    private Config config;
+    private AccumuloClusterConfig accumuloClusterConfig;
 
 
     public Manager() {
@@ -88,7 +88,7 @@ public class Manager {
 
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                config = ( Config ) event.getProperty().getValue();
+                accumuloClusterConfig = ( AccumuloClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -124,9 +124,9 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = AccumuloUI.getAccumuloManager().startCluster( config.getClusterName() );
+                UUID trackID = AccumuloUI.getAccumuloManager().startCluster( accumuloClusterConfig.getClusterName() );
                 ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        Config.PRODUCT_KEY );
+                        AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -144,9 +144,9 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = AccumuloUI.getAccumuloManager().stopCluster( config.getClusterName() );
+                UUID trackID = AccumuloUI.getAccumuloManager().stopCluster( accumuloClusterConfig.getClusterName() );
                 ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        Config.PRODUCT_KEY );
+                        AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -164,17 +164,17 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                if ( config != null ) {
+                if ( accumuloClusterConfig != null ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            String.format( "Do you want to destroy the %s cluster?", accumuloClusterConfig.getClusterName() ), "Yes",
                             "No" );
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = AccumuloUI.getAccumuloManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = AccumuloUI.getAccumuloManager().uninstallCluster( accumuloClusterConfig.getClusterName() );
                             ProgressWindow window =
                                     new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                            Config.PRODUCT_KEY );
+                                            AccumuloClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -198,23 +198,23 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                if ( config != null ) {
+                if ( accumuloClusterConfig != null ) {
 
                     org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-                            AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
+                            AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
                     ZookeeperClusterConfig zkConfig =
-                            AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
+                            AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
                     if ( hadoopConfig != null ) {
                         if ( zkConfig != null ) {
                             Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
                             availableNodes.retainAll( zkConfig.getNodes() );
-                            availableNodes.removeAll( config.getTracers() );
+                            availableNodes.removeAll( accumuloClusterConfig.getTracers() );
                             if ( availableNodes.isEmpty() ) {
                                 Notification.show( "All Hadoop nodes already have tracers installed" );
                                 return;
                             }
 
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, availableNodes, NodeType.TRACER );
+                            AddNodeWindow addNodeWindow = new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -225,11 +225,11 @@ public class Manager {
                         }
                         else {
                             Notification
-                                    .show( String.format( "Zookeeper cluster %s not found", config.getClusterName() ) );
+                                    .show( String.format( "Zookeeper cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                         }
                     }
                     else {
-                        Notification.show( String.format( "Hadoop cluster %s not found", config.getClusterName() ) );
+                        Notification.show( String.format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                     }
                 }
                 else {
@@ -245,23 +245,23 @@ public class Manager {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                if ( config != null ) {
+                if ( accumuloClusterConfig != null ) {
 
                     org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-                            AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
+                            AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
                     ZookeeperClusterConfig zkConfig =
-                            AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
+                            AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
                     if ( hadoopConfig != null ) {
                         if ( zkConfig != null ) {
                             Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
                             availableNodes.retainAll( zkConfig.getNodes() );
-                            availableNodes.removeAll( config.getSlaves() );
+                            availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
                             if ( availableNodes.isEmpty() ) {
                                 Notification.show( "All Hadoop nodes already have slaves installed" );
                                 return;
                             }
 
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, availableNodes, NodeType.LOGGER );
+                            AddNodeWindow addNodeWindow = new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -272,11 +272,11 @@ public class Manager {
                         }
                         else {
                             Notification
-                                    .show( String.format( "Zookeeper cluster %s not found", config.getClusterName() ) );
+                                    .show( String.format( "Zookeeper cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                         }
                     }
                     else {
-                        Notification.show( String.format( "Hadoop cluster %s not found", config.getClusterName() ) );
+                        Notification.show( String.format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                     }
                 }
                 else {
@@ -299,18 +299,18 @@ public class Manager {
         removePropertyBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+                if ( accumuloClusterConfig != null ) {
                     String propertyName = ( String ) propertyNameTextField.getValue();
                     if ( Strings.isNullOrEmpty( propertyName ) ) {
                         Notification.show( "Please, specify property name to remove" );
                     }
                     else {
                         UUID trackID =
-                                AccumuloUI.getAccumuloManager().removeProperty( config.getClusterName(), propertyName );
+                                AccumuloUI.getAccumuloManager().removeProperty( accumuloClusterConfig.getClusterName(), propertyName );
 
                         ProgressWindow window =
                                 new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                        Config.PRODUCT_KEY );
+                                        AccumuloClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -336,7 +336,7 @@ public class Manager {
         addPropertyBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
+                if ( accumuloClusterConfig != null ) {
                     String propertyName = propertyNameTextField.getValue();
                     String propertyValue = propertyValueTextField.getValue();
                     if ( Strings.isNullOrEmpty( propertyName ) ) {
@@ -347,11 +347,11 @@ public class Manager {
                     }
                     else {
                         UUID trackID = AccumuloUI.getAccumuloManager()
-                                                 .addProperty( config.getClusterName(), propertyName, propertyValue );
+                                                 .addProperty( accumuloClusterConfig.getClusterName(), propertyName, propertyValue );
 
                         ProgressWindow window =
                                 new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                        Config.PRODUCT_KEY );
+                                        AccumuloClusterConfig.PRODUCT_KEY );
                         window.getWindow().addCloseListener( new Window.CloseListener() {
                             @Override
                             public void windowClose( Window.CloseEvent closeEvent ) {
@@ -377,13 +377,13 @@ public class Manager {
 
 
     private void refreshUI() {
-        if ( config != null ) {
-            populateTable( slavesTable, new ArrayList<>( config.getSlaves() ), false );
-            populateTable( tracersTable, new ArrayList<>( config.getTracers() ), false );
+        if ( accumuloClusterConfig != null ) {
+            populateTable( slavesTable, new ArrayList<>( accumuloClusterConfig.getSlaves() ), false );
+            populateTable( tracersTable, new ArrayList<>( accumuloClusterConfig.getTracers() ), false );
             List<Agent> masters = new ArrayList<>();
-            masters.add( config.getMasterNode() );
-            masters.add( config.getGcNode() );
-            masters.add( config.getMonitor() );
+            masters.add( accumuloClusterConfig.getMasterNode() );
+            masters.add( accumuloClusterConfig.getGcNode() );
+            masters.add( accumuloClusterConfig.getMonitor() );
             populateTable( mastersTable, masters, true );
         }
         else {
@@ -395,16 +395,16 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        List<AccumuloClusterConfig> mongoClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
+        AccumuloClusterConfig clusterInfo = ( AccumuloClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( Config mongoClusterInfo : mongoClusterInfos ) {
+            for ( AccumuloClusterConfig mongoClusterInfo : mongoClusterInfos ) {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null ) {
-                for ( Config mongoClusterInfo : mongoClusterInfos ) {
+                for ( AccumuloClusterConfig mongoClusterInfo : mongoClusterInfos ) {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
                         clusterCombo.setValue( mongoClusterInfo );
                         return;
@@ -451,7 +451,7 @@ public class Manager {
                     progressIcon.setVisible( true );
 
                     AccumuloUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                            new CheckTask( accumuloClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                                 public void onComplete( String result ) {
                                     synchronized ( progressIcon ) {
@@ -484,13 +484,13 @@ public class Manager {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
                             UUID trackID = AccumuloUI.getAccumuloManager()
-                                                     .destroyNode( config.getClusterName(), agent.getHostname(),
+                                                     .destroyNode( accumuloClusterConfig.getClusterName(), agent.getHostname(),
                                                              table == tracersTable ? NodeType.TRACER :
                                                              NodeType.LOGGER );
 
                             ProgressWindow window =
                                     new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                                            Config.PRODUCT_KEY );
+                                            AccumuloClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
