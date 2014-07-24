@@ -19,7 +19,7 @@
         <module>cassandra</module>
         <module>common</module>
         <module>flume</module>
-        <!--<module>hadoop</module>-->
+        <module>hadoop</module>
         <module>hbase</module>
         <module>hive</module>
         <module>hivequery</module>
