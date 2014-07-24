@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-function master_create {
+function master_import {
   # Check for Master Existence
   # ---------------------------------------------------------------------------
 
@@ -24,13 +24,9 @@ function master_create {
   if [ -f "$debian_file" ]; then
     msg_info "Using available debian file for import: $debian_file"
 
-    if [ -d "$debian_root" ]; then
-      rm -rf $debian_root
-    fi
 
     pushd . >> /dev/null
     cd $SUBUTAI_TMPDIR
-    dpkg -i $debian_file
     if [ $? -eq 0 ]; then
       msg_ok "Debian package of $container is installed succesfully"
     else
@@ -120,14 +116,7 @@ function master_create {
     echo "$SUBUTAI_APT_MIRROR archive.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
     echo "$SUBUTAI_APT_MIRROR security.ubuntu.com" >> /var/lib/lxc/master/rootfs/etc/hosts
   fi
-  
-  # Configuration for apt-proxy
-  if [ -n "$SUBUTAI_APT_PROXY" ]; then
-    echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       > /etc/apt/sources.list
-    echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       >> /etc/apt/sources.list
-  fi
+
   lxc_wait_net master
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
       >> /var/lib/lxc/master/rootfs/etc/apt/sources.list.d/subutai-repo.list
@@ -171,7 +160,7 @@ function master_create {
   addmount master var lxc-data
 }
 
-function master_create_description {
+function master_import_description {
   echo creates a new master from scratch
 }
 
