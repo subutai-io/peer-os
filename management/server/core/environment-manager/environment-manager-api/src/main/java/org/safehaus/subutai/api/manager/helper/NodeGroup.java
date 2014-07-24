@@ -48,12 +48,12 @@ public class NodeGroup {
     }
 
 
-    public PlacementStrategyENUM getPlacementStrategyENUM() {
+    public PlacementStrategyENUM getPlacementStrategy() {
         return placementStrategyENUM;
     }
 
 
-    public void setPlacementStrategyENUM( final PlacementStrategyENUM placementStrategyENUM ) {
+    public void setPlacementStrategy( final PlacementStrategyENUM placementStrategyENUM ) {
         this.placementStrategyENUM = placementStrategyENUM;
     }
 

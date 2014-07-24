@@ -40,7 +40,7 @@ public class EnvironmentBuilder {
         Environment environment = new Environment();
         environment.setName( blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategyENUM();
+            PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategy();
             int nodeCount = nodeGroup.getNumberOfNodes();
 
             Set<Node> nodes = new HashSet<>();

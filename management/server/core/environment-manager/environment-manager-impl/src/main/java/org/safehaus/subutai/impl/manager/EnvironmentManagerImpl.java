@@ -8,6 +8,7 @@ package org.safehaus.subutai.impl.manager;
 
 import java.util.List;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
@@ -30,17 +31,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
-    private TemplateRegistryManager templateRegistryManager;
-    private DbManager dbManager;
 
 
     public EnvironmentManagerImpl( final ContainerManager containerManager,
-                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager ) {
+                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager,
+                                   final AgentManager agentManager ) {
         this.containerManager = containerManager;
-        this.templateRegistryManager = templateRegistryManager;
-        this.dbManager = dbManager;
         this.environmentDAO = new EnvironmentDAO( dbManager );
         this.blueprintParser = new BlueprintParser();
+        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager );
     }
 
 
