@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to ask Subutai if a template name is registered 
+# already. Since this functionality is not available I just stubbed it 
+# out with a call to zfs_is_template. 
+function is_registered {
+  
+  ### REMOVE THIS CODE BLOCK WHEN REGISTRATION WORKS ###
+  echo true
+  exit 0
+  ### END OF BLOCK ###
+
+  local template=$1
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo true
+  fi
+
+  resp=`curl -XGET $url`
+
+  # response should contain quoted template name
+  if [[ -n "$resp" && "$resp" == *\"$template\"* ]]; then 
+    echo true
+  else
+    echo false
+  fi
+} 
+    
+
+# TODO: stub function that returns registered templates
+# will be completed when REST service will be available
+function list_templates {
+  echo ""
+}
+  
+# URGENT: this is a stub function and needs to be properly implemented
+# this function needs to take the supplied debian package file and upload and 
+# register it with the Subutai management server.
+#
+# REST service receives Debian package, uploads it to repo, and registers it
+# in templates registry 
+function send_n_register {
+  local debian_file=$1
+  local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
+
+  if [ "$TEST_MODE" == "true" ]; then
+    msg_notice "${FUNCNAME[0]} called in TEST mode"
+    return
+  fi
+
+  curl -XPOST $url --data-binary @$debian_file
+
+  check_status "Sending Debian file $debian_file to management server" "$?"
+} 
+
+
+# This function builds URL for REST services and returns it.
+# Accepets path argument which is appended to REST services URL
+function build_rest_url {
+  local path=$1
+  local url=http://$SUBUTAI_REST_IP
+
+  if [ -n "$SUBUTAI_REST_PORT" ]; then
+    url=$url:$SUBUTAI_REST_PORT
+  fi
+  if [ -n "$SUBUTAI_REST_PATH" ]; then
+    url=$url/$SUBUTAI_REST_PATH
+  fi
+  if [ -n "$path" ]; then
+    url="$url/$path"
+  fi
+
+  echo $url
+}
+

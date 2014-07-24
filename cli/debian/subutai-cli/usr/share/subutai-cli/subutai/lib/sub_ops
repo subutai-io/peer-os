@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------
+# Bunch-O subutai convenience operations
+# --------------------------------------------------------------------------
+
+. /etc/subutai/config
+. /etc/subutai/bsfl
+init
+
+
+function sub_clone {
+  local parent="$1"
+  local child="$2"
+  local usage="$3"
+  
+  if [ -z "$child" -o -z "$parent" ]; then
+    msg_error "Parameters not provided. Aborting ..."
+  fi
+
+  lxc_clone $parent $child $usage
+  check_status "    - clone of $child from $parent" "$?"
+
+  git_child_branch $child
+  check_status "    - new child branch in git for $child" "$?"
+}
+
+

@@ -1,0 +1,195 @@
+#!/bin/bash
+
+
+function promote_usage {
+  echo -----------------------------------------------------------------------
+  echo Usage: Converts an instance container into a template
+  echo
+  echo "        "subutai promote container
+  echo
+  echo -----------------------------------------------------------------------
+}
+
+
+# Plan for creating a template from a container
+# ---------------------------------------------------------------------------
+# (1) perform sanity checks first
+#     - container MUST exist
+#     - container MUST NOT have a 'template' snapshot
+#     - container name MUST NOT be in the template registry
+#     - container parent MUST be present in the template registry
+# (2) replace package manifest next to config file
+# (3) commit config point changes and push to site git as new branch from parent
+# (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
+
+function promote {
+  OPTIND=0
+  if [ "$1" == "promote" ]; then
+    shift
+  fi
+
+  copyit="false"
+  newname=""
+
+  while getopts ":cn:" opt; do
+    case $opt in
+      n)
+        newname="$OPTARG"
+        ;;
+      c)
+        copyit="true"
+        ;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ "$copyit" == "true" -a -z "$newname" ]; then
+    msg_error "Cannot use -c option without -n option"
+    exit 1
+  fi
+
+  if [ -n "$newname" ]; then
+    while true; do
+      if [ "$1" == "$newname" ]; then
+        shift
+        break
+      else
+        shift
+      fi
+    done
+  fi
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo ---- TEST_MODE DUMP ----
+    echo -e "operand count\t= $#"
+    echo -e "operands\t= $@"
+    echo -e "newname\t= $newname"
+    echo -e "copyit\t= $copyit"
+    echo
+  fi
+ 
+  local lxc="$1"
+
+  # The master is already a template
+  if [ "$lxc" == "master" ]; then
+    msg_error "The master is already a template. Aborting ..."
+    exit 1
+  fi
+
+  # ---------------------------------------------------------------------------
+  # (1) perform some sanity checks
+  # ---------------------------------------------------------------------------
+  lxc_assert $lxc
+
+  # check to make sure the container is NOT already a template
+  if [ "`zfs_is_template $lxc`" == "true" ]; then
+    msg_error "Container \"$lxc\" is already a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$lxc\" is NOT a template"
+  fi
+
+  # check to make sure container is NOT registered as a template
+  #if [ "`is_registered $lxc`" == "true" ]; then
+  #  msg_error "A template with name \"$lxc\" is registered. Aborting ..."
+  #  exit 1
+  #else
+  #  msg_info "    - check passed: \"$lxc\" is NOT registered"
+  #fi
+
+  parent=`zfs_get_parent $lxc`
+  lxc_assert $parent
+  # check to make sure the parent is a template
+  if [ "`zfs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
+  # if a newname is specified check to see such a container does not exist
+  # make a copy of the container before converting it into a template
+  if [ -n "$newname" -a "true" == "$copyit" ]; then
+    lxc_assert_no "$newname" "`usage`"
+    lxc_stop "$lxc"
+    lxc_copy "$lxc" "$newname"
+    lxc_template="$newname"
+  elif [ -n "$newname" -a "false" == "$copyit" ]; then
+    lxc_assert_no "$newname" "`usage`"
+    lxc_stop "$lxc"
+    lxc_rename "$lxc" "$newname"
+    lxc_template="$newname"
+  else
+    lxc_template="$lxc"
+  fi
+
+  # start container if it is stopped
+  if [ -z "`lxc-ls --running | grep $lxc_template`" ]; then
+    lxc-start -d -n $lxc_template
+  fi
+
+  # ---------------------------------------------------------------------------
+  # (2) replace package manifest next to config file
+  # ---------------------------------------------------------------------------
+
+  lxc_home=/var/lib/lxc/$lxc_template
+  for debpkg in "`lxc-attach -n $lxc_template -- dpkg -l`"; do
+    echo "$debpkg" >> $lxc_home/packages
+  done
+
+  # ---------------------------------------------------------------------------
+  # (3) git operations
+  # ---------------------------------------------------------------------------
+
+  # add and commit all uncommitted files (should be some: /etc/hosts)
+  if [ -n "$newname" ]; then
+    `git_rename_branch $lxc $lxc_template`
+  fi
+
+  uuid=`git_add_commit $lxc_template`
+
+  # inject the commit UUID 
+  echo "subutai.git.uuid = $uuid" >> $lxc_home/config
+  msg_info "    - commit UUID extracted: $uuid"
+
+  # push to the subutai site git repository is handled by register subcommand
+
+  # ---------------------------------------------------------------------------
+  # (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
+  # ---------------------------------------------------------------------------
+
+  lxc-stop -n $lxc_template
+  zfs snapshot lxc/$lxc_template@template
+  zfs hold keep lxc/$lxc_template@template
+  zfs set readonly=on lxc/$lxc_template
+
+  zfs snapshot lxc/$lxc_template-opt@template
+  zfs hold keep lxc/$lxc_template-opt@template
+  zfs set readonly=on lxc/$lxc_template-opt
+
+  zfs snapshot lxc-data/$lxc_template-var@template
+  zfs hold keep lxc-data/$lxc_template-var@template
+  zfs set readonly=on lxc-data/$lxc_template-var
+
+  zfs snapshot lxc-data/$lxc_template-home@template
+  zfs hold keep lxc-data/$lxc_template-home@template
+  zfs set readonly=on lxc-data/$lxc_template-home
+}
+
+
+function promote_description {
+  echo promotes an instance container into a template
+}
+
+
