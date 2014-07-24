@@ -80,7 +80,7 @@ function master_export {
 
   msg_info "Building debian package file for master"
 
-  pkg=`deb_pkg_master $container`
+  pkg=`deb_pkg $container`
   # Remove debian root directory after debian package generation
   rm -rf $debian_root
 

@@ -31,20 +31,14 @@ function register {
 
   lxc_assert $container "`usage`"
 
-  if [ "$container" == "master" ]; then
-    subutai-master-export
-    exit $?
-  fi
-
   local debian_package_name=`get_debian_package_name $container`
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
 
-  if [ -f $debian_file ]; then
-    msg_error "It seems the debian file has already been generated"
-    msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
+  if [ ! -f $debian_file ]; then
+    msg_error "It seems the debian file has not been generated"
+    msg_error "Please invoke export $container first"
     exit 1
   fi
-
   # check to make sure the container is a template
   if [ "`zfs_is_template $container`" == "false" ]; then
     msg_error "Container \"$container\" is NOT a template. Aborting ..."
@@ -52,14 +46,14 @@ function register {
   else
     msg_info "    - check passed: \"$container\" is a template"
   fi
-
-  # check to make sure container is registered as a template
-  if [ "`is_registered $container`" == "false" ]; then
-    msg_error "Container \"$container\" NOT registered as template. Aborting ..."
-    exit 1
-    else
-    msg_info "    - check passed: \"$container\" is registered"
-  fi
+  # Enable this check when register works
+  # check to make sure container is NOT registered as a template
+  #if [ "`is_registered $container`" == "true" ]; then
+  #  msg_error "Container \"$container\" is registered as template already. Aborting ..."
+  #  exit 1
+  #  else
+  #  msg_info "    - check passed: \"$container\" is registered"
+  #fi
 
   parent=`zfs_get_parent $container`
   lxc_assert $parent
@@ -71,8 +65,8 @@ function register {
     msg_info "    - check passed: parent \"$parent\" is a template"
   fi
 
-  # check to make sure the parent is registered
-  if [ "`is_registered $parent`" == "false" ]; then
+  # check to make sure the parent is registered if container itself is not master
+  if [ $container != "master" -a "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
     exit 1
   else

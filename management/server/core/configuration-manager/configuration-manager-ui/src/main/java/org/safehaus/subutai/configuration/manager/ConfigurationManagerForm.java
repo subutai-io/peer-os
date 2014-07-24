@@ -7,9 +7,7 @@ package org.safehaus.subutai.configuration.manager;
 
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
-import org.safehaus.subutai.configuration.manager.manage.CassandraClusterConfigForm;
-import org.safehaus.subutai.configuration.manager.manage.HBaseClusterConfigForm;
-import org.safehaus.subutai.configuration.manager.manage.HadoopClusterConfigForm;
+import org.safehaus.subutai.configuration.manager.manage.ConfigLoaderForm;
 import org.safehaus.subutai.shared.protocol.Disposable;
 
 import com.vaadin.ui.CustomComponent;
@@ -24,11 +22,6 @@ import com.vaadin.ui.themes.Runo;
 public class ConfigurationManagerForm extends CustomComponent implements Disposable {
 
 
-    private CassandraClusterConfigForm cassandraConfigForm;
-    private HadoopClusterConfigForm hadoopClusterConfigForm;
-    private HBaseClusterConfigForm hBaseClusterConfigForm;
-
-
     public ConfigurationManagerForm( ConfigManager configManager ) {
         setHeight( 100, UNITS_PERCENTAGE );
 
@@ -39,18 +32,8 @@ public class ConfigurationManagerForm extends CustomComponent implements Disposa
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-//        blueprintManager = new BlueprintLoadForm(environmentManager);
-//        environmentForm = new EnvironmentsForm(environmentManager);
-        cassandraConfigForm = new CassandraClusterConfigForm(configManager);
-        hadoopClusterConfigForm = new HadoopClusterConfigForm(configManager);
-        hBaseClusterConfigForm = new HBaseClusterConfigForm( configManager );
-        sheet.addTab( cassandraConfigForm.getContentRoot(), "Cassandra" );
-        sheet.addTab( hadoopClusterConfigForm.getContentRoot(), "Hadoop" );
-        sheet.addTab( hBaseClusterConfigForm.getContentRoot(), "HBase" );
-//        sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
-//        sheet.addTab( environmentForm.getContentRoot(), "Environments" );
+        sheet.addTab( new ConfigLoaderForm( configManager ), "Configuration");
         verticalLayout.addComponent( sheet );
-
 
         setCompositionRoot( verticalLayout );
     }

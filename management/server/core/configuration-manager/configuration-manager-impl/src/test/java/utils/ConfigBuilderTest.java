@@ -24,12 +24,10 @@ public class ConfigBuilderTest {
         ConfigBuilder configBuilder = new ConfigBuilder();
         JsonObject jo = configBuilder.getConfigJsonObject("test", ConfigTypeEnum.PROPERTIES);
 
-        JsonObject field1 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", "value" );
-        JsonObject field2 = configBuilder.buildFieldJsonObject( "field name", "Field Name", "mandatory", "textarea", "value" );
+        JsonObject field1 = configBuilder.buildFieldJsonObject( "field name", "Field Name", true, "textarea", true, "value" );
 
         List<JsonObject> fields = new ArrayList<>();
         fields.add( field1 );
-        fields.add( field2 );
 
         JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
