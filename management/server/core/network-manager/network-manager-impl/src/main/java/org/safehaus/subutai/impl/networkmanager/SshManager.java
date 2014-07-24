@@ -59,7 +59,6 @@ public class SshManager {
 				AgentResult result = command.getResults().get(agent.getUuid());
 				if (!Strings.isNullOrEmpty(result.getStdOut())) {
 					value.append(result.getStdOut());
-					value.append("\n");
 				}
 			}
 		}
