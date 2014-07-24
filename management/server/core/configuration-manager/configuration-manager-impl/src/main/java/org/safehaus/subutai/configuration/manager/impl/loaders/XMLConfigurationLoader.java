@@ -34,8 +34,9 @@ public class XMLConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public void setConfiguration( final Agent agent, JsonObject config ) {
+    public boolean setConfiguration( final Agent agent, String configFilePath,  String config ) {
         //TODO Read config from instance, set values from Config, inject Config
+        return true;
     }
 
 

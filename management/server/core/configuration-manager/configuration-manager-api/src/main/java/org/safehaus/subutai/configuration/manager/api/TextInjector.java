@@ -18,4 +18,6 @@ public interface TextInjector {
      * @return
      */
     public String catFile( Agent agent, String pathToFile );
+
+    public String getConfigTemplate(String path);
 }
