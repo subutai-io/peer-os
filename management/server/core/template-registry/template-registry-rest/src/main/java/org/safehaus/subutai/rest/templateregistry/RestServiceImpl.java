@@ -59,6 +59,20 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public Response unregisterTemplate( final String templateName ) {
+        try {
+
+            templateRegistryManager.unregisterTemplate( templateName );
+
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( Throwable e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
     public String getTemplate( final String templateName, final String lxcArch ) {
         return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
     }
