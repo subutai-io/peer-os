@@ -2,7 +2,6 @@ package utils;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
 
 
 /**
@@ -12,7 +11,8 @@ public class XMLConfigurationLoaderTest {
 
     @Test
     public void test() {
-        XMLConfigurationLoader loader = new XMLConfigurationLoader();
+//        XMLConfigurationLoader loader = new XMLConfigurationLoader();
+
 //        loader.loadConfig();
     }
 

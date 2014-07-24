@@ -40,13 +40,14 @@ public class ConfigBuilder {
     }
 
 
-    public JsonObject buildFieldJsonObject( String fieldName, String label, String required, String uiType,
+    public JsonObject buildFieldJsonObject( String fieldName, String label, boolean required, String type, boolean enabled,
                                             String value ) {
         JsonObject jo = new JsonObject();
         jo.addProperty( "fieldName", fieldName );
         jo.addProperty( "label", label );
         jo.addProperty( "required", required );
-        jo.addProperty( "uiType", uiType );
+        jo.addProperty( "enabled", enabled );
+        jo.addProperty( "type", type );
         jo.addProperty( "value", value );
 
         return jo;

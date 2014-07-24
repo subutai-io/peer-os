@@ -19,20 +19,22 @@ import com.google.gson.JsonObject;
  */
 public class PropertiesConfigurationLoaderTest {
 
-    @Test
-    public void convertStringToJson() {
-        System.out.println("convert");
-    }
+    //    @Test
+    //    public void convertStringToJson() {
+    //        System.out.println( "convert" );
+    //    }
+    //
 
-//    @Test
+
+    @Test
     public void test() {
         PropertiesConfigurationLoader loader = new PropertiesConfigurationLoader();
         //        Config o = loader.getConfiguration( null, null, null );
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        System.out.println( json );
+        //        System.out.println( json );
 
 
-        JsonObject  jo = new JsonObject();
+        JsonObject jo = new JsonObject();
         jo.addProperty( "path", "full/path/to/file" );
         jo.addProperty( "type", "YAML" );
 
@@ -44,17 +46,25 @@ public class PropertiesConfigurationLoaderTest {
         cf.addProperty( "value", "Value" );
 
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(cf);
-        jo.add( "configField", jsonArray );
+        jsonArray.add( cf );
+        jo.add( "configFields", jsonArray );
 
         Gson gsonNew = new GsonBuilder().setPrettyPrinting().create();
-        System.out.println(gson.toJson( jo ));
+        System.out.println( gson.toJson( jo ) );
 
         Set<Map.Entry<String, JsonElement>> set = jo.entrySet();
         for ( Map.Entry<String, JsonElement> stringJsonElementEntry : set ) {
-            System.out.println(stringJsonElementEntry.getKey() + " " + stringJsonElementEntry.getValue());
-
+            System.out.println( stringJsonElementEntry.getKey() + " " + stringJsonElementEntry.getValue() );
         }
 
+        JsonArray jsonArray2 = jo.getAsJsonArray( "configFields" );
+        System.out.println( jsonArray2.size() );
+        System.out.println( "test" );
+        for ( int i = 0; i < jsonArray2.size(); i++ ) {
+            JsonObject jo1 = ( JsonObject ) jsonArray2.get( i );
+            String fieldName = jo1.getAsJsonPrimitive( "fieldName" ).getAsString();
+            String value = jo1.getAsJsonPrimitive( "value" ).getAsString();
+            System.out.println( fieldName + " " + value );
+        }
     }
 }

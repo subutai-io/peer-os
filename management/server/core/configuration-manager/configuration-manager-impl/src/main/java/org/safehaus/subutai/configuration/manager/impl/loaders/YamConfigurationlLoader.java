@@ -30,7 +30,7 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
 
 
     @Override
-    public void setConfiguration( final Agent agent, JsonObject config ) {
+    public boolean setConfiguration( final Agent agent, String configFilePath, String config ) {
         // TODO Read config from instance
         TextInjectorImpl injector = new TextInjectorImpl();
         String content = injector.catFile( agent, "" );
@@ -43,5 +43,6 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
 
         // TODO inject Config
         injector.echoTextIntoAgent( agent, "path", newContent );
+        return true;
     }
 }

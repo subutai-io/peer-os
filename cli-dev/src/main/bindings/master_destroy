@@ -9,6 +9,22 @@ function master_destroy {
     echo No zfs dataset \'lxc/master\' found - aborting ...
     exit 1
   fi
+  local container="master"
+  local package_name=`get_package_name $container`
+  local debian_root="$SUBUTAI_TMPDIR/$container"
+
+  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai master_destroy called from command line"
+    # Check if the package is installed
+    dpkg -s $package_name > /dev/null 2>&1
+    if [ $? = 0  ]; then
+      apt-get --assume-yes --force-yes purge $package_name
+      exit $?
+    fi
+  else
+    msg_info "subutai master_destroy called while removing template via package-manager"
+  fi
 
   zfs release keep lxc/master-opt@template
   zfs destroy -r lxc/master-opt
@@ -23,24 +39,7 @@ function master_destroy {
   zfs destroy -r lxc/master
   lxc-destroy -n master
   
-  # Check if master destroy is succesfull
-  stat=$?
-  if [ $stat != 0  ]; then
-    echo "Could not destroy master, not continuing..."
-    exit 1
-  fi
-
   # Remove relevant directories under $SUBUTAI_TMPDIR if any
-  local container="master"
-  local package_name=`get_package_name $container`
-
-  # Check if the package is installed
-  dpkg -s $package_name > /dev/null 2>&1
-  if [ $? = 0  ]; then
-    apt-get --assume-yes --force-yes purge $package_name
-  fi
-
-  local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
 }
 

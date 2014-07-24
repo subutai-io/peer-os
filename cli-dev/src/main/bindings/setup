@@ -27,7 +27,7 @@ function setup {
 
   if [ -z "`lxc-ls | grep master`" ]; then
     echo Could not find installed base container, installing now ...
-    subutai-master-create
+    subutai master_create
   fi
 }
 
