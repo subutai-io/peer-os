@@ -1,5 +1,5 @@
 Source: subutai-cli
-Section: unknown
+Section: devel
 Priority: optional
 Maintainer: Subutai
 Build-Depends: debhelper (>= 8.0.0)
