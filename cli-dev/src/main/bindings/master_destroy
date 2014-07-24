@@ -25,8 +25,14 @@ function master_destroy {
   fi
 
   echo WARNING: this destroys everything mercilessly
-  echo \<Return\> to continue, or Ctrl-C to exit
-  read
+  while true; do
+    read -p "Do you wish to destroy master template? [Y/N]" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+  done
 
   zfs release keep lxc/master-opt@template
   zfs destroy -r lxc/master-opt
