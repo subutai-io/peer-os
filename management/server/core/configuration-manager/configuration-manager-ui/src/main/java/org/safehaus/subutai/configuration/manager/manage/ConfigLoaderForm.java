@@ -148,9 +148,9 @@ public class ConfigLoaderForm extends CustomComponent {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
                     String configPath = textField_1.getValue();
-                    ConfigTypeEnum o = ( ConfigTypeEnum ) comboBox_2.getValue();
+                    ConfigTypeEnum typeEnum = ( ConfigTypeEnum ) comboBox_2.getValue();
 
-                    JsonObject configStr = configManager.getJsonObjectFromResources( configPath, o );
+                    JsonObject configStr = configManager.getJsonObjectFromResources( configPath, typeEnum );
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     textArea_1.setValue( gson.toJson( configStr ) );
                 }
