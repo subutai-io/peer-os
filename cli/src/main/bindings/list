@@ -105,6 +105,31 @@ function list_templates {
   done
 }
 
+# lists all registered templates
+# first parameter $1 = mode which can be "" or "parents"
+function list_registered_templates {
+  local mode="$1"
+  local templates=`list_reg_templates "$mode"`
+
+  if [ "false" == "$subutai_quiet" -a -z "$mode" ]; then
+    echo -e "TEMPLATE"
+    echo -e "--------"
+  elif [ "false" == "$subutai_quiet" -a "parents" == "$mode" ]; then
+    echo -e "TEMPLATE\tPARENT"
+    echo -e "--------\t-------"
+  fi
+
+  for template in $templates; do
+    local t=`echo -e "$template" | cut -f 1`
+    local p=`echo -e "$template" | cut -s -f 2`
+    if [ "parents" == "$mode" ]; then
+      echo -e "$t\t\t$p"
+    else
+      echo "$t"
+    fi
+  done
+}
+
 
 # lists all the containers (not templates) together filtered by operands
 # first parameter $1 = set of container names for filtering (operands)
@@ -160,23 +185,31 @@ function list {
   
   templates="false"
   containers="false"
+  registered="false"
   parents="false"
   ancestors="false"
 
   shift_amount=0;
-  while getopts ":tcpa" opt; do
+  while getopts ":tcrpa" opt; do
     case $opt in
       t)
         templates="true"
-        if [ "true" == "$containers" ]; then
-          msg_error "Cannot use the -t and -c options together." >&2
+        if [[ "true" == "$containers" || "true" == "$registered" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
           exit 1
         fi
         ;;
       c)
         containers="true"
-        if [ "true" == "$templates" ]; then
-          msg_error "Cannot use the -t and -c options together." >&2
+        if [[ "true" == "$templates" || "true" == "$registered" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
+          exit 1
+        fi
+        ;;
+      r)
+        registered="true"
+        if [[ "true" == "$templates" || "true" == "$containers" ]]; then
+          msg_error "Cannot use the -t, -r, and -c options together." >&2
           exit 1
         fi
         ;;
@@ -214,12 +247,13 @@ function list {
     echo -e "operands\t= $operands"
     echo -e "parents\t\t= $parents"
     echo -e "templates\t= $templates"
+    echo -e "registered\t= $registered"
     echo -e "containers\t= $containers"
     echo -e "ancestors\t= $ancestors"
     echo
   fi
 
-  if [ "false" == "$templates" -a "false" == "$containers" ]; then
+  if [ "false" == "$templates" -a "false" == "$containers" -a "false" == "$registered" ]; then
     if [ "false" == "$parents" -a "false" == "$ancestors" ]; then
       list_contemp "$operands"
     elif [ "true" == "$parents" ];then
@@ -242,6 +276,12 @@ function list {
       list_containers "$operands" "parents"
     elif [ "true" == "$ancestors" ]; then
       list_containers "$operands" "ancestors"
+    fi
+  elif [ "true" == "$registered" ]; then
+    if [  "true" == "$parents" ]; then
+      list_registered_templates "parents"
+    else
+      list_registered_templates
     fi
   fi
 
