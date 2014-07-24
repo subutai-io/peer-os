@@ -29,7 +29,7 @@ function master_destroy {
     read -p "Do you wish to destroy master template? [Y/N]" yn
     case $yn in
         [Yy]* ) break;;
-        [Nn]* ) exit;;
+        [Nn]* ) exit 1;;
         * ) echo "Please answer yes or no.";;
     esac
   done
