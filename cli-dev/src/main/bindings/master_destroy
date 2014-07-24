@@ -1,14 +1,12 @@
 #!/bin/bash
 
 function master_destroy {
-  echo WARNING: this destroys everything mercilessly
-  echo \<Return\> to continue, or Ctrl-C to exit
-  read
 
   if [ -z "`zfs list lxc/master`" ]; then
     echo No zfs dataset \'lxc/master\' found - aborting ...
     exit 1
   fi
+
   local container="master"
   local package_name=`get_package_name $container`
   local debian_root="$SUBUTAI_TMPDIR/$container"
@@ -25,6 +23,10 @@ function master_destroy {
   else
     msg_info "subutai master_destroy called while removing template via package-manager"
   fi
+
+  echo WARNING: this destroys everything mercilessly
+  echo \<Return\> to continue, or Ctrl-C to exit
+  read
 
   zfs release keep lxc/master-opt@template
   zfs destroy -r lxc/master-opt
