@@ -231,9 +231,9 @@ function create_preinst_script_master {
   echo "mkdir -p /lxc-data/tmpdir" >> $preinst_file
   # Copy master debian package from archive_directory 
   # under $SUBUTAI_TMPDIR directory
-  echo "if [ -f $archive_directory/$debian_package_name".deb" ]; then"
+  echo "if [ -f $archive_directory/$debian_package_name".deb" ]; then" >> $preinst_file
   echo "  cp $archive_directory/$debian_package_name".deb" $SUBUTAI_TMPDIR"  >> $preinst_file
-  echo "fi"
+  echo "fi" >> $preinst_file
   echo ""  >> $preinst_file
   chmod 755 $preinst_file
 }
