@@ -20,6 +20,9 @@ import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 
 /**
  * @author dilshat
+ *
+ *
+ *         * @todo refactor addPropertyCommand & removePropertyCommand to not use custom scripts
  */
 public class Commands extends CommandsSingleton {
 
@@ -88,7 +91,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents ) {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
-                agents );
+                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
+                                propertyName ) ), agents );
     }
 }

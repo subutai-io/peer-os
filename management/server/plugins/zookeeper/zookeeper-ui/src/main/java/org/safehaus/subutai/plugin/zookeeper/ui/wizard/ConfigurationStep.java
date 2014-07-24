@@ -9,10 +9,10 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 
 import java.util.*;
 
@@ -137,16 +137,16 @@ public class ConfigurationStep extends Panel {
 			hadoopClustersCombo.setRequired(true);
 			hadoopClustersCombo.setNullSelectionAllowed(false);
 
-			List<Config> clusters = ZookeeperUI.getHadoopManager().getClusters();
+			List<HadoopClusterConfig> clusters = ZookeeperUI.getHadoopManager().getClusters();
 			if (clusters.size() > 0) {
-				for (Config hadoopClusterInfo : clusters) {
+				for (HadoopClusterConfig hadoopClusterInfo : clusters) {
 					hadoopClustersCombo.addItem(hadoopClusterInfo);
 					hadoopClustersCombo.setItemCaption(hadoopClusterInfo,
 							hadoopClusterInfo.getClusterName());
 				}
 			}
 
-			Config info = ZookeeperUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
+			HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
 			if (info != null) {
 				hadoopClustersCombo.setValue(info);
@@ -155,7 +155,7 @@ public class ConfigurationStep extends Panel {
 			}
 
 			if (hadoopClustersCombo.getValue() != null) {
-				Config hadoopInfo = (Config) hadoopClustersCombo.getValue();
+				HadoopClusterConfig hadoopInfo = (HadoopClusterConfig ) hadoopClustersCombo.getValue();
 				wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
 				hadoopNodesSelect.setContainerDataSource(
 						new BeanItemContainer<>(
@@ -167,7 +167,7 @@ public class ConfigurationStep extends Panel {
 				@Override
 				public void valueChange(Property.ValueChangeEvent event) {
 					if (event.getProperty().getValue() != null) {
-						Config hadoopInfo = (Config) event.getProperty().getValue();
+						HadoopClusterConfig hadoopInfo = (HadoopClusterConfig ) event.getProperty().getValue();
 						hadoopNodesSelect.setValue(null);
 						hadoopNodesSelect.setContainerDataSource(
 								new BeanItemContainer<>(

@@ -205,7 +205,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 						Agent agent = agentManager.getAgentByUUID(response.getUuid());
 						String host = agent == null ? String.format("Offline[%s]", response.getUuid()) :
 								agent.getHostname();
-						StringBuilder out = new StringBuilder();
+						StringBuilder out = new StringBuilder("host\n");
 
 						if (!Strings.isNullOrEmpty(response.getStdOut())) {
 							out.append(response.getStdOut());

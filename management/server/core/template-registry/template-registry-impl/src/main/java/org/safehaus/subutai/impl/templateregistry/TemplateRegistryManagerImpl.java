@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.templateregistry.Template;
@@ -21,6 +26,7 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -65,12 +71,60 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             String subutaiGitBranch = properties.getProperty( "subutai.git.branch" );
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
-            return new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
+            Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
                     subutaiGitUuid, packagesFile );
+
+            if ( template.getParentTemplateName() == null ) {
+
+                template.setProducts( getPackagesDiff( null, template ) );
+            }
+            else {
+                Template parentTemplate = getTemplate( template.getParentTemplateName() );
+
+                template.setProducts( getPackagesDiff( parentTemplate, template ) );
+            }
+
+
+            return template;
         }
         catch ( IOException e ) {
             throw new RuntimeException( String.format( "Error parsing template configuration %s", e ) );
         }
+    }
+
+
+    private Set<String> getPackagesDiff( Template parent, Template child ) {
+        if ( parent == null ) {
+            return extractPackageNames( Sets.newHashSet( child.getPackagesManifest().split( "\n" ) ) );
+        }
+        else {
+            return getPackagesDiff( Sets.newHashSet( parent.getPackagesManifest().split( "\n" ) ),
+                    Sets.newHashSet( child.getPackagesManifest().split( "\n" ) ) );
+        }
+    }
+
+
+    private Set<String> getPackagesDiff( Set<String> parentPackages, Set<String> childPackages ) {
+        Set<String> p = extractPackageNames( parentPackages );
+        Set<String> c = extractPackageNames( childPackages );
+        c.removeAll( p );
+
+        return c;
+    }
+
+
+    private Set<String> extractPackageNames( Set<String> ls ) {
+        Pattern p = Pattern.compile( String.format( "(%s.+?)\\s", Common.PACKAGE_PREFIX ) );
+        Matcher m = p.matcher( "" );
+
+        SortedSet<String> res = new TreeSet<>();
+        for ( String s : ls ) {
+            if ( m.reset( s ).find() ) {
+                res.add( m.group( 1 ) );
+            }
+        }
+
+        return res;
     }
 
 

@@ -12,8 +12,9 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -21,7 +22,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +64,7 @@ public class Manager {
 
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (ZookeeperClusterConfig ) event.getProperty().getValue();
+				config = (ZookeeperClusterConfig) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -175,7 +175,7 @@ public class Manager {
 							}
 						});
 					} else {
-						org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
+						HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
 						if (info != null) {
 							Set<Agent> nodes = new HashSet<Agent>(info.getAllNodes());
@@ -469,7 +469,7 @@ public class Manager {
 
 	public void refreshClustersInfo() {
 		List<ZookeeperClusterConfig> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
-		ZookeeperClusterConfig clusterInfo = (ZookeeperClusterConfig ) clusterCombo.getValue();
+		ZookeeperClusterConfig clusterInfo = (ZookeeperClusterConfig) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
 			for (ZookeeperClusterConfig mongoClusterInfo : mongoClusterInfos) {
