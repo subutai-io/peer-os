@@ -12,9 +12,9 @@
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
     <reference id="zkManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
+               interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper"/>
 
-    <bean id="accumulo-impl" scope="singleton" class="org.safehaus.subutai.impl.accumulo.AccumuloImpl"
+    <bean id="accumulo-impl" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
         <argument ref="agentManager"/>
@@ -24,6 +24,6 @@
         <argument ref="zkManager"/>
     </bean>
 
-    <service ref="accumulo-impl" interface="org.safehaus.subutai.api.accumulo.Accumulo"/>
+    <service ref="accumulo-impl" interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo"/>
 
 </blueprint>

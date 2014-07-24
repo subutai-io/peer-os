@@ -13,19 +13,12 @@
     </cxf:features>
   </cxf:bus>
   <!-- 2 -->
-  <jaxrs:server address="/accumulo" id="accumuloRestService">
+  <jaxrs:server address="/accumulo2" id="accumuloRestService">
     <jaxrs:serviceBeans>
       <ref component-id="accumuloRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <!-- 3 -->
   <!-- Implementation of the rest service -->
-  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.accumulo.services.RestServiceImpl">
-    <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
+  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.plugin.accumulo.rest.RestServiceImpl">
   </bean>
-  <!-- 4 -->
-  <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
-  <!--<reference id="helloServiceBean"-->
-  <!--interface="org.safehaus.subutai.rest.services.HelloService">-->
-  <!--</reference>-->
 </blueprint>
