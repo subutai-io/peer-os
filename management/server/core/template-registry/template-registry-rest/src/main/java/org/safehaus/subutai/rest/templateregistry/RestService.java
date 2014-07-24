@@ -23,6 +23,10 @@ public interface RestService {
                                       @QueryParam( "packages" ) String packagesFilePath );
 
     @GET
+    @Path( "unregister_template/{templateName}" )
+    public Response unregisterTemplate( @PathParam( "templateName" ) String templateName );
+
+    @GET
     @Path( "get_template/{templateName}/{lxcArch}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String getTemplate( @PathParam( "templateName" ) String templateName,

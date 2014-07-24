@@ -378,22 +378,11 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             };
         }
         group.setStrategy( EnumSet.of( strategy[0], strategy ) );
-        group.setProducts( generatePacksDiff( templateName ) );
+        Template template = templateRegistry.getTemplate( templateName );
+        group.setProducts( template.getProducts() );
         for ( Agent a : agents ) {
             group.setInstanceId( a.getUuid() );
             dbManager.executeUpdate( cql, a.getUuid().toString(), envId.toString(), gson.toJson( group ) );
         }
-    }
-
-
-    private List<String> generatePacksDiff( String template ) {
-        Template t = templateRegistry.getTemplate( template );
-        String templatePacks = t.getPackagesManifest();
-
-        Template p = templateRegistry.getParentTemplate( template );
-        String parentPacks = p.getPackagesManifest();
-
-        PackageDiff pdiff = new PackageDiff();
-        return pdiff.getDiff( parentPacks, templatePacks );
     }
 }
