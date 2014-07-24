@@ -5,6 +5,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+import java.util.*;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -12,8 +13,6 @@ import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
-
-import java.util.*;
 
 public class Manager {
 
@@ -40,7 +39,7 @@ public class Manager {
 		HorizontalLayout controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
 
-		Label clusterNameLabel = new Label("Select the cluster");
+        Label clusterNameLabel = new Label("Select Sqoop installation:");
 		controlsContent.addComponent(clusterNameLabel);
 
 		clusterCombo = new ComboBox();
@@ -56,7 +55,7 @@ public class Manager {
 			}
 		});
 
-		Button refreshClustersBtn = new Button("Refresh clusters");
+		Button refreshClustersBtn = new Button("Refresh");
 		refreshClustersBtn.addStyleName("default");
 		refreshClustersBtn.addClickListener(new Button.ClickListener() {
 
@@ -66,19 +65,19 @@ public class Manager {
 			}
 		});
 
-		Button destroyClusterBtn = new Button("Destroy cluster");
+		Button destroyClusterBtn = new Button("Destroy");
 		destroyClusterBtn.addStyleName("default");
 		destroyClusterBtn.addClickListener(new Button.ClickListener() {
 
 			@Override
 			public void buttonClick(Button.ClickEvent event) {
 				if (config == null) {
-					show("Select cluster");
+                    show("Select Sqoop installation");
 					return;
 				}
 
-				ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
-						"Yes", "No");
+                ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to completely destroy installation '%s'?", config.getClusterName()),
+                  						"Yes", "No");
 				alert.getOk().addClickListener(new Button.ClickListener() {
 					@Override
 					public void buttonClick(Button.ClickEvent clickEvent) {
@@ -98,7 +97,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent event) {
 				if (config == null) {
-					show("Select cluster");
+                    show("Select Sqoop installation");
 					return;
 				}
 

@@ -2,12 +2,11 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
-
-import java.util.UUID;
 
 public class VerificationStep extends Panel {
 
@@ -25,7 +24,7 @@ public class VerificationStep extends Panel {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+        cfgView.addStringCfg("Installation name", wizard.getConfig().getClusterName());
 		for (Agent agent : wizard.getConfig().getNodes()) {
 			cfgView.addStringCfg("Node to install", agent.getHostname());
 		}
