@@ -172,7 +172,6 @@ function create_postinst_script {
   local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
-  echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
   echo "export APT_GET_INVOCATION=true" >> $postinst_file
   # Check if the template is master
