@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
  */
 public class FileContentReaderTest {
 
-//    @Test
+    @Test
     public void test() {
         FileContentReader fileContentReader = new FileContentReader();
         //        String filePath =
@@ -31,7 +31,8 @@ public class FileContentReaderTest {
         String filePath = "cassandra_conf/cassandra.yaml";
         String content = FileUtil.getContent( filePath, this );
 
-        try {
+        System.out.println(content);
+       /* try {
             ConfigParser iniParser = new IniParser( content );
             JsonObject cjo = iniParser.parserConfig( filePath, ConfigTypeEnum.PROPERTIES );
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -39,6 +40,6 @@ public class FileContentReaderTest {
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

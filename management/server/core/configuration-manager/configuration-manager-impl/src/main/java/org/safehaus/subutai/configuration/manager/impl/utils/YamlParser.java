@@ -2,10 +2,13 @@ package org.safehaus.subutai.configuration.manager.impl.utils;
 
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.yaml.snakeyaml.Yaml;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
@@ -76,29 +79,22 @@ public class YamlParser implements ConfigParser {
 
     @Override
     public JsonObject parserConfig( final String pathToConfig, final ConfigTypeEnum configTypeEnum ) {
-        /*ConfigBuilder configBuilder = new ConfigBuilder();
+        ConfigBuilder configBuilder = new ConfigBuilder();
         JsonObject jo = configBuilder.getConfigJsonObject( pathToConfig, configTypeEnum );
 
-        Iterator<String> iterator = yaml.getKeys();
-        for ( Object o : yaml.keySet() ) {
-            StringBuilder sb = new StringBuilder();
-            String valuePath = getValuePath( sb, o );
-        }
+        String content = FileUtil.getContent( pathToConfig, this );
 
+        Yaml yaml = new Yaml();
+        Map<String, Object> config = ( Map<String, Object> ) yaml.load( content );
         List<JsonObject> fields = new ArrayList<>();
-        while ( iterator.hasNext() ) {
-            String key = iterator.next();
-            String value = ( String ) config.getProperty( key );
-            JsonObject field = configBuilder.buildFieldJsonObject( key, "", "", "", value );
+        for ( String key : config.keySet() ) {
+            Object value = config.get( key );
+            JsonObject field = configBuilder.buildFieldJsonObject( key, "", true, "textfield", true, value.toString() );
             fields.add( field );
         }
 
         JsonObject njo = configBuilder.addJsonArrayToConfig( jo, fields );
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-        return njo*/
-        ;
-        return null;
+        return njo;
     }
 
 
