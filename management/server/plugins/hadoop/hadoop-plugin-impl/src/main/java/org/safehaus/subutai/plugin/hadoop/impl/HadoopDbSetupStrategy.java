@@ -120,7 +120,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 
 					//continue installation here
 
-//					installHadoopCluster();
+					installHadoopCluster();
 
 					//@todo add containers destroyal in case of failure
 				} catch (EnvironmentBuildException e) {
