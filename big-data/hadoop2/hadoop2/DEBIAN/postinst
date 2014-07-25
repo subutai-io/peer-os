@@ -3,13 +3,6 @@ set -e
 . /etc/profile
 
 hadoopVersion=2.3.0
-tar -xpzf /opt/hadoop-$hadoopVersion.tar.gz -C /opt
-
-# copy conf files from etc/hadoop to conf
-mkdir /opt/hadoop-$hadoopVersion/conf
-cp -a /opt/hadoop-$hadoopVersion/etc/hadoop/* /opt/hadoop-$hadoopVersion/conf
-rm -rf /opt/hadoop-$hadoopVersion/etc
-
 hadoopHome="/opt/hadoop-$hadoopVersion"
 hadoopConf=/etc/hadoop
 
@@ -63,7 +56,9 @@ $hadoopHome/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts /opt/hadoop-$hado
 $hadoopHome/bin/hadoop-property.sh add hdfs-site.xml dfs.hosts.exclude /opt/hadoop-$hadoopVersion/conf/dfs.exclude
 
 # mapred-site.xml
-cp /opt/hadoop-$hadoopVersion/conf/mapred-site.xml.template /opt/hadoop-$hadoopVersion/conf/mapred-site.xml
+if [[ -f "/etc/hadoop/mapred-site.xml.template" ]]; then
+	mv /etc/hadoop/mapred-site.xml.template /etc/hadoop/mapred-site.xml
+fi 
 $hadoopHome/bin/hadoop-property.sh add mapred-site.xml mapreduce.framework.name yarn
 
 # yarn-site.xml
