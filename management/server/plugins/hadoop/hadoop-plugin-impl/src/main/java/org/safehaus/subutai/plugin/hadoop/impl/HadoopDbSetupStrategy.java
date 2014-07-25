@@ -99,7 +99,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 						hadoopClusterConfig.getClusterName()));
 			} else {
 				try {
-					po.addLog(String.format("Creating %d servers...", hadoopClusterConfig.getAllNodes().size()));
+					po.addLog(String.format("Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes() + 3));
 
                     /*Set<Agent> cfgServers = containerManager.clone( hadoopClusterConfig.getTemplateName(), 3,
                             HadoopImpl.getAgentManager().getPhysicalAgents(),

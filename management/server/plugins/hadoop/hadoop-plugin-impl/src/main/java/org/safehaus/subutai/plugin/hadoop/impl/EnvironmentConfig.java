@@ -58,9 +58,8 @@ public class EnvironmentConfig {
 
 	public HadoopClusterConfig setup() throws EnvironmentBuildException {
 		Environment environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
-		System.out.println(environment);
-		/*setMasterNodes(environment);
-		setSlaveNodes(environment);*/
+		setMasterNodes(environment);
+//		setSlaveNodes(environment);
 
 		return config;
 	}
@@ -68,9 +67,11 @@ public class EnvironmentConfig {
 	private void setMasterNodes(Environment environment) {
 		Set<Node> nodes = environment.getNodes();
 		if (nodes != null && nodes.size() >= 2) {
-			Node[] arr = nodes.toArray(new Node[nodes.size()]);
 
-			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
+			Node[] arr = nodes.toArray(new Node[nodes.size()]);
+			System.out.println(arr);
+
+			/*if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
 				config.setNameNode(arr[0].getAgent());
 			}
 
@@ -80,7 +81,7 @@ public class EnvironmentConfig {
 
 			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
 				config.setSecondaryNameNode(arr[2].getAgent());
-			}
+			}*/
 		}
 	}
 
