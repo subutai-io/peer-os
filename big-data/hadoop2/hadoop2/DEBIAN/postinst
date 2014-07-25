@@ -3,13 +3,6 @@ set -e
 . /etc/profile
 
 hadoopVersion=2.3.0
-tar -xpzf /opt/hadoop-$hadoopVersion.tar.gz -C /opt
-
-# copy conf files from etc/hadoop to conf
-mkdir /opt/hadoop-$hadoopVersion/conf
-cp -a /opt/hadoop-$hadoopVersion/etc/hadoop/* /opt/hadoop-$hadoopVersion/conf
-rm -rf /opt/hadoop-$hadoopVersion/etc
-
 hadoopHome="/opt/hadoop-$hadoopVersion"
 hadoopConf=/etc/hadoop
 
