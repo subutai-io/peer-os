@@ -51,6 +51,16 @@ public class VerificationStep extends Panel {
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
         }
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+            cfgView.addStringCfg( "Zookeeper cluster name", wizard.getConfig().getClusterName() );
+            cfgView.addStringCfg( "Number of Zookeeper cluster nodes", wizard.getConfig().getNumberOfNodes() + "" );
+            cfgView.addStringCfg( "Hadoop cluster name", wizard.getHadoopClusterConfig().getClusterName() );
+            cfgView.addStringCfg( "Number of Hadoop slave nodes",
+                    wizard.getHadoopClusterConfig().getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor for Hadoop slave nodes",
+                    wizard.getHadoopClusterConfig().getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Hadoop cluster domain name", wizard.getHadoopClusterConfig().getDomainName() );
+        }
 
         Button install = new Button( "Install" );
         install.addStyleName( "default" );
