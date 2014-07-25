@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #------------------------------------------------------
-#(0) exit if there are uncommitted or unstaged files
-#(1) check if there are local commits, return if there is no commit
+#(0) exit if there are uncommitted or unstaged files under the specified directory
+#(1) check if there are local commits and they are related with specified path
 #(2) read the version number
 #(3) increment the patch version number (X) in the memory and in the file
 #(4) commit and push with incremented patch version number (X+1)
@@ -10,6 +10,8 @@
 #------------------------------------------------------
 
 package_name="subutai-cli-dev"
+absPath="cli-dev"
+currentDirectory=$(pwd)
 # This function returns true if variable is empty, false if not empty
 function isEmpty {
   if [ -z "$1" ]; then
@@ -20,7 +22,7 @@ function isEmpty {
 }
 
 
-function exitIfNoChange {
+function exitIfNoCommits {
   local changelogFile=$1
   branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
   branch_name="(unnamed branch)"     # detached HEAD
@@ -38,28 +40,57 @@ function exitIfNoChange {
 }
 
 
-require_clean_work_directory () {
+function require_clean_work_directory {
   if [ -z "$(git status --porcelain .)" ]; then
-    echo "This directory $(pwd) is clean"
+    echo "This directory $currentDirectory is clean"
   else
-    echo "Please commit the changes first under $(pwd) directory!"
+    echo "Please commit the changes first under $currentDirectory directory!"
     exit 1
   fi 
 }
 
+
+function getListofCommits {
+  commitList=($(git log origin/$branch_name..HEAD | grep "^commit" | awk '{split($0,a," "); print a[2] }'))
+}
+
+
+function checkCommitsForPath {
+  getListofCommits
+  for commit in "${commitList[@]}"
+  do
+    # Get list of files of this commit
+    files=$(git diff-tree --no-commit-id --name-only -r $commit)
+    # Check if there are changed files under the specified path
+    changedFiles=$(echo $files | grep ^$absPath/)
+    echo "$commit: $changedFiles"
+    if [ -n "$changedFiles" ]; then
+      isChanged="true"
+      break;
+    fi
+  done
+  echo "isChanged: -$isChanged-"
+  if [ -n "$isChanged" -a "$isChanged" == "true" ]; then
+    echo "There are changed files for $package_name"
+  else
+    echo "No change for path $absPath, exiting..."
+    exit 0
+  fi
+}
 
 changelogFile="debian/changelog"
 # Ignore changes inside changelog file
 git checkout -- $changelogFile > /dev/null 2>&1
 
 #------------------------------------------------------
-#(0) exit if there are uncommitted or unstaged files
+#(0) exit if there are uncommitted or unstaged files under the specified directory
 #------------------------------------------------------
 require_clean_work_directory
 #------------------------------------------------------
-#(1) check if there are local commits, return if there is no commit
+#(1) check if there are local commits and they are related with specified path
 #------------------------------------------------------
-exitIfNoChange $changelogFile
+exitIfNoCommits $changelogFile
+checkCommitsForPath 
 
 #----------------UPDATE_VERSION-----------------------
 #------------------------------------------------------
@@ -94,7 +125,7 @@ sed -i "s/$version/$updatedVersion/1" $changelogFile
 #(4) commit and push with incremented patch version number (X+1) if there are uncommitted changes
 #------------------------------------------------------
 git add .
-git commit -m "Auto commit while building $package_name package"
+git commit -m "Incrementing patch version of $package_name package"
 isSuccesful=$?
 git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
