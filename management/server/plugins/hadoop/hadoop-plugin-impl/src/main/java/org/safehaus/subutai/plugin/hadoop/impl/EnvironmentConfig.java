@@ -61,6 +61,7 @@ public class EnvironmentConfig {
 		setMasterNodes(environment);
 		setSlaveNodes(environment);
 
+		System.out.println(config);
 		return config;
 	}
 
