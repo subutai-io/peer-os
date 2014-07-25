@@ -24,6 +24,8 @@ function isEmpty {
 
 function exitIfNoChange {
   local changelogFile=$1
+  # Ignore changes in this file before decision
+  git checkout -- $changelogFile > /dev/null 2>&1
   branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
   branch_name="(unnamed branch)"     # detached HEAD
   branch_name=${branch_name##refs/heads/}
@@ -38,7 +40,6 @@ function exitIfNoChange {
   echo "isDiffEmpty: $isDiffEmpty"
   echo "Checking if there is a change for branch: $branch_name"
   if [ $isStatusEmpty = "true" -a $isDiffEmpty = "true" ]; then
-    git checkout -- $changelogFile > /dev/null 2>&1
     echo "No change is made on debian package"
     exit 0
   fi
@@ -89,7 +90,7 @@ if [ $isStatusEmpty = "false" ]; then
 else
   isSuccesful=0
 fi
-git push
+git push origin $branch_name
 isSuccesful=`expr $? + $isSuccesful`
 #------------------------------------------------------
 #(4) if commit and push worked then generate the package with the new (X+1) version number which must be unique, else exit

@@ -172,7 +172,6 @@ function create_postinst_script {
   local debian_dir=$2
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
-  echo "set -e"  >> $postinst_file
   echo ""  >> $postinst_file
   echo "export APT_GET_INVOCATION=true" >> $postinst_file
   # Check if the template is master
@@ -198,6 +197,8 @@ function create_prerm_script {
   # Check if the template is master
   if [ $lxc != "master" ]; then
     echo "subutai destroy $lxc" >> $prerm_file
+  else
+    echo "subutai master_destroy" >> $prerm_file
   fi
   chmod 755 $prerm_file
 }
@@ -227,4 +228,13 @@ function get_package_name {
 
 function get_architecture {
   echo "amd64"
+}
+
+
+function is_package_installed {
+  if [ -z "$1" ]; then
+    msg_error "package name is not provided. Aborting ..."
+    exit 1
+  fi
+  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^i'
 }

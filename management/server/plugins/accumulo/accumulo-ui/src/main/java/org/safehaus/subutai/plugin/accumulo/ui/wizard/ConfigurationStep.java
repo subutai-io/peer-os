@@ -12,12 +12,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
+import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
-import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -61,15 +62,15 @@ public class ConfigurationStep extends Panel {
                 UiUtil.getTwinSelect( "Slaves", "hostname", "Available Nodes", "Selected Nodes", 4 );
 
         //get hadoop clusters from db
-        List<Config> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> hadoopClusters = AccumuloUI.getHadoopManager().getClusters();
         final List<ZookeeperClusterConfig> zkClusters = AccumuloUI.getZookeeperManager().getClusters();
-        Set<Config> filteredHadoopClusters = new HashSet<>();
+        Set<HadoopClusterConfig> filteredHadoopClusters = new HashSet<>();
 
         //filter out those hadoop clusters which have zk clusters installed on top
-        for ( Config hadoopClusterInfo : hadoopClusters ) {
+        for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusters ) {
             for ( ZookeeperClusterConfig zkClusterInfo : zkClusters ) {
-                if ( hadoopClusterInfo.getClusterName().equals( zkClusterInfo.getClusterName() ) && !zkClusterInfo
-                        .isStandalone() ) {
+                if ( hadoopClusterInfo.getClusterName().equals( zkClusterInfo.getClusterName() )
+                        && zkClusterInfo.getSetupType() == SetupType.OVER_HADOOP ) {
                     filteredHadoopClusters.add( hadoopClusterInfo );
                     break;
                 }
@@ -78,14 +79,15 @@ public class ConfigurationStep extends Panel {
 
         //fill hadoopClustersCombo with hadoop cluster infos
         if ( filteredHadoopClusters.size() > 0 ) {
-            for ( Config hadoopClusterInfo : filteredHadoopClusters ) {
+            for ( HadoopClusterConfig hadoopClusterInfo : filteredHadoopClusters ) {
                 hadoopClustersCombo.addItem( hadoopClusterInfo );
                 hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
         //try to find hadoop cluster info based on one saved in the configuration
-        Config info = AccumuloUI.getHadoopManager().getCluster( wizard.getAccumuloClusterConfig().getClusterName() );
+        HadoopClusterConfig info =
+                AccumuloUI.getHadoopManager().getCluster( wizard.getAccumuloClusterConfig().getClusterName() );
 
         //select if saved found
         if ( info != null ) {
@@ -100,7 +102,7 @@ public class ConfigurationStep extends Panel {
 
         //fill selection controls with hadoop nodes
         if ( hadoopClustersCombo.getValue() != null ) {
-            Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
+            HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
 
             wizard.getAccumuloClusterConfig().setClusterName( hadoopInfo.getClusterName() );
 
@@ -116,7 +118,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    Config hadoopInfo = ( Config ) event.getProperty().getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     setComboDS( masterNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
                     setComboDS( gcNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
                     setComboDS( monitorNodeCombo, filterAgents( hadoopInfo, zkClusters ) );
@@ -148,7 +150,7 @@ public class ConfigurationStep extends Panel {
                 if ( event.getProperty().getValue() != null ) {
                     Agent masterNode = ( Agent ) event.getProperty().getValue();
                     wizard.getAccumuloClusterConfig().setMasterNode( masterNode );
-                    Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( masterNode );
                     gcNodeCombo.removeValueChangeListener( gcNodeComboChangeListener );
@@ -171,7 +173,7 @@ public class ConfigurationStep extends Panel {
                 if ( event.getProperty().getValue() != null ) {
                     Agent gcNode = ( Agent ) event.getProperty().getValue();
                     wizard.getAccumuloClusterConfig().setGcNode( gcNode );
-                    Config hadoopInfo = ( Config ) hadoopClustersCombo.getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
                     List<Agent> hadoopNodes = filterAgents( hadoopInfo, zkClusters );
                     hadoopNodes.remove( gcNode );
                     masterNodeCombo.removeValueChangeListener( masterNodeComboChangeListener );
@@ -346,7 +348,7 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private List<Agent> filterAgents( Config hadoopInfo, List<ZookeeperClusterConfig> zkClusters ) {
+    private List<Agent> filterAgents( HadoopClusterConfig hadoopInfo, List<ZookeeperClusterConfig> zkClusters ) {
 
         List<Agent> filteredAgents = new ArrayList<>();
         ZookeeperClusterConfig zkConfig = null;

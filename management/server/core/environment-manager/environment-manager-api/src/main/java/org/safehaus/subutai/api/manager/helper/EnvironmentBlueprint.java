@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * Created by bahadyr on 6/23/14.
  */
-public class EnvironmentBlueprint  {
+public class EnvironmentBlueprint {
 
 
     private String name;
@@ -22,8 +22,6 @@ public class EnvironmentBlueprint  {
     public void setName( final String name ) {
         this.name = name;
     }
-
-
 
 
     public Set<NodeGroup> getNodeGroups() {

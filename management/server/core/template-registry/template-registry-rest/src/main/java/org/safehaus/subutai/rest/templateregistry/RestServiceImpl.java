@@ -1,168 +1,179 @@
 package org.safehaus.subutai.rest.templateregistry;
 
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
+
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
 /**
  *
  */
+
 public class RestServiceImpl implements RestService {
 
     private static final String TEMPLATE_PARENT_DELIMITER = " ";
     private static final String TEMPLATES_DELIMITER = "\n";
 
-    private static final Gson gson
-            = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson gson =
+            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
     private TemplateRegistryManager templateRegistryManager;
 
-    public void setTemplateRegistryManager(TemplateRegistryManager templateRegistryManager) {
+
+    public void setTemplateRegistryManager( TemplateRegistryManager templateRegistryManager ) {
         this.templateRegistryManager = templateRegistryManager;
     }
 
-    @Override
-    public String getTemplate(final String templateName) {
-        return gson.toJson(templateRegistryManager.getTemplate(templateName));
-    }
 
     @Override
-    public Response registerTemplate(final String configFilePath, final String packagesFilePath) {
+    public String getTemplate( final String templateName ) {
+        return gson.toJson( templateRegistryManager.getTemplate( templateName ) );
+    }
+
+
+    @Override
+    public Response registerTemplate( final String configFilePath, final String packagesFilePath ) {
         try {
 
-            templateRegistryManager.registerTemplate(FileUtil.readFile(configFilePath, Charset.defaultCharset()),
-                    FileUtil.readFile(packagesFilePath, Charset.defaultCharset()));
+            templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
+                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ) );
 
-            return Response.status(Response.Status.OK).build();
-        } catch(Throwable e) {
-            return Response.status(Response.Status.BAD_REQUEST).header("exception", e.getMessage()).build();
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( Throwable e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
 
+
     @Override
-    public Response registerTemplateDummy(String templateName) {
-        String config = "lxc.utsname = " + templateName + "\n"
-                + "lxc.arch    = amd64\n"
-                + "subutai.config.path     = /etc\n"
-                + "subutai.app.data.path   = /var\n"
-                + "subutai.parent          = " + (templateName.equals("master") ? "" : "master") + "\n"
-                + "subutai.git.branch      = " + templateName + "-branch\n"
-                +"subutai.git.uuid        = 1234567890QWERTYUIOP\n";
-        String packs = "Desired=Unknown/Install/Remove/Purge/Hold\n"
-                + "| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend\n"
-                + "|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)\n"
-                + "||/ Name                                                  Version                                             Architecture Description\n"
-                + "+++-=====================================================-===================================================-============-===============================================================================\n"
-                + "ii  account-plugin-aim                                    3.8.6-0ubuntu9.1                                    amd64        Messaging account plugin for AIM\n"
-                + "ii  account-plugin-facebook                               0.11+14.04.20140409.1-0ubuntu1                      all          GNOME Control Center account plugin for single signon - facebook\n"
-                + "ii  account-plugin-flickr                                 0.11+14.04.20140409.1-0ubuntu1                      all          GNOME Control Center account plugin for single signon - flickr\n"
-                + "rc  account-plugin-generic-oauth                          0.10bzr13.03.26-0ubuntu1.1                          amd64        GNOME Control Center account plugin for single signon - generic OAuth\n"
-                + "ii  account-plugin-google                                 0.11+14.04.20140409.1-0ubuntu1                      all          GNOME Control Center account plugin for single signon\n"                ;
+    public Response unregisterTemplate( final String templateName ) {
         try {
-            templateRegistryManager.registerTemplate(config, packs);
-            return Response.ok().build();
-        } catch(Exception ex) {
-            return Response.serverError().build();
+
+            templateRegistryManager.unregisterTemplate( templateName );
+
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( Throwable e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
 
-    @Override
-    public String getTemplate(final String templateName, final String lxcArch) {
-        return gson.toJson(templateRegistryManager.getTemplate(templateName, lxcArch));
-    }
 
     @Override
-    public String getParentTemplate(final String childTemplateName) {
-        return gson.toJson(templateRegistryManager.getParentTemplate(childTemplateName));
+    public String getTemplate( final String templateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
     }
 
-    @Override
-    public String getParentTemplate(final String childTemplateName, final String lxcArch) {
-        return gson.toJson(templateRegistryManager.getParentTemplate(childTemplateName, lxcArch));
-    }
 
     @Override
-    public String getParentTemplates(final String childTemplateName) {
+    public String getParentTemplate( final String childTemplateName ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName ) );
+    }
+
+
+    @Override
+    public String getParentTemplate( final String childTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName, lxcArch ) );
+    }
+
+
+    @Override
+    public String getParentTemplates( final String childTemplateName ) {
         List<String> parents = new ArrayList<>();
-        for(Template template : templateRegistryManager.getParentTemplates(childTemplateName)) {
-            parents.add(template.getTemplateName());
+        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName ) ) {
+            parents.add( template.getTemplateName() );
         }
-        return gson.toJson(parents);
+        return gson.toJson( parents );
     }
 
+
     @Override
-    public String getParentTemplates(final String childTemplateName, final String lxcArch) {
+    public String getParentTemplates( final String childTemplateName, final String lxcArch ) {
         List<String> parents = new ArrayList<>();
-        for(Template template : templateRegistryManager.getParentTemplates(childTemplateName, lxcArch)) {
-            parents.add(template.getTemplateName());
+        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName, lxcArch ) ) {
+            parents.add( template.getTemplateName() );
         }
-        return gson.toJson(parents);
+        return gson.toJson( parents );
     }
 
-    @Override
-    public String getChildTemplates(final String parentTemplateName) {
-        return gson.toJson(templateRegistryManager.getChildTemplates(parentTemplateName));
-    }
 
     @Override
-    public String getChildTemplates(final String parentTemplateName, final String lxcArch) {
-        return gson.toJson(templateRegistryManager.getChildTemplates(parentTemplateName, lxcArch));
+    public String getChildTemplates( final String parentTemplateName ) {
+        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
     }
+
+
+    @Override
+    public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
+    }
+
 
     @Override
     public String getTemplateTree() {
         TemplateTree tree = templateRegistryManager.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
-        if(uberTemplates != null)
-            for(Template template : uberTemplates) {
-                addChildren(tree, template);
+        if ( uberTemplates != null ) {
+            for ( Template template : uberTemplates ) {
+                addChildren( tree, template );
             }
-        return gson.toJson(uberTemplates);
+        }
+        return gson.toJson( uberTemplates );
     }
+
 
     @Override
     public String listTemplates() {
-        return gson.toJson(templateRegistryManager.getAllTemplates());
+        return gson.toJson( templateRegistryManager.getAllTemplates() );
     }
 
+
     @Override
-    public String listTemplates(final String lxcArch) {
-        return gson.toJson(templateRegistryManager.getAllTemplates(lxcArch));
+    public String listTemplates( final String lxcArch ) {
+        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
     }
+
 
     @Override
     public String listTemplatesPlain() {
-        return listTemplatesPlain(Common.DEFAULT_LXC_ARCH);
+        return listTemplatesPlain( Common.DEFAULT_LXC_ARCH );
     }
 
-    @Override
-    public String listTemplatesPlain(final String lxcArch) {
-        StringBuilder output = new StringBuilder();
-        List<Template> templates = templateRegistryManager.getAllTemplates(lxcArch);
 
-        for(final Template template : templates) {
-            output.append(template.getTemplateName()).append(TEMPLATE_PARENT_DELIMITER).append(
-                    Strings.isNullOrEmpty(template.getParentTemplateName()) ? "" : template.getParentTemplateName())
-                    .append(TEMPLATES_DELIMITER);
+    @Override
+    public String listTemplatesPlain( final String lxcArch ) {
+        StringBuilder output = new StringBuilder();
+        List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
+
+        for ( final Template template : templates ) {
+            output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
+                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
+                  .append( TEMPLATES_DELIMITER );
         }
 
         return output.toString();
     }
 
-    private void addChildren(TemplateTree tree, Template currentTemplate) {
-        List<Template> children = tree.getChildrenTemplates(currentTemplate);
-        if(!(children == null || children.isEmpty())) {
-            currentTemplate.addChildren(children);
-            for(Template child : children) {
-                addChildren(tree, child);
+
+    private void addChildren( TemplateTree tree, Template currentTemplate ) {
+        List<Template> children = tree.getChildrenTemplates( currentTemplate );
+        if ( !( children == null || children.isEmpty() ) ) {
+            currentTemplate.addChildren( children );
+            for ( Template child : children ) {
+                addChildren( tree, child );
             }
         }
     }

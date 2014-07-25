@@ -30,7 +30,7 @@ function master_import {
     fi
 
     pushd $SUBUTAI_TMPDIR > /dev/null
-    dpkg -s $package_name > /dev/null 2>&1
+    is_package_installed $package_name
     if [ $? = 0  ]; then
       msg_error "Template $container seems already installed, please destroy first"
       exit 1

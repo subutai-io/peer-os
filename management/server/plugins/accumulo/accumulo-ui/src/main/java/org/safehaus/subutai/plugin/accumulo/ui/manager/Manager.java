@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
+import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
+import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
-import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -166,12 +167,13 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( accumuloClusterConfig != null ) {
                     ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", accumuloClusterConfig.getClusterName() ), "Yes",
-                            "No" );
+                            String.format( "Do you want to destroy the %s cluster?",
+                                    accumuloClusterConfig.getClusterName() ), "Yes", "No" );
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = AccumuloUI.getAccumuloManager().uninstallCluster( accumuloClusterConfig.getClusterName() );
+                            UUID trackID = AccumuloUI.getAccumuloManager()
+                                                     .uninstallCluster( accumuloClusterConfig.getClusterName() );
                             ProgressWindow window =
                                     new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
                                             AccumuloClusterConfig.PRODUCT_KEY );
@@ -200,7 +202,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( accumuloClusterConfig != null ) {
 
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+                    HadoopClusterConfig hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
                     ZookeeperClusterConfig zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
@@ -214,7 +216,8 @@ public class Manager {
                                 return;
                             }
 
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -224,12 +227,13 @@ public class Manager {
                             } );
                         }
                         else {
-                            Notification
-                                    .show( String.format( "Zookeeper cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+                            Notification.show( String.format( "Zookeeper cluster %s not found",
+                                    accumuloClusterConfig.getClusterName() ) );
                         }
                     }
                     else {
-                        Notification.show( String.format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+                        Notification.show( String
+                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                     }
                 }
                 else {
@@ -247,7 +251,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( accumuloClusterConfig != null ) {
 
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+                    HadoopClusterConfig hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
                     ZookeeperClusterConfig zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
@@ -261,7 +265,8 @@ public class Manager {
                                 return;
                             }
 
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
+                            AddNodeWindow addNodeWindow =
+                                    new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -271,12 +276,13 @@ public class Manager {
                             } );
                         }
                         else {
-                            Notification
-                                    .show( String.format( "Zookeeper cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+                            Notification.show( String.format( "Zookeeper cluster %s not found",
+                                    accumuloClusterConfig.getClusterName() ) );
                         }
                     }
                     else {
-                        Notification.show( String.format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
+                        Notification.show( String
+                                .format( "Hadoop cluster %s not found", accumuloClusterConfig.getClusterName() ) );
                     }
                 }
                 else {
@@ -305,8 +311,9 @@ public class Manager {
                         Notification.show( "Please, specify property name to remove" );
                     }
                     else {
-                        UUID trackID =
-                                AccumuloUI.getAccumuloManager().removeProperty( accumuloClusterConfig.getClusterName(), propertyName );
+                        UUID trackID = AccumuloUI.getAccumuloManager()
+                                                 .removeProperty( accumuloClusterConfig.getClusterName(),
+                                                         propertyName );
 
                         ProgressWindow window =
                                 new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
@@ -347,7 +354,8 @@ public class Manager {
                     }
                     else {
                         UUID trackID = AccumuloUI.getAccumuloManager()
-                                                 .addProperty( accumuloClusterConfig.getClusterName(), propertyName, propertyValue );
+                                                 .addProperty( accumuloClusterConfig.getClusterName(), propertyName,
+                                                         propertyValue );
 
                         ProgressWindow window =
                                 new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
@@ -438,11 +446,11 @@ public class Manager {
             progressIcon.setVisible( false );
 
             table.addItem( masters ? new Object[] {
-                            ( i == 1 ? UiUtil.MASTER_PREFIX : i == 2 ? UiUtil.GC_PREFIX : UiUtil.MONITOR_PREFIX )
-                                    + agent.getHostname(), checkBtn, resultHolder, progressIcon
-                    } : new Object[] {
-                            agent.getHostname(), checkBtn, destroyBtn, resultHolder, progressIcon
-                    }, null );
+                    ( i == 1 ? UiUtil.MASTER_PREFIX : i == 2 ? UiUtil.GC_PREFIX : UiUtil.MONITOR_PREFIX ) + agent
+                            .getHostname(), checkBtn, resultHolder, progressIcon
+            } : new Object[] {
+                    agent.getHostname(), checkBtn, destroyBtn, resultHolder, progressIcon
+            }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
 
@@ -451,24 +459,25 @@ public class Manager {
                     progressIcon.setVisible( true );
 
                     AccumuloUI.getExecutor().execute(
-                            new CheckTask( accumuloClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                            new CheckTask( accumuloClusterConfig.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                                public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( masters ) {
-                                            resultHolder.setValue( parseMastersState( result ) );
+                                        public void onComplete( String result ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( masters ) {
+                                                    resultHolder.setValue( parseMastersState( result ) );
+                                                }
+                                                else if ( table == tracersTable ) {
+                                                    resultHolder.setValue( parseTracersState( result ) );
+                                                }
+                                                else if ( table == slavesTable ) {
+                                                    resultHolder.setValue( parseSlavesState( result ) );
+                                                }
+                                                destroyBtn.setEnabled( true );
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else if ( table == tracersTable ) {
-                                            resultHolder.setValue( parseTracersState( result ) );
-                                        }
-                                        else if ( table == slavesTable ) {
-                                            resultHolder.setValue( parseSlavesState( result ) );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
-                                    }
-                                }
-                            } ) );
+                                    } ) );
                 }
             } );
 
@@ -484,7 +493,8 @@ public class Manager {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
                             UUID trackID = AccumuloUI.getAccumuloManager()
-                                                     .destroyNode( accumuloClusterConfig.getClusterName(), agent.getHostname(),
+                                                     .destroyNode( accumuloClusterConfig.getClusterName(),
+                                                             agent.getHostname(),
                                                              table == tracersTable ? NodeType.TRACER :
                                                              NodeType.LOGGER );
 

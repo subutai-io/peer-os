@@ -3,12 +3,13 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
@@ -97,7 +98,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
         boolean install = !result.getStdOut().contains( "ksks-accumulo" );
 
-        org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+        HadoopClusterConfig hadoopConfig =
                 manager.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
 
         if ( hadoopConfig == null ) {
@@ -141,7 +142,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
             po.addLog( "Cluster info updated in DB" );
 
             if ( install ) {
-                po.addLog( String.format( "Installing %s on %s node...", AccumuloClusterConfig.PRODUCT_KEY, lxcAgent.getHostname() ) );
+                po.addLog( String.format( "Installing %s on %s node...", AccumuloClusterConfig.PRODUCT_KEY,
+                        lxcAgent.getHostname() ) );
 
                 Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
                 manager.getCommandRunner().runCommand( installCommand );
@@ -159,36 +161,36 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
             Command addNodeCommand;
             if ( nodeType.isSlave() ) {
-                addNodeCommand = Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
-                        .getSlaves() );
+                addNodeCommand = Commands.getAddSlavesCommand( accumuloClusterConfig.getAllNodes(),
+                        accumuloClusterConfig.getSlaves() );
             }
             else {
-                addNodeCommand = Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(), accumuloClusterConfig
-                        .getTracers() );
+                addNodeCommand = Commands.getAddTracersCommand( accumuloClusterConfig.getAllNodes(),
+                        accumuloClusterConfig.getTracers() );
             }
             manager.getCommandRunner().runCommand( addNodeCommand );
 
             if ( addNodeCommand.hasSucceeded() ) {
                 po.addLog( "Node registration succeeded\nSetting master node..." );
 
-                Command setMasterNodeCommand =
-                        Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getMasterNode() );
+                Command setMasterNodeCommand = Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ),
+                        accumuloClusterConfig.getMasterNode() );
                 manager.getCommandRunner().runCommand( setMasterNodeCommand );
 
                 if ( setMasterNodeCommand.hasSucceeded() ) {
 
                     po.addLog( "Setting master node succeeded\nSetting GC node..." );
 
-                    Command setGcNodeCommand =
-                            Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getGcNode() );
+                    Command setGcNodeCommand = Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ),
+                            accumuloClusterConfig.getGcNode() );
                     manager.getCommandRunner().runCommand( setGcNodeCommand );
 
                     if ( setGcNodeCommand.hasSucceeded() ) {
 
                         po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-                        Command setMonitorCommand =
-                                Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ), accumuloClusterConfig.getMonitor() );
+                        Command setMonitorCommand = Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ),
+                                accumuloClusterConfig.getMonitor() );
                         manager.getCommandRunner().runCommand( setMonitorCommand );
 
                         if ( setMonitorCommand.hasSucceeded() ) {

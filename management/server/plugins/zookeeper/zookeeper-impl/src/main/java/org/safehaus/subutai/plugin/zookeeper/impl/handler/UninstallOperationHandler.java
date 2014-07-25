@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
@@ -41,7 +42,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             return;
         }
 
-        if ( config.isStandalone() ) {
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
             po.addLog( "Destroying lxc containers" );
             try {
                 for ( Agent agent : config.getNodes() ) {
@@ -61,7 +62,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
                 po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
             }
         }
-        else {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             //just uninstall nodes
             po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 

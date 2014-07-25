@@ -10,7 +10,7 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
     <reference id="zkManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper"/>
 

@@ -1,6 +1,7 @@
 package org.safehaus.subutai.api.manager.helper;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -8,27 +9,27 @@ import java.util.UUID;
 /**
  * Created by bahadyr on 6/24/14.
  */
-public class Environment  {
+public class Environment {
 
     private String owner;
     private UUID uuid;
-    //user set<Node> instead of Set<Agents>
     private Set<Node> nodes;
     private String name;
 
 
-        public String getName() {
-            return name;
-        }
+    public String getName() {
+        return name;
+    }
 
 
-        public void setName( final String name ) {
-            this.name = name;
-        }
+    public void setName( final String name ) {
+        this.name = name;
+    }
 
 
     public Environment() {
         this.uuid = UUID.randomUUID();
+        this.nodes = new HashSet<>();
     }
 
 
@@ -57,6 +58,8 @@ public class Environment  {
         return "Environment{" +
                 "owner='" + owner + '\'' +
                 ", uuid=" + uuid +
+                ", nodes=" + nodes +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

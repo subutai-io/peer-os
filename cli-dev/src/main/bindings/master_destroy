@@ -1,14 +1,12 @@
 #!/bin/bash
 
 function master_destroy {
-  echo WARNING: this destroys everything mercilessly
-  echo \<Return\> to continue, or Ctrl-C to exit
-  read
 
   if [ -z "`zfs list lxc/master`" ]; then
     echo No zfs dataset \'lxc/master\' found - aborting ...
     exit 1
   fi
+
   local container="master"
   local package_name=`get_package_name $container`
   local debian_root="$SUBUTAI_TMPDIR/$container"
@@ -17,8 +15,18 @@ function master_destroy {
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     msg_info "subutai master_destroy called from command line"
     # Check if the package is installed
-    dpkg -s $package_name > /dev/null 2>&1
+    is_package_installed $package_name
     if [ $? = 0  ]; then
+      # Confirm destroy operation
+      echo WARNING: this destroys everything mercilessly
+      while true; do
+        read -p "Do you wish to destroy master template? [Y/N]" yn
+        case $yn in
+          [Yy]* ) break;;
+          [Nn]* ) exit 1;;
+          * ) echo "Please answer yes or no.";;
+        esac
+      done
       apt-get --assume-yes --force-yes purge $package_name
       exit $?
     fi
