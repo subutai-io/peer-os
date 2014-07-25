@@ -72,6 +72,10 @@ public class EnvironmentConfig {
 
 			Node[] arr = nodes.toArray(new Node[nodes.size()]);
 
+			System.out.println(arr[0].getTemplate().getProducts());
+			System.out.println(config.getTemplateName());
+
+
 			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
 				config.setNameNode(arr[0].getAgent());
 			}
