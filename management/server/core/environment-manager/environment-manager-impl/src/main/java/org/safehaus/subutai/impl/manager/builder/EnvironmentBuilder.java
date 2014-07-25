@@ -7,14 +7,14 @@ import java.util.Set;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.exception.EnvironmentInstanceDestroyException;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
@@ -40,7 +40,7 @@ public class EnvironmentBuilder {
         Environment environment = new Environment();
         environment.setName( blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategy();
+            PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
             int nodeCount = nodeGroup.getNumberOfNodes();
 
             Set<Node> nodes = new HashSet<>();
@@ -68,7 +68,7 @@ public class EnvironmentBuilder {
     }
 
 
-    public void destroy( final Environment environment ) throws EnvironmentInstanceDestroyException {
+    public void destroy( final Environment environment ) throws EnvironmentDestroyException {
         //TODO destroy environment code goes here
         //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
         //            nodeGroupBuilder.destroy( nodeGroup );

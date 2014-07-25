@@ -13,13 +13,13 @@ import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.exception.EnvironmentInstanceDestroyException;
+import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
-import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
+import org.safehaus.subutai.impl.manager.util.BlueprintParser;
 
 
 /**
@@ -74,7 +74,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 boolean saveResult = environmentDAO.saveEnvironment( environment );
                 if ( !saveResult ) {
                     //rollback build action.
-                    environmentBuilder.destroy( environment );
+                    try {
+                        environmentBuilder.destroy( environment );
+                    }
+                    catch ( EnvironmentDestroyException e ) {
+                    }
                     return false;
                 }
                 return true;
@@ -82,15 +86,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             catch ( EnvironmentBuildException e ) {
                 System.out.println( e.getMessage() );
             }
-            catch ( EnvironmentInstanceDestroyException e ) {
-                System.out.println( e.getMessage() );
-            }
-            //            finally {
-            //                Environment e = new Environment();
-            //                e.setName( blueprint.getName() );
-            //                environmentDAO.saveEnvironment( e );
-            //                return false;
-            //            }
         }
         return false;
     }
@@ -118,7 +113,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
             //TODO environmentDAO.deleteEnvironmentInfo( environment.getName() );
             return true;
         }
-        catch ( EnvironmentInstanceDestroyException e ) {
+        catch ( EnvironmentDestroyException e ) {
             e.printStackTrace();
         }
         return false;
@@ -127,8 +122,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        EnvironmentBlueprint blueprint =
-                ( EnvironmentBlueprint ) blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
         boolean saveResult = environmentDAO.saveBlueprint( blueprint );
         return saveResult;
     }
@@ -144,6 +138,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public boolean deleteBlueprint( String blueprintName ) {
         return environmentDAO.deleteBlueprint( blueprintName );
+    }
+
+
+    @Override
+    public String parseBlueprint( final EnvironmentBlueprint blueprint ) {
+        return blueprintParser.parseEnvironmentBlueprint( blueprint );
     }
 
 

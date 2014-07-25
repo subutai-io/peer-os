@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.manager.util;
+package org.safehaus.subutai.impl.manager.util;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;

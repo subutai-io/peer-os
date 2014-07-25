@@ -12,7 +12,7 @@ public class NodeGroup {
     private String name;
     private int numberOfNodes;
     private String templateName;
-    private PlacementStrategyENUM placementStrategy;
+    private PlacementStrategy placementStrategy;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
     private Set<String> physicalNodes;
@@ -48,13 +48,13 @@ public class NodeGroup {
     }
 
 
-    public PlacementStrategyENUM getPlacementStrategy() {
+    public PlacementStrategy getPlacementStrategy() {
         return placementStrategy;
     }
 
 
-    public void setPlacementStrategy( final PlacementStrategyENUM placementStrategyENUM ) {
-        this.placementStrategy = placementStrategyENUM;
+    public void setPlacementStrategy( final PlacementStrategy placementStrategy ) {
+        this.placementStrategy = placementStrategy;
     }
 
 

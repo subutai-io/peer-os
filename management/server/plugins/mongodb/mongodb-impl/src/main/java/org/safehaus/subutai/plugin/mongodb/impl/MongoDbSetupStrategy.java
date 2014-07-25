@@ -8,7 +8,7 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -53,16 +53,16 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 	}
 
 
-	public static PlacementStrategyENUM getNodePlacementStrategyByNodeType(NodeType nodeType) {
+	public static PlacementStrategy getNodePlacementStrategyByNodeType(NodeType nodeType) {
 		switch (nodeType) {
 			case CONFIG_NODE:
-				return PlacementStrategyENUM.MORE_RAM;
+				return PlacementStrategy.MORE_RAM;
 			case ROUTER_NODE:
-				return PlacementStrategyENUM.MORE_CPU;
+				return PlacementStrategy.MORE_CPU;
 			case DATA_NODE:
-				return PlacementStrategyENUM.MORE_HDD;
+				return PlacementStrategy.MORE_HDD;
 			default:
-				return PlacementStrategyENUM.ROUND_ROBIN;
+				return PlacementStrategy.ROUND_ROBIN;
 		}
 	}
 

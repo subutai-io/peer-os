@@ -2,12 +2,12 @@ package org.safehaus.subutai.impl.strategy;
 
 
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 
 
 abstract class MetricComparator {
 
-    static MetricComparator create( PlacementStrategyENUM st ) {
+    static MetricComparator create( PlacementStrategy st ) {
         MetricComparator mc = null;
         // TODO: add missing case clauses
         switch ( st ) {

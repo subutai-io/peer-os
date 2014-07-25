@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
@@ -41,14 +41,14 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategyENUM getNodePlacementStrategyByNodeType( NodeType nodeType ) {
+    public static PlacementStrategy getNodePlacementStrategyByNodeType( NodeType nodeType ) {
         switch ( nodeType ) {
             case MASTER_NODE:
-                return PlacementStrategyENUM.MORE_RAM;
+                return PlacementStrategy.MORE_RAM;
             case SLAVE_NODE:
-                return PlacementStrategyENUM.MORE_HDD;
+                return PlacementStrategy.MORE_HDD;
             default:
-                return PlacementStrategyENUM.ROUND_ROBIN;
+                return PlacementStrategy.ROUND_ROBIN;
         }
     }
 

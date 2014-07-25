@@ -13,7 +13,7 @@ import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
-import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperSetupStrategy;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -69,6 +69,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         }
         else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             installOverHadoop();
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            installWithHadoop();
         }
     }
 
@@ -146,7 +149,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                 try {
                     configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
                             ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ZookeeperStandaloneSetupStrategy.prepareConfiguration( config.getNodes() ),
                             ConfigParams.CONFIG_FILE_PATH.getParamValue() );
                 }
                 catch ( ClusterConfigurationException e ) {
@@ -220,5 +223,12 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         catch ( ClusterSetupException e ) {
             po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
+    }
+
+
+    private void installWithHadoop() {
+        //call Hadoop CLusterSetupStrategy and feed HadooClusterConfig
+        //obtain hadoop nodes and configure ZK cluster with specified number of nodes
+
     }
 }
