@@ -68,7 +68,7 @@ function checkCommitsForPath {
     fi
   done
 
-  if [ -n "$isChanged" -a $isChanged == "true" ]; then
+  if [ -n "$isChanged" -a "$isChanged" == "true" ]; then
     echo "There are changed files for $package_name"
   else
     echo "No change for path $absPath, exiting..."
