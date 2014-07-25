@@ -21,7 +21,7 @@ public class HadoopClusterConfig implements ConfigBase {
     private String clusterName, domainName;
     private Agent nameNode, jobTracker, secondaryNameNode;
     private List<Agent> dataNodes, taskTrackers;
-    private Integer replicationFactor, countOfSlaveNodes;
+    private Integer replicationFactor = 1, countOfSlaveNodes = 1;
     private Set<Agent> blockedAgents;
 
 

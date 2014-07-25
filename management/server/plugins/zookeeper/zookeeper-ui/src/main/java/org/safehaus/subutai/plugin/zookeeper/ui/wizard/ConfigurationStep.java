@@ -250,7 +250,7 @@ public class ConfigurationStep extends Panel {
 
             //configuration servers number
             List<Integer> s = new ArrayList<Integer>();
-            for ( int i = 0; i < 50; i++ ) {
+            for ( int i = 1; i < 50; i++ ) {
                 s.add( i );
             }
 
@@ -340,6 +340,9 @@ public class ConfigurationStep extends Panel {
 
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                         show( "Please provide Zookeeper cluster name" );
+                    }
+                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+                        show( "Please provide Hadoop cluster name" );
                     }
                     else {
                         wizard.next();
