@@ -63,22 +63,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 	@Override
 	public Environment buildEnvironmentAndReturn(final EnvironmentBlueprint blueprint)
 			throws EnvironmentBuildException {
-		Environment environment = null;
-		try {
-			environment = environmentBuilder.build(blueprint, containerManager);
-			boolean saveResult = environmentDAO.saveEnvironment(environment);
-			if (!saveResult) {
-				//rollback build action.
-				environmentBuilder.destroy(environment);
-				environment = null;
-			}
-		} catch (EnvironmentBuildException e) {
-			System.out.println(e.getMessage());
-		} catch (EnvironmentInstanceDestroyException e) {
-			System.out.println(e.getMessage());
-		} finally {
-			return environment;
-		}
+		return environmentBuilder.build(blueprint, containerManager);
 	}
 
 
