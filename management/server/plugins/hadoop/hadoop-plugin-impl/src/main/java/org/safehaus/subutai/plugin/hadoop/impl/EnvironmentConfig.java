@@ -72,19 +72,21 @@ public class EnvironmentConfig {
 
 			Node[] arr = nodes.toArray(new Node[nodes.size()]);
 
+
 			System.out.println(arr[0].getTemplate().getProducts());
 			System.out.println(config.getTemplateName());
+			System.out.println(arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName()));
 
 
-			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
+			if (arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
 				config.setNameNode(arr[0].getAgent());
 			}
 
-			if (arr[1].getTemplate().getProducts().contains(config.getTemplateName())) {
+			if (arr[1].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
 				config.setJobTracker(arr[1].getAgent());
 			}
 
-			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
+			if (arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
 				config.setSecondaryNameNode(arr[2].getAgent());
 			}
 		}
