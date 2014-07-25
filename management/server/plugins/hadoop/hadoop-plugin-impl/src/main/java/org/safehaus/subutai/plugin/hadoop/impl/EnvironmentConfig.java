@@ -66,12 +66,14 @@ public class EnvironmentConfig {
 
 	private void setMasterNodes(Environment environment) {
 		Set<Node> nodes = environment.getNodes();
-		if (nodes != null && nodes.size() >= 2) {
+		for(Node node : nodes){
+			System.out.println(node);
+		}
+		/*if (nodes != null && nodes.size() >= 2) {
 
 			Node[] arr = nodes.toArray(new Node[nodes.size()]);
-			System.out.println(arr);
 
-			/*if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
+			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
 				config.setNameNode(arr[0].getAgent());
 			}
 
@@ -81,8 +83,8 @@ public class EnvironmentConfig {
 
 			if (arr[0].getTemplate().getProducts().contains(config.getTemplateName())) {
 				config.setSecondaryNameNode(arr[2].getAgent());
-			}*/
-		}
+			}
+		}*/
 	}
 
 	private void setSlaveNodes(Environment environment) {
