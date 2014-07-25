@@ -20,7 +20,6 @@ public class ZookeeperClusterConfig implements ConfigBase {
     public static final String PRODUCT_KEY = "Zookeeper2";
     public String templateName = "zookeeper";
     private String clusterName = "";
-    private String zkName = "";
     private int numberOfNodes = 3;
     private Set<Agent> nodes;
     private SetupType setupType;
@@ -43,16 +42,6 @@ public class ZookeeperClusterConfig implements ConfigBase {
 
     public String getTemplateName() {
         return templateName;
-    }
-
-
-    public String getZkName() {
-        return zkName;
-    }
-
-
-    public void setZkName( String zkName ) {
-        this.zkName = zkName;
     }
 
 

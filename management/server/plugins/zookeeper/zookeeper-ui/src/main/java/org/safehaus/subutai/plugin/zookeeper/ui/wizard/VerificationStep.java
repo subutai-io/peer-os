@@ -43,7 +43,6 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "ZK Name", wizard.getConfig().getZkName() );
         if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE ) {
             cfgView.addStringCfg( "Number of nodes", wizard.getConfig().getNumberOfNodes() + "" );
         }

@@ -50,7 +50,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     @Override
     public void run() {
-        if ( Strings.isNullOrEmpty( config.getZkName() ) || Strings.isNullOrEmpty( config.getClusterName() )
+        if ( Strings.isNullOrEmpty( config.getClusterName() )
                 //either number of nodes to create or hadoop cluster nodes must be present
                 || ( config.getSetupType() == SetupType.STANDALONE && config.getNumberOfNodes() <= 0 ) || (
                 config.getSetupType() == SetupType.OVER_HADOOP && Util.isCollectionEmpty( config.getNodes() ) ) ) {
