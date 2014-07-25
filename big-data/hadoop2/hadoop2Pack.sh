@@ -12,8 +12,8 @@ downloadFileAndMakeChanges() {
 	hadoopVersion=2.3.0
 
 	# Create directories that are required for the debian package
-    mkdir -p $tempDirectory
-    mkdir -p $confDirectory
+    	mkdir -p $tempDirectory
+    	mkdir -p $confDirectory
 
 	wget http://www.apache.org/dist/hadoop/core/hadoop-$hadoopVersion/hadoop-$hadoopVersion-src.tar.gz -P $tempDirectory/
 
