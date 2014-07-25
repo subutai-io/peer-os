@@ -45,14 +45,14 @@ public class EnvironmentConfig {
 		masterNodes.setPhysicalNodes(stringAgents);
 	}
 
-	public static PlacementStrategyENUM getNodePlacementStrategyByNodeType(NodeType nodeType) {
+	public static PlacementStrategy getNodePlacementStrategyByNodeType(NodeType nodeType) {
 		switch (nodeType) {
 			case MASTER_NODE:
-				return PlacementStrategyENUM.MORE_RAM;
+				return PlacementStrategy.MORE_RAM;
 			case SLAVE_NODE:
-				return PlacementStrategyENUM.MORE_HDD;
+				return PlacementStrategy.MORE_HDD;
 			default:
-				return PlacementStrategyENUM.ROUND_ROBIN;
+				return PlacementStrategy.ROUND_ROBIN;
 		}
 	}
 
