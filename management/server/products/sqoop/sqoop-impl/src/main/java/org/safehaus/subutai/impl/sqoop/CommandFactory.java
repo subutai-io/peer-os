@@ -9,6 +9,7 @@ public class CommandFactory {
 
     public static String build(CommandType type, CommonSetting settings) {
         String s = null;
+        boolean use_opt = false;
         switch(type) {
             case LIST:
                 s = "dpkg -l | grep '^ii' | grep ksks";
@@ -23,14 +24,18 @@ public class CommandFactory {
             case IMPORT:
                 if(settings instanceof ImportSetting)
                     s = importData((ImportSetting)settings);
+                use_opt = true;
                 break;
             case EXPORT:
                 if(settings instanceof ExportSetting)
                     s = exportData((ExportSetting)settings);
+                use_opt = true;
                 break;
             default:
                 throw new AssertionError(type.name());
         }
+        if(use_opt && settings != null && settings.getOptionalParameters() != null)
+            s += " " + settings.getOptionalParameters();
         return s;
     }
 

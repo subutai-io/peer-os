@@ -6,6 +6,7 @@ public class CommonSetting extends BasicSetting {
     String tableName;
     String username;
     String password;
+    String optionalParameters;
 
     public String getConnectionString() {
         return connectionString;
@@ -37,6 +38,14 @@ public class CommonSetting extends BasicSetting {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getOptionalParameters() {
+        return optionalParameters;
+    }
+
+    public void setOptionalParameters(String optionalParameters) {
+        this.optionalParameters = optionalParameters;
     }
 
     @Override

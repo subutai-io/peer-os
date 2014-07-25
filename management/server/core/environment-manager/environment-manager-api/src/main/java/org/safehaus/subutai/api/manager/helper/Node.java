@@ -10,30 +10,29 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class Node {
 
-	private Agent agent;
-	private Template template;
+    private Agent agent;
+    private Template template;
+    private String nodeGroupName;
 
 
-	public Node(final Agent agent, final Template template) {
-		this.agent = agent;
-		this.template = template;
-	}
+    public Node( final Agent agent, final Template template, final String nodeGroupName ) {
+        this.agent = agent;
+        this.template = template;
+        this.nodeGroupName = nodeGroupName;
+    }
 
 
-	public Agent getAgent() {
-		return agent;
-	}
+    public String getNodeGroupName() {
+        return nodeGroupName;
+    }
 
 
-	public Template getTemplate() {
-		return template;
-	}
+    public Agent getAgent() {
+        return agent;
+    }
 
-	@Override
-	public String toString() {
-		return "Node{" +
-				"agent=" + (agent == null ? "null" : agent.toString()) +
-				", template=" + (template == null ? "null" : template.toString()) +
-				'}';
-	}
+
+    public Template getTemplate() {
+        return template;
+    }
 }

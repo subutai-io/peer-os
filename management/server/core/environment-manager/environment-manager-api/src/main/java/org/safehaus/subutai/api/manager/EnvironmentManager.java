@@ -7,6 +7,7 @@ package org.safehaus.subutai.api.manager;
 
 
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 
@@ -41,7 +42,7 @@ public interface EnvironmentManager {
     /**
      * Destroys environment by a given environmentt name.
      */
-    public boolean destroyEnvironment( String environmentName );
+    public boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
 
     /**
      * Saves blueprint test into database
@@ -51,4 +52,6 @@ public interface EnvironmentManager {
     public List<EnvironmentBlueprint> getBlueprints();
 
     boolean deleteBlueprint( String name );
+
+    public String parseBlueprint( EnvironmentBlueprint blueprint );
 }

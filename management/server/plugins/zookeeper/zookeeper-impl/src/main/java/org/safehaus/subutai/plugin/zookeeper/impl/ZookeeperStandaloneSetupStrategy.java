@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
 /**
  * This is a zk cluster setup strategy.
  */
-public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
+public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
     public static final String TEMPLATE_NAME = "zookeeper";
     private final ZookeeperClusterConfig config;
@@ -35,8 +35,8 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
     private final ProductOperation po;
 
 
-    public ZookeeperSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po,
-                                   ContainerManager containerManager, CommandRunner commandRunner ) {
+    public ZookeeperStandaloneSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po,
+                                             ContainerManager containerManager, CommandRunner commandRunner ) {
         this.config = config;
         this.po = po;
         this.containerManager = containerManager;
@@ -44,8 +44,8 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public static PlacementStrategyENUM getNodePlacementStrategy() {
-        return PlacementStrategyENUM.ROUND_ROBIN;
+    public static PlacementStrategy getNodePlacementStrategy() {
+        return PlacementStrategy.ROUND_ROBIN;
     }
 
 
@@ -109,7 +109,7 @@ public class ZookeeperSetupStrategy implements ClusterSetupStrategy {
 
     //temporary workaround until we get full configuration injection working
     public static String prepareConfiguration( Set<Agent> nodes ) throws ClusterConfigurationException {
-        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", ZookeeperSetupStrategy.class );
+        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", ZookeeperStandaloneSetupStrategy.class );
 
         if ( Strings.isNullOrEmpty( zooCfgFile ) ) {
             throw new ClusterConfigurationException( "Zoo.cfg resource is missing" );

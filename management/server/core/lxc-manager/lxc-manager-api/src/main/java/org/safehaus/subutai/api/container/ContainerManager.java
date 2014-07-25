@@ -8,17 +8,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public interface ContainerManager {
 
     public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException;
+                             PlacementStrategy... strategy ) throws LxcCreateException;
 
     public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException;
+                             PlacementStrategy... strategy ) throws LxcCreateException;
 
     public boolean attachAndExecute( Agent physicalHost, String cloneName, String cmd );
 

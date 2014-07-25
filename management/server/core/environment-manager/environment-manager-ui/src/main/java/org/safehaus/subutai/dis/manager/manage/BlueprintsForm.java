@@ -13,7 +13,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class BlueprintsForm {
 
     private VerticalLayout contentRoot;
@@ -59,7 +59,7 @@ public class BlueprintsForm {
             viewButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( final Button.ClickEvent clickEvent ) {
-                    BlueprintDetails details = new BlueprintDetails( "Blueprint details" );
+                    BlueprintDetails details = new BlueprintDetails( "Blueprint details", environmentManager );
                     details.setContent( blueprint );
                     contentRoot.getUI().addWindow( details );
                     details.setVisible( true );

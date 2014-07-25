@@ -1,13 +1,39 @@
 package org.safehaus.subutai.impl.container;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.lxcmanager.*;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.api.lxcmanager.LxcState;
+import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -15,9 +41,8 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
@@ -42,7 +67,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException {
+                             PlacementStrategy... strategy ) throws LxcCreateException {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
@@ -143,7 +168,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException {
+                             PlacementStrategy... strategy ) throws LxcCreateException {
         return clone( null, templateName, nodesCount, hosts, strategy );
     }
 
@@ -340,7 +365,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 
     private void saveNodeGroup( UUID envId, String templateName, Set<Agent> agents,
-                                PlacementStrategyENUM... strategy ) {
+                                PlacementStrategy... strategy ) {
 
         String cql = "INSERT INTO nodes(uuid, env_id, info) VALUES(?, ?, ?)";
 
@@ -348,7 +373,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         group.setEnvId( envId );
         group.setTemplateName( templateName );
         if ( strategy == null || strategy.length == 0 ) {
-            strategy = new PlacementStrategyENUM[] {
+            strategy = new PlacementStrategy[] {
                     PlacementStrategyFactory.getDefaultStrategyType()
             };
         }

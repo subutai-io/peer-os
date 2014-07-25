@@ -2,16 +2,16 @@ package org.safehaus.subutai.impl.strategy;
 
 import java.util.*;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class BestServerStrategy extends RoundRobinStrategy {
 
-    private Set<PlacementStrategyENUM> strategyFactors;
+    private Set<PlacementStrategy> strategyFactors;
 
-    public BestServerStrategy(int nodesCount, PlacementStrategyENUM... strategyFactors) {
+    public BestServerStrategy(int nodesCount, PlacementStrategy... strategyFactors) {
         super(nodesCount);
-        this.strategyFactors = EnumSet.noneOf(PlacementStrategyENUM.class);
+        this.strategyFactors = EnumSet.noneOf(PlacementStrategy.class);
         this.strategyFactors.addAll(Arrays.asList(strategyFactors));
     }
 
@@ -20,7 +20,7 @@ public class BestServerStrategy extends RoundRobinStrategy {
         // using each startegy criteria, grade servers one by one
         Map<Agent, Integer> grades = new HashMap<>();
         for(Agent a : serverMetrics.keySet()) grades.put(a, 0);
-        for(PlacementStrategyENUM sf : strategyFactors) {
+        for(PlacementStrategy sf : strategyFactors) {
             try {
                 Agent a = getBestMatch(serverMetrics, MetricComparator.create(sf));
                 if(a != null) grades.put(a, grades.get(a) + 1);

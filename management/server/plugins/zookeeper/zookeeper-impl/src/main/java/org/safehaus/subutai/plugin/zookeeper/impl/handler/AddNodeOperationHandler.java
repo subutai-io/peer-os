@@ -14,7 +14,7 @@ import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
-import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperSetupStrategy;
+import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -130,7 +130,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
                 try {
                     configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
                             ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ZookeeperStandaloneSetupStrategy.prepareConfiguration( config.getNodes() ),
                             ConfigParams.CONFIG_FILE_PATH.getParamValue() );
                 }
                 catch ( ClusterConfigurationException e ) {
@@ -186,8 +186,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             //create lxc
             po.addLog( "Creating lxc container..." );
 
-            Set<Agent> agents = manager.getContainerManager().clone( ZookeeperSetupStrategy.TEMPLATE_NAME, 1, null,
-                    ZookeeperSetupStrategy.getNodePlacementStrategy() );
+            Set<Agent> agents = manager.getContainerManager().clone( ZookeeperStandaloneSetupStrategy.TEMPLATE_NAME, 1, null,
+                    ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
 
             Agent agent = agents.iterator().next();
 
@@ -205,7 +205,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
                 try {
                     configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
                             ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                            ZookeeperSetupStrategy.prepareConfiguration( config.getNodes() ),
+                            ZookeeperStandaloneSetupStrategy.prepareConfiguration( config.getNodes() ),
                             ConfigParams.CONFIG_FILE_PATH.getParamValue() );
                 }
                 catch ( ClusterConfigurationException e ) {

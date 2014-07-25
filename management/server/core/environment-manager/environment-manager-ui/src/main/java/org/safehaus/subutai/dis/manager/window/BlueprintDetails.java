@@ -1,8 +1,8 @@
 package org.safehaus.subutai.dis.manager.window;
 
 
+import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
-import org.safehaus.subutai.api.manager.util.BlueprintParser;
 
 import com.vaadin.ui.TextArea;
 
@@ -12,17 +12,17 @@ import com.vaadin.ui.TextArea;
  */
 public class BlueprintDetails extends DetailsWindow {
 
-    private BlueprintParser blueprintParser;
+    private EnvironmentManager environmentManager;
 
 
-    public BlueprintDetails( String caption ) {
+    public BlueprintDetails( String caption, EnvironmentManager environmentManager ) {
         super( caption );
-        this.blueprintParser = new BlueprintParser();
+        this.environmentManager = environmentManager;
     }
 
 
     public void setContent( EnvironmentBlueprint blueprint ) {
-        String value = blueprintParser.parseEnvironmentBlueprint(  blueprint );
+        String value = environmentManager.parseBlueprint( blueprint );
         TextArea area = getTextArea();
         area.setValue( value );
         verticalLayout.addComponent( area );
