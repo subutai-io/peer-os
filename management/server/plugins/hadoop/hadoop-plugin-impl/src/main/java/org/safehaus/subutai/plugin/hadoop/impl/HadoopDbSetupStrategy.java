@@ -147,23 +147,23 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
         }*/
 
 		po.addLog("Hadoop installation started");
-		InstallHadoopOperation installOperation = new InstallHadoopOperation(hadoopClusterConfig);
-		for (Command command : installOperation.getCommandList()) {
-			po.addLog((String.format("%s started...", command.getDescription())));
-			HadoopImpl.getCommandRunner().runCommand(command);
-
-			if (command.hasSucceeded()) {
-				po.addLogDone(String.format("%s succeeded", command.getDescription()));
-			} else {
-				po.addLogFailed(
-						String.format("%s failed, %s", command.getDescription(), command.getAllErrors()));
-			}
-		}
-
 		if (HadoopImpl.getDbManager()
 				.saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
 						hadoopClusterConfig)) {
 			po.addLog("Cluster info saved to DB");
+
+			InstallHadoopOperation installOperation = new InstallHadoopOperation(hadoopClusterConfig);
+			for (Command command : installOperation.getCommandList()) {
+				po.addLog((String.format("%s started...", command.getDescription())));
+				HadoopImpl.getCommandRunner().runCommand(command);
+
+				if (command.hasSucceeded()) {
+					po.addLogDone(String.format("%s succeeded", command.getDescription()));
+				} else {
+					po.addLogFailed(
+							String.format("%s failed, %s", command.getDescription(), command.getAllErrors()));
+				}
+			}
 		} else {
 			destroyLXC(po, "Could not save cluster info to DB! Please see logs\nInstallation aborted");
 		}
