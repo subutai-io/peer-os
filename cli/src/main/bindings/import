@@ -32,7 +32,7 @@ function import {
   fi
 
   if [ "$container" = "master" ];then
-    subutai master_create
+    subutai master_import
     exit $?
   fi
   # ----------------------------------------------------------------------------
