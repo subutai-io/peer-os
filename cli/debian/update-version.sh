@@ -51,23 +51,25 @@ function require_clean_work_directory {
 
 
 function getListofCommits {
-  commitList=($(git log origin/subutai-cli-fix..HEAD | grep "^commit" |  awk '{split($0,a," "); print a[2] }'))
+  commitList=($(git log origin/$branch_name..HEAD | grep "^commit" | awk '{split($0,a," "); print a[2] }'))
 }
 
 
 function checkCommitsForPath {
+  getListofCommits
   for commit in "${commitList[@]}"
   do
     # Get list of files of this commit
     files=$(git diff-tree --no-commit-id --name-only -r $commit)
     # Check if there are changed files under the specified path
     changedFiles=$(echo $files | grep ^$absPath/)
+    echo "$commit: $changedFiles"
     if [ -n "$changedFiles" ]; then
       isChanged="true"
       break;
     fi
   done
-
+  echo "isChanged: -$isChanged-"
   if [ -n "$isChanged" -a "$isChanged" == "true" ]; then
     echo "There are changed files for $package_name"
   else
@@ -83,7 +85,7 @@ git checkout -- $changelogFile > /dev/null 2>&1
 #------------------------------------------------------
 #(0) exit if there are uncommitted or unstaged files under the specified directory
 #------------------------------------------------------
-require_clean_work_directory
+#require_clean_work_directory
 #------------------------------------------------------
 #(1) check if there are local commits and they are related with specified path
 #------------------------------------------------------
