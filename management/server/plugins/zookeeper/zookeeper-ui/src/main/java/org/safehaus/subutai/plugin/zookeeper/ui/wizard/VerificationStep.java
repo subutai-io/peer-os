@@ -43,7 +43,6 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
         cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "ZK Name", wizard.getConfig().getZkName() );
         if ( wizard.getConfig().getSetupType() == SetupType.STANDALONE ) {
             cfgView.addStringCfg( "Number of nodes", wizard.getConfig().getNumberOfNodes() + "" );
         }
@@ -51,6 +50,16 @@ public class VerificationStep extends Panel {
             for ( Agent node : wizard.getConfig().getNodes() ) {
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
+        }
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+            cfgView.addStringCfg( "Zookeeper cluster name", wizard.getConfig().getClusterName() );
+            cfgView.addStringCfg( "Number of Zookeeper cluster nodes", wizard.getConfig().getNumberOfNodes() + "" );
+            cfgView.addStringCfg( "Hadoop cluster name", wizard.getHadoopClusterConfig().getClusterName() );
+            cfgView.addStringCfg( "Number of Hadoop slave nodes",
+                    wizard.getHadoopClusterConfig().getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor for Hadoop slave nodes",
+                    wizard.getHadoopClusterConfig().getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Hadoop cluster domain name", wizard.getHadoopClusterConfig().getDomainName() );
         }
 
         Button install = new Button( "Install" );

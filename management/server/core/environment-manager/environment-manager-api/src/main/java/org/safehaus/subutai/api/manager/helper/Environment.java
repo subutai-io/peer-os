@@ -11,7 +11,6 @@ import java.util.UUID;
  */
 public class Environment {
 
-    private String owner;
     private UUID uuid;
     private Set<Node> nodes;
     private String name;
@@ -22,14 +21,10 @@ public class Environment {
     }
 
 
-    public void setName( final String name ) {
-        this.name = name;
-    }
-
-
-    public Environment() {
+    public Environment( String name ) {
         this.uuid = UUID.randomUUID();
         this.nodes = new HashSet<>();
+        this.name = name;
     }
 
 
@@ -43,21 +38,10 @@ public class Environment {
     }
 
 
-    public void setUuid( final UUID uuid ) {
-        this.uuid = uuid;
-    }
-
-
-    public void setNodes( final Set<Node> nodes ) {
-        this.nodes = nodes;
-    }
-
-
     @Override
     public String toString() {
         return "Environment{" +
-                "owner='" + owner + '\'' +
-                ", uuid=" + uuid +
+                "uuid=" + uuid +
                 ", nodes=" + nodes +
                 ", name='" + name + '\'' +
                 '}';

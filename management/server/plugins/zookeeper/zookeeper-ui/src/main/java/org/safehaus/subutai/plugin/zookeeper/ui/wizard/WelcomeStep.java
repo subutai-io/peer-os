@@ -54,6 +54,10 @@ public class WelcomeStep extends Panel {
         startOverHadoop.addStyleName( "default" );
         grid.addComponent( startOverHadoop, 7, 4, 7, 4 );
         grid.setComponentAlignment( startOverHadoop, Alignment.BOTTOM_RIGHT );
+        Button startWithHadoop = new Button( "Start with-Hadoop installation" );
+        startWithHadoop.addStyleName( "default" );
+        grid.addComponent( startWithHadoop, 8, 4, 8, 4 );
+        grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
         startStandalone.addClickListener( new Button.ClickListener() {
             @Override
@@ -68,6 +72,14 @@ public class WelcomeStep extends Panel {
             public void buttonClick( Button.ClickEvent event ) {
                 wizard.init();
                 wizard.getConfig().setSetupType( SetupType.OVER_HADOOP );
+                wizard.next();
+            }
+        } );
+        startWithHadoop.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent event ) {
+                wizard.init();
+                wizard.getConfig().setSetupType( SetupType.WITH_HADOOP );
                 wizard.next();
             }
         } );

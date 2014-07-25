@@ -60,17 +60,6 @@ public class ConfigurationStep extends Panel {
                     wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
-            final TextField zkNameTxtFld = new TextField( "Enter zk name" );
-            zkNameTxtFld.setInputPrompt( "ZK name" );
-            zkNameTxtFld.setRequired( true );
-            zkNameTxtFld.setMaxLength( 20 );
-            zkNameTxtFld.setValue( wizard.getConfig().getZkName() );
-            zkNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
-                @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
-                    wizard.getConfig().setZkName( event.getProperty().getValue().toString().trim() );
-                }
-            } );
 
             //number of nodes
             ComboBox nodesCountCombo =
@@ -97,9 +86,6 @@ public class ConfigurationStep extends Panel {
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                         show( "Please provide cluster name" );
                     }
-                    else if ( Strings.isNullOrEmpty( wizard.getConfig().getZkName() ) ) {
-                        show( "Please provide zk name" );
-                    }
                     else {
                         wizard.next();
                     }
@@ -123,7 +109,6 @@ public class ConfigurationStep extends Panel {
             standaloneInstallationControls.addComponent(
                     new Label( "Please, specify installation settings for standalone cluster installation" ) );
             standaloneInstallationControls.addComponent( clusterNameTxtFld );
-            standaloneInstallationControls.addComponent( zkNameTxtFld );
             standaloneInstallationControls.addComponent( nodesCountCombo );
             standaloneInstallationControls.addComponent( buttons );
 
@@ -137,18 +122,6 @@ public class ConfigurationStep extends Panel {
             overHadoopInstallationControls.setSizeFull();
             overHadoopInstallationControls.setSpacing( true );
             overHadoopInstallationControls.setMargin( true );
-
-            final TextField zkNameTxtFld = new TextField( "Enter zk name" );
-            zkNameTxtFld.setInputPrompt( "ZK name" );
-            zkNameTxtFld.setRequired( true );
-            zkNameTxtFld.setMaxLength( 20 );
-            zkNameTxtFld.setValue( wizard.getConfig().getZkName() );
-            zkNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
-                @Override
-                public void valueChange( Property.ValueChangeEvent event ) {
-                    wizard.getConfig().setZkName( event.getProperty().getValue().toString().trim() );
-                }
-            } );
 
             ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
             final TwinColSelect hadoopNodesSelect = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
@@ -227,9 +200,6 @@ public class ConfigurationStep extends Panel {
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                         show( "Please, select Hadoop cluster" );
                     }
-                    else if ( Strings.isNullOrEmpty( wizard.getConfig().getZkName() ) ) {
-                        show( "Please provide zk name" );
-                    }
                     else if ( Util.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
                         show( "Please, select target nodes" );
                     }
@@ -254,11 +224,161 @@ public class ConfigurationStep extends Panel {
 
             overHadoopInstallationControls.addComponent(
                     new Label( "Please, specify installation settings for over-Hadoop cluster installation" ) );
-            overHadoopInstallationControls.addComponent( zkNameTxtFld );
             overHadoopInstallationControls.addComponent( hadoopClustersCombo );
             overHadoopInstallationControls.addComponent( hadoopNodesSelect );
             overHadoopInstallationControls.addComponent( buttons );
             setContent( overHadoopInstallationControls );
+        }
+        else if ( wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ) {
+            //Hadoop+Zookeeper combo template based cluster installation controls
+
+            //Hadoop settings
+
+            final TextField hadoopClusterNameTxtFld = new TextField( "Enter Hadoop cluster name" );
+            hadoopClusterNameTxtFld.setInputPrompt( "Hadoop cluster name" );
+            hadoopClusterNameTxtFld.setRequired( true );
+            hadoopClusterNameTxtFld.setMaxLength( 20 );
+            if ( !Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+                hadoopClusterNameTxtFld.setValue( wizard.getHadoopClusterConfig().getClusterName() );
+            }
+            hadoopClusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getHadoopClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                }
+            } );
+
+            //configuration servers number
+            List<Integer> s = new ArrayList<Integer>();
+            for ( int i = 1; i < 50; i++ ) {
+                s.add( i );
+            }
+
+            ComboBox hadoopSlaveNodesComboBox = new ComboBox( "Choose number of Hadoop slave nodes", s );
+            hadoopSlaveNodesComboBox.setImmediate( true );
+            hadoopSlaveNodesComboBox.setTextInputAllowed( false );
+            hadoopSlaveNodesComboBox.setNullSelectionAllowed( false );
+            hadoopSlaveNodesComboBox.setValue( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() );
+
+            hadoopSlaveNodesComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getHadoopClusterConfig().setCountOfSlaveNodes( ( Integer ) event.getProperty().getValue() );
+                }
+            } );
+
+            //configuration replication factor
+            ComboBox hadoopReplicationFactorComboBox =
+                    new ComboBox( "Choose replication factor for Hadoop slave nodes", s );
+            hadoopReplicationFactorComboBox.setImmediate( true );
+            hadoopReplicationFactorComboBox.setTextInputAllowed( false );
+            hadoopReplicationFactorComboBox.setNullSelectionAllowed( false );
+            hadoopReplicationFactorComboBox.setValue( wizard.getHadoopClusterConfig().getReplicationFactor() );
+
+            hadoopReplicationFactorComboBox.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getHadoopClusterConfig().setReplicationFactor( ( Integer ) event.getProperty().getValue() );
+                }
+            } );
+
+            TextField HadoopDomainTxtFld = new TextField( "Enter Hadoop cluster domain name" );
+            HadoopDomainTxtFld.setInputPrompt( wizard.getHadoopClusterConfig().getDomainName() );
+            HadoopDomainTxtFld.setValue( wizard.getHadoopClusterConfig().getDomainName() );
+            HadoopDomainTxtFld.setMaxLength( 20 );
+            HadoopDomainTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    String value = event.getProperty().getValue().toString().trim();
+                    if ( !Util.isStringEmpty( value ) ) {
+                        wizard.getHadoopClusterConfig().setDomainName( value );
+                    }
+                }
+            } );
+
+
+            //Zookeeper settings
+
+            GridLayout withHadoopInstallationControls = new GridLayout( 1, 5 );
+            withHadoopInstallationControls.setSizeFull();
+            withHadoopInstallationControls.setSpacing( true );
+            withHadoopInstallationControls.setMargin( true );
+
+            final TextField clusterNameTxtFld = new TextField( "Enter Zookeeper cluster name" );
+            clusterNameTxtFld.setInputPrompt( "Zookeeper cluster name" );
+            clusterNameTxtFld.setRequired( true );
+            clusterNameTxtFld.setMaxLength( 20 );
+            clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                }
+            } );
+
+            //number of nodes
+            ComboBox nodesCountCombo =
+                    new ComboBox( "Choose number of Zookeeper nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
+            nodesCountCombo.setImmediate( true );
+            nodesCountCombo.setTextInputAllowed( false );
+            nodesCountCombo.setNullSelectionAllowed( false );
+            nodesCountCombo.setValue( wizard.getConfig().getNumberOfNodes() );
+
+            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
+                }
+            } );
+
+            Button next = new Button( "Next" );
+            next.addStyleName( "default" );
+            next.addClickListener( new Button.ClickListener() {
+
+                @Override
+                public void buttonClick( Button.ClickEvent event ) {
+
+                    if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                        show( "Please provide Zookeeper cluster name" );
+                    }
+                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
+                        show( "Please provide Hadoop cluster name" );
+                    }
+                    else {
+                        wizard.next();
+                    }
+                }
+            } );
+
+            Button back = new Button( "Back" );
+            back.addStyleName( "default" );
+            back.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( Button.ClickEvent event ) {
+                    wizard.back();
+                }
+            } );
+
+
+            HorizontalLayout buttons = new HorizontalLayout();
+            buttons.addComponent( back );
+            buttons.addComponent( next );
+
+
+            withHadoopInstallationControls.addComponent( new Label(
+                    "Please, specify installation settings for combo Hadoop+Zookeeper clusters installation" ) );
+            withHadoopInstallationControls.addComponent( new Label( "Zookeeper settings" ) );
+            withHadoopInstallationControls.addComponent( clusterNameTxtFld );
+            withHadoopInstallationControls.addComponent( nodesCountCombo );
+            withHadoopInstallationControls.addComponent( new Label( "Hadoop settings" ) );
+            withHadoopInstallationControls.addComponent( hadoopClusterNameTxtFld );
+            withHadoopInstallationControls.addComponent( hadoopSlaveNodesComboBox );
+            withHadoopInstallationControls.addComponent( hadoopReplicationFactorComboBox );
+            withHadoopInstallationControls.addComponent( HadoopDomainTxtFld );
+
+            withHadoopInstallationControls.addComponent( buttons );
+
+            setContent( withHadoopInstallationControls );
         }
     }
 

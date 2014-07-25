@@ -33,7 +33,7 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
+import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -67,7 +67,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException {
+                             PlacementStrategy... strategy ) throws LxcCreateException {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
@@ -168,7 +168,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts,
-                             PlacementStrategyENUM... strategy ) throws LxcCreateException {
+                             PlacementStrategy... strategy ) throws LxcCreateException {
         return clone( null, templateName, nodesCount, hosts, strategy );
     }
 
@@ -365,7 +365,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 
     private void saveNodeGroup( UUID envId, String templateName, Set<Agent> agents,
-                                PlacementStrategyENUM... strategy ) {
+                                PlacementStrategy... strategy ) {
 
         String cql = "INSERT INTO nodes(uuid, env_id, info) VALUES(?, ?, ?)";
 
@@ -373,7 +373,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         group.setEnvId( envId );
         group.setTemplateName( templateName );
         if ( strategy == null || strategy.length == 0 ) {
-            strategy = new PlacementStrategyENUM[] {
+            strategy = new PlacementStrategy[] {
                     PlacementStrategyFactory.getDefaultStrategyType()
             };
         }
