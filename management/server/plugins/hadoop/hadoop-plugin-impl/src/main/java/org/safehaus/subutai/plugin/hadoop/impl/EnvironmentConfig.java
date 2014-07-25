@@ -97,7 +97,7 @@ public class EnvironmentConfig {
 		if (nodes != null && nodes.size() > 2) {
 			Set<Node> slaveNodes = Sets.difference(nodes, Sets.newHashSet(config.getNameNode(), config.getSecondaryNameNode(), config.getJobTracker()));
 			for (Node node : slaveNodes) {
-				if (node.getTemplate().getProducts().contains(config.getTemplateName())) {
+				if (node.getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
 					config.getDataNodes().add(node.getAgent());
 					config.getTaskTrackers().add(node.getAgent());
 				}
