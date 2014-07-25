@@ -62,13 +62,13 @@ function checkCommitsForPath {
     files=$(git diff-tree --no-commit-id --name-only -r $commit)
     # Check if there are changed files under the specified path
     changedFiles=$(echo $files | grep ^$absPath/)
-    if [ -n $changedFiles ]; then
+    if [ -n "$changedFiles" ]; then
       isChanged="true"
       break;
     fi
   done
 
-  if [ -n $isChanged -a $isChanged == "true" ]; then
+  if [ -n "$isChanged" -a $isChanged == "true" ]; then
     echo "There are changed files for $package_name"
   else
     echo "No change for path $absPath, exiting..."
