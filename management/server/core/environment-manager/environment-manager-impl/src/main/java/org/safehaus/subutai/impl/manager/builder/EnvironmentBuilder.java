@@ -19,55 +19,54 @@ import java.util.Set;
  */
 public class EnvironmentBuilder {
 
-    private final TemplateRegistryManager templateRegistryManager;
-    private final AgentManager agentManager;
+	private final TemplateRegistryManager templateRegistryManager;
+	private final AgentManager agentManager;
 
 
-    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager,
-                               final AgentManager agentManager ) {
-        this.templateRegistryManager = templateRegistryManager;
-        this.agentManager = agentManager;
-    }
+	public EnvironmentBuilder(final TemplateRegistryManager templateRegistryManager,
+	                          final AgentManager agentManager) {
+		this.templateRegistryManager = templateRegistryManager;
+		this.agentManager = agentManager;
+	}
 
 
-    //@todo Baha handle all exceptional situations like if physical agent is not connected, if template is not found etc
-    public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
-            throws EnvironmentBuildException {
-        Environment environment = new Environment();
-        environment.setName( blueprint.getName() );
-        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategy();
-            int nodeCount = nodeGroup.getNumberOfNodes();
+	//@todo Baha handle all exceptional situations like if physical agent is not connected, if template is not found etc
+	public Environment build(final EnvironmentBlueprint blueprint, ContainerManager containerManager)
+			throws EnvironmentBuildException {
+		Environment environment = new Environment();
+		environment.setName(blueprint.getName());
+		for (NodeGroup nodeGroup : blueprint.getNodeGroups()) {
+			PlacementStrategyENUM placementStrategy = nodeGroup.getPlacementStrategy();
+			int nodeCount = nodeGroup.getNumberOfNodes();
 
-            Set<Node> nodes = new HashSet<>();
-            Set<Agent> physicalAgents = new HashSet<>();
-            for ( String host : nodeGroup.getPhysicalNodes() ) {
-                physicalAgents.add( agentManager.getAgentByHostname( host ) );
-            }
-            try {
-                Set<Agent> agents = containerManager
-                        .clone( environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, physicalAgents,
-                                placementStrategy );
+			Set<Node> nodes = new HashSet<>();
+			Set<Agent> physicalAgents = new HashSet<>();
+			for (String host : nodeGroup.getPhysicalNodes()) {
+				physicalAgents.add(agentManager.getAgentByHostname(host));
+			}
+			try {
+				Set<Agent> agents = containerManager
+						.clone(environment.getUuid(), nodeGroup.getTemplateName(), nodeCount, physicalAgents,
+								placementStrategy);
 
-                for ( Agent agent : agents ) {
-                    nodes.add( new Node( agent, templateRegistryManager.getTemplate( nodeGroup.getTemplateName() ) ) );
-                }
-            }
-            catch ( LxcCreateException ex ) {
-                throw new EnvironmentBuildException( ex.toString() );
-            }
+				for (Agent agent : agents) {
+					nodes.add(new Node(agent, templateRegistryManager.getTemplate(nodeGroup.getTemplateName())));
+				}
+			} catch (LxcCreateException ex) {
+				throw new EnvironmentBuildException(ex.toString());
+			}
 
-            environment.getNodes().addAll( nodes );
-        }
+			environment.setNodes(nodes);
+		}
 
-        return environment;
-    }
+		return environment;
+	}
 
 
-    public void destroy( final Environment environment ) throws EnvironmentInstanceDestroyException {
-        //TODO destroy environment code goes here
-        //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
-        //            nodeGroupBuilder.destroy( nodeGroup );
-        //        }
-    }
+	public void destroy(final Environment environment) throws EnvironmentInstanceDestroyException {
+		//TODO destroy environment code goes here
+		//        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
+		//            nodeGroupBuilder.destroy( nodeGroup );
+		//        }
+	}
 }

@@ -32,8 +32,8 @@ public class Node {
 	@Override
 	public String toString() {
 		return "Node{" +
-				"agent=" + agent.toString() +
-				", template=" + template.toString() +
+				"agent=" + (agent == null ? "null" : agent.toString()) +
+				", template=" + (template == null ? "null" : template.toString()) +
 				'}';
 	}
 }
