@@ -99,7 +99,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 						hadoopClusterConfig.getClusterName()));
 			} else {
 				try {
-					po.addLog(String.format("Creating %d master servers...", 3));
+					po.addLog(String.format("Creating %d servers...", hadoopClusterConfig.getAllNodes().size()));
 
                     /*Set<Agent> cfgServers = containerManager.clone( hadoopClusterConfig.getTemplateName(), 3,
                             HadoopImpl.getAgentManager().getPhysicalAgents(),
@@ -120,7 +120,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 
 					//continue installation here
 
-					installHadoopCluster();
+//					installHadoopCluster();
 
 					//@todo add containers destroyal in case of failure
 				} catch (EnvironmentBuildException e) {

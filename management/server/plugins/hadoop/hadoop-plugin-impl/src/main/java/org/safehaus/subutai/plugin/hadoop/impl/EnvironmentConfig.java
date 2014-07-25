@@ -58,8 +58,9 @@ public class EnvironmentConfig {
 
 	public HadoopClusterConfig setup() throws EnvironmentBuildException {
 		Environment environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
-		setMasterNodes(environment);
-		setSlaveNodes(environment);
+		System.out.println(environment);
+		/*setMasterNodes(environment);
+		setSlaveNodes(environment);*/
 
 		return config;
 	}
