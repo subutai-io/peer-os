@@ -4,13 +4,12 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.ui.sqoop.SqoopUI;
 
 public class ExportPanel extends ImportExportBase {
 
@@ -42,6 +41,7 @@ public class ExportPanel extends ImportExportBase {
 		buttons.addComponent(UIUtil.getButton("Export", 120,
 				new Button.ClickListener() {
 
+                    @Override
 					public void buttonClick(Button.ClickEvent event) {
 						clearLogMessages();
 						if (!checkFields()) return;
@@ -52,6 +52,7 @@ public class ExportPanel extends ImportExportBase {
 						OperationWatcher watcher = new OperationWatcher(trackId);
 						watcher.setCallback(new OperationCallback() {
 
+                            @Override
 							public void onComplete() {
 								setFieldsEnabled(true);
 							}
@@ -62,32 +63,36 @@ public class ExportPanel extends ImportExportBase {
 				}));
 		buttons.addComponent(UIUtil.getButton("Cancel", 120, new Button.ClickListener() {
 
+            @Override
 			public void buttonClick(Button.ClickEvent event) {
 				detachFromParent();
 			}
 		}));
 
-		List<Component> ls = new ArrayList<Component>();
+		List<Component> ls = new ArrayList<>();
 		ls.add(UIUtil.getLabel("<h1>Sqoop Export</h1>", 100, Unit.PERCENTAGE));
 		ls.add(connStringField);
 		ls.add(tableField);
 		ls.add(usernameField);
 		ls.add(passwordField);
 		ls.add(hdfsPathField);
-		ls.add(buttons);
+        ls.add(buttons);
+        ls.add(optionalParams);
 
 		addComponents(ls);
 	}
 
+    @Override
 	ExportSetting makeSettings() {
 		ExportSetting s = new ExportSetting();
 		s.setClusterName(clusterName);
 		s.setHostname(agent.getHostname());
-		s.setConnectionString(connStringField.getValue().toString());
-		s.setTableName(tableField.getValue().toString());
-		s.setUsername(usernameField.getValue().toString());
-		s.setPassword(passwordField.getValue().toString());
-		s.setHdfsPath(hdfsPathField.getValue().toString());
+		s.setConnectionString(connStringField.getValue());
+		s.setTableName(tableField.getValue());
+		s.setUsername(usernameField.getValue());
+		s.setPassword(passwordField.getValue());
+        s.setHdfsPath(hdfsPathField.getValue());
+        s.setOptionalParameters(optionalParams.getValue());
 		return s;
 	}
 

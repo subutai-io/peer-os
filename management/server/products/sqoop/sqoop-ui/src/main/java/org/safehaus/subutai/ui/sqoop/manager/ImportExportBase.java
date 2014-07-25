@@ -1,6 +1,9 @@
 package org.safehaus.subutai.ui.sqoop.manager;
 
 import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.setting.CommonSetting;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -8,16 +11,13 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 public abstract class ImportExportBase extends VerticalLayout {
 
 	AbstractTextField connStringField = UIUtil.getTextField("Connection string:", 300);
 	AbstractTextField tableField = UIUtil.getTextField("Table name:", 300);
 	AbstractTextField usernameField = UIUtil.getTextField("Username:", 300);
-	AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
+    AbstractTextField passwordField = UIUtil.getTextField("Password:", 300, true);
+    AbstractTextField optionalParams = UIUtil.getTextField("Optional parameters:", 300);
 	TextArea logTextArea = UIUtil.getTextArea("Logs:", 600, 200);
 
 	protected String clusterName;
@@ -50,7 +50,8 @@ public abstract class ImportExportBase extends VerticalLayout {
 		fields.add(connStringField);
 		fields.add(tableField);
 		fields.add(usernameField);
-		fields.add(passwordField);
+        fields.add(passwordField);
+        fields.add(optionalParams);
 		fields.add(logTextArea);
 	}
 
@@ -102,7 +103,7 @@ public abstract class ImportExportBase extends VerticalLayout {
 	void appendLogMessage(String m) {
 		if (m != null && m.length() > 0) {
 			logTextArea.setValue(logTextArea.getValue() + "\n" + m);
-			logTextArea.setCursorPosition(logTextArea.getValue().toString().length());
+			logTextArea.setCursorPosition(logTextArea.getValue().length());
 		}
 	}
 
@@ -128,6 +129,7 @@ public abstract class ImportExportBase extends VerticalLayout {
 			this.callback = callback;
 		}
 
+        @Override
 		public void run() {
 			String m = "";
 			while (true) {
