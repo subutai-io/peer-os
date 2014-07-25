@@ -1,38 +1,12 @@
 package org.safehaus.subutai.impl.container;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.lxcmanager.LxcState;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
@@ -41,8 +15,9 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {

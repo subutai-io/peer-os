@@ -1,21 +1,17 @@
 package org.safehaus.subutai.impl.manager.builder;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
-import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategyENUM;
-import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentInstanceDestroyException;
+import org.safehaus.subutai.api.manager.helper.*;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**

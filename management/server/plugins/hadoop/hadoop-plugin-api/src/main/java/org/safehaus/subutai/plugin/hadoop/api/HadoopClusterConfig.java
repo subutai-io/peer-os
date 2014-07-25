@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.hadoop.api;
 
 
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 
 /**

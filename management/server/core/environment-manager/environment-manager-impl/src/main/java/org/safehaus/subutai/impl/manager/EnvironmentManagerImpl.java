@@ -6,8 +6,6 @@
 package org.safehaus.subutai.impl.manager;
 
 
-import java.util.List;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -20,6 +18,8 @@ import org.safehaus.subutai.api.manager.util.BlueprintParser;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
+
+import java.util.List;
 
 
 /**
