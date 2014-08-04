@@ -14,6 +14,7 @@ import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.api.manager.helper.NodeGroup;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -26,12 +27,14 @@ public class EnvironmentBuilder {
 
     private final TemplateRegistryManager templateRegistryManager;
     private final AgentManager agentManager;
+    private final NetworkManager networkManager;
 
 
-    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager,
-                               final AgentManager agentManager ) {
+    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager, final AgentManager agentManager,
+                               NetworkManager networkManager ) {
         this.templateRegistryManager = templateRegistryManager;
         this.agentManager = agentManager;
+        this.networkManager = networkManager;
     }
 
 
