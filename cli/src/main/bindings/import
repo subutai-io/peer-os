@@ -25,6 +25,15 @@ function import_usage {
 
 function import {
   local container="$1"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
+  
+  if [ -f "$debian_file" ]; then
+    is_local="true"
+  else
+    is_local="false"
+  fi
 
   if [ -z "$container"  ]; then
     msg_error "Expecting single parameter for the container to import"
@@ -41,14 +50,6 @@ function import {
   msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     msg_info "subutai import called from command line"
-    local debian_package_name=`get_debian_package_name $container`
-    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-    local package_name=`get_package_name $container`
-
-    if [ ! -f "$debian_file" ]; then
-      msg_error "Could not find template file \"$debian_file\". Aborting ..."
-      exit 1
-    fi
 
     cd $SUBUTAI_TMPDIR
     is_package_installed $package_name
@@ -57,13 +58,30 @@ function import {
       exit 1
     fi
 
-    dpkg -i $debian_file
-    if [ $? -eq 0 ]; then
-      msg_ok "Debian package of $package_name is installed succesfully"
-      exit 0
+    if [ "$is_local" == "true" ]
+    then
+      dpkg -i $debian_file
+      if [ $? -eq 0 ]; then
+        msg_ok "Debian package of $package_name is installed succesfully from local"
+        exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        subutai destroy $container
+        exit 1
+      fi
+    elif [ "`is_registered $container`" == "true" ]
+    then
+      apt-get --assume-yes --force-yes install $package_name
+      if [ $? -eq 0 ]; then
+       msg_ok "Debian package of $package_name is installed succesfully from repo"
+       exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        subutai destroy $container
+        exit 1
+      fi
     else
-      msg_error "Debian package of $package_name could not be installed, removing"
-      subutai destroy $container
+      msg_error "Package $package_name is not found!"
       exit 1
     fi
   else
@@ -133,4 +151,3 @@ function import {
 function import_description {
   echo import a template
 }
-
