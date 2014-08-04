@@ -35,29 +35,37 @@ public class EnvironmentBuilder {
     }
 
 
+    //@todo add linkHosts and exchangeSshKeys logic
+    //@todo destroy all containers of all groups inside environment on any failure
     public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
             throws EnvironmentBuildException {
         Environment environment = new Environment( blueprint.getName() );
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
             if ( nodeGroup.getNumberOfNodes() <= 0 ) {
-                throw new EnvironmentBuildException( "Host servers with available container slots are not found" );
+                throw new EnvironmentBuildException(
+                        String.format( "Node Group %s specifies invalid number of nodes %d", nodeGroup.getName(),
+                                nodeGroup.getNumberOfNodes() ) );
             }
 
-            Set<Node> nodes = new HashSet<>();
-            Set<Agent> physicalAgents = new HashSet<>();
-            for ( String host : nodeGroup.getPhysicalNodes() ) {
-                Agent pAgent = agentManager.getAgentByHostname( host );
-                if ( pAgent == null ) {
-                    throw new EnvironmentBuildException( String.format( "Physical agent %s is not connected", host ) );
+            Set<Agent> physicalAgents = null;
+            if ( nodeGroup.getPhysicalNodes() != null && !nodeGroup.getPhysicalNodes().isEmpty() ) {
+                physicalAgents = new HashSet<>();
+                for ( String host : nodeGroup.getPhysicalNodes() ) {
+                    Agent pAgent = agentManager.getAgentByHostname( host );
+                    if ( pAgent == null ) {
+                        throw new EnvironmentBuildException(
+                                String.format( "Physical agent %s is not connected", host ) );
+                    }
+                    physicalAgents.add( pAgent );
                 }
-                physicalAgents.add( pAgent );
             }
             Template template = templateRegistryManager.getTemplate( nodeGroup.getTemplateName() );
             if ( template == null ) {
                 throw new EnvironmentBuildException(
                         String.format( "Template %s not registered", nodeGroup.getTemplateName() ) );
             }
+            Set<Node> nodes = new HashSet<>();
             try {
                 Set<Agent> agents = containerManager
                         .clone( environment.getUuid(), template.getTemplateName(), nodeGroup.getNumberOfNodes(),

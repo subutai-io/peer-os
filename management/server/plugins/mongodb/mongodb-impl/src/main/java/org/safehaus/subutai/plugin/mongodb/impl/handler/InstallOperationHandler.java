@@ -36,6 +36,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     @Override
     public void run() {
+
         ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {

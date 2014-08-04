@@ -71,7 +71,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = lxcManager.getPhysicalServerMetrics();
-        if ( hosts != null ) {
+        if ( hosts != null && !hosts.isEmpty() ) {
             Iterator<Agent> it = metrics.keySet().iterator();
             while ( it.hasNext() ) {
                 if ( !hosts.contains( it.next() ) ) {
@@ -364,8 +364,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
 
-    private void saveNodeGroup( UUID envId, String templateName, Set<Agent> agents,
-                                PlacementStrategy... strategy ) {
+    private void saveNodeGroup( UUID envId, String templateName, Set<Agent> agents, PlacementStrategy... strategy ) {
 
         String cql = "INSERT INTO nodes(uuid, env_id, info) VALUES(?, ?, ?)";
 
