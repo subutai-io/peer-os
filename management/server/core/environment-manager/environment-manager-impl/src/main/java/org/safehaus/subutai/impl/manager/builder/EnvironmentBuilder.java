@@ -41,7 +41,7 @@ public class EnvironmentBuilder {
         for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
             PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
             if ( nodeGroup.getNumberOfNodes() <= 0 ) {
-
+                throw new EnvironmentBuildException( "Host servers with available container slots are not found" );
             }
 
             Set<Node> nodes = new HashSet<>();
