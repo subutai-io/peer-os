@@ -4,10 +4,11 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.Adding;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.Deletion;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.Installation;
@@ -34,13 +35,15 @@ public class HadoopImpl implements Hadoop {
 	private static ContainerManager containerManager;
 	private static NetworkManager networkManager;
 	private static ExecutorService executor;
+	private static EnvironmentManager environmentManager;
 
 	public HadoopImpl(AgentManager agentManager,
 	                  Tracker tracker,
 	                  CommandRunner commandRunner,
 	                  DbManager dbManager,
 	                  NetworkManager networkManager,
-	                  ContainerManager containerManager) {
+	                  ContainerManager containerManager,
+	                  EnvironmentManager environmentManager) {
 
 		HadoopImpl.agentManager = agentManager;
 		HadoopImpl.tracker = tracker;
@@ -48,6 +51,7 @@ public class HadoopImpl implements Hadoop {
 		HadoopImpl.dbManager = dbManager;
 		HadoopImpl.networkManager = networkManager;
 		HadoopImpl.containerManager = containerManager;
+		HadoopImpl.environmentManager = environmentManager;
 	}
 
 	public void init() {
@@ -87,9 +91,13 @@ public class HadoopImpl implements Hadoop {
 		return agentManager;
 	}
 
+	public static EnvironmentManager getEnvironmentManager() {
+		return environmentManager;
+	}
+
 	@Override
-	public UUID installCluster(final HadoopClusterConfig hadoopClusterConfig ) {
-		return new Installation(this, hadoopClusterConfig ).execute();
+	public UUID installCluster(final HadoopClusterConfig hadoopClusterConfig) {
+		return new Installation(this, hadoopClusterConfig).execute();
 	}
 
 	@Override
@@ -98,28 +106,28 @@ public class HadoopImpl implements Hadoop {
 	}
 
 	@Override
-	public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig ) {
-		return new NameNode(this, hadoopClusterConfig ).start();
+	public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).start();
 	}
 
 	@Override
-	public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig ) {
-		return new NameNode(this, hadoopClusterConfig ).stop();
+	public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).stop();
 	}
 
 	@Override
-	public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig ) {
-		return new NameNode(this, hadoopClusterConfig ).restart();
+	public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).restart();
 	}
 
 	@Override
-	public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig ) {
-		return new NameNode(this, hadoopClusterConfig ).status();
+	public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).status();
 	}
 
 	@Override
-	public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig ) {
-		return new SecondaryNameNode(this, hadoopClusterConfig ).status();
+	public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new SecondaryNameNode(this, hadoopClusterConfig).status();
 	}
 
 	@Override
@@ -128,23 +136,23 @@ public class HadoopImpl implements Hadoop {
 	}
 
 	@Override
-	public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig ) {
-		return new JobTracker(this, hadoopClusterConfig ).start();
+	public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).start();
 	}
 
 	@Override
-	public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig ) {
-		return new JobTracker(this, hadoopClusterConfig ).stop();
+	public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).stop();
 	}
 
 	@Override
-	public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig ) {
-		return new JobTracker(this, hadoopClusterConfig ).restart();
+	public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).restart();
 	}
 
 	@Override
-	public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig ) {
-		return new JobTracker(this, hadoopClusterConfig ).status();
+	public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).status();
 	}
 
 	@Override
@@ -159,36 +167,36 @@ public class HadoopImpl implements Hadoop {
 
 	@Override
 	public UUID blockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig ).block(agent);
+		return new DataNode(this, hadoopClusterConfig).block(agent);
 	}
 
 	@Override
 	public UUID blockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig ).block(agent);
+		return new TaskTracker(this, hadoopClusterConfig).block(agent);
 	}
 
 	@Override
 	public UUID unblockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig ).unblock(agent);
+		return new DataNode(this, hadoopClusterConfig).unblock(agent);
 	}
 
 	@Override
 	public UUID unblockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig ).unblock(agent);
+		return new TaskTracker(this, hadoopClusterConfig).unblock(agent);
 	}
 
 	@Override
 	public List<HadoopClusterConfig> getClusters() {
-		return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
+		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
 	}
 
 	@Override
 	public HadoopClusterConfig getCluster(String clusterName) {
-		return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
+		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
 	}
 
 	@Override
-	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig ) {
-		return new HadoopDbSetupStrategy(po, this, containerManager, hadoopClusterConfig );
+	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig) {
+		return new HadoopDbSetupStrategy(po, this, containerManager, hadoopClusterConfig);
 	}
 }
