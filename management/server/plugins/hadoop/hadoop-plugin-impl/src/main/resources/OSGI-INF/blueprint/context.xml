@@ -13,6 +13,8 @@
                interface="org.safehaus.subutai.api.container.ContainerManager"/>
     <reference id="networkManager" availability="mandatory"
                interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
 
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl"
           init-method="init" destroy-method="destroy">
@@ -22,6 +24,7 @@
         <argument ref="dbManager"/>
         <argument ref="networkManager"/>
         <argument ref="containerManager"/>
+        <argument ref="environmentManager"/>
     </bean>
 
     <service ref="hadoop-impl" interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
