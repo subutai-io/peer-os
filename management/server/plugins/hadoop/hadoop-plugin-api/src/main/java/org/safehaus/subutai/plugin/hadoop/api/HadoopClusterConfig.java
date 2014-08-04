@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.api;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ public class HadoopClusterConfig implements ConfigBase {
 
 
     public HadoopClusterConfig() {
-        domainName = "intra.lan";
+        domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
         blockedAgents = new HashSet<>();

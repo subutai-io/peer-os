@@ -1,7 +1,9 @@
 package org.safehaus.subutai.impl.manager.builder;
 
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
@@ -19,9 +21,11 @@ import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.common.collect.Lists;
+
 
 /**
- * Created by bahadyr on 6/23/14.
+ * This class creates containers according to supplied Environment Blueprint
  */
 public class EnvironmentBuilder {
 
@@ -39,7 +43,7 @@ public class EnvironmentBuilder {
 
 
     //@todo add linkHosts and exchangeSshKeys logic
-    //@todo destroy all containers of all groups inside environment on any failure
+    //@todo destroy all containers of all groups inside environment on any failure ???
     public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
             throws EnvironmentBuildException {
         Environment environment = new Environment( blueprint.getName() );
@@ -76,12 +80,30 @@ public class EnvironmentBuilder {
                 for ( Agent agent : agents ) {
                     nodes.add( new Node( agent, template, nodeGroup.getName() ) );
                 }
+                if ( nodeGroup.isLinkHosts() ) {
+                    networkManager.configHostsOnAgents( Lists.newArrayList( agents ), nodeGroup.getDomainName() );
+                }
+                if ( nodeGroup.isExchangeSshKeys() ) {
+                    networkManager.configSshOnAgents( Lists.newArrayList( agents ) );
+                }
             }
             catch ( LxcCreateException ex ) {
                 throw new EnvironmentBuildException( ex.toString() );
             }
 
             environment.getNodes().addAll( nodes );
+        }
+
+        List<Agent> allAgents = new ArrayList<>();
+        for ( Node node : environment.getNodes() ) {
+            allAgents.add( node.getAgent() );
+        }
+
+        if ( blueprint.isLinkHosts() ) {
+            networkManager.configHostsOnAgents( allAgents, blueprint.getDomainName() );
+        }
+        if ( blueprint.isExchangeSshKeys() ) {
+            networkManager.configSshOnAgents( allAgents );
         }
 
         return environment;

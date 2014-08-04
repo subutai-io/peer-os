@@ -3,9 +3,11 @@ package org.safehaus.subutai.api.manager.helper;
 
 import java.util.Set;
 
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 
 /**
- * Created by bahadyr on 6/23/14.
+ * Environment Blueprint class
  */
 public class EnvironmentBlueprint {
 
@@ -14,6 +16,17 @@ public class EnvironmentBlueprint {
     Set<NodeGroup> nodeGroups;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
+
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+
+    public void setDomainName( final String domainName ) {
+        this.domainName = domainName;
+    }
 
 
     public boolean isLinkHosts() {

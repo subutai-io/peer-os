@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
@@ -21,7 +22,7 @@ public class MongoClusterConfig implements ConfigBase {
     public static final String PRODUCT_KEY = "MongoDB2";
     private String clusterName = "";
     private String replicaSetName = "repl";
-    private String domainName = "intra.lan";
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private int numberOfConfigServers = 3;
     private int numberOfRouters = 2;
     private int numberOfDataNodes = 3;
@@ -35,7 +36,7 @@ public class MongoClusterConfig implements ConfigBase {
 
 
     public Set<Agent> getAllNodes() {
-        Set<Agent> nodes = new HashSet<Agent>();
+        Set<Agent> nodes = new HashSet<>();
         nodes.addAll( configServers );
         nodes.addAll( dataNodes );
         nodes.addAll( routerServers );
