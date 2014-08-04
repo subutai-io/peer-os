@@ -110,13 +110,15 @@ function promote {
     msg_info "    - check passed: parent \"$parent\" is a template"
   fi
 
+  # TODO is this check really necessary while promoting a child container?? 
+  # User may have promoted the parent but may not have registered yet!
   # check to make sure the parent is registered
-  if [ "`is_registered $parent`" == "false" ]; then
-    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: parent \"$parent\" is registered"
-  fi
+  #if [ "`is_registered $parent`" == "false" ]; then
+  #  msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+  #  exit 1
+  #else
+  #  msg_info "    - check passed: parent \"$parent\" is registered"
+  #fi
 
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
