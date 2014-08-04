@@ -37,7 +37,6 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     private MongoImpl mongoManager;
     private ProductOperation po;
     private MongoClusterConfig config;
-    public static final String TEMPLATE_NAME = "mongodb";
 
 
     public MongoDbSetupStrategy( MongoClusterConfig config, ProductOperation po, MongoImpl mongoManager ) {
@@ -74,21 +73,21 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         NodeGroup cfgServersGroup = new NodeGroup();
         cfgServersGroup.setName( NodeType.CONFIG_NODE.name() );
         cfgServersGroup.setNumberOfNodes( config.getNumberOfConfigServers() );
-        cfgServersGroup.setTemplateName( TEMPLATE_NAME );
+        cfgServersGroup.setTemplateName( config.getTemplateName() );
         cfgServersGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.CONFIG_NODE ) );
 
         //routers
         NodeGroup routersGroup = new NodeGroup();
         routersGroup.setName( NodeType.ROUTER_NODE.name() );
         routersGroup.setNumberOfNodes( config.getNumberOfRouters() );
-        routersGroup.setTemplateName( TEMPLATE_NAME );
+        routersGroup.setTemplateName( config.getTemplateName() );
         routersGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.ROUTER_NODE ) );
 
         //data nodes
         NodeGroup dataNodesGroup = new NodeGroup();
         dataNodesGroup.setName( NodeType.DATA_NODE.name() );
         dataNodesGroup.setNumberOfNodes( config.getNumberOfDataNodes() );
-        dataNodesGroup.setTemplateName( TEMPLATE_NAME );
+        dataNodesGroup.setTemplateName( config.getTemplateName() );
         dataNodesGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
 
         return environmentBlueprint;

@@ -20,6 +20,7 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 public class MongoClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "MongoDB2";
+    private String templateName = "mongodb";
     private String clusterName = "";
     private String replicaSetName = "repl";
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
@@ -42,6 +43,16 @@ public class MongoClusterConfig implements ConfigBase {
         nodes.addAll( routerServers );
 
         return nodes;
+    }
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
     }
 
 

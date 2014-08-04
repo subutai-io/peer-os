@@ -173,10 +173,10 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po ) {
         if ( config.getSetupType() == SetupType.STANDALONE ) {
-            return new ZookeeperStandaloneSetupStrategy( config, po, containerManager, commandRunner );
+            return new ZookeeperStandaloneSetupStrategy( config, po, this );
         }
-        else { //this is over Hadoop or with Hadoop
-            return null;
+        else { //this is over Hadoop
+            return new ZookeeperOverHadoopSetupStrategy( config, po, this );
         }
     }
 

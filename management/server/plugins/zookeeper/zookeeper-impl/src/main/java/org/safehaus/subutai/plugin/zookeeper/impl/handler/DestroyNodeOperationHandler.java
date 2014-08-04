@@ -171,7 +171,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                     config.getClusterName() ) );
         }
         else {
-            po.addLogDone( "Done" );
+            po.addLogDone( "DB updated\nDone" );
         }
     }
 }

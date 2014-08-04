@@ -18,11 +18,21 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 public class ZookeeperClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Zookeeper2";
-    public String templateName = "zookeeper";
+    private String templateName = "zookeeper";
     private String clusterName = "";
     private int numberOfNodes = 3;
     private Set<Agent> nodes;
     private SetupType setupType;
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
 
 
     public SetupType getSetupType() {
@@ -32,16 +42,6 @@ public class ZookeeperClusterConfig implements ConfigBase {
 
     public void setSetupType( final SetupType setupType ) {
         this.setupType = setupType;
-    }
-
-
-    public void setTemplateName( String templateName ) {
-        this.templateName = templateName;
-    }
-
-
-    public String getTemplateName() {
-        return templateName;
     }
 
 

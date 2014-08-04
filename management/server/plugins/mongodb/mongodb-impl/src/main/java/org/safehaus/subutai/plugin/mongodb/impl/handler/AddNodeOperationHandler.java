@@ -63,7 +63,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
             po.addLog( "Creating lxc container" );
 
-            Set<Agent> agents = manager.getContainerManager().clone( MongoDbSetupStrategy.TEMPLATE_NAME, 1, null,
+            Set<Agent> agents = manager.getContainerManager().clone( config.getTemplateName(), 1, null,
                     MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ) );
 
             Agent agent = agents.iterator().next();

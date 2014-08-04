@@ -7,8 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -24,23 +22,21 @@ import com.google.common.base.Strings;
 
 
 /**
- * This is a zk cluster setup strategy.
+ * This is a standalone zk cluster setup strategy.
  */
 public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
     public static final String TEMPLATE_NAME = "zookeeper";
     private final ZookeeperClusterConfig config;
-    private final ContainerManager containerManager;
-    private final CommandRunner commandRunner;
+    private final ZookeeperImpl zookeeperManager;
     private final ProductOperation po;
 
 
     public ZookeeperStandaloneSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po,
-                                             ContainerManager containerManager, CommandRunner commandRunner ) {
+                                             ZookeeperImpl zookeeperManager ) {
         this.config = config;
         this.po = po;
-        this.containerManager = containerManager;
-        this.commandRunner = commandRunner;
+        this.zookeeperManager = zookeeperManager;
     }
 
 
@@ -54,8 +50,9 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
         try {
             po.addLog( String.format( "Creating %d lxc containers...", config.getNumberOfNodes() ) );
-            Set<Agent> agents = containerManager
-                    .clone( TEMPLATE_NAME, config.getNumberOfNodes(), null, getNodePlacementStrategy() );
+            Set<Agent> agents = zookeeperManager.getContainerManager()
+                                                .clone( TEMPLATE_NAME, config.getNumberOfNodes(), null,
+                                                        getNodePlacementStrategy() );
             config.setNodes( agents );
 
             po.addLog( "Lxc containers created successfully\nConfiguring cluster..." );
@@ -64,7 +61,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                     ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
                     prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue() );
 
-            commandRunner.runCommand( configureClusterCommand );
+            zookeeperManager.getCommandRunner().runCommand( configureClusterCommand );
 
             if ( configureClusterCommand.hasSucceeded() ) {
 
@@ -72,7 +69,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                 //start all nodes
                 Command startCommand = Commands.getStartCommand( config.getNodes() );
                 final AtomicInteger count = new AtomicInteger();
-                commandRunner.runCommand( startCommand, new CommandCallback() {
+                zookeeperManager.getCommandRunner().runCommand( startCommand, new CommandCallback() {
                     @Override
                     public void onResponse( Response response, AgentResult agentResult, Command command ) {
                         if ( agentResult.getStdOut().contains( "STARTED" ) ) {
@@ -96,11 +93,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                         String.format( "Failed to configure cluster, %s", configureClusterCommand.getAllErrors() ) );
             }
         }
-        catch ( LxcCreateException ex ) {
+        catch ( LxcCreateException | ClusterConfigurationException ex ) {
             throw new ClusterSetupException( ex.getMessage() );
-        }
-        catch ( ClusterConfigurationException e ) {
-            throw new ClusterSetupException( e.getMessage() );
         }
 
         return config;
