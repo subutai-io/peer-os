@@ -36,7 +36,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * @author dilshat
+ * Implementation of Mongo interface. Implements all backend logic for mongo cluster management
  */
 public class MongoImpl implements Mongo {
 

@@ -40,9 +40,9 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     public static final String TEMPLATE_NAME = "mongodb";
 
 
-    /*@todo add parameter validation logic*/
     public MongoDbSetupStrategy( MongoClusterConfig config, ProductOperation po, MongoImpl mongoManager ) {
 
+        Preconditions.checkNotNull( config, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( mongoManager, "Mongo manager is null" );
 

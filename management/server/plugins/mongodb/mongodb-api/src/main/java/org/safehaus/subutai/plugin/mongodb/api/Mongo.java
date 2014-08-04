@@ -14,7 +14,7 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 /**
- * @author dilshat
+ * Mongo manager interface
  */
 public interface Mongo extends ApiBase<MongoClusterConfig> {
 
@@ -68,5 +68,13 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
      */
     public UUID checkNode( String clusterName, String lxcHostName );
 
+    /**
+     * Returns Mongo cluster setup strategy
+     *
+     * @param config - mongo cluster configuration
+     * @param po - product operation tracker
+     *
+     * @return - strategy
+     */
     public ClusterSetupStrategy getClusterSetupStrategy( MongoClusterConfig config, ProductOperation po );
 }

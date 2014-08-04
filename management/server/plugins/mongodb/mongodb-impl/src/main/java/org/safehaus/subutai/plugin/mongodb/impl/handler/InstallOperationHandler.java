@@ -12,7 +12,7 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 /**
- * Created by dilshat on 7/21/14.
+ * Handles install mongo cluster operation
  */
 public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
 

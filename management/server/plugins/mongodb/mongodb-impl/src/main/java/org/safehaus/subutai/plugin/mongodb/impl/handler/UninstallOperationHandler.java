@@ -12,7 +12,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles uninstall mongo cluster operation
  */
 public class UninstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;

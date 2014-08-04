@@ -23,7 +23,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles destroy mongo node operation
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
