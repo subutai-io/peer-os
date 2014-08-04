@@ -25,8 +25,10 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -69,6 +71,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
         //config servers
         NodeGroup cfgServersGroup = new NodeGroup();
         cfgServersGroup.setName( NodeType.CONFIG_NODE.name() );
@@ -90,6 +94,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         dataNodesGroup.setTemplateName( config.getTemplateName() );
         dataNodesGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
 
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
+
         return environmentBlueprint;
     }
 
@@ -107,6 +113,9 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         //if no nodes are set, setup default environment
         if ( config.getAllNodes() == null || config.getAllNodes().isEmpty() ) {
             try {
+
+                po.addLog( "Building environment..." );
+
                 Environment env = mongoManager.getEnvironmentManager()
                                               .buildEnvironmentAndReturn( getDefaultEnvironmentBlueprint() );
 

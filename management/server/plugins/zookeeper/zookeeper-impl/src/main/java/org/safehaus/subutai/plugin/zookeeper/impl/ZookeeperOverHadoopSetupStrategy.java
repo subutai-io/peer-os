@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -14,6 +15,7 @@ import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
@@ -70,13 +72,14 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( "ksks-zookeeper" ) ) {
+            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + zookeeperClusterConfig.getTemplateName() ) ) {
                 po.addLog(
                         String.format( "Node %s already has Zookeeper installed. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
             }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
+            else if ( !result.getStdOut()
+                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.DEFAULT_HADOOP_TEMPLATE ) ) {
                 po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();

@@ -24,7 +24,7 @@ import com.google.common.collect.Sets;
 
 
 /**
- * Created by dilshat on 5/7/14.
+ * Handles destroy node operation
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;
@@ -93,7 +93,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                 }
             }
         }
-        else if(config.getSetupType() == SetupType.OVER_HADOOP) {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP || config.getSetupType() == SetupType.WITH_HADOOP ) {
             //just uninstall Zookeeper
             po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 

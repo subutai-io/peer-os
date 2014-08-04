@@ -19,6 +19,8 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
  */
 public interface Zookeeper extends ApiBase<ZookeeperClusterConfig> {
 
+    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig );
+
     public UUID startNode( String clusterName, String lxcHostname );
 
     public UUID stopNode( String clusterName, String lxcHostname );

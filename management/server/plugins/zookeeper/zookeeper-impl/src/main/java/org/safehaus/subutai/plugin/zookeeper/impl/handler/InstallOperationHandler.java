@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
@@ -16,11 +17,12 @@ import com.google.common.base.Strings;
 
 
 /**
- * Installs Zookeeper cluster either on newly created lxcs or over hadoop cluster nodes
+ * Installs Zookeeper cluster either on newly created lxcs or over hadoop cluster nodes or together with hadoop
  */
 public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;
-    private final ZookeeperClusterConfig config;
+    private ZookeeperClusterConfig config;
+    private HadoopClusterConfig hadoopClusterConfig;
 
 
     public InstallOperationHandler( ZookeeperImpl manager, ZookeeperClusterConfig config ) {
@@ -28,6 +30,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         this.config = config;
         po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
                 String.format( "Installing %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+    }
+
+
+    public InstallOperationHandler( final ZookeeperImpl manager, ZookeeperClusterConfig config,
+                                    final HadoopClusterConfig hadoopClusterConfig ) {
+        this( manager, config );
+        this.hadoopClusterConfig = hadoopClusterConfig;
     }
 
 
@@ -115,8 +124,22 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
 
     private void installWithHadoop() {
-        //call Hadoop CLusterSetupStrategy and feed HadooClusterConfig
-        //obtain hadoop nodes and configure ZK cluster with specified number of nodes
+        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( hadoopClusterConfig, config, po );
 
+        try {
+            ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
+
+            if ( manager.getDbManager()
+                        .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
+                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
+            }
+            else {
+                po.addLogFailed( "Failed to save cluster information to database" );
+            }
+        }
+        catch ( ClusterSetupException e ) {
+            po.addLogFailed(
+                    String.format( "Failed to setup with-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
+        }
     }
 }

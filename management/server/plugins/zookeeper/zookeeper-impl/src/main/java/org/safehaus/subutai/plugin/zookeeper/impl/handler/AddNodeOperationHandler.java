@@ -68,6 +68,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
             addOverHadoop( config );
         }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            //TODO to be implemented
+        }
     }
 
 
@@ -191,9 +194,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             //create lxc
             po.addLog( "Creating lxc container..." );
 
-            Set<Agent> agents = manager.getContainerManager()
-                                       .clone( ZookeeperStandaloneSetupStrategy.TEMPLATE_NAME, 1, null,
-                                               ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+            Set<Agent> agents = manager.getContainerManager().clone( config.getTemplateName(), 1, null,
+                    ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
 
             Agent agent = agents.iterator().next();
 
