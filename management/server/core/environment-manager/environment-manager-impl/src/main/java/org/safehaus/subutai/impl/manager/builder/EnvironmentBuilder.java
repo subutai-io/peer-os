@@ -42,7 +42,6 @@ public class EnvironmentBuilder {
     }
 
 
-    //@todo add linkHosts and exchangeSshKeys logic
     //@todo destroy all containers of all groups inside environment on any failure ???
     public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
             throws EnvironmentBuildException {
