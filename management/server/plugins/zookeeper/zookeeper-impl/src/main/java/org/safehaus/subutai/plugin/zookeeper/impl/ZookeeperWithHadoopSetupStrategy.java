@@ -126,6 +126,7 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
             po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
 
+            //TODO implement own logic since over hadoop installs zookeeper, here we need to just configure ZK cluster
             ClusterSetupStrategy clusterSetupStrategy =
                     zookeeperManager.getClusterSetupStrategy( zookeeperClusterConfig, po );
 
