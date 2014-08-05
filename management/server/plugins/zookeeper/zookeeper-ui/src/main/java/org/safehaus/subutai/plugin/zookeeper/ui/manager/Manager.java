@@ -193,7 +193,8 @@ public class Manager {
                             }
                         } );
                     }
-                    else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                    else if ( config.getSetupType() == SetupType.OVER_HADOOP
+                            || config.getSetupType() == SetupType.WITH_HADOOP ) {
                         HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster( config.getClusterName() );
 
                         if ( info != null ) {
@@ -386,8 +387,8 @@ public class Manager {
             progressIcon.setVisible( false );
 
             table.addItem( new Object[] {
-                            agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
-                    }, null );
+                    agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
+            }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
 

@@ -68,7 +68,11 @@ public class VerificationStep extends Panel {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = ZookeeperUI.getManager().installCluster( wizard.getConfig() );
+                UUID trackID = wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ? ZookeeperUI.getManager()
+                                                                                                       .installCluster(
+                                                                                                               wizard.getConfig(),
+                                                                                                               wizard.getHadoopClusterConfig() ) :
+                               ZookeeperUI.getManager().installCluster( wizard.getConfig() );
 
                 ProgressWindow window =
                         new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,
