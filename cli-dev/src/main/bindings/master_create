@@ -46,9 +46,9 @@ function master_create {
   # Configuration for apt-proxy
   if [ -n "$SUBUTAI_APT_PROXY" ]; then
     echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       > /etc/apt/sources.list
+       > /etc/apt/sources.list.d/subutai-repo.list
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       >> /etc/apt/sources.list
+       >> /etc/apt/sources.list.d/subutai-repo.list
   fi
   lxc_wait_net master
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
