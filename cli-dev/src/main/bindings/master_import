@@ -96,7 +96,9 @@ function master_import {
   fi
 
   msg_ok "Master import from debian package is successful"
-  rm -rf $debian_root
+  if [ -d $debian_root ]; then
+    rm -rf $debian_root
+  fi
   exit 0
 }
 
