@@ -52,7 +52,7 @@ function register {
     exit 1
     else
     msg_info "    - check passed: \"$container\" is not registered"
-  #fi
+  fi
 
   parent=`zfs_get_parent $container`
   lxc_assert $parent
