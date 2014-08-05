@@ -115,10 +115,10 @@ public class ConfigLoaderForm extends CustomComponent {
         comboBox_2.setImmediate( false );
         comboBox_2.setWidth( "-1px" );
         comboBox_2.setHeight( "-1px" );
-        comboBox_2.addItem( ConfigTypeEnum.PROPERTIES );
-        comboBox_2.addItem( ConfigTypeEnum.XML );
-        comboBox_2.addItem( ConfigTypeEnum.YAML );
-        //        comboBox_2.addItem( ConfigTypeEnum.BLANK );
+        comboBox_2.setNullSelectionAllowed( false );
+        for ( ConfigTypeEnum anEnum : ConfigTypeEnum.values() ) {
+            comboBox_2.addItem( anEnum );
+        }
         horizontalLayout_1.addComponent( comboBox_2 );
 
         // textField_1
