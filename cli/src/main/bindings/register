@@ -46,14 +46,13 @@ function register {
   else
     msg_info "    - check passed: \"$container\" is a template"
   fi
-  # Enable this check when register works
   # check to make sure container is NOT registered as a template
-  #if [ "`is_registered $container`" == "true" ]; then
-  #  msg_error "Container \"$container\" is registered as template already. Aborting ..."
-  #  exit 1
-  #  else
-  #  msg_info "    - check passed: \"$container\" is registered"
-  #fi
+  if [ "`is_registered $container`" == "true" ]; then
+    msg_error "Container \"$container\" is ALREADY registered as template already. Aborting ..."
+    exit 1
+    else
+    msg_info "    - check passed: \"$container\" is not registered"
+  fi
 
   parent=`zfs_get_parent $container`
   lxc_assert $parent
@@ -69,7 +68,7 @@ function register {
   if [ $container != "master" -a "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
     exit 1
-  else
+  elif [ $container != "master" ]; then
     msg_info "    - check passed: parent \"$parent\" is registered"
   fi
 
