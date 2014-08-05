@@ -5,7 +5,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
@@ -17,8 +21,10 @@ import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.collect.Lists;
@@ -114,8 +120,9 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
                 throw new ClusterSetupException( "Failed to save Hadoop cluster information to DB" );
             }
 
-            po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
+            //setup ZK cluster
 
+            po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
 
             Set<Agent> zkNodes = new HashSet<>();
             Iterator<Agent> hadoopNodesIterator = hadoopClusterConfig.getAllNodes().iterator();
@@ -126,11 +133,61 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
             po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
 
-            //TODO implement own logic since over hadoop installs zookeeper, here we need to just configure ZK cluster
-            ClusterSetupStrategy clusterSetupStrategy =
-                    zookeeperManager.getClusterSetupStrategy( zookeeperClusterConfig, po );
+            Command configureClusterCommand;
+            try {
+                configureClusterCommand = Commands.getConfigureClusterCommand( zookeeperClusterConfig.getNodes(),
+                        ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
+                        ZookeeperStandaloneSetupStrategy.prepareConfiguration( zookeeperClusterConfig.getNodes() ),
+                        ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+            }
+            catch ( ClusterConfigurationException e ) {
+                throw new ClusterSetupException( String.format( "Error configuring cluster %s", e.getMessage() ) );
+            }
 
-            clusterSetupStrategy.setup();
+            //configure ZK cluster
+            zookeeperManager.getCommandRunner().runCommand( configureClusterCommand );
+
+            if ( configureClusterCommand.hasSucceeded() ) {
+
+                po.addLog( String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
+                //start all nodes
+                Command startCommand = Commands.getStartCommand( zookeeperClusterConfig.getNodes() );
+                final AtomicInteger count = new AtomicInteger();
+                zookeeperManager.getCommandRunner().runCommand( startCommand, new CommandCallback() {
+                    @Override
+                    public void onResponse( Response response, AgentResult agentResult, Command command ) {
+                        if ( agentResult.getStdOut().contains( "STARTED" ) ) {
+                            if ( count.incrementAndGet() == zookeeperClusterConfig.getNodes().size() ) {
+                                stop();
+                            }
+                        }
+                    }
+                } );
+
+                if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
+                    po.addLog( String.format( "Starting %s succeeded\nSaving info to DB...",
+                            ZookeeperClusterConfig.PRODUCT_KEY ) );
+
+                    //save to db
+                    if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
+                            zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
+                        po.addLog( "Cluster info saved to DB" );
+                    }
+                    else {
+                        throw new ClusterSetupException( "Could not save cluster info to DB! Check logs" );
+                    }
+                }
+                else {
+                    throw new ClusterSetupException(
+                            String.format( "Starting %s failed, %s", ZookeeperClusterConfig.PRODUCT_KEY,
+                                    startCommand.getAllErrors() ) );
+                }
+            }
+            else {
+                throw new ClusterSetupException( String.format(
+                        "Failed to configure cluster, %s\nPlease configure cluster manually and restart it",
+                        configureClusterCommand.getAllErrors() ) );
+            }
         }
         catch ( EnvironmentBuildException e ) {
             throw new ClusterSetupException( String.format( "Error building environment: %s", e.getMessage() ) );
