@@ -2,7 +2,7 @@
 
 function get_lxc_list()
 {
-  echo "`ls -l /var/lib/lxc/ | egrep '^d' | awk '{print $9}'`"
+  echo "`lxc-ls -f | tail -n +3 | cut -d " " -f1`"
 }
 
 function destroy_all_lxcs()
@@ -27,35 +27,29 @@ function master_destroy {
   local package_name=`get_package_name $container`
   local debian_root="$SUBUTAI_TMPDIR/$container"
   
-  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
-  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    msg_info "subutai master_destroy called from command line"
-    echo WARNING: this destroys everything mercilessly
-    while true; do
-      read -p "Do you wish to destroy master template? [Y/N]" yn
-      case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit 1;;
-        * ) echo "Please answer yes or no.";;
-      esac
-    done
-    # Check if the package is installed
-    is_package_installed $package_name
-    if [ $? == 0  ]; then
-      # Confirm destroy operation
-      apt-get --assume-yes --force-yes purge $package_name
-      exit $?
-    fi
-  else
-    msg_info "subutai master_destroy called while removing template via package-manager"
-  fi
+  echo WARNING: this destroys everything mercilessly
+  while true; do
+    read -p "Do you wish to destroy master template? [Y/N]" yn
+    case $yn in
+      [Yy]* ) break;;
+      [Nn]* ) exit 1;;
+      * ) echo "Please answer yes or no.";;
+    esac
+  done
 
   lxc_list="`get_lxc_list`"
-  while [ "`echo $lxc_list | wc -w`" != "1" ]
+  while [ "`echo $lxc_list | wc -w`" -gt 1 ]
   do
     lxc_list="`get_lxc_list`"
     destroy_all_lxcs "$lxc_list"
   done
+ 
+  # Check if the package is installed
+  is_package_installed $package_name
+  if [ $? == 0  ]; then
+    # Confirm destroy operation
+    apt-get --assume-yes --force-yes purge $package_name
+  fi
 
 
   zfs release keep lxc/master-opt@template
