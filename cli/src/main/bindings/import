@@ -13,12 +13,12 @@ function import_usage {
 
 # Plan for importing a template
 # ----------------------------------------------------------------------------
-# (1) Install the debian package if subutai import not called during a debian package installation
-# (2) perform sanity checks first
+# (1) perform sanity checks first
 #     - a container with the same name MUST NOT already exist
 #     - the template name MUST be in the template registry
 #     - the template parent MUST be present and in the template registry
 #       if NOT the user will have to install the parent container first
+# (2) Install the debian package if subutai import not called during a debian package installation
 # (3) Setup the LXC container area under /var/lib/lxc/
 # (4) Receive delta images of all filesystems starting with the rootfs
 # (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
@@ -28,13 +28,52 @@ function import {
   local debian_package_name=`get_debian_package_name $container`
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
   local package_name=`get_package_name $container`
-  
+  debian_root=$SUBUTAI_TMPDIR/$container
+  config=$debian_root/config
+  parent=`cat $config | grep subutai.parent | awk '{print $3}'`
+ 
+  # ----------------------------------------------------------------------------
+  # (1) perform sanity checks first
+  #     - a container with the same name MUST NOT already exist
+  #     - the template name MUST be in the template registry
+  #     - the template parent MUST be present and in the template registry
+  #       if NOT the user will have to install the parent container first
+  # ----------------------------------------------------------------------------
+  lxc_assert_no $container
+  zfs_assert_nods lxc/$container
+
+  # check to make sure container is registered as a template
+  if [ "`is_registered $container`" == "false" ]; then
+    msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: \"$container\" is registered"
+  fi
+
+  lxc_assert $parent
+
+  # check to make sure the parent is a template
+  if [ "`zfs_is_template $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is a template"
+  fi
+
+  # check to make sure the parent is registered
+  if [ "`is_registered $parent`" == "false" ]; then
+    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    exit 1
+  else
+    msg_info "    - check passed: parent \"$parent\" is registered"
+  fi
+
   if [ -f "$debian_file" ]; then
     is_local="true"
   else
     is_local="false"
   fi
-
+  
   if [ -z "$container"  ]; then
     msg_error "Expecting single parameter for the container to import"
     show_usage "`import_usage`"
@@ -44,8 +83,9 @@ function import {
     subutai master_import
     exit $?
   fi
+  
   # ----------------------------------------------------------------------------
-  # (1) Install the debian package if subutai import not called during a debian package installation
+  # (2) Install the debian package if subutai import not called during a debian package installation
   # ----------------------------------------------------------------------------
   msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
@@ -86,44 +126,6 @@ function import {
     fi
   else
     msg_info "subutai import called while installing template from the debian package"
-  fi
-  # ----------------------------------------------------------------------------
-  # (2) perform sanity checks first
-  #     - a container with the same name MUST NOT already exist
-  #     - the template name MUST be in the template registry
-  #     - the template parent MUST be present and in the template registry
-  #       if NOT the user will have to install the parent container first
-  # ----------------------------------------------------------------------------
-  lxc_assert_no $container
-
-  # check to make sure container is registered as a template
-  if [ "`is_registered $container`" == "false" ]; then
-    msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
-    exit 1
-  else 
-    msg_info "    - check passed: \"$container\" is registered"
-  fi
-
-  debian_root=$SUBUTAI_TMPDIR/$container
-  config=$debian_root/config
-  parent=`cat $config | grep subutai.parent | awk '{print $3}'`
-
-  lxc_assert $parent
-
-  # check to make sure the parent is a template
-  if [ "`zfs_is_template $parent`" == "false" ]; then
-    msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: parent \"$parent\" is a template"
-  fi
-
-  # check to make sure the parent is registered
-  if [ "`is_registered $parent`" == "false" ]; then
-    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: parent \"$parent\" is registered"
   fi
 
   # start creating the container
