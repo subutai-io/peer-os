@@ -15,6 +15,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -35,7 +36,7 @@ import com.google.common.base.Preconditions;
 
 
 /**
- * @author dilshat
+ * Implementation of Mongo interface. Implements all backend logic for mongo cluster management
  */
 public class MongoImpl implements Mongo {
 
@@ -44,18 +45,25 @@ public class MongoImpl implements Mongo {
     private DbManager dbManager;
     private Tracker tracker;
     private ContainerManager containerManager;
+    private EnvironmentManager environmentManager;
     private ExecutorService executor;
 
 
     public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      ContainerManager containerManager ) {
+                      ContainerManager containerManager, EnvironmentManager environmentManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.containerManager = containerManager;
+        this.environmentManager = environmentManager;
 
         Commands.init( commandRunner );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
     }
 
 
@@ -180,6 +188,6 @@ public class MongoImpl implements Mongo {
 
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final MongoClusterConfig config, final ProductOperation po ) {
-        return new MongoDbSetupStrategy( po, agentManager, this, commandRunner, containerManager, config );
+        return new MongoDbSetupStrategy( config, po, this );
     }
 }

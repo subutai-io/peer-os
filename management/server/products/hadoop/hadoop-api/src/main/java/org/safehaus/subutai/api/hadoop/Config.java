@@ -27,7 +27,7 @@ public class Config implements ConfigBase {
 
 
     public Config() {
-        domainName = "intra.lan";
+        domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<Agent>();
         taskTrackers = new ArrayList<Agent>();
         blockedAgents = new HashSet<Agent>();

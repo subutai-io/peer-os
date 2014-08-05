@@ -26,4 +26,5 @@ public class Common {
     public static final String TMP_DEB_PACKAGE_UNPACK_PATH = "/tmp";
     public static final String DEFAULT_LXC_ARCH = "amd64";
     public static final String PACKAGE_PREFIX = "ksks-";
+    public static final String DEFAULT_DOMAIN_NAME = "intra.lan";
 }

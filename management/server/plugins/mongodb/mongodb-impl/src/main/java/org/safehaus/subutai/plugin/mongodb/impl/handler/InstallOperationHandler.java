@@ -12,7 +12,7 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 /**
- * Created by dilshat on 7/21/14.
+ * Handles install mongo cluster operation
  */
 public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
 
@@ -36,6 +36,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     @Override
     public void run() {
+
+        po.addLog( String.format( "Setting up %s Mongo cluster", config.getClusterName() ) );
+
         ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {

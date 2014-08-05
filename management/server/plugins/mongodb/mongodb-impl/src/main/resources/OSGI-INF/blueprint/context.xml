@@ -11,6 +11,8 @@
              interface="org.safehaus.subutai.api.tracker.Tracker" />
   <reference id="containerManager" availability="mandatory"
              interface="org.safehaus.subutai.api.container.ContainerManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
   <bean id="mongo-impl" scope="singleton" class="org.safehaus.subutai.plugin.mongodb.impl.MongoImpl"
         init-method="init" destroy-method="destroy">
@@ -19,6 +21,7 @@
     <argument ref="dbManager" />
     <argument ref="tracker" />
     <argument ref="containerManager" />
+    <argument ref="environmentManager" />
   </bean>
 
   <service ref="mongo-impl" interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />

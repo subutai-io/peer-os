@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
 /**
- * Created by dilshat on 7/23/14.
+ * ZK config params
  */
 public enum ConfigParams {
     DATA_DIR( "dataDir", "/var/zookeeper" ), SERVERS( "servers", null ), PORTS( null, ":2888:3888 " ),

@@ -13,7 +13,7 @@ import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import java.util.UUID;
 
 /**
- * Created by dilshat on 5/7/14.
+ * Handles stop node operation
  */
 public class StopNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;

@@ -1,20 +1,22 @@
 package org.safehaus.subutai.plugin.hadoop.api;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
  * Created by daralbaev on 02.04.14.
  */
 public class HadoopClusterConfig implements ConfigBase {
-    private String templateName = "hadoop";
+    public static final String DEFAULT_HADOOP_TEMPLATE = "hadoop";
+    private String templateName = DEFAULT_HADOOP_TEMPLATE;
     public static final String PRODUCT_KEY = "Hadoop2";
     public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
 
@@ -26,7 +28,7 @@ public class HadoopClusterConfig implements ConfigBase {
 
 
     public HadoopClusterConfig() {
-        domainName = "intra.lan";
+        domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
         blockedAgents = new HashSet<>();
