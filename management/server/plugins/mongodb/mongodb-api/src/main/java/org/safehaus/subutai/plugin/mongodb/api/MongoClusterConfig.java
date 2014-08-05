@@ -38,9 +38,15 @@ public class MongoClusterConfig implements ConfigBase {
 
     public Set<Agent> getAllNodes() {
         Set<Agent> nodes = new HashSet<>();
-        nodes.addAll( configServers );
-        nodes.addAll( dataNodes );
-        nodes.addAll( routerServers );
+        if ( configServers != null ) {
+            nodes.addAll( configServers );
+        }
+        if ( dataNodes != null ) {
+            nodes.addAll( dataNodes );
+        }
+        if ( routerServers != null ) {
+            nodes.addAll( routerServers );
+        }
 
         return nodes;
     }
