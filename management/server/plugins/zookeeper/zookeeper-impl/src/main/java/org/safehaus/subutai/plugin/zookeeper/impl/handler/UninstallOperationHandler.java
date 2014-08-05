@@ -15,7 +15,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
- * Created by dilshat on 5/7/14.
+ * Handles uninstall cluster operation
  */
 public class UninstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;
@@ -62,7 +62,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
                 po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
             }
         }
-        else if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+        else if ( config.getSetupType() == SetupType.OVER_HADOOP || config.getSetupType() == SetupType.WITH_HADOOP ) {
             //just uninstall nodes
             po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 

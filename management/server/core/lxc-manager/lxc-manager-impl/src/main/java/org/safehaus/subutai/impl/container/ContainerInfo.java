@@ -1,22 +1,24 @@
 package org.safehaus.subutai.impl.container;
 
 
+import java.util.Set;
+
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
- * Created by dilshat on 7/23/14.
+ * Contains information for Completion service
  */
 public class ContainerInfo {
 
     private final Agent physicalAgent;
-    private final String lxcHostname;
+    private final Set<String> lxcHostnames;
     private boolean result;
 
 
-    public ContainerInfo( final Agent physicalAgent, final String lxcHostname ) {
+    public ContainerInfo( final Agent physicalAgent, final Set<String> lxcHostnames ) {
         this.physicalAgent = physicalAgent;
-        this.lxcHostname = lxcHostname;
+        this.lxcHostnames = lxcHostnames;
     }
 
 
@@ -30,8 +32,8 @@ public class ContainerInfo {
     }
 
 
-    public String getLxcHostname() {
-        return lxcHostname;
+    public Set<String> getLxcHostnames() {
+        return lxcHostnames;
     }
 
 

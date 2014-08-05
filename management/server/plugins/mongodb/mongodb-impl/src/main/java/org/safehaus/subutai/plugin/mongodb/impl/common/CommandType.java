@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.mongodb.impl.common;
 
 /**
  *
- * @author dilshat
+ * Contains mongo control command types
  */
 public enum CommandType {
 

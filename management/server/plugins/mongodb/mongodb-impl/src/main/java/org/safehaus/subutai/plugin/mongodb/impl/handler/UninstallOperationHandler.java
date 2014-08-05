@@ -8,11 +8,10 @@ import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles uninstall mongo cluster operation
  */
 public class UninstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
@@ -41,9 +40,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
 
         po.addLog( "Destroying lxc containers" );
         try {
-            for ( Agent agent : config.getAllNodes() ) {
-                manager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
-            }
+            manager.getContainerManager().clonesDestroy( config.getAllNodes() );
             po.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex ) {

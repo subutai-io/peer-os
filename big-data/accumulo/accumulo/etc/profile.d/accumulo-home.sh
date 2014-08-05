@@ -1,4 +1,4 @@
-accumuloHome="/opt/accumulo-1.6.0"
+accumuloHome="/opt/accumulo-1.4.2"
 export ACCUMULO_HOME=$accumuloHome
 
 path_content=$(echo $PATH)

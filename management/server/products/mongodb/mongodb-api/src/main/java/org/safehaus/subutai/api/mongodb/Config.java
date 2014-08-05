@@ -7,6 +7,7 @@ package org.safehaus.subutai.api.mongodb;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,7 @@ public class Config implements ConfigBase {
     public static final String PRODUCT_KEY = "MongoDB";
     private String clusterName = "";
     private String replicaSetName = "repl";
-    private String domainName = "intra.lan";
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private int numberOfConfigServers = 3;
     private int numberOfRouters = 2;
     private int numberOfDataNodes = 3;
@@ -32,7 +33,7 @@ public class Config implements ConfigBase {
     private Set<Agent> dataNodes;
 
     public Set<Agent> getAllNodes() {
-        Set<Agent> nodes = new HashSet<Agent>();
+        Set<Agent> nodes = new HashSet<>();
         nodes.addAll(configServers);
         nodes.addAll(dataNodes);
         nodes.addAll(routerServers);

@@ -10,12 +10,15 @@
              interface="org.safehaus.subutai.api.container.ContainerManager" />
   <reference id="templateRegistryManager" availability="mandatory"
              interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
+  <reference id="networkManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.networkmanager.NetworkManager" />
 
   <bean id="environmentManager" scope="singleton" class="org.safehaus.subutai.impl.manager.EnvironmentManagerImpl">
     <argument ref="containerManager" />
     <argument ref="templateRegistryManager" />
     <argument ref="dbManager" />
     <argument ref="agentManager" />
+    <argument ref="networkManager" />
   </bean>
 
 </blueprint>

@@ -2,7 +2,7 @@
 set -e
 FilePath="/etc/profile"
 
-accumuloVersion=1.6.0
+accumuloVersion=1.4.2
 accumuloHome="/opt/accumulo-$accumuloVersion"
 accumuloConf="/etc/accumulo"
 
@@ -48,7 +48,7 @@ fi
 
 if [ "x$ACCUMULO_LOG_DIR" = "x" ];
 then
-        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR /opt/accumulo-1.4.2/log 
+        $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $accumuloHome/log
 else
         $accumuloHome/bin/accumulo-property.sh ACCUMULO_LOG_DIR $ACCUMULO_LOG_DIR
 fi

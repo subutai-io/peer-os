@@ -4,12 +4,12 @@ package org.safehaus.subutai.impl.manager.dao;
 import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 
 
 /**
- * Created by bahadyr on 6/24/14.
+ * Environment Manager DAO
  */
 public class EnvironmentDAO {
 
@@ -23,14 +23,12 @@ public class EnvironmentDAO {
 
 
     public List<Environment> getEnvironments() {
-        List<Environment> environments = dbManager.getEnvironmentInfo( source, Environment.class );
-        return environments;
+        return dbManager.getEnvironmentInfo( source, Environment.class );
     }
 
 
     public Environment getEnvironment( final String environmentName ) {
-        Environment environment = dbManager.getEnvironmentInfo( source, environmentName, Environment.class );
-        return environment;
+        return dbManager.getEnvironmentInfo( source, environmentName, Environment.class );
     }
 
 
@@ -49,8 +47,7 @@ public class EnvironmentDAO {
 
 
     public List<EnvironmentBlueprint> getBlueprints() {
-        List<EnvironmentBlueprint> blueprints = dbManager.getEnvironmentInfo( "BLUEPRINT", EnvironmentBlueprint.class );
-        return blueprints;
+        return dbManager.getEnvironmentInfo( "BLUEPRINT", EnvironmentBlueprint.class );
     }
 
 

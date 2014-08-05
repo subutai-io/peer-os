@@ -3,9 +3,11 @@ package org.safehaus.subutai.api.manager.helper;
 
 import java.util.Set;
 
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 
 /**
- * Created by bahadyr on 6/24/14.
+ * Node Group class
  */
 public class NodeGroup {
 
@@ -15,7 +17,18 @@ public class NodeGroup {
     private PlacementStrategy placementStrategy;
     private boolean linkHosts;
     private boolean exchangeSshKeys;
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private Set<String> physicalNodes;
+
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+
+    public void setDomainName( final String domainName ) {
+        this.domainName = domainName;
+    }
 
 
     public String getName() {
