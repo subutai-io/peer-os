@@ -1,8 +1,6 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-
 import com.google.gson.JsonObject;
 
 
@@ -11,13 +9,13 @@ import com.google.gson.JsonObject;
  */
 public class PlainConfigurationLoader implements ConfigurationLoader {
     @Override
-    public JsonObject getConfiguration( final Agent agent, final String configPathFilename ) {
+    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
         return null;
     }
 
 
     @Override
-    public boolean setConfiguration( final Agent agent, final String configFilePath, final String jsonObjectConfig ) {
+    public boolean setConfiguration( String hostname, String configFilePath, String jsonObjectConfig ) {
         return false;
     }
 }

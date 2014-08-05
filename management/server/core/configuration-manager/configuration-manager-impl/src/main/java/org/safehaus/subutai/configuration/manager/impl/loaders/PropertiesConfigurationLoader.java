@@ -9,7 +9,6 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigBuilder;
 import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -26,13 +25,21 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
     //    String filename = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/log4j.properties";
 
+//    private Agent agent;
+//
+//    public PropertiesConfigurationLoader(Agent agent) {
+//        this.agent = agent;
+//    }
 
     // Maps configuration into Config object
     @Override
-    public JsonObject getConfiguration( Agent agent, String configPathFilename ) {
+    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
-        String content = configurationInjector.catFile( agent, configPathFilename );
+//        Agent agent = null;
+//        Agent agent = agentManager.getAgentByHostname( hostname );
+
+        String content = configurationInjector.catFile( hostname, configPathFilename );
 
         try {
             IniParser iniParser = null;
@@ -62,11 +69,14 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public boolean setConfiguration( final Agent agent, String configFilePath, String jsonObjectConfig ) {
+    public boolean setConfiguration( final String hostname, String configFilePath, String jsonObjectConfig ) {
         //TODO Read config from instance, set values from Config, inject Config
         //        JsonObject jsonObject = getConfiguration( agent, "" );
+
+//        Agent agent = null;
+
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
-        String content = configurationInjector.catFile( agent, configFilePath );
+        String content = configurationInjector.catFile( hostname, configFilePath );
         Gson gson = new Gson();
 
         try {
@@ -80,7 +90,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
                 iniParser.setProperty( fieldName, value );
             }
 
-            configurationInjector.echoTextIntoAgent( agent, configFilePath, content );
+            configurationInjector.echoTextIntoAgent( hostname, configFilePath, content );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();

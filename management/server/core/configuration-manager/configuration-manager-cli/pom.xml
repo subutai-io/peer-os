@@ -60,10 +60,10 @@
       <artifactId>org.apache.servicemix.bundles.junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>agent-manager-api</artifactId>
-    </dependency>
+    </dependency>-->
   </dependencies>
 
   <build>
