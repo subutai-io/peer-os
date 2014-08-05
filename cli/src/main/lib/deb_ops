@@ -193,13 +193,13 @@ function create_prerm_script {
   local prerm_file=$debian_dir/DEBIAN/prerm
   echo "#!/bin/bash"  >> $prerm_file
   echo ""  >> $prerm_file
-  echo "export APT_GET_INVOCATION=true" >> $prerm_file
+  #echo "export APT_GET_INVOCATION=true" >> $prerm_file
   # Check if the template is master
-  if [ $lxc != "master" ]; then
-    echo "subutai destroy $lxc" >> $prerm_file
-  else
-    echo "subutai master_destroy" >> $prerm_file
-  fi
+  #if [ $lxc != "master" ]; then
+  #  echo "subutai destroy $lxc" >> $prerm_file
+  #else
+  #  echo "subutai master_destroy" >> $prerm_file
+  #fi
   chmod 755 $prerm_file
 }
 

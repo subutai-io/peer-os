@@ -19,9 +19,9 @@ function destroy {
 
   # Destruction Plan:
   # ----------------------------------------------------------------------------
-  # (1) Remove the debian package if installed
-  # (2) check that clone exists first, and find its parent
-  # (3) check if the clone has dependent child and abort if so
+  # (1) check that clone exists first, and find its parent
+  # (2) check if the clone has dependent child and abort if so
+  # (3) Remove the debian package if installed
   # (4) release all holds on clone's rootfs snapshots
   # (5) destroy all snapshots on clones's rootfs
   # (6) lxc-destroy the clone
@@ -29,33 +29,15 @@ function destroy {
   # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   # ----------------------------------------------------------------------------
 
-  # (1) Remove the debian package if installed
-  local container=$clone
-  local package_name=`get_package_name $container`
-
-  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
-  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    msg_info "subutai destroy called from command line"
-  
-  # Check if the package is installed
-  is_package_installed $package_name
-  if [ $? = 0  ]; then
-      apt-get --assume-yes --force-yes purge $package_name
-      exit $?
-    fi
-  else
-    msg_info "subutai destroy called while removing template via package-manager"
-  fi
-
-  # (2) check that clone exists first: turn off if on
+  # (1) check that clone exists first: turn off if on
   lxc_assert "$clone" "`usage`"
   lxc_stop $clone
 
-  # (2) let's get the clone's parent
+  # (1) let's get the clone's parent
   parent_snap=`zfs get origin "lxc/$clone" -o value -H`
   parent=`zfs_ctnr_from_ds $parent_snap`
 
-  # (3) check if the clone has dependent children
+  # (2) check if the clone has dependent children
   # TODO: add a -r switch option to allow recursive destruction of children
   msg_info "    - checking if \"$clone\" has dependent children ..."
   zfs_get_children $clone
@@ -64,6 +46,16 @@ function destroy {
   if [ $child_count -gt 0 ]; then
     msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
     exit 1
+  fi
+
+  # (3) Remove the debian package if installed
+  local container=$clone
+  local package_name=`get_package_name $container`
+  
+  # Check if the package is installed
+  is_package_installed $package_name
+  if [ $? = 0  ]; then
+    apt-get --assume-yes --force-yes purge $package_name
   fi
 
   # (4) & (5) release all holds on clone's rootfs snaps and delete snaps
