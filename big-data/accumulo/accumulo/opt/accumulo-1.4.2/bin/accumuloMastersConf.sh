@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumuloVer="1.6.0"
+accumuloVer="1.4.2"
 
 function usage()
 {

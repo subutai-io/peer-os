@@ -9,7 +9,7 @@ downloadFileAndMakeChanges() {
 	tempDirectory=$BASE/$fileName/opt
 	confDirectory=$BASE/$fileName/etc/accumulo
 
-	accumuloVersion=1.6.0
+	accumuloVersion=1.4.2
 
 	# Create directories that are required for the debian package
     mkdir -p $tempDirectory

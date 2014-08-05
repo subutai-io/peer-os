@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-accumulo=accumulo-1.6.0
+accumulo=accumulo-1.4.2
 
 usage()
 {
