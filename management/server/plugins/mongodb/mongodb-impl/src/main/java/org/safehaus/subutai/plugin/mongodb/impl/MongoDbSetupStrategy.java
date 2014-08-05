@@ -111,7 +111,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                             config.getClusterName() ) );
         }
         //if no nodes are set, setup default environment
-        if ( config.getAllNodes() == null || config.getAllNodes().isEmpty() ) {
+        if ( config.getAllNodes().isEmpty() ) {
             try {
 
                 po.addLog( "Building environment..." );
