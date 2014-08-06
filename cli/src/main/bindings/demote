@@ -38,8 +38,7 @@ function demote {
   if [ "$child_count" -gt 0 ]; then
     msg_error "Template \"$temp\" cannot be demoted with $child_count children."
     exit 1
-  # TODO: false for testing - must set to true
-  elif [ "false" == "`is_registered $temp`" ]; then
+  elif [ "true" == "`is_registered $temp`" ]; then
     msg_error "Cannot demote registered template \"$temp\""
     exit 1
   else
