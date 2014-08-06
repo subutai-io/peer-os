@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -11,10 +10,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -22,10 +18,10 @@ import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -51,26 +47,6 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private EnvironmentBlueprint getDefaultEnvironmentBlueprint() {
-
-
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
-
-        //node group
-        NodeGroup nodesGroup = new NodeGroup();
-        nodesGroup.setName( "DEFAULT" );
-        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
-        nodesGroup.setTemplateName( config.getTemplateName() );
-        nodesGroup.setPlacementStrategy( getNodePlacementStrategy() );
-
-
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
-
-        return environmentBlueprint;
-    }
-
-
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
 
@@ -80,8 +56,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                 //setup environment
                 po.addLog( "Building environment..." );
                 try {
-                    Environment env = zookeeperManager.getEnvironmentManager()
-                                                      .buildEnvironmentAndReturn( getDefaultEnvironmentBlueprint() );
+                    Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                            zookeeperManager.getDefaultEnvironmentBlueprint( config ) );
 
                     Set<Agent> zkAgents = new HashSet<>();
                     for ( Node node : env.getNodes() ) {

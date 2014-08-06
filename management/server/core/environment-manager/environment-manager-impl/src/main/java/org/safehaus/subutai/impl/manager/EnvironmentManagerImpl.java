@@ -15,7 +15,7 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;

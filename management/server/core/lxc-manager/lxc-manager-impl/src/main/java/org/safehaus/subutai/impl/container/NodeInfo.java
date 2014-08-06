@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.container;
 
 import java.util.*;
 
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 
 class NodeInfo {

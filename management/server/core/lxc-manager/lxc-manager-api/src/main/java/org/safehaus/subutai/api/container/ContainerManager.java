@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 

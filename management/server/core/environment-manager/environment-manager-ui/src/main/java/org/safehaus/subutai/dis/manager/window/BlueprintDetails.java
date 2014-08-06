@@ -2,7 +2,7 @@ package org.safehaus.subutai.dis.manager.window;
 
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 import com.vaadin.ui.TextArea;
 

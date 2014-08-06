@@ -32,7 +32,7 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
