@@ -32,11 +32,21 @@ public class AccumuloClusterConfig implements ConfigBase {
     public Set<Agent> getAllNodes() {
         Set<Agent> allNodes = new HashSet<>();
 
-        allNodes.add( masterNode );
-        allNodes.add( gcNode );
-        allNodes.add( monitor );
-        allNodes.addAll( tracers );
-        allNodes.addAll( slaves );
+        if ( masterNode != null ) {
+            allNodes.add( masterNode );
+        }
+        if ( gcNode != null ) {
+            allNodes.add( gcNode );
+        }
+        if ( monitor != null ) {
+            allNodes.add( monitor );
+        }
+        if ( tracers != null ) {
+            allNodes.addAll( tracers );
+        }
+        if ( slaves != null ) {
+            allNodes.addAll( slaves );
+        }
 
         return allNodes;
     }

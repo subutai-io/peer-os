@@ -15,12 +15,12 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.util.BlueprintParser;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Strings;
 
@@ -65,6 +65,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public Environment buildEnvironmentAndReturn( final EnvironmentBlueprint blueprint )
             throws EnvironmentBuildException {
+
         return environmentBuilder.build( blueprint, containerManager );
     }
 
