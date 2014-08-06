@@ -11,17 +11,17 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
 
 import com.google.common.base.Strings;
@@ -51,7 +51,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private EnvironmentBlueprint getDefaultEnvironmentBlueprint() {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
 
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
@@ -80,8 +80,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                 //setup environment
                 po.addLog( "Building environment..." );
                 try {
-                    Environment env = zookeeperManager.getEnvironmentManager()
-                                                      .buildEnvironmentAndReturn( getDefaultEnvironmentBlueprint() );
+                    Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                            getDefaultEnvironmentBlueprint( config ) );
 
                     Set<Agent> zkAgents = new HashSet<>();
                     for ( Node node : env.getNodes() ) {

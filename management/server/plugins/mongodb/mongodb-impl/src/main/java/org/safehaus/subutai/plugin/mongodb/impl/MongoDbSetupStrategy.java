@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.mongodb.impl;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -12,10 +11,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
@@ -24,11 +20,10 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 /**
@@ -67,39 +62,6 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private EnvironmentBlueprint getDefaultEnvironmentBlueprint() {
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
-        environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-
-        //config servers
-        NodeGroup cfgServersGroup = new NodeGroup();
-        cfgServersGroup.setName( NodeType.CONFIG_NODE.name() );
-        cfgServersGroup.setNumberOfNodes( config.getNumberOfConfigServers() );
-        cfgServersGroup.setTemplateName( config.getTemplateName() );
-        cfgServersGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.CONFIG_NODE ) );
-
-        //routers
-        NodeGroup routersGroup = new NodeGroup();
-        routersGroup.setName( NodeType.ROUTER_NODE.name() );
-        routersGroup.setNumberOfNodes( config.getNumberOfRouters() );
-        routersGroup.setTemplateName( config.getTemplateName() );
-        routersGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.ROUTER_NODE ) );
-
-        //data nodes
-        NodeGroup dataNodesGroup = new NodeGroup();
-        dataNodesGroup.setName( NodeType.DATA_NODE.name() );
-        dataNodesGroup.setNumberOfNodes( config.getNumberOfDataNodes() );
-        dataNodesGroup.setTemplateName( config.getTemplateName() );
-        dataNodesGroup.setPlacementStrategy( getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
-
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
-
-        return environmentBlueprint;
-    }
-
-
     @Override
     public MongoClusterConfig setup() throws ClusterSetupException {
 
@@ -116,8 +78,8 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
                 po.addLog( "Building environment..." );
 
-                Environment env = mongoManager.getEnvironmentManager()
-                                              .buildEnvironmentAndReturn( getDefaultEnvironmentBlueprint() );
+                Environment env = mongoManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                        mongoManager.getDefaultEnvironmentBlueprint( config ) );
 
                 Set<Agent> configServers = new HashSet<>();
                 Set<Agent> routers = new HashSet<>();

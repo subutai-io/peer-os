@@ -76,7 +76,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
 
         //update settings
         po.addLog("Updating settings...");
-        Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+        Command updateSettingsCommand = Commands.getUpdateSettingsCommand( config.getNodes());
         manager.getCommandRunner().runCommand(updateSettingsCommand);
 
         if (updateSettingsCommand.hasSucceeded()) {

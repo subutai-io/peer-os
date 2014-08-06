@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.manager.helper;
+package org.safehaus.subutai.shared.protocol;
 
 
 import java.util.Set;

@@ -114,7 +114,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
                 po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                 //update settings
-                Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getNodes());
                 manager.getCommandRunner().runCommand(updateSettingsCommand);
 
                 if (updateSettingsCommand.hasSucceeded()) {
@@ -179,7 +179,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
                     po.addLog("Cluster info updated in DB\nUpdating settings...");
 
                     //update settings
-                    Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                    Command updateSettingsCommand = Commands.getUpdateSettingsCommand( config.getNodes());
                     manager.getCommandRunner().runCommand(updateSettingsCommand);
 
                     if (updateSettingsCommand.hasSucceeded()) {

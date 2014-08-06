@@ -5,7 +5,6 @@ import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 
 /**
@@ -30,7 +29,7 @@ public class AccumuloSetupStrategy implements ClusterSetupStrategy {
      * 2) Configure Accumulo Cluster using ZookeeperClusterConfig and HadoopClusterConfig
      */
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public AccumuloClusterConfig setup() throws ClusterSetupException {
         return null;
     }
 }

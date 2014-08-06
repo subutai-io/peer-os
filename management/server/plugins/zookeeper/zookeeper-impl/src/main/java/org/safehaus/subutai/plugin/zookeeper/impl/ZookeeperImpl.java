@@ -204,7 +204,7 @@ public class ZookeeperImpl implements Zookeeper {
             return new ZookeeperStandaloneSetupStrategy( config, po, this );
         }
         else {
-            //this is an over-Hadoop ZK cluster setup  or with-Hadoop cluster setup
+            //this is an over-Hadoop ZK cluster setup
             return new ZookeeperOverHadoopSetupStrategy( config, po, this );
         }
     }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 
 /**

@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.manager.util;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
