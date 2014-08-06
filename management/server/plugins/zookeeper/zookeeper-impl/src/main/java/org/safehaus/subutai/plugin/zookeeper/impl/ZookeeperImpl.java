@@ -29,6 +29,10 @@ import org.safehaus.subutai.plugin.zookeeper.impl.handler.UninstallOperationHand
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+
+import com.google.common.collect.Sets;
 
 
 public class ZookeeperImpl implements Zookeeper {
@@ -204,7 +208,7 @@ public class ZookeeperImpl implements Zookeeper {
             return new ZookeeperStandaloneSetupStrategy( config, po, this );
         }
         else {
-            //this is an over-Hadoop ZK cluster setup  or with-Hadoop cluster setup
+            //this is an over-Hadoop ZK cluster setup
             return new ZookeeperOverHadoopSetupStrategy( config, po, this );
         }
     }
@@ -248,5 +252,25 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ZookeeperClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
+    }
+
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
+
+
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+
+        //node group
+        NodeGroup nodesGroup = new NodeGroup();
+        nodesGroup.setName( "DEFAULT" );
+        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodesGroup.setTemplateName( config.getTemplateName() );
+        nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+
+        return environmentBlueprint;
     }
 }

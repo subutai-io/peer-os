@@ -31,8 +31,12 @@ import org.safehaus.subutai.plugin.mongodb.impl.handler.UninstallOperationHandle
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -189,5 +193,41 @@ public class MongoImpl implements Mongo {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final MongoClusterConfig config, final ProductOperation po ) {
         return new MongoDbSetupStrategy( config, po, this );
+    }
+
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config ) {
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
+        //config servers
+        NodeGroup cfgServersGroup = new NodeGroup();
+        cfgServersGroup.setName( NodeType.CONFIG_NODE.name() );
+        cfgServersGroup.setNumberOfNodes( config.getNumberOfConfigServers() );
+        cfgServersGroup.setTemplateName( config.getTemplateName() );
+        cfgServersGroup.setPlacementStrategy(
+                MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.CONFIG_NODE ) );
+
+        //routers
+        NodeGroup routersGroup = new NodeGroup();
+        routersGroup.setName( NodeType.ROUTER_NODE.name() );
+        routersGroup.setNumberOfNodes( config.getNumberOfRouters() );
+        routersGroup.setTemplateName( config.getTemplateName() );
+        routersGroup.setPlacementStrategy(
+                MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.ROUTER_NODE ) );
+
+        //data nodes
+        NodeGroup dataNodesGroup = new NodeGroup();
+        dataNodesGroup.setName( NodeType.DATA_NODE.name() );
+        dataNodesGroup.setNumberOfNodes( config.getNumberOfDataNodes() );
+        dataNodesGroup.setTemplateName( config.getTemplateName() );
+        dataNodesGroup
+                .setPlacementStrategy( MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
+
+        return environmentBlueprint;
     }
 }

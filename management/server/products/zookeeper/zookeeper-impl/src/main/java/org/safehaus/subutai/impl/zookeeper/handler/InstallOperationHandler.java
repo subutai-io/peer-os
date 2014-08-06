@@ -38,8 +38,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
     @Override
     public void run() {
-        if (Strings.isNullOrEmpty(config.getZkName())
-                || Strings.isNullOrEmpty(config.getClusterName())
+        if (Strings.isNullOrEmpty(config.getClusterName())
                 //either number of nodes to create or hadoop cluster nodes must be present
                 || (config.isStandalone() && config.getNumberOfNodes() <= 0)
                 || (!config.isStandalone() && Util.isCollectionEmpty(config.getNodes()))) {
@@ -125,7 +124,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                 po.addLog("Installation succeeded\nUpdating settings...");
 
                 //update settings
-                Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getNodes());
                 manager.getCommandRunner().runCommand(updateSettingsCommand);
 
                 if (updateSettingsCommand.hasSucceeded()) {
@@ -189,7 +188,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
                     po.addLog("Installation succeeded\nUpdating settings...");
 
                     //update settings
-                    Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getZkName(), config.getNodes());
+                    Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getNodes());
                     manager.getCommandRunner().runCommand(updateSettingsCommand);
 
                     if (updateSettingsCommand.hasSucceeded()) {

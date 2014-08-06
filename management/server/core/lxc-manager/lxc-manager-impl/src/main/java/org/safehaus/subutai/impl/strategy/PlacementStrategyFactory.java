@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.strategy;
 import java.util.EnumSet;
 import java.util.Set;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 
 public class PlacementStrategyFactory {

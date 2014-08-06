@@ -4,7 +4,6 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -12,10 +11,8 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.manager.helper.NodeGroup;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -25,7 +22,6 @@ import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.collect.Lists;
 
@@ -36,7 +32,6 @@ import com.google.common.collect.Lists;
 public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
     public static final String COMBO_TEMPLATE_NAME = "zknhadoop";
-    private final static int HADOOP_MASTER_NODES_QUANTITY = 3;
 
     private final HadoopClusterConfig hadoopClusterConfig;
     private final ZookeeperClusterConfig zookeeperClusterConfig;
@@ -57,6 +52,7 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
+        int HADOOP_MASTER_NODES_QUANTITY = Hadoop.DEFAULT_HADOOP_MASTER_NODES_QUANTITY;
 
         int totalHadoopNodesCount = HADOOP_MASTER_NODES_QUANTITY + hadoopClusterConfig.getCountOfSlaveNodes();
         if ( zookeeperClusterConfig.getNumberOfNodes() > totalHadoopNodesCount ) {
@@ -66,8 +62,10 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
         //setup environment
         po.addLog( "Building environment..." );
         try {
-            Environment env = zookeeperManager.getEnvironmentManager()
-                                              .buildEnvironmentAndReturn( getDefaultHadoopEnvironmentBlueprint() );
+            hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
+
+            Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
+                    zookeeperManager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
 
             Set<Agent> masterNodes = new HashSet<>();
             Set<Agent> slaveNodes = new HashSet<>();
@@ -106,7 +104,6 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
             //setup Hadoop cluster
             ClusterSetupStrategy hadoopSetupStrategy =
                     zookeeperManager.getHadoopManager().getClusterSetupStrategy( po, hadoopClusterConfig );
-
 
             hadoopSetupStrategy.setup();
 
@@ -195,39 +192,5 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
 
         return zookeeperClusterConfig;
-    }
-
-
-    private EnvironmentBlueprint getDefaultHadoopEnvironmentBlueprint() {
-
-
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
-        environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setExchangeSshKeys( true );
-        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-        Set<NodeGroup> nodeGroups = new HashSet<>();
-
-
-        //hadoop master nodes
-        NodeGroup mastersGroup = new NodeGroup();
-        mastersGroup.setName( NodeType.MASTER_NODE.name() );
-        mastersGroup.setNumberOfNodes( HADOOP_MASTER_NODES_QUANTITY );
-        mastersGroup.setTemplateName( ZookeeperWithHadoopSetupStrategy.COMBO_TEMPLATE_NAME );
-        mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        nodeGroups.add( mastersGroup );
-
-        //hadoop slave nodes
-        NodeGroup slavesGroup = new NodeGroup();
-        slavesGroup.setName( NodeType.SLAVE_NODE.name() );
-        slavesGroup.setNumberOfNodes( hadoopClusterConfig.getCountOfSlaveNodes() );
-        slavesGroup.setTemplateName( ZookeeperWithHadoopSetupStrategy.COMBO_TEMPLATE_NAME );
-        slavesGroup.setPlacementStrategy( PlacementStrategy.MORE_HDD );
-        nodeGroups.add( slavesGroup );
-
-
-        environmentBlueprint.setNodeGroups( nodeGroups );
-
-        return environmentBlueprint;
     }
 }
