@@ -3,13 +3,13 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
@@ -63,7 +63,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
-        if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() ) == null ) {
+        if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() )
+                == null ) {
             po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
@@ -126,8 +127,9 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
             }
 
             po.addLog( "Updating db..." );
-            if ( manager.getDbManager().saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
-                    accumuloClusterConfig ) ) {
+            if ( manager.getDbManager()
+                        .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
+                                accumuloClusterConfig ) ) {
                 po.addLogDone( "Cluster info updated\nDone" );
             }
             else {

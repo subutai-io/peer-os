@@ -15,6 +15,7 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Strings;
 
@@ -43,6 +44,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
     }
 
 
+    //TODO if the node has hadoop zk and accumulo just reconfigure the cluster
+    //else if the node has hadoop and zk , install accumulo and reconfigure the cluster
+    //otherwise fail
     @Override
     public void run() {
         if ( Strings.isNullOrEmpty( clusterName ) || Strings.isNullOrEmpty( lxcHostname ) || nodeType == null ) {
@@ -85,18 +89,18 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
         AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
 
-        if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
+        if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation. Installation aborted",
                     lxcAgent.getHostname() ) );
             return;
         }
-        else if ( !result.getStdOut().contains( "ksks-zookeeper" ) ) {
+        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed( String.format( "Node %s has no Zookeeper installation. Installation aborted",
                     lxcAgent.getHostname() ) );
             return;
         }
 
-        boolean install = !result.getStdOut().contains( "ksks-accumulo" );
+        boolean install = !result.getStdOut().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME );
 
         HadoopClusterConfig hadoopConfig =
                 manager.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );

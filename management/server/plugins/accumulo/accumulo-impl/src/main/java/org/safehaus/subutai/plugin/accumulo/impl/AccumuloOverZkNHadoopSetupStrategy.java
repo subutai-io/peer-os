@@ -57,27 +57,33 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
                 .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || Util
                 .isCollectionEmpty( accumuloClusterConfig.getTracers() ) || Util
                 .isCollectionEmpty( accumuloClusterConfig.getSlaves() ) ) {
-            throw new ClusterSetupException( "Malformed configuration\nInstallation aborted" );
+            throw new ClusterSetupException( "Malformed configuration" );
         }
 
         if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null ) {
             throw new ClusterSetupException(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                            accumuloClusterConfig.getClusterName() ) );
+                    String.format( "Cluster with name '%s' already exists", accumuloClusterConfig.getClusterName() ) );
+        }
+
+        if ( accumuloManager.getHadoopManager().getCluster( hadoopClusterConfig.getClusterName() ) == null ) {
+            throw new ClusterSetupException(
+                    String.format( "Hadoop cluster with name '%s' not found", hadoopClusterConfig.getClusterName() ) );
+        }
+        if ( accumuloManager.getZkManager().getCluster( zookeeperClusterConfig.getClusterName() ) == null ) {
+            throw new ClusterSetupException(
+                    String.format( "ZK cluster with name '%s' not found", zookeeperClusterConfig.getClusterName() ) );
         }
 
 
         if ( !hadoopClusterConfig.getAllNodes().containsAll( accumuloClusterConfig.getAllNodes() ) ) {
-            throw new ClusterSetupException(
-                    String.format( "Not all supplied nodes belong to Hadoop cluster %s \nInstallation aborted",
-                            accumuloClusterConfig.getClusterName() ) );
+            throw new ClusterSetupException( String.format( "Not all supplied nodes belong to Hadoop cluster %s",
+                    hadoopClusterConfig.getClusterName() ) );
         }
 
 
         if ( !zookeeperClusterConfig.getNodes().containsAll( accumuloClusterConfig.getAllNodes() ) ) {
-            throw new ClusterSetupException(
-                    String.format( "Not all supplied nodes belong to Zookeeper cluster %s \nInstallation aborted",
-                            accumuloClusterConfig.getClusterName() ) );
+            throw new ClusterSetupException( String.format( "Not all supplied nodes belong to Zookeeper cluster %s",
+                    zookeeperClusterConfig.getClusterName() ) );
         }
 
 
@@ -88,8 +94,7 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
         accumuloManager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
-            throw new ClusterSetupException(
-                    "Failed to check presence of installed subutai packages\nInstallation aborted" );
+            throw new ClusterSetupException( "Failed to check presence of installed subutai packages" );
         }
 
         for ( Agent node : accumuloClusterConfig.getAllNodes() ) {
@@ -97,18 +102,15 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
 
             if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + AccumuloClusterConfig.PRODUCT_NAME ) ) {
                 throw new ClusterSetupException(
-                        String.format( "Node %s already has Accumulo installed. Installation aborted",
-                                node.getHostname() ) );
+                        String.format( "Node %s already has Accumulo installed", node.getHostname() ) );
             }
             else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
                 throw new ClusterSetupException(
-                        String.format( "Node %s has no Hadoop installation. Installation aborted",
-                                node.getHostname() ) );
+                        String.format( "Node %s has no Hadoop installation", node.getHostname() ) );
             }
             else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
                 throw new ClusterSetupException(
-                        String.format( "Node %s has no Zookeeper installation. Installation aborted",
-                                node.getHostname() ) );
+                        String.format( "Node %s has no Zookeeper installation", node.getHostname() ) );
             }
         }
 

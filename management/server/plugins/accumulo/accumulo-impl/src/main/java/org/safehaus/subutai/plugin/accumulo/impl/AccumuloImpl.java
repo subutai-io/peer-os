@@ -32,8 +32,6 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
-import com.google.common.base.Preconditions;
-
 
 public class AccumuloImpl implements Accumulo {
 
@@ -107,14 +105,8 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig ) {
-
-        Preconditions.checkNotNull( accumuloClusterConfig, "Configuration is null" );
-
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, accumuloClusterConfig );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
+        //not implemented since in our use-case Accumulo always needs ZK and Hadoop clusters and can not be standalone
+        return null;
     }
 
 
@@ -136,6 +128,19 @@ public class AccumuloImpl implements Accumulo {
 
     public AccumuloClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID installCluster( final ZookeeperClusterConfig zookeeperClusterConfig,
+                                final HadoopClusterConfig hadoopClusterConfig,
+                                final AccumuloClusterConfig accumuloClusterConfig ) {
+        AbstractOperationHandler operationHandler =
+                new InstallOperationHandler( this, accumuloClusterConfig, zookeeperClusterConfig, hadoopClusterConfig );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
     }
 
 

@@ -54,8 +54,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
-        if ( zookeeperClusterConfig == null ||
-                Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
+        if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
                 Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
                 zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
             po.addLogFailed( "Malformed configuration\nZookeeper installation aborted" );
@@ -118,6 +117,16 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                 else {
                     po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
                             startCommand.getAllErrors() ) );
+                }
+
+                po.addLog( "Saving cluster information to database..." );
+
+                if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
+                        zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
+                    po.addLog( "Cluster information saved to database" );
+                }
+                else {
+                    throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
                 }
             }
             else {

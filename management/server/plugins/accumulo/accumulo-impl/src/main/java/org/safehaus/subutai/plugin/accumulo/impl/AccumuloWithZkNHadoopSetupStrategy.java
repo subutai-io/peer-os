@@ -63,12 +63,12 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
                 Strings.isNullOrEmpty( accumuloClusterConfig.getClusterName() ) ||
                 Strings.isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
                 Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) ) {
-            po.addLogFailed( "Malformed configuration\nAccumulo installation aborted" );
+            po.addLogFailed( "Malformed configuration" );
         }
 
         if ( accumuloManager.getCluster( accumuloClusterConfig.getClusterName() ) != null ) {
             throw new ClusterSetupException(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                    String.format( "Cluster with name '%s' already exists",
                             accumuloClusterConfig.getClusterName() ) );
         }
 

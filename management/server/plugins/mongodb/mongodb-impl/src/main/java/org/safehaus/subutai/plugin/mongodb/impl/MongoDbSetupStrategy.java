@@ -143,6 +143,15 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
         installMongoCluster();
 
+        po.addLog( "Saving cluster information to database..." );
+
+        if ( mongoManager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+            po.addLog( "Cluster information saved to database" );
+        }
+        else {
+            throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
+        }
+
         return config;
     }
 

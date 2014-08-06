@@ -45,17 +45,15 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
-        if ( zookeeperClusterConfig == null ||
-                Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
+        if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
                 Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
                 zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
-            po.addLogFailed( "Malformed configuration\nZookeeper installation aborted" );
+            po.addLogFailed( "Malformed configuration" );
         }
 
         if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
             throw new ClusterSetupException(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                            zookeeperClusterConfig.getClusterName() ) );
+                    String.format( "Cluster with name '%s' already exists", zookeeperClusterConfig.getClusterName() ) );
         }
 
         po.addLog( "Installing over hadoop cluster nodes" );
@@ -97,8 +95,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
                                 node.getHostname() ) );
                 it.remove();
             }
-            else if ( !result.getStdOut()
-                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+            else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
                 po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();
@@ -107,7 +104,7 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
         //no nodes with Hadoop
         if ( zookeeperClusterConfig.getNodes().isEmpty() ) {
-            throw new ClusterSetupException( "No nodes eligible for installation. Operation aborted" );
+            throw new ClusterSetupException( "No nodes eligible for installation" );
         }
 
         po.addLog( String.format( "Installing Zookeeper on %s...", zookeeperClusterConfig.getNodes() ) );
@@ -151,17 +148,26 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
                 } );
 
                 if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
-                    po.addLog( String.format( "Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY ) );
+                    po.addLog( String.format( "Starting %s succeeded", ZookeeperClusterConfig.PRODUCT_KEY ) );
                 }
                 else {
                     po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
                             startCommand.getAllErrors() ) );
                 }
+
+                po.addLog( "Saving cluster information to database..." );
+
+                if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
+                        zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
+                    po.addLog( "Cluster information saved to database" );
+                }
+                else {
+                    throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
+                }
             }
             else {
-                throw new ClusterSetupException( String.format(
-                        "Failed to configure cluster, %s\nPlease configure cluster manually and restart it",
-                        configureClusterCommand.getAllErrors() ) );
+                throw new ClusterSetupException(
+                        String.format( "Failed to configure cluster, %s", configureClusterCommand.getAllErrors() ) );
             }
         }
         else {
