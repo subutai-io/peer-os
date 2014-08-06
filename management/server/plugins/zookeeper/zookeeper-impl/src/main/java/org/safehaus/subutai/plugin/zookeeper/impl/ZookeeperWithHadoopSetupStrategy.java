@@ -82,6 +82,8 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
         try {
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
 
+
+
             //this part should be moved to Hadoop plugin  --START
             Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
                     zookeeperManager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );

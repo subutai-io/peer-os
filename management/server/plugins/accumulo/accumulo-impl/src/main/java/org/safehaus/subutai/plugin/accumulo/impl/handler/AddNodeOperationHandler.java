@@ -47,6 +47,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
     //TODO if the node has hadoop zk and accumulo just reconfigure the cluster
     //else if the node has hadoop and zk , install accumulo and reconfigure the cluster
     //otherwise fail
+    //pass Hadoop and ZK cluster config here instead of using the same name for all the clusters
     @Override
     public void run() {
         if ( Strings.isNullOrEmpty( clusterName ) || Strings.isNullOrEmpty( lxcHostname ) || nodeType == null ) {
@@ -83,7 +84,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            po.addLogFailed( "Failed to check presence of installed subutai\nInstallation aborted" );
             return;
         }
 
