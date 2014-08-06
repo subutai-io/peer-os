@@ -6,15 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.api.NodeType;
+import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.AddPropertyOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.CheckNodeOperationHandler;
@@ -24,7 +24,13 @@ import org.safehaus.subutai.plugin.accumulo.impl.handler.RemovePropertyOperation
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 import com.google.common.base.Preconditions;
 
@@ -37,19 +43,26 @@ public class AccumuloImpl implements Accumulo {
     private Tracker tracker;
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
+    private EnvironmentManager environmentManager;
     private ExecutorService executor;
 
 
     public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                         Hadoop hadoopManager, Zookeeper zkManager ) {
+                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.hadoopManager = hadoopManager;
         this.zkManager = zkManager;
+        this.environmentManager = environmentManager;
 
         Commands.init( commandRunner );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
     }
 
 
@@ -199,5 +212,20 @@ public class AccumuloImpl implements Accumulo {
         executor.execute( operationHandler );
 
         return operationHandler.getTrackerId();
+    }
+
+
+    public ClusterSetupStrategy getClusterSetupStrategy( AccumuloClusterConfig accumuloClusterConfig,
+                                                         HadoopClusterConfig hadoopClusterConfig,
+                                                         ZookeeperClusterConfig zookeeperClusterConfig,
+                                                         ProductOperation po ) {
+        if ( accumuloClusterConfig.getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
+            return new AccumuloOverZkNHadoopSetupStrategy( po, accumuloClusterConfig, hadoopClusterConfig,
+                    zookeeperClusterConfig, this );
+        }
+        else {
+            return new AccumuloWithZkNHadoopSetupStrategy( po, accumuloClusterConfig, hadoopClusterConfig,
+                    zookeeperClusterConfig, this );
+        }
     }
 }

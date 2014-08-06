@@ -256,7 +256,7 @@ public class HadoopImpl implements Hadoop {
         //hadoop master nodes
         NodeGroup mastersGroup = new NodeGroup();
         mastersGroup.setName( NodeType.MASTER_NODE.name() );
-        mastersGroup.setNumberOfNodes( DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
+        mastersGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
         mastersGroup.setTemplateName( config.getTemplateName() );
         mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM );
         nodeGroups.add( mastersGroup );

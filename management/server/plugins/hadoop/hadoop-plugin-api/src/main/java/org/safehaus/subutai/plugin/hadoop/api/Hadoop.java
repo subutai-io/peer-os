@@ -15,8 +15,6 @@ import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
  */
 public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 
-    public static final int DEFAULT_HADOOP_MASTER_NODES_QUANTITY = 3;
-
     public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig );
 
     public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig );

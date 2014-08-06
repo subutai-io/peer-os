@@ -19,6 +19,8 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 public class AccumuloClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Accumulo2";
+    public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
+    public static final String PRODUCT_NAME = "accumulo";
     private String clusterName = "";
     private String instanceName = "";
     private String password = "";
@@ -27,6 +29,39 @@ public class AccumuloClusterConfig implements ConfigBase {
     private Agent monitor;
     private Set<Agent> tracers;
     private Set<Agent> slaves;
+    private int numberOfTracers = 1;
+    private int numberOfSlaves = 3;
+    private SetupType setupType;
+
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
+    }
+
+
+    public int getNumberOfTracers() {
+        return numberOfTracers;
+    }
+
+
+    public void setNumberOfTracers( final int numberOfTracers ) {
+        this.numberOfTracers = numberOfTracers;
+    }
+
+
+    public int getNumberOfSlaves() {
+        return numberOfSlaves;
+    }
+
+
+    public void setNumberOfSlaves( final int numberOfSlaves ) {
+        this.numberOfSlaves = numberOfSlaves;
+    }
 
 
     public Set<Agent> getAllNodes() {
@@ -114,7 +149,7 @@ public class AccumuloClusterConfig implements ConfigBase {
 
     @Override
     public String getProductName() {
-        return PRODUCT_KEY;
+        return PRODUCT_NAME;
     }
 
 
@@ -147,12 +182,14 @@ public class AccumuloClusterConfig implements ConfigBase {
         monitor = null;
         tracers = null;
         slaves = null;
+        numberOfTracers = 1;
+        numberOfSlaves = 3;
     }
 
 
     @Override
     public String toString() {
-        return "Config{" +
+        return "AccumuloClusterConfig{" +
                 "clusterName='" + clusterName + '\'' +
                 ", instanceName='" + instanceName + '\'' +
                 ", password='" + password + '\'' +
@@ -161,6 +198,9 @@ public class AccumuloClusterConfig implements ConfigBase {
                 ", monitor=" + monitor +
                 ", tracers=" + tracers +
                 ", slaves=" + slaves +
+                ", numberOfTracers=" + numberOfTracers +
+                ", numberOfSlaves=" + numberOfSlaves +
+                ", setupType=" + setupType +
                 '}';
     }
 }

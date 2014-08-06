@@ -17,6 +17,9 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 
 /**
  * ZK cluster setup strategy over an existing Hadoop cluster
@@ -30,6 +33,10 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
     public ZookeeperOverHadoopSetupStrategy( final ZookeeperClusterConfig zookeeperClusterConfig,
                                              final ProductOperation po, final ZookeeperImpl zookeeperManager ) {
+        Preconditions.checkNotNull( zookeeperClusterConfig, "Cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+        Preconditions.checkNotNull( zookeeperManager, "ZK manager is null" );
+
         this.zookeeperClusterConfig = zookeeperClusterConfig;
         this.po = po;
         this.zookeeperManager = zookeeperManager;
@@ -38,6 +45,18 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
+        if ( zookeeperClusterConfig == null ||
+                Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
+                Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
+                zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
+            po.addLogFailed( "Malformed configuration\nZookeeper installation aborted" );
+        }
+
+        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                            zookeeperClusterConfig.getClusterName() ) );
+        }
 
         po.addLog( "Installing over hadoop cluster nodes" );
 
@@ -72,14 +91,14 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
 
             AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + zookeeperClusterConfig.getTemplateName() ) ) {
+            if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
                 po.addLog(
                         String.format( "Node %s already has Zookeeper installed. Omitting this node from installation",
                                 node.getHostname() ) );
                 it.remove();
             }
             else if ( !result.getStdOut()
-                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.DEFAULT_HADOOP_TEMPLATE ) ) {
+                             .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
                 po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();
@@ -132,22 +151,11 @@ public class ZookeeperOverHadoopSetupStrategy implements ClusterSetupStrategy {
                 } );
 
                 if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
-                    po.addLog( String.format( "Starting %s succeeded\nSaving info to DB...",
-                            ZookeeperClusterConfig.PRODUCT_KEY ) );
-
-                    //save to db
-                    if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
-                            zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
-                        po.addLog( "Cluster info saved to DB" );
-                    }
-                    else {
-                        throw new ClusterSetupException( "Could not save cluster info to DB! Check logs" );
-                    }
+                    po.addLog( String.format( "Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY ) );
                 }
                 else {
-                    throw new ClusterSetupException(
-                            String.format( "Starting %s failed, %s", ZookeeperClusterConfig.PRODUCT_KEY,
-                                    startCommand.getAllErrors() ) );
+                    po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
+                            startCommand.getAllErrors() ) );
                 }
             }
             else {

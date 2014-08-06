@@ -18,7 +18,8 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 public class ZookeeperClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Zookeeper2";
-    private String templateName = "zookeeper";
+    public static final String PRODUCT_NAME = "zookeeper";
+    private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 3;
     private Set<Agent> nodes;
@@ -57,7 +58,7 @@ public class ZookeeperClusterConfig implements ConfigBase {
 
     @Override
     public String getProductName() {
-        return PRODUCT_KEY;
+        return PRODUCT_NAME;
     }
 
 
