@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ApiBase;
@@ -48,6 +49,9 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
     public UUID unblockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, HadoopClusterConfig hadoopClusterConfig );
+
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
+                                                         Environment environment );
 
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config );
 }
