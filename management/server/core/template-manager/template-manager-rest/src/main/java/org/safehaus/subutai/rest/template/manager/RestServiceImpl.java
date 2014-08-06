@@ -73,7 +73,7 @@ public class RestServiceImpl implements RestService {
 
         Agent mgmt = agentManager.getAgentByHostname(managementHostName);
         try {
-            //aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
+            aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
 
             Path p = Paths.get(configDir, "config");
             List<String> conf = aptRepoManager.readFileContents(mgmt,
