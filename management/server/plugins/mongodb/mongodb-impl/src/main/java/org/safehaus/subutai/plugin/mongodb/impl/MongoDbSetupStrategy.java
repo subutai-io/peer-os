@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.mongodb.impl;
 
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -37,14 +37,18 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     private MongoImpl mongoManager;
     private ProductOperation po;
     private MongoClusterConfig config;
+    private Environment environment;
 
 
-    public MongoDbSetupStrategy( MongoClusterConfig config, ProductOperation po, MongoImpl mongoManager ) {
+    public MongoDbSetupStrategy( Environment environment, MongoClusterConfig config, ProductOperation po,
+                                 MongoImpl mongoManager ) {
 
+        Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( config, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
         Preconditions.checkNotNull( mongoManager, "Mongo manager is null" );
 
+        this.environment = environment;
         this.mongoManager = mongoManager;
         this.po = po;
         this.config = config;
@@ -68,8 +72,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     @Override
     public MongoClusterConfig setup() throws ClusterSetupException {
 
-        if ( config == null ||
-                Strings.isNullOrEmpty( config.getClusterName() ) ||
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getDomainName() ) ||
                 Strings.isNullOrEmpty( config.getReplicaSetName() ) ||
                 Strings.isNullOrEmpty( config.getTemplateName() ) ||
@@ -79,69 +82,88 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                 !Range.closed( 1024, 65535 ).contains( config.getCfgSrvPort() ) ||
                 !Range.closed( 1024, 65535 ).contains( config.getRouterPort() ) ||
                 !Range.closed( 1024, 65535 ).contains( config.getDataNodePort() ) ) {
-            po.addLogFailed( "Malformed configuration\nMongoDB installation aborted" );
+            throw new ClusterSetupException( "Malformed cluster configuration" );
         }
+
         if ( mongoManager.getCluster( config.getClusterName() ) != null ) {
             throw new ClusterSetupException(
                     String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
         }
-        //if no nodes are set, setup default environment
-        if ( config.getAllNodes().isEmpty() ) {
-            try {
 
-                po.addLog( "Building environment..." );
+        if ( environment.getNodes().isEmpty() ) {
+            throw new ClusterSetupException( "Environment has no nodes" );
+        }
 
-                Environment env = mongoManager.getEnvironmentManager().buildEnvironmentAndReturn(
-                        mongoManager.getDefaultEnvironmentBlueprint( config ) );
+        int totalNodesRequired =
+                config.getNumberOfRouters() + config.getNumberOfConfigServers() + config.getNumberOfDataNodes();
+        if ( environment.getNodes().size() < totalNodesRequired ) {
+            throw new ClusterSetupException(
+                    String.format( "Environment needs to have %d but has %d nodes", totalNodesRequired,
+                            environment.getNodes().size() ) );
+        }
 
-                Set<Agent> configServers = new HashSet<>();
-                Set<Agent> routers = new HashSet<>();
-                Set<Agent> dataNodes = new HashSet<>();
-                for ( Node node : env.getNodes() ) {
-                    if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
-                        configServers.add( node.getAgent() );
-                    }
-                    else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
-                        routers.add( node.getAgent() );
-                    }
-                    else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
-                        dataNodes.add( node.getAgent() );
-                    }
-                }
 
-                if ( configServers.isEmpty() ) {
-                    throw new ClusterSetupException( "Config servers are not created" );
-                }
-                if ( routers.isEmpty() ) {
-                    throw new ClusterSetupException( "Routers are not created" );
-                }
-                if ( dataNodes.isEmpty() ) {
-                    throw new ClusterSetupException( "Data nodes are not created" );
-                }
-                config.setConfigServers( configServers );
-                config.setRouterServers( routers );
-                config.setDataNodes( dataNodes );
+        Set<Agent> configServers = new HashSet<>();
+        Set<Agent> routers = new HashSet<>();
+        Set<Agent> dataNodes = new HashSet<>();
+        for ( Node node : environment.getNodes() ) {
+            if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
+                configServers.add( node.getAgent() );
             }
-            catch ( EnvironmentBuildException e ) {
-                throw new ClusterSetupException( String.format( "Error building environment: %s", e.getMessage() ) );
+            else if ( NodeType.ROUTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
+                routers.add( node.getAgent() );
+            }
+            else if ( NodeType.DATA_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
+                dataNodes.add( node.getAgent() );
             }
         }
-        else {
+        Set<Agent> envAgents = new HashSet<>();
 
-            //check if nodes are set
-            if ( config.getConfigServers() == null || config.getConfigServers().isEmpty() ) {
-                throw new ClusterSetupException( "No config servers are set" );
-            }
-            if ( config.getDataNodes() == null || config.getDataNodes().isEmpty() ) {
-                throw new ClusterSetupException( "No data nodes are set" );
-            }
-            if ( config.getRouterServers() == null || config.getRouterServers().isEmpty() ) {
-                throw new ClusterSetupException( "No routers are set" );
+        for ( Node node : environment.getNodes() ) {
+            envAgents.add( node.getAgent() );
+        }
+
+        envAgents.removeAll( configServers );
+        envAgents.removeAll( routers );
+        envAgents.removeAll( dataNodes );
+
+        if ( configServers.size() < config.getNumberOfConfigServers() ) {
+            //take necessary number of nodes at random
+            int numNeededMore = config.getNumberOfConfigServers() - configServers.size();
+            Iterator<Agent> it = envAgents.iterator();
+            for ( int i = 0; i < numNeededMore; i++ ) {
+                configServers.add( it.next() );
+                it.remove();
             }
         }
 
-        installMongoCluster();
+        if ( routers.size() < config.getNumberOfRouters() ) {
+            //take necessary number of nodes at random
+            int numNeededMore = config.getNumberOfRouters() - routers.size();
+            Iterator<Agent> it = envAgents.iterator();
+            for ( int i = 0; i < numNeededMore; i++ ) {
+                routers.add( it.next() );
+                it.remove();
+            }
+        }
+
+        if ( dataNodes.size() < config.getNumberOfDataNodes() ) {
+            //take necessary number of nodes at random
+            int numNeededMore = config.getNumberOfDataNodes() - dataNodes.size();
+            Iterator<Agent> it = envAgents.iterator();
+            for ( int i = 0; i < numNeededMore; i++ ) {
+                dataNodes.add( it.next() );
+                it.remove();
+            }
+        }
+
+        config.setConfigServers( configServers );
+        config.setRouterServers( routers );
+        config.setDataNodes( dataNodes );
+
+
+        configureMongoCluster();
 
         po.addLog( "Saving cluster information to database..." );
 
@@ -156,7 +178,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    private void installMongoCluster() throws ClusterSetupException {
+    private void configureMongoCluster() throws ClusterSetupException {
 
         List<Command> installationCommands = Commands.getInstallationCommands( config );
 

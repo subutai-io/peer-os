@@ -16,6 +16,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -191,11 +192,13 @@ public class MongoImpl implements Mongo {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final MongoClusterConfig config, final ProductOperation po ) {
-        return new MongoDbSetupStrategy( config, po, this );
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MongoClusterConfig config,
+                                                         final ProductOperation po ) {
+        return new MongoDbSetupStrategy( environment, config, po, this );
     }
 
 
+    @Override
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );

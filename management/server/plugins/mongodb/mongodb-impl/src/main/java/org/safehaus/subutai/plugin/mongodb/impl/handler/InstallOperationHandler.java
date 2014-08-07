@@ -3,6 +3,8 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -37,15 +39,18 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     @Override
     public void run() {
 
-
-        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
+        po.addLog( "Building environment..." );
 
         try {
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
+
+            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             clusterSetupStrategy.setup();
 
             po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e ) {
             po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
