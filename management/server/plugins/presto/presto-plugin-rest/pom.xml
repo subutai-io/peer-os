@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-plugin-parent</artifactId>
+        <artifactId>presto-plugin-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-plugin-ui</artifactId>
-    <name>Subutai Hadoop UI</name>
-    <description>Subutai Hadoop UI</description>
+    <artifactId>presto-plugin-rest</artifactId>
+    <name>Subutai Presto REST</name>
+    <description>Subutai Presto REST</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -25,19 +25,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>tracker-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>vaadin-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>vaadin-custom</artifactId>
+            <artifactId>presto-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -45,8 +33,43 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hadoop-plugin-api</artifactId>
+            <artifactId>tracker-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--CXF-->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -56,7 +79,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.plugin.hadoop.ui</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.presto.rest</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

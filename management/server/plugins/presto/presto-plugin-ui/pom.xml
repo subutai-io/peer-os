@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-plugin-parent</artifactId>
+        <artifactId>presto-plugin-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>hadoop-plugin-ui</artifactId>
-    <name>Subutai Hadoop UI</name>
-    <description>Subutai Hadoop UI</description>
+    <artifactId>presto-plugin-ui</artifactId>
+    <name>Subutai Presto UI</name>
+    <description>Subutai Presto UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -28,20 +28,26 @@
             <artifactId>tracker-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.safehaus.subutai</groupId>
-            <artifactId>vaadin-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>vaadin-custom</artifactId>
+            <artifactId>agent-manager-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vaadin-custom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>presto-plugin-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -56,7 +62,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.plugin.hadoop.ui</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.ui.presto</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
