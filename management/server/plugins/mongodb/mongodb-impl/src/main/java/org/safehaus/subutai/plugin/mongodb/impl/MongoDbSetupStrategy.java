@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -184,12 +185,15 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
         po.addLog( "Saving cluster information to database..." );
 
-        if ( mongoManager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        try {
+            mongoManager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLog( "Cluster information saved to database" );
         }
-        else {
-            throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
+        catch ( DBException e ) {
+            throw new ClusterSetupException(
+                    String.format( "Error saving cluster information to database, %s", e.getMessage() ) );
         }
+
 
         return config;
     }

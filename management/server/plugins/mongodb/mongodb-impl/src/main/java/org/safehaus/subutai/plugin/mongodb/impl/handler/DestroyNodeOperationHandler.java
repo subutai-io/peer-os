@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -171,13 +172,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             }
         }
         //update db
-        po.addLog( "Updating db..." );
-        if ( !manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-            po.addLogFailed( String.format( "Error while updating cluster information [%s] in database. Check logs",
-                    config.getClusterName() ) );
+        po.addLog( "Updating cluster information in database..." );
+        try {
+            manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster information updated in database" );
         }
-        else {
-            po.addLogDone( "Done" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Error while updating cluster information, %s", e.getMessage() ) );
         }
     }
 }

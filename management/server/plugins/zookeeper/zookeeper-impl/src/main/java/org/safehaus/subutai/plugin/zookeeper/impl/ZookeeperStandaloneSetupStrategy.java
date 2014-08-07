@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -107,13 +108,15 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
         po.addLog( "Saving cluster information to database..." );
 
-        if ( zookeeperManager.getDbManager()
-                             .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
-                                     zookeeperClusterConfig ) ) {
+        try {
+            zookeeperManager.getDbManager()
+                            .saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
+                                    zookeeperClusterConfig );
             po.addLog( "Cluster information saved to database" );
         }
-        else {
-            throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
+        catch ( DBException e ) {
+            throw new ClusterSetupException(
+                    String.format( "Failed to save cluster information to database, %s", e.getMessage() ) );
         }
 
 

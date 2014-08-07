@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
@@ -145,6 +146,55 @@ public class DbManagerImpl implements DbManager {
             LOG.log( Level.SEVERE, "Error in executeQuery", ex );
         }
         return null;
+    }
+
+
+    public ResultSet executeQuery2( String cql, Object... values ) throws DBException {
+
+        try {
+            PreparedStatement stmt = statements.get( cql );
+            if ( stmt == null ) {
+                stmt = session.prepare( cql );
+                statements.put( cql, stmt );
+            }
+            BoundStatement boundStatement = new BoundStatement( stmt );
+            if ( values != null && values.length > 0 ) {
+                boundStatement.bind( values );
+            }
+            return session.execute( boundStatement );
+        }
+        catch ( Throwable ex ) {
+            throw new DBException( ex.getMessage() );
+        }
+    }
+
+
+    public void saveInfo2( String source, String key, Object info ) throws DBException {
+        executeUpdate2( "insert into product_info(source,key,info) values (?,?,?)", source, key, gson.toJson( info ) );
+    }
+
+
+    public void deleteInfo2( String source, String key ) throws DBException {
+        executeUpdate2( "delete from product_info where source = ? and key = ?", source, key );
+    }
+
+
+    public void executeUpdate2( String cql, Object... values ) throws DBException {
+        try {
+            PreparedStatement stmt = statements.get( cql );
+            if ( stmt == null ) {
+                stmt = session.prepare( cql );
+                statements.put( cql, stmt );
+            }
+            BoundStatement boundStatement = new BoundStatement( stmt );
+            if ( values != null && values.length > 0 ) {
+                boundStatement.bind( values );
+            }
+            session.execute( boundStatement );
+        }
+        catch ( Throwable ex ) {
+            throw new DBException( ex.getMessage() );
+        }
     }
 
 
