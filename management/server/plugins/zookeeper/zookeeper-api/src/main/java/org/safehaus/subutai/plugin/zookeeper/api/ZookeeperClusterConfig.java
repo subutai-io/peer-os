@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.zookeeper.api;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -24,6 +25,22 @@ public class ZookeeperClusterConfig implements ConfigBase {
     private int numberOfNodes = 3;
     private Set<Agent> nodes;
     private SetupType setupType;
+    private String hadoopClusterName;
+
+
+    public ZookeeperClusterConfig() {
+        nodes = new HashSet<>();
+    }
+
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
 
     public String getTemplateName() {
@@ -79,5 +96,18 @@ public class ZookeeperClusterConfig implements ConfigBase {
 
     public void setNodes( Set<Agent> nodes ) {
         this.nodes = nodes;
+    }
+
+
+    @Override
+    public String toString() {
+        return "ZookeeperClusterConfig{" +
+                "templateName='" + templateName + '\'' +
+                ", clusterName='" + clusterName + '\'' +
+                ", numberOfNodes=" + numberOfNodes +
+                ", nodes=" + nodes +
+                ", setupType=" + setupType +
+                ", hadoopClusterName='" + hadoopClusterName + '\'' +
+                '}';
     }
 }

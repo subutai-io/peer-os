@@ -123,6 +123,18 @@ public class ConfigurationStep extends Panel {
             overHadoopInstallationControls.setSpacing( true );
             overHadoopInstallationControls.setMargin( true );
 
+            final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
+            clusterNameTxtFld.setInputPrompt( "Cluster name" );
+            clusterNameTxtFld.setRequired( true );
+            clusterNameTxtFld.setMaxLength( 20 );
+            clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
+            clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
+                @Override
+                public void valueChange( Property.ValueChangeEvent event ) {
+                    wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                }
+            } );
+
             ComboBox hadoopClustersCombo = new ComboBox( "Hadoop cluster" );
             final TwinColSelect hadoopNodesSelect = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
 
@@ -150,7 +162,7 @@ public class ConfigurationStep extends Panel {
 
             if ( hadoopClustersCombo.getValue() != null ) {
                 HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
-                wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+                wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                 hadoopNodesSelect
                         .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
             }
@@ -163,7 +175,7 @@ public class ConfigurationStep extends Panel {
                         hadoopNodesSelect.setValue( null );
                         hadoopNodesSelect.setContainerDataSource(
                                 new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-                        wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+                        wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                         wizard.getConfig().setNodes( new HashSet<Agent>() );
                     }
                 }
@@ -198,10 +210,13 @@ public class ConfigurationStep extends Panel {
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                        show( "Please, prvide cluster name" );
+                    }
+                    else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) ) {
                         show( "Please, select Hadoop cluster" );
                     }
                     else if ( Util.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
-                        show( "Please, select target nodes" );
+                        show( "Please, select zk nodes" );
                     }
                     else {
                         wizard.next();
@@ -224,6 +239,7 @@ public class ConfigurationStep extends Panel {
 
             overHadoopInstallationControls.addComponent(
                     new Label( "Please, specify installation settings for over-Hadoop cluster installation" ) );
+            overHadoopInstallationControls.addComponent( clusterNameTxtFld );
             overHadoopInstallationControls.addComponent( hadoopClustersCombo );
             overHadoopInstallationControls.addComponent( hadoopNodesSelect );
             overHadoopInstallationControls.addComponent( buttons );
@@ -345,6 +361,7 @@ public class ConfigurationStep extends Panel {
                         show( "Please provide Hadoop cluster name" );
                     }
                     else {
+                        wizard.getConfig().setHadoopClusterName( wizard.getHadoopClusterConfig().getClusterName() );
                         wizard.next();
                     }
                 }

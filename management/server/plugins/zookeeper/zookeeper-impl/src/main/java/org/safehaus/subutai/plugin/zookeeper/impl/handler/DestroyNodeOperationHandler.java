@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -49,14 +50,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
     public void run() {
         final ZookeeperClusterConfig config = manager.getCluster( clusterName );
         if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null ) {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !config.getNodes().contains( agent ) ) {
@@ -66,8 +66,17 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         }
 
         if ( config.getNodes().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last node in the cluster. Please, destroy cluster instead" );
+            return;
+        }
+
+        config.getNodes().remove( agent );
+
+        try {
+            reconfigureZkCluster( config );
+        }
+        catch ( ClusterConfigurationException e ) {
+            po.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
             return;
         }
 
@@ -93,7 +102,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                 }
             }
         }
-        else if ( config.getSetupType() == SetupType.OVER_HADOOP || config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else {
             //just uninstall Zookeeper
             po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 
@@ -115,7 +124,22 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             }
         }
 
-        config.getNodes().remove( agent );
+
+        //update db
+        po.addLog( "Updating cluster information in database..." );
+
+        try {
+            manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster information updated in database" );
+        }
+        catch ( DBException e ) {
+            po.addLogFailed(
+                    String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
+        }
+    }
+
+
+    private void reconfigureZkCluster( final ZookeeperClusterConfig config ) throws ClusterConfigurationException {
 
         //reconfiguring cluster
         po.addLog( "Reconfiguring cluster..." );
@@ -128,8 +152,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                     ConfigParams.CONFIG_FILE_PATH.getParamValue() );
         }
         catch ( ClusterConfigurationException e ) {
-            po.addLogFailed( String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
-            return;
+            throw new ClusterConfigurationException(
+                    String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
         }
 
         manager.getCommandRunner().runCommand( configureClusterCommand );
@@ -159,19 +183,9 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
             }
         }
         else {
-            po.addLog( String.format(
-                    "Cluster reconfiguration failed, %s\nPlease reconfigure cluster manually and restart the it, "
-                            + "skipping...", configureClusterCommand.getAllErrors() ) );
-        }
 
-        //update db
-        po.addLog( "Updating db..." );
-        if ( !manager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-            po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                    config.getClusterName() ) );
-        }
-        else {
-            po.addLogDone( "DB updated\nDone" );
+            throw new ClusterConfigurationException(
+                    String.format( "Cluster reconfiguration failed, %s", configureClusterCommand.getAllErrors() ) );
         }
     }
 }

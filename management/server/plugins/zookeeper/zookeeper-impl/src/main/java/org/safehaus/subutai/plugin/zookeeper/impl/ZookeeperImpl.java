@@ -11,6 +11,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -202,24 +203,21 @@ public class ZookeeperImpl implements Zookeeper {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final ZookeeperClusterConfig config,
+                                                         final ProductOperation po ) {
         if ( config.getSetupType() == SetupType.STANDALONE ) {
             //this is a standalone ZK cluster setup
-            return new ZookeeperStandaloneSetupStrategy( config, po, this );
+            return new ZookeeperStandaloneSetupStrategy( environment, config, po, this );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            //this is a with-Hadoop ZK cluster setup
+            return new ZookeeperWithHadoopSetupStrategy( environment, config, po, this );
         }
         else {
             //this is an over-Hadoop ZK cluster setup
             return new ZookeeperOverHadoopSetupStrategy( config, po, this );
         }
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final HadoopClusterConfig hadoopConfig,
-                                                         final ZookeeperClusterConfig zkConfig,
-                                                         final ProductOperation po ) {
-        //this is a with-Hadoop ZK cluster setup
-        return new ZookeeperWithHadoopSetupStrategy( hadoopConfig, zkConfig, po, this );
     }
 
 

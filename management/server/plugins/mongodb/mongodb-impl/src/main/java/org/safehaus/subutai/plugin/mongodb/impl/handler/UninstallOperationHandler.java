@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
@@ -47,12 +48,14 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
             po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
-        po.addLog( "Updating db..." );
-        if ( manager.getDbManager().deleteInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
+        po.addLog( "Deleting cluster information from database.." );
+
+        try {
+            manager.getDbManager().deleteInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() );
             po.addLogDone( "Cluster info deleted from database" );
         }
-        else {
-            po.addLogFailed( "Error while deleting cluster info from DB. Check logs" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Error while deleting cluster info from database, %s", e.getMessage() ) );
         }
     }
 }

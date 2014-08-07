@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -11,7 +12,6 @@ import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
@@ -45,24 +45,25 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         if ( config.getSetupType() == SetupType.STANDALONE ) {
             po.addLog( "Destroying lxc containers" );
             try {
-                for ( Agent agent : config.getNodes() ) {
-                    manager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
-                }
+                manager.getContainerManager().clonesDestroy( config.getNodes() );
                 po.addLog( "Lxc containers successfully destroyed" );
             }
             catch ( LxcDestroyException ex ) {
                 po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
             }
 
-            po.addLog( "Updating db..." );
-            if ( manager.getDbManager().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-                po.addLogDone( "Cluster info deleted from DB\nDone" );
+            po.addLog( "Deleting cluster information from database..." );
+
+            try {
+                manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                po.addLogDone( "Cluster information deleted from database" );
             }
-            else {
-                po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+            catch ( DBException e ) {
+                po.addLogFailed(
+                        String.format( "Error while deleting cluster information from database, %s", e.getMessage() ) );
             }
         }
-        else if ( config.getSetupType() == SetupType.OVER_HADOOP || config.getSetupType() == SetupType.WITH_HADOOP ) {
+        else {
             //just uninstall nodes
             po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
 
@@ -77,13 +78,15 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
                             uninstallCommand.getAllErrors() ) );
                 }
 
-                po.addLog( "Updating db..." );
-                if ( manager.getDbManager()
-                            .deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
+                po.addLog( "Deleting cluster information from database..." );
+
+                try {
+                    manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                    po.addLogDone( "Cluster information deleted from database" );
                 }
-                else {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                catch ( DBException e ) {
+                    po.addLogFailed( String.format( "Error while deleting cluster information from database, %s",
+                            e.getMessage() ) );
                 }
             }
             else {

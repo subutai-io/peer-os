@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -79,36 +80,29 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             }
             po.addLog( "Lxc container created successfully\nConfiguring cluster..." );
 
+            boolean result = true;
             //add node
             if ( nodeType == NodeType.DATA_NODE ) {
-                if ( addDataNode( po, config, agent ) ) {
-                    po.addLog( "Saving cluster information to database..." );
-                    if ( manager.getDbManager()
-                                .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                        po.addLogDone( "Cluster information saved to database" );
-                    }
-                    else {
-                        po.addLogFailed( "Failed to save cluster information to database. Check logs" );
-                    }
-                }
-                else {
-                    po.addLogFailed( "Node addition failed" );
-                }
+                result = addDataNode( po, config, agent );
             }
             else if ( nodeType == NodeType.ROUTER_NODE ) {
-                if ( addRouter( po, config, agent ) ) {
-                    po.addLog( "Saving cluster information to database..." );
-                    if ( manager.getDbManager()
-                                .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                        po.addLogDone( "Cluster information saved to database" );
-                    }
-                    else {
-                        po.addLogFailed( "Failed to save cluster information to database. Check logs" );
-                    }
+                result = addRouter( po, config, agent );
+            }
+
+            if ( result ) {
+                po.addLog( "Updating cluster information in database..." );
+
+                try {
+                    manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                    po.addLogDone( "Cluster information updated in database" );
                 }
-                else {
-                    po.addLogFailed( "Node addition failed" );
+                catch ( DBException e ) {
+                    po.addLogFailed(
+                            String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
                 }
+            }
+            else {
+                po.addLogFailed( "Node addition failed" );
             }
         }
         catch ( LxcCreateException ex ) {

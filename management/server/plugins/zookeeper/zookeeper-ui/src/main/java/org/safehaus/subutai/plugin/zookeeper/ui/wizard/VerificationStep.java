@@ -47,6 +47,7 @@ public class VerificationStep extends Panel {
             cfgView.addStringCfg( "Number of nodes", wizard.getConfig().getNumberOfNodes() + "" );
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+            cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
             for ( Agent node : wizard.getConfig().getNodes() ) {
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
