@@ -56,8 +56,8 @@ public class View extends CustomComponent {
         layout.setHeight( 1000, Unit.PIXELS );
 
         layout.addComponent( logTextArea, "left: 200px; top: 50px;" );
-        logTextArea.setRows( 25 );
-        logTextArea.setWidth( "400px" );
+        logTextArea.setRows( 30 );
+        logTextArea.setWidth( "700px" );
 
         addButtons( layout );
 
@@ -79,7 +79,7 @@ public class View extends CustomComponent {
         installButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                System.out.println( ">> install" );
+                installButtonClicked();
             }
         } );
 
@@ -87,7 +87,7 @@ public class View extends CustomComponent {
         removeButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                System.out.println( ">> remove" );
+                removeButtonClicked();
             }
         } );
     }
@@ -119,6 +119,64 @@ public class View extends CustomComponent {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private void removeButtonClicked() {
+
+        addLog( "Checking status..." );
+
+        Agent agent = getSelectedAgent();
+
+        if ( agent == null ) {
+            addLog( "Please select a node!" );
+            return;
+        }
+
+        AgentResult statusResult = elasticSearch.serviceStatus( agent );
+
+        if ( statusResult.getExitCode() == 256 ) {
+            addLog( "Elasticsearch NOT installed" );
+            return;
+        }
+
+        addLog( "Removing Elasticsearch..." );
+
+        AgentResult removeResult = elasticSearch.remove( agent );
+        String message = removeResult.getExitCode() == 0
+                         ? "Elasticsearch removed successfully"
+                         : "Error to remove Elasticsearch. Please see logs for details.";
+
+        addLog( message );
+    }
+
+
+    private void installButtonClicked() {
+
+        addLog( "Checking status..." );
+
+        Agent agent = getSelectedAgent();
+
+        if ( agent == null ) {
+            addLog( "Please select a node!" );
+            return;
+        }
+
+        AgentResult agentResult = elasticSearch.serviceStatus( agent );
+
+        if ( agentResult.getExitCode() != 256 ) {
+            addLog( "Elasticsearch ALREADY installed" );
+            return;
+        }
+
+        addLog( "Installing Elasticsearch..." );
+
+        AgentResult installResult = elasticSearch.install( agent );
+        String message = installResult.getExitCode() == 0
+                         ? "Elasticsearch installed successfully"
+                         : "Error to install Elasticsearch. Please see logs for details.";
+
+        addLog( message );
+    }
 
 
     private void statusButtonClicked() {
