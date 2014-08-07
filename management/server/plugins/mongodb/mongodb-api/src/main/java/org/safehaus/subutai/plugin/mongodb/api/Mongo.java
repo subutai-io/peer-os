@@ -8,9 +8,11 @@ package org.safehaus.subutai.plugin.mongodb.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 
 /**
@@ -76,5 +78,8 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
      *
      * @return - strategy
      */
-    public ClusterSetupStrategy getClusterSetupStrategy( MongoClusterConfig config, ProductOperation po );
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MongoClusterConfig config,
+                                                         ProductOperation po );
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config );
 }

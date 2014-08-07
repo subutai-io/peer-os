@@ -1,7 +1,5 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="textInjector" availability="mandatory"
              interface="org.safehaus.subutai.configuration.manager.api.TextInjector" />
   <reference id="configManager" availability="mandatory"
@@ -10,7 +8,6 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="config/cat">
       <action class="org.safehaus.subutai.cli.commands.CatCommand">
-        <property name="agentManager" ref="agentManager" />
         <property name="textInjector" ref="textInjector" />
       </action>
     </command>
@@ -19,7 +16,6 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="config/echo">
       <action class="org.safehaus.subutai.cli.commands.EchoCommand">
-        <property name="agentManager" ref="agentManager" />
         <property name="textInjector" ref="textInjector" />
       </action>
     </command>
@@ -44,7 +40,6 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="config/echo-text-to-file">
       <action class="org.safehaus.subutai.cli.commands.EchoTextToFileCommand">
-        <property name="agentManager" ref="agentManager" />
         <property name="configManager" ref="configManager" />
       </action>
     </command>

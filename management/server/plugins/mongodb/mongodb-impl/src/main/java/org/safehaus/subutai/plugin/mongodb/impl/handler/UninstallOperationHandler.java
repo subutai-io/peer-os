@@ -49,10 +49,10 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
 
         po.addLog( "Updating db..." );
         if ( manager.getDbManager().deleteInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-            po.addLogDone( "Cluster info deleted from DB\nDone" );
+            po.addLogDone( "Cluster info deleted from database" );
         }
         else {
-            po.addLogFailed( "Error while deleting cluster info from DB. Check logs\nFailed" );
+            po.addLogFailed( "Error while deleting cluster info from DB. Check logs" );
         }
     }
 }

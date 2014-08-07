@@ -63,7 +63,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
         }
         else {
             po.addLogFailed(
-                    String.format( "Failed to stop node %s. %s", lxcHostname, stopNodeCommand.getAllErrors() ) );
+                    String.format( "Failed to stop node %s, %s", lxcHostname, stopNodeCommand.getAllErrors() ) );
         }
     }
 }

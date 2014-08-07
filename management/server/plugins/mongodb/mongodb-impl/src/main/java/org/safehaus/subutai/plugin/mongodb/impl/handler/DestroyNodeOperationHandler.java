@@ -65,19 +65,15 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         final NodeType nodeType = config.getNodeType( agent );
         if ( nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last configuration server in the cluster. Please, destroy cluster instead\nOperation"
-                            + " aborted" );
+            po.addLogFailed( "This is the last configuration server in the cluster. Please, destroy cluster instead" );
             return;
         }
         else if ( nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last data node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last data node in the cluster. Please, destroy cluster instead" );
             return;
         }
         else if ( nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last router in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last router in the cluster. Please, destroy cluster instead" );
             return;
         }
 
@@ -177,7 +173,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         //update db
         po.addLog( "Updating db..." );
         if ( !manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-            po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
+            po.addLogFailed( String.format( "Error while updating cluster information [%s] in database. Check logs",
                     config.getClusterName() ) );
         }
         else {
