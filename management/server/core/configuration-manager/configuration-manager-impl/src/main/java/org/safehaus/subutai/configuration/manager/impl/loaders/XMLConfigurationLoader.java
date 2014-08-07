@@ -1,8 +1,6 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
@@ -18,7 +16,7 @@ public class XMLConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public JsonObject getConfiguration( Agent agent, String configPathFilename ) {
+    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
         try {
             //TODO cat file from given agent, convert to required format, detect types and form a Config
             //TODO convert text to XML object
@@ -34,7 +32,7 @@ public class XMLConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public boolean setConfiguration( final Agent agent, String configFilePath,  String config ) {
+    public boolean setConfiguration( String hostname, String configFilePath,  String config ) {
         //TODO Read config from instance, set values from Config, inject Config
         return true;
     }
