@@ -156,7 +156,7 @@ public class AccumuloWithZkNHadoopSetupStrategy implements ClusterSetupStrategy 
             zookeeperClusterConfig.setNodes( zkNodes );
 
             ClusterSetupStrategy zkSetupStrategy = accumuloManager.getZkManager()
-                                                                  .getClusterSetupStrategy( hadoopClusterConfig,
+                                                                  .getClusterSetupStrategy( null,
                                                                           zookeeperClusterConfig, po );
 
             zkSetupStrategy.setup();

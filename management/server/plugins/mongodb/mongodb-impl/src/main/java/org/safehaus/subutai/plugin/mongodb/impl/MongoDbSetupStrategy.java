@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -18,10 +19,12 @@ import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -103,11 +106,26 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                             environment.getNodes().size() ) );
         }
 
+        Set<Agent> mongoAgents = new HashSet<>();
+        Set<Node> mongoNodes = new HashSet<>();
+        for ( Node node : environment.getNodes() ) {
+            if ( node.getTemplate().getProducts()
+                     .contains( Common.PACKAGE_PREFIX + MongoClusterConfig.PRODUCT_NAME ) ) {
+                mongoAgents.add( node.getAgent() );
+                mongoNodes.add( node );
+            }
+        }
+
+        if ( mongoAgents.size() < totalNodesRequired ) {
+            throw new ClusterSetupException( String.format(
+                    "Environment needs to have %d with MongoDb installed but has only %d nodes with MongoDb installed",
+                    totalNodesRequired, mongoAgents.size() ) );
+        }
 
         Set<Agent> configServers = new HashSet<>();
         Set<Agent> routers = new HashSet<>();
         Set<Agent> dataNodes = new HashSet<>();
-        for ( Node node : environment.getNodes() ) {
+        for ( Node node : mongoNodes ) {
             if ( NodeType.CONFIG_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
                 configServers.add( node.getAgent() );
             }
@@ -118,20 +136,15 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                 dataNodes.add( node.getAgent() );
             }
         }
-        Set<Agent> envAgents = new HashSet<>();
 
-        for ( Node node : environment.getNodes() ) {
-            envAgents.add( node.getAgent() );
-        }
-
-        envAgents.removeAll( configServers );
-        envAgents.removeAll( routers );
-        envAgents.removeAll( dataNodes );
+        mongoAgents.removeAll( configServers );
+        mongoAgents.removeAll( routers );
+        mongoAgents.removeAll( dataNodes );
 
         if ( configServers.size() < config.getNumberOfConfigServers() ) {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfConfigServers() - configServers.size();
-            Iterator<Agent> it = envAgents.iterator();
+            Iterator<Agent> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ ) {
                 configServers.add( it.next() );
                 it.remove();
@@ -141,7 +154,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         if ( routers.size() < config.getNumberOfRouters() ) {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfRouters() - routers.size();
-            Iterator<Agent> it = envAgents.iterator();
+            Iterator<Agent> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ ) {
                 routers.add( it.next() );
                 it.remove();
@@ -151,7 +164,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         if ( dataNodes.size() < config.getNumberOfDataNodes() ) {
             //take necessary number of nodes at random
             int numNeededMore = config.getNumberOfDataNodes() - dataNodes.size();
-            Iterator<Agent> it = envAgents.iterator();
+            Iterator<Agent> it = mongoAgents.iterator();
             for ( int i = 0; i < numNeededMore; i++ ) {
                 dataNodes.add( it.next() );
                 it.remove();
@@ -163,22 +176,32 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         config.setDataNodes( dataNodes );
 
 
-        configureMongoCluster();
+        try {
+            configureMongoCluster();
+        }
+        catch ( ClusterConfigurationException e ) {
+            throw new ClusterSetupException( e.getMessage() );
+        }
 
         po.addLog( "Saving cluster information to database..." );
 
-        if ( mongoManager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        try {
+            mongoManager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLog( "Cluster information saved to database" );
         }
-        else {
-            throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
+        catch ( DBException e ) {
+            throw new ClusterSetupException(
+                    String.format( "Error saving cluster information to database, %s", e.getMessage() ) );
         }
+
 
         return config;
     }
 
 
-    private void configureMongoCluster() throws ClusterSetupException {
+    private void configureMongoCluster() throws ClusterConfigurationException {
+
+        po.addLog( "Configuring cluster..." );
 
         List<Command> installationCommands = Commands.getInstallationCommands( config );
 
@@ -228,7 +251,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
                 po.addLog( String.format( "Command %s succeeded", command.getDescription() ) );
             }
             else {
-                throw new ClusterSetupException(
+                throw new ClusterConfigurationException(
                         String.format( "Command %s failed: %s", command.getDescription(), command.getAllErrors() ) );
             }
         }
