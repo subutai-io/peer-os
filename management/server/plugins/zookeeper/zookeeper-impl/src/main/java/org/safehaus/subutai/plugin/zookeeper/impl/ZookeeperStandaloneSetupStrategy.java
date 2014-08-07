@@ -21,6 +21,7 @@ import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -29,14 +30,18 @@ import com.google.common.base.Strings;
  */
 public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
-    private final ZookeeperClusterConfig config;
+    private final ZookeeperClusterConfig zookeeperClusterConfig;
     private final ZookeeperImpl zookeeperManager;
     private final ProductOperation po;
 
 
-    public ZookeeperStandaloneSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po,
+    public ZookeeperStandaloneSetupStrategy( final ZookeeperClusterConfig zookeeperClusterConfig, ProductOperation po,
                                              ZookeeperImpl zookeeperManager ) {
-        this.config = config;
+        Preconditions.checkNotNull( zookeeperClusterConfig, "Cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+        Preconditions.checkNotNull( zookeeperManager, "ZK manager is null" );
+
+        this.zookeeperClusterConfig = zookeeperClusterConfig;
         this.po = po;
         this.zookeeperManager = zookeeperManager;
     }
@@ -49,21 +54,31 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
+        if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
+                Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
+                zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
+            po.addLogFailed( "Malformed configuration\nZookeeper installation aborted" );
+        }
 
+        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                            zookeeperClusterConfig.getClusterName() ) );
+        }
         try {
 
-            if ( config.getNodes() == null || config.getNodes().isEmpty() ) {
+            if ( zookeeperClusterConfig.getNodes() == null || zookeeperClusterConfig.getNodes().isEmpty() ) {
                 //setup environment
                 po.addLog( "Building environment..." );
                 try {
                     Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
-                            zookeeperManager.getDefaultEnvironmentBlueprint( config ) );
+                            zookeeperManager.getDefaultEnvironmentBlueprint( zookeeperClusterConfig ) );
 
                     Set<Agent> zkAgents = new HashSet<>();
                     for ( Node node : env.getNodes() ) {
                         zkAgents.add( node.getAgent() );
                     }
-                    config.setNodes( zkAgents );
+                    zookeeperClusterConfig.setNodes( zkAgents );
                 }
                 catch ( EnvironmentBuildException e ) {
                     throw new ClusterSetupException(
@@ -72,9 +87,10 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
             }
             po.addLog( "Configuring cluster..." );
 
-            Command configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
+            Command configureClusterCommand = Commands.getConfigureClusterCommand( zookeeperClusterConfig.getNodes(),
                     ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                    prepareConfiguration( config.getNodes() ), ConfigParams.CONFIG_FILE_PATH.getParamValue() );
+                    prepareConfiguration( zookeeperClusterConfig.getNodes() ),
+                    ConfigParams.CONFIG_FILE_PATH.getParamValue() );
 
             zookeeperManager.getCommandRunner().runCommand( configureClusterCommand );
 
@@ -82,25 +98,35 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
                 po.addLog( String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
                 //start all nodes
-                Command startCommand = Commands.getStartCommand( config.getNodes() );
+                Command startCommand = Commands.getStartCommand( zookeeperClusterConfig.getNodes() );
                 final AtomicInteger count = new AtomicInteger();
                 zookeeperManager.getCommandRunner().runCommand( startCommand, new CommandCallback() {
                     @Override
                     public void onResponse( Response response, AgentResult agentResult, Command command ) {
                         if ( agentResult.getStdOut().contains( "STARTED" ) ) {
-                            if ( count.incrementAndGet() == config.getNodes().size() ) {
+                            if ( count.incrementAndGet() == zookeeperClusterConfig.getNodes().size() ) {
                                 stop();
                             }
                         }
                     }
                 } );
 
-                if ( count.get() == config.getNodes().size() ) {
+                if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
                     po.addLog( String.format( "Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY ) );
                 }
                 else {
                     po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
                             startCommand.getAllErrors() ) );
+                }
+
+                po.addLog( "Saving cluster information to database..." );
+
+                if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
+                        zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
+                    po.addLog( "Cluster information saved to database" );
+                }
+                else {
+                    throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
                 }
             }
             else {
@@ -112,7 +138,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
             throw new ClusterSetupException( ex.getMessage() );
         }
 
-        return config;
+        return zookeeperClusterConfig;
     }
 
 

@@ -9,17 +9,18 @@ import java.util.Set;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 import com.google.common.collect.Lists;
 
@@ -87,6 +88,25 @@ public class EnvironmentBuilder {
                 }
             }
             catch ( LxcCreateException ex ) {
+
+                //destroy lxcs here
+                Set<Node> alreadyBuiltNodes = environment.getNodes();
+
+                if ( alreadyBuiltNodes != null && !alreadyBuiltNodes.isEmpty() ) {
+
+                    Set<Agent> agents = new HashSet<>();
+                    for ( Node node : alreadyBuiltNodes ) {
+                        agents.add( node.getAgent() );
+                    }
+
+                    try {
+                        containerManager.clonesDestroy( agents );
+                    }
+                    catch ( LxcDestroyException ignore ) {
+                    }
+                }
+
+
                 throw new EnvironmentBuildException( ex.toString() );
             }
 

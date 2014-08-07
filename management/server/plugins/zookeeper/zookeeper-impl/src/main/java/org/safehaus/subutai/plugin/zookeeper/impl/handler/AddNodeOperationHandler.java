@@ -103,7 +103,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
 
-        if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.DEFAULT_HADOOP_TEMPLATE ) ) {
+        if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
             return;
         }
@@ -214,7 +214,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
         else if ( !result.getStdOut()
-                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.DEFAULT_HADOOP_TEMPLATE ) ) {
+                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
             return;
         }

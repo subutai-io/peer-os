@@ -32,10 +32,10 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,6 +184,20 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
 
         if ( !result ) {
+
+            //destroy clones
+
+            Set<String> names = new HashSet<>();
+
+            for ( String key : cloneNames.keySet() ) {
+                names.addAll( cloneNames.get( key ) );
+            }
+            try {
+                clonesDestroyByHostname( names );
+            }
+            catch ( LxcDestroyException ignore ) {
+            }
+
             throw new LxcCreateException(
                     String.format( "Waiting interval for lxc agents timed out. Use LXC module to cleanup nodes %s",
                             cloneNames ) );

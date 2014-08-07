@@ -12,7 +12,6 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -23,6 +22,8 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.Response;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 
@@ -31,7 +32,7 @@ import com.google.common.collect.Lists;
  */
 public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
-    public static final String COMBO_TEMPLATE_NAME = "zknhadoop";
+    public static final String COMBO_TEMPLATE_NAME = "hadoopnzk";
 
     private final HadoopClusterConfig hadoopClusterConfig;
     private final ZookeeperClusterConfig zookeeperClusterConfig;
@@ -42,6 +43,11 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
     public ZookeeperWithHadoopSetupStrategy( final HadoopClusterConfig hadoopClusterConfig,
                                              final ZookeeperClusterConfig zookeeperClusterConfig,
                                              final ProductOperation po, final ZookeeperImpl zookeeperManager ) {
+        Preconditions.checkNotNull( zookeeperClusterConfig, "ZK cluster config is null" );
+        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation tracker is null" );
+        Preconditions.checkNotNull( zookeeperManager, "ZK manager is null" );
+
         this.hadoopClusterConfig = hadoopClusterConfig;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
         this.po = po;
@@ -52,11 +58,23 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ZookeeperClusterConfig setup() throws ClusterSetupException {
-        int HADOOP_MASTER_NODES_QUANTITY = Hadoop.DEFAULT_HADOOP_MASTER_NODES_QUANTITY;
+        if ( Strings.isNullOrEmpty( zookeeperClusterConfig.getClusterName() ) ||
+                Strings.isNullOrEmpty( zookeeperClusterConfig.getTemplateName() ) ||
+                zookeeperClusterConfig.getNumberOfNodes() <= 0 ) {
+            po.addLogFailed( "Malformed configuration\nZookeeper installation aborted" );
+        }
+
+        if ( zookeeperManager.getCluster( zookeeperClusterConfig.getClusterName() ) != null ) {
+            throw new ClusterSetupException(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                            zookeeperClusterConfig.getClusterName() ) );
+        }
+
+        int HADOOP_MASTER_NODES_QUANTITY = HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY;
 
         int totalHadoopNodesCount = HADOOP_MASTER_NODES_QUANTITY + hadoopClusterConfig.getCountOfSlaveNodes();
         if ( zookeeperClusterConfig.getNumberOfNodes() > totalHadoopNodesCount ) {
-            throw new ClusterSetupException( "Number of ZK nodes exceeds number of Hadoop nodes" );
+            throw new ClusterSetupException( "Number of needed ZK nodes exceeds number of available Hadoop nodes" );
         }
 
         //setup environment
@@ -64,6 +82,9 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
         try {
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
 
+
+
+            //this part should be moved to Hadoop plugin  --START
             Environment env = zookeeperManager.getEnvironmentManager().buildEnvironmentAndReturn(
                     zookeeperManager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
 
@@ -93,6 +114,8 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
             hadoopClusterConfig.setDataNodes( Lists.newArrayList( slaveNodes ) );
             hadoopClusterConfig.setTaskTrackers( Lists.newArrayList( slaveNodes ) );
 
+            //this part should be moved to Hadoop plugin  --END
+
             if ( totalHadoopNodesCount != hadoopClusterConfig.getAllNodes().size() ) {
                 throw new ClusterSetupException(
                         String.format( "Specified %d hadoop nodes, but %d are created", totalHadoopNodesCount,
@@ -121,12 +144,16 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
 
             po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
 
-            Set<Agent> zkNodes = new HashSet<>();
-            Iterator<Agent> hadoopNodesIterator = hadoopClusterConfig.getAllNodes().iterator();
-            for ( int i = 0; i < zookeeperClusterConfig.getNumberOfNodes(); i++ ) {
-                zkNodes.add( hadoopNodesIterator.next() );
+            //pick random nodes from hadoop cluster to setup ZK cluster if they are not set by calling party
+            if ( zookeeperClusterConfig.getNodes() == null || zookeeperClusterConfig.getNodes().isEmpty() ) {
+
+                Set<Agent> zkNodes = new HashSet<>();
+                Iterator<Agent> hadoopNodesIterator = hadoopClusterConfig.getAllNodes().iterator();
+                for ( int i = 0; i < zookeeperClusterConfig.getNumberOfNodes(); i++ ) {
+                    zkNodes.add( hadoopNodesIterator.next() );
+                }
+                zookeeperClusterConfig.setNodes( zkNodes );
             }
-            zookeeperClusterConfig.setNodes( zkNodes );
 
             po.addLog( String.format( "Setting up %s ZK cluster", zookeeperClusterConfig.getClusterName() ) );
 
@@ -162,22 +189,21 @@ public class ZookeeperWithHadoopSetupStrategy implements ClusterSetupStrategy {
                 } );
 
                 if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
-                    po.addLog( String.format( "Starting %s succeeded\nSaving info to DB...",
-                            ZookeeperClusterConfig.PRODUCT_KEY ) );
-
-                    //save to db
-                    if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
-                            zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
-                        po.addLog( "Cluster info saved to DB" );
-                    }
-                    else {
-                        throw new ClusterSetupException( "Could not save cluster info to DB! Check logs" );
-                    }
+                    po.addLog( String.format( "Starting %s succeeded\nDone", ZookeeperClusterConfig.PRODUCT_KEY ) );
                 }
                 else {
-                    throw new ClusterSetupException(
-                            String.format( "Starting %s failed, %s", ZookeeperClusterConfig.PRODUCT_KEY,
-                                    startCommand.getAllErrors() ) );
+                    po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
+                            startCommand.getAllErrors() ) );
+                }
+
+                po.addLog( "Saving cluster information to database..." );
+
+                if ( zookeeperManager.getDbManager().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY,
+                        zookeeperClusterConfig.getClusterName(), zookeeperClusterConfig ) ) {
+                    po.addLog( "Cluster information saved to database" );
+                }
+                else {
+                    throw new ClusterSetupException( "Failed to save cluster information to database. Check logs" );
                 }
             }
             else {

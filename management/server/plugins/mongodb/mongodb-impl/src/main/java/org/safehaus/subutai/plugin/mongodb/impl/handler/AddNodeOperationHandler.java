@@ -38,7 +38,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
         super( manager, clusterName );
         this.nodeType = nodeType;
         po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
-                String.format( "Adding %s to %s", nodeType, clusterName ) );
+                String.format( "Adding %s to %s...", nodeType, clusterName ) );
     }
 
 
@@ -61,7 +61,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
         }
         try {
 
-            po.addLog( "Creating lxc container" );
+            po.addLog( "Creating lxc container..." );
 
             Set<Agent> agents = manager.getContainerManager().clone( config.getTemplateName(), 1, null,
                     MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ) );
@@ -77,20 +77,38 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             else if ( nodeType == NodeType.ROUTER_NODE ) {
                 config.getRouterServers().add( agent );
             }
-            po.addLog( "Lxc container created successfully\nUpdating db..." );
-            if ( manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                po.addLog( "Cluster info updated in DB\nInstalling Mongo" );
-                //start addition of node
-                if ( nodeType == NodeType.DATA_NODE ) {
-                    addDataNode( po, config, agent );
+            po.addLog( "Lxc container created successfully\nConfiguring cluster..." );
+
+            //add node
+            if ( nodeType == NodeType.DATA_NODE ) {
+                if ( addDataNode( po, config, agent ) ) {
+                    po.addLog( "Saving cluster information to database..." );
+                    if ( manager.getDbManager()
+                                .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+                        po.addLogDone( "Cluster information saved to database" );
+                    }
+                    else {
+                        po.addLogFailed( "Failed to save cluster information to database. Check logs" );
+                    }
                 }
-                else if ( nodeType == NodeType.ROUTER_NODE ) {
-                    addRouter( po, config, agent );
+                else {
+                    po.addLogFailed( "Node addition failed" );
                 }
             }
-            else {
-                po.addLogFailed(
-                        "Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
+            else if ( nodeType == NodeType.ROUTER_NODE ) {
+                if ( addRouter( po, config, agent ) ) {
+                    po.addLog( "Saving cluster information to database..." );
+                    if ( manager.getDbManager()
+                                .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+                        po.addLogDone( "Cluster information saved to database" );
+                    }
+                    else {
+                        po.addLogFailed( "Failed to save cluster information to database. Check logs" );
+                    }
+                }
+                else {
+                    po.addLogFailed( "Node addition failed" );
+                }
             }
         }
         catch ( LxcCreateException ex ) {
@@ -99,7 +117,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
     }
 
 
-    private void addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
+    private boolean addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
         List<Command> commands = Commands.getAddDataNodeCommands( config, agent );
 
         boolean additionOK = true;
@@ -162,30 +180,31 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
                     manager.getCommandRunner().runCommand( registerSecondaryNodeWithPrimaryCommand );
                     if ( registerSecondaryNodeWithPrimaryCommand.hasSucceeded() ) {
-                        po.addLogDone( String.format( "Command %s succeeded\nNode addition succeeded",
+                        po.addLog( String.format( "Command %s succeeded",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription() ) );
+
+                        return true;
                     }
                     else {
-                        po.addLogFailed( String.format( "Command %s failed: %s\nNode addition failed",
+                        po.addLog( String.format( "Command %s failed: %s",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription(),
                                 registerSecondaryNodeWithPrimaryCommand.getAllErrors() ) );
                     }
                 }
                 else {
-                    po.addLogFailed( "Could not find primary node\nNode addition failed" );
+                    po.addLog( "Could not find primary node" );
                 }
             }
             else {
-                po.addLogFailed( "Could not find primary node\nNode addition failed" );
+                po.addLog( "Could not find primary node" );
             }
         }
-        else {
-            po.addLogFailed( "Node addition failed" );
-        }
+
+        return false;
     }
 
 
-    private void addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
+    private boolean addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
         List<Command> commands = Commands.getAddRouterCommands( config, agent );
 
         boolean additionOK = true;
@@ -221,11 +240,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             }
         }
 
-        if ( additionOK ) {
-            po.addLogDone( "Node addition succeeded" );
-        }
-        else {
-            po.addLogFailed( "Node addition failed" );
-        }
+        return additionOK;
     }
 }
