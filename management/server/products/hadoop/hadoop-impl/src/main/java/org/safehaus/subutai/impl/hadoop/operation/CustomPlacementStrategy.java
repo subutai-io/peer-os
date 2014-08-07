@@ -1,17 +1,16 @@
 package org.safehaus.subutai.impl.hadoop.operation;
 
 import java.util.*;
-
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class CustomPlacementStrategy extends LxcPlacementStrategy {
 
     public static final String MASTER_NODE_TYPE = "master";
     public static final String SLAVE_NODE_TYPE = "slave";
+    private static final Logger logger = LoggerFactory.getLogger(CustomPlacementStrategy.class);
     private float hddPerNodeMb;
     private float hddReservedMb;
     private float ramPerNodeMb;
@@ -101,10 +100,12 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
     public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> metrics) {
         if(metrics == null || metrics.isEmpty()) return null;
 
+        logger.info(" ----- Calculating slots for each server -----");
         Map<Agent, Integer> slots = new HashMap<>();
         for(Map.Entry<Agent, ServerMetric> e : metrics.entrySet()) {
             ServerMetric m = e.getValue();
             int min = Integer.MAX_VALUE;
+            logger.info("{}", m);
 
             int n = Math.round((m.getFreeRamMb() - ramReservedMb) / ramPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
@@ -112,9 +113,7 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
             n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
 
-            int unusedCpu = 100 - m.getCpuLoadPercent();
-            n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-            if((min = Math.min(n, min)) <= 0) continue;
+            // TODO: check cpu load when cpu load determination is reimplemented
 
             slots.put(e.getKey(), min);
         }
