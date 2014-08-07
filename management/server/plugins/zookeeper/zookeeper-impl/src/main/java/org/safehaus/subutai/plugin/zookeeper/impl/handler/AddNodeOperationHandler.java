@@ -108,7 +108,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
 
-        boolean hasZkInstalled = result.getStdOut().contains( Common.PACKAGE_PREFIX + config.getTemplateName() );
+        boolean hasZkInstalled =
+                result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME );
 
         if ( hasZkInstalled ) {
 
@@ -208,13 +209,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
 
-        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + config.getTemplateName() ) ) {
+        if ( result.getStdOut().contains( Common.PACKAGE_PREFIX + ZookeeperClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed(
                     String.format( "Node %s already has Zookeeper installed\nInstallation aborted", lxcHostname ) );
             return;
         }
-        else if ( !result.getStdOut()
-                         .contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
+        else if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
             return;
         }

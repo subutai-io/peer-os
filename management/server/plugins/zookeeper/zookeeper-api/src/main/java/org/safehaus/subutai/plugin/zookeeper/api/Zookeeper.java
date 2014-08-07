@@ -8,6 +8,7 @@ package org.safehaus.subutai.plugin.zookeeper.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
@@ -37,9 +38,7 @@ public interface Zookeeper extends ApiBase<ZookeeperClusterConfig> {
 
     public UUID removeProperty( String clusterName, String fileName, String propertyName );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( ZookeeperClusterConfig config, ProductOperation po );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( HadoopClusterConfig hadoopConfig,
-                                                         ZookeeperClusterConfig zkConfig, ProductOperation po );
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, ZookeeperClusterConfig config,
+                                                         ProductOperation po );
 }
 
