@@ -13,6 +13,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -243,6 +244,17 @@ public class HadoopImpl implements Hadoop {
     }
 
 
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
+                                                         Environment environment ) {
+        //parse environment to get nodes and assign their roles(refer to getDefaultEnvironmentBlueprint)
+        //use template registry to get template pojo and use Template's products to figure out which nodes have
+        // Hadoop installed
+        //use passed hadoopClusterConfig to figure out number of slave nodes
+        //generate exception if hadoopClusterConfig is misconfigured   or environment is invalid
+        return null;
+    }
+
+
     @Override
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
@@ -256,7 +268,7 @@ public class HadoopImpl implements Hadoop {
         //hadoop master nodes
         NodeGroup mastersGroup = new NodeGroup();
         mastersGroup.setName( NodeType.MASTER_NODE.name() );
-        mastersGroup.setNumberOfNodes( DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
+        mastersGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
         mastersGroup.setTemplateName( config.getTemplateName() );
         mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM );
         nodeGroups.add( mastersGroup );

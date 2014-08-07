@@ -20,7 +20,8 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 public class MongoClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "MongoDB2";
-    private String templateName = "mongodb";
+    public static final String PRODUCT_NAME = "mongodb";
+    private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private String replicaSetName = "repl";
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
@@ -154,7 +155,7 @@ public class MongoClusterConfig implements ConfigBase {
 
     @Override
     public String getProductName() {
-        return PRODUCT_KEY;
+        return PRODUCT_NAME;
     }
 
 

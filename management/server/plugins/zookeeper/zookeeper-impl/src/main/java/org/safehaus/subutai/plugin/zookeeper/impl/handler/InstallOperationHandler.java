@@ -29,7 +29,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
-                String.format( "Installing %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+                String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
 
@@ -51,7 +51,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         if ( Strings.isNullOrEmpty( config.getClusterName() )
                 //either number of nodes to create or hadoop cluster nodes must be present
                 || ( config.getSetupType() == SetupType.STANDALONE && config.getNumberOfNodes() <= 0 ) || (
-                config.getSetupType() == SetupType.OVER_HADOOP && Util.isCollectionEmpty( config.getNodes() ) ) ) {
+                config.getSetupType() == SetupType.OVER_HADOOP && Util.isCollectionEmpty( config.getNodes() ) ) ||
+                ( config.getSetupType() == SetupType.WITH_HADOOP && hadoopClusterConfig == null ) ) {
             po.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
@@ -81,19 +82,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {
-            ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
+            clusterSetupStrategy.setup();
 
-            if ( manager.getDbManager()
-                        .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
-                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
-            }
-            else {
-                po.addLogFailed( "Failed to save cluster information to database" );
-            }
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e ) {
             po.addLogFailed(
-                    String.format( "Failed to setup over-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup an over-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 
@@ -106,19 +101,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
 
         try {
-            ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
+            clusterSetupStrategy.setup();
 
-            if ( manager.getDbManager()
-                        .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
-                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
-            }
-            else {
-                po.addLogFailed( "Failed to save cluster information to database" );
-            }
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e ) {
             po.addLogFailed(
-                    String.format( "Failed to setup standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup a standalone ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 
@@ -127,19 +116,13 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( hadoopClusterConfig, config, po );
 
         try {
-            ZookeeperClusterConfig finalConfig = ( ZookeeperClusterConfig ) clusterSetupStrategy.setup();
+            clusterSetupStrategy.setup();
 
-            if ( manager.getDbManager()
-                        .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
-                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
-            }
-            else {
-                po.addLogFailed( "Failed to save cluster information to database" );
-            }
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( ClusterSetupException e ) {
             po.addLogFailed(
-                    String.format( "Failed to setup with-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
+                    String.format( "Failed to setup a with-Hadoop ZK cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 }
