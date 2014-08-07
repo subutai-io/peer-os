@@ -1,12 +1,11 @@
 package org.safehaus.subutai.impl.mongodb;
 
 import java.util.*;
-
-import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {
@@ -66,9 +65,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
             n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
 
-            int unusedCpu = 100 - m.getCpuLoadPercent();
-            n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-            if((min = Math.min(n, min)) <= 0) continue;
+            // TODO: check cpu load when cpu load determination is reimplemented
 
             slots.put(e.getKey(), min);
         }
