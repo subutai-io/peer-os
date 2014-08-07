@@ -9,13 +9,16 @@ import org.safehaus.subutai.api.elasticsearch.ElasticSearch;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.elasticsearch.component.AgentTree;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 
 
 public class View extends CustomComponent {
@@ -24,7 +27,10 @@ public class View extends CustomComponent {
     private ElasticSearch elasticSearch;
 
     private AgentTree agentTree;
-    private TextArea logTextArea = new TextArea( "Log:" );
+    private final TextArea logTextArea = new TextArea( "Log:" );
+    private final ComboBox configComboBox = new ComboBox( "Config:" );
+    private final TextField configValueField = new TextField("Value:");
+
 
     public View( AgentManager agentManager, ElasticSearch elasticSearch ) {
         this.agentManager = agentManager;
@@ -59,13 +65,39 @@ public class View extends CustomComponent {
         logTextArea.setRows( 30 );
         logTextArea.setWidth( "700px" );
 
-        addButtons( layout );
+        addMainButtons( layout );
+        addConfItems( layout );
 
         return layout;
     }
 
 
-    private void addButtons( AbsoluteLayout layout ) {
+    private void addConfItems( AbsoluteLayout layout ) {
+
+        configComboBox.setNullSelectionAllowed( false );
+        configComboBox.setTextInputAllowed( false );
+        configComboBox.addItem( "cluster.name" );
+        configComboBox.addItem( "node.name" );
+        configComboBox.addItem( "node.name" );
+        configComboBox.addItem( "node.master" );
+        configComboBox.addItem( "node.data" );
+        configComboBox.addItem( "index.number_of_shards" );
+        configComboBox.addItem( "index.number_of_replicas" );
+
+        layout.addComponent( configComboBox, "left: 20px; top: 250px;" );
+        layout.addComponent( configValueField, "left: 20px; top: 300px;" );
+
+        Button statusButton = addButton( layout, "Submit", 350 );
+        statusButton.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                confSubmitButtonClicked();
+            }
+        } );
+    }
+
+
+    private void addMainButtons( AbsoluteLayout layout ) {
 
         Button statusButton = addButton( layout, "Status", 50 );
         statusButton.addClickListener( new Button.ClickListener() {
@@ -119,6 +151,32 @@ public class View extends CustomComponent {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private void confSubmitButtonClicked() {
+
+        Agent agent = getSelectedAgent();
+
+        if ( agent == null ) {
+            addLog( "Please select a node!" );
+            return;
+        }
+
+        String configKey = (String) configComboBox.getValue();
+        String configValue = configValueField.getValue();
+
+        if ( StringUtils.isEmpty( configKey ) || StringUtils.isEmpty( configKey ) ) {
+            addLog( "Please enter config values!" );
+            return;
+        }
+
+        AgentResult agentResult = elasticSearch.config( agent, configKey, configValue );
+        String message = agentResult.getExitCode() == 0
+                         ? "Command executed successfully"
+                         : "Error to execute command. Please see logs for details.";
+
+        addLog( message );
+    }
 
 
     private void removeButtonClicked() {
