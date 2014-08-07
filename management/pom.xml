@@ -1366,6 +1366,11 @@
         <artifactId>elasticsearch-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- Products Modules - END -->
 
