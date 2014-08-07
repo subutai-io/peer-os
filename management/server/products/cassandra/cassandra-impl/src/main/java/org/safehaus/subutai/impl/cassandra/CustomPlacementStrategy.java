@@ -1,7 +1,6 @@
 package org.safehaus.subutai.impl.cassandra;
 
 import java.util.*;
-
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
@@ -55,9 +54,7 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
             n = Math.round((m.getFreeHddMb() - HDD_IN_RESERVE_MB) / HDD_PER_NODE_MB);
             if((min = Math.min(n, min)) <= 0) continue;
 
-            int unusedCpu = 100 - m.getCpuLoadPercent();
-            n = Math.round(unusedCpu - CPU_IN_RESERVE_PERCENTAGE / CPU_PER_NODE_PERCENTAGE);
-            if((min = Math.min(n, min)) <= 0) continue;
+            // TODO: check cpu load when cpu load determination is reimplemented
 
             slots.put(e.getKey(), min);
         }
