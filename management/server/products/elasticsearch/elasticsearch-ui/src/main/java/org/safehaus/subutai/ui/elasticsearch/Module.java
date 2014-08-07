@@ -13,7 +13,8 @@ import java.io.File;
 
 public class Module implements PortalModule {
 
-    public static final String MODULE_IMAGE = "monitor.png";
+//    public static final String MODULE_IMAGE = "monitor.png";
+    public static final String MODULE_IMAGE = "logo.jpeg";
     private static final String MODULE_NAME = "ElasticSearch";
 
     private AgentManager agentManager;

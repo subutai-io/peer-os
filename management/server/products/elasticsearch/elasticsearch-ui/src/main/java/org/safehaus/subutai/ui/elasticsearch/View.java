@@ -66,13 +66,13 @@ public class View extends CustomComponent {
         logTextArea.setWidth( "700px" );
 
         addMainButtons( layout );
-        addConfItems( layout );
+        addConfigItems( layout );
 
         return layout;
     }
 
 
-    private void addConfItems( AbsoluteLayout layout ) {
+    private void addConfigItems( AbsoluteLayout layout ) {
 
         configComboBox.setNullSelectionAllowed( false );
         configComboBox.setTextInputAllowed( false );
@@ -84,10 +84,10 @@ public class View extends CustomComponent {
         configComboBox.addItem( "index.number_of_shards" );
         configComboBox.addItem( "index.number_of_replicas" );
 
-        layout.addComponent( configComboBox, "left: 20px; top: 250px;" );
-        layout.addComponent( configValueField, "left: 20px; top: 300px;" );
+        layout.addComponent( configComboBox, "left: 20px; top: 400px;" );
+        layout.addComponent( configValueField, "left: 20px; top: 450px;" );
 
-        Button statusButton = addButton( layout, "Submit", 350 );
+        Button statusButton = addButton( layout, "Submit", 500 );
         statusButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -107,7 +107,23 @@ public class View extends CustomComponent {
             }
         } );
 
-        Button installButton = addButton( layout, "Install", 90 );
+        Button startButton = addButton( layout, "Start", 90 );
+        startButton.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                startButtonClicked();
+            }
+        } );
+
+        Button stopButton = addButton( layout, "Stop", 130 );
+        stopButton.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                stopButtonClicked();
+            }
+        } );
+
+        Button installButton = addButton( layout, "Install", 200 );
         installButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -115,7 +131,7 @@ public class View extends CustomComponent {
             }
         } );
 
-        Button removeButton = addButton( layout, "Remove", 130 );
+        Button removeButton = addButton( layout, "Remove", 240 );
         removeButton.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
@@ -259,6 +275,54 @@ public class View extends CustomComponent {
                 break;
             default:
                 addLog( "Elasticsearch NOT installed" );
+                break;
+        }
+    }
+
+
+    private void startButtonClicked() {
+
+        addLog( "Checking status..." );
+
+        Agent agent = getSelectedAgent();
+
+        if ( agent == null ) {
+            addLog( "Please select a node!" );
+            return;
+        }
+
+        AgentResult agentResult = elasticSearch.serviceStart( agent );
+
+        switch ( agentResult.getExitCode() ) {
+            case 0:
+                addLog( "Elasticsearch started successfully" );
+                break;
+            default:
+                addLog( "Error to start Elasticsearch" );
+                break;
+        }
+    }
+
+
+    private void stopButtonClicked() {
+
+        addLog( "Checking status..." );
+
+        Agent agent = getSelectedAgent();
+
+        if ( agent == null ) {
+            addLog( "Please select a node!" );
+            return;
+        }
+
+        AgentResult agentResult = elasticSearch.serviceStop( agent );
+
+        switch ( agentResult.getExitCode() ) {
+            case 0:
+                addLog( "Elasticsearch stopped successfully" );
+                break;
+            default:
+                addLog( "Error to stop Elasticsearch" );
                 break;
         }
     }
