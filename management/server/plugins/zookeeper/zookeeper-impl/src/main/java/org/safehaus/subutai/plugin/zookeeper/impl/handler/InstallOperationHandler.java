@@ -23,7 +23,7 @@ import com.google.common.base.Strings;
  */
 public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;
-    private ZookeeperClusterConfig config;
+    private final ZookeeperClusterConfig config;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
@@ -125,6 +125,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
     private void setupWithHadoop() {
 
         try {
+
+            final String COMBO_TEMPLATE_NAME = "hadoopnzk";
+            hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
             //create environment
             Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
                     manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
