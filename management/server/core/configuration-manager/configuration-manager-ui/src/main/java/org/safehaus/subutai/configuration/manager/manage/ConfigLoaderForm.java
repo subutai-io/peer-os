@@ -142,12 +142,14 @@ public class ConfigLoaderForm extends CustomComponent {
         horizontalLayout_1.addComponent( button_1 );
 
         textFieldHostname = new TextField();
+        textFieldHostname.setCaption( "Hostname" );
         textFieldHostname.setImmediate( false );
         textFieldHostname.setWidth( "-1px" );
         textFieldHostname.setHeight( "-1px" );
         horizontalLayout_1.addComponent( textFieldHostname );
 
         textFieldPath = new TextField();
+        textFieldPath.setCaption( "Path" );
         textFieldPath.setImmediate( false );
         textFieldPath.setWidth( "-1px" );
         textFieldPath.setHeight( "-1px" );
@@ -194,7 +196,7 @@ public class ConfigLoaderForm extends CustomComponent {
                     String hostname = textFieldHostname.getValue().trim();
                     String configPath = textFieldPath.getValue().trim();
                     ConfigTypeEnum typeEnum = ( ConfigTypeEnum ) comboBox_2.getValue();
-                    String config = "";
+                    String config = textArea_1.getValue();
 
                     Boolean result = configManager.injectConfiguration( hostname, configPath, config, typeEnum );
 //                    textArea_2.setValue( result.toString() );
