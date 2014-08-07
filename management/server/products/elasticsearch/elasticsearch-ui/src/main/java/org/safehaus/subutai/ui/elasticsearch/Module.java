@@ -4,6 +4,7 @@ package org.safehaus.subutai.ui.elasticsearch;
 import com.vaadin.ui.Component;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.elasticsearch.ElasticSearch;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
@@ -16,10 +17,16 @@ public class Module implements PortalModule {
     private static final String MODULE_NAME = "ElasticSearch";
 
     private AgentManager agentManager;
+    private ElasticSearch elasticSearch;
 
 
     public void setAgentManager( AgentManager agentManager ) {
         this.agentManager = agentManager;
+    }
+
+
+    public void setElasticSearch( ElasticSearch elasticSearch ) {
+        this.elasticSearch = elasticSearch;
     }
 
 
@@ -43,6 +50,6 @@ public class Module implements PortalModule {
 
     @Override
     public Component createComponent() {
-        return new View( agentManager );
+        return new View( agentManager, elasticSearch );
     }
 }

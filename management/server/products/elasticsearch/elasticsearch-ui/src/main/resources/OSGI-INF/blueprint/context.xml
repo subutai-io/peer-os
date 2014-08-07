@@ -4,8 +4,12 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
+    <reference id="elasticSearch" availability="mandatory"
+               interface="org.safehaus.subutai.api.elasticsearch.ElasticSearch"/>
+
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.elasticsearch.Module">
         <property name="agentManager" ref="agentManager" />
+        <property name="elasticSearch" ref="elasticSearch" />
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
