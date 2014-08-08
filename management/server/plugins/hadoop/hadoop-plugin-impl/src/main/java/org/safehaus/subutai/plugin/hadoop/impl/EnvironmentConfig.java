@@ -2,7 +2,8 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.*;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -64,7 +65,6 @@ public class EnvironmentConfig {
 		setMasterNodes(environment);
 		setSlaveNodes(environment);
 
-		System.out.println(config);
 		return config;
 	}
 
@@ -74,11 +74,6 @@ public class EnvironmentConfig {
 		if (nodes != null && nodes.size() >= 2) {
 
 			Node[] arr = nodes.toArray(new Node[nodes.size()]);
-
-
-			System.out.println(arr[0].getTemplate().getProducts());
-			System.out.println(config.getTemplateName());
-			System.out.println(arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName()));
 
 
 			if (arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
