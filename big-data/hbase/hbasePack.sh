@@ -12,11 +12,11 @@ downloadFileAndMakeChanges() {
 	hbaseVersion=0.98.3
 
 	# Create directories that are required for the debian package
-    mkdir -p $tempDirectory
-    mkdir -p $confDirectory
+	mkdir -p $tempDirectory
+	mkdir -p $confDirectory
 
 	# download hbase which is compatible with hadoop1 version. 
-	wget http://apache.bilkent.edu.tr/hbase/stable/hbase-$hbaseVersion-hadoop1-bin.tar.gz -P $tempDirectory
+	wget https://archive.apache.org/dist/hbase/hbase-0.98.3/hbase-0.98.3-hadoop1-bin.tar.gz -P $tempDirectory 
 	pushd $tempDirectory
 	tar -xpf hbase-*.tar.gz
 
