@@ -48,7 +48,7 @@ public class ClusterNode extends HorizontalLayout {
 	}
 
 	public void setHostname(String value) {
-		hostname.setValue(value.replaceAll("-", "\n"));
+		hostname.setValue("<pre>" + value.replaceAll("-", "\n") + "</pre>");
 	}
 
 	private Embedded getProgressButton() {
