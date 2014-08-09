@@ -1354,6 +1354,33 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+                                <!-- Presto 2 -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>presto-plugin-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>presto-plugin-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>presto-plugin-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>presto-plugin-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>presto-plugin-rest</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
                                 <!-- Shark -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
@@ -1534,26 +1561,26 @@
                                 </artifactItem>
 
                                 <!-- ElasticSearch -->
-                                <!-- <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>elasticsearch-api</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>elasticsearch-impl</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>elasticsearch-cli</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>
-                                 <artifactItem>
-                                     <groupId>org.safehaus.subutai</groupId>
-                                     <artifactId>elasticsearch-ui</artifactId>
-                                     <version>${project.version}</version>
-                                 </artifactItem>-->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>elasticsearch-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>elasticsearch-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>elasticsearch-cli</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>elasticsearch-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
 
                                 <!-- Products Modules - END -->
 

@@ -864,7 +864,7 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Presto -->
+            <!-- Presto 2 -->
             <dependency>
                 <groupId>org.safehaus.subutai</groupId>
                 <artifactId>presto-plugin-api</artifactId>
