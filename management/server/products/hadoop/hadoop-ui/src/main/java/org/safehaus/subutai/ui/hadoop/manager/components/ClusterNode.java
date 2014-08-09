@@ -1,6 +1,7 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
@@ -49,6 +50,7 @@ public class ClusterNode extends HorizontalLayout {
 
 	public void setHostname(String value) {
 		hostname.setValue("<pre>" + value.replaceAll("-", "\n") + "</pre>");
+		hostname.setContentMode(ContentMode.HTML);
 	}
 
 	private Embedded getProgressButton() {
