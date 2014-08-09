@@ -11,7 +11,7 @@
 
     <artifactId>presto-plugin-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Presto Api</name>
+    <name>:: Subutai Presto Api</name>
     <description>Subutai Presto Api</description>
 
     <dependencies>
@@ -22,6 +22,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>environment-manager-api</artifactId>
         </dependency>
     </dependencies>
 

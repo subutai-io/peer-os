@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>presto-plugin-ui</artifactId>
-    <name>Subutai Presto UI</name>
+    <name>:: Subutai Presto UI</name>
     <description>Subutai Presto UI</description>
     <packaging>bundle</packaging>
 

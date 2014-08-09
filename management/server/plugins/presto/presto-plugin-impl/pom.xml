@@ -11,7 +11,7 @@
 
     <artifactId>presto-plugin-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Presto</name>
+    <name>:: Subutai Presto</name>
     <description>Subutai Presto</description>
 
     <dependencies>
