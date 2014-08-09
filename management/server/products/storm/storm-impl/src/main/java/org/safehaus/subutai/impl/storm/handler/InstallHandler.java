@@ -6,11 +6,13 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.impl.storm.CommandType;
 import org.safehaus.subutai.impl.storm.Commands;
 import org.safehaus.subutai.impl.storm.StormImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
@@ -32,6 +34,12 @@ public class InstallHandler extends AbstractHandler {
 
     @Override
     public void run() {
+        doInstallation();
+        if(po.getState() != ProductOperationState.SUCCEEDED)
+            destroyNodes();
+    }
+
+    void doInstallation() {
         if(manager.getCluster(config.getClusterName()) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     config.getClusterName()));
@@ -114,6 +122,12 @@ public class InstallHandler extends AbstractHandler {
                         masterFailed = true;
                     } else {
                         po.addLog("Failed to install on " + a.getHostname());
+                        po.addLog(String.format("Destroying container for %s...", a.getHostname()));
+                        try {
+                            manager.getLxcManager().destroyLxcs(new HashSet<>(Arrays.asList(a)));
+                        } catch(LxcDestroyException ex) {
+                            po.addLog("Failed to detroy container. Use LXC manager to clean up.");
+                        }
                         config.getSupervisors().remove(a);
                     }
                 }
@@ -140,6 +154,22 @@ public class InstallHandler extends AbstractHandler {
             po.addLogDone("Storm cluster successfully configured");
         else
             po.addLogFailed("Failed to configure Storm cluster");
+    }
+
+    void destroyNodes() {
+        try {
+            if(config.getSupervisors() != null && config.getSupervisors().size() > 0) {
+                po.addLog("Destroying supervisor nodes...");
+                manager.getLxcManager().destroyLxcs(config.getSupervisors());
+            }
+            if(config.getNimbus() != null && !config.isExternalZookeeper()) {
+                po.addLog("Destroying Nimbus node...");
+                HashSet<Agent> set = new HashSet<>(Arrays.asList(config.getNimbus()));
+                manager.getLxcManager().destroyLxcs(set);
+            }
+        } catch(LxcDestroyException ex) {
+            po.addLog("Failed to destroy nodes: " + ex.getMessage());
+        }
     }
 
     private boolean prepareNodes(Config config) throws LxcCreateException {
