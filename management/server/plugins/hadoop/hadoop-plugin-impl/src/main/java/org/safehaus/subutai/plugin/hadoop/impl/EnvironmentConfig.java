@@ -1,105 +1,86 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
  * Created by daralbaev on 7/25/14.
  */
 public class EnvironmentConfig {
-	public final static int NUMBER_OF_MASTER_NODES = 3;
-
 	private HadoopClusterConfig config;
 	private EnvironmentBlueprint blueprint;
-	private NodeGroup masterNodes;
+	private Environment environment;
 
-	public EnvironmentConfig(HadoopClusterConfig config) {
+	public EnvironmentConfig(HadoopClusterConfig config, EnvironmentBlueprint blueprint) {
 		this.config = config;
-		blueprint = new EnvironmentBlueprint();
-		blueprint.setName(config.getClusterName());
-		setMasterNodes();
-		blueprint.setNodeGroups(Sets.newHashSet(masterNodes));
+		this.blueprint = blueprint;
 	}
 
-	private void setMasterNodes() {
-		masterNodes = new NodeGroup();
-		masterNodes.setName(config.getClusterName() + "_MasterNodes");
-		masterNodes.setNumberOfNodes(EnvironmentConfig.NUMBER_OF_MASTER_NODES + config.getCountOfSlaveNodes());
-		masterNodes.setTemplateName(config.getTemplateName());
-		masterNodes.setPlacementStrategy(getNodePlacementStrategyByNodeType(NodeType.DEFAULT_NODE));
-		masterNodes.setLinkHosts(true);
-		masterNodes.setExchangeSshKeys(true);
+	public EnvironmentConfig(HadoopClusterConfig config, Environment environment) {
+		this.config = config;
+		this.environment = environment;
+	}
 
-		Set<Agent> physicalAgents = HadoopImpl.getAgentManager().getPhysicalAgents();
-		Set<String> stringAgents = new HashSet<>();
-		for (Agent agent : physicalAgents) {
-			stringAgents.add(agent.getHostname());
+	public HadoopClusterConfig setup() throws EnvironmentBuildException, ClusterSetupException {
+		if (environment == null && blueprint != null) {
+			environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
 		}
-		masterNodes.setPhysicalNodes(stringAgents);
-	}
 
-	public static PlacementStrategy getNodePlacementStrategyByNodeType(NodeType nodeType) {
-		switch (nodeType) {
-			case MASTER_NODE:
-				return PlacementStrategy.MORE_RAM;
-			case SLAVE_NODE:
-				return PlacementStrategy.MORE_HDD;
-			default:
-				return PlacementStrategy.ROUND_ROBIN;
-		}
-	}
-
-	public HadoopClusterConfig setup() throws EnvironmentBuildException {
-		Environment environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
 		setMasterNodes(environment);
 		setSlaveNodes(environment);
 
 		return config;
 	}
 
-	private void setMasterNodes(Environment environment) {
-		Set<Node> nodes = environment.getNodes();
+	private void setMasterNodes(Environment environment) throws ClusterSetupException {
+		Set<Agent> masterNodes = new HashSet<>();
 
-		if (nodes != null && nodes.size() >= 2) {
-
-			Node[] arr = nodes.toArray(new Node[nodes.size()]);
-
-
-			if (arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
-				config.setNameNode(arr[0].getAgent());
-			}
-
-			if (arr[1].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
-				config.setJobTracker(arr[1].getAgent());
-			}
-
-			if (arr[0].getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
-				config.setSecondaryNameNode(arr[2].getAgent());
-			}
-		}
-	}
-
-	private void setSlaveNodes(Environment environment) {
-		Set<Node> nodes = environment.getNodes();
-		if (nodes != null && nodes.size() > 2) {
-			Set<Node> slaveNodes = Sets.difference(nodes, Sets.newHashSet(config.getNameNode(), config.getSecondaryNameNode(), config.getJobTracker()));
-			for (Node node : slaveNodes) {
+		for (Node node : environment.getNodes()) {
+			if (NodeType.MASTER_NODE.name().equalsIgnoreCase(node.getNodeGroupName())) {
 				if (node.getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
-					config.getDataNodes().add(node.getAgent());
-					config.getTaskTrackers().add(node.getAgent());
+					masterNodes.add(node.getAgent());
 				}
 			}
 		}
+
+		if (masterNodes.size() != HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY) {
+			throw new ClusterSetupException(
+					String.format("Hadoop master nodes must be %d in count", HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY));
+		}
+
+		Iterator<Agent> masterIterator = masterNodes.iterator();
+		config.setNameNode(masterIterator.next());
+		config.setSecondaryNameNode(masterIterator.next());
+		config.setJobTracker(masterIterator.next());
+	}
+
+	private void setSlaveNodes(Environment environment) throws ClusterSetupException {
+		Set<Agent> slaveNodes = new HashSet<>();
+
+		for (Node node : environment.getNodes()) {
+			if (NodeType.SLAVE_NODE.name().equalsIgnoreCase(node.getNodeGroupName())) {
+				if (node.getTemplate().getProducts().contains("ksks-" + config.getTemplateName())) {
+					slaveNodes.add(node.getAgent());
+				}
+			}
+		}
+
+		if (slaveNodes.isEmpty()) {
+			throw new ClusterSetupException("Hadoop slave nodes are empty");
+		}
+
+		config.setDataNodes(Lists.newArrayList(slaveNodes));
+		config.setTaskTrackers(Lists.newArrayList(slaveNodes));
 	}
 }

@@ -55,10 +55,6 @@
     background: #f99 !important;
 }
 
-.v-tooltip-text {
-    color: gray;
-}
-
 @font-face {
     font-family: "vdebugfont";
     font-style: normal;

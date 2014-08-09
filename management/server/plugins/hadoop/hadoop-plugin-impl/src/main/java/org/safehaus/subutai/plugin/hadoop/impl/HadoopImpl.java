@@ -232,18 +232,14 @@ public class HadoopImpl implements Hadoop {
 	@Override
 	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
 	                                                    HadoopClusterConfig hadoopClusterConfig) {
-		return new HadoopDbSetupStrategy(po, this, containerManager, hadoopClusterConfig);
+		return new HadoopDbSetupStrategy(po, this, hadoopClusterConfig);
 	}
 
 
-	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
+	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
+	                                                    HadoopClusterConfig hadoopClusterConfig,
 	                                                    Environment environment) {
-		//parse environment to get nodes and assign their roles(refer to getDefaultEnvironmentBlueprint)
-		//use template registry to get template pojo and use Template's products to figure out which nodes have
-		// Hadoop installed
-		//use passed hadoopClusterConfig to figure out number of slave nodes
-		//generate exception if hadoopClusterConfig is misconfigured   or environment is invalid
-		return null;
+		return new HadoopDbSetupStrategy(po, this, hadoopClusterConfig, environment);
 	}
 
 

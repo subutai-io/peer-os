@@ -26,8 +26,7 @@ public class Installation {
 		parent.getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, HadoopImpl.getContainerManager(),
-                        hadoopClusterConfig );
+				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, hadoopClusterConfig );
 				try {
 					strategy.setup();
 				} catch (ClusterSetupException e) {
