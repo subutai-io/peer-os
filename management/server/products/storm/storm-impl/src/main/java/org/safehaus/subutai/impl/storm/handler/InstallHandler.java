@@ -39,9 +39,15 @@ public class InstallHandler extends AbstractHandler {
         }
 
         try {
-            if(!prepareNodes(config)) return;
+            if(!prepareNodes(config)) {
+                po.addLogFailed("Failed to prepare nodes");
+                return;
+            }
         } catch(LxcCreateException ex) {
             po.addLogFailed("Failed to create nodes: " + ex.getMessage());
+            return;
+        } catch(Exception ex) {
+            po.addLogFailed("Failed to prepare nodes: " + ex.getMessage());
             return;
         }
         if(!isNodeConnected(config.getNimbus().getHostname())) {
@@ -55,7 +61,7 @@ public class InstallHandler extends AbstractHandler {
             return;
         }
 
-        po.addLog("Check installed packages");
+        po.addLog("Checking installed packages...");
         Set<Agent> allNodes = new HashSet<>(config.getSupervisors());
         allNodes.add(config.getNimbus());
 
@@ -87,7 +93,7 @@ public class InstallHandler extends AbstractHandler {
         }
 
         // install package
-        po.addLog("Installing Storm on nodes");
+        po.addLog("Installing Storm on nodes...");
         allNodes.removeAll(skipped);
         if(allNodes.size() > 0) {
             String s = Commands.make(CommandType.INSTALL);
@@ -104,7 +110,7 @@ public class InstallHandler extends AbstractHandler {
                     if(isZero(res.getExitCode()))
                         po.addLog("Storm successfully installed on " + a.getHostname());
                     else if(isNimbusNode(config, a.getHostname())) {
-                        po.addLog("Failed to install on master node");
+                        po.addLog("Failed to install on Nimbus node");
                         masterFailed = true;
                     } else {
                         po.addLog("Failed to install on " + a.getHostname());
@@ -140,6 +146,7 @@ public class InstallHandler extends AbstractHandler {
         InstallHelper helper = new InstallHelper(manager);
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {
+            po.addLog("Creating container for Nimbus node...");
             Agent nimbus = helper.createNimbusContainer();
             if(nimbus == null) {
                 po.addLogFailed("Failed to create nimbus node");
@@ -147,6 +154,7 @@ public class InstallHandler extends AbstractHandler {
             }
             config.setNimbus(nimbus);
             // install Zookeeper on nimbus
+            po.addLog("Installing Zookeeper on Nimbus node...");
             boolean b = helper.installZookeeper(nimbus);
             if(!b) {
                 po.addLogFailed("Failed to install Zookeeper on nimbus");
@@ -154,6 +162,8 @@ public class InstallHandler extends AbstractHandler {
             }
         }
         // create supervisor nodes
+        po.addLog(String.format("Creating %s container(s) for supervisor nodes...",
+                config.getSupervisorsCount()));
         Set<Agent> set = helper.createSupervisorContainers(config.getSupervisorsCount());
         if(set.size() != config.getSupervisorsCount())
             po.addLog("Not all nodes created. Created nodes count: " + set.size());
