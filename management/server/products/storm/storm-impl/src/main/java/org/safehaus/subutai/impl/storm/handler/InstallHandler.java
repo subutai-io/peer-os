@@ -2,44 +2,36 @@ package org.safehaus.subutai.impl.storm.handler;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.impl.storm.CommandType;
-import org.safehaus.subutai.impl.storm.Commands;
-import org.safehaus.subutai.impl.storm.StormImpl;
+import org.safehaus.subutai.impl.storm.*;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
-    private final ProductOperation po;
     private final Config config;
 
     public InstallHandler(StormImpl manager, Config config) {
         super(manager, config.getClusterName());
         this.config = config;
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_NAME,
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_NAME,
                 "Install cluster " + config.getClusterName());
-    }
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
     }
 
     @Override
     public void run() {
         doInstallation();
-        if(po.getState() != ProductOperationState.SUCCEEDED)
+        if(productOperation.getState() != ProductOperationState.SUCCEEDED)
             destroyNodes();
     }
 
     void doInstallation() {
+        ProductOperation po = productOperation;
         if(manager.getCluster(config.getClusterName()) != null) {
             po.addLogFailed(String.format("Cluster '%s' already exists",
                     config.getClusterName()));
@@ -157,6 +149,7 @@ public class InstallHandler extends AbstractHandler {
     }
 
     void destroyNodes() {
+        ProductOperation po = productOperation;
         try {
             if(config.getSupervisors() != null && config.getSupervisors().size() > 0) {
                 po.addLog("Destroying supervisor nodes...");
@@ -173,6 +166,7 @@ public class InstallHandler extends AbstractHandler {
     }
 
     private boolean prepareNodes(Config config) throws LxcCreateException {
+        ProductOperation po = productOperation;
         InstallHelper helper = new InstallHelper(manager);
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {

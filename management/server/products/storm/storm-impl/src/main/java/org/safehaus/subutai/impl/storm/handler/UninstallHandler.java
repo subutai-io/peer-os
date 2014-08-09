@@ -2,7 +2,6 @@ package org.safehaus.subutai.impl.storm.handler;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
@@ -15,21 +14,16 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public class UninstallHandler extends AbstractHandler {
 
-    private final ProductOperation po;
-
     public UninstallHandler(StormImpl manager, String clusterName) {
         super(manager, clusterName);
-        po = manager.getTracker().createProductOperation(Config.PRODUCT_NAME,
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_NAME,
                 "Uninstall cluster " + clusterName);
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
-    @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed("Cluster not found: " + clusterName);
