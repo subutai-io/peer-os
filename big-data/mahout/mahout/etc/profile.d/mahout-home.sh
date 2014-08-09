@@ -1,3 +1,11 @@
+#!/bin/sh
 mahoutHome="/opt/mahout"
 export MAHOUT_HOME=$mahoutHome
-export PATH=$PATH:$MAHOUT_HOME/bin
+
+path_content=$(echo $PATH)
+
+pattern="$mahoutHome/bin"
+if test "${path_content#*$pattern}" = "$path_content"
+then
+	export PATH=$PATH:$pattern
+fi
