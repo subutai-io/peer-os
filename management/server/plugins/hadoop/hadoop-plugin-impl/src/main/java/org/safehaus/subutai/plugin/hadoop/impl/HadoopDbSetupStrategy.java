@@ -110,7 +110,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 					po.addLog("Lxc containers created successfully");
 
 					//continue installation here
-					installHadoopCluster();
+//					installHadoopCluster();
 
 					po.addLogDone(String.format("Cluster '%s' \nInstallation finished",
 							hadoopClusterConfig.getClusterName()));

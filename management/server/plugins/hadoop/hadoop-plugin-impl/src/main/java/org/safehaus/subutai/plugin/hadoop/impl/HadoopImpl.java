@@ -27,12 +27,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-/**
- * Created by daralbaev on 02.04.14.
- */
 public class HadoopImpl implements Hadoop {
-	public static final String MODULE_NAME = "Hadoop";
+	public static final int INITIAL_CAPACITY = 2;
 
 	private static CommandRunner commandRunner;
 	private static AgentManager agentManager;
@@ -58,12 +54,12 @@ public class HadoopImpl implements Hadoop {
 	}
 
 
-	public void init() {
+	public static void init() {
 		executor = Executors.newCachedThreadPool();
 	}
 
 
-	public void destroy() {
+	public static void destroy() {
 		executor.shutdown();
 		commandRunner = null;
 	}
@@ -250,7 +246,7 @@ public class HadoopImpl implements Hadoop {
 		environmentBlueprint.setLinkHosts(true);
 		environmentBlueprint.setExchangeSshKeys(true);
 		environmentBlueprint.setDomainName(Common.DEFAULT_DOMAIN_NAME);
-		Set<NodeGroup> nodeGroups = new HashSet<>();
+		Set<NodeGroup> nodeGroups = new HashSet<>(INITIAL_CAPACITY);
 
 		//hadoop master nodes
 		NodeGroup mastersGroup = new NodeGroup();

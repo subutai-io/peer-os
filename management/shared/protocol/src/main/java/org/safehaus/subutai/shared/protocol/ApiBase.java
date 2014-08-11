@@ -8,34 +8,34 @@ import java.util.UUID;
  */
 public interface ApiBase<T extends ConfigBase> {
 
-    /**
-     * Installs cluster according to the specified configuration object
-     *
-     * @param config - cluster configuration object
-     * @return - UUID of operation to track
-     */
-    public UUID installCluster(T config);
+	/**
+	 * Installs cluster according to the specified configuration object
+	 *
+	 * @param config - cluster configuration object
+	 * @return - UUID of operation to track
+	 */
+	public UUID installCluster(T config);
 
-    /**
-     * Uninstalls the specified cluster
-     *
-     * @param clusterName - name of cluster
-     * @return - UUID of operation to track
-     */
-    public UUID uninstallCluster(String clusterName);
+	/**
+	 * Uninstalls the specified cluster
+	 *
+	 * @param clusterName - name of cluster
+	 * @return - UUID of operation to track
+	 */
+	public UUID uninstallCluster(String clusterName);
 
-    /**
-     * Returns list of configuration objects of installed clusters
-     *
-     * @return - list of configuration objects of installed clusters
-     */
-    public List<T> getClusters();
+	/**
+	 * Returns list of configuration objects of installed clusters
+	 *
+	 * @return - list of configuration objects of installed clusters
+	 */
+	public List<T> getClusters();
 
-    /**
-     * Returns configuration object of installed cluster by name
-     *
-     * @param clusterName - - name of cluster
-     * @return - configuration object of installed cluster
-     */
-    public T getCluster(String clusterName);
+	/**
+	 * Returns configuration object of installed cluster by name
+	 *
+	 * @param clusterName - - name of cluster
+	 * @return - configuration object of installed cluster
+	 */
+	public T getCluster(String clusterName);
 }
