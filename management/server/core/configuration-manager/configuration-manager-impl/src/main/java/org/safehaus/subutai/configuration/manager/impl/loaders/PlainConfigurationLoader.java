@@ -27,7 +27,6 @@ public class PlainConfigurationLoader implements ConfigurationLoader {
 
     @Override
     public boolean setConfiguration( String hostname, String configFilePath, String content ) {
-        System.out.println("setConfiguration: " + hostname + " " + configFilePath + " " + content);
         textInjector.echoTextIntoAgent( hostname, configFilePath, content );
         return true;
     }

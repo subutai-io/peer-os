@@ -198,8 +198,6 @@ public class ConfigLoaderForm extends CustomComponent {
                     ConfigTypeEnum typeEnum = ( ConfigTypeEnum ) comboBox_2.getValue();
                     String config = textArea_1.getValue();
 
-                    System.out.println(hostname+ " " + configPath + " "+ typeEnum+ " " +config);
-                    System.out.println("Config Manager : " + configManager);
                     Boolean result = configManager.injectConfiguration( hostname, configPath, config, typeEnum );
 //                    textArea_2.setValue( result.toString() );
                 }
