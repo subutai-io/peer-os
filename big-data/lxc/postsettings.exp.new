@@ -52,6 +52,14 @@ expect "# " { send "./collectd-conf.sh\r" }
 sleep 1
 expect "# " { send "sed -i -e 's/^/#/' /etc/apt/sources.list \r" }
 sleep 1
+expect "# " { send "echo "deb http://gw.intra.lan:9999/ubuntu trusty main restricted universe multiverse" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo "deb-src http://gw.intra.lan:9999/ubuntu/ trusty main restricted universe multiverse" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo "deb http://gw.intra.lan:9999/ubuntu trusty-updates main restricted universe multiverse" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo "deb-src http://gw.intra.lan:9999/ubuntu trusty-updates main restricted universe multiverse" >> /etc/apt/sources.list \r"}
+sleep 1
 #Cleaning archive folder
 expect "# " { send "python deleter.py\r" }
 sleep 1
