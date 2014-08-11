@@ -1,6 +1,7 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
@@ -48,7 +49,8 @@ public class ClusterNode extends HorizontalLayout {
 	}
 
 	public void setHostname(String value) {
-		hostname.setValue(value);
+		hostname.setValue("<pre>" + value.replaceAll("-", "\n") + "</pre>");
+		hostname.setContentMode(ContentMode.HTML);
 	}
 
 	private Embedded getProgressButton() {
@@ -63,8 +65,6 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getStartButton() {
 		startButton = new Embedded("", new ThemeResource("img/btn/play.png"));
 		startButton.setDescription("Start");
-		/*startButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		startButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return startButton;
 	}
@@ -72,8 +72,6 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getStopButton() {
 		stopButton = new Embedded("", new ThemeResource("img/btn/stop.png"));
 		stopButton.setDescription("Stop");
-		/*stopButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		stopButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return stopButton;
 	}
@@ -81,8 +79,6 @@ public class ClusterNode extends HorizontalLayout {
 	private Embedded getRestartButton() {
 		restartButton = new Embedded("", new ThemeResource("img/btn/update.png"));
 		restartButton.setDescription("Restart");
-		/*restartButton.setWidth(ICON_SIZE, Unit.PIXELS);
-		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return restartButton;
 	}
