@@ -567,6 +567,12 @@
         <artifactId>tracker-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>tracker-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
 
       <!-- Git Manager -->
       <dependency>

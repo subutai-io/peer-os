@@ -65,34 +65,8 @@ public class Manager {
 			}
 		});
 
-		Button destroyClusterBtn = new Button("Destroy");
-		destroyClusterBtn.addStyleName("default");
-		destroyClusterBtn.addClickListener(new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
-				if (config == null) {
-                    show("Select Sqoop installation");
-					return;
-				}
-
-                ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to completely destroy installation '%s'?", config.getClusterName()),
-                  						"Yes", "No");
-				alert.getOk().addClickListener(new Button.ClickListener() {
-					@Override
-					public void buttonClick(Button.ClickEvent clickEvent) {
-						destroyClusterHandler();
-					}
-				});
-
-				contentRoot.getUI().addWindow(alert.getAlert());
-			}
-
-		});
-
 		controlsContent.addComponent(clusterCombo);
 		controlsContent.addComponent(refreshClustersBtn);
-		controlsContent.addComponent(destroyClusterBtn);
 
 		contentRoot.addComponent(controlsContent, 0, 0);
 		contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
@@ -241,19 +215,6 @@ public class Manager {
 			}
 		});
 		return table;
-	}
+    }
 
-	private void destroyClusterHandler() {
-
-		UUID trackID = SqoopUI.getManager().uninstallCluster(config.getClusterName());
-
-		ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
-		window.getWindow().addCloseListener(new Window.CloseListener() {
-			@Override
-			public void windowClose(Window.CloseEvent closeEvent) {
-				refreshClustersInfo();
-			}
-		});
-		contentRoot.getUI().addWindow(window.getWindow());
-	}
 }

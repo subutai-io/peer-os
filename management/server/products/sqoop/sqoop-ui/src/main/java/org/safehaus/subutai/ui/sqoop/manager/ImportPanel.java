@@ -143,8 +143,8 @@ public class ImportPanel extends ImportExportBase {
 			default:
 				throw new AssertionError(type.name());
 		}
-        ls.add(buttons);
         ls.add(optionalParams);
+        ls.add(buttons);
 
 		addComponents(ls);
 	}
