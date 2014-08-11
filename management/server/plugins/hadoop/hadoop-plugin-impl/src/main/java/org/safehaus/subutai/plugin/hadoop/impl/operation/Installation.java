@@ -15,22 +15,22 @@ public class Installation {
 	private HadoopImpl parent;
 	private HadoopClusterConfig hadoopClusterConfig;
 
-	public Installation(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
+	public Installation(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig) {
 		this.parent = parent;
 		this.hadoopClusterConfig = hadoopClusterConfig;
 	}
 
 	public UUID execute() {
-		final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY, "Installation of Hadoop");
+		final ProductOperation po = parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY, "Installation of Hadoop");
 
 		parent.getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, hadoopClusterConfig );
+				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, hadoopClusterConfig);
 				try {
 					strategy.setup();
 				} catch (ClusterSetupException e) {
-					e.printStackTrace();
+					po.addLogFailed(e.getMessage());
 				}
 			}
 		});

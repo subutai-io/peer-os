@@ -240,7 +240,7 @@ public class HadoopImpl implements Hadoop {
 
 
 	@Override
-	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config) {
+	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config) throws ClusterSetupException {
 		EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
 		environmentBlueprint.setName(String.format("%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUID.randomUUID()));
 		environmentBlueprint.setLinkHosts(true);
@@ -266,20 +266,24 @@ public class HadoopImpl implements Hadoop {
 		slavesGroup.setPhysicalNodes(convertAgent2Hostname());
 		nodeGroups.add(slavesGroup);
 
-
 		environmentBlueprint.setNodeGroups(nodeGroups);
 
 		return environmentBlueprint;
 	}
 
-	private Set<String> convertAgent2Hostname() {
+	private Set<String> convertAgent2Hostname() throws ClusterSetupException {
 		Set<Agent> agents = agentManager.getPhysicalAgents();
-		Set<String> hostnames = new HashSet<>(agents.size());
 
-		for (Agent agent : agents) {
-			hostnames.add(agent.getHostname());
+		if (agents != null && !agents.isEmpty()) {
+			Set<String> hostNames = new HashSet<>(agents.size());
+
+			for (Agent agent : agents) {
+				hostNames.add(agent.getHostname());
+			}
+
+			return hostNames;
+		} else {
+			throw new ClusterSetupException("No physical machines available");
 		}
-
-		return hostnames;
 	}
 }

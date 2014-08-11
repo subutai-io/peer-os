@@ -78,7 +78,7 @@ function destroy {
   done
 
   # (6) lxc-destroy the clone
-  lxc-destroy -n $clone
+  lxc-destroy -n $clone -f
 
   # (7) destroy mounted partitions 
   remove-mount $clone $parent opt lxc

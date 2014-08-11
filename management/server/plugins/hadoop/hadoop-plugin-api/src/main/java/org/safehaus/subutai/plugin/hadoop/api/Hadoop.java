@@ -3,10 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.api;
 
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ApiBase;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.*;
 
 import java.util.UUID;
 
@@ -50,5 +47,5 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, HadoopClusterConfig hadoopClusterConfig,
 	                                                    Environment environment);
 
-	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config);
+	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config) throws ClusterSetupException;
 }
