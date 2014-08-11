@@ -1372,6 +1372,28 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- ElasticSearch2 -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch2-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch2-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch2-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch2-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Products Modules - END -->
 
       <!--karaf-->

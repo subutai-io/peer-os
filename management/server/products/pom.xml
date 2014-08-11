@@ -36,6 +36,7 @@
         <module>storm</module>
         <module>zookeeper</module>
         <module>elasticsearch</module>
+        <module>elasticsearch2</module>
     </modules>
 
 </project>

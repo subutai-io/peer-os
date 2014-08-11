@@ -1555,6 +1555,28 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Elasticsearch2 -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch2-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch2-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch2-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch2-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Products Modules - END -->
 
               </artifactItems>
