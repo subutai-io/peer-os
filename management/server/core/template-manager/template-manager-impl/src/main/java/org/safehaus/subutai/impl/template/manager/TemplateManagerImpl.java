@@ -103,7 +103,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 
 		boolean result = true;
 		for (String cloneName : cloneNames) {
-			String command = String.format("/usr/bin/subutai clone %s %s", templateName, cloneName);
+			String command = String.format("/usr/bin/subutai clone %s %s &", templateName, cloneName);
 			Command cmd = getCommandRunner()
 					.createCommand(new RequestBuilder(command.toString()).withTimeout(180), Sets.newHashSet(a));
 			getCommandRunner().runCommand(cmd);
