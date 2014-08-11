@@ -97,7 +97,7 @@ public class Manager {
 				}
 
 				org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
-						config.getClusterName());
+                        config.getHadoopClusterName());
 				if (hci == null) {
 					show("Hadoop cluster info not found");
 					return;
