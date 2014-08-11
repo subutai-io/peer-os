@@ -21,7 +21,7 @@ public class DestroyNodeHandler extends AbstractHandler {
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {
-            po.addLogFailed("Cluster not found: " + clusterName);
+            po.addLogFailed("Sqoop installation not found: " + clusterName);
             return;
         }
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
@@ -48,12 +48,12 @@ public class DestroyNodeHandler extends AbstractHandler {
             else
                 b = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
                         config.getClusterName(), config);
-            if(b) po.addLogDone("Cluster info successfully udated");
-            else po.addLogFailed("Failed to update cluster info");
+            if(b) po.addLogDone("Installation info successfully updated");
+            else po.addLogFailed("Failed to update installation info");
 
         } else {
             po.addLog(cmd.getAllErrors());
-            po.addLogFailed("Failed to remove node from cluster");
+            po.addLogFailed("Failed to remove Sqoop from node");
         }
 
     }

@@ -6,10 +6,10 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;
 import org.safehaus.subutai.impl.sqoop.CommandType;
 import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CheckHandler extends AbstractHandler {
@@ -22,7 +22,7 @@ public class CheckHandler extends AbstractHandler {
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {
-            po.addLogFailed("Cluster not found: " + clusterName);
+            po.addLogFailed("Sqoop installation not found: " + clusterName);
             return;
         }
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);

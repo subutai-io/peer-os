@@ -13,7 +13,7 @@ public class SqoopImpl extends SqoopBase {
     @Override
     public UUID installCluster(Config config) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Install Sqoop cluster " + config.getClusterName());
+                "Install Sqoop on " + config.getClusterName());
         InstallHandler h = new InstallHandler(this, config.getClusterName(), po);
         h.setConfig(config);
         executor.execute(h);
