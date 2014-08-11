@@ -32,15 +32,15 @@ public class EnvironmentConfig {
 		this.environment = environment;
 	}
 
-	public HadoopClusterConfig setup() throws EnvironmentBuildException, ClusterSetupException {
+	public HadoopClusterConfig init() throws EnvironmentBuildException, ClusterSetupException {
 		System.out.printf("Environment: %s%n", environment);
 		System.out.printf("Blueprint: %s%n", blueprint);
-		/*if (environment == null && blueprint != null) {
+		if (environment == null && blueprint != null) {
 			environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
 		}
 
 		setMasterNodes(environment);
-		setSlaveNodes(environment);*/
+		setSlaveNodes(environment);
 
 		return config;
 	}

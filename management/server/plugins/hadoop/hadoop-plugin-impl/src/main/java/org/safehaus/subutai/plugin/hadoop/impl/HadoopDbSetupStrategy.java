@@ -19,7 +19,7 @@ import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 
 /**
- * This is a hadoop cluster setup strategy.
+ * This is a hadoop cluster init strategy.
  */
 public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 
@@ -104,13 +104,13 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 					} else {
 						config = new EnvironmentConfig(hadoopClusterConfig, environment);
 					}
-					hadoopClusterConfig = config.setup();
+					hadoopClusterConfig = config.init();
 
 
 					po.addLog("Lxc containers created successfully");
 
 					//continue installation here
-//					installHadoopCluster();
+					installHadoopCluster();
 
 					po.addLogDone(String.format("Cluster '%s' \nInstallation finished",
 							hadoopClusterConfig.getClusterName()));
