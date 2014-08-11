@@ -1,6 +1,8 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
+import org.safehaus.subutai.configuration.manager.api.TextInjector;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
@@ -13,6 +15,13 @@ import com.google.gson.JsonObject;
 public class XMLConfigurationLoader implements ConfigurationLoader {
 
     //            String xmlConfig = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/core-site.xml";
+
+    private TextInjector textInjector;
+
+
+    public XMLConfigurationLoader( final TextInjector textInjector ) {
+        this.textInjector = textInjector;
+    }
 
 
     @Override

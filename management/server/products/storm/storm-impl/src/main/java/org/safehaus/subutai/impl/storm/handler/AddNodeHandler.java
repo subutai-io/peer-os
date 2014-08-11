@@ -2,37 +2,31 @@ package org.safehaus.subutai.impl.storm.handler;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.storm.CommandType;
 import org.safehaus.subutai.impl.storm.Commands;
 import org.safehaus.subutai.impl.storm.StormImpl;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class AddNodeHandler extends AbstractHandler {
 
-    private final ProductOperation po;
     private final String hostname;
 
     public AddNodeHandler(StormImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
-        this.po = manager.getTracker().createProductOperation(
+        this.productOperation = manager.getTracker().createProductOperation(
                 Config.PRODUCT_NAME, "Add node to cluster: " + hostname);
         this.hostname = hostname;
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
-    @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));

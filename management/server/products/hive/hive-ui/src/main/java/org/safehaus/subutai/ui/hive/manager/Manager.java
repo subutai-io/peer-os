@@ -1,6 +1,5 @@
 package org.safehaus.subutai.ui.hive.manager;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -87,22 +86,6 @@ public class Manager {
 			}
 		});
 
-		Button checkAllBtn = new Button("Check all");
-		checkAllBtn.addStyleName("default");
-		checkAllBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				Table[] tables = new Table[] {serverTable, clientsTable};
-				for (Table t : tables) {
-					for (Object itemId : t.getItemIds()) {
-						Item item = t.getItem(itemId);
-						Object e = item.getItemProperty("Check").getValue();
-						if (e instanceof Button) ((Button) e).click();
-					}
-				}
-			}
-		});
-
 		Button addNodeBtn = new Button("Add Node");
 		addNodeBtn.addStyleName("default");
 		addNodeBtn.addClickListener(new Button.ClickListener() {
@@ -142,7 +125,6 @@ public class Manager {
 		controlsContent.addComponent(clusterCombo);
 		controlsContent.addComponent(refreshClustersBtn);
 		controlsContent.addComponent(destroyClusterBtn);
-		controlsContent.addComponent(checkAllBtn);
 		controlsContent.addComponent(addNodeBtn);
 
 		VerticalLayout tablesLayout = new VerticalLayout();

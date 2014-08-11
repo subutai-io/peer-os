@@ -9,12 +9,13 @@ import com.google.gson.JsonObject;
 /**
  * Created by bahadyr on 8/4/14.
  */
-public class PlainConfigurationLoader implements ConfigurationLoader {
+public class ShellConfigurationLoader implements ConfigurationLoader {
+
 
     private TextInjector textInjector;
 
 
-    public PlainConfigurationLoader( final TextInjector textInjector ) {
+    public ShellConfigurationLoader( final TextInjector textInjector ) {
         this.textInjector = textInjector;
     }
 
@@ -26,8 +27,7 @@ public class PlainConfigurationLoader implements ConfigurationLoader {
 
 
     @Override
-    public boolean setConfiguration( String hostname, String configFilePath, String content ) {
-        textInjector.echoTextIntoAgent( hostname, configFilePath, content );
-        return true;
+    public boolean setConfiguration( String hostname, String configFilePath, String jsonObjectConfig ) {
+        return false;
     }
 }
