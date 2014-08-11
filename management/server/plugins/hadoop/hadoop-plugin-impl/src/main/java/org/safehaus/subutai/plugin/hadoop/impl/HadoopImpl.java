@@ -254,6 +254,7 @@ public class HadoopImpl implements Hadoop {
 		mastersGroup.setNumberOfNodes(HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY);
 		mastersGroup.setTemplateName(config.getTemplateName());
 		mastersGroup.setPlacementStrategy(PlacementStrategy.MORE_RAM);
+		mastersGroup.setPhysicalNodes(convertAgent2Hostname());
 		nodeGroups.add(mastersGroup);
 
 		//hadoop slave nodes
@@ -262,11 +263,23 @@ public class HadoopImpl implements Hadoop {
 		slavesGroup.setNumberOfNodes(config.getCountOfSlaveNodes());
 		slavesGroup.setTemplateName(config.getTemplateName());
 		slavesGroup.setPlacementStrategy(PlacementStrategy.MORE_HDD);
+		slavesGroup.setPhysicalNodes(convertAgent2Hostname());
 		nodeGroups.add(slavesGroup);
 
 
 		environmentBlueprint.setNodeGroups(nodeGroups);
 
 		return environmentBlueprint;
+	}
+
+	private Set<String> convertAgent2Hostname() {
+		Set<Agent> agents = agentManager.getPhysicalAgents();
+		Set<String> hostnames = new HashSet<>(agents.size());
+
+		for (Agent agent : agents) {
+			hostnames.add(agent.getHostname());
+		}
+
+		return hostnames;
 	}
 }
