@@ -142,14 +142,14 @@ public class ConfigLoaderForm extends CustomComponent {
         horizontalLayout_1.addComponent( button_1 );
 
         textFieldHostname = new TextField();
-        textFieldHostname.setCaption( "Hostname" );
+        textFieldHostname.setValue( "py502714478" );
         textFieldHostname.setImmediate( false );
         textFieldHostname.setWidth( "-1px" );
         textFieldHostname.setHeight( "-1px" );
         horizontalLayout_1.addComponent( textFieldHostname );
 
         textFieldPath = new TextField();
-        textFieldPath.setCaption( "Path" );
+        textFieldPath.setValue( "/etc/text.txt" );
         textFieldPath.setImmediate( false );
         textFieldPath.setWidth( "-1px" );
         textFieldPath.setHeight( "-1px" );
@@ -186,7 +186,7 @@ public class ConfigLoaderForm extends CustomComponent {
     private class InjectIntoLxcButton extends Button {
 
         private InjectIntoLxcButton( final ConfigManager configManager ) {
-            setCaption( "Inject JSON" );
+            setCaption( "Inject file" );
             setImmediate( true );
             setWidth( "-1px" );
             setHeight( "-1px" );

@@ -33,7 +33,7 @@ public class YamlConfigurationLoaderTest {
         for ( String key : config.keySet() ) {
 
             Object value = config.get( key );
-            System.out.println( key + " " + value);
+//            System.out.println( key + " " + value);
         }
     }
 }
