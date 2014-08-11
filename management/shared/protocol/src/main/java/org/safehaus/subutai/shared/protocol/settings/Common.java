@@ -6,7 +6,7 @@ public class Common {
     public static final String UNKNOWN_LXC_PARENT_NAME = "UNKNOWN";
     public static final String BROADCAST_TOPIC = "BROADCAST_TOPIC";   //todo migrate to amqConfig
     public static final int REFRESH_UI_SEC = 3;
-    public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 120;
+    public static final int LXC_AGENT_WAIT_TIMEOUT_SEC = 300;
     public static final int AGENT_FRESHNESS_MIN = 4;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final int INACTIVE_COMMAND_DROP_TIMEOUT_SEC = 24 * 60 * 60; // 24 hours

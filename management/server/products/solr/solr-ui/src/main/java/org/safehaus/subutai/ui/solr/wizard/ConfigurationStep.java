@@ -50,7 +50,7 @@ public class ConfigurationStep extends VerticalLayout {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
-                    show( "Please provide cluster name" );
+                    show( "Please provide installation name" );
                 }
                 else {
                     wizard.next();
