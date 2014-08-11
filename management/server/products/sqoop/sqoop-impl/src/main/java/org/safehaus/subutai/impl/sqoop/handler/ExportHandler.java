@@ -29,6 +29,7 @@ public class ExportHandler extends AbstractHandler {
         this.hostname = settings.getHostname();
     }
 
+    @Override
     public void run() {
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) {
@@ -39,7 +40,7 @@ public class ExportHandler extends AbstractHandler {
         String s = CommandFactory.build(CommandType.EXPORT, settings);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s).withTimeout(60),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
 
         manager.getCommandRunner().runCommand(cmd);
 
