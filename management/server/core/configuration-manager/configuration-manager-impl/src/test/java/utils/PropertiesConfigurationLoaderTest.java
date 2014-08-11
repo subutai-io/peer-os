@@ -50,21 +50,21 @@ public class PropertiesConfigurationLoaderTest {
         jo.add( "configFields", jsonArray );
 
         Gson gsonNew = new GsonBuilder().setPrettyPrinting().create();
-        System.out.println( gson.toJson( jo ) );
+//        System.out.println( gson.toJson( jo ) );
 
         Set<Map.Entry<String, JsonElement>> set = jo.entrySet();
         for ( Map.Entry<String, JsonElement> stringJsonElementEntry : set ) {
-            System.out.println( stringJsonElementEntry.getKey() + " " + stringJsonElementEntry.getValue() );
+//            System.out.println( stringJsonElementEntry.getKey() + " " + stringJsonElementEntry.getValue() );
         }
 
         JsonArray jsonArray2 = jo.getAsJsonArray( "configFields" );
-        System.out.println( jsonArray2.size() );
-        System.out.println( "test" );
+//        System.out.println( jsonArray2.size() );
+//        System.out.println( "test" );
         for ( int i = 0; i < jsonArray2.size(); i++ ) {
             JsonObject jo1 = ( JsonObject ) jsonArray2.get( i );
             String fieldName = jo1.getAsJsonPrimitive( "fieldName" ).getAsString();
             String value = jo1.getAsJsonPrimitive( "value" ).getAsString();
-            System.out.println( fieldName + " " + value );
+//            System.out.println( fieldName + " " + value );
         }
     }
 }

@@ -13,12 +13,13 @@
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <bean id="configManager" scope="singleton"
         class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
     <!--<property name="bcontext" ref="blueprintBundleContext"></property>-->
     <!--<property name="agentManager" ref="agentManager" />-->
+    <property name="textInjector" ref="textInjector" />
   </bean>
 
   <bean id="textInjector" scope="singleton"

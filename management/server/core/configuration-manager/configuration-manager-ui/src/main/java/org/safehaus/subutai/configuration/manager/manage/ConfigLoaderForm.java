@@ -142,14 +142,14 @@ public class ConfigLoaderForm extends CustomComponent {
         horizontalLayout_1.addComponent( button_1 );
 
         textFieldHostname = new TextField();
-        textFieldHostname.setCaption( "Hostname" );
+        textFieldHostname.setValue( "py502714478" );
         textFieldHostname.setImmediate( false );
         textFieldHostname.setWidth( "-1px" );
         textFieldHostname.setHeight( "-1px" );
         horizontalLayout_1.addComponent( textFieldHostname );
 
         textFieldPath = new TextField();
-        textFieldPath.setCaption( "Path" );
+        textFieldPath.setValue( "/etc/text.txt" );
         textFieldPath.setImmediate( false );
         textFieldPath.setWidth( "-1px" );
         textFieldPath.setHeight( "-1px" );
@@ -198,6 +198,8 @@ public class ConfigLoaderForm extends CustomComponent {
                     ConfigTypeEnum typeEnum = ( ConfigTypeEnum ) comboBox_2.getValue();
                     String config = textArea_1.getValue();
 
+                    System.out.println(hostname+ " " + configPath + " "+ typeEnum+ " " +config);
+                    System.out.println("Config Manager : " + configManager);
                     Boolean result = configManager.injectConfiguration( hostname, configPath, config, typeEnum );
 //                    textArea_2.setValue( result.toString() );
                 }
