@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.elasticsearch2.Cassandra;
+import org.safehaus.subutai.api.elasticsearch2.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch2.Config;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -18,33 +13,30 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author dilshat
- */
-public class CassandraUI implements PortalModule {
+public class ElasticsearchUI implements PortalModule {
 
-//	public static final String MODULE_IMAGE = "cassandra.png";
 	public static final String MODULE_IMAGE = "logo.jpeg";
 
-	private static Cassandra cassandraManager;
+	private static Elasticsearch elasticsearchManager;
 	private static AgentManager agentManager;
 	private static CommandRunner commandRunner;
 	private static Tracker tracker;
 	private static ExecutorService executor;
 
-	public CassandraUI(AgentManager agentManager, Cassandra cassandraManager, Tracker tracker, CommandRunner commandRunner) {
-		CassandraUI.cassandraManager = cassandraManager;
-		CassandraUI.agentManager = agentManager;
-		CassandraUI.tracker = tracker;
-		CassandraUI.commandRunner = commandRunner;
+	public ElasticsearchUI( AgentManager agentManager, Elasticsearch elasticsearchManager, Tracker tracker,
+                            CommandRunner commandRunner ) {
+		ElasticsearchUI.elasticsearchManager = elasticsearchManager;
+		ElasticsearchUI.agentManager = agentManager;
+		ElasticsearchUI.tracker = tracker;
+		ElasticsearchUI.commandRunner = commandRunner;
 	}
 
 	public static Tracker getTracker() {
 		return tracker;
 	}
 
-	public static Cassandra getCassandraManager() {
-		return cassandraManager;
+	public static Elasticsearch getElasticsearchManager() {
+		return elasticsearchManager;
 	}
 
 	public static ExecutorService getExecutor() {
@@ -64,7 +56,7 @@ public class CassandraUI implements PortalModule {
 	}
 
 	public void destroy() {
-		cassandraManager = null;
+        elasticsearchManager = null;
 		agentManager = null;
 		tracker = null;
 		executor.shutdown();
@@ -81,11 +73,11 @@ public class CassandraUI implements PortalModule {
 
 	@Override
 	public File getImage() {
-		return FileUtil.getFile(CassandraUI.MODULE_IMAGE, this);
+		return FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this);
 	}
 
 	public Component createComponent() {
-		return new CassandraForm();
+		return new ElasticsearchForm();
 	}
 
 }

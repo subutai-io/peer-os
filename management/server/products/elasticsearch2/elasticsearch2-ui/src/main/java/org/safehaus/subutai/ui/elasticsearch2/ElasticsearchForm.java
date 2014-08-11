@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2;
 
 import com.vaadin.ui.CustomComponent;
@@ -13,15 +8,12 @@ import org.safehaus.subutai.ui.elasticsearch2.configuration.ConfigurationView;
 import org.safehaus.subutai.ui.elasticsearch2.manager.Manager;
 import org.safehaus.subutai.ui.elasticsearch2.wizard.Wizard;
 
-/**
- * @author dilshat
- */
-public class CassandraForm extends CustomComponent {
+public class ElasticsearchForm extends CustomComponent {
 
 	private final Wizard wizard;
 	private final Manager manager;
 
-	public CassandraForm() {
+	public ElasticsearchForm() {
 		setSizeFull();
 
 		VerticalLayout verticalLayout = new VerticalLayout();

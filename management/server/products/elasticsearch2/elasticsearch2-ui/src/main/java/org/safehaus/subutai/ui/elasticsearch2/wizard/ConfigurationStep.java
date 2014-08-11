@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2.wizard;
 
 import com.vaadin.data.Property;
@@ -11,9 +6,6 @@ import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.Arrays;
 
-/**
- * @author dilshat
- */
 public class ConfigurationStep extends VerticalLayout {
 
 	public ConfigurationStep(final Wizard wizard) {
@@ -39,7 +31,7 @@ public class ConfigurationStep extends VerticalLayout {
 
 		final TextField domainNameTxtFld = new TextField("Enter domain name");
 		domainNameTxtFld.setInputPrompt("Domain name");
-		domainNameTxtFld.setRequired(true);
+		domainNameTxtFld.setRequired(false);
 		domainNameTxtFld.setMaxLength(20);
 		domainNameTxtFld.setValue(wizard.getConfig().getClusterName());
 		domainNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
@@ -51,7 +43,7 @@ public class ConfigurationStep extends VerticalLayout {
 
 		final TextField dataDirectoryTxtFld = new TextField("Data directory");
 		dataDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/data");
-		dataDirectoryTxtFld.setRequired(true);
+		dataDirectoryTxtFld.setRequired(false);
 		dataDirectoryTxtFld.setMaxLength(20);
 		dataDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
 		dataDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
@@ -63,7 +55,7 @@ public class ConfigurationStep extends VerticalLayout {
 
 		final TextField commitLogDirectoryTxtFld = new TextField("Commit log directory");
 		commitLogDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/commitlog");
-		commitLogDirectoryTxtFld.setRequired(true);
+		commitLogDirectoryTxtFld.setRequired(false);
 		commitLogDirectoryTxtFld.setMaxLength(20);
 		commitLogDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
 		commitLogDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
@@ -75,7 +67,7 @@ public class ConfigurationStep extends VerticalLayout {
 
 		final TextField savedCachesDirectoryTxtFld = new TextField("Saved caches directory");
 		savedCachesDirectoryTxtFld.setInputPrompt("/var/lib/cassandra/saved_caches");
-		savedCachesDirectoryTxtFld.setRequired(true);
+		savedCachesDirectoryTxtFld.setRequired(false);
 		savedCachesDirectoryTxtFld.setMaxLength(20);
 		savedCachesDirectoryTxtFld.setValue(wizard.getConfig().getClusterName());
 		savedCachesDirectoryTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
@@ -122,8 +114,8 @@ public class ConfigurationStep extends VerticalLayout {
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
 					show("Please provide cluster name");
-				} else if (Util.isStringEmpty(wizard.getConfig().getDomainName())) {
-					show("Please provide domain name");
+//				} else if (Util.isStringEmpty(wizard.getConfig().getDomainName())) {
+//					show("Please provide domain name");
 				} else {
 					wizard.next();
 				}

@@ -1,19 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2.wizard;
 
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.protocol.FileUtil;
-import org.safehaus.subutai.ui.elasticsearch2.CassandraUI;
+import org.safehaus.subutai.ui.elasticsearch2.ElasticsearchUI;
 
-/**
- * @author dilshat
- */
+
 public class StepStart extends VerticalLayout {
 
 	public StepStart(final Wizard wizard) {
@@ -23,14 +16,14 @@ public class StepStart extends VerticalLayout {
 		gridLayout.setSizeFull();
 
 		Label welcomeMsg = new Label(
-				"<center><h2>Welcome to Cassandra Installation Wizard!</h2></center>"
+				"<center><h2>Welcome to Elasticsearch Installation Wizard!</h2></center>"
 		);
 		welcomeMsg.addStyleName("h2");
 		welcomeMsg.setContentMode(ContentMode.HTML);
 		gridLayout.addComponent(welcomeMsg, 3, 1, 6, 2);
 
 		Label logoImg = new Label();
-		logoImg.setIcon(new FileResource(FileUtil.getFile(CassandraUI.MODULE_IMAGE, this)));
+		logoImg.setIcon(new FileResource(FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this)));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(150, Unit.PIXELS);
 		logoImg.setWidth(220, Unit.PIXELS);

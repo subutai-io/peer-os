@@ -22,7 +22,7 @@
   <reference id="configManager" availability="mandatory"
              interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>
 
-  <bean id="elasticsearch2-impl" scope="singleton" class="org.safehaus.subutai.impl.elasticsearch2.CassandraImpl"
+  <bean id="elasticsearch2-impl" scope="singleton" class="org.safehaus.subutai.impl.elasticsearch2.ElasticsearchImpl"
         init-method="init" destroy-method="destroy">
     <property name="tracker" ref="tracker" />
     <property name="dbManager" ref="dbManager" />
@@ -38,6 +38,6 @@
   </bean>
 
   <service ref="elasticsearch2-configuration-logic" interface="org.safehaus.subutai.api.elasticsearch2.ConfigurationLogic" />
-  <service ref="elasticsearch2-impl" interface="org.safehaus.subutai.api.elasticsearch2.Cassandra" />
+  <service ref="elasticsearch2-impl" interface="org.safehaus.subutai.api.elasticsearch2.Elasticsearch" />
 
 </blueprint>

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.impl.elasticsearch2;
 
 import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
@@ -17,21 +12,31 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand(Set<Agent> agents) {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra")
+                        " apt-get --force-yes --assume-yes install ksks-elasticsearch ")
                         .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents
         );
 
     }
+
+    public static Command getConfigureCommand(Set<Agent> agents, String param) {
+
+        return createCommand(
+                new RequestBuilder(
+                        String.format(" . /etc/profile && es-conf.sh %s ", param))
+                ,
+                agents
+        );
+    }
+
+
+
 
     public static Command getStartCommand(Set<Agent> agents) {
         return createCommand(
@@ -55,16 +60,6 @@ public class Commands extends CommandsSingleton {
         return createCommand(
                 new RequestBuilder(
                         "service cassandra status")
-                ,
-                agents
-        );
-    }
-
-    public static Command getConfigureCommand(Set<Agent> agents, String param) {
-
-        return createCommand(
-                new RequestBuilder(
-                        String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param))
                 ,
                 agents
         );

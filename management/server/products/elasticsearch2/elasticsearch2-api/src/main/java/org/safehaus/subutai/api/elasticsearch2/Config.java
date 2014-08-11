@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.api.elasticsearch2;
 
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -10,9 +5,6 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 import java.util.Set;
 
-/**
- * @author dilshat
- */
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Elasticsearch2";

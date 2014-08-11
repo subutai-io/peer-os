@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.elasticsearch2;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.elasticsearch2.Cassandra;
+import org.safehaus.subutai.api.elasticsearch2.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch2.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -14,13 +14,13 @@ import org.safehaus.subutai.shared.protocol.Agent;
 @Command(scope = "cassandra", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
 public class DescribeClusterCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
+    private static Elasticsearch cassandraManager;
 
-    public void setCassandraManager(Cassandra cassandraManager) {
+    public void setCassandraManager(Elasticsearch cassandraManager) {
         DescribeClusterCommand.cassandraManager = cassandraManager;
     }
 
-    public static Cassandra getCassandraManager() {
+    public static Elasticsearch getCassandraManager() {
         return cassandraManager;
     }
 

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2.manager;
 
 
@@ -17,7 +12,7 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.ui.elasticsearch2.CassandraUI;
+import org.safehaus.subutai.ui.elasticsearch2.ElasticsearchUI;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,9 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 
 
-/**
- * @author dilshat
- */
 public class Manager {
 
 	private final Table nodesTable;
@@ -79,9 +71,10 @@ public class Manager {
 			public void itemClick(ItemClickEvent event) {
 				if (event.isDoubleClick()) {
 					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
+					Agent lxcAgent = ElasticsearchUI.getAgentManager().getAgentByHostname(lxcHostname);
 					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), CassandraUI.getExecutor(), CassandraUI.getCommandRunner(), CassandraUI.getAgentManager());
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), ElasticsearchUI
+                                .getExecutor(), ElasticsearchUI.getCommandRunner(), ElasticsearchUI.getAgentManager());
 						contentRoot.getUI().addWindow(terminal.getWindow());
 					} else {
 						show("Agent is not connected");
@@ -135,8 +128,8 @@ public class Manager {
 		checkAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().checkAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().checkAllNodes(config.getClusterName());
+				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -157,8 +150,8 @@ public class Manager {
 		startAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().startAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().startAllNodes(config.getClusterName());
+				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -179,8 +172,8 @@ public class Manager {
 		stopAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().stopAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().stopAllNodes(config.getClusterName());
+				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -207,10 +200,11 @@ public class Manager {
 					alert.getOk().addClickListener(new Button.ClickListener() {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = CassandraUI.getCassandraManager()
+							UUID trackID = ElasticsearchUI.getElasticsearchManager()
 									.uninstallCluster(config.getClusterName());
 
-							ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(
+                                    ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -245,7 +239,7 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<Config> info = CassandraUI.getCassandraManager().getClusters();
+		List<Config> info = ElasticsearchUI.getElasticsearchManager().getClusters();
 		Config clusterInfo = (Config) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (info != null && info.size() > 0) {

@@ -1,21 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.ui.elasticsearch2.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.elasticsearch2.Config;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.ui.elasticsearch2.CassandraUI;
+import org.safehaus.subutai.ui.elasticsearch2.ElasticsearchUI;
 
 import java.util.UUID;
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends VerticalLayout {
 
 	public VerificationStep(final Wizard wizard) {
@@ -39,22 +31,27 @@ public class VerificationStep extends VerticalLayout {
 		cfgView.addStringCfg("Commit log directory", wizard.getConfig().getCommitLogDirectory());
 		cfgView.addStringCfg("Number of seeds", wizard.getConfig().getNumberOfSeeds() + "");
 
-		Button install = new Button("Install");
-		install.addStyleName("default");
-		install.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, Config.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						wizard.init();
-					}
-				});
-				getUI().addWindow(window.getWindow());
-			}
-		});
+		Button installButton = new Button("Install");
+		installButton.addStyleName( "default" );
+		installButton.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+
+                UUID trackID = ElasticsearchUI.getElasticsearchManager().installCluster( wizard.getConfig() );
+
+                ProgressWindow window =
+                        new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
+                                Config.PRODUCT_KEY );
+
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        wizard.init();
+                    }
+                } );
+                getUI().addWindow( window.getWindow() );
+            }
+        } );
 
 		Button back = new Button("Back");
 		back.addStyleName("default");
@@ -67,7 +64,7 @@ public class VerificationStep extends VerticalLayout {
 
 		HorizontalLayout buttons = new HorizontalLayout();
 		buttons.addComponent(back);
-		buttons.addComponent(install);
+		buttons.addComponent(installButton);
 
 		grid.addComponent(confirmationLbl, 0, 0);
 

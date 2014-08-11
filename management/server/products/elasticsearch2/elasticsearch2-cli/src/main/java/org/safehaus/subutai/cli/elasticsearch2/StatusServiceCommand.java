@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.elasticsearch2;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.elasticsearch2.Cassandra;
+import org.safehaus.subutai.api.elasticsearch2.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch2.Config;
 import org.safehaus.subutai.api.tracker.Tracker;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Command(scope = "cassandra", name = "service-cassandra-status", description = "Command to check Cassandra service")
 public class StatusServiceCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
+    private static Elasticsearch cassandraManager;
     private static Tracker tracker;
 
     public Tracker getTracker() {
@@ -28,11 +28,11 @@ public class StatusServiceCommand extends OsgiCommandSupport {
         StatusServiceCommand.tracker = tracker;
     }
 
-    public void setCassandraManager(Cassandra cassandraManager) {
+    public void setCassandraManager(Elasticsearch cassandraManager) {
         StatusServiceCommand.cassandraManager = cassandraManager;
     }
 
-    public static Cassandra getCassandraManager() {
+    public static Elasticsearch getCassandraManager() {
         return cassandraManager;
     }
 

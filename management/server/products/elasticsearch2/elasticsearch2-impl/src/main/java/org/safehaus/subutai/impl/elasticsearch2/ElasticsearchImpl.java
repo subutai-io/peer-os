@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.elasticsearch2.Cassandra;
+import org.safehaus.subutai.api.elasticsearch2.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch2.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -20,7 +20,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-public class CassandraImpl implements Cassandra {
+public class ElasticsearchImpl implements Elasticsearch {
 
     private DbManager dbManager;
     private Tracker tracker;
@@ -67,8 +67,9 @@ public class CassandraImpl implements Cassandra {
         this.commandRunner = commandRunner;
     }
 
+
     public UUID installCluster(final Config config) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Cassandra");
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY, "Installing Elasticsearch...");
 
         executor.execute(new Runnable() {
 
@@ -79,9 +80,10 @@ public class CassandraImpl implements Cassandra {
                 }
 
                 try {
-                    po.addLog(String.format("Creating %d lxc containers for Cassandra cluster...", config.getNumberOfNodes()));
+                    po.addLog(String.format("Creating %d LXC containers for Elasticsearch cluster...", config.getNumberOfNodes()));
                     Map<Agent, Set<Agent>> lxcAgentsMap = CustomPlacementStrategy.createNodes(
                             lxcManager, config.getNumberOfNodes());
+
                     config.setNodes(new HashSet<Agent>());
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
@@ -97,19 +99,11 @@ public class CassandraImpl implements Cassandra {
 
                     po.addLog("Lxc containers created successfully.");
                     po.addLog("Updating db...");
+
                     if (dbManager.saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
                         po.addLog("Cluster info saved to DB");
 
-                        po.addLog("Configuring networking between nodes...");
-                        if (networkManager.configHostsOnAgents(new ArrayList<Agent>(config.getNodes()), config.getDomainName()) &&
-                                networkManager.configSshOnAgents(new ArrayList<Agent>(config.getNodes()))) {
-                            po.addLog("Network configuration done...");
-                        } else {
-                            po.addLogFailed(String.format("Network configuration failed..."));
-                            return;
-                        }
-
-                        //install
+                        // Install
 
                         po.addLog("Installing...");
                         Command installCommand = Commands.getInstallCommand(config.getNodes());
@@ -122,9 +116,11 @@ public class CassandraImpl implements Cassandra {
                             return;
                         }
 
-                        // setting cluster name
-                        po.addLog("Setting cluster name " + config.getClusterName());
-                        Command setClusterNameCommand = Commands.getConfigureCommand(config.getNodes(), "cluster_name " + config.getClusterName());
+                        // Setting cluster name
+
+                        po.addLog( "Setting cluster name: " + config.getClusterName() );
+
+                        Command setClusterNameCommand = Commands.getConfigureCommand(config.getNodes(), "cluster.name " + config.getClusterName());
                         commandRunner.runCommand(setClusterNameCommand);
 
                         if (setClusterNameCommand.hasSucceeded()) {
@@ -134,90 +130,16 @@ public class CassandraImpl implements Cassandra {
                             return;
                         }
 
-                        // setting data directory name
-                        po.addLog("Setting data directory: " + config.getDataDirectory());
-                        Command setDataDirCommand = Commands.getConfigureCommand(config.getNodes(), "data_dir " + config.getDataDirectory());
-                        commandRunner.runCommand(setDataDirCommand);
+                        // @TODO bookmark
+//                        if ( true ) {
+//                            po.addLogDone( "[done]" );
+//                            return;
+//                        }
 
-                        if (setDataDirCommand.hasSucceeded()) {
-                            po.addLog("Configure data directory succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setDataDirCommand.getAllErrors()));
-                            return;
-                        }
-
-                        // setting commit log directory
-                        po.addLog("Setting commit directory: " + config.getCommitLogDirectory());
-                        Command setCommitDirCommand = Commands.getConfigureCommand(config.getNodes(), "commitlog_dir " + config.getCommitLogDirectory());
-                        commandRunner.runCommand(setCommitDirCommand);
-
-                        if (setCommitDirCommand.hasSucceeded()) {
-                            po.addLog("Configure commit directory succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setCommitDirCommand.getAllErrors()));
-                            return;
-                        }
-
-                        // setting saved cache directory
-                        po.addLog("Setting saved cache directory: " + config.getSavedCachesDirectory());
-                        Command setSavedCacheDirCommand = Commands.getConfigureCommand(config.getNodes(), "saved_cache_dir " + config.getSavedCachesDirectory());
-                        commandRunner.runCommand(setSavedCacheDirCommand);
-
-                        if (setSavedCacheDirCommand.hasSucceeded()) {
-                            po.addLog("Configure saved cache directory succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setSavedCacheDirCommand.getAllErrors()));
-                            return;
-                        }
-
-                        // setting rpc address
-                        po.addLog("Setting rpc address");
-                        Command setRpcAddressCommand = Commands.getConfigureRpcAndListenAddressesCommand(config.getNodes(), "rpc_address");
-                        commandRunner.runCommand(setRpcAddressCommand);
-
-                        if (setRpcAddressCommand.hasSucceeded()) {
-                            po.addLog("Configure rpc address succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setRpcAddressCommand.getAllErrors()));
-                            return;
-                        }
-
-                        // setting listen address
-                        po.addLog("Setting listen address");
-                        Command setListenAddressCommand = Commands.getConfigureRpcAndListenAddressesCommand(config.getNodes(), "listen_address");
-                        commandRunner.runCommand(setListenAddressCommand);
-
-                        if (setListenAddressCommand.hasSucceeded()) {
-                            po.addLog("Configure listen address succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setListenAddressCommand.getAllErrors()));
-                            return;
-                        }
-
-                        // setting seeds
-                        StringBuilder sb = new StringBuilder();
-//                        sb.append('"');
-                        for (Agent seed : config.getSeedNodes()) {
-                            sb.append(Util.getAgentIpByMask(seed, Common.IP_MASK)).append(",");
-                        }
-                        sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
-//                        sb.append('"');
-                        po.addLog("Settings seeds " + sb.toString());
-
-                        Command setSeedsCommand = Commands.getConfigureCommand(config.getNodes(), "seeds " + sb.toString());
-                        commandRunner.runCommand(setSeedsCommand);
-
-                        if (setSeedsCommand.hasSucceeded()) {
-                            po.addLog("Configure seeds succeeded");
-                        } else {
-                            po.addLogFailed(String.format("Installation failed, %s", setSeedsCommand.getAllErrors()));
-                            return;
-                        }
-                        po.addLogDone("Installation of Cassandra cluster succeeded");
-
+                        po.addLogDone("Installation of Elasticsearch cluster succeeded");
 
                     } else {
-                        //destroy all lxcs also
+                        // Destroy all lxcs also
                         try {
                             lxcManager.destroyLxcs(config.getNodes());
                         } catch (LxcDestroyException ex) {
@@ -234,6 +156,7 @@ public class CassandraImpl implements Cassandra {
 
         return po.getId();
     }
+
 
     public UUID uninstallCluster(final String clusterName) {
         final ProductOperation po
