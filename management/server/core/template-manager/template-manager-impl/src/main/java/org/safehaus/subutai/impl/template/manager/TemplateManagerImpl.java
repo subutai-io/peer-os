@@ -101,22 +101,18 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 			}
 		}
 
-		StringBuilder cmdBuilder = new StringBuilder();
-
-		int i = 0;
+		boolean result = true;
 		for (String cloneName : cloneNames) {
+			String command = String.format("/usr/bin/subutai clone %s %s", templateName, cloneName);
+			Command cmd = getCommandRunner()
+					.createCommand(new RequestBuilder(command.toString()).withTimeout(180), Sets.newHashSet(a));
+			getCommandRunner().runCommand(cmd);
 
-			StringBuilder append = cmdBuilder.append("/usr/bin/subutai clone ").append(templateName).append(" ").append(cloneName);
-			if (++i < cloneNames.size()) {
-				cmdBuilder.append(" & ");
-			}
+			result &= cmd.hasSucceeded();
 		}
 
-		Command cmd = getCommandRunner()
-				.createCommand(new RequestBuilder(cmdBuilder.toString()).withTimeout(180 * cloneNames.size()), Sets.newHashSet(a));
-		getCommandRunner().runCommand(cmd);
 
-		return cmd.hasSucceeded();
+		return result;
 	}
 
 
