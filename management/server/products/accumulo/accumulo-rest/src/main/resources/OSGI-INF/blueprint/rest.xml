@@ -15,9 +15,12 @@
 
   <reference id="accumuloManager" availability="mandatory"
              interface="org.safehaus.subutai.api.accumulo.Accumulo" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.accumulo.services.RestServiceImpl">
     <property name="accumuloManager" ref="accumuloManager" />
+    <property name="agentManager" ref="agentManager" />
   </bean>
 
   <jaxrs:server address="/accumulo" id="accumuloRestService">
