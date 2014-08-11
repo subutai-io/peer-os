@@ -8,13 +8,17 @@ package org.safehaus.subutai.configuration.manager.impl;
 
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.configuration.manager.api.TextInjector;
 import org.safehaus.subutai.configuration.manager.impl.loaders.ConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.PlainConfigurationLoader;
 import org.safehaus.subutai.configuration.manager.impl.loaders.PropertiesConfigurationLoader;
+import org.safehaus.subutai.configuration.manager.impl.loaders.ShellConfigurationLoader;
 import org.safehaus.subutai.configuration.manager.impl.loaders.XMLConfigurationLoader;
 import org.safehaus.subutai.configuration.manager.impl.loaders.YamConfigurationlLoader;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigParser;
 import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
 import org.safehaus.subutai.configuration.manager.impl.utils.PlainParser;
+import org.safehaus.subutai.configuration.manager.impl.utils.ShellParser;
 import org.safehaus.subutai.configuration.manager.impl.utils.XmlParser;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
@@ -28,6 +32,18 @@ import com.google.gson.JsonObject;
  */
 public class ConfigManagerImpl implements ConfigManager {
 
+    private TextInjector textInjector;
+
+
+    public TextInjector getTextInjector() {
+        return textInjector;
+    }
+
+
+    public void setTextInjector( final TextInjector textInjector ) {
+        this.textInjector = textInjector;
+    }
+
 
     @Override
     public boolean injectConfiguration( String hostname, String configFilePath, String jsonObjectConfig,
@@ -40,29 +56,99 @@ public class ConfigManagerImpl implements ConfigManager {
         String type = "";
         switch ( configTypeEnum ) {
             case YAML: {
-                configurationLoader = new YamConfigurationlLoader();
+                configurationLoader = new YamConfigurationlLoader(textInjector);
                 break;
             }
             case PROPERTIES: {
-                configurationLoader = new PropertiesConfigurationLoader();
+                configurationLoader = new PropertiesConfigurationLoader(textInjector);
                 break;
             }
             case XML: {
-                configurationLoader = new XMLConfigurationLoader();
+                configurationLoader = new XMLConfigurationLoader(textInjector);
                 break;
             }
             case PLAIN: {
                 //TODO
+                configurationLoader = new PlainConfigurationLoader(textInjector);
                 break;
             }
             case SH: {
                 //TODO
+                configurationLoader = new ShellConfigurationLoader(textInjector);
                 break;
             }
         }
         boolean result = configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
 
         return result;
+    }
+
+
+    @Override
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
+                                        ConfigTypeEnum configTypeEnum ) {
+        ConfigurationLoader loader = null;
+        switch ( configTypeEnum ) {
+            case YAML: {
+                loader = new YamConfigurationlLoader(textInjector);
+                break;
+            }
+            case PROPERTIES: {
+                loader = new PropertiesConfigurationLoader(textInjector);
+                break;
+            }
+            case XML: {
+                loader = new XMLConfigurationLoader(textInjector);
+                break;
+            }
+            case PLAIN: {
+                //TODO
+                loader = new PlainConfigurationLoader(textInjector);
+                break;
+            }
+            case SH: {
+                //TODO
+                loader = new ShellConfigurationLoader(textInjector);
+                break;
+            }
+        }
+
+        return loader.getConfiguration( agentHostname, configPathFilename );
+    }
+
+
+    @Override
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum ) {
+        ConfigParser parser = null;
+        String content = FileUtil.getContent( configPathFilename, this );
+        try {
+            switch ( configTypeEnum ) {
+                case YAML: {
+                    parser = new XmlParser( content );
+                    break;
+                }
+                case PROPERTIES: {
+                    parser = new IniParser( content );
+                    break;
+                }
+                case XML: {
+                    parser = new XmlParser( content );
+                    break;
+                }
+                case PLAIN: {
+                    parser = new PlainParser( content );
+                    break;
+                }
+                case SH: {
+                    parser = new ShellParser( content );
+                }
+            }
+            return parser.parserConfig( configPathFilename, configTypeEnum );
+        }
+        catch ( ConfigurationException e ) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -117,68 +203,5 @@ public class ConfigManagerImpl implements ConfigManager {
         catch ( ConfigurationException e ) {
             e.printStackTrace();
         }*/
-    }
-
-
-    @Override
-    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
-                                        ConfigTypeEnum configTypeEnum ) {
-        ConfigurationLoader loader = null;
-        switch ( configTypeEnum ) {
-            case YAML: {
-                loader = new YamConfigurationlLoader();
-                break;
-            }
-            case PROPERTIES: {
-                loader = new PropertiesConfigurationLoader();
-                break;
-            }
-            case XML: {
-                loader = new XMLConfigurationLoader();
-                break;
-            }
-            case PLAIN: {
-                //TODO
-                break;
-            }
-            case SH: {
-                //TODO
-                break;
-            }
-        }
-
-        return loader.getConfiguration( agentHostname, configPathFilename );
-    }
-
-
-    @Override
-    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum ) {
-        ConfigParser parser = null;
-        String content = FileUtil.getContent( configPathFilename, this );
-        try {
-            switch ( configTypeEnum ) {
-                case YAML: {
-                    parser = new XmlParser( content );
-                    break;
-                }
-                case PROPERTIES: {
-                    parser = new IniParser( content );
-                    break;
-                }
-                case XML: {
-                    parser = new XmlParser( content );
-                    break;
-                }
-                case PLAIN: {
-                    parser = new PlainParser( content );
-                    break;
-                }
-            }
-            return parser.parserConfig( configPathFilename, configTypeEnum );
-        }
-        catch ( ConfigurationException e ) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
