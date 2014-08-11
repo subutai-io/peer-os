@@ -39,15 +39,17 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
                         .append("\n");
             }
             sb.append("Seeds:").append("\n");
-            for (Agent agent : config.getSeedNodes()) {
+            for (Agent agent : config.getMasterNodes()) {
                 sb.append("Hostname: ").append(agent.getHostname())
                         .append(", Agent UUID: ").append(agent.getUuid())
                         .append("\n");
             }
-            sb.append("Data directory: ").append(config.getDataDirectory()).append("\n");
-            sb.append("Commit log directory: ").append(config.getCommitLogDirectory()).append("\n");
-            sb.append("Saved cache directory: ").append(config.getSavedCachesDirectory()).append("\n");
-            sb.append("Domain name: ").append(config.getDomainName()).append("\n");
+
+//            sb.append("Data directory: ").append(config.getDataDirectory()).append("\n");
+//            sb.append("Commit log directory: ").append(config.getCommitLogDirectory()).append("\n");
+//            sb.append("Saved cache directory: ").append(config.getSavedCachesDirectory()).append("\n");
+//            sb.append("Domain name: ").append(config.getDomainName()).append("\n");
+
             System.out.println(sb.toString());
         } else System.out.println("No clusters found...");
 

@@ -52,9 +52,9 @@ public class InstallClusterCommand extends OsgiCommandSupport {
     protected Object doExecute() throws IOException {
         Config config = new Config();
         config.setClusterName(clusterName);
-        config.setDomainName(domainName);
+//        config.setDomainName(domainName);
         config.setNumberOfNodes(Integer.parseInt(numberOfNodes));
-        config.setNumberOfSeeds(Integer.parseInt(numberOfSeeds));
+        config.setNumberOfMasterNodes( Integer.parseInt( numberOfSeeds ) );
 
         UUID uuid = cassandraManager.installCluster(config);
         tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);

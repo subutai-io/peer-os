@@ -23,13 +23,10 @@ public class VerificationStep extends VerticalLayout {
 				+ "(You may change them by clicking on Back button)</strong><br/>");
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
-		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Domain Name", wizard.getConfig().getDomainName());
-		cfgView.addStringCfg("Data directory", wizard.getConfig().getDataDirectory());
-		cfgView.addStringCfg("Saved caches directory", wizard.getConfig().getSavedCachesDirectory());
-		cfgView.addStringCfg("Commit log directory", wizard.getConfig().getCommitLogDirectory());
-		cfgView.addStringCfg("Number of seeds", wizard.getConfig().getNumberOfSeeds() + "");
+        ConfigView cfgView = new ConfigView( "Installation configuration" );
+        cfgView.addStringCfg( "Cluster Name: ", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Number of Nodes: ", "" + wizard.getConfig().getNumberOfNodes() );
+        cfgView.addStringCfg( "Number of Master Nodes: ", "" + wizard.getConfig().getNumberOfMasterNodes() );
 
 		Button installButton = new Button("Install");
 		installButton.addStyleName( "default" );

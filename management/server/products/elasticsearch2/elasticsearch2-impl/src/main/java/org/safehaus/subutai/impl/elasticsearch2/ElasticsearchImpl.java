@@ -18,7 +18,7 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+
 
 public class ElasticsearchImpl implements Elasticsearch {
 
@@ -84,18 +84,18 @@ public class ElasticsearchImpl implements Elasticsearch {
                     Map<Agent, Set<Agent>> lxcAgentsMap = CustomPlacementStrategy.createNodes(
                             lxcManager, config.getNumberOfNodes());
 
-                    config.setNodes(new HashSet<Agent>());
-
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
                         config.getNodes().addAll(entry.getValue());
                     }
 
-                    Set<Agent> seedNodes = new HashSet<Agent>();
-                    for (Agent agent : config.getNodes()) {
-                        seedNodes.add(agent);
-                        if (seedNodes.size() == config.getNumberOfSeeds()) break;
+                    Set<Agent> masterNodes = new HashSet();
+                    for ( Agent agent : config.getNodes() ) {
+                        masterNodes.add( agent );
+                        if ( masterNodes.size() == config.getNumberOfMasterNodes() ) {
+                            break;
+                        }
                     }
-                    config.setSeedNodes(seedNodes);
+                    config.setMasterNodes( masterNodes );
 
                     po.addLog("Lxc containers created successfully.");
                     po.addLog("Updating db...");
@@ -127,6 +127,20 @@ public class ElasticsearchImpl implements Elasticsearch {
                             po.addLog("Configure cluster name succeeded");
                         } else {
                             po.addLogFailed(String.format("Installation failed, %s", setClusterNameCommand.getAllErrors()));
+                            return;
+                        }
+
+                        // Setting master nodes
+
+                        po.addLog( "Setting master nodes..." );
+
+                        Command setMasterNodesCommand = Commands.getConfigureCommand( config.getMasterNodes(), " node.master true " );
+                        commandRunner.runCommand(setMasterNodesCommand);
+
+                        if (setMasterNodesCommand.hasSucceeded()) {
+                            po.addLog("Master nodes setup successful");
+                        } else {
+                            po.addLogFailed(String.format("Installation failed, %s", setMasterNodesCommand.getAllErrors()));
                             return;
                         }
 
