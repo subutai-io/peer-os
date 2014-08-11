@@ -65,17 +65,17 @@ public class Commands extends CommandsSingleton {
         );
     }
 
-    public static Command getConfigureRpcAndListenAddressesCommand(Set<Agent> agents, String param) {
-        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
-        for (Agent agent : agents) {
-            AgentRequestBuilder arb = new AgentRequestBuilder(agent,
-                    String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
-                            param,
-                            Util.getAgentIpByMask(agent, Common.IP_MASK))
-            );
-            sarb.add(arb);
-        }
-        return createCommand(sarb);
-    }
+//    public static Command getConfigureRpcAndListenAddressesCommand(Set<Agent> agents, String param) {
+//        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
+//        for (Agent agent : agents) {
+//            AgentRequestBuilder arb = new AgentRequestBuilder(agent,
+//                    String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
+//                            param,
+//                            Util.getAgentIpByMask(agent, Common.IP_MASK))
+//            );
+//            sarb.add(arb);
+//        }
+//        return createCommand(sarb);
+//    }
 
 }

@@ -130,12 +130,6 @@ public class ElasticsearchImpl implements Elasticsearch {
                             return;
                         }
 
-                        // @TODO bookmark
-//                        if ( true ) {
-//                            po.addLogDone( "[done]" );
-//                            return;
-//                        }
-
                         po.addLogDone("Installation of Elasticsearch cluster succeeded");
 
                     } else {
@@ -158,9 +152,9 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
+    @Override
     public UUID uninstallCluster(final String clusterName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
+        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 String.format("Destroying cluster %s", clusterName));
 
         executor.execute(new Runnable() {
@@ -192,6 +186,8 @@ public class ElasticsearchImpl implements Elasticsearch {
 
         return po.getId();
     }
+
+
 
     @Override
     public UUID startAllNodes(final String clusterName) {
