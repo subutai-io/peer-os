@@ -48,14 +48,14 @@ public class Commands extends CommandsSingleton {
 
     public static Command getLxcStartCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand(
-                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", lxcHostName ) ).withTimeout( 120 ),
+                new RequestBuilder( String.format( "/usr/bin/lxc-start -n %s -d &", lxcHostName ) ).withTimeout( 180 ),
                 Util.wrapAgentToSet( physicalAgent ) );
     }
 
 
     public static Command getLxcStopCommand( Agent physicalAgent, String lxcHostName ) {
         return createCommand(
-                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", lxcHostName ) ).withTimeout( 60 ),
+                new RequestBuilder( String.format( "/usr/bin/lxc-stop -n %s &", lxcHostName ) ).withTimeout( 180 ),
                 Util.wrapAgentToSet( physicalAgent ) );
     }
 

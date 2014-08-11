@@ -1,42 +1,39 @@
 package org.safehaus.subutai.cassandra.services;
 
 
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
-
-import java.util.UUID;
 
 
 /**
  * Created by bahadyr on 5/6/14.
  */
 
-public class RestServiceImpl implements RestService
-{
+public class RestServiceImpl implements RestService {
 
     private Cassandra cassandraManager;
 
 
-    public void setCassandraManager( Cassandra cassandraManager )
-    {
+    public void setCassandraManager( Cassandra cassandraManager ) {
         this.cassandraManager = cassandraManager;
     }
 
 
-    public Cassandra getCassandraManager()
-    {
+    public Cassandra getCassandraManager() {
         return cassandraManager;
     }
 
 
-    public RestServiceImpl()
-    {
+    public RestServiceImpl() {
     }
 
 
     @Override
-    public String install( String clusterName, String domainName, String numberOfNodes, String numberOfSeeds )
-    {
+    public String install( String clusterName, String domainName, String numberOfNodes, String numberOfSeeds ) {
         Config config = new Config();
         config.setClusterName( clusterName );
         config.setDomainName( domainName );
@@ -49,10 +46,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String uninstall( String clusterName )
-    {
+    public String uninstall( String clusterName ) {
         UUID uuid = cassandraManager.uninstallCluster( clusterName );
         return uuid.toString();
     }
 
+
+    @Override
+    public Response installFromJson( final String json ) {
+        String result = "Json saved : " + json;
+        return Response.status( 201 ).entity( result ).build();
+    }
 }
