@@ -378,14 +378,15 @@ public class LxcManagerImpl implements LxcManager {
 	 */
 	public boolean destroyLxcOnHost(Agent physicalAgent, String lxcHostname) {
 		if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
-			Command stopLxcCommand = Commands.getLxcTerminateCommand(physicalAgent, lxcHostname);
+//			Command stopLxcCommand = Commands.getLxcTerminateCommand(physicalAgent, lxcHostname);
 			Command destroyLxcCommand = Commands.getLxcDestroyCommand(physicalAgent, lxcHostname);
 
-			commandRunner.runCommand(stopLxcCommand);
+			/*commandRunner.runCommand(stopLxcCommand);
 			if (stopLxcCommand.hasCompleted()) {
 				commandRunner.runCommand(destroyLxcCommand);
-			}
+			}*/
 
+			commandRunner.runCommand(destroyLxcCommand);
 			return destroyLxcCommand.hasCompleted();
 		}
 		return false;
