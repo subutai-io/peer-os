@@ -17,6 +17,7 @@ public class DestroyNodeHandler extends AbstractHandler {
         super(manager, clusterName, po);
     }
 
+    @Override
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {
@@ -32,7 +33,7 @@ public class DestroyNodeHandler extends AbstractHandler {
         String s = CommandFactory.build(CommandType.PURGE, null);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
 
         manager.getCommandRunner().runCommand(cmd);
 

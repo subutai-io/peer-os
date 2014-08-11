@@ -14,6 +14,7 @@ public class RemoveHandler extends AbstractHandler {
         super(manager, clusterName, po);
     }
 
+    @Override
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {

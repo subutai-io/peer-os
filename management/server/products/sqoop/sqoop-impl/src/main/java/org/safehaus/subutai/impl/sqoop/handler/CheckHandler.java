@@ -18,6 +18,7 @@ public class CheckHandler extends AbstractHandler {
         super(manager, clusterName, po);
     }
 
+    @Override
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {
@@ -33,7 +34,7 @@ public class CheckHandler extends AbstractHandler {
         String s = CommandFactory.build(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
 
         manager.getCommandRunner().runCommand(cmd);
 

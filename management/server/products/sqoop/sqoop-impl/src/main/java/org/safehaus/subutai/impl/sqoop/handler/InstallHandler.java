@@ -28,6 +28,7 @@ public class InstallHandler extends AbstractHandler {
         this.config = config;
     }
 
+    @Override
     public void run() {
         if(getClusterConfig() != null) {
             po.addLogFailed("Cluster already exists: " + config.getClusterName());
@@ -44,7 +45,7 @@ public class InstallHandler extends AbstractHandler {
                 new RequestBuilder(s), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
-        Set<UUID> skipInstall = new HashSet<UUID>();
+        Set<UUID> skipInstall = new HashSet<>();
         if(cmd.hasCompleted()) {
             Iterator<Agent> it = config.getNodes().iterator();
             while(it.hasNext()) {

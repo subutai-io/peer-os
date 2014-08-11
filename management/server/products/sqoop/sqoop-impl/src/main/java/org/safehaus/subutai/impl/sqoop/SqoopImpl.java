@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public class SqoopImpl extends SqoopBase {
 
+    @Override
     public UUID installCluster(Config config) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Install Sqoop cluster " + config.getClusterName());
@@ -20,6 +21,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public UUID uninstallCluster(String clusterName) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Remove Sqoop cluster " + clusterName);
@@ -28,6 +30,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public UUID isInstalled(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Check Sqoop package on " + hostname);
@@ -37,6 +40,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public UUID addNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Add new node " + hostname);
@@ -46,6 +50,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public UUID destroyNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Destroy node " + hostname);
@@ -55,6 +60,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
@@ -64,6 +70,7 @@ public class SqoopImpl extends SqoopBase {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
 
+    @Override
     public UUID exportData(ExportSetting settings) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Export data. Node: " + settings.getHostname());
@@ -73,6 +80,7 @@ public class SqoopImpl extends SqoopBase {
         return po.getId();
     }
 
+    @Override
     public UUID importData(ImportSetting settings) {
         ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
                 "Import data. Node: " + settings.getHostname());

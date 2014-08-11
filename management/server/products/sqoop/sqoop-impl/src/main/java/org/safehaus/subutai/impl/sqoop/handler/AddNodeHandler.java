@@ -19,6 +19,7 @@ public class AddNodeHandler extends AbstractHandler {
         super(manager, clusterName, po);
     }
 
+    @Override
     public void run() {
         Config config = getClusterConfig();
         if(config == null) {
@@ -35,7 +36,7 @@ public class AddNodeHandler extends AbstractHandler {
         String s = CommandFactory.build(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded()) {
@@ -58,7 +59,7 @@ public class AddNodeHandler extends AbstractHandler {
         s = CommandFactory.build(CommandType.INSTALL, null);
         cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(s).withTimeout(60),
-                new HashSet<Agent>(Arrays.asList(agent)));
+                new HashSet<>(Arrays.asList(agent)));
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded()) {
