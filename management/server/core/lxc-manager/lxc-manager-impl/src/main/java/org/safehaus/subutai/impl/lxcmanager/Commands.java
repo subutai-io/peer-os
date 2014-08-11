@@ -59,12 +59,6 @@ public class Commands extends CommandsSingleton {
 				Util.wrapAgentToSet(physicalAgent));
 	}
 
-	public static Command getLxcTerminateCommand(Agent physicalAgent, String lxcHostName) {
-		return createCommand(
-				new RequestBuilder(String.format("/usr/bin/lxc-stop -n -W %s &", lxcHostName)).withTimeout(180),
-				Util.wrapAgentToSet(physicalAgent));
-	}
-
 
 	public static Command getLxcDestroyCommand(Agent physicalAgent, String lxcHostName) {
 		return createCommand(new RequestBuilder(

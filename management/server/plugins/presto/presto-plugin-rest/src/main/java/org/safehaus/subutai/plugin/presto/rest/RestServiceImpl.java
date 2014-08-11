@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.presto.rest;
 
-import org.safehaus.subutai.api.presto.Presto;
+
+import org.safehaus.subutai.plugin.presto.api.Presto;
 
 /**
  * Created by bahadyr on 5/6/14.
