@@ -33,8 +33,6 @@ public class EnvironmentConfig {
 	}
 
 	public HadoopClusterConfig init() throws EnvironmentBuildException, ClusterSetupException {
-		System.out.printf("Environment: %s%n", environment);
-		System.out.printf("Blueprint: %s%n", blueprint);
 		if (environment == null && blueprint != null) {
 			environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
 		}
