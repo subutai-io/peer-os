@@ -757,6 +757,29 @@
 
             <!-- Core Modules - END -->
 
+            <!--Vaadin - START-->
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>vaadin-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>vaadin-custom</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>vaadin-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>vaadin-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--Vaadin - END-->
+
             <!-- Products Modules - START -->
 
             <!-- Common -->
