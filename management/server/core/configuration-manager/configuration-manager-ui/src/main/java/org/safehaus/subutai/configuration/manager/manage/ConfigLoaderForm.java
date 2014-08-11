@@ -186,7 +186,7 @@ public class ConfigLoaderForm extends CustomComponent {
     private class InjectIntoLxcButton extends Button {
 
         private InjectIntoLxcButton( final ConfigManager configManager ) {
-            setCaption( "Inject JSON" );
+            setCaption( "Inject file" );
             setImmediate( true );
             setWidth( "-1px" );
             setHeight( "-1px" );
