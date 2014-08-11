@@ -6,26 +6,24 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-  <!-- 1 -->
+
   <cxf:bus id="cxfBus1Cassandra">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <!-- 2 -->
+
+  <reference id="accumuloManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.accumulo.Accumulo" />
+
+  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.accumulo.services.RestServiceImpl">
+    <property name="accumuloManager" ref="accumuloManager" />
+  </bean>
+
   <jaxrs:server address="/accumulo" id="accumuloRestService">
     <jaxrs:serviceBeans>
       <ref component-id="accumuloRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <!-- 3 -->
-  <!-- Implementation of the rest service -->
-  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.accumulo.services.RestServiceImpl">
-    <!--<property name="helloService" ref="helloServiceBean"/>  &lt;!&ndash;Points to the reference below &ndash;&gt;-->
-  </bean>
-  <!-- 4 -->
-  <!-- This has to point to the service registered through serviceimpl.xml in the service.impl project -->
-  <!--<reference id="helloServiceBean"-->
-  <!--interface="org.safehaus.subutai.rest.services.HelloService">-->
-  <!--</reference>-->
+
 </blueprint>

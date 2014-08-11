@@ -1,6 +1,8 @@
 package org.safehaus.subutai.rest.tracker;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -28,8 +30,9 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getProductOperation( final String source, final UUID uuid ) {
-        ProductOperationView productOperationView = tracker.getProductOperation( source, uuid );
+    public String getProductOperation( final String source, final String uuid ) {
+        UUID poUUID = UUID.fromString( uuid );
+        ProductOperationView productOperationView = tracker.getProductOperation( source, poUUID );
         if ( productOperationView != null ) {
             return gson.toJson( productOperationView );
         }
@@ -38,8 +41,17 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String getProductOperations( final String source, final Date fromDate, final Date toDate, final int limit ) {
-        return gson.toJson( tracker.getProductOperations( source, fromDate, toDate, limit ) );
+    public String getProductOperations( final String source, final String fromDate, final String toDate,
+                                        final int limit ) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+            Date fromDat = sdf.parse( fromDate );
+            Date toDat = sdf.parse( toDate );
+            return gson.toJson( tracker.getProductOperations( source, fromDat, toDat, limit ) );
+        }
+        catch ( ParseException e ) {
+            return gson.toJson( e );
+        }
     }
 
 

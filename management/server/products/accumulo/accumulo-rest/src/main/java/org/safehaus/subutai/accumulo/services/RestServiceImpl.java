@@ -1,35 +1,30 @@
 package org.safehaus.subutai.accumulo.services;
 
 
+import org.safehaus.subutai.api.accumulo.Accumulo;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
 /**
  * Created by bahadyr on 5/6/14.
  */
 
 public class RestServiceImpl implements RestService {
-    //Just like Spring.  Please add Getters/Setters. Blueprint annotations are still work in progress
-    //    private HelloService helloService;
+
+    private static final Gson gson =
+            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private Accumulo accumuloManager;
 
 
-    /*
-        Constructor
-     */
-    public RestServiceImpl() {
+    public void setAccumuloManager( final Accumulo accumuloManager ) {
+        this.accumuloManager = accumuloManager;
     }
 
 
-    public String handleGet( String name ) {
-        //        return helloService.sayHello(name);
-        return "Accumulo " + name;
+    @Override
+    public String listClusters() {
+        return gson.toJson( accumuloManager.getClusters() );
     }
-
-    /*
-        Getters and Setters
-     */
-    //    public HelloService getHelloService() {
-    //        return helloService;
-    //    }
-    //
-    //    public void setHelloService(HelloService helloService) {
-    //        this.helloService = helloService;
-    //    }
 }
