@@ -97,4 +97,16 @@ public class ProductOperationViewImpl implements ProductOperationView {
         final ProductOperationViewImpl other = ( ProductOperationViewImpl ) obj;
         return !( this.id != other.id && ( this.id == null || !this.id.equals( other.id ) ) );
     }
+
+
+    @Override
+    public String toString() {
+        return "ProductOperationViewImpl{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", log='" + log + '\'' +
+                ", state=" + state +
+                ", createDate=" + createDate +
+                '}';
+    }
 }
