@@ -52,7 +52,15 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 
     @Override
     public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> metrics) {
-        if(metrics == null || metrics.isEmpty()) return null;
+        try {
+            return calculateSlotsInternal(metrics);
+        } catch(LxcCreateException ex) {
+            return Collections.emptyMap();
+        }
+    }
+
+    Map<Agent, Integer> calculateSlotsInternal(Map<Agent, ServerMetric> metrics) throws LxcCreateException {
+        if(metrics == null || metrics.isEmpty()) return Collections.emptyMap();
 
         Map<Agent, Integer> slots = new HashMap<>();
         for(Map.Entry<Agent, ServerMetric> e : metrics.entrySet()) {
@@ -60,13 +68,14 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
             int min = Integer.MAX_VALUE;
 
             int n = Math.round((m.getFreeRamMb() - ramReservedMb) / ramPerNodeMb);
-            if((min = Math.min(n, min)) <= 0) continue;
+            if((min = Math.min(n, min)) <= 0)
+                throw new LxcCreateException("Placement strategy returned empty due to RAM resources");
 
             n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
-            if((min = Math.min(n, min)) <= 0) continue;
+            if((min = Math.min(n, min)) <= 0)
+                throw new LxcCreateException("Placement strategy returned empty due to HDD resources");
 
             // TODO: check cpu load when cpu load determination is reimplemented
-
             slots.put(e.getKey(), min);
         }
         return slots;
@@ -77,12 +86,15 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
         for(NodeType type : NodeType.values()) {
 
             setCriteria(type);
-            Map<Agent, Integer> serverSlots = calculateSlots(serverMetrics);
+            Map<Agent, Integer> serverSlots = calculateSlotsInternal(serverMetrics);
             if(serverSlots == null || serverSlots.isEmpty()) return;
 
             int available = 0;
             for(Integer i : serverSlots.values()) available += i.intValue();
-            if(available < nodesCount.get(type)) return;
+            if(available < nodesCount.get(type))
+                throw new LxcCreateException(String.format(
+                        "Placement strategy returned only %d container(s)",
+                        available));
 
             calculatePlacement(type, serverSlots);
         }
