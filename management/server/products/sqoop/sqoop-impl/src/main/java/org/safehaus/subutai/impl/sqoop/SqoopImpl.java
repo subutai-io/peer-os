@@ -1,13 +1,12 @@
 package org.safehaus.subutai.impl.sqoop;
 
+import java.util.List;
+import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
 import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.handler.*;
-
-import java.util.List;
-import java.util.UUID;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 
 public class SqoopImpl extends SqoopBase {
 
@@ -23,11 +22,7 @@ public class SqoopImpl extends SqoopBase {
 
     @Override
     public UUID uninstallCluster(String clusterName) {
-        ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                "Remove Sqoop cluster " + clusterName);
-        RemoveHandler h = new RemoveHandler(this, clusterName, po);
-        executor.execute(h);
-        return po.getId();
+        return null;
     }
 
     @Override
