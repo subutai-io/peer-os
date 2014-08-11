@@ -28,7 +28,7 @@ public class PropertiesConfigurationLoaderTest {
 
     @Test
     public void test() {
-        PropertiesConfigurationLoader loader = new PropertiesConfigurationLoader();
+//        PropertiesConfigurationLoader loader = new PropertiesConfigurationLoader();
         //        Config o = loader.getConfiguration( null, null, null );
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         //        System.out.println( json );

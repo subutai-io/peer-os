@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.configuration.manager.api.TextInjector;
 import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.safehaus.subutai.configuration.manager.impl.utils.ConfigBuilder;
 import org.safehaus.subutai.configuration.manager.impl.utils.IniParser;
@@ -25,19 +26,26 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
     //    String filename = "/home/bahadyr/Desktop/products/hadoop-1.2.1/conf/log4j.properties";
 
-//    private Agent agent;
-//
-//    public PropertiesConfigurationLoader(Agent agent) {
-//        this.agent = agent;
-//    }
+    //    private Agent agent;
+    //
+    //    public PropertiesConfigurationLoader(Agent agent) {
+    //        this.agent = agent;
+    //    }
+    private TextInjector textInjector;
+
+
+    public PropertiesConfigurationLoader( final TextInjector textInjector ) {
+        this.textInjector = textInjector;
+    }
+
 
     // Maps configuration into Config object
     @Override
     public JsonObject getConfiguration( String hostname, String configPathFilename ) {
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
-//        Agent agent = null;
-//        Agent agent = agentManager.getAgentByHostname( hostname );
+        //        Agent agent = null;
+        //        Agent agent = agentManager.getAgentByHostname( hostname );
 
         String content = configurationInjector.catFile( hostname, configPathFilename );
 
@@ -73,7 +81,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
         //TODO Read config from instance, set values from Config, inject Config
         //        JsonObject jsonObject = getConfiguration( agent, "" );
 
-//        Agent agent = null;
+        //        Agent agent = null;
 
         TextInjectorImpl configurationInjector = new TextInjectorImpl();
         String content = configurationInjector.catFile( hostname, configFilePath );

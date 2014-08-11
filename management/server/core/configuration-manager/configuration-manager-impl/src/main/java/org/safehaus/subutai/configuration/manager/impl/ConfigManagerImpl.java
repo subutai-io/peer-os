@@ -56,15 +56,15 @@ public class ConfigManagerImpl implements ConfigManager {
         String type = "";
         switch ( configTypeEnum ) {
             case YAML: {
-                configurationLoader = new YamConfigurationlLoader();
+                configurationLoader = new YamConfigurationlLoader(textInjector);
                 break;
             }
             case PROPERTIES: {
-                configurationLoader = new PropertiesConfigurationLoader();
+                configurationLoader = new PropertiesConfigurationLoader(textInjector);
                 break;
             }
             case XML: {
-                configurationLoader = new XMLConfigurationLoader();
+                configurationLoader = new XMLConfigurationLoader(textInjector);
                 break;
             }
             case PLAIN: {
@@ -74,7 +74,7 @@ public class ConfigManagerImpl implements ConfigManager {
             }
             case SH: {
                 //TODO
-                configurationLoader = new ShellConfigurationLoader();
+                configurationLoader = new ShellConfigurationLoader(textInjector);
                 break;
             }
         }
@@ -90,15 +90,15 @@ public class ConfigManagerImpl implements ConfigManager {
         ConfigurationLoader loader = null;
         switch ( configTypeEnum ) {
             case YAML: {
-                loader = new YamConfigurationlLoader();
+                loader = new YamConfigurationlLoader(textInjector);
                 break;
             }
             case PROPERTIES: {
-                loader = new PropertiesConfigurationLoader();
+                loader = new PropertiesConfigurationLoader(textInjector);
                 break;
             }
             case XML: {
-                loader = new XMLConfigurationLoader();
+                loader = new XMLConfigurationLoader(textInjector);
                 break;
             }
             case PLAIN: {
@@ -108,7 +108,7 @@ public class ConfigManagerImpl implements ConfigManager {
             }
             case SH: {
                 //TODO
-                loader = new ShellConfigurationLoader();
+                loader = new ShellConfigurationLoader(textInjector);
                 break;
             }
         }
