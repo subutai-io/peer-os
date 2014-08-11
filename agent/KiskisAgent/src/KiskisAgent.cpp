@@ -209,7 +209,7 @@ bool checkLXC()
 	try
 	{
 		string firstline;
-		ifstream file("/proc/1/cgroup");	//opening root cgroup file
+		ifstream file("/proc/1/cpuset");	//opening root cgroup file
 		getline(file,firstline);
 		file.close();
 		int ret = firstline.find("lxc");

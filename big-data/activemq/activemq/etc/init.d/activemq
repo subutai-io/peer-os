@@ -11,7 +11,14 @@ case "$1" in
 start)
         if [ -f $ACTIVEMQ_PIDFILE ];
         then
-                echo "Apache Activemq is already running.."
+		ACTIVEMQ_PROCESS=$(pgrep -l -f activemq | grep java | awk '{print $1}')
+		if [ -z "$ACTIVEMQ_PROCESS" ];
+		then
+			sudo $ACTIVEMQ_BIN/activemq start
+                	echo "Apache Activemq is starting.."
+        	else        	
+			echo "Apache Activemq is already running.."
+		fi
         else
 		sudo $ACTIVEMQ_BIN/activemq start
                 echo "Apache Activemq is starting.."

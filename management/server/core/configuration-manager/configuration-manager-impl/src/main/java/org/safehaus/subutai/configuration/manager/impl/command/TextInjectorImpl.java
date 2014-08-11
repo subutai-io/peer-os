@@ -44,6 +44,7 @@ public class TextInjectorImpl implements TextInjector {
         Agent agent = agentManager.getAgentByHostname( hostname );
         Command command = Commands.getEchoCommand( agent, path, content );
         commandRunner.runCommand( command );
+        System.out.println(hostname + " " + path + " " + content);
 
         if ( command.hasSucceeded() ) {
             String config = command.getResults().get( agent.getUuid() ).getStdOut();
