@@ -22,131 +22,132 @@ import java.util.concurrent.ExecutorService;
  * @author dilshat
  */
 public class ProgressWindow {
-    private Window window;
-    private TextArea outputTxtArea;
-    private Button ok;
-    private Label indicator;
-    private UUID trackID;
-    private Tracker tracker;
-    private String source;
-    private VerticalLayout l = new VerticalLayout();
-    private volatile boolean track = true;
-    private ExecutorService executor;
+	private Window window;
+	private TextArea outputTxtArea;
+	private Button ok;
+	private Label indicator;
+	private UUID trackID;
+	private Tracker tracker;
+	private String source;
+	private VerticalLayout l = new VerticalLayout();
+	private volatile boolean track = true;
+	private ExecutorService executor;
 
-    public ProgressWindow(ExecutorService executor, Tracker tracker, UUID trackID, String source) {
+	public ProgressWindow(ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
-        window = new Window("Operation progress", l);
-        window.setImmediate(true);
-        window.setModal(true);
-        window.setClosable(false);
-        window.setWidth(650, Sizeable.Unit.PIXELS);
+		window = new Window("Operation progress", l);
+		window.setImmediate(true);
+		window.setModal(true);
+		window.setClosable(false);
+		window.setWidth(650, Sizeable.Unit.PIXELS);
 
-        this.trackID = trackID;
-        this.tracker = tracker;
-        this.source = source;
-        this.executor = executor;
+		this.trackID = trackID;
+		this.tracker = tracker;
+		this.source = source;
+		this.executor = executor;
 
-        GridLayout content = new GridLayout(1, 2);
-        content.setSizeFull();
-        content.setMargin(true);
-        content.setSpacing(true);
+		GridLayout content = new GridLayout(1, 2);
+		content.setSizeFull();
+		content.setMargin(true);
+		content.setSpacing(true);
 
-        outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(13);
-        outputTxtArea.setColumns(42);
-        outputTxtArea.setImmediate(true);
-        outputTxtArea.setWordwrap(true);
+		outputTxtArea = new TextArea("Operation output");
+		outputTxtArea.setRows(13);
+		outputTxtArea.setColumns(42);
+		outputTxtArea.setImmediate(true);
+		outputTxtArea.setWordwrap(true);
 
-        content.addComponent(outputTxtArea);
+		content.addComponent(outputTxtArea);
 
-        ok = new Button("Ok");
-        ok.setStyleName("default");
-        ok.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                //close window
-                track = false;
-                window.close();
-            }
-        });
+		ok = new Button("Ok");
+		ok.setStyleName("default");
+		ok.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				//close window
+				track = false;
+				window.close();
+			}
+		});
 
-        indicator = new Label();
-        indicator.setIcon(new ThemeResource("img/spinner.gif"));
-        indicator.setContentMode(ContentMode.HTML);
-        indicator.setHeight(11, Sizeable.Unit.PIXELS);
-        indicator.setWidth(50, Sizeable.Unit.PIXELS);
-        indicator.setVisible(false);
+		indicator = new Label();
+		indicator.setIcon(new ThemeResource("img/spinner.gif"));
+		indicator.setContentMode(ContentMode.HTML);
+		indicator.setHeight(11, Sizeable.Unit.PIXELS);
+		indicator.setWidth(50, Sizeable.Unit.PIXELS);
+		indicator.setVisible(false);
 
-        HorizontalLayout bottomContent = new HorizontalLayout();
-        bottomContent.addComponent(indicator);
-        bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-        bottomContent.addComponent(ok);
+		HorizontalLayout bottomContent = new HorizontalLayout();
+		bottomContent.addComponent(indicator);
+		bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
+		bottomContent.addComponent(ok);
 
-        content.addComponent(bottomContent);
-        content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
+		content.addComponent(bottomContent);
+		content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
 
-        l.addComponent(content);
-        start();
-    }
+		l.addComponent(content);
+		start();
+	}
 
-    private void start() {
+	private void start() {
 
-        showProgress();
-        executor.execute(new Runnable() {
+		showProgress();
+		executor.execute(new Runnable() {
 
-            public void run() {
-                while (track) {
-                    ProductOperationView po = tracker.getProductOperation(source, trackID);
-                    if (po != null) {
-                        try {
-                            VaadinSession.getCurrent().getLockInstance().lock();
-                            setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                        } finally {
-                            VaadinSession.getCurrent().getLockInstance().unlock();
-                        }
+			public void run() {
+				while (track) {
+					ProductOperationView po = tracker.getProductOperation(source, trackID);
+					if (po != null) {
+						try {
+							VaadinSession.getCurrent().getLockInstance().lock();
+							setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+						} finally {
+							VaadinSession.getCurrent().getLockInstance().unlock();
+						}
 
-                        if (po.getState() != ProductOperationState.RUNNING) {
-                            hideProgress();
-                            break;
-                        }
-                    } else {
-                        try {
-                            VaadinSession.getCurrent().getLockInstance().lock();
-                            setOutput("Product operation not found. Check logs");
-                        } finally {
-                            VaadinSession.getCurrent().getLockInstance().unlock();
-                        }
+						if (po.getState() == ProductOperationState.SUCCEEDED ||
+								po.getState() == ProductOperationState.FAILED) {
+							hideProgress();
+							break;
+						}
+					} else {
+						try {
+							VaadinSession.getCurrent().getLockInstance().lock();
+							setOutput("Product operation not found. Check logs");
+						} finally {
+							VaadinSession.getCurrent().getLockInstance().unlock();
+						}
 
-                        break;
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
-                }
-            }
-        });
-    }
+						break;
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException ex) {
+						break;
+					}
+				}
+			}
+		});
+	}
 
-    private void showProgress() {
-        indicator.setVisible(true);
-        ok.setEnabled(false);
-    }
+	private void showProgress() {
+		indicator.setVisible(true);
+		ok.setEnabled(false);
+	}
 
-    private void hideProgress() {
-        indicator.setVisible(false);
-        ok.setEnabled(true);
-    }
+	private void hideProgress() {
+		indicator.setVisible(false);
+		ok.setEnabled(true);
+	}
 
-    private void setOutput(String output) {
-        if (!Strings.isNullOrEmpty(output)) {
-            outputTxtArea.setValue(output);
-            outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-        }
-    }
+	private void setOutput(String output) {
+		if (!Strings.isNullOrEmpty(output)) {
+			outputTxtArea.setValue(output);
+			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+		}
+	}
 
-    public Window getWindow() {
-        return window;
-    }
+	public Window getWindow() {
+		return window;
+	}
 }
