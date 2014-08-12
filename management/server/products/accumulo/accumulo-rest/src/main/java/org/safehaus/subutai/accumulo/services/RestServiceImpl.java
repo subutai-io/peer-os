@@ -23,8 +23,7 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Accumulo accumuloManager;
     private AgentManager agentManager;
 

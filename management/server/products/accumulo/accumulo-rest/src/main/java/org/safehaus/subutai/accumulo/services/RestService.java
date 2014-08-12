@@ -42,15 +42,15 @@ public interface RestService {
     public String createCluster( @QueryParam( "config" ) String config );
 
     @GET
-    @Path( "add_node" )
+    @Path( "add_node/{clustername}/{lxchostname}/{nodetype}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String addNode( @QueryParam( "clustername" ) String clustername,
-                           @QueryParam( "lxchostname" ) String lxchostname, @QueryParam( "nodetype" ) String nodetype );
+    public String addNode( @PathParam( "clustername" ) String clustername,
+                           @PathParam( "lxchostname" ) String lxchostname, @PathParam( "nodetype" ) String nodetype );
 
     @GET
-    @Path( "destroy_node" )
+    @Path( "destroy_node/{clustername}/{lxchostname}/{nodetype}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String destroyNode( @QueryParam( "clustername" ) String clustername,
-                               @QueryParam( "lxchostname" ) String lxchostname,
-                               @QueryParam( "nodetype" ) String nodetype );
+    public String destroyNode( @PathParam( "clustername" ) String clustername,
+                               @PathParam( "lxchostname" ) String lxchostname,
+                               @PathParam( "nodetype" ) String nodetype );
 }
