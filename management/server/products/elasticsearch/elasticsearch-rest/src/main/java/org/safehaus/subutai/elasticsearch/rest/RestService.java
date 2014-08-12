@@ -108,4 +108,16 @@ public class RestService {
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
 
+
+    @GET
+    @Path( "startAllNodes" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String startAllNodes(
+            @QueryParam( "clusterName" ) String clusterName
+    ) {
+
+        UUID uuid = elasticsearch.startAllNodes( clusterName );
+
+        return JsonUtil.toJson( OPERATION_ID, uuid );
+    }
 }
