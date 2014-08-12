@@ -70,8 +70,8 @@ cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
-cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/
-cp $SOURCE/var/lib/lxc/check.sh $LXCSOURCE/$pattern/rootfs/etc/init.d/ 
+cp $SOURCE/var/lib/lxc/check.sh $LXCSOURCE/$pattern/rootfs/etc/init.d/
+cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/ 
 #cp $SOURCE/var/lib/lxc/README.md $BASE/$fileName/var/lib/lxc/
 
 if ls *.deb ; then
