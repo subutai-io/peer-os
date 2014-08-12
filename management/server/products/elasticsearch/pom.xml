@@ -18,5 +18,6 @@
         <module>elasticsearch-api</module>
         <module>elasticsearch-impl</module>
         <module>elasticsearch-ui</module>
+        <module>elasticsearch-rest</module>
     </modules>
 </project>

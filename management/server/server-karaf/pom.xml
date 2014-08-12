@@ -1554,6 +1554,11 @@
                   <artifactId>elasticsearch-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Products Modules - END -->
 
