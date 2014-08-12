@@ -1,11 +1,8 @@
 package org.safehaus.subutai.elasticsearch.rest;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,8 +10,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,9 +37,17 @@ public class RestService {
 
 
     @GET
-    @Path( "list" )
+    @Path( "list-clusters" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String listClusters() {
-        return gson.toJson( "list clusters" );
+
+        List<Config> configList = elasticsearch.getClusters();
+        ArrayList<String> clusterNames = new ArrayList();
+
+        for ( Config config : configList ) {
+            clusterNames.add( config.getClusterName() );
+        }
+
+        return gson.toJson( clusterNames );
     }
 }
