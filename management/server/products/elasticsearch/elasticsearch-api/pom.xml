@@ -11,7 +11,8 @@
 
     <artifactId>elasticsearch-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Elasticsearch API</name>
+    <name>Subutai Elasticsearch Api</name>
+    <description>Subutai Elasticsearch Api</description>
 
     <dependencies>
         <dependency>
@@ -21,10 +22,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>command-runner-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -43,6 +40,7 @@
                     </instructions>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>
