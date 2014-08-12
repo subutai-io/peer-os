@@ -4,7 +4,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
-import org.safehaus.subutai.ui.elasticsearch2.configuration.ConfigurationView;
 import org.safehaus.subutai.ui.elasticsearch2.manager.Manager;
 import org.safehaus.subutai.ui.elasticsearch2.wizard.Wizard;
 
@@ -27,7 +26,6 @@ public class ElasticsearchForm extends CustomComponent {
 		manager = new Manager();
 		wizard = new Wizard();
 		sheet.addTab(wizard.getContent(), "Install");
-		sheet.addTab(new ConfigurationView(), "Configure");
 		sheet.addTab(manager.getContent(), "Manage");
 		verticalLayout.addComponent(sheet);
 
