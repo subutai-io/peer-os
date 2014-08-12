@@ -9,7 +9,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 
-@Path("zookeeper")
 public interface RestService {
 
 

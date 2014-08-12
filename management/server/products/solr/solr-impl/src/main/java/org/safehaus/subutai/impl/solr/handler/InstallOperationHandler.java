@@ -1,9 +1,12 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
-import com.google.common.base.Strings;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.solr.Config;
@@ -11,9 +14,7 @@ import org.safehaus.subutai.impl.solr.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Strings;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> {
@@ -23,8 +24,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
     public InstallOperationHandler( SolrImpl manager, Config config ) {
         super( manager, config.getClusterName() );
         this.config = config;
-        productOperation = manager.getTracker()
-                    .createProductOperation( Config.PRODUCT_KEY, String.format( "Installing %s", Config.PRODUCT_KEY ) );
+        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Installing %s", Config.PRODUCT_KEY ) );
     }
 
 
@@ -51,33 +52,34 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
                 config.getNodes().addAll( entry.getValue() );
             }
 
-            productOperation.addLog( "Lxc containers created successfully\nUpdating db..." );
+            productOperation.addLog( "Lxc containers created successfully\nInstalling Solr..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                productOperation.addLog( "Installation info saved to DB\nInstalling Solr..." );
-                Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
-                manager.getCommandRunner().runCommand( installCommand );
 
-                if ( installCommand.hasSucceeded() ) {
-                    productOperation.addLogDone( "Installation succeeded" );
+            Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
+            manager.getCommandRunner().runCommand( installCommand );
+
+            if ( installCommand.hasSucceeded() ) {
+                productOperation.addLog( "Installation succeeded\nSaving information to database..." );
+
+                try {
+                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                    productOperation.addLogDone( "Information saved to database" );
                 }
-                else {
+                catch ( DBException e ) {
                     productOperation.addLogFailed(
-                            String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                            String.format( "Failed to save information to database, %s", e.getMessage() ) );
+
+                    try {
+                        manager.getLxcManager().destroyLxcs( lxcAgentsMap );
+                    }
+                    catch ( LxcDestroyException ignore ) {
+                    }
                 }
             }
             else {
-                // Destroy all LXCs also
-                try {
-                    manager.getLxcManager().destroyLxcs( lxcAgentsMap );
-                }
-                catch ( LxcDestroyException ex ) {
-                    productOperation.addLogFailed(
-                            "Could not save installation info to DB! Please see logs. Use LXC module to "
-                                    + "cleanup\nInstallation aborted" );
-                }
-                productOperation.addLogFailed(
-                        "Could not save installation info to DB! Please see logs\nInstallation aborted" );
+                productOperation
+                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
         catch ( LxcCreateException ex ) {

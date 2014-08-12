@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.impl.solr.SolrImpl;
@@ -27,8 +28,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
         Config config = manager.getCluster( clusterName );
 
         if ( config == null ) {
-            productOperation.addLogFailed(
-                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
+            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -40,25 +40,27 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
             Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
             config.getNodes().add( lxcAgent );
-            productOperation.addLog( "Lxc container created successfully\nUpdating db..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, clusterName, config ) ) {
-                productOperation.addLog( "Cluster info updated in DB\nInstalling Solr..." );
+            productOperation.addLog( "Lxc container created successfully\nInstalling Solr..." );
 
-                Command installCommand = manager.getCommands().getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
-                manager.getCommandRunner().runCommand( installCommand );
+            Command installCommand = manager.getCommands().getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
+            manager.getCommandRunner().runCommand( installCommand );
 
-                if ( installCommand.hasSucceeded() ) {
-                    productOperation.addLogDone( "Installation succeeded\nDone" );
+            if ( installCommand.hasSucceeded() ) {
+                productOperation.addLog( "Installation succeeded\nSaving information to database..." );
+
+                try {
+                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
+                    productOperation.addLogDone( "Information saved to database" );
                 }
-                else {
-                    productOperation
-                            .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                catch ( DBException e ) {
+                    productOperation.addLogFailed(
+                            String.format( "Failed to save information to database, %s", e.getMessage() ) );
                 }
             }
             else {
-                productOperation.addLogFailed(
-                        "Error while updating installation info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
+                productOperation
+                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
         catch ( LxcCreateException ex ) {

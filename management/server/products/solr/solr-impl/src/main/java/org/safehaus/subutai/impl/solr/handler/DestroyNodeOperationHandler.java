@@ -1,6 +1,7 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.impl.solr.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -39,7 +40,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
 
         if ( !config.getNodes().contains( agent ) ) {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s does not belong to installation %s", lxcHostname,
+                            clusterName ) );
             return;
         }
 
@@ -63,15 +65,15 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         }
 
         // Update db
-        productOperation.addLog( "Updating db..." );
+        productOperation.addLog( "Saving information to database..." );
 
-        if ( !manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
-            productOperation.addLogFailed(
-                    String.format( "Error while updating installation info [%s] in DB. Check logs\nFailed",
-                            config.getClusterName() ) );
+        try {
+            manager.getDbManager().deleteInfo2( Config.PRODUCT_KEY, config.getClusterName() );
+            productOperation.addLogDone( "Saved information to database" );
         }
-        else {
-            productOperation.addLogDone( "Done" );
+        catch ( DBException e ) {
+            productOperation
+                    .addLogFailed( String.format( "Failed to save infomation to database, %s", e.getMessage() ) );
         }
     }
 }
