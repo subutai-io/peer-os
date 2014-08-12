@@ -9,8 +9,7 @@ import com.google.gson.GsonBuilder;
 
 public class JsonUtil {
 
-    public static final Gson GSON =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 
     public static String toJson( Object key, Object value ) {
