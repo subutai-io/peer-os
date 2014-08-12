@@ -4,6 +4,7 @@ package org.safehaus.subutai.impl.zookeeper.handler;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.impl.zookeeper.Commands;
@@ -68,13 +69,15 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             }
         }
 
+        po.addLog( "Updating information in database..." );
 
-        po.addLog( "Updating db..." );
-        if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
-            po.addLogDone( "Cluster info deleted from DB\nDone" );
+        try {
+            manager.getDbManager().deleteInfo2( Config.PRODUCT_KEY, clusterName );
+
+            po.addLogDone( "Information in database updated successfully" );
         }
-        else {
-            po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Failed to update information in database, %s", e.getMessage() ) );
         }
     }
 }
