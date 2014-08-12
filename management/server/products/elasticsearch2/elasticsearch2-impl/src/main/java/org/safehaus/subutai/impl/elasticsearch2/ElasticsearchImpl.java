@@ -168,7 +168,20 @@ public class ElasticsearchImpl implements Elasticsearch {
                         }
                         else {
                             po.addLogFailed(
-                                    String.format( "Installation failed, %s", setMasterNodesCommand.getAllErrors() ) );
+                                    String.format( "Installation failed, %s", dataNodesCommand.getAllErrors() ) );
+                            return;
+                        }
+
+                        // Setting number of shards
+
+                        po.addLog( "Setting number of shards..." );
+
+                        Command shardsCommand = Commands.getConfigureCommand( config.getNodes(),
+                                "index.number_of_shards " + config.getNumberOfShards() );
+                        commandRunner.runCommand( shardsCommand );
+
+                        if ( !shardsCommand.hasSucceeded() ) {
+                            po.addLogFailed( String.format( "Installation failed, %s", shardsCommand.getAllErrors() ) );
                             return;
                         }
 

@@ -69,18 +69,19 @@ public class ConfigurationStep extends VerticalLayout {
             }
         } );
 
-		TextField domainNameTxtFld = new TextField("Enter domain name");
-		domainNameTxtFld.setInputPrompt("Domain name");
-		domainNameTxtFld.setRequired(false);
-		domainNameTxtFld.setMaxLength(20);
-		domainNameTxtFld.setValue(wizard.getConfig().getClusterName());
-		domainNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
-			}
-		});
 
+        ComboBox numberOfShardsCombo = new ComboBox("Number of shards:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        numberOfShardsCombo.setImmediate( true );
+        numberOfShardsCombo.setTextInputAllowed( false );
+        numberOfShardsCombo.setNullSelectionAllowed( false );
+        numberOfShardsCombo.setValue( wizard.getConfig() );
+
+        numberOfShardsCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                wizard.getConfig().setNumberOfShards( ( Integer ) event.getProperty().getValue() );
+            }
+        } );
 
 
 		Button next = new Button("Next");
@@ -118,6 +119,7 @@ public class ConfigurationStep extends VerticalLayout {
 		content.addComponent(nodesCountCombo);
 		content.addComponent(mastersCountCombo);
 		content.addComponent(dataNodesCountCombo);
+		content.addComponent(numberOfShardsCombo);
 		content.addComponent(buttons);
 
 		addComponent(layout);
