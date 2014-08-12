@@ -16,7 +16,6 @@
     <modules>
         <module>elasticsearch-api</module>
         <module>elasticsearch-impl</module>
-        <module>elasticsearch-cli</module>
         <module>elasticsearch-ui</module>
     </modules>
 </project>

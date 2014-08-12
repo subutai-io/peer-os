@@ -25,45 +25,28 @@ public class Commands extends CommandsSingleton {
 
     }
 
-    public static Command getConfigureCommand(Set<Agent> agents, String param) {
 
-        return createCommand(
-                new RequestBuilder(
-                        String.format(" . /etc/profile && es-conf.sh %s ", param))
-                ,
-                agents
-        );
+    public static Command getConfigureCommand( Set<Agent> agents, String param ) {
+        return createCommand( new RequestBuilder( String.format( " . /etc/profile && es-conf.sh %s ", param ) ), agents
+                            );
     }
 
 
-
-
-    public static Command getStartCommand(Set<Agent> agents) {
-        return createCommand(
-                new RequestBuilder(
-                        "service cassandra start")
-                ,
-                agents
-        );
+    public static Command getStatusCommand( Set<Agent> agents ) {
+        return createCommand( new RequestBuilder( "service elasticsearch status" ), agents );
     }
 
-    public static Command getStopCommand(Set<Agent> agents) {
-        return createCommand(
-                new RequestBuilder(
-                        "service cassandra stop")
-                ,
-                agents
-        );
+
+    public static Command getStartCommand( Set<Agent> agents ) {
+        return createCommand( new RequestBuilder( "service elasticsearch start" ), agents );
     }
 
-    public static Command getStatusCommand(Set<Agent> agents) {
-        return createCommand(
-                new RequestBuilder(
-                        "service cassandra status")
-                ,
-                agents
-        );
+
+    public static Command getStopCommand( Set<Agent> agents ) {
+        return createCommand( new RequestBuilder( "service elasticsearch stop" ), agents );
     }
+
+
 
 //    public static Command getConfigureRpcAndListenAddressesCommand(Set<Agent> agents, String param) {
 //        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();

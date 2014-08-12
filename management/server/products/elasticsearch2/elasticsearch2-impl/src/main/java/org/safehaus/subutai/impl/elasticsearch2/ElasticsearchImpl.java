@@ -258,65 +258,65 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-
     @Override
-    public UUID startAllNodes(final String clusterName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting cluster %s", clusterName));
+    public UUID startAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Starting cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
-
+        executor.execute( new Runnable() {
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
-                Command startServiceCommand = Commands.getStartCommand(config.getNodes());
-                commandRunner.runCommand(startServiceCommand);
+                Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
+                commandRunner.runCommand( startServiceCommand );
 
-                if (startServiceCommand.hasSucceeded()) {
-                    po.addLogDone("Start succeeded");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", startServiceCommand.getAllErrors()));
+                if ( startServiceCommand.hasSucceeded() ) {
+                    po.addLogDone( "Start succeeded" );
                 }
-
+                else {
+                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+                }
             }
-        });
+        } );
 
         return po.getId();
     }
 
-    @Override
-    public UUID stopAllNodes(final String clusterName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping cluster %s", clusterName));
 
-        executor.execute(new Runnable() {
+    @Override
+    public UUID stopAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Stopping cluster %s", clusterName ) );
+
+        executor.execute( new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                Command stopServiceCommand = Commands.getStopCommand(config.getNodes());
-                commandRunner.runCommand(stopServiceCommand);
+                Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
+                commandRunner.runCommand( stopServiceCommand );
 
-                if (stopServiceCommand.hasSucceeded()) {
-                    po.addLogDone("Stop succeeded");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", stopServiceCommand.getAllErrors()));
+                if ( stopServiceCommand.hasSucceeded() ) {
+                    po.addLogDone( "Stop succeeded" );
                 }
-
+                else {
+                    po.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
+                }
             }
-        });
+        } );
 
         return po.getId();
     }
+
 
     @Override
     public UUID startCassandraService(final String agentUUID) {
@@ -394,35 +394,37 @@ public class ElasticsearchImpl implements Elasticsearch {
         return po.getId();
     }
 
-    @Override
-    public UUID checkAllNodes(final String clusterName) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking cluster %s", clusterName));
 
-        executor.execute(new Runnable() {
+    @Override
+    public UUID checkAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Checking cluster %s", clusterName ) );
+
+        executor.execute( new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
-                    po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                Command checkStatusCommand = Commands.getStatusCommand(config.getNodes());
-                commandRunner.runCommand(checkStatusCommand);
+                Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
+                commandRunner.runCommand( checkStatusCommand );
 
-                if (checkStatusCommand.hasSucceeded()) {
-                    po.addLogDone("All nodes are running.");
-                } else {
-                    po.addLogFailed(String.format("Check status failed, %s", checkStatusCommand.getAllErrors()));
+                if ( checkStatusCommand.hasSucceeded() ) {
+                    po.addLogDone( "All nodes are running." );
                 }
-
+                else {
+                    po.addLogFailed( String.format( "Check status failed\n%s", checkStatusCommand.getAllErrors() ) );
+                }
             }
-        });
+        } );
 
         return po.getId();
     }
+
 
     public List<Config> getClusters() {
 

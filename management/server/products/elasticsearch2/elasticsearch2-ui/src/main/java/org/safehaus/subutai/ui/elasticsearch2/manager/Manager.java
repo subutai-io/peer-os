@@ -144,27 +144,31 @@ public class Manager {
 		controlsContent.setComponentAlignment(checkAllBtn, Alignment.MIDDLE_CENTER);
 	}
 
-	private void getStartAllButton() {
-		Button startAllBtn = new Button("Start all");
-		startAllBtn.addStyleName("default");
-		startAllBtn.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = ElasticsearchUI.getElasticsearchManager().startAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						refreshClustersInfo();
-					}
-				});
-				contentRoot.getUI().addWindow(window.getWindow());
-			}
-		});
 
-		controlsContent.addComponent(startAllBtn);
-		controlsContent.setComponentAlignment(startAllBtn, Alignment.MIDDLE_CENTER);
-	}
+    private void getStartAllButton() {
+        Button startAllBtn = new Button( "Start all" );
+        startAllBtn.addStyleName( "default" );
+        startAllBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                UUID trackID = ElasticsearchUI.getElasticsearchManager().startAllNodes( config.getClusterName() );
+                ProgressWindow window =
+                        new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
+                                Config.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        refreshClustersInfo();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
+            }
+        } );
+
+        controlsContent.addComponent( startAllBtn );
+        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
+    }
+
 
 	private void getStopAllButton() {
 		Button stopAllBtn = new Button("Stop all");
