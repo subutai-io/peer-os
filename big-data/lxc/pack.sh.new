@@ -83,8 +83,8 @@ cd $BASE/$fileName/var/lib/lxc/
 cp check.sh $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/init.d/
 cd $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/
 sed -i '10 a\/etc/init.d/check.sh' rc.local
-sed -i '13 a\/. usr/bin/modifyHostname.sh' rc.local
-sed -i '14 a\/service logstash start' rc.local
+sed -i '13 a\/usr/bin/modifyHostname.sh' rc.local
+sed -i '14 a\service logstash start' rc.local
 
 cd $BASE/$fileName/var/lib/lxc/
 tar -cvpzf $pattern".tar.gz" $pattern/

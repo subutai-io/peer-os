@@ -1,6 +1,7 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
+import org.safehaus.subutai.configuration.manager.api.TextInjector;
 import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.yaml.snakeyaml.Yaml;
 
@@ -18,6 +19,13 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
 //    public YamConfigurationlLoader(Agent agent) {
 //        this.agent = agent;
 //    }
+
+    private TextInjector textInjector;
+
+
+    public YamConfigurationlLoader( final TextInjector textInjector ) {
+        this.textInjector = textInjector;
+    }
 
 
     @Override

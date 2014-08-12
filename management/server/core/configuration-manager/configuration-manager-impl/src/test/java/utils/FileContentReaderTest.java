@@ -31,7 +31,7 @@ public class FileContentReaderTest {
         String filePath = "cassandra_conf/cassandra.yaml";
         String content = FileUtil.getContent( filePath, this );
 
-        System.out.println(content);
+//        System.out.println(content);
        /* try {
             ConfigParser iniParser = new IniParser( content );
             JsonObject cjo = iniParser.parserConfig( filePath, ConfigTypeEnum.PROPERTIES );

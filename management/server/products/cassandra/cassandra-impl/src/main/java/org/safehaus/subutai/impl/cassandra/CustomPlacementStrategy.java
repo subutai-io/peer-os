@@ -41,6 +41,14 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
     @Override
     public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> metrics) {
+        try {
+            return calculateSlotsInternal(metrics);
+        } catch(LxcCreateException ex) {
+            return Collections.emptyMap();
+        }
+    }
+
+    Map<Agent, Integer> calculateSlotsInternal(Map<Agent, ServerMetric> metrics) throws LxcCreateException {
         Map<Agent, Integer> slots = new HashMap<>();
         if(metrics == null || metrics.isEmpty()) return slots;
 
@@ -49,13 +57,14 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
             int min = Integer.MAX_VALUE;
 
             int n = Math.round((m.getFreeRamMb() - RAM_IN_RESERVE_MB) / RAM_PER_NODE_MB);
-            if((min = Math.min(n, min)) <= 0) continue;
+            if((min = Math.min(n, min)) <= 0)
+                throw new LxcCreateException("Placement strategy returned empty due to RAM resources");
 
             n = Math.round((m.getFreeHddMb() - HDD_IN_RESERVE_MB) / HDD_PER_NODE_MB);
-            if((min = Math.min(n, min)) <= 0) continue;
+            if((min = Math.min(n, min)) <= 0)
+                throw new LxcCreateException("Placement strategy returned empty due to HDD resources");
 
             // TODO: check cpu load when cpu load determination is reimplemented
-
             slots.put(e.getKey(), min);
         }
         return slots;
@@ -64,12 +73,15 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
     @Override
     public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException {
 
-        Map<Agent, Integer> serversSlots = calculateSlots(serverMetrics);
+        Map<Agent, Integer> serversSlots = calculateSlotsInternal(serverMetrics);
         if(serversSlots.isEmpty()) return;
 
         int available = 0;
         for(Integer i : serversSlots.values()) available += i.intValue();
-        if(available < nodesCount) return;
+        if(available < nodesCount)
+            throw new LxcCreateException(String.format(
+                    "Placement strategy returned only %d container(s)",
+                    available));
 
         for(int i = 0; i < nodesCount; i++) {
             Agent physicalNode = findBestServer(serversSlots);

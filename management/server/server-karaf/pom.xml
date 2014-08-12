@@ -640,6 +640,11 @@
                   <artifactId>tracker-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                  <artifactItem>
+                      <groupId>org.safehaus.subutai</groupId>
+                      <artifactId>tracker-rest</artifactId>
+                      <version>${project.version}</version>
+                  </artifactItem>
 
                 <!-- Git Manager -->
                 <artifactItem>
