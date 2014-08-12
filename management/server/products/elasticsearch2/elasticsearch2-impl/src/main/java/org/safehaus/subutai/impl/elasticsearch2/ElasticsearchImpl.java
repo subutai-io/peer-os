@@ -88,6 +88,8 @@ public class ElasticsearchImpl implements Elasticsearch {
                         config.getNodes().addAll(entry.getValue());
                     }
 
+                    // Master nodes
+
                     Set<Agent> masterNodes = new HashSet();
                     for ( Agent agent : config.getNodes() ) {
                         masterNodes.add( agent );
@@ -96,6 +98,15 @@ public class ElasticsearchImpl implements Elasticsearch {
                         }
                     }
                     config.setMasterNodes( masterNodes );
+
+                    // Data nodes
+
+                    for ( Agent agent : config.getNodes() ) {
+                        config.getDataNodes().add( agent );
+                        if ( config.getDataNodes().size() == config.getNumberOfDataNodes() ) {
+                            break;
+                        }
+                    }
 
                     po.addLog("Lxc containers created successfully.");
                     po.addLog("Updating db...");
@@ -134,7 +145,7 @@ public class ElasticsearchImpl implements Elasticsearch {
 
                         po.addLog( "Setting master nodes..." );
 
-                        Command setMasterNodesCommand = Commands.getConfigureCommand( config.getMasterNodes(), " node.master true " );
+                        Command setMasterNodesCommand = Commands.getConfigureCommand( config.getMasterNodes(), "node.master true" );
                         commandRunner.runCommand(setMasterNodesCommand);
 
                         if (setMasterNodesCommand.hasSucceeded()) {
@@ -144,10 +155,29 @@ public class ElasticsearchImpl implements Elasticsearch {
                             return;
                         }
 
+                        // Setting data nodes
+
+                        po.addLog( "Setting data nodes..." );
+
+                        Command dataNodesCommand =
+                                Commands.getConfigureCommand( config.getDataNodes(), "node.data true" );
+                        commandRunner.runCommand( dataNodesCommand );
+
+                        if ( dataNodesCommand.hasSucceeded() ) {
+                            po.addLog( "Data nodes setup successful" );
+                        }
+                        else {
+                            po.addLogFailed(
+                                    String.format( "Installation failed, %s", setMasterNodesCommand.getAllErrors() ) );
+                            return;
+                        }
+
+                        // Done
+
                         po.addLogDone("Installation of Elasticsearch cluster succeeded");
 
                     } else {
-                        // Destroy all lxcs also
+                        // In case of error - destroy created LXCs
                         try {
                             lxcManager.destroyLxcs(config.getNodes());
                         } catch (LxcDestroyException ex) {

@@ -13,41 +13,61 @@ public class Config implements ConfigBase {
 
     private int numberOfNodes;
     private int numberOfMasterNodes;
+    private int numberOfDataNodes;
 
     private Set<Agent> nodes = new HashSet<>();
     private Set<Agent> masterNodes = new HashSet<>();
+    private Set<Agent> dataNodes = new HashSet<>();
 
     public static String getProductKey() {
         return PRODUCT_KEY;
     }
 
+
+    @Override
     public String getClusterName() {
         return clusterName;
     }
 
-    public void setClusterName(String clusterName) {
+
+    public void setClusterName( String clusterName ) {
         this.clusterName = clusterName;
     }
+
 
     @Override
     public String getProductName() {
         return PRODUCT_KEY;
     }
 
+
     public int getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+
+    public void setNumberOfNodes( int numberOfNodes ) {
         this.numberOfNodes = numberOfNodes;
     }
+
 
     public int getNumberOfMasterNodes() {
         return numberOfMasterNodes;
     }
 
+
     public void setNumberOfMasterNodes( int numberOfSeeds ) {
         this.numberOfMasterNodes = numberOfSeeds;
+    }
+
+
+    public int getNumberOfDataNodes() {
+        return numberOfDataNodes;
+    }
+
+
+    public void setNumberOfDataNodes( int numberOfDataNodes ) {
+        this.numberOfDataNodes = numberOfDataNodes;
     }
 
 
@@ -60,8 +80,14 @@ public class Config implements ConfigBase {
         return masterNodes;
     }
 
+
     public void setMasterNodes( Set<Agent> seedNodes ) {
         this.masterNodes = seedNodes;
+    }
+
+
+    public Set<Agent> getDataNodes() {
+        return dataNodes;
     }
 
 

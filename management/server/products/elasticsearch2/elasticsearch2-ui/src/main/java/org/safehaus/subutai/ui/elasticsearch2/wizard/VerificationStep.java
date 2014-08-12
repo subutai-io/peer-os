@@ -27,6 +27,7 @@ public class VerificationStep extends VerticalLayout {
         cfgView.addStringCfg( "Cluster Name: ", wizard.getConfig().getClusterName() );
         cfgView.addStringCfg( "Number of Nodes: ", "" + wizard.getConfig().getNumberOfNodes() );
         cfgView.addStringCfg( "Number of Master Nodes: ", "" + wizard.getConfig().getNumberOfMasterNodes() );
+        cfgView.addStringCfg( "Number of Data Nodes: ", "" + wizard.getConfig().getNumberOfDataNodes() );
 
 		Button installButton = new Button("Install");
 		installButton.addStyleName( "default" );

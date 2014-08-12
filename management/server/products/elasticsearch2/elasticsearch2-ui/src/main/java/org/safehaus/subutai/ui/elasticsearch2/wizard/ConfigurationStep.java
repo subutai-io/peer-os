@@ -56,18 +56,30 @@ public class ConfigurationStep extends VerticalLayout {
             }
         } );
 
+        ComboBox dataNodesCountCombo = new ComboBox("Number of data nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        dataNodesCountCombo.setImmediate( true );
+        dataNodesCountCombo.setTextInputAllowed( false );
+        dataNodesCountCombo.setNullSelectionAllowed( false );
+        dataNodesCountCombo.setValue( wizard.getConfig() );
 
-//		final TextField domainNameTxtFld = new TextField("Enter domain name");
-//		domainNameTxtFld.setInputPrompt("Domain name");
-//		domainNameTxtFld.setRequired(false);
-//		domainNameTxtFld.setMaxLength(20);
-//		domainNameTxtFld.setValue(wizard.getConfig().getClusterName());
-//		domainNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
-//			@Override
-//			public void valueChange(Property.ValueChangeEvent event) {
-//				wizard.getConfig().setDomainName(event.getProperty().getValue().toString().trim());
-//			}
-//		});
+        dataNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
+            }
+        } );
+
+		TextField domainNameTxtFld = new TextField("Enter domain name");
+		domainNameTxtFld.setInputPrompt("Domain name");
+		domainNameTxtFld.setRequired(false);
+		domainNameTxtFld.setMaxLength(20);
+		domainNameTxtFld.setValue(wizard.getConfig().getClusterName());
+		domainNameTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
+			}
+		});
 
 
 
@@ -105,6 +117,7 @@ public class ConfigurationStep extends VerticalLayout {
 		content.addComponent(clusterNameTxtFld);
 		content.addComponent(nodesCountCombo);
 		content.addComponent(mastersCountCombo);
+		content.addComponent(dataNodesCountCombo);
 		content.addComponent(buttons);
 
 		addComponent(layout);
