@@ -84,6 +84,19 @@ public class ConfigurationStep extends VerticalLayout {
         } );
 
 
+        ComboBox numberOfReplicasCombo = new ComboBox("Number of replicas:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        numberOfReplicasCombo.setImmediate( true );
+        numberOfReplicasCombo.setTextInputAllowed( false );
+        numberOfReplicasCombo.setNullSelectionAllowed( false );
+        numberOfReplicasCombo.setValue( wizard.getConfig() );
+
+        numberOfReplicasCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                wizard.getConfig().setNumberOfReplicas( ( Integer ) event.getProperty().getValue() );
+            }
+        } );
+
 		Button next = new Button("Next");
 		next.addStyleName("default");
 		next.addClickListener(new Button.ClickListener() {
@@ -120,6 +133,7 @@ public class ConfigurationStep extends VerticalLayout {
 		content.addComponent(mastersCountCombo);
 		content.addComponent(dataNodesCountCombo);
 		content.addComponent(numberOfShardsCombo);
+		content.addComponent(numberOfReplicasCombo);
 		content.addComponent(buttons);
 
 		addComponent(layout);

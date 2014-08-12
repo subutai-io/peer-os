@@ -185,6 +185,19 @@ public class ElasticsearchImpl implements Elasticsearch {
                             return;
                         }
 
+                        // Setting number of replicas
+
+                        po.addLog( "Setting number of replicas..." );
+
+                        Command numberOfReplicasCommand = Commands.getConfigureCommand( config.getNodes(),
+                                "index.number_of_replicas " + config.getNumberOfReplicas() );
+                        commandRunner.runCommand( numberOfReplicasCommand );
+
+                        if ( !numberOfReplicasCommand.hasSucceeded() ) {
+                            po.addLogFailed( String.format( "Installation failed, %s", numberOfReplicasCommand.getAllErrors() ) );
+                            return;
+                        }
+
                         // Done
 
                         po.addLogDone("Installation of Elasticsearch cluster succeeded");

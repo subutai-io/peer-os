@@ -15,6 +15,7 @@ public class Config implements ConfigBase {
     private int numberOfMasterNodes;
     private int numberOfDataNodes;
     private int numberOfShards = 5;
+    private int numberOfReplicas = 5;
 
     private Set<Agent> nodes = new HashSet<>();
     private Set<Agent> masterNodes = new HashSet<>();
@@ -59,6 +60,16 @@ public class Config implements ConfigBase {
 
     public void setNumberOfShards( final int numberOfShards ) {
         this.numberOfShards = numberOfShards;
+    }
+
+
+    public int getNumberOfReplicas() {
+        return numberOfReplicas;
+    }
+
+
+    public void setNumberOfReplicas( final int numberOfReplicas ) {
+        this.numberOfReplicas = numberOfReplicas;
     }
 
 
