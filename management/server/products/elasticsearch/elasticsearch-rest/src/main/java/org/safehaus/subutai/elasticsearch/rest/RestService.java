@@ -94,4 +94,18 @@ public class RestService {
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
+
+
+    @GET
+    @Path( "checkAllNodes" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String checkAllNodes(
+            @QueryParam( "clusterName" ) String clusterName
+    ) {
+
+        UUID uuid = elasticsearch.checkAllNodes( clusterName );
+
+        return JsonUtil.toJson( OPERATION_ID, uuid );
+    }
+
 }
