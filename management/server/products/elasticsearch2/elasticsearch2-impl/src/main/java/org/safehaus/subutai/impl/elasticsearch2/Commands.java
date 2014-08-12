@@ -1,15 +1,11 @@
 package org.safehaus.subutai.impl.elasticsearch2;
 
-import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class Commands extends CommandsSingleton {
@@ -45,20 +41,4 @@ public class Commands extends CommandsSingleton {
     public static Command getStopCommand( Set<Agent> agents ) {
         return createCommand( new RequestBuilder( "service elasticsearch stop" ), agents );
     }
-
-
-
-//    public static Command getConfigureRpcAndListenAddressesCommand(Set<Agent> agents, String param) {
-//        Set<AgentRequestBuilder> sarb = new HashSet<AgentRequestBuilder>();
-//        for (Agent agent : agents) {
-//            AgentRequestBuilder arb = new AgentRequestBuilder(agent,
-//                    String.format(". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s %s",
-//                            param,
-//                            Util.getAgentIpByMask(agent, Common.IP_MASK))
-//            );
-//            sarb.add(arb);
-//        }
-//        return createCommand(sarb);
-//    }
-
 }

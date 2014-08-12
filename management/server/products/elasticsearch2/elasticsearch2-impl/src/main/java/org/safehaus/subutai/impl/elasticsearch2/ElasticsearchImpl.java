@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.elasticsearch2.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch2.Config;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -17,7 +16,6 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 
 public class ElasticsearchImpl implements Elasticsearch {
@@ -319,83 +317,6 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     @Override
-    public UUID startCassandraService(final String agentUUID) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting Cassandra service on %s", agentUUID));
-        executor.execute(new Runnable() {
-            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
-
-            public void run() {
-                Command startServiceCommand = Commands.getStartCommand(Util.wrapAgentToSet(agent));
-                commandRunner.runCommand(startServiceCommand);
-                if (startServiceCommand.hasSucceeded()) {
-                    AgentResult ar = startServiceCommand.getResults().get(agent.getUuid());
-                    if (ar.getStdOut().contains("starting Cassandra ...") ||
-                            ar.getStdOut().contains("is already running...")) {
-                        po.addLog(ar.getStdOut());
-                        po.addLogDone("Start succeeded");
-                    }
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", startServiceCommand.getAllErrors()));
-                }
-            }
-        });
-        return po.getId();
-    }
-
-    @Override
-    public UUID stopCassandraService(final String agentUUID) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping Cassandra service on %s", agentUUID));
-        executor.execute(new Runnable() {
-            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
-
-            public void run() {
-                Command stopServiceCommand = Commands.getStopCommand(Util.wrapAgentToSet(agent));
-                commandRunner.runCommand(stopServiceCommand);
-                if (stopServiceCommand.hasSucceeded()) {
-                    AgentResult ar = stopServiceCommand.getResults().get(agent.getUuid());
-                    po.addLog(ar.getStdOut());
-                    po.addLogDone("Stop succeeded");
-                } else {
-                    po.addLogFailed(String.format("Stop failed, %s", stopServiceCommand.getAllErrors()));
-                }
-            }
-        });
-        return po.getId();
-    }
-
-    @Override
-    public UUID statusCassandraService(final String agentUUID) {
-        final ProductOperation po
-                = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking status of Cassandra service on %s", agentUUID));
-        executor.execute(new Runnable() {
-            Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
-
-            public void run() {
-                Command statusServiceCommand = Commands.getStatusCommand(Util.wrapAgentToSet(agent));
-                commandRunner.runCommand(statusServiceCommand);
-                if (statusServiceCommand.hasSucceeded()) {
-                    AgentResult ar = statusServiceCommand.getResults().get(agent.getUuid());
-                    if (ar.getStdOut().contains("is running")) {
-                        po.addLogDone("Cassandra is running");
-                    } else {
-                        po.addLogFailed("Cassandra is not running");
-                    }
-                } else {
-                    po.addLogFailed("Cassandra is not running");
-//                    po.addLogFailed(String.format("Status check failed, %s", statusServiceCommand.getAllErrors()));
-                }
-            }
-        });
-        return po.getId();
-    }
-
-
-    @Override
     public UUID checkAllNodes( final String clusterName ) {
         final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
                 String.format( "Checking cluster %s", clusterName ) );
@@ -427,15 +348,12 @@ public class ElasticsearchImpl implements Elasticsearch {
 
 
     public List<Config> getClusters() {
-
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-
     }
+
 
     @Override
     public Config getCluster(String clusterName) {
         return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
     }
-
-
 }

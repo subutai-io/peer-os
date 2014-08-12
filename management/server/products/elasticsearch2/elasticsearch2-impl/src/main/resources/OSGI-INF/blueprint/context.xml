@@ -32,12 +32,6 @@
     <property name="agentManager" ref="agentManager" />
   </bean>
 
-  <bean id="elasticsearch2-configuration-logic" scope="singleton"
-        class="org.safehaus.subutai.impl.elasticsearch2.configuration.logic.ConfigurationLogicImpl">
-      <property name="configManager" ref="configManager"/>
-  </bean>
-
-  <service ref="elasticsearch2-configuration-logic" interface="org.safehaus.subutai.api.elasticsearch2.ConfigurationLogic" />
   <service ref="elasticsearch2-impl" interface="org.safehaus.subutai.api.elasticsearch2.Elasticsearch" />
 
 </blueprint>
