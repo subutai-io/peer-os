@@ -173,6 +173,7 @@ public class Manager {
 								contentRoot.getUI().addWindow(window.getWindow());
 							}
 						});
+                        contentRoot.getUI().addWindow(alert.getAlert());
 					} else {
 						org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
