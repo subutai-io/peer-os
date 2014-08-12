@@ -5,13 +5,19 @@
  */
 package org.safehaus.subutai.ui.hbase.wizard;
 
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
+import java.util.UUID;
+
+import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.hbase.HBaseUI;
 
-import java.util.UUID;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 /**
  * @author dilshat
@@ -49,7 +55,8 @@ public class VerificationStep extends VerticalLayout {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = HBaseUI.getHbaseManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
+                        HBaseConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

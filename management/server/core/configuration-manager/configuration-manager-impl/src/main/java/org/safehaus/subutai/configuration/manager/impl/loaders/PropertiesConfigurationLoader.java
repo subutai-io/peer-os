@@ -83,8 +83,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
 
         //        Agent agent = null;
 
-        TextInjectorImpl configurationInjector = new TextInjectorImpl();
-        String content = configurationInjector.catFile( hostname, configFilePath );
+        String content = textInjector.catFile( hostname, configFilePath );
         Gson gson = new Gson();
 
         try {
@@ -98,7 +97,7 @@ public class PropertiesConfigurationLoader implements ConfigurationLoader {
                 iniParser.setProperty( fieldName, value );
             }
 
-            configurationInjector.echoTextIntoAgent( hostname, configFilePath, content );
+            textInjector.echoTextIntoAgent( hostname, configFilePath, content );
         }
         catch ( ConfigurationException e ) {
             e.printStackTrace();

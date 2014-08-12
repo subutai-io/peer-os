@@ -2,7 +2,6 @@ package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
 import org.safehaus.subutai.configuration.manager.api.TextInjector;
-import org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl;
 import org.yaml.snakeyaml.Yaml;
 
 import com.google.gson.JsonObject;
@@ -47,8 +46,7 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
     public boolean setConfiguration( String hostname, String configFilePath, String config ) {
         // TODO Read config from instance
 //        Agent agent = null;
-        TextInjectorImpl injector = new TextInjectorImpl();
-        String content = injector.catFile( hostname, "" );
+        String content = textInjector.catFile( hostname, "" );
 
         // TODO set values to yaml object from Config
         Yaml yaml = new Yaml();
@@ -57,7 +55,7 @@ public class YamConfigurationlLoader implements ConfigurationLoader {
         String newContent = ""; // yaml to string
 
         // TODO inject Config
-        injector.echoTextIntoAgent( hostname, "path", newContent );
+        textInjector.echoTextIntoAgent( hostname, "path", newContent );
         return true;
     }
 }
