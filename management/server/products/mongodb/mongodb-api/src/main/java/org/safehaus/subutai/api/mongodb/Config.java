@@ -30,9 +30,11 @@ public class Config implements ConfigBase {
     private int routerPort = 27018;
     private int dataNodePort = 27017;
 
-    private Set<Agent> configServers;
-    private Set<Agent> routerServers;
-    private Set<Agent> dataNodes;
+    private Set<Agent> configServers = new HashSet<>();
+    private Set<Agent> routerServers = new HashSet<>();
+    ;
+    private Set<Agent> dataNodes = new HashSet<>();
+    ;
 
 
     public Set<Agent> getAllNodes() {

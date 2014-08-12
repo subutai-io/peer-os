@@ -660,15 +660,6 @@ public class LxcManagerImpl implements LxcManager {
                 for ( int i = 0; i < numOfLxcs; i++ ) {
                     count++;
 
-                    //pause after every 5 lxcs
-                    if ( count % 5 == 0 ) {
-                        try {
-                            Thread.sleep( 1 * 60 * 1000 );
-                        }
-                        catch ( InterruptedException ignore ) {
-                        }
-                    }
-
                     LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType );
                     lxcInfos.add( lxcInfo );
                     completer.submit( new LxcActor( lxcInfo, this, LxcAction.CREATE ) );
