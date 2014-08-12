@@ -27,7 +27,7 @@ public class RestServiceImpl implements RestService {
     private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
 
     private static final Gson gson =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+            new GsonBuilder().setPrettyPrinting().create();
     private Tracker tracker;
 
 
