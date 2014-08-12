@@ -567,6 +567,11 @@
         <artifactId>tracker-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>tracker-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- Git Manager -->
       <dependency>
@@ -752,6 +757,29 @@
 
       <!-- Core Modules - END -->
 
+      <!--Vaadin - START-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>vaadin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>vaadin-custom</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>vaadin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>vaadin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!--Vaadin - END-->
+
       <!-- Products Modules - START -->
 
       <!-- Common -->
@@ -839,6 +867,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>presto-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Presto 2 -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>presto-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>presto-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>presto-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>presto-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>presto-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1350,7 +1405,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Elasticsearch -->
+      <!-- ElasticSearch -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-api</artifactId>
@@ -1415,4 +1470,3 @@
     </pluginManagement>
   </build>
 </project>
-
