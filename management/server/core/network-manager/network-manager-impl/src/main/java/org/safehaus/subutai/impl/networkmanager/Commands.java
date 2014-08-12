@@ -89,8 +89,8 @@ public class Commands {
 				appendHosts.insert(0, cleanHosts);
 			}
 
-//			appendHosts.append("/bin/echo '127.0.0.1 localhost ").append(agent.getHostname())
-//					.append("' >> '/etc/hosts';");
+			appendHosts.append("/bin/echo '127.0.0.1 localhost ")
+					.append("' >> '/etc/hosts';");
 
 			requestBuilders.add((AgentRequestBuilder) new AgentRequestBuilder(agent, appendHosts.toString())
 					.withTimeout(30));
