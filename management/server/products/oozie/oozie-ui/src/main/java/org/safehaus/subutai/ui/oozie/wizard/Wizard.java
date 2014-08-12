@@ -9,9 +9,10 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
+import org.safehaus.subutai.api.oozie.Config;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.api.oozie.Config;
 
 /**
  * @author dilshat
