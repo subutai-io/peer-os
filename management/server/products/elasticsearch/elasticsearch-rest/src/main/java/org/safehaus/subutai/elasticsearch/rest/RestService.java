@@ -120,4 +120,16 @@ public class RestService {
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
+
+    @GET
+    @Path( "stopAllNodes" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String stopAllNodes(
+            @QueryParam( "clusterName" ) String clusterName
+    ) {
+
+        UUID uuid = elasticsearch.stopAllNodes( clusterName );
+
+        return JsonUtil.toJson( OPERATION_ID, uuid );
+    }
 }
