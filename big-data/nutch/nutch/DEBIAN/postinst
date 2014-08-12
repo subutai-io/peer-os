@@ -20,4 +20,4 @@ fi
 
 
 # Create symlink to configuration files and scripts
-ln -s $nutchConf/* $nutchHome/conf/
+ln -sf $nutchConf/* $nutchHome/conf/

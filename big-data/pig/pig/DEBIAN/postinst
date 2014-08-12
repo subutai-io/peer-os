@@ -20,5 +20,5 @@ fi
 
 
 # Create symlink to configuration files and scripts
-ln -s $pigConf/* $pigHome/conf/
-ln -s $pigHome/bin/* /usr/local/bin/
+ln -sf $pigConf/* $pigHome/conf/
+ln -sf $pigHome/bin/* /usr/local/bin/

@@ -9,14 +9,24 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.Set;
+
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
-import java.util.ArrayList;
-import java.util.Set;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * @author dilshat
@@ -39,7 +49,7 @@ public class StepSetConfig extends Panel {
 		menu.setContentMode(ContentMode.HTML);
 		panel.setContent(menu);
 		grid.addComponent(menu, 0, 0, 2, 1);
-		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+//		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
