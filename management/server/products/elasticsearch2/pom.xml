@@ -18,6 +18,5 @@
         <module>elasticsearch2-api</module>
         <module>elasticsearch2-impl</module>
         <module>elasticsearch2-ui</module>
-        <module>elasticsearch2-cli</module>
     </modules>
 </project>

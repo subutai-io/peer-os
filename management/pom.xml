@@ -1350,28 +1350,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ElasticSearch -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- ElasticSearch2 -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>

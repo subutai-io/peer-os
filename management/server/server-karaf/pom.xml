@@ -1533,28 +1533,6 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- ElasticSearch -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
                 <!-- Elasticsearch2 -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
