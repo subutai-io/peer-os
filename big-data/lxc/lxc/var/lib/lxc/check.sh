@@ -2,8 +2,8 @@
 BASE="/etc/init.d/"
 #Edit localhost line
 file="/etc/hosts"
-sed -i '/127.0.0.1/d' $file
-echo "127.0.0.1 localhost" >> $file
+sed -i '/127.0.1.1/d' $file
+echo "127.0.1.1 `hostname`" >> $file
 #Agent checks
 agentresult=$(dpkg --get-selections | grep ksks-agent)
 source /etc/profile
