@@ -472,9 +472,16 @@
       </dependency>
 
       <!-- Core Modules - START -->
+
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>mgmt-shared-protocol</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>common</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1419,6 +1426,11 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

@@ -243,28 +243,33 @@ public class Manager {
 		}
 	}
 
-	public void refreshClustersInfo() {
-		List<Config> info = ElasticsearchUI.getElasticsearchManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (info != null && info.size() > 0) {
-			for (Config mongoInfo : info) {
-				clusterCombo.addItem(mongoInfo);
-				clusterCombo.setItemCaption(mongoInfo,
-						mongoInfo.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (Config cassandraInfo : info) {
-					if (cassandraInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(cassandraInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(info.iterator().next());
-			}
-		}
-	}
+
+    public void refreshClustersInfo() {
+        List<Config> configList = ElasticsearchUI.getElasticsearchManager().getClusters();
+        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        clusterCombo.removeAllItems();
+
+        if ( configList == null || configList.isEmpty() ) {
+            return;
+        }
+
+        for ( Config config : configList ) {
+            clusterCombo.addItem( config );
+            clusterCombo.setItemCaption( config, config.getClusterName() );
+        }
+
+        if ( clusterInfo != null ) {
+            for ( Config cassandraInfo : configList ) {
+                if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+                    clusterCombo.setValue( cassandraInfo );
+                    return;
+                }
+            }
+        }
+        else {
+            clusterCombo.setValue( configList.iterator().next() );
+        }
+    }
 
 	private void populateTable(final Table table, Set<Agent> agents) {
 		table.removeAllItems();
