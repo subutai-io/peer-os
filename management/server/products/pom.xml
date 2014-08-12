@@ -35,7 +35,7 @@
         <module>sqoop</module>
         <module>storm</module>
         <module>zookeeper</module>
-        <module>elasticsearch2</module>
+        <module>elasticsearch</module>
     </modules>
 
 </project>

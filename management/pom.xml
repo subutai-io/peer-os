@@ -1350,25 +1350,20 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ElasticSearch2 -->
+      <!-- Elasticsearch -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch2-api</artifactId>
+        <artifactId>elasticsearch-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch2-impl</artifactId>
+        <artifactId>elasticsearch-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch2-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch2-ui</artifactId>
+        <artifactId>elasticsearch-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
