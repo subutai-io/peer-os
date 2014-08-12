@@ -6,10 +6,11 @@ import java.util.UUID;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
@@ -116,118 +117,118 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             }
         }
 
-        po.addLog( "Updating db..." );
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
+        //install
+        Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
 
-            po.addLog( "Cluster info saved to DB\nInstalling Accumulo..." );
+        if ( installCommand.hasSucceeded() ) {
+            po.addLog( "Installation succeeded\nSetting master node..." );
 
-            //install
-            Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
+            Command setMasterCommand = Commands.getAddMasterCommand( config.getAllNodes(), config.getMasterNode() );
+            manager.getCommandRunner().runCommand( setMasterCommand );
 
-            if ( installCommand.hasSucceeded() ) {
-                po.addLog( "Installation succeeded\nSetting master node..." );
+            if ( setMasterCommand.hasSucceeded() ) {
+                po.addLog( "Setting master node succeeded\nSetting GC node..." );
+                Command setGCNodeCommand = Commands.getAddGCCommand( config.getAllNodes(), config.getGcNode() );
+                manager.getCommandRunner().runCommand( setGCNodeCommand );
+                if ( setGCNodeCommand.hasSucceeded() ) {
+                    po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-                Command setMasterCommand = Commands.getAddMasterCommand( config.getAllNodes(), config.getMasterNode() );
-                manager.getCommandRunner().runCommand( setMasterCommand );
+                    Command setMonitorCommand =
+                            Commands.getAddMonitorCommand( config.getAllNodes(), config.getMonitor() );
+                    manager.getCommandRunner().runCommand( setMonitorCommand );
 
-                if ( setMasterCommand.hasSucceeded() ) {
-                    po.addLog( "Setting master node succeeded\nSetting GC node..." );
-                    Command setGCNodeCommand = Commands.getAddGCCommand( config.getAllNodes(), config.getGcNode() );
-                    manager.getCommandRunner().runCommand( setGCNodeCommand );
-                    if ( setGCNodeCommand.hasSucceeded() ) {
-                        po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
+                    if ( setMonitorCommand.hasSucceeded() ) {
+                        po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
 
-                        Command setMonitorCommand =
-                                Commands.getAddMonitorCommand( config.getAllNodes(), config.getMonitor() );
-                        manager.getCommandRunner().runCommand( setMonitorCommand );
+                        Command setTracersCommand =
+                                Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+                        manager.getCommandRunner().runCommand( setTracersCommand );
 
-                        if ( setMonitorCommand.hasSucceeded() ) {
-                            po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
+                        if ( setTracersCommand.hasSucceeded() ) {
+                            po.addLog( "Setting tracers succeeded\nSetting slaves..." );
 
-                            Command setTracersCommand =
-                                    Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
-                            manager.getCommandRunner().runCommand( setTracersCommand );
+                            Command setSlavesCommand =
+                                    Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+                            manager.getCommandRunner().runCommand( setSlavesCommand );
 
-                            if ( setTracersCommand.hasSucceeded() ) {
-                                po.addLog( "Setting tracers succeeded\nSetting slaves..." );
+                            if ( setSlavesCommand.hasSucceeded() ) {
+                                po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
 
-                                Command setSlavesCommand =
-                                        Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
-                                manager.getCommandRunner().runCommand( setSlavesCommand );
+                                Command setZkClusterCommand =
+                                        Commands.getBindZKClusterCommand( config.getAllNodes(), zkConfig.getNodes() );
+                                manager.getCommandRunner().runCommand( setZkClusterCommand );
 
-                                if ( setSlavesCommand.hasSucceeded() ) {
-                                    po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
+                                if ( setZkClusterCommand.hasSucceeded() ) {
+                                    po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
 
-                                    Command setZkClusterCommand =
-                                            Commands.getBindZKClusterCommand( config.getAllNodes(),
-                                                    zkConfig.getNodes() );
-                                    manager.getCommandRunner().runCommand( setZkClusterCommand );
+                                    Command initCommand =
+                                            Commands.getInitCommand( config.getInstanceName(), config.getPassword(),
+                                                    config.getMasterNode() );
+                                    manager.getCommandRunner().runCommand( initCommand );
 
-                                    if ( setZkClusterCommand.hasSucceeded() ) {
-                                        po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
+                                    if ( initCommand.hasSucceeded() ) {
+                                        po.addLog( "Initialization succeeded\nStarting cluster..." );
 
-                                        Command initCommand =
-                                                Commands.getInitCommand( config.getInstanceName(), config.getPassword(),
-                                                        config.getMasterNode() );
-                                        manager.getCommandRunner().runCommand( initCommand );
+                                        Command startClusterCommand =
+                                                Commands.getStartCommand( config.getMasterNode() );
+                                        manager.getCommandRunner().runCommand( startClusterCommand );
 
-                                        if ( initCommand.hasSucceeded() ) {
-                                            po.addLog( "Initialization succeeded\nStarting cluster..." );
-
-                                            Command startClusterCommand =
-                                                    Commands.getStartCommand( config.getMasterNode() );
-                                            manager.getCommandRunner().runCommand( startClusterCommand );
-
-                                            if ( startClusterCommand.hasSucceeded() ) {
-                                                po.addLogDone( "Cluster started successfully\nDone" );
-                                            }
-                                            else {
-                                                po.addLogFailed( String.format( "Starting cluster failed, %s",
-                                                        startClusterCommand.getAllErrors() ) );
-                                            }
+                                        if ( startClusterCommand.hasSucceeded() ) {
+                                            po.addLog( "Cluster started successfully" );
                                         }
                                         else {
-                                            po.addLogFailed( String.format( "Initialization failed, %s",
-                                                    initCommand.getAllErrors() ) );
+                                            po.addLog( String.format( "Starting cluster failed, %s, skipping...",
+                                                    startClusterCommand.getAllErrors() ) );
+                                        }
+                                        po.addLog( "Updating db..." );
+
+                                        try {
+                                            manager.getDbManager()
+                                                   .saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                                            po.addLogDone( "Database information updated" );
+                                        }
+                                        catch ( DBException e ) {
+                                            po.addLogFailed( String.format( "Failed to update database information, %s",
+                                                            e.getMessage() ) );
                                         }
                                     }
                                     else {
-                                        po.addLogFailed( String.format( "Setting ZK cluster failed, %s",
-                                                setZkClusterCommand.getAllErrors() ) );
+                                        po.addLogFailed( String.format( "Initialization failed, %s",
+                                                initCommand.getAllErrors() ) );
                                     }
                                 }
                                 else {
-                                    po.addLogFailed( String.format( "Setting slaves failed, %s",
-                                            setSlavesCommand.getAllErrors() ) );
+                                    po.addLogFailed( String.format( "Setting ZK cluster failed, %s",
+                                            setZkClusterCommand.getAllErrors() ) );
                                 }
                             }
                             else {
-                                po.addLogFailed( String.format( "Setting tracers failed, %s",
-                                        setTracersCommand.getAllErrors() ) );
+                                po.addLogFailed(
+                                        String.format( "Setting slaves failed, %s", setSlavesCommand.getAllErrors() ) );
                             }
                         }
                         else {
                             po.addLogFailed(
-                                    String.format( "Setting monitor failed, %s", setMonitorCommand.getAllErrors() ) );
+                                    String.format( "Setting tracers failed, %s", setTracersCommand.getAllErrors() ) );
                         }
                     }
                     else {
                         po.addLogFailed(
-                                String.format( "Setting gc node failed, %s", setGCNodeCommand.getAllErrors() ) );
+                                String.format( "Setting monitor failed, %s", setMonitorCommand.getAllErrors() ) );
                     }
                 }
                 else {
-                    po.addLogFailed(
-                            String.format( "Setting master node failed, %s", setMasterCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Setting gc node failed, %s", setGCNodeCommand.getAllErrors() ) );
                 }
             }
             else {
-                po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                po.addLogFailed( String.format( "Setting master node failed, %s", setMasterCommand.getAllErrors() ) );
             }
         }
         else {
-            po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+            po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
     }
 }
