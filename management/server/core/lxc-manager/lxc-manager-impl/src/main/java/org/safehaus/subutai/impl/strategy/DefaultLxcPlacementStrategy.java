@@ -26,9 +26,9 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
     Logger LOG = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
 
     public static final String defaultNodeType = "default";
-    private final double MIN_HDD_LXC_MB = 10 * 1024;         // 10G
-    private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;  // 20G
-    private final double MIN_RAM_LXC_MB = 1024;          // 1G
+    private final double MIN_HDD_LXC_MB = 5 * 1024;
+    private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
+    private final double MIN_RAM_LXC_MB = 512;          // 1G
     private final double MIN_RAM_IN_RESERVE_MB = 1024;   // 1G
     private final double MIN_CPU_LXC_PERCENT = 5;           // 5%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
