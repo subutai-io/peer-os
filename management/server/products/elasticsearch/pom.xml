@@ -11,12 +11,12 @@
 
     <artifactId>elasticsearch-parent</artifactId>
     <name>Subutai Elasticsearch Parent</name>
+    <description>Subutai Elasticsearch Parent</description>
     <packaging>pom</packaging>
 
     <modules>
         <module>elasticsearch-api</module>
         <module>elasticsearch-impl</module>
-        <module>elasticsearch-cli</module>
         <module>elasticsearch-ui</module>
     </modules>
 </project>
