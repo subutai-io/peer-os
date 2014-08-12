@@ -1,15 +1,15 @@
 package org.safehaus.subutai.plugin.hadoop.impl.operation;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {
 
@@ -70,9 +70,9 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 			n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
 			if ((min = Math.min(n, min)) <= 0) continue;
 
-//			int unusedCpu = 100 - m.getCpuLoadPercent();
-//			n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-//			if ((min = Math.min(n, min)) <= 0) continue;
+			/*int unusedCpu = 100 - m.getCpuLoadPercent();
+			n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
+			if ((min = Math.min(n, min)) <= 0) continue;*/
 
 			slots.put(e.getKey(), min);
 		}

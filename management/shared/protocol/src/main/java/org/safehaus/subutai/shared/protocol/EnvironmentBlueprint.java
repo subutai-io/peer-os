@@ -1,9 +1,9 @@
 package org.safehaus.subutai.shared.protocol;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.shared.protocol.settings.Common;
+
+import java.util.Set;
 
 
 /**
@@ -67,4 +67,15 @@ public class EnvironmentBlueprint {
     public void setNodeGroups( final Set<NodeGroup> nodeGroups ) {
         this.nodeGroups = nodeGroups;
     }
+
+	@Override
+	public String toString() {
+		return "EnvironmentBlueprint{" +
+				"name='" + name + '\'' +
+				", nodeGroups=" + nodeGroups +
+				", linkHosts=" + linkHosts +
+				", exchangeSshKeys=" + exchangeSshKeys +
+				", domainName='" + domainName + '\'' +
+				'}';
+	}
 }
