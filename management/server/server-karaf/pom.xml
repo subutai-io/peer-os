@@ -620,6 +620,12 @@
                 <!-- Core Modules - START -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>subutai-common</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mgmt-shared-protocol</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>

@@ -15,6 +15,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>subutai-common</module>
     <module>agent-manager</module>
     <module>db-manager</module>
     <module>communication-manager</module>

@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
+import org.safehaus.subutai.common.JsonUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -49,7 +50,7 @@ public class RestService {
 
 
     @GET
-    @Path( "list-clusters" )
+    @Path( "listClusters" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public String listClusters() {
 
@@ -60,7 +61,7 @@ public class RestService {
             clusterNames.add( config.getClusterName() );
         }
 
-        return gson.toJson( clusterNames );
+        return JsonUtil.GSON.toJson( clusterNames );
     }
 
 
@@ -87,5 +88,18 @@ public class RestService {
         UUID uuid = elasticsearch.installCluster( config );
 
         return wrapUUID( uuid );
+    }
+
+
+    @GET
+    @Path( "uninstallCluster" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String uninstallCluster(
+            @QueryParam( "clusterName" ) String clusterName
+    ) {
+
+        System.out.println( ">> " + JsonUtil.toJson( "a", 1 ) );
+
+        return gson.toJson( "done" );
     }
 }
