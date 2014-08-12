@@ -5,12 +5,13 @@
  */
 package org.safehaus.subutai.impl.oozie;
 
+import java.util.Set;
+
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
-import java.util.Set;
 
 /**
  * @author dilshat
@@ -32,7 +33,7 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes install ksks-oozie-clients")
+                        "sleep 10; apt-get --force-yes --assume-yes install ksks-oozie-client")
                         .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents
         );

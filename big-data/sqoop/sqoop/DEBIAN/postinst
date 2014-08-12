@@ -20,4 +20,4 @@ fi
 
 
 # Create symlink to configuration files and scripts
-ln -s $sqoopConf/* $sqoopHome/conf/
+ln -sf $sqoopConf/* $sqoopHome/conf/
