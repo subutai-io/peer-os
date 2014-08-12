@@ -24,10 +24,10 @@ import com.google.gson.GsonBuilder;
 
 public class RestService {
 
-    private static final Gson gson =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private static final String OPERATION_ID = "OPERATION_ID";
 
     private Elasticsearch elasticsearch;
+
     private AgentManager agentManager;
 
 
@@ -38,14 +38,6 @@ public class RestService {
 
     public void setElasticsearch( Elasticsearch elasticsearch ) {
         this.elasticsearch = elasticsearch;
-    }
-
-
-    private String wrapUUID( UUID uuid ) {
-        HashMap map = new HashMap();
-        map.put( "OPERATION_ID", uuid );
-
-        return gson.toJson( map );
     }
 
 
@@ -87,7 +79,7 @@ public class RestService {
 
         UUID uuid = elasticsearch.installCluster( config );
 
-        return wrapUUID( uuid );
+        return JsonUtil.toJson( OPERATION_ID, uuid );
     }
 
 
@@ -98,8 +90,8 @@ public class RestService {
             @QueryParam( "clusterName" ) String clusterName
     ) {
 
-        System.out.println( ">> " + JsonUtil.toJson( "a", 1 ) );
+        UUID uuid = elasticsearch.uninstallCluster( clusterName );
 
-        return gson.toJson( "done" );
+        return JsonUtil.toJson( OPERATION_ID, uuid );
     }
 }
