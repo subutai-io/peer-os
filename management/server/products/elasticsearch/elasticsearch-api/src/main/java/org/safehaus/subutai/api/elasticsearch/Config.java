@@ -9,6 +9,7 @@ import java.util.Set;
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Elasticsearch";
+
     private String clusterName = "";
 
     private int numberOfNodes;
