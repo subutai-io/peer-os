@@ -71,16 +71,16 @@ fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
 cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/
-cp $SOURCE/var/lib/lxc/check.sh $BASE/$fileName/var/lib/lxc/
-cp $SOURCE/var/lib/lxc/README.md $BASE/$fileName/var/lib/lxc/
+cp $SOURCE/var/lib/lxc/check.sh $LXCSOURCE/$pattern/rootfs/etc/init.d/ 
+#cp $SOURCE/var/lib/lxc/README.md $BASE/$fileName/var/lib/lxc/
 
 if ls *.deb ; then
         rm  *.deb
 fi
 
-cd $BASE/$fileName/var/lib/lxc/
+#cd $BASE/$fileName/var/lib/lxc/
+#cp check.sh $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/init.d/
 
-cp check.sh $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/init.d/
 cd $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/
 sed -i '10 a\/etc/init.d/check.sh' rc.local
 sed -i '13 a\/usr/bin/modifyHostname.sh' rc.local
@@ -94,8 +94,8 @@ cd $BASE
 cp -a $SOURCE/DEBIAN $BASE/$fileName/
 cp -a $SOURCE/var $BASE/$fileName/
 cp -a $SOURCE/etc $BASE/$fileName/
-rm $BASE/$fileName/var/lib/lxc/README.md
-rm $BASE/$fileName/var/lib/lxc/check.sh
+#rm $BASE/$fileName/var/lib/lxc/README.md
+#rm $BASE/$fileName/var/lib/lxc/check.sh
 
 lineNumberVersion=$(sed -n '/Version:/=' $fileName/DEBIAN/control)
 lineNumberPackage=$(sed -n '/Package:/=' $fileName/DEBIAN/control)
