@@ -1,11 +1,7 @@
 package org.safehaus.subutai.impl.manager.builder;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
@@ -22,7 +18,10 @@ import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.shared.protocol.NodeGroup;
 import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -30,109 +29,116 @@ import com.google.common.collect.Lists;
  */
 public class EnvironmentBuilder {
 
-    private final TemplateRegistryManager templateRegistryManager;
-    private final AgentManager agentManager;
-    private final NetworkManager networkManager;
+	private final TemplateRegistryManager templateRegistryManager;
+	private final AgentManager agentManager;
+	private final NetworkManager networkManager;
 
 
-    public EnvironmentBuilder( final TemplateRegistryManager templateRegistryManager, final AgentManager agentManager,
-                               NetworkManager networkManager ) {
-        this.templateRegistryManager = templateRegistryManager;
-        this.agentManager = agentManager;
-        this.networkManager = networkManager;
-    }
+	public EnvironmentBuilder(final TemplateRegistryManager templateRegistryManager, final AgentManager agentManager,
+	                          NetworkManager networkManager) {
+		this.templateRegistryManager = templateRegistryManager;
+		this.agentManager = agentManager;
+		this.networkManager = networkManager;
+	}
 
 
-    //@todo destroy all containers of all groups inside environment on any failure ???
-    public Environment build( final EnvironmentBlueprint blueprint, ContainerManager containerManager )
-            throws EnvironmentBuildException {
-        Environment environment = new Environment( blueprint.getName() );
-        for ( NodeGroup nodeGroup : blueprint.getNodeGroups() ) {
-            PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
-            if ( nodeGroup.getNumberOfNodes() <= 0 ) {
-                throw new EnvironmentBuildException(
-                        String.format( "Node Group %s specifies invalid number of nodes %d", nodeGroup.getName(),
-                                nodeGroup.getNumberOfNodes() ) );
-            }
+	//@todo destroy all containers of all groups inside environment on any failure ???
+	public Environment build(final EnvironmentBlueprint blueprint, ContainerManager containerManager)
+			throws EnvironmentBuildException {
+		Environment environment = new Environment(blueprint.getName());
+		for (NodeGroup nodeGroup : blueprint.getNodeGroups()) {
+			PlacementStrategy placementStrategy = nodeGroup.getPlacementStrategy();
+			if (nodeGroup.getNumberOfNodes() <= 0) {
+				throw new EnvironmentBuildException(
+						String.format("Node Group %s specifies invalid number of nodes %d", nodeGroup.getName(),
+								nodeGroup.getNumberOfNodes()));
+			}
 
-            Set<Agent> physicalAgents = null;
-            if ( nodeGroup.getPhysicalNodes() != null && !nodeGroup.getPhysicalNodes().isEmpty() ) {
-                physicalAgents = new HashSet<>();
-                for ( String host : nodeGroup.getPhysicalNodes() ) {
-                    Agent pAgent = agentManager.getAgentByHostname( host );
-                    if ( pAgent == null ) {
-                        throw new EnvironmentBuildException(
-                                String.format( "Physical agent %s is not connected", host ) );
-                    }
-                    physicalAgents.add( pAgent );
-                }
-            }
-            Template template = templateRegistryManager.getTemplate( nodeGroup.getTemplateName() );
-            if ( template == null ) {
-                throw new EnvironmentBuildException(
-                        String.format( "Template %s not registered", nodeGroup.getTemplateName() ) );
-            }
-            Set<Node> nodes = new HashSet<>();
-            try {
-                Set<Agent> agents = containerManager
-                        .clone( environment.getUuid(), template.getTemplateName(), nodeGroup.getNumberOfNodes(),
-                                physicalAgents, placementStrategy );
-                for ( Agent agent : agents ) {
-                    nodes.add( new Node( agent, template, nodeGroup.getName() ) );
-                }
-                if ( nodeGroup.isLinkHosts() ) {
-                    networkManager.configHostsOnAgents( Lists.newArrayList( agents ), nodeGroup.getDomainName() );
-                }
-                if ( nodeGroup.isExchangeSshKeys() ) {
-                    networkManager.configSshOnAgents( Lists.newArrayList( agents ) );
-                }
-            }
-            catch ( LxcCreateException ex ) {
-
-                //destroy lxcs here
-                Set<Node> alreadyBuiltNodes = environment.getNodes();
-
-                if ( alreadyBuiltNodes != null && !alreadyBuiltNodes.isEmpty() ) {
-
-                    Set<Agent> agents = new HashSet<>();
-                    for ( Node node : alreadyBuiltNodes ) {
-                        agents.add( node.getAgent() );
-                    }
-
-                    try {
-                        containerManager.clonesDestroy( agents );
-                    }
-                    catch ( LxcDestroyException ignore ) {
-                    }
-                }
+			Set<Agent> physicalAgents = null;
+			if (nodeGroup.getPhysicalNodes() != null && !nodeGroup.getPhysicalNodes().isEmpty()) {
+				physicalAgents = new HashSet<>();
+				for (String host : nodeGroup.getPhysicalNodes()) {
+					Agent pAgent = agentManager.getAgentByHostname(host);
+					if (pAgent == null) {
+						throw new EnvironmentBuildException(
+								String.format("Physical agent %s is not connected", host));
+					}
+					physicalAgents.add(pAgent);
+				}
+			}
+			Template template = templateRegistryManager.getTemplate(nodeGroup.getTemplateName());
+			if (template == null) {
+				throw new EnvironmentBuildException(
+						String.format("Template %s not registered", nodeGroup.getTemplateName()));
+			}
+			Set<Node> nodes = new HashSet<>();
+			try {
+				Set<Agent> agents = containerManager
+						.clone(environment.getUuid(), template.getTemplateName(), nodeGroup.getNumberOfNodes(),
+								physicalAgents, placementStrategy);
+				for (Agent agent : agents) {
+					nodes.add(new Node(agent, template, nodeGroup.getName()));
+				}
 
 
-                throw new EnvironmentBuildException( ex.toString() );
-            }
+				// Removing redundant operations with hosts file
+				if (!blueprint.isLinkHosts()) {
+					if (nodeGroup.isLinkHosts()) {
+						networkManager.configHostsOnAgents(Lists.newArrayList(agents), nodeGroup.getDomainName());
+					}
+				}
 
-            environment.getNodes().addAll( nodes );
-        }
+				// Removing redundant operations with ssh
+				if (!blueprint.isExchangeSshKeys()) {
+					if (nodeGroup.isExchangeSshKeys()) {
+						networkManager.configSshOnAgents(Lists.newArrayList(agents));
+					}
+				}
+			} catch (LxcCreateException ex) {
 
-        List<Agent> allAgents = new ArrayList<>();
-        for ( Node node : environment.getNodes() ) {
-            allAgents.add( node.getAgent() );
-        }
+				//destroy lxcs here
+				Set<Node> alreadyBuiltNodes = environment.getNodes();
 
-        if ( blueprint.isLinkHosts() ) {
-            networkManager.configHostsOnAgents( allAgents, blueprint.getDomainName() );
-        }
-        if ( blueprint.isExchangeSshKeys() ) {
-            networkManager.configSshOnAgents( allAgents );
-        }
+				if (alreadyBuiltNodes != null && !alreadyBuiltNodes.isEmpty()) {
 
-        return environment;
-    }
+					Set<Agent> agents = new HashSet<>();
+					for (Node node : alreadyBuiltNodes) {
+						agents.add(node.getAgent());
+					}
+
+					try {
+						containerManager.clonesDestroy(agents);
+					} catch (LxcDestroyException ignore) {
+					}
+				}
 
 
-    public void destroy( final Environment environment ) throws EnvironmentDestroyException {
-        //TODO destroy environment code goes here
-        //        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
-        //            nodeGroupBuilder.destroy( nodeGroup );
-        //        }
-    }
+				throw new EnvironmentBuildException(ex.toString());
+			}
+
+			environment.getNodes().addAll(nodes);
+		}
+
+		List<Agent> allAgents = new ArrayList<>();
+		for (Node node : environment.getNodes()) {
+			allAgents.add(node.getAgent());
+		}
+
+		if (blueprint.isLinkHosts()) {
+			networkManager.configHostsOnAgents(allAgents, blueprint.getDomainName());
+		}
+		if (blueprint.isExchangeSshKeys()) {
+			networkManager.configSshOnAgents(allAgents);
+		}
+
+		return environment;
+	}
+
+
+	public void destroy(final Environment environment) throws EnvironmentDestroyException {
+		//TODO destroy environment code goes here
+		//        for ( EnvironmentNodeGroup nodeGroup : environment.getEnvironmentNodeGroups() ) {
+		//            nodeGroupBuilder.destroy( nodeGroup );
+		//        }
+	}
 }

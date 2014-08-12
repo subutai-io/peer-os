@@ -70,9 +70,9 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 			n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
 			if ((min = Math.min(n, min)) <= 0) continue;
 
-			int unusedCpu = 100 - m.getCpuLoadPercent();
+			/*int unusedCpu = 100 - m.getCpuLoadPercent();
 			n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-			if ((min = Math.min(n, min)) <= 0) continue;
+			if ((min = Math.min(n, min)) <= 0) continue;*/
 
 			slots.put(e.getKey(), min);
 		}
