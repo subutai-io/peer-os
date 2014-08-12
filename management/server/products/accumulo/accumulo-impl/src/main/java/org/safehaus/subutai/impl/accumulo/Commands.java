@@ -23,7 +23,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 120 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
                 agents

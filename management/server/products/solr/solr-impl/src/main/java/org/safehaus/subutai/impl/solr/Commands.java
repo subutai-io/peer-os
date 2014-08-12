@@ -27,7 +27,7 @@ public class Commands extends CommandsSingleton {
 
     public Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( INSTALL ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                new RequestBuilder( INSTALL ).withTimeout( 120 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
