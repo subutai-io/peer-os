@@ -1538,7 +1538,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- ElasticSearch -->
+                <!-- Elasticsearch -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>elasticsearch-api</artifactId>
@@ -1547,11 +1547,6 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>elasticsearch-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
