@@ -1,7 +1,6 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +45,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> 
         try {
             productOperation.addLog( String.format( "Creating %d lxc containers...", config.getNumberOfNodes() ) );
             Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs( config.getNumberOfNodes() );
-            config.setNodes( new HashSet<Agent>() );
 
             for ( Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet() ) {
                 config.getNodes().addAll( entry.getValue() );

@@ -35,6 +35,11 @@ public class Config implements ConfigBase {
     }
 
 
+    public void setNumberOfNodes( final int numberOfNodes ) {
+        this.numberOfNodes = numberOfNodes;
+    }
+
+
     @Override
     public String getProductName() {
         return PRODUCT_KEY;
@@ -48,11 +53,6 @@ public class Config implements ConfigBase {
 
     public Set<Agent> getNodes() {
         return nodes;
-    }
-
-
-    public void setNodes( Set<Agent> nodes ) {
-        this.nodes = nodes;
     }
 
 
