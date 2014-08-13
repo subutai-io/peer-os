@@ -75,6 +75,7 @@ public class LuceneImpl implements Lucene {
 	}
 
 
+    @Override
 	public UUID installCluster(final Config config) {
 
 		Preconditions.checkNotNull(config, "Configuration is null");
@@ -87,6 +88,7 @@ public class LuceneImpl implements Lucene {
 	}
 
 
+    @Override
 	public UUID uninstallCluster(final String clusterName) {
 
 		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
@@ -97,6 +99,7 @@ public class LuceneImpl implements Lucene {
 	}
 
 
+    @Override
 	public UUID destroyNode(final String clusterName, final String lxcHostname) {
 
 		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
@@ -107,6 +110,7 @@ public class LuceneImpl implements Lucene {
 	}
 
 
+    @Override
 	public UUID addNode(final String clusterName, final String lxcHostname) {
 
 		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
@@ -117,6 +121,7 @@ public class LuceneImpl implements Lucene {
 	}
 
 
+    @Override
 	public List<Config> getClusters() {
 		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
 	}
