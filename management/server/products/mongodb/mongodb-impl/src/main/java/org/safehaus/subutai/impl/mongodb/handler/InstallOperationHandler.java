@@ -1,6 +1,8 @@
 package org.safehaus.subutai.impl.mongodb.handler;
 
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,8 +16,6 @@ import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.mongodb.Config;
-import org.safehaus.subutai.api.mongodb.NodeType;
-import org.safehaus.subutai.impl.mongodb.CustomPlacementStrategy;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;
 import org.safehaus.subutai.impl.mongodb.common.CommandType;
 import org.safehaus.subutai.impl.mongodb.common.Commands;
@@ -80,47 +80,56 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
             //clone lxc containers
             po.addLog( String.format( "Creating %d lxc containers...", numberOfLxcsNeeded ) );
 
-            //            Map<Agent, Set<Agent>> agents = manager.getLxcManager().createLxcs( numberOfLxcsNeeded );
-            //
-            //            Set<Agent> allAgents = new HashSet<>();
-            //            for ( Set<Agent> ag : agents.values() ) {
-            //                allAgents.addAll( ag );
-            //            }
-            //            Iterator<Agent> it = allAgents.iterator();
-            //            for ( int i = 0; i < config.getNumberOfConfigServers(); i++ ) {
-            //                config.getConfigServers().add( it.next() );
-            //            }
-            //            for ( int i = 0; i < config.getNumberOfRouters(); i++ ) {
-            //                config.getRouterServers().add( it.next() );
-            //            }
-            //            for ( int i = 0; i < config.getNumberOfDataNodes(); i++ ) {
-            //                config.getDataNodes().add( it.next() );
-            //            }
+            Map<Agent, Set<Agent>> agents = manager.getLxcManager().createLxcs( numberOfLxcsNeeded );
 
-            Map<NodeType, Set<Agent>> nodes = CustomPlacementStrategy
-                    .getNodes( manager.getLxcManager(), config.getNumberOfConfigServers(), config.getNumberOfRouters(),
-                            config.getNumberOfDataNodes() );
-            config.setConfigServers( nodes.get( NodeType.CONFIG_NODE ) );
-            config.setDataNodes( nodes.get( NodeType.DATA_NODE ) );
-            config.setRouterServers( nodes.get( NodeType.ROUTER_NODE ) );
+            Set<Agent> allAgents = new HashSet<>();
+            for ( Set<Agent> ag : agents.values() ) {
+                allAgents.addAll( ag );
+            }
 
-
-            po.addLog( "Lxc containers created successfully" );
-
-            if ( installMongoCluster( config, po ) ) {
-                po.addLog( "Updating db..." );
-
-                try {
-                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
-
-                    po.addLogDone( "Database information updated" );
-                }
-                catch ( DBException e ) {
-                    po.addLogFailed( String.format( "Failed to update database information, %s", e.getMessage() ) );
-                }
+            if ( allAgents.size() < numberOfLxcsNeeded ) {
+                po.addLogFailed( String.format( "Needed %d containers but %d were created", numberOfLxcsNeeded,
+                        allAgents.size() ) );
             }
             else {
-                po.addLogFailed( "Installation failed" );
+
+                Iterator<Agent> it = allAgents.iterator();
+                for ( int i = 0; i < config.getNumberOfConfigServers(); i++ ) {
+                    config.getConfigServers().add( it.next() );
+                }
+                for ( int i = 0; i < config.getNumberOfRouters(); i++ ) {
+                    config.getRouterServers().add( it.next() );
+                }
+                for ( int i = 0; i < config.getNumberOfDataNodes(); i++ ) {
+                    config.getDataNodes().add( it.next() );
+                }
+
+                //            Map<NodeType, Set<Agent>> nodes = CustomPlacementStrategy
+                //                    .getNodes( manager.getLxcManager(), config.getNumberOfConfigServers(),
+                // config.getNumberOfRouters(),
+                //                            config.getNumberOfDataNodes() );
+                //            config.setConfigServers( nodes.get( NodeType.CONFIG_NODE ) );
+                //            config.setDataNodes( nodes.get( NodeType.DATA_NODE ) );
+                //            config.setRouterServers( nodes.get( NodeType.ROUTER_NODE ) );
+
+
+                po.addLog( "Lxc containers created successfully" );
+
+                if ( installMongoCluster( config, po ) ) {
+                    po.addLog( "Updating db..." );
+
+                    try {
+                        manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                        po.addLogDone( "Database information updated" );
+                    }
+                    catch ( DBException e ) {
+                        po.addLogFailed( String.format( "Failed to update database information, %s", e.getMessage() ) );
+                    }
+                }
+                else {
+                    po.addLogFailed( "Installation failed" );
+                }
             }
 
             if ( po.getState() != ProductOperationState.SUCCEEDED ) {
