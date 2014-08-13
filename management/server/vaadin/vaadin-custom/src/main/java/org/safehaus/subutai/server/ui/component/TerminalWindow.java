@@ -84,7 +84,7 @@ public class TerminalWindow {
 		controls.addComponent(indicator);
 
 		grid.addComponent(txtCommand, 0, 0, 0, 9);
-		grid.setComponentAlignment(txtCommand, Alignment.TOP_CENTER);
+		grid.setComponentAlignment(commandOutputTxtArea, Alignment.TOP_CENTER);
 		grid.addComponent(controls, 0, 10);
 		grid.setComponentAlignment(controls, Alignment.BOTTOM_CENTER);
 
