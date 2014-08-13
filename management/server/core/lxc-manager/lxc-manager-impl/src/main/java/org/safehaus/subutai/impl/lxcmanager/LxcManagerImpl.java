@@ -663,6 +663,12 @@ public class LxcManagerImpl implements LxcManager {
                     LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType );
                     lxcInfos.add( lxcInfo );
                     completer.submit( new LxcActor( lxcInfo, this, LxcAction.CREATE ) );
+
+                    try {
+                        Thread.sleep( 30 * 1000 );
+                    }
+                    catch ( InterruptedException ignore ) {
+                    }
                 }
             }
         }
