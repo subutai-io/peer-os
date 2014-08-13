@@ -3,15 +3,14 @@ package org.safehaus.subutai.ui.flume.manager;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import java.util.Set;
+import java.util.UUID;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.flume.FlumeUI;
-
-import java.util.Set;
-import java.util.UUID;
 
 class AddNodeWindow extends Window {
 
@@ -25,25 +24,28 @@ class AddNodeWindow extends Window {
 		setModal(true);
 		setClosable(false);
 
-		setWidth(600, Unit.PIXELS);
+        setWidth(600, Unit.PIXELS);
+        setHeight(400, Unit.PIXELS);
 
 		GridLayout content = new GridLayout(1, 3);
 		content.setSizeFull();
 		content.setMargin(true);
-		content.setSpacing(true);
+        content.setSpacing(true);
 
 		HorizontalLayout topContent = new HorizontalLayout();
 		topContent.setSpacing(true);
 
 		content.addComponent(topContent);
-		topContent.addComponent(new Label("Nodes:"));
+        Component lblNodes = new Label("Nodes:");
+        lblNodes.addStyleName("default");
+        topContent.addComponent(lblNodes);
 
 		final ComboBox hadoopNodes = new ComboBox();
 		hadoopNodes.setImmediate(true);
 		hadoopNodes.setTextInputAllowed(false);
 		hadoopNodes.setNullSelectionAllowed(false);
 		hadoopNodes.setRequired(true);
-		hadoopNodes.setWidth(200, Unit.PIXELS);
+        hadoopNodes.setWidth(60, Unit.PERCENTAGE);
 		for (Agent node : nodes) {
 			hadoopNodes.addItem(node);
 			hadoopNodes.setItemCaption(node, node.getHostname());
@@ -90,8 +92,8 @@ class AddNodeWindow extends Window {
 		});
 
 		outputTxtArea = new TextArea("Operation output");
-		outputTxtArea.setRows(13);
-		outputTxtArea.setColumns(43);
+        outputTxtArea.setRows(10);
+        outputTxtArea.setWidth(80, Unit.PERCENTAGE);
 		outputTxtArea.setImmediate(true);
 		outputTxtArea.setWordwrap(true);
 
@@ -145,7 +147,7 @@ class AddNodeWindow extends Window {
 	private void setOutput(String output) {
 		if (!Util.isStringEmpty(output)) {
 			outputTxtArea.setValue(output);
-			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+			outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
 		}
 	}
 
