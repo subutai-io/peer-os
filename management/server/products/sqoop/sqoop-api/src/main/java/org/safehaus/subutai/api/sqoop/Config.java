@@ -3,13 +3,14 @@ package org.safehaus.subutai.api.sqoop;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Sqoop";
-    String clusterName;
-    Set<Agent> nodes;
+    private String clusterName;
+    private Set<Agent> nodes = new HashSet();
 
     public String getClusterName() {
         return clusterName;
