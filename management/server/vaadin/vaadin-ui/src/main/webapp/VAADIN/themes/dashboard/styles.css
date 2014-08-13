@@ -5635,7 +5635,7 @@ body .dashboard.v-app .v-app-loading {
 }
 
 .dashboard .v-label .dark {
-    color: #5a6066;
+    color: #5a6066 !important;
 }
 
 .dashboard .v-table .v-label {

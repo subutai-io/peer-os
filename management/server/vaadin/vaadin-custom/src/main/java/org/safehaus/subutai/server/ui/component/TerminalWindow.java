@@ -46,7 +46,7 @@ public class TerminalWindow {
 		window = new Window(String.format("Shell"), grid);
 		window.setModal(true);
 		window.setWidth(600, Unit.PIXELS);
-		window.setHeight(400, Unit.PIXELS);
+		window.setHeight(420, Unit.PIXELS);
 
 		commandOutputTxtArea = new TextArea("Commands output");
 		commandOutputTxtArea.setRows(15);
