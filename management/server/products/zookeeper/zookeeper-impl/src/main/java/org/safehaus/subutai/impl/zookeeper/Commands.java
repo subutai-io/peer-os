@@ -29,8 +29,8 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getInstallCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper" )
-                .withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+        return createCommand( new RequestBuilder( "sleep 20 ; apt-get --force-yes --assume-yes install ksks-zookeeper" )
+                .withTimeout( 120 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 

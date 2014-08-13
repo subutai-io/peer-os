@@ -3,11 +3,8 @@ package org.safehaus.subutai.rest.tracker;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -26,26 +23,12 @@ public class RestServiceImpl implements RestService {
 
     private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
 
-    private static final Gson gson =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Tracker tracker;
 
 
     public void setTracker( Tracker tracker ) {
         this.tracker = tracker;
-    }
-
-
-    private Map serializeProductOperation( ProductOperationView po ) {
-        Map map = new HashMap();
-
-        map.put( "Id", po.getId() );
-        map.put( "Date", po.getCreateDate() );
-        map.put( "Description", po.getDescription() );
-        map.put( "State", po.getState() );
-        map.put( "Log", po.getLog() );
-
-        return map;
     }
 
 
@@ -56,7 +39,7 @@ public class RestServiceImpl implements RestService {
         ProductOperationView productOperationView = tracker.getProductOperation( source, poUUID );
 
         if ( productOperationView != null ) {
-            return gson.toJson( serializeProductOperation( productOperationView ) );
+            return gson.toJson( productOperationView );
         }
         return null;
     }
@@ -71,13 +54,8 @@ public class RestServiceImpl implements RestService {
             Date toDat = sdf.parse( toDate );
 
             List<ProductOperationView> pos = tracker.getProductOperations( source, fromDat, toDat, limit );
-            List<Map> serializedPOs = new ArrayList<>();
 
-            for ( ProductOperationView po : pos ) {
-                serializedPOs.add( serializeProductOperation( po ) );
-            }
-
-            return gson.toJson( serializedPOs );
+            return gson.toJson( pos );
         }
         catch ( ParseException e ) {
             return gson.toJson( e );

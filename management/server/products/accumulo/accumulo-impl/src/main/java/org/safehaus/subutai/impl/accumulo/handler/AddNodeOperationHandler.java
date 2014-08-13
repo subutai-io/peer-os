@@ -7,10 +7,11 @@ import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
@@ -53,44 +54,42 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         }
         Config config = manager.getCluster( clusterName );
         if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( lxcAgent == null ) {
-            po.addLogFailed( String.format( "Agent %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent %s is not connected", lxcHostname ) );
             return;
         }
 
         if ( nodeType == NodeType.TRACER && config.getTracers().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Agent %s already belongs to tracers\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent %s already belongs to tracers", lxcHostname ) );
             return;
         }
         else if ( nodeType.isSlave() && config.getSlaves().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Agent %s already belongs to slaves\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent %s already belongs to slaves", lxcHostname ) );
             return;
         }
 
-        //check installed ksks packages
+        //check installed subutai packages
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Util.wrapAgentToSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            po.addLogFailed( "Failed to check presence of installed subutai packages" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
 
         if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation. Installation aborted",
-                    lxcAgent.getHostname() ) );
+            po.addLogFailed( String.format( "Node %s has no Hadoop installation.", lxcAgent.getHostname() ) );
             return;
         }
         else if ( !result.getStdOut().contains( "ksks-zookeeper" ) ) {
-            po.addLogFailed( String.format( "Node %s has no Zookeeper installation. Installation aborted",
-                    lxcAgent.getHostname() ) );
+            po.addLogFailed( String.format( "Node %s has no Zookeeper installation.", lxcAgent.getHostname() ) );
             return;
         }
 
@@ -100,14 +99,13 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                 manager.getHadoopManager().getCluster( config.getClusterName() );
 
         if ( hadoopConfig == null ) {
-            po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+            po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found", config.getClusterName() ) );
             return;
         }
 
         if ( !hadoopConfig.getAllNodes().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Node '%s' does not belong to Hadoop cluster %s\nInstallation aborted",
-                    lxcAgent.getHostname(), config.getClusterName() ) );
+            po.addLogFailed( String.format( "Node '%s' does not belong to Hadoop cluster %s", lxcAgent.getHostname(),
+                    config.getClusterName() ) );
             return;
         }
 
@@ -115,14 +113,13 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                 manager.getZkManager().getCluster( config.getClusterName() );
 
         if ( zkConfig == null ) {
-            po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found\nInstallation aborted",
-                    config.getClusterName() ) );
+            po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found", config.getClusterName() ) );
             return;
         }
 
         if ( !zkConfig.getNodes().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Node '%s' does not belong to Zookeeper cluster %s\nInstallation aborted",
-                    lxcAgent.getHostname(), config.getClusterName() ) );
+            po.addLogFailed( String.format( "Node '%s' does not belong to Zookeeper cluster %s", lxcAgent.getHostname(),
+                    config.getClusterName() ) );
             return;
         }
 
@@ -134,128 +131,128 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
             config.getTracers().add( lxcAgent );
         }
 
-        po.addLog( "Updating DB..." );
-        if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
 
-            po.addLog( "Cluster info updated in DB" );
+        if ( install ) {
+            po.addLog( String.format( "Installing %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname() ) );
 
-            if ( install ) {
-                po.addLog( String.format( "Installing %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname() ) );
+            Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
+            manager.getCommandRunner().runCommand( installCommand );
 
-                Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
-                manager.getCommandRunner().runCommand( installCommand );
-
-                if ( installCommand.hasSucceeded() ) {
-                    po.addLog( "Installation succeeded" );
-                }
-                else {
-                    po.addLogFailed( String.format( "Installation failed, %s\nOperation aborted",
-                            installCommand.getAllErrors() ) );
-                    return;
-                }
-            }
-            po.addLog( "Registering node with cluster..." );
-
-            Command addNodeCommand;
-            if ( nodeType.isSlave() ) {
-                addNodeCommand = Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+            if ( installCommand.hasSucceeded() ) {
+                po.addLog( "Installation succeeded" );
             }
             else {
-                addNodeCommand = Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+                po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                return;
             }
-            manager.getCommandRunner().runCommand( addNodeCommand );
+        }
+        po.addLog( "Registering node with cluster..." );
 
-            if ( addNodeCommand.hasSucceeded() ) {
-                po.addLog( "Node registration succeeded\nSetting master node..." );
+        Command addNodeCommand;
+        if ( nodeType.isSlave() ) {
+            addNodeCommand = Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+        }
+        else {
+            addNodeCommand = Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+        }
+        manager.getCommandRunner().runCommand( addNodeCommand );
 
-                Command setMasterNodeCommand =
-                        Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ), config.getMasterNode() );
-                manager.getCommandRunner().runCommand( setMasterNodeCommand );
+        if ( addNodeCommand.hasSucceeded() ) {
+            po.addLog( "Node registration succeeded\nSetting master node..." );
 
-                if ( setMasterNodeCommand.hasSucceeded() ) {
+            Command setMasterNodeCommand =
+                    Commands.getAddMasterCommand( Util.wrapAgentToSet( lxcAgent ), config.getMasterNode() );
+            manager.getCommandRunner().runCommand( setMasterNodeCommand );
 
-                    po.addLog( "Setting master node succeeded\nSetting GC node..." );
+            if ( setMasterNodeCommand.hasSucceeded() ) {
 
-                    Command setGcNodeCommand =
-                            Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ), config.getGcNode() );
-                    manager.getCommandRunner().runCommand( setGcNodeCommand );
+                po.addLog( "Setting master node succeeded\nSetting GC node..." );
 
-                    if ( setGcNodeCommand.hasSucceeded() ) {
+                Command setGcNodeCommand =
+                        Commands.getAddGCCommand( Util.wrapAgentToSet( lxcAgent ), config.getGcNode() );
+                manager.getCommandRunner().runCommand( setGcNodeCommand );
 
-                        po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
+                if ( setGcNodeCommand.hasSucceeded() ) {
 
-                        Command setMonitorCommand =
-                                Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ), config.getMonitor() );
-                        manager.getCommandRunner().runCommand( setMonitorCommand );
+                    po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-                        if ( setMonitorCommand.hasSucceeded() ) {
+                    Command setMonitorCommand =
+                            Commands.getAddMonitorCommand( Util.wrapAgentToSet( lxcAgent ), config.getMonitor() );
+                    manager.getCommandRunner().runCommand( setMonitorCommand );
 
-                            po.addLog( "Setting monitor node succeeded\nSetting tracers/slaves..." );
+                    if ( setMonitorCommand.hasSucceeded() ) {
 
-                            Command setTracersSlavesCommand = nodeType.isSlave() ? Commands.getAddTracersCommand(
-                                    Util.wrapAgentToSet( lxcAgent ), config.getTracers() ) :
-                                                              Commands.getAddSlavesCommand(
-                                                                      Util.wrapAgentToSet( lxcAgent ),
-                                                                      config.getSlaves() );
+                        po.addLog( "Setting monitor node succeeded\nSetting tracers/slaves..." );
 
-                            manager.getCommandRunner().runCommand( setTracersSlavesCommand );
+                        Command setTracersSlavesCommand = nodeType.isSlave() ? Commands.getAddTracersCommand(
+                                Util.wrapAgentToSet( lxcAgent ), config.getTracers() ) :
+                                                          Commands.getAddSlavesCommand( Util.wrapAgentToSet( lxcAgent ),
+                                                                  config.getSlaves() );
 
-                            if ( setTracersSlavesCommand.hasSucceeded() ) {
+                        manager.getCommandRunner().runCommand( setTracersSlavesCommand );
 
-                                po.addLog( "Setting tracers/slaves succeeded\nSetting Zk cluster..." );
+                        if ( setTracersSlavesCommand.hasSucceeded() ) {
 
-                                Command setZkClusterCommand =
-                                        Commands.getBindZKClusterCommand( Util.wrapAgentToSet( lxcAgent ),
-                                                zkConfig.getNodes() );
-                                manager.getCommandRunner().runCommand( setZkClusterCommand );
+                            po.addLog( "Setting tracers/slaves succeeded\nSetting Zk cluster..." );
 
-                                if ( setZkClusterCommand.hasSucceeded() ) {
-                                    po.addLog( "Setting ZK cluster succeeded\nRestarting cluster..." );
+                            Command setZkClusterCommand =
+                                    Commands.getBindZKClusterCommand( Util.wrapAgentToSet( lxcAgent ),
+                                            zkConfig.getNodes() );
+                            manager.getCommandRunner().runCommand( setZkClusterCommand );
 
-                                    Command restartClusterCommand =
-                                            Commands.getRestartCommand( config.getMasterNode() );
-                                    manager.getCommandRunner().runCommand( restartClusterCommand );
+                            if ( setZkClusterCommand.hasSucceeded() ) {
+                                po.addLog( "Setting ZK cluster succeeded\nRestarting cluster..." );
 
-                                    if ( restartClusterCommand.hasSucceeded() ) {
-                                        po.addLogDone( "Cluster restarted successfully\nDone" );
-                                    }
-                                    else {
-                                        po.addLogFailed( String.format( "Cluster restart failed, %s",
-                                                restartClusterCommand.getAllErrors() ) );
-                                    }
+                                Command restartClusterCommand = Commands.getRestartCommand( config.getMasterNode() );
+                                manager.getCommandRunner().runCommand( restartClusterCommand );
+
+                                if ( restartClusterCommand.hasSucceeded() ) {
+                                    po.addLog( "Cluster restarted successfully" );
                                 }
                                 else {
-                                    po.addLogFailed( String.format( "Setting ZK cluster failed, %s",
-                                            setZkClusterCommand.getAllErrors() ) );
+                                    po.addLog( String.format( "Cluster restart failed, %s, skipping...",
+                                            restartClusterCommand.getAllErrors() ) );
+                                }
+
+                                po.addLog( "Updating db..." );
+
+                                try {
+                                    manager.getDbManager()
+                                           .saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                                    po.addLogDone( "Database information updated" );
+                                }
+                                catch ( DBException e ) {
+                                    po.addLogFailed( String.format( "Failed to update database information, %s",
+                                            e.getMessage() ) );
                                 }
                             }
                             else {
-                                po.addLogFailed( String.format( "Setting tracers/slaves failed, %s",
-                                        setTracersSlavesCommand.getAllErrors() ) );
+                                po.addLogFailed( String.format( "Setting ZK cluster failed, %s",
+                                        setZkClusterCommand.getAllErrors() ) );
                             }
                         }
                         else {
-                            po.addLogFailed( String.format( "Setting monitor node failed, %s",
-                                    setMonitorCommand.getAllErrors() ) );
+                            po.addLogFailed( String.format( "Setting tracers/slaves failed, %s",
+                                    setTracersSlavesCommand.getAllErrors() ) );
                         }
                     }
                     else {
                         po.addLogFailed(
-                                String.format( "Setting GC node failed, %s", setGcNodeCommand.getAllErrors() ) );
+                                String.format( "Setting monitor node failed, %s", setMonitorCommand.getAllErrors() ) );
                     }
                 }
                 else {
-                    po.addLogFailed(
-                            String.format( "Setting master node failed, %s", setMasterNodeCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Setting GC node failed, %s", setGcNodeCommand.getAllErrors() ) );
                 }
             }
             else {
-                po.addLogFailed( String.format( "Node registration failed, %s", addNodeCommand.getAllErrors() ) );
+                po.addLogFailed(
+                        String.format( "Setting master node failed, %s", setMasterNodeCommand.getAllErrors() ) );
             }
         }
         else {
-            po.addLogFailed(
-                    "Error while updating cluster info in DB. Check logs. Use Terminal Module to cleanup\nFailed" );
+            po.addLogFailed( String.format( "Node registration failed, %s", addNodeCommand.getAllErrors() ) );
         }
     }
 }
