@@ -8,7 +8,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Path ("presto")
@@ -25,6 +27,30 @@ public class RestService {
 
 	public void setAgentManager(AgentManager agentManager) {
 		this.agentManager = agentManager;
+	}
+
+	@GET
+	@Path ("list_clusters")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String listClusters() {
+
+		List<Config> configList = prestoManager.getClusters();
+		ArrayList<String> clusterNames = new ArrayList();
+
+		for (Config config : configList) {
+			clusterNames.add(config.getClusterName());
+		}
+
+		return JsonUtil.GSON.toJson(clusterNames);
+	}
+
+	@GET
+	@Path ("get_cluster/{clusterName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String getCluster(
+			@PathParam ("clusterName") String clusterName
+	) {
+		return JsonUtil.GSON.toJson(prestoManager.getCluster(clusterName));
 	}
 
 	@GET
