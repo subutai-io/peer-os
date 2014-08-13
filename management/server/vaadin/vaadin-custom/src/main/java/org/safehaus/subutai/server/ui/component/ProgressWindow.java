@@ -38,7 +38,6 @@ public class ProgressWindow {
 		window = new Window("Operation progress", l);
 		window.setImmediate(true);
 		window.setModal(true);
-		window.setClosable(false);
 		window.setWidth(650, Sizeable.Unit.PIXELS);
 
 		this.trackID = trackID;
