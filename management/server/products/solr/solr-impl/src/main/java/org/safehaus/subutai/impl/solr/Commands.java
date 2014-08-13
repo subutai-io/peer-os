@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class Commands extends CommandsSingleton {
 
-    public static final String INSTALL = "sleep 10 ; apt-get --force-yes --assume-yes install ksks-solr";
+    public static final String INSTALL = "sleep 20 ; apt-get --force-yes --assume-yes install ksks-solr";
     public static final String START = "service solr start";
     public static final String STOP = "service solr stop";
     public static final String STATUS = "service solr status";

@@ -26,7 +26,7 @@ public class Commands extends CommandsSingleton {
     public static Command getInstallCommand(Set<Agent> agents) {
         return createCommand("Install Mongo",
                 new RequestBuilder(
-                        "sleep 10 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo")
+                        "sleep 20 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo")
                         .withTimeout(360),
                 agents
         );
