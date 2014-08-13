@@ -1489,6 +1489,11 @@
                   <artifactId>storm-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Zookeeper -->
                 <artifactItem>
