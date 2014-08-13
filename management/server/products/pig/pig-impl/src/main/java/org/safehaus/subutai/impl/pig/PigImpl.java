@@ -73,7 +73,8 @@ public class PigImpl implements Pig {
     }
 
 
-    public UUID installCluster( final Config config ) {
+    @Override
+    public UUID installCluster( Config config ) {
 
         Preconditions.checkNotNull( config, "Configuration is null" );
 
@@ -84,12 +85,13 @@ public class PigImpl implements Pig {
     }
 
 
+    @Override
     public UUID uninstallCluster( final String clusterName ) {
-
         return null;
     }
 
 
+    @Override
     public UUID destroyNode( final String clusterName, final String lxcHostname ) {
 
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
@@ -100,6 +102,7 @@ public class PigImpl implements Pig {
     }
 
 
+    @Override
     public List<Config> getClusters() {
         return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
     }
