@@ -31,7 +31,7 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 20; apt-get --force-yes --assume-yes install ksks-oozie-server")
+                        "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server")
                         .withTimeout(180)
                         .withStdOutRedirection(OutputRedirection.NO),
                 agents
@@ -43,7 +43,7 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 20; apt-get --force-yes --assume-yes install ksks-oozie-client")
+                        "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client")
                         .withTimeout(180)
                         .withStdOutRedirection(OutputRedirection.NO),
                 agents
@@ -110,7 +110,7 @@ public class Commands extends CommandsSingleton {
     public static Command getUninstallClientsCommand(Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes purge ksks-oozie-client")
+                        "apt-get --force-yes --assume-yes purge ksks-oozie-client")
                         .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents
         );

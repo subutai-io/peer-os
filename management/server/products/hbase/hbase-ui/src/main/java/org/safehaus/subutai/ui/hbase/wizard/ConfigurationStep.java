@@ -6,15 +6,27 @@
 package org.safehaus.subutai.ui.hbase.wizard;
 
 
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.hbase.HBaseUI;
 
-import java.util.*;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
@@ -61,7 +73,7 @@ public class ConfigurationStep extends VerticalLayout {
 		if (hadoopClusters.getValue() != null) {
 			Config hadoopInfo = (Config) hadoopClusters.getValue();
 			wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-			wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getUuid());
+			wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getHostname());
 			select.setContainerDataSource(new BeanItemContainer<>(Agent.class, hadoopInfo.getAllNodes()));
 		}
 
@@ -74,8 +86,8 @@ public class ConfigurationStep extends VerticalLayout {
 					select.setContainerDataSource(
 							new BeanItemContainer<>(Agent.class, hadoopInfo.getAllNodes()));
 					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-					wizard.getConfig().setNodes(new HashSet<UUID>());
-					wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getUuid());
+					wizard.getConfig().setNodes(new HashSet<String>());
+					wizard.getConfig().setHadoopNameNode(hadoopInfo.getNameNode().getHostname());
 				}
 			}
 		});
@@ -97,12 +109,12 @@ public class ConfigurationStep extends VerticalLayout {
 			public void valueChange(Property.ValueChangeEvent event) {
 				if (event.getProperty().getValue() != null) {
 					Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-					Set<UUID> uuids = new HashSet<>();
+					Set<String> hostnames = new HashSet<>();
 					for (Agent agent : agentList) {
-						uuids.add(agent.getUuid());
+						hostnames.add( agent.getHostname() );
 					}
 
-					wizard.getConfig().setNodes(uuids);
+					wizard.getConfig().setNodes(hostnames);
 				}
 			}
 		});
@@ -112,12 +124,12 @@ public class ConfigurationStep extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				Set<UUID> uuids = new HashSet<>();
+				Set<String> hostnames = new HashSet<>();
 				for (Agent agent : (Set<Agent>) select.getValue()) {
-					uuids.add(agent.getUuid());
+					hostnames.add( agent.getHostname() );
 				}
 
-				wizard.getConfig().setNodes(uuids);
+				wizard.getConfig().setNodes(hostnames);
 
 				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
 					show("Please, select Hadoop cluster");

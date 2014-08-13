@@ -1,13 +1,12 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
 
-import java.util.UUID;
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
@@ -48,14 +47,14 @@ public class DescribeClusterCommand extends OsgiCommandSupport
             sb.append( "Master node: " ).append( config.getMaster() ).append( "\n" );
             sb.append( "Backup master node: " ).append( config.getBackupMasters() ).append( "\n" );
             sb.append( "Region nodes:" ).append( "\n" );
-            for ( UUID uuid : config.getRegion() )
+            for ( String hostname : config.getRegion() )
             {
-                sb.append( uuid ).append( "\n" );
+                sb.append( hostname ).append( "\n" );
             }
             sb.append( "Quorum nodes:" ).append( "\n" );
-            for ( UUID uuid : config.getQuorum() )
+            for ( String hostname : config.getQuorum() )
             {
-                sb.append( uuid ).append( "\n" );
+                sb.append( hostname ).append( "\n" );
             }
             System.out.println( sb.toString() );
         }
