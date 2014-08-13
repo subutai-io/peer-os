@@ -52,10 +52,7 @@ public class RestService {
 	public String getCluster(
 			@QueryParam ("clusterName") String clusterName
 	) {
-
-		UUID uuid = hadoopManager.uninstallCluster(clusterName);
-
-		return JsonUtil.toJson(OPERATION_ID, uuid);
+		return JsonUtil.GSON.toJson(hadoopManager.getCluster(clusterName));
 	}
 
 	@GET
