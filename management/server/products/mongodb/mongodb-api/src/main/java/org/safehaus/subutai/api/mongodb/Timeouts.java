@@ -14,5 +14,5 @@ public class Timeouts {
     public static final int STOP_NODE_TIMEOUT_SEC = 60;
     public static final int START_ROUTER_TIMEOUT_SEC = 180;
     public static final int START_CONFIG_SERVER_TIMEOUT_SEC = 180;
-    public static final int START_DATE_NODE_TIMEOUT_SEC = 300;
+    public static final int START_DATE_NODE_TIMEOUT_SEC = 420;
 }
