@@ -29,8 +29,11 @@ public class LxcActor implements Callable<LxcInfo> {
 
 
     public LxcInfo call() throws Exception {
-        if ( lxcAction == LxcAction.CREATE ) {
-            info.setResult( lxcManager.cloneNStartLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
+        if ( lxcAction == LxcAction.CLONE ) {
+            info.setResult( lxcManager.cloneLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
+        }
+        else if ( lxcAction == LxcAction.START ) {
+            info.setResult( lxcManager.startLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
         }
         else if ( lxcAction == LxcAction.DESTROY ) {
             info.setResult( lxcManager.destroyLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
