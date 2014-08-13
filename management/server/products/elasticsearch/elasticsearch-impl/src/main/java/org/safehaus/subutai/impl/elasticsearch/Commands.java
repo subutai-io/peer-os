@@ -14,7 +14,7 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        " apt-get --force-yes --assume-yes install ksks-elasticsearch ")
+                        "sleep 10; apt-get --force-yes --assume-yes install ksks-elasticsearch")
                         .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents
         );
