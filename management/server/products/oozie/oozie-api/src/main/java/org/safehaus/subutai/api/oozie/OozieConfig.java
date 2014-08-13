@@ -82,12 +82,13 @@ public class OozieConfig implements ConfigBase {
         this.hadoopNodes = hadoopNodes;
     }
 
+
     @Override
     public String toString() {
         return "OozieConfig{" +
-                "uuid=" + uuid +
-                ", domainInfo='" + domainInfo + '\'' +
-                ", server=" + server +
+                "domainInfo='" + domainInfo + '\'' +
+                ", uuid=" + uuid +
+                ", server='" + server + '\'' +
                 ", clients=" + clients +
                 ", hadoopNodes=" + hadoopNodes +
                 ", clusterName='" + clusterName + '\'' +

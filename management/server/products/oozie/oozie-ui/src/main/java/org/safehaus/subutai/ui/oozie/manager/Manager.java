@@ -155,7 +155,7 @@ public class Manager {
 		Notification.show(notification);
 	}
 
-	private void populateServerTable(final Table table, final String agent) {
+	private void populateServerTable(final Table table, final String agentHostname) {
 
 		table.removeAllItems();
 		final Button checkBtn = new Button("Check");
@@ -168,7 +168,10 @@ public class Manager {
 		progressIcon.setVisible(false);
 
 		final Object rowId = table.addItem(new Object[] {
-						agent,
+						agentHostname,
+                        checkBtn,
+                        startBtn,
+                        stopBtn,
 						progressIcon},
 				null
 		);
@@ -228,11 +231,11 @@ public class Manager {
 
 	}
 
-	private void populateClientsTable(final Table table, Set<String> agents) {
+	private void populateClientsTable(final Table table, Set<String> clientHostnames) {
 
 		table.removeAllItems();
 
-		for (final String agent : agents) {
+		for (final String agent : clientHostnames) {
 			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
 			progressIcon.setVisible(false);
 

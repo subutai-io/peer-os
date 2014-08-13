@@ -71,7 +71,7 @@ public class StepSetConfig extends Panel {
 		vl.addComponent(cbServers);
 
 		final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<String>());
-		selectClients.setItemCaptionPropertyId("hostname");
+//		selectClients.setItemCaptionPropertyId("hostname");
 		selectClients.setRows(7);
 		selectClients.setNullSelectionAllowed(true);
 		selectClients.setMultiSelect(true);
