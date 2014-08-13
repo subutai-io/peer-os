@@ -54,7 +54,7 @@ public class NodeSelectionStep extends Panel {
                         if(wizard.getConfig().getNimbus() != null)
                             masterNodeCombo.setValue(wizard.getConfig().getNimbus());
 
-                        wizard.getConfig().setClusterName(zk.getClusterName());
+                        wizard.getConfig().setZookeeperClusterName(zk.getClusterName());
                     }
                 }
             });
@@ -62,7 +62,7 @@ public class NodeSelectionStep extends Panel {
             for(org.safehaus.subutai.api.zookeeper.Config zkc : zk_list) {
                 zkClustersCombo.addItem(zkc);
                 zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
-                if(zkc.getClusterName().equals(wizard.getConfig().getClusterName()))
+                if(zkc.getClusterName().equals(wizard.getConfig().getZookeeperClusterName()))
                     zkClustersCombo.setValue(zkc);
             }
             if(wizard.getConfig().getNimbus() != null)

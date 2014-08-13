@@ -6,6 +6,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+import java.util.*;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -15,8 +16,6 @@ import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.storm.StormUI;
-
-import java.util.*;
 
 public class Manager {
 
@@ -259,7 +258,7 @@ public class Manager {
 			final Button restartBtn = new Button("Restart");
 			restartBtn.addStyleName("default");
 			final Button destroyBtn = !server ? new Button("Destroy") : null;
-			destroyBtn.addStyleName("default");
+            if(destroyBtn != null) destroyBtn.addStyleName("default");
 			final Embedded icon = new Embedded("", new ThemeResource(
 					"img/spinner.gif"));
 
