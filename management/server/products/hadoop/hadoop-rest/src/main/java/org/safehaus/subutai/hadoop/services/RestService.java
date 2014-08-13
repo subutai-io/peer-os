@@ -23,12 +23,12 @@ public class RestService {
 	private Hadoop hadoopManager;
 	private AgentManager agentManager;
 
-	public Hadoop getHadoopManager() {
-		return hadoopManager;
+	public void setHadoopManager(Hadoop hadoopManager) {
+		this.hadoopManager = hadoopManager;
 	}
 
-	public AgentManager getAgentManager() {
-		return agentManager;
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
 	}
 
 	@GET
