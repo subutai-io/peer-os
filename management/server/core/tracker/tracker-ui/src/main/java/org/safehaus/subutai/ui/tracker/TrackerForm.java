@@ -11,6 +11,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -252,9 +253,14 @@ public class TrackerForm extends CustomComponent {
 
 					sortNeeded = true;
 				} else {
-					if (item.getItemProperty("Status") != null && !((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
-							progressIcon.getSource())) {
-						item.getItemProperty("Status").setValue(progressIcon);
+					try {
+						VaadinSession.getCurrent().getLockInstance().lock();
+						if (item.getItemProperty("Status") != null && !((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
+								progressIcon.getSource())) {
+							item.getItemProperty("Status").setValue(progressIcon);
+						}
+					} finally {
+						VaadinSession.getCurrent().getLockInstance().unlock();
 					}
 				}
 			}
