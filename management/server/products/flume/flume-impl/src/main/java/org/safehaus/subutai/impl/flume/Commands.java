@@ -17,7 +17,9 @@ public class Commands {
                 return sb.toString();
             case START:
             case STOP:
-                return "service flume-ng " + type.toString().toLowerCase() + " agent";
+                String s = "service flume-ng " + type.toString().toLowerCase() + " agent";
+                if(type == CommandType.START) s += " &"; // TODO:
+                return s;
             default:
                 throw new AssertionError(type.name());
 
