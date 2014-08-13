@@ -1,11 +1,13 @@
 package org.safehaus.subutai.cli.commands;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.oozie.Config;
-import org.safehaus.subutai.api.oozie.Oozie;
 
 import java.util.List;
+
+import org.safehaus.subutai.api.oozie.Oozie;
+import org.safehaus.subutai.api.oozie.OozieConfig;
+
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 
 /**
@@ -25,9 +27,9 @@ public class ListClustersCommand extends OsgiCommandSupport {
     }
 
     protected Object doExecute() {
-        List<Config> configList = oozieManager.getClusters();
+        List<OozieConfig> configList = oozieManager.getClusters();
         if (!configList.isEmpty())
-            for (Config config : configList) {
+            for (OozieConfig config : configList) {
                 System.out.println(config.getClusterName());
             }
         else System.out.println("No Oozie cluster");

@@ -5,8 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.oozie.Config;
 import org.safehaus.subutai.api.oozie.Oozie;
+import org.safehaus.subutai.api.oozie.OozieConfig;
+
 
 /**
  * Created by bahadyr on 5/6/14.
@@ -26,7 +27,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String installCluster(String clusterName, String domainInfo, String serverHostname, String... clientsHostnames) {
-        Config config = new Config();
+        OozieConfig config = new OozieConfig();
         config.setClusterName( clusterName );
         config.setDomainInfo( domainInfo );
         config.setServer( serverHostname );

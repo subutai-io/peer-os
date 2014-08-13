@@ -9,7 +9,7 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class OozieConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Oozie";
     String domainInfo;
@@ -19,7 +19,7 @@ public class Config implements ConfigBase {
     private Set<String> hadoopNodes;
     private String clusterName = "";
 
-    public Config() {
+    public OozieConfig() {
         this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
     }
 

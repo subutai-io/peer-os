@@ -5,11 +5,12 @@
  */
 package org.safehaus.subutai.ui.oozie.manager;
 
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.oozie.Config;
+import org.safehaus.subutai.api.oozie.OozieConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -42,7 +43,7 @@ public class Manager {
 	private final ComboBox clusterCombo;
 	private final Table serverTable;
 	private final Table clientsTable;
-	private Config config;
+	private OozieConfig config;
 
 	public Manager() {
 
@@ -71,7 +72,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				config = (OozieConfig ) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -112,7 +113,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = OozieUI.getOozieManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -178,7 +179,7 @@ public class Manager {
 				progressIcon.setVisible(true);
 
 				UUID trackID = OozieUI.getOozieManager().checkServerStatus(config);
-				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -197,7 +198,7 @@ public class Manager {
 				stopBtn.setEnabled(false);
 
 				UUID trackID = OozieUI.getOozieManager().startServer(config);
-				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -214,7 +215,7 @@ public class Manager {
 				progressIcon.setVisible(true);
 
 				UUID trackID = OozieUI.getOozieManager().stopServer(config);
-				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -254,17 +255,17 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<Config> info = OozieUI.getOozieManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
+		List<OozieConfig> info = OozieUI.getOozieManager().getClusters();
+        OozieConfig clusterInfo = (OozieConfig) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (info != null && info.size() > 0) {
-			for (Config oozieConfig : info) {
+			for (OozieConfig oozieConfig : info) {
 				clusterCombo.addItem(oozieConfig);
 				clusterCombo.setItemCaption(oozieConfig,
 						oozieConfig.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (Config oozieInfo : info) {
+				for (OozieConfig oozieInfo : info) {
 					if (oozieInfo.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(oozieInfo);
 						return;
