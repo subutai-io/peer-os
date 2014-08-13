@@ -95,7 +95,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
                 hddReservedMb = GB2MB(10);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
-                cpuPerNodePercentage = 10;
+                cpuPerNodePercentage = 5;
                 cpuReservedPercentage = 10;
                 break;
             case ROUTER_NODE:
@@ -107,11 +107,11 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
                 cpuReservedPercentage = 10;
                 break;
             case DATA_NODE:
-                hddPerNodeMb = GB2MB(50);
-                hddReservedMb = GB2MB(20);
+                hddPerNodeMb = GB2MB(20);
+                hddReservedMb = GB2MB(30);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
-                cpuPerNodePercentage = 10;
+                cpuPerNodePercentage = 5;
                 cpuReservedPercentage = 10;
                 break;
             default:
