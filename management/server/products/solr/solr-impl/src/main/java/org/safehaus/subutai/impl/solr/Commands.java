@@ -27,22 +27,22 @@ public class Commands extends CommandsSingleton {
 
     public Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( INSTALL ).withTimeout( 120 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                new RequestBuilder( INSTALL ).withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
     public Command getStartCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( START ).withStdOutRedirection( OutputRedirection.NO ),
+        return createCommand( new RequestBuilder( START ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ),
                 Util.wrapAgentToSet( agent ) );
     }
 
 
     public Command getStopCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( STOP ), Util.wrapAgentToSet( agent ) );
+        return createCommand( new RequestBuilder( STOP ).withTimeout( 60 ), Util.wrapAgentToSet( agent ) );
     }
 
 
     public Command getStatusCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( STATUS ), Util.wrapAgentToSet( agent ) );
+        return createCommand( new RequestBuilder( STATUS ).withTimeout( 60 ), Util.wrapAgentToSet( agent ) );
     }
 }
