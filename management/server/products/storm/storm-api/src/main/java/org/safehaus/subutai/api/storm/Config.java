@@ -11,6 +11,7 @@ public class Config implements ConfigBase {
     private String clusterName;
     private int supervisorsCount;
     private boolean externalZookeeper;
+    private String zookeeperClusterName;
     private Agent nimbus; // master node
     private Set<Agent> supervisors; // worker nodes
 
@@ -60,4 +61,11 @@ public class Config implements ConfigBase {
         this.externalZookeeper = externalZookeeper;
     }
 
+    public String getZookeeperClusterName() {
+        return zookeeperClusterName;
+    }
+
+    public void setZookeeperClusterName(String zookeeperClusterName) {
+        this.zookeeperClusterName = zookeeperClusterName;
+    }
 }
