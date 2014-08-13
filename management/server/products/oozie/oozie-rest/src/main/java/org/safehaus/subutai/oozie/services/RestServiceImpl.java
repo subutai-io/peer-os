@@ -1,5 +1,11 @@
 package org.safehaus.subutai.oozie.services;
 
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.api.oozie.Config;
 import org.safehaus.subutai.api.oozie.Oozie;
 
 /**
@@ -19,8 +25,19 @@ public class RestServiceImpl implements RestService {
     }
 
     @Override
-    public String installCluster(String clusterName) {
-        return null;
+    public String installCluster(String clusterName, String domainInfo, String serverHostname, String... clientsHostnames) {
+        Config config = new Config();
+        config.setClusterName( clusterName );
+        config.setDomainInfo( domainInfo );
+        config.setServer( serverHostname );
+        Set<String> clients = new HashSet<String>();
+        for(String ch : clientsHostnames) {
+            clients.add( ch );
+        }
+        config.setClients( clients );
+
+        UUID uuid = this.oozieManager.installCluster(config);
+        return uuid.toString();
     }
 
     @Override

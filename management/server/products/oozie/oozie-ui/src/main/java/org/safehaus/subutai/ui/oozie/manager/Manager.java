@@ -5,12 +5,10 @@
  */
 package org.safehaus.subutai.ui.oozie.manager;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.api.oozie.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -19,9 +17,21 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.oozie.OozieUI;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 
 /**
  * @author dilshat
@@ -144,7 +154,7 @@ public class Manager {
 		Notification.show(notification);
 	}
 
-	private void populateServerTable(final Table table, final Agent agent) {
+	private void populateServerTable(final Table table, final String agent) {
 
 		table.removeAllItems();
 		final Button checkBtn = new Button("Check");
@@ -157,7 +167,7 @@ public class Manager {
 		progressIcon.setVisible(false);
 
 		final Object rowId = table.addItem(new Object[] {
-						agent.getHostname(),
+						agent,
 						progressIcon},
 				null
 		);
@@ -217,16 +227,16 @@ public class Manager {
 
 	}
 
-	private void populateClientsTable(final Table table, Set<Agent> agents) {
+	private void populateClientsTable(final Table table, Set<String> agents) {
 
 		table.removeAllItems();
 
-		for (final Agent agent : agents) {
+		for (final String agent : agents) {
 			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
 			progressIcon.setVisible(false);
 
 			final Object rowId = table.addItem(new Object[] {
-							agent.getHostname(),
+							agent,
 					},
 					null
 			);

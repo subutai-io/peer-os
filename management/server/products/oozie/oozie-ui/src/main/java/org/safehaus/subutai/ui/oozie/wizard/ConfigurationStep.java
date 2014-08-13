@@ -49,7 +49,7 @@ public class ConfigurationStep extends Panel {
         content.setMargin( true );
 
         hadoopClusters = new ComboBox( "Hadoop cluster" );
-        select = new TwinColSelect( "Nodes", new ArrayList<Agent>() );
+        select = new TwinColSelect( "Nodes", new ArrayList<String>() );
 
         hadoopClusters.setImmediate( true );
         hadoopClusters.setTextInputAllowed( false );
@@ -76,7 +76,12 @@ public class ConfigurationStep extends Panel {
         if ( hadoopClusters.getValue() != null ) {
             Config hadoopInfo = ( Config ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
-            select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+            hadoopInfo.getAllNodes();
+            Set<String> hadoopNodes = new HashSet<>();
+            for(Agent hadoopAgent : hadoopInfo.getAllNodes()) {
+                hadoopNodes.add( hadoopAgent.getHostname() );
+            }
+            select.setContainerDataSource( new BeanItemContainer<>( String.class, hadoopNodes ) );
         }
 
         hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
@@ -85,9 +90,13 @@ public class ConfigurationStep extends Panel {
                 if ( event.getProperty().getValue() != null ) {
                     Config hadoopInfo = ( Config ) event.getProperty().getValue();
                     select.setValue( null );
-                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+                    Set<String> hadoopNodes = new HashSet<String>();
+                    for(Agent hadoopNode : hadoopInfo.getAllNodes()) {
+                        hadoopNodes.add( hadoopNode.getHostname() );
+                    }
+                    select.setContainerDataSource( new BeanItemContainer<>( String.class, hadoopNodes ) );
                     wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
-                    wizard.getConfig().setHadoopNodes( new HashSet<Agent>() );
+                    wizard.getConfig().setHadoopNodes( new HashSet<String>() );
                 }
             }
         } );
@@ -108,7 +117,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
+                    Set<String> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
                     wizard.getConfig().setHadoopNodes( agentList );
                 }
             }
@@ -119,7 +128,7 @@ public class ConfigurationStep extends Panel {
         next.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                wizard.getConfig().setHadoopNodes( ( Set<Agent> ) select.getValue() );
+                wizard.getConfig().setHadoopNodes( ( Set<String> ) select.getValue() );
 
                 if ( Util.isStringEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );

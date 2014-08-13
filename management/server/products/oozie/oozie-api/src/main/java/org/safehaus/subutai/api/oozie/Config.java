@@ -1,11 +1,10 @@
 package org.safehaus.subutai.api.oozie;
 
-import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 /**
  * @author dilshat
@@ -15,9 +14,9 @@ public class Config implements ConfigBase {
     public static final String PRODUCT_KEY = "Oozie";
     String domainInfo;
     private UUID uuid;
-    private Agent server;
-    private Set<Agent> clients;
-    private Set<Agent> hadoopNodes;
+    private String server;
+    private Set<String> clients;
+    private Set<String> hadoopNodes;
     private String clusterName = "";
 
     public Config() {
@@ -46,19 +45,19 @@ public class Config implements ConfigBase {
         this.domainInfo = domainInfo;
     }
 
-    public Agent getServer() {
+    public String getServer() {
         return server;
     }
 
-    public void setServer(Agent server) {
+    public void setServer(String server) {
         this.server = server;
     }
 
-    public Set<Agent> getClients() {
+    public Set<String> getClients() {
         return clients;
     }
 
-    public void setClients(Set<Agent> clients) {
+    public void setClients(Set<String> clients) {
         this.clients = clients;
     }
 
@@ -75,11 +74,11 @@ public class Config implements ConfigBase {
         return PRODUCT_KEY;
     }
 
-    public Set<Agent> getHadoopNodes() {
+    public Set<String> getHadoopNodes() {
         return hadoopNodes;
     }
 
-    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+    public void setHadoopNodes(Set<String> hadoopNodes) {
         this.hadoopNodes = hadoopNodes;
     }
 
