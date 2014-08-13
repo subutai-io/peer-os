@@ -1,5 +1,6 @@
 package org.safehaus.subutai.api.hive;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
@@ -10,7 +11,7 @@ public class Config implements ConfigBase {
     private String clusterName = "";
     private String hadoopClusterName = "";
     private Agent server;
-    private Set<Agent> clients;
+    private Set<Agent> clients = new HashSet();
 
     @Override
     public String getClusterName() {
