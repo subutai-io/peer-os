@@ -76,22 +76,6 @@ public class HBaseImpl implements HBase {
         final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY, "Installing HBase" );
 
         final Set<Agent> allNodes = getAllNodes( config );
-        //                new HashSet<Agent>();
-        //
-        //        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
-        //        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
-        //
-        //        for ( UUID uuid : config.getRegion() )
-        //        {
-        //            allNodes.add( agentManager.getAgentByUUID( uuid ) );
-        //        }
-        //
-        //        for ( UUID uuid : config.getQuorum() )
-        //        {
-        //            allNodes.add( agentManager.getAgentByUUID( uuid ) );
-        //        }
-
-        //        allNodes.addAll( config.getQuorum() );
 
         executor.execute( new Runnable() {
 
@@ -107,8 +91,8 @@ public class HBaseImpl implements HBase {
 
                     po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
 
-                    // Installing HBase
-                    po.addLog( "Installing Dialog..." );
+                    // Installing Dialog
+                    /*po.addLog( "Installing Dialog..." );
                     Command installDialogCommand = Commands.getInstallDialogCommand( allNodes );
                     commandRunner.runCommand( installDialogCommand );
 
@@ -119,10 +103,13 @@ public class HBaseImpl implements HBase {
                         po.addLogFailed(
                                 String.format( "Installation failed, %s", installDialogCommand.getAllErrors() ) );
                         return;
-                    }
+                    }*/
 
                     // Installing HBase
-                    po.addLog( "Installing HBase..." );
+                    po.addLog( "Installing HBase on ..." );
+                    for(Agent agent : allNodes) {
+                        po.addLog( agent.getHostname() );
+                    }
                     Command installCommand = Commands.getInstallCommand( allNodes );
                     commandRunner.runCommand( installCommand );
 

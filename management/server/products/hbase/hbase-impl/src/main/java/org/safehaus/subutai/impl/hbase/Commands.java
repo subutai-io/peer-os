@@ -23,7 +23,7 @@ public class Commands extends CommandsSingleton {
     public static Command getInstallDialogCommand( Set<Agent> agents ) {
 
         return createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 180 )
+                new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 360 )
                                                                                            .withStdOutRedirection(
                                                                                                    OutputRedirection
                                                                                                            .NO ),
@@ -34,7 +34,7 @@ public class Commands extends CommandsSingleton {
     public static Command getInstallCommand( Set<Agent> agents ) {
 
         return createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 180 )
+                new RequestBuilder( "apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 360 )
                                                                                            .withStdOutRedirection(
                                                                                                    OutputRedirection
                                                                                                            .NO ),
@@ -45,7 +45,7 @@ public class Commands extends CommandsSingleton {
     public static Command getUninstallCommand( Set<Agent> agents ) {
 
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-hbase" ).withTimeout( 180 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-hbase" ).withTimeout( 360 )
                                                                                          .withStdOutRedirection(
                                                                                                  OutputRedirection.NO ),
                 agents );
