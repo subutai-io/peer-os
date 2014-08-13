@@ -286,7 +286,7 @@ public class TrackerForm extends CustomComponent {
 	private void setOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
 			outputTxtArea.setValue(output);
-			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+			outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
 		}
 	}
 
