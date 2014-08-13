@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.mongodb.Config;
@@ -20,10 +21,13 @@ import org.safehaus.subutai.impl.mongodb.common.CommandType;
 import org.safehaus.subutai.impl.mongodb.common.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -51,18 +55,22 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     @Override
     public void run() {
 
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) || Strings.isNullOrEmpty( config.getReplicaSetName() )
-                || Strings.isNullOrEmpty( config.getDomainName() ) || config.getNumberOfConfigServers() <= 0
-                || config.getNumberOfRouters() <= 0 || config.getNumberOfDataNodes() <= 0 || config.getCfgSrvPort() <= 0
-                || config.getDataNodePort() <= 0 || config.getRouterPort() <= 0 ) {
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
+                Strings.isNullOrEmpty( config.getDomainName() ) ||
+                Strings.isNullOrEmpty( config.getReplicaSetName() ) ||
+                !Sets.newHashSet( 1, 3 ).contains( config.getNumberOfConfigServers() ) ||
+                !Range.closed( 1, 3 ).contains( config.getNumberOfRouters() ) ||
+                !Sets.newHashSet( 3, 5, 7 ).contains( config.getNumberOfDataNodes() ) ||
+                !Range.closed( 1024, 65535 ).contains( config.getCfgSrvPort() ) ||
+                !Range.closed( 1024, 65535 ).contains( config.getRouterPort() ) ||
+                !Range.closed( 1024, 65535 ).contains( config.getDataNodePort() ) ) {
             po.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
 
         //check if mongo cluster with the same name already exists
         if ( manager.getCluster( config.getClusterName() ) != null ) {
-            po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                    config.getClusterName() ) );
+            po.addLogFailed( String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
             return;
         }
 
@@ -71,30 +79,56 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
                     config.getNumberOfConfigServers() + config.getNumberOfRouters() + config.getNumberOfDataNodes();
             //clone lxc containers
             po.addLog( String.format( "Creating %d lxc containers...", numberOfLxcsNeeded ) );
+
+            //            Map<Agent, Set<Agent>> agents = manager.getLxcManager().createLxcs( numberOfLxcsNeeded );
+            //
+            //            Set<Agent> allAgents = new HashSet<>();
+            //            for ( Set<Agent> ag : agents.values() ) {
+            //                allAgents.addAll( ag );
+            //            }
+            //            Iterator<Agent> it = allAgents.iterator();
+            //            for ( int i = 0; i < config.getNumberOfConfigServers(); i++ ) {
+            //                config.getConfigServers().add( it.next() );
+            //            }
+            //            for ( int i = 0; i < config.getNumberOfRouters(); i++ ) {
+            //                config.getRouterServers().add( it.next() );
+            //            }
+            //            for ( int i = 0; i < config.getNumberOfDataNodes(); i++ ) {
+            //                config.getDataNodes().add( it.next() );
+            //            }
+
             Map<NodeType, Set<Agent>> nodes = CustomPlacementStrategy
                     .getNodes( manager.getLxcManager(), config.getNumberOfConfigServers(), config.getNumberOfRouters(),
                             config.getNumberOfDataNodes() );
-
             config.setConfigServers( nodes.get( NodeType.CONFIG_NODE ) );
             config.setDataNodes( nodes.get( NodeType.DATA_NODE ) );
             config.setRouterServers( nodes.get( NodeType.ROUTER_NODE ) );
-            po.addLog( "Lxc containers created successfully\nUpdating db..." );
 
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                po.addLog( "Cluster info saved to DB\nInstalling Mongo..." );
-                installMongoCluster( config, po );
+
+            po.addLog( "Lxc containers created successfully" );
+
+            if ( installMongoCluster( config, po ) ) {
+                po.addLog( "Updating db..." );
+
+                try {
+                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                    po.addLogDone( "Database information updated" );
+                }
+                catch ( DBException e ) {
+                    po.addLogFailed( String.format( "Failed to update database information, %s", e.getMessage() ) );
+                }
             }
             else {
-                //destroy all lxcs also
+                po.addLogFailed( "Installation failed" );
+            }
+
+            if ( po.getState() != ProductOperationState.SUCCEEDED ) {
                 try {
                     manager.getLxcManager().destroyLxcs( config.getAllNodes() );
                 }
-                catch ( LxcDestroyException ex ) {
-                    po.addLogFailed( "Could not save cluster info to DB! Please see logs. Use LXC module to "
-                                    + "cleanup\nInstallation aborted"
-                                   );
+                catch ( LxcDestroyException ignore ) {
                 }
-                po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
             }
         }
         catch ( LxcCreateException ex ) {
@@ -103,7 +137,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
     }
 
 
-    private void installMongoCluster( final Config config, final ProductOperation po ) {
+    private boolean installMongoCluster( final Config config, final ProductOperation po ) {
 
         List<Command> installationCommands = Commands.getInstallationCommands( config );
 
@@ -161,11 +195,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
             }
         }
 
-        if ( installationOK ) {
-            po.addLogDone( "Installation succeeded" );
-        }
-        else {
-            po.addLogFailed( "Installation failed" );
-        }
+        return installationOK;
     }
 }

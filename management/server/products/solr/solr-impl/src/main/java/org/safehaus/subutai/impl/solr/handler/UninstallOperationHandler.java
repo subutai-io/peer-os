@@ -1,6 +1,7 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.impl.solr.SolrImpl;
@@ -38,11 +39,13 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
 
         productOperation.addLog( "Updating db..." );
 
-        if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
-            productOperation.addLogDone( "Installation info deleted from DB\nDone" );
+        try {
+            manager.getDbManager().deleteInfo2( Config.PRODUCT_KEY, config.getClusterName() );
+            productOperation.addLogDone( "Information updated in database" );
         }
-        else {
-            productOperation.addLogFailed( "Error while deleting installation info from DB. Check logs.\nFailed" );
+        catch ( DBException e ) {
+            productOperation
+                    .addLogFailed( String.format( "Failed to update information in database, %s", e.getMessage() ) );
         }
     }
 }

@@ -23,8 +23,7 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson =
-            new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Accumulo accumuloManager;
     private AgentManager agentManager;
 
@@ -67,6 +66,12 @@ public class RestServiceImpl implements RestService {
     @Override
     public String startCluster( final String clusterName ) {
         return wrapUUID( accumuloManager.startCluster( clusterName ) );
+    }
+
+
+    @Override
+    public String checkNode( final String clusterName, final String lxchostname ) {
+        return wrapUUID( accumuloManager.checkNode( clusterName, lxchostname ) );
     }
 
 
