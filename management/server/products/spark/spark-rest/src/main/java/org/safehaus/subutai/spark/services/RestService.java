@@ -108,23 +108,23 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("start_node/{clusterName}/{lxcHostName}")
+	@Path ("start_node/{clusterName}/{lxcHostName}/{master}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String startNode(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("lxcHostName") String lxcHostName,
-			@PathParam ("keepSlave") boolean keepSlave) {
-		return JsonUtil.toJson(OPERATION_ID, sparkManager.startNode(clusterName, lxcHostName, keepSlave));
+			@PathParam ("master") boolean master) {
+		return JsonUtil.toJson(OPERATION_ID, sparkManager.startNode(clusterName, lxcHostName, master));
 	}
 
 	@GET
-	@Path ("stop_node/{clusterName}/{lxcHostName}")
+	@Path ("stop_node/{clusterName}/{lxcHostName}/{master}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String stopNode(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("lxcHostName") String lxcHostName,
-			@PathParam ("keepSlave") boolean keepSlave) {
-		return JsonUtil.toJson(OPERATION_ID, sparkManager.stopNode(clusterName, lxcHostName, keepSlave));
+			@PathParam ("master") boolean master) {
+		return JsonUtil.toJson(OPERATION_ID, sparkManager.stopNode(clusterName, lxcHostName, master));
 	}
 
 	@GET
