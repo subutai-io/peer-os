@@ -141,7 +141,7 @@ public class LxcManagerImpl implements LxcManager {
                         for ( String metric : metrics ) {
                             line++;
                             if ( line == 1 ) {
-                                //   -/+ buffers/cache:       1829       5810
+                                //-/+ buffers/cache:       1829       5810
                                 String[] ramMetric = metric.split( "\\s+" );
                                 String freeRamMbStr = ramMetric[ramMetric.length - 1];
                                 if ( Util.isNumeric( freeRamMbStr ) ) {
@@ -152,7 +152,7 @@ public class LxcManagerImpl implements LxcManager {
                                 }
                             }
                             else if ( line == 2 ) {
-                                //   /dev/sda1       449G  3.8G  422G   1% /
+                                //lxc-data       143264768 608768 142656000   1% /lxc-data
                                 String[] hddMetric = metric.split( "\\s+" );
                                 if ( hddMetric.length == 6 ) {
                                     String hddMetricKbStr = hddMetric[3];
@@ -168,7 +168,7 @@ public class LxcManagerImpl implements LxcManager {
                                 }
                             }
                             else if ( line == 3 ) {
-                                //    15:10:33 up 18:51,  0 users,  load average: 0.03, 0.08, 0.06
+                                // 09:17:38 up 4 days, 23:06,  0 users,  load average: 2.18, 3.06, 2.12
 
                                 Matcher m = p.matcher( metric );
                                 if ( m.find() ) {

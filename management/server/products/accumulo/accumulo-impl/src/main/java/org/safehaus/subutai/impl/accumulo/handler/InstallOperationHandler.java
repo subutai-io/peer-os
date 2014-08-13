@@ -48,6 +48,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
+        if ( config.getMasterNode().equals( config.getGcNode() ) ) {
+            po.addLogFailed( "Master and CG can not be the same node" );
+            return;
+        }
+
         if ( manager.getCluster( config.getClusterName() ) != null ) {
             po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                     config.getClusterName() ) );
@@ -191,7 +196,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                                         }
                                         catch ( DBException e ) {
                                             po.addLogFailed( String.format( "Failed to update database information, %s",
-                                                            e.getMessage() ) );
+                                                    e.getMessage() ) );
                                         }
                                     }
                                     else {

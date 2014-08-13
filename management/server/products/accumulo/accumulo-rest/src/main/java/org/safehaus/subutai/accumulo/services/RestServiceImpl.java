@@ -70,6 +70,12 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public String checkNode( final String clusterName, final String lxchostname ) {
+        return wrapUUID( accumuloManager.checkNode( clusterName, lxchostname ) );
+    }
+
+
+    @Override
     public String stopCluster( final String clusterName ) {
         return wrapUUID( accumuloManager.stopCluster( clusterName ) );
     }
