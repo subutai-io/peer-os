@@ -665,7 +665,7 @@ public class LxcManagerImpl implements LxcManager {
                     completer.submit( new LxcActor( lxcInfo, this, LxcAction.CREATE ) );
 
                     try {
-                        Thread.sleep( 30 * 1000 );
+                        Thread.sleep( 60 * 1000 );
                     }
                     catch ( InterruptedException ignore ) {
                     }
@@ -741,7 +741,8 @@ public class LxcManagerImpl implements LxcManager {
                 break;
             }
             else {
-                if ( System.currentTimeMillis() - waitStart > Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) {
+                if ( System.currentTimeMillis() - waitStart > Math
+                        .max( count * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) {
                     break;
                 }
                 else {
