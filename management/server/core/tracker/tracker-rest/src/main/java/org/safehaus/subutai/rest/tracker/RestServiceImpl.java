@@ -49,9 +49,9 @@ public class RestServiceImpl implements RestService {
     public String getProductOperations( final String source, final String fromDate, final String toDate,
                                         final int limit ) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
-            Date fromDat = sdf.parse( fromDate );
-            Date toDat = sdf.parse( toDate );
+            SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+            Date fromDat = df.parse( fromDate + " 00:00:00" );
+            Date toDat = df.parse( toDate + " 23:59:59" );
 
             List<ProductOperationView> pos = tracker.getProductOperations( source, fromDat, toDat, limit );
 

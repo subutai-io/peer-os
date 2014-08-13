@@ -1,5 +1,11 @@
 package org.safehaus.subutai.impl.hadoop.operation;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
@@ -7,8 +13,6 @@ import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 class CustomPlacementStrategy extends LxcPlacementStrategy {
 
@@ -154,16 +158,16 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 	public void setCriteria(String type) {
 		switch (type) {
 			case MASTER_NODE_TYPE:
-				hddPerNodeMb = GB2MB(10);
-				hddReservedMb = GB2MB(20);
+				hddPerNodeMb = GB2MB(2);
+				hddReservedMb = GB2MB(4);
 				ramPerNodeMb = GB2MB(1);
-				ramReservedMb = GB2MB(2);
+				ramReservedMb = GB2MB(1);
 				cpuPerNodePercentage = 10;
 				cpuReservedPercentage = 20;
 				break;
 			case SLAVE_NODE_TYPE:
-				hddPerNodeMb = GB2MB(10);
-				hddReservedMb = GB2MB(20);
+				hddPerNodeMb = GB2MB(2);
+				hddReservedMb = GB2MB(4);
 				ramPerNodeMb = GB2MB(1);
 				ramReservedMb = GB2MB(1);
 				cpuPerNodePercentage = 5;
