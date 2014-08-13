@@ -54,7 +54,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("install/{clusterName}")
+	@Path ("install")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String installCluster(@QueryParam ("config") String config) {
 		TrimmedPrestoConfig trimmedPrestoConfig = JsonUtil.GSON.fromJson(config, TrimmedPrestoConfig.class);
