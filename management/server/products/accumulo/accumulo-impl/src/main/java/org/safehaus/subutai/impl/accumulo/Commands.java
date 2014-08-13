@@ -23,7 +23,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "sleep 20 ; apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 120 )
+                new RequestBuilder( "sleep 20 ; apt-get --force-yes --assume-yes install ksks-accumulo" ).withTimeout( 180 )
                                                                                               .withStdOutRedirection(
                                                                                                       OutputRedirection.NO ),
                 agents
@@ -33,7 +33,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getUninstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 60 ), agents
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-accumulo" ).withTimeout( 120 ), agents
                             );
     }
 
@@ -44,7 +44,7 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStartCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( "/etc/init.d/accumulo start" ).withTimeout( 60 ),
+        return createCommand( new RequestBuilder( "/etc/init.d/accumulo start" ).withTimeout( 90 ),
                 Util.wrapAgentToSet( agent ) );
     }
 

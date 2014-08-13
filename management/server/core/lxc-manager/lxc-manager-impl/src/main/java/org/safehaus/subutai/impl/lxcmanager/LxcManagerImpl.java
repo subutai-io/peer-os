@@ -36,16 +36,12 @@ import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
 public class LxcManagerImpl implements LxcManager {
-
-    private static Logger LOG = LoggerFactory.getLogger( LxcManagerImpl.class );
 
     private final Pattern p = Pattern.compile( "load average: (.*)" );
     private final long WAIT_BEFORE_CHECK_STATUS_TIMEOUT = 10000;
@@ -353,7 +349,7 @@ public class LxcManagerImpl implements LxcManager {
             try {
                 Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
             }
-            catch ( InterruptedException e ) {
+            catch ( InterruptedException ignore ) {
             }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
@@ -387,7 +383,7 @@ public class LxcManagerImpl implements LxcManager {
             try {
                 Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT );
             }
-            catch ( InterruptedException e ) {
+            catch ( InterruptedException ignore ) {
             }
             Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
             commandRunner.runCommand( lxcInfoCommand );
@@ -517,7 +513,7 @@ public class LxcManagerImpl implements LxcManager {
                     future.get();
                 }
             }
-            catch ( InterruptedException | ExecutionException e ) {
+            catch ( InterruptedException | ExecutionException ignore ) {
             }
 
             boolean result = true;
@@ -645,10 +641,9 @@ public class LxcManagerImpl implements LxcManager {
             throw new LxcCreateException( "LXC placement nodes are empty" );
         }
 
-        //create lxcs here
+        //create containers
         CompletionService<LxcInfo> completer = new ExecutorCompletionService<>( executor );
         Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
-        int count = 0;
         List<LxcInfo> lxcInfos = new ArrayList<>();
         for ( Map.Entry<Agent, Map<String, Integer>> placementEntry : placementNodes.entrySet() ) {
             Agent physicalNode = placementEntry.getKey();
@@ -656,31 +651,24 @@ public class LxcManagerImpl implements LxcManager {
                 String nodeType = lxcEntry.getKey();
                 Integer numOfLxcs = lxcEntry.getValue();
 
-                //create lxc containers
+
                 for ( int i = 0; i < numOfLxcs; i++ ) {
-                    count++;
 
                     LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType );
                     lxcInfos.add( lxcInfo );
-                    completer.submit( new LxcActor( lxcInfo, this, LxcAction.CREATE ) );
-
-                    try {
-                        Thread.sleep( 60 * 1000 );
-                    }
-                    catch ( InterruptedException ignore ) {
-                    }
+                    completer.submit( new LxcActor( lxcInfo, this, LxcAction.CLONE ) );
                 }
             }
         }
 
         //wait for completion
         try {
-            for ( int i = 0; i < count; i++ ) {
+            for ( LxcInfo ignore : lxcInfos ) {
                 Future<LxcInfo> future = completer.take();
                 future.get();
             }
         }
-        catch ( InterruptedException | ExecutionException e ) {
+        catch ( InterruptedException | ExecutionException ignore ) {
         }
 
         boolean result = true;
@@ -710,47 +698,71 @@ public class LxcManagerImpl implements LxcManager {
             throw new LxcCreateException( "Not all lxcs created successfully" );
         }
 
-        //wait for lxc agents to connect
-        long waitStart = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
-            result = true;
-            for ( LxcInfo lxcInfo : lxcInfos ) {
-                Agent lxcAgent = agentManager.getAgentByHostname( lxcInfo.getLxcHostname() );
-                if ( lxcAgent == null ) {
-                    result = false;
-                    break;
-                }
-                else {
-                    //populate families
 
-                    Map<Agent, Set<Agent>> family = families.get( lxcInfo.getNodeType() );
-                    if ( family == null ) {
-                        family = new HashMap<>();
-                        families.put( lxcInfo.getNodeType(), family );
-                    }
-                    Set<Agent> childs = family.get( lxcInfo.getPhysicalAgent() );
-                    if ( childs == null ) {
-                        childs = new HashSet<>();
-                        family.put( lxcInfo.getPhysicalAgent(), childs );
-                    }
+        //start containers
+        for ( LxcInfo lxcInfo : lxcInfos ) {
+            lxcInfo.setResult( false );
+            completer.submit( new LxcActor( lxcInfo, this, LxcAction.START ) );
+        }
 
-                    childs.add( lxcAgent );
-                }
+        //wait for completion
+        try {
+            for ( LxcInfo ignore : lxcInfos ) {
+                Future<LxcInfo> future = completer.take();
+                future.get();
             }
-            if ( result ) {
-                break;
-            }
-            else {
-                if ( System.currentTimeMillis() - waitStart > Math
-                        .max( count * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) {
-                    break;
-                }
-                else {
-                    try {
-                        Thread.sleep( 1000 );
-                    }
-                    catch ( InterruptedException ex ) {
+        }
+        catch ( InterruptedException | ExecutionException ignore ) {
+        }
+
+        for ( LxcInfo lxcInfo : lxcInfos ) {
+            result &= lxcInfo.isResult();
+        }
+
+        if ( result ) {
+
+            //wait for lxc agents to connect
+            long waitStart = System.currentTimeMillis();
+            while ( !Thread.interrupted() ) {
+                result = true;
+                for ( LxcInfo lxcInfo : lxcInfos ) {
+                    Agent lxcAgent = agentManager.getAgentByHostname( lxcInfo.getLxcHostname() );
+                    if ( lxcAgent == null ) {
+                        result = false;
                         break;
+                    }
+                    else {
+                        //populate families
+
+                        Map<Agent, Set<Agent>> family = families.get( lxcInfo.getNodeType() );
+                        if ( family == null ) {
+                            family = new HashMap<>();
+                            families.put( lxcInfo.getNodeType(), family );
+                        }
+                        Set<Agent> childs = family.get( lxcInfo.getPhysicalAgent() );
+                        if ( childs == null ) {
+                            childs = new HashSet<>();
+                            family.put( lxcInfo.getPhysicalAgent(), childs );
+                        }
+
+                        childs.add( lxcAgent );
+                    }
+                }
+                if ( result ) {
+                    break;
+                }
+                else {
+                    if ( System.currentTimeMillis() - waitStart > Math
+                            .max( lxcInfos.size() * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) {
+                        break;
+                    }
+                    else {
+                        try {
+                            Thread.sleep( 1000 );
+                        }
+                        catch ( InterruptedException ex ) {
+                            break;
+                        }
                     }
                 }
             }
