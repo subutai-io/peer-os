@@ -93,7 +93,7 @@ public class OozieImpl implements Oozie {
                         Agent client = agentManager.getAgentByHostname( clientAgent );
                         clientAgents.add( client );
                     }
-                    Command installClientsCommand = Commands.getInstallServerCommand(clientAgents);
+                    Command installClientsCommand = Commands.getInstallClientCommand(clientAgents);
                     commandRunner.runCommand(installClientsCommand);
 
                     if (installClientsCommand.hasSucceeded()) {
