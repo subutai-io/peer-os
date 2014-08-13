@@ -1,16 +1,20 @@
 package org.safehaus.subutai.accumulo.services;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.api.accumulo.Accumulo;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-import javax.ws.rs.GET;
-import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -47,7 +51,6 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    @GET
     @Override
     public String getCluster( final String source ) {
         return gson.toJson( accumuloManager.getCluster( source ) );
