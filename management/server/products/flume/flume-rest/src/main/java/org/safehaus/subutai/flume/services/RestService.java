@@ -31,10 +31,6 @@ public class RestService {
         this.agentManager = agentManager;
     }
 
-    public Flume getFlumeManager() {
-        return flumeManager;
-    }
-
 
     public void setFlumeManager( Flume flumeManager ) {
         this.flumeManager = flumeManager;
