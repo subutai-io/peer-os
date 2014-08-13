@@ -47,7 +47,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("get_cluster")
+	@Path ("get_cluster/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getCluster(
 			@PathParam ("clusterName") String clusterName
@@ -56,7 +56,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("install_cluster")
+	@Path ("install_cluster/{clusterName}/{numberOfSlaveNodes}/{numberOfReplicas}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String installCluster(
 			@PathParam ("clusterName") String clusterName,
@@ -75,7 +75,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("uninstall_cluster")
+	@Path ("uninstall_cluster/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String uninstallCluster(
 			@PathParam ("clusterName") String clusterName
@@ -87,7 +87,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("start_name_node")
+	@Path ("start_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String startNameNode(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -95,7 +95,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("stop_name_node")
+	@Path ("stop_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String stopNameNode(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -103,7 +103,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("restart_name_node")
+	@Path ("restart_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String restartNameNode(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -111,7 +111,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("status_name_node")
+	@Path ("status_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusNameNode(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -119,7 +119,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("status_secondary_name_node")
+	@Path ("status_secondary_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusSecondaryNameNode(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -127,7 +127,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("status_data_node")
+	@Path ("status_data_node/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusDataNode(@PathParam ("hostname") String hostname) {
 		Agent agent = agentManager.getAgentByHostname(hostname);
@@ -135,7 +135,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("start_job_tracker")
+	@Path ("start_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String startJobTracker(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -143,7 +143,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("stop_job_tracker")
+	@Path ("stop_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String stopJobTracker(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -151,7 +151,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("restart_job_tracker")
+	@Path ("restart_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String restartJobTracker(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -159,7 +159,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("status_job_tracker")
+	@Path ("status_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusJobTracker(@PathParam ("clusterName") String clusterName) {
 		Config config = hadoopManager.getCluster(clusterName);
@@ -175,14 +175,14 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("add_node")
+	@Path ("add_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String addNode(@PathParam ("clusterName") String clusterName) {
 		return JsonUtil.toJson(OPERATION_ID, hadoopManager.addNode(clusterName));
 	}
 
 	@GET
-	@Path ("block_data_node")
+	@Path ("block_data_node/{clusterName}/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String blockDataNode(
 			@PathParam ("clusterName") String clusterName,
@@ -194,7 +194,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("block_task_tracker")
+	@Path ("block_task_tracker/{clusterName}/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String blockTaskTracker(
 			@PathParam ("clusterName") String clusterName,
@@ -206,7 +206,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("unblock_data_node")
+	@Path ("unblock_data_node/{clusterName}/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String unblockDataNode(
 			@PathParam ("clusterName") String clusterName,
@@ -218,7 +218,7 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("unblock_task_tracker")
+	@Path ("unblock_task_tracker/{clusterName}/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String unblockTaskTracker(
 			@PathParam ("clusterName") String clusterName,
