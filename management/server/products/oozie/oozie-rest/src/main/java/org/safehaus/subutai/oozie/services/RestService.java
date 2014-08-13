@@ -9,7 +9,10 @@ public interface RestService {
 
     @GET
     @Path("install/{clusterName}")
-    public String installCluster(@PathParam("clusterName") String clusterName);
+    public String installCluster(@PathParam("clusterName") String clusterName,
+                                       @PathParam("domainName") String domainInfo,
+                                       @PathParam( "serverHostname" ) String serverHostname,
+                                       @PathParam( "clientHostnames" )String... clientsHostnames);
 
     @GET
     @Path("uninstall/{clusterName}") //Maps for the `hello/John` in the URL
