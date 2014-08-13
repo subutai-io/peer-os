@@ -224,16 +224,16 @@ public class Manager {
 		Notification.show(notification);
 	}
 
-	private void populateMasterTable(final Table table, Set<UUID> agents, final HBaseType type) {
+	private void populateMasterTable(final Table table, Set<String> agents, final HBaseType type) {
 
 		table.removeAllItems();
 
-		for (final UUID uuid : agents) {
+		for (final String hostname : agents) {
 			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
 			progressIcon.setVisible(false);
 
 			final Object rowId = table.addItem(new Object[] {
-							HBaseUI.getAgentManager().getAgentByUUID(uuid).getHostname(),
+							HBaseUI.getAgentManager().getAgentByHostname(hostname).getHostname(),
 							type,
 							progressIcon},
 					null
@@ -241,16 +241,16 @@ public class Manager {
 		}
 	}
 
-	private void populateTable(final Table table, Set<UUID> agents, final HBaseType type) {
+	private void populateTable(final Table table, Set<String> agents, final HBaseType type) {
 
 		table.removeAllItems();
 
-		for (final UUID uuid : agents) {
+		for (final String hostname : agents) {
 			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
 			progressIcon.setVisible(false);
 
 			final Object rowId = table.addItem(new Object[] {
-							HBaseUI.getAgentManager().getAgentByUUID(uuid).getHostname(),
+							HBaseUI.getAgentManager().getAgentByHostname( hostname ).getHostname(),
 							type,
 							progressIcon},
 					null
@@ -263,11 +263,11 @@ public class Manager {
 			populateTable(quorumTable, config.getQuorum(), HBaseType.HQuorumPeer);
 			populateTable(regionTable, config.getRegion(), HBaseType.HRegionServer);
 
-			Set<UUID> masterSet = new HashSet<>();
+			Set<String> masterSet = new HashSet<>();
 			masterSet.add(config.getMaster());
 			populateMasterTable(masterTable, masterSet, HBaseType.HMaster);
 
-			Set<UUID> bmasterSet = new HashSet<>();
+			Set<String> bmasterSet = new HashSet<>();
 			bmasterSet.add(config.getBackupMasters());
 			populateTable(bmasterTable, bmasterSet, HBaseType.BackupMaster);
 

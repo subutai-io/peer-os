@@ -1,24 +1,24 @@
 package org.safehaus.subutai.impl.hbase;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.api.hbase.HBaseConfig;
-import org.safehaus.subutai.api.hbase.HBase;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.shared.protocol.Agent;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.api.hbase.HBase;
+import org.safehaus.subutai.api.hbase.HBaseConfig;
+import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class HBaseImpl implements HBase
@@ -140,8 +140,8 @@ public class HBaseImpl implements HBase
                     // Configuring master
                     Command configureMasterCommand = Commands
                         .getConfigMasterTask( allNodes,
-                            agentManager.getAgentByUUID( config.getHadoopNameNode() ).getHostname(),
-                            agentManager.getAgentByUUID( config.getMaster() ).getHostname() );
+                            agentManager.getAgentByHostname( config.getHadoopNameNode() ).getHostname(),
+                            agentManager.getAgentByHostname( config.getMaster() ).getHostname() );
                     commandRunner.runCommand( configureMasterCommand );
 
                     if ( configureMasterCommand.hasSucceeded() )
@@ -157,9 +157,9 @@ public class HBaseImpl implements HBase
 
                     // Configuring region
                     StringBuilder sbRegion = new StringBuilder();
-                    for ( UUID uuid : config.getRegion() )
+                    for ( String hostname : config.getRegion() )
                     {
-                        Agent agent = agentManager.getAgentByUUID( uuid );
+                        Agent agent = agentManager.getAgentByHostname( hostname );
                         sbRegion.append( agent.getHostname() );
                         sbRegion.append( " " );
                     }
@@ -181,9 +181,9 @@ public class HBaseImpl implements HBase
 
                     // Configuring quorum
                     StringBuilder sbQuorum = new StringBuilder();
-                    for ( UUID uuid : config.getQuorum() )
+                    for ( String hostname : config.getQuorum() )
                     {
-                        Agent agent = agentManager.getAgentByUUID( uuid );
+                        Agent agent = agentManager.getAgentByHostname( hostname );
                         sbQuorum.append( agent.getHostname() );
                         sbQuorum.append( " " );
                     }
@@ -206,7 +206,7 @@ public class HBaseImpl implements HBase
                     // Configuring backup master
                     Command configureBackupMasterCommand = Commands
                         .getConfigBackupMastersCommand( allNodes,
-                            agentManager.getAgentByUUID( config.getBackupMasters() ).getHostname() );
+                            agentManager.getAgentByHostname( config.getBackupMasters() ).getHostname() );
                     commandRunner.runCommand( configureBackupMasterCommand );
 
                     if ( configureBackupMasterCommand.hasSucceeded() )
@@ -445,17 +445,17 @@ public class HBaseImpl implements HBase
     {
         final Set<Agent> allNodes = new HashSet<Agent>();
 
-        allNodes.add( agentManager.getAgentByUUID( config.getMaster() ) );
-        allNodes.add( agentManager.getAgentByUUID( config.getBackupMasters() ) );
+        allNodes.add( agentManager.getAgentByHostname( config.getMaster() ) );
+        allNodes.add( agentManager.getAgentByHostname( config.getBackupMasters() ) );
 
-        for ( UUID uuid : config.getRegion() )
+        for ( String hostname : config.getRegion() )
         {
-            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+            allNodes.add( agentManager.getAgentByHostname( hostname ) );
         }
 
-        for ( UUID uuid : config.getQuorum() )
+        for ( String hostname : config.getQuorum() )
         {
-            allNodes.add( agentManager.getAgentByUUID( uuid ) );
+            allNodes.add( agentManager.getAgentByHostname( hostname ) );
         }
 
         return allNodes;
