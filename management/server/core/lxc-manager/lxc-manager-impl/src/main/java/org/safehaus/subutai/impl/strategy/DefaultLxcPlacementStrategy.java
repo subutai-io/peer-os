@@ -57,11 +57,11 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
                 LOG.log( Level.WARNING, metric.toString() );
                 int numOfLxcByRam = ( int ) ( ( metric.getFreeRamMb() - MIN_RAM_IN_RESERVE_MB ) / MIN_RAM_LXC_MB );
                 int numOfLxcByHdd = ( int ) ( ( metric.getFreeHddMb() - MIN_HDD_IN_RESERVE_MB ) / MIN_HDD_LXC_MB );
-                LOG.log( Level.WARNING, numOfLxcByRam + " | " + numOfLxcByHdd );
-                //                int numOfLxcByCpu = ( int ) (
-                //                        ( ( 100 - metric.getCpuLoadPercent() ) - ( MIN_CPU_IN_RESERVE_PERCENT / metric
-                //                                .getNumOfProcessors() ) ) / ( MIN_CPU_LXC_PERCENT / metric
-                // .getNumOfProcessors() ) );
+                int numOfLxcByCpu = ( int ) (
+                        ( ( 100 - metric.getCpuLoadPercent() ) - ( MIN_CPU_IN_RESERVE_PERCENT / metric
+                                .getNumOfProcessors() ) ) / ( MIN_CPU_LXC_PERCENT / metric.getNumOfProcessors() ) );
+                LOG.log( Level.WARNING, numOfLxcByRam + " | " + numOfLxcByHdd + " | " + numOfLxcByCpu );
+
                 //                if ( numOfLxcByCpu > 0 && numOfLxcByHdd > 0 && numOfLxcByRam > 0 ) {
                 //                    int minNumOfLxcs = Math.min( Math.min( numOfLxcByCpu, numOfLxcByHdd ),
                 // numOfLxcByRam );
