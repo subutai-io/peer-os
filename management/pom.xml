@@ -1434,6 +1434,28 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Storm -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Products Modules - END -->
 
       <!--karaf-->

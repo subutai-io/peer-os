@@ -10,14 +10,14 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
-  <reference id="hiveManager" availability="mandatory" interface="org.safehaus.subutai.api.hive.Hive" />
+  <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.api.storm.Storm" />
 
-  <bean id="restService" class="org.safehaus.subutai.hive.services.RestService">
+  <bean id="restService" class="org.safehaus.subutai.storm.services.RestService">
     <property name="agentManager" ref="agentManager" />
-    <property name="hiveManager" ref="hiveManager" />
+    <property name="stormManager" ref="stormManager" />
   </bean>
 
-  <jaxrs:server address="/hive" id="hiveRestService">
+  <jaxrs:server address="/storm" id="stormRestService">
     <jaxrs:serviceBeans>
       <ref component-id="restService" />
     </jaxrs:serviceBeans>

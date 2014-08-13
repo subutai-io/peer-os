@@ -1,4 +1,4 @@
-package org.safehaus.subutai.hive.services;
+package org.safehaus.subutai.storm.services;
 
 
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.hive.Config;
-import org.safehaus.subutai.api.hive.Hive;
+import org.safehaus.subutai.api.storm.Config;
+import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -24,7 +24,7 @@ public class RestService {
 
     private static final String OPERATION_ID = "OPERATION_ID";
 
-    private Hive hiveManager;
+    private Storm stormManager;
 
     private AgentManager agentManager;
 
@@ -34,8 +34,8 @@ public class RestService {
     }
 
 
-    public void setHiveManager( Hive hiveManager ) {
-        this.hiveManager = hiveManager;
+    public void setStormManager( Storm stormManager ) {
+        this.stormManager = stormManager;
     }
 
 
@@ -44,7 +44,7 @@ public class RestService {
     @Produces( { MediaType.APPLICATION_JSON } )
     public String getClusters() {
 
-        List<Config> configs = hiveManager.getClusters();
+        List<Config> configs = stormManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
         for ( Config config : configs ) {
@@ -61,7 +61,7 @@ public class RestService {
     public String getCluster(
             @QueryParam( "clusterName" ) String clusterName
     ) {
-        Config config = hiveManager.getCluster( clusterName );
+        Config config = stormManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
     }
@@ -72,24 +72,28 @@ public class RestService {
     @Produces({ MediaType.APPLICATION_JSON })
     public String installCluster(
             @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
-            @QueryParam( "server" ) String server,
-            @QueryParam( "clients" ) List<String> clients
+            @QueryParam( "externalZookeeper" ) boolean externalZookeeper,
+            @QueryParam( "zookeeperClusterName" ) String zookeeperClusterName,
+            @QueryParam( "nimbus" ) String nimbus,
+            @QueryParam( "supervisors" ) List<String> supervisors
     ) {
 
         Config config = new Config();
         config.setClusterName( clusterName );
-        config.setClusterName( hadoopClusterName );
+        config.setExternalZookeeper( externalZookeeper );
+        config.setZookeeperClusterName( zookeeperClusterName );
 
-        Agent serverAgent = agentManager.getAgentByHostname( server );
-        config.setServer( serverAgent );
+        Agent nimbusAgent = agentManager.getAgentByHostname( nimbus );
+        config.setNimbus( nimbusAgent );
 
-        for ( String client : clients ) {
-            Agent agent = agentManager.getAgentByHostname( client );
-            config.getClients().add( agent );
+        config.setSupervisorsCount( supervisors.size() );
+
+        for ( String hostname : supervisors ) {
+            Agent agent = agentManager.getAgentByHostname( hostname );
+            config.getSupervisors().add( agent );
         }
 
-        UUID uuid = hiveManager.installCluster( config );
+        UUID uuid = stormManager.installCluster( config );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
@@ -101,7 +105,7 @@ public class RestService {
     public String uninstallCluster(
             @QueryParam( "clusterName" ) String clusterName
     ) {
-        UUID uuid = hiveManager.uninstallCluster( clusterName );
+        UUID uuid = stormManager.uninstallCluster( clusterName );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
@@ -114,7 +118,7 @@ public class RestService {
             @QueryParam( "clusterName" ) String clusterName,
             @QueryParam( "hostname" ) String hostname
     ) {
-        UUID uuid = hiveManager.addNode( clusterName, hostname );
+        UUID uuid = stormManager.addNode( clusterName, hostname );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
@@ -127,7 +131,7 @@ public class RestService {
             @QueryParam( "clusterName" ) String clusterName,
             @QueryParam( "hostname" ) String hostname
     ) {
-        UUID uuid = hiveManager.destroyNode( clusterName, hostname );
+        UUID uuid = stormManager.destroyNode( clusterName, hostname );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
