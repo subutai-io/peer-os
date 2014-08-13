@@ -1,9 +1,8 @@
 #!/bin/bash
 BASE="/etc/init.d/"
-#Edit localhost line
+#Remove 127.0.1.1 line
 file="/etc/hosts"
 sed -i '/127.0.1.1/d' $file
-echo "127.0.1.1 `hostname`" >> $file
 #Agent checks
 agentresult=$(dpkg --get-selections | grep ksks-agent)
 source /etc/profile
