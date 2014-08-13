@@ -1,5 +1,6 @@
 package org.safehaus.subutai.api.storm;
 
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
@@ -13,7 +14,7 @@ public class Config implements ConfigBase {
     private boolean externalZookeeper;
     private String zookeeperClusterName;
     private Agent nimbus; // master node
-    private Set<Agent> supervisors; // worker nodes
+    private Set<Agent> supervisors = new HashSet(); // worker nodes
 
     @Override
     public String getClusterName() {
