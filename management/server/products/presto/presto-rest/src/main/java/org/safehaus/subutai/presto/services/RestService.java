@@ -1,19 +1,110 @@
 package org.safehaus.subutai.presto.services;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.presto.Config;
+import org.safehaus.subutai.api.presto.Presto;
+import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.shared.protocol.Agent;
 
-@Path("presto")
-public interface RestService {
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import java.util.HashSet;
+import java.util.Set;
 
-    @GET
-    @Path("install/{clusterName}")
-    public String installCluster(@PathParam("clusterName") String clusterName);
+@Path ("presto")
+public class RestService {
 
-    @GET
-    @Path("uninstall/{clusterName}") //Maps for the `hello/John` in the URL
-    public String uninstallCluster(@PathParam("clusterName") String clusterName);
+	private static final String OPERATION_ID = "OPERATION_ID";
 
+	private Presto prestoManager;
+	private AgentManager agentManager;
 
+	public void setPrestoManager(Presto prestoManager) {
+		this.prestoManager = prestoManager;
+	}
+
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
+
+	@GET
+	@Path ("install/{clusterName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String installCluster(@QueryParam ("config") String config) {
+		TrimmedPrestoConfig trimmedPrestoConfig = JsonUtil.GSON.fromJson(config, TrimmedPrestoConfig.class);
+		Config expandedConfig = new Config();
+
+		expandedConfig.setClusterName(trimmedPrestoConfig.getClusterName());
+		expandedConfig.setCoordinatorNode(agentManager.getAgentByHostname(trimmedPrestoConfig.getCoordinatorHost()));
+		if (trimmedPrestoConfig.getWorkersHost() != null && !trimmedPrestoConfig.getWorkersHost().isEmpty()) {
+			Set<Agent> nodes = new HashSet<>();
+			for (String node : trimmedPrestoConfig.getWorkersHost()) {
+				nodes.add(agentManager.getAgentByHostname(node));
+			}
+			expandedConfig.setWorkers(nodes);
+		}
+
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.installCluster(expandedConfig));
+	}
+
+	@GET
+	@Path ("uninstall/{clusterName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String uninstallCluster(@PathParam ("clusterName") String clusterName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.uninstallCluster(clusterName));
+	}
+
+	@GET
+	@Path ("add_worker_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String addWorkerNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.addWorkerNode(clusterName, lxcHostName));
+	}
+
+	@GET
+	@Path ("destroy_worker_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String destroyWorkerNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.destroyWorkerNode(clusterName, lxcHostName));
+	}
+
+	@GET
+	@Path ("change_coordinator_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String changeCoordinatorNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.changeCoordinatorNode(clusterName, lxcHostName));
+	}
+
+	@GET
+	@Path ("start_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String startNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.startNode(clusterName, lxcHostName));
+	}
+
+	@GET
+	@Path ("stop_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String stopNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.stopNode(clusterName, lxcHostName));
+	}
+
+	@GET
+	@Path ("check_node/{clusterName}/{lxcHostName}")
+	@Produces ( {MediaType.APPLICATION_JSON})
+	public String checkNode(
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("lxcHostName") String lxcHostName) {
+		return JsonUtil.toJson(OPERATION_ID, prestoManager.checkNode(clusterName, lxcHostName));
+	}
 }
