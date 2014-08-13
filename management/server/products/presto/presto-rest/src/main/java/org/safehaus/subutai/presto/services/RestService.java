@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Path ("presto")
 public class RestService {
 
 	private static final String OPERATION_ID = "OPERATION_ID";
