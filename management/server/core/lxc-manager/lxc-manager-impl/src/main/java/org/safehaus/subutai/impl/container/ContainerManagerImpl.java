@@ -416,28 +416,30 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private Set<String> getContainerNames( Collection<Agent> hostsToCheck ) {
         Map<String, EnumMap<LxcState, List<String>>> map = lxcManager.getLxcOnPhysicalServers();
 
-        Iterator<String> it = map.keySet().iterator();
-        while ( it.hasNext() ) {
-            String hostname = it.next();
-            boolean hostIncluded = false;
-            for ( Agent agent : hostsToCheck ) {
-                if ( agent.getHostname().equalsIgnoreCase( hostname ) ) {
-                    hostIncluded = true;
-                    break;
+        if ( hostsToCheck != null && !hostsToCheck.isEmpty() ) {
+            Iterator<String> it = map.keySet().iterator();
+            while ( it.hasNext() ) {
+                String hostname = it.next();
+                boolean hostIncluded = false;
+                for ( Agent agent : hostsToCheck ) {
+                    if ( agent.getHostname().equalsIgnoreCase( hostname ) ) {
+                        hostIncluded = true;
+                        break;
+                    }
                 }
-            }
-            if ( !hostIncluded ) {
-                it.remove();
+                if ( !hostIncluded ) {
+                    it.remove();
+                }
             }
         }
 
-        Set<String> lxcHostnames = new HashSet<>();
+        Set<String> lxcHostNames = new HashSet<>();
         for ( EnumMap<LxcState, List<String>> lxcsOnOneHost : map.values() ) {
             for ( List<String> hosts : lxcsOnOneHost.values() ) {
-                lxcHostnames.addAll( hosts );
+                lxcHostNames.addAll( hosts );
             }
         }
-        return lxcHostnames;
+        return lxcHostNames;
     }
 
 

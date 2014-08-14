@@ -6,19 +6,25 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <cxf:bus id="cxfBus1">
+    <cxf:bus id="cxfBusHadoop">
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <jaxrs:server address="/hadoop" id="hadoopRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="hadoopRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <bean id="hadoopRestServiceImpl" class="org.safehaus.subutai.hadoop.services.RestServiceImpl">
-        <property name="hadoopManager" ref="hadoopManager"/>
-    </bean>
+
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+
+    <bean id="hadoopRestService" class="org.safehaus.subutai.hadoop.services.RestService">
+        <property name="agentManager" ref="agentManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
+    </bean>
+
+    <jaxrs:server address="/hadoop" id="hadoopRestServiceImpl">
+        <jaxrs:serviceBeans>
+            <ref component-id="hadoopRestService"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
 </blueprint>

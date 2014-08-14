@@ -1,11 +1,10 @@
 package org.safehaus.subutai.impl.sqoop.handler;
 
 import java.util.*;
-
-import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;
 import org.safehaus.subutai.impl.sqoop.CommandType;
 import org.safehaus.subutai.impl.sqoop.SqoopImpl;
@@ -28,9 +27,10 @@ public class InstallHandler extends AbstractHandler {
         this.config = config;
     }
 
+    @Override
     public void run() {
         if(getClusterConfig() != null) {
-            po.addLogFailed("Cluster already exists: " + config.getClusterName());
+            po.addLogFailed("Sqoop installation already exists: " + config.getClusterName());
             return;
         }
         if(checkNodes(config, true) == 0) {
@@ -44,7 +44,7 @@ public class InstallHandler extends AbstractHandler {
                 new RequestBuilder(s), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
-        Set<UUID> skipInstall = new HashSet<UUID>();
+        Set<UUID> skipInstall = new HashSet<>();
         if(cmd.hasCompleted()) {
             Iterator<Agent> it = config.getNodes().iterator();
             while(it.hasNext()) {
@@ -109,8 +109,8 @@ public class InstallHandler extends AbstractHandler {
     private boolean saveClusterInfo(Config config) {
         boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
                 config.getClusterName(), config);
-        if(saved) po.addLog("Cluster info successfully saved");
-        else po.addLog("Failed to save cluster info");
+        if(saved) po.addLog("Installation info successfully saved");
+        else po.addLog("Failed to save installation info");
         return saved;
     }
 

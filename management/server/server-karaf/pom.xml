@@ -620,6 +620,12 @@
                 <!-- Core Modules - START -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>subutai-common</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mgmt-shared-protocol</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
@@ -640,6 +646,11 @@
                   <artifactId>tracker-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                  <artifactItem>
+                      <groupId>org.safehaus.subutai</groupId>
+                      <artifactId>tracker-rest</artifactId>
+                      <version>${project.version}</version>
+                  </artifactItem>
 
                 <!-- Git Manager -->
                 <artifactItem>
@@ -1478,6 +1489,11 @@
                   <artifactId>storm-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Zookeeper -->
                 <artifactItem>
@@ -1533,7 +1549,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- ElasticSearch -->
+                <!-- Elasticsearch -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>elasticsearch-api</artifactId>
@@ -1546,12 +1562,12 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-cli</artifactId>
+                  <artifactId>elasticsearch-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>elasticsearch-ui</artifactId>
+                  <artifactId>elasticsearch-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

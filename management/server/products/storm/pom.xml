@@ -18,5 +18,6 @@
         <module>storm-api</module>
         <module>storm-impl</module>
         <module>storm-ui</module>
+        <module>storm-rest</module>
     </modules>
 </project>

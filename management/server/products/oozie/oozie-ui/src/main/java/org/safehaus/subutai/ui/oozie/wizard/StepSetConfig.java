@@ -9,14 +9,23 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
-
 import java.util.ArrayList;
 import java.util.Set;
+
+import org.safehaus.subutai.shared.protocol.Util;
+
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * @author dilshat
@@ -39,7 +48,7 @@ public class StepSetConfig extends Panel {
 		menu.setContentMode(ContentMode.HTML);
 		panel.setContent(menu);
 		grid.addComponent(menu, 0, 0, 2, 1);
-		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+//		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
 		VerticalLayout vl = new VerticalLayout();
 		vl.setSizeFull();
@@ -53,16 +62,16 @@ public class StepSetConfig extends Panel {
 		vl.addComponent(server);
 
 		final ComboBox cbServers = new ComboBox();
-		for (Agent agent : wizard.getConfig().getHadoopNodes()) {
+		for (String agent : wizard.getConfig().getHadoopNodes()) {
 			cbServers.addItem(agent);
-			cbServers.setItemCaption(agent, agent.getHostname());
+			cbServers.setItemCaption(agent, agent);
 			cbServers.setNullSelectionAllowed(false);
 		}
 
 		vl.addComponent(cbServers);
 
-		final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<Agent>());
-		selectClients.setItemCaptionPropertyId("hostname");
+		final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<String>());
+//		selectClients.setItemCaptionPropertyId("hostname");
 		selectClients.setRows(7);
 		selectClients.setNullSelectionAllowed(true);
 		selectClients.setMultiSelect(true);
@@ -73,7 +82,7 @@ public class StepSetConfig extends Panel {
 		selectClients.setRequired(true);
 		selectClients.setContainerDataSource(
 				new BeanItemContainer<>(
-						Agent.class, wizard.getConfig().getHadoopNodes())
+						String.class, wizard.getConfig().getHadoopNodes())
 		);
 
 		vl.addComponent(selectClients);
@@ -85,8 +94,8 @@ public class StepSetConfig extends Panel {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.getConfig().setServer((Agent) cbServers.getValue());
-				wizard.getConfig().setClients((Set<Agent>) selectClients.getValue());
+				wizard.getConfig().setServer((String) cbServers.getValue());
+				wizard.getConfig().setClients((Set<String>) selectClients.getValue());
 
 				if (Util.isCollectionEmpty(wizard.getConfig().getClients())) {
 					show("Please select nodes for Oozie clients");

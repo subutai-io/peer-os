@@ -1,5 +1,8 @@
 #!/bin/bash
 BASE="/etc/init.d/"
+#Remove 127.0.1.1 line
+file="/etc/hosts"
+sed -i '/127.0.1.1/d' $file
 #Agent checks
 agentresult=$(dpkg --get-selections | grep ksks-agent)
 source /etc/profile
@@ -15,4 +18,4 @@ if [ -z "$agentresult" ] ;then
   sudo apt-get --force-yes --assume-yes install ksks-agent
 else
   echo "installed agent package is found script will be by-passed"
-fi 
+fi

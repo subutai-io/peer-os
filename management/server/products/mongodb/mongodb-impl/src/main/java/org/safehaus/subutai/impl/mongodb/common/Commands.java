@@ -26,8 +26,8 @@ public class Commands extends CommandsSingleton {
     public static Command getInstallCommand(Set<Agent> agents) {
         return createCommand("Install Mongo",
                 new RequestBuilder(
-                        "sleep 10 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo")
-                        .withTimeout(360),
+                        "sleep 20 ; /usr/bin/apt-get --force-yes --assume-yes install ksks-mongo")
+                        .withTimeout(500),
                 agents
         );
     }
@@ -39,7 +39,7 @@ public class Commands extends CommandsSingleton {
                                 "/bin/sed -i 's/# replSet = setname/replSet = %s/1' '%s'",
                                 replicaSetName,
                                 Constants.DATA_NODE_CONF_FILE)
-                ).withTimeout(30),
+                ).withTimeout(90),
                 agents
         );
     }
@@ -72,7 +72,7 @@ public class Commands extends CommandsSingleton {
 
             appendHosts.append("/bin/echo '127.0.0.1 localhost ").append(agent.getHostname()).append("' >> '/etc/hosts';");
 
-            requestBuilders.add((AgentRequestBuilder) new AgentRequestBuilder(agent, appendHosts.toString()).withTimeout(30));
+            requestBuilders.add((AgentRequestBuilder) new AgentRequestBuilder(agent, appendHosts.toString()).withTimeout(90));
 
         }
 
@@ -111,7 +111,7 @@ public class Commands extends CommandsSingleton {
                                 dataNodePort,
                                 dataNodePort,
                                 secondaryStr.toString())
-                ).withTimeout(180),
+                ).withTimeout(240),
                 Util.wrapAgentToSet(primaryNodeAgent)
         );
     }
@@ -126,7 +126,7 @@ public class Commands extends CommandsSingleton {
                                 domainName,
                                 dataNodePort
                         )
-                ).withTimeout(30),
+                ).withTimeout(90),
                 Util.wrapAgentToSet(primaryNodeAgent)
         );
     }
@@ -146,7 +146,7 @@ public class Commands extends CommandsSingleton {
                                 routerPort,
                                 shard.toString()
                         )
-                ).withTimeout(120),
+                ).withTimeout(180),
                 Util.wrapAgentToSet(router)
         );
     }
@@ -231,7 +231,7 @@ public class Commands extends CommandsSingleton {
     public static Command getFindPrimaryNodeCommand(Agent secondaryNode, int dataNodePort) {
         return createCommand("Find primary node",
                 new RequestBuilder(String.format("/bin/echo 'db.isMaster()' | mongo --port %s", dataNodePort))
-                        .withTimeout(30),
+                        .withTimeout(90),
                 Util.wrapAgentToSet(secondaryNode)
         );
     }

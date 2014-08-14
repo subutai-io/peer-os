@@ -11,9 +11,6 @@ import java.util.UUID;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 
 
-/**
- * @author dilshat
- */
 public interface Pig extends ApiBase<Config> {
 
 
