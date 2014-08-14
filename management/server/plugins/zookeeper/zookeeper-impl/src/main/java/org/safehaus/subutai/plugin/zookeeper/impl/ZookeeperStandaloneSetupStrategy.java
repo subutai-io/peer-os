@@ -179,15 +179,15 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
                 .replace( "$" + ConfigParams.DATA_DIR.getPlaceHolder(), ConfigParams.DATA_DIR.getParamValue() );
 
         /*
-        1=zookeeper1:2888:3888
-        2=zookeeper2:2888:3888
-        3=zookeeper3:2888:3888
+        server.1=zookeeper1:2888:3888
+        server.2=zookeeper2:2888:3888
+        server.3=zookeeper3:2888:3888
          */
 
         StringBuilder serversBuilder = new StringBuilder();
         int id = 0;
         for ( Agent agent : nodes ) {
-            serversBuilder.append( ++id ).append( "=" ).append( agent.getHostname() )
+            serversBuilder.append( "server." ).append( ++id ).append( "=" ).append( agent.getHostname() )
                           .append( ConfigParams.PORTS.getParamValue() ).append( "\n" );
         }
 
