@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.impl.hbase;
 
 
@@ -15,9 +10,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 
 
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton {
 
     public static Command getInstallDialogCommand( Set<Agent> agents ) {
@@ -34,7 +26,7 @@ public class Commands extends CommandsSingleton {
     public static Command getInstallCommand( Set<Agent> agents ) {
 
         return createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 360 )
+                new RequestBuilder( "sleep 20; apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 360 )
                                                                                            .withStdOutRedirection(
                                                                                                    OutputRedirection
                                                                                                            .NO ),
