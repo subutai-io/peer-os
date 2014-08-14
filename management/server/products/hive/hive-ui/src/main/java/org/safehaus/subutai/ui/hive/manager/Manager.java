@@ -288,7 +288,8 @@ public class Manager {
 							restartBtn.setEnabled(!stopped);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
@@ -314,7 +315,8 @@ public class Manager {
 							restartBtn.setEnabled(true);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
