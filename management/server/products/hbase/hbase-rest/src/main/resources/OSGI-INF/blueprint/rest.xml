@@ -2,23 +2,22 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
            xmlns:cxf="http://cxf.apache.org/blueprint/core"
-           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
+            http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+            http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
+            http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
-  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
-  http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <cxf:bus id="cxfBus1HBase">
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-    </cxf:bus>
-    <jaxrs:server address="/hbase" id="hbaseRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="hbaseRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <bean id="hbaseRestServiceImpl" class="org.safehaus.subutai.hbase.services.RestServiceImpl">
-        <property name="hbaseManager" ref="hbaseManager"/>
-    </bean>
-    <reference id="hbaseManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.hbase.HBase"/>
+
+  <reference id="hbaseManager" availability="mandatory" interface="org.safehaus.subutai.api.hbase.HBase" />
+
+  <bean id="restService" class="org.safehaus.subutai.hbase.services.RestService">
+    <property name="hbaseManager" ref="hbaseManager" />
+  </bean>
+
+  <jaxrs:server address="/hbase" id="hbaseRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="restService" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
 </blueprint>
