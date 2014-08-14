@@ -97,7 +97,7 @@ public class Manager {
 				}
 
 				org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
-						config.getClusterName());
+                        config.getHadoopClusterName());
 				if (hci == null) {
 					show("Hadoop cluster info not found");
 					return;
@@ -261,7 +261,8 @@ public class Manager {
 							restartBtn.setEnabled(started);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
@@ -287,7 +288,8 @@ public class Manager {
 							restartBtn.setEnabled(!stopped);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
@@ -313,7 +315,8 @@ public class Manager {
 							restartBtn.setEnabled(true);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
