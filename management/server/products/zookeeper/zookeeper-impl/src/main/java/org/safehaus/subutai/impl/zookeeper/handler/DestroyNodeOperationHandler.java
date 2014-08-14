@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.impl.zookeeper.Commands;
 import org.safehaus.subutai.impl.zookeeper.ZookeeperImpl;
@@ -44,14 +45,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
     public void run() {
         final Config config = manager.getCluster( clusterName );
         if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null ) {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !config.getNodes().contains( agent ) ) {
@@ -61,8 +61,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         }
 
         if ( config.getNodes().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last node in the cluster. Please, destroy cluster instead" );
             return;
         }
 
@@ -138,12 +137,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
 
         //update db
         po.addLog( "Updating db..." );
-        if ( !manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
-            po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                    config.getClusterName() ) );
+
+        try {
+            manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Information updated" );
         }
-        else {
-            po.addLogDone( "Done" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Failed to update information, %s", e.getMessage() ) );
         }
     }
 }

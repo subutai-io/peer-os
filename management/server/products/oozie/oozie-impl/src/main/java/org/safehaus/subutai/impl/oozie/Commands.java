@@ -7,6 +7,7 @@ package org.safehaus.subutai.impl.oozie;
 
 import java.util.Set;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
@@ -18,12 +19,21 @@ import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
  */
 public class Commands extends CommandsSingleton {
 
+    private AgentManager agentManager;
+
+
+    public Commands( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
     public static Command getInstallServerCommand(Set<Agent> agents) {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes install ksks-oozie-server")
-                        .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                        "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-server")
+                        .withTimeout(180)
+                        .withStdOutRedirection(OutputRedirection.NO),
                 agents
         );
 
@@ -33,8 +43,9 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes install ksks-oozie-client")
-                        .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                        "sleep 1; apt-get --force-yes --assume-yes install ksks-oozie-client")
+                        .withTimeout(180)
+                        .withStdOutRedirection(OutputRedirection.NO),
                 agents
         );
 
@@ -99,7 +110,7 @@ public class Commands extends CommandsSingleton {
     public static Command getUninstallClientsCommand(Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder(
-                        "sleep 10; apt-get --force-yes --assume-yes purge ksks-oozie-client")
+                        "apt-get --force-yes --assume-yes purge ksks-oozie-client")
                         .withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
                 agents
         );

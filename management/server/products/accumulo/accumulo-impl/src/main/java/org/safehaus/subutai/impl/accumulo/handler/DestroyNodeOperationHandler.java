@@ -6,10 +6,11 @@ import java.util.UUID;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 
@@ -48,14 +49,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
 
         final Config config = manager.getCluster( clusterName );
         if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null ) {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !config.getAllNodes().contains( agent ) ) {
@@ -64,21 +64,20 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
             return;
         }
         if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null ) {
-            po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
-                    config.getMasterNode().getHostname() ) );
+            po.addLogFailed( String.format( "Master node %s is not connected", config.getMasterNode().getHostname() ) );
             return;
         }
 
         if ( nodeType == NodeType.TRACER ) {
             if ( config.getTracers().size() == 1 ) {
-                po.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead\nOperation aborted" );
+                po.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead" );
                 return;
             }
             config.getTracers().remove( agent );
         }
         else {
             if ( config.getSlaves().size() == 1 ) {
-                po.addLogFailed( "This is the last slave in the cluster, destroy cluster instead\nOperation aborted" );
+                po.addLogFailed( "This is the last slave in the cluster, destroy cluster instead" );
                 return;
             }
             config.getSlaves().remove( agent );
@@ -126,17 +125,18 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
             }
 
             po.addLog( "Updating db..." );
-            if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                po.addLogDone( "Cluster info updated\nDone" );
+
+            try {
+                manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
+
+                po.addLogDone( "Database information updated" );
             }
-            else {
-                po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                        config.getClusterName() ) );
+            catch ( DBException e ) {
+                po.addLogFailed( String.format( "Failed to update database information, %s", e.getMessage() ) );
             }
         }
         else {
-            po.addLogFailed( String.format( "Unregistering node failed, %s\nOperation aborted",
-                    unregisterNodeCommand.getAllErrors() ) );
+            po.addLogFailed( String.format( "Unregistering node failed, %s", unregisterNodeCommand.getAllErrors() ) );
         }
     }
 }

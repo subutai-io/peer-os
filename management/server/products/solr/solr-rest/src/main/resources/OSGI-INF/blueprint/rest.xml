@@ -6,19 +6,26 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <cxf:bus id="cxfBus1">
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-    </cxf:bus>
-    <jaxrs:server address="/solr" id="solrRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="solrRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <bean id="solrRestServiceImpl" class="org.safehaus.subutai.solr.services.RestServiceImpl">
-        <property name="solrManager" ref="solrManager"/>
-    </bean>
-    <reference id="solrManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.solr.Solr"/>
+  <cxf:bus id="cxfBus1">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="solrManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.solr.Solr" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
+  <bean id="solrRestServiceImpl" class="org.safehaus.subutai.solr.services.RestServiceImpl">
+    <property name="solrManager" ref="solrManager" />
+    <property name="agentManager" ref="agentManager" />
+  </bean>
+
+  <jaxrs:server address="/solr" id="solrRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="solrRestServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
 </blueprint>

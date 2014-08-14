@@ -36,36 +36,40 @@ public class TerminalWindow {
 			final CommandRunner commandRunner,
 			final AgentManager agentManager) {
 
-		VerticalLayout content = new VerticalLayout();
-		content.setSizeFull();
-		content.setMargin(true);
-		content.setSpacing(true);
+		GridLayout grid = new GridLayout();
+		grid.setColumns(1);
+		grid.setRows(11);
+		grid.setSizeFull();
+		grid.setMargin(true);
+		grid.setSpacing(true);
 
-		window = new Window(String.format("Shell"), content);
+		window = new Window(String.format("Shell"), grid);
 		window.setModal(true);
 		window.setWidth(600, Unit.PIXELS);
-		window.setHeight(400, Unit.PIXELS);
+		window.setHeight(420, Unit.PIXELS);
 
 		commandOutputTxtArea = new TextArea("Commands output");
 		commandOutputTxtArea.setRows(15);
-		commandOutputTxtArea.setColumns(43);
+		commandOutputTxtArea.setColumns(40);
 		commandOutputTxtArea.setImmediate(true);
 		commandOutputTxtArea.setWordwrap(true);
-		content.addComponent(commandOutputTxtArea);
 
 		HorizontalLayout controls = new HorizontalLayout();
 		controls.setSpacing(true);
-		content.addComponent(controls);
 
 		Label lblCommand = new Label("Command");
+		lblCommand.addStyleName("dark");
+
 		final TextField txtCommand = new TextField();
 		txtCommand.setWidth(250, Unit.PIXELS);
 		txtCommand.setValue("pwd");
 
 		final Button clearBtn = new Button("Clear");
 		clearBtn.addStyleName("default");
+
 		final Button sendBtn = new Button("Send");
 		sendBtn.addStyleName("default");
+
 		final Label indicator = new Label();
 		indicator.setIcon(new ThemeResource("img/spinner.gif"));
 		indicator.setContentMode(ContentMode.HTML);
@@ -79,6 +83,11 @@ public class TerminalWindow {
 		controls.addComponent(sendBtn);
 		controls.addComponent(indicator);
 
+		grid.addComponent(commandOutputTxtArea, 0, 0, 0, 9);
+		grid.setComponentAlignment(commandOutputTxtArea, Alignment.TOP_CENTER);
+		grid.addComponent(controls, 0, 10);
+		grid.setComponentAlignment(controls, Alignment.BOTTOM_CENTER);
+
 		txtCommand.addShortcutListener(new ShortcutListener("Shortcut Name", ShortcutAction.KeyCode.ENTER, null) {
 			@Override
 			public void handleAction(Object sender, Object target) {
@@ -88,10 +97,10 @@ public class TerminalWindow {
 		sendBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (!Strings.isNullOrEmpty(txtCommand.getValue().toString())) {
+				if (!Strings.isNullOrEmpty(txtCommand.getValue())) {
 					indicator.setVisible(true);
 					taskCount++;
-					final Command command = commandRunner.createCommand(new RequestBuilder(txtCommand.getValue().toString()), agents);
+					final Command command = commandRunner.createCommand(new RequestBuilder(txtCommand.getValue()), agents);
 					executor.execute(new Runnable() {
 						@Override
 						public void run() {
@@ -103,10 +112,10 @@ public class TerminalWindow {
 									String host = agent == null ? String.format("Offline[%s]", response.getUuid()) : agent.getHostname();
 									StringBuilder out = new StringBuilder(host).append(":\n");
 									if (!Strings.isNullOrEmpty(response.getStdOut())) {
-										out.append(response.getStdOut()).append("\n");
+										out.append(response.getStdOut()).append('\n');
 									}
 									if (!Strings.isNullOrEmpty(response.getStdErr())) {
-										out.append(response.getStdErr()).append("\n");
+										out.append(response.getStdErr()).append('\n');
 									}
 									if (response.isFinal()) {
 										if (response.getType() == ResponseType.EXECUTE_RESPONSE_DONE) {
@@ -141,7 +150,7 @@ public class TerminalWindow {
 	private void addOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
 			commandOutputTxtArea.setValue(String.format("%s%s", commandOutputTxtArea.getValue(), output));
-			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().toString().length() - 1);
+			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length() - 1);
 		}
 	}
 

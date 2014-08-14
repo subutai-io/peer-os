@@ -46,7 +46,7 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
     }
 
     boolean configure(Config config) {
-        String zk_servers = makeZookeeperServersList();
+        String zk_servers = makeZookeeperServersList(config);
         if(zk_servers == null) return false;
 
         Map<String, String> paramValues = new LinkedHashMap<>();
@@ -67,17 +67,22 @@ abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
         return true;
     }
 
-    private String makeZookeeperServersList() {
-        org.safehaus.subutai.api.zookeeper.Config zkConfig
-                = manager.getZookeeperManager().getCluster(clusterName);
-        if(zkConfig == null) return null;
+    private String makeZookeeperServersList(Config config) {
+        if(config.isExternalZookeeper()) {
+            org.safehaus.subutai.api.zookeeper.Config zkConfig
+                    = manager.getZookeeperManager().getCluster(
+                            config.getZookeeperClusterName());
+            if(zkConfig != null) {
+                StringBuilder sb = new StringBuilder();
+                for(Agent a : zkConfig.getNodes()) {
+                    if(sb.length() > 0) sb.append(",");
+                    sb.append(a.getListIP().get(0));
+                }
+                return sb.toString();
+            }
+        } else if(config.getNimbus() != null)
+            return config.getNimbus().getListIP().get(0);
 
-        StringBuilder sb = new StringBuilder();
-        for(Agent a : zkConfig.getNodes()) {
-            if(sb.length() > 0) sb.append(",");
-            sb.append(a.getListIP().get(0));
-        }
-        return sb.toString();
+        return null;
     }
-
 }

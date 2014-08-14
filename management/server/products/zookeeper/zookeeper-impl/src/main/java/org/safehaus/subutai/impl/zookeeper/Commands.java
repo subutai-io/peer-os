@@ -29,14 +29,14 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getInstallCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "sleep 10 ; apt-get --force-yes --assume-yes install ksks-zookeeper" )
-                .withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+        return createCommand( new RequestBuilder( "sleep 20 ; apt-get --force-yes --assume-yes install ksks-zookeeper" )
+                .withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
     public static Command getUninstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-zookeeper" ).withTimeout( 90 )
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-zookeeper" ).withTimeout( 120 )
                                                                                              .withStdOutRedirection(
                                                                                                      OutputRedirection.NO ),
                 agents );
@@ -44,12 +44,12 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStartCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "service zookeeper start" ).withTimeout( 15 ), agents );
+        return createCommand( new RequestBuilder( "service zookeeper start" ), agents );
     }
 
 
     public static Command getRestartCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "service zookeeper restart" ).withTimeout( 15 ), agents );
+        return createCommand( new RequestBuilder( "service zookeeper restart" ), agents );
     }
 
 

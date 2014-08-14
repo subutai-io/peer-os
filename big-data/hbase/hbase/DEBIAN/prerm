@@ -1,5 +1,3 @@
 #!/bin/bash
 set -e
 
-# stop hbase if it is running
-service hbase stop

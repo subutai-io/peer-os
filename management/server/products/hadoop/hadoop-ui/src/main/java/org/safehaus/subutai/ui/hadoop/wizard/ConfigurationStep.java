@@ -44,12 +44,11 @@ public class ConfigurationStep extends VerticalLayout {
 
 		//configuration servers number
 		List<Integer> s = new ArrayList<Integer>();
-		for (int i = 0; i < 50; i++) {
+		for (int i = 1; i < 16; i++) {
 			s.add(i);
 		}
 
 		ComboBox slaveNodesComboBox = new ComboBox("Choose number of slave nodes", s);
-//        slaveNodesComboBox.setMultiSelect(false);
 		slaveNodesComboBox.setImmediate(true);
 		slaveNodesComboBox.setTextInputAllowed(false);
 		slaveNodesComboBox.setNullSelectionAllowed(false);
@@ -63,8 +62,12 @@ public class ConfigurationStep extends VerticalLayout {
 		});
 
 		//configuration replication factor
-		ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s);
-//        replicationFactorComboBox.setMultiSelect(false);
+		List<Integer> s2 = new ArrayList<Integer>();
+		for (int i = 1; i < 6; i++) {
+			s2.add(i);
+		}
+
+		ComboBox replicationFactorComboBox = new ComboBox("Choose replication factor for slave nodes", s2);
 		replicationFactorComboBox.setImmediate(true);
 		replicationFactorComboBox.setTextInputAllowed(false);
 		replicationFactorComboBox.setNullSelectionAllowed(false);

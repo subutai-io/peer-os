@@ -5,10 +5,11 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 
 
 /**
@@ -35,7 +36,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
     public void run() {
         Config config = manager.getCluster( clusterName );
         if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -66,11 +67,14 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Accumulo
             }
 
             po.addLog( "Updating db..." );
-            if ( manager.getDbManager().deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
-                po.addLogDone( "Cluster info deleted from DB\nDone" );
+
+            try {
+                manager.getDbManager().deleteInfo2( Config.PRODUCT_KEY, config.getClusterName() );
+
+                po.addLogDone( "Database information updated" );
             }
-            else {
-                po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+            catch ( DBException e ) {
+                po.addLogFailed( String.format( "Failed to update database information, %s", e.getMessage() ) );
             }
         }
         else {

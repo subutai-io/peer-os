@@ -40,11 +40,11 @@ public class VerificationStep extends VerticalLayout {
 		ConfigView cfgView = new ConfigView("Installation configuration");
 		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
 		cfgView.addStringCfg("Master", wizard.getConfig().getMaster() + "\n");
-		for (UUID uuid : wizard.getConfig().getRegion()) {
-			cfgView.addStringCfg("Region", uuid + "\n");
+		for (String hostname : wizard.getConfig().getRegion()) {
+			cfgView.addStringCfg("Region", hostname + "\n");
 		}
-		for (UUID uuid : wizard.getConfig().getQuorum()) {
-			cfgView.addStringCfg("Quorum", uuid + "\n");
+		for (String hostname : wizard.getConfig().getQuorum()) {
+			cfgView.addStringCfg("Quorum", hostname + "\n");
 		}
 		cfgView.addStringCfg("Backup master", wizard.getConfig().getBackupMasters() + "\n");
 		cfgView.addStringCfg("Hadoop name node", wizard.getConfig().getHadoopNameNode() + "\n");
