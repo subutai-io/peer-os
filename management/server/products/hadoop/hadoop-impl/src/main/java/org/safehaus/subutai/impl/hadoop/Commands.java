@@ -270,7 +270,7 @@ public class Commands {
 	public static Command getNameNodeCommand(Agent agent, String command) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				String.format("Execute NameNode/SecondaryNameNode/DataNode command %s", command),
-				new RequestBuilder(String.format("sleep 10; service hadoop-dfs %s &", command))
+				new RequestBuilder(String.format("sleep 10; service hadoop-dfs %s", command))
 						.withTimeout(20),
 				Sets.newHashSet(agent)
 		);
@@ -279,7 +279,7 @@ public class Commands {
 	public static Command getJobTrackerCommand(Agent agent, String command) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				String.format("Execute JobTracker/TaskTracker command %s", command),
-				new RequestBuilder(String.format("sleep 10; service hadoop-mapred %s &", command))
+				new RequestBuilder(String.format("sleep 10; service hadoop-mapred %s", command))
 						.withTimeout(20),
 				Sets.newHashSet(agent)
 		);
