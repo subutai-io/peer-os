@@ -122,6 +122,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             }
         }
 
+        po.addLog( "Installing Accumulo..." );
+
         //install
         Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
         manager.getCommandRunner().runCommand( installCommand );
