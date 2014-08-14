@@ -2,6 +2,8 @@ package org.safehaus.subutai.impl.accumulo.handler;
 
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -41,6 +43,11 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
     @Override
     public void run() {
+
+        Logger LOG = Logger.getLogger( InstallOperationHandler.class.getName() );
+
+        LOG.log( Level.WARNING, config.toString() );
+
         if ( config.getMasterNode() == null || config.getGcNode() == null || config.getMonitor() == null || Strings
                 .isNullOrEmpty( config.getClusterName() ) || Util.isCollectionEmpty( config.getTracers() ) || Util
                 .isCollectionEmpty( config.getSlaves() ) ) {
