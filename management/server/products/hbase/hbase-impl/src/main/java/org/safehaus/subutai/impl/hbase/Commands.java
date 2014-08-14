@@ -14,11 +14,9 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallDialogCommand( Set<Agent> agents ) {
 
-        return createCommand(
-                new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 360 )
-                                                                                           .withStdOutRedirection(
-                                                                                                   OutputRedirection
-                                                                                                           .NO ),
+        return createCommand( new RequestBuilder( "apt-get --assume-yes --force-yes install dialog" ).withTimeout( 360 )
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
                 agents );
     }
 
@@ -27,9 +25,8 @@ public class Commands extends CommandsSingleton {
 
         return createCommand(
                 new RequestBuilder( "sleep 20; apt-get --assume-yes --force-yes install ksks-hbase" ).withTimeout( 360 )
-                                                                                           .withStdOutRedirection(
-                                                                                                   OutputRedirection
-                                                                                                           .NO ),
+                                                                                                     .withStdOutRedirection(
+                                                                                                             OutputRedirection.NO ),
                 agents );
     }
 
@@ -59,39 +56,40 @@ public class Commands extends CommandsSingleton {
     }
 
 
-    public static Command getConfigureCommand( Set<Agent> agents, String param ) {
+    /*public static Command getConfigureCommand( Set<Agent> agents, String param ) {
 
         return createCommand( new RequestBuilder(
                         String.format( ". /etc/profile && $CASSANDRA_HOME/bin/cassandra-conf.sh %s", param ) ),
                 agents );
-    }
+    }*/
 
 
+    // $HBASE_HOME/scripts/
     public static Command getConfigBackupMastersCommand( Set<Agent> agents, String hostname ) {
-        return createCommand( new RequestBuilder(
-                        String.format( ". /etc/profile && $HBASE_HOME/scripts/backUpMasters.sh %s", hostname ) ),
+        return createCommand( new RequestBuilder( String.format( ". /etc/profile && backUpMasters.sh %s", hostname ) ),
                 agents );
     }
 
 
+    //$HBASE_HOME/scripts/
     public static Command getConfigQuorumCommand( Set<Agent> agents, String quorums ) {
-        return createCommand(
-                new RequestBuilder( String.format( ". /etc/profile && $HBASE_HOME/scripts/quorum.sh %s", quorums ) ),
+        return createCommand( new RequestBuilder( String.format( ". /etc/profile && quorum.sh %s", quorums ) ),
                 agents );
     }
 
 
+    //$HBASE_HOME/scripts/
     public static Command getConfigRegionCommand( Set<Agent> agents, String hostnames ) {
-        return createCommand(
-                new RequestBuilder( String.format( ". /etc/profile && $HBASE_HOME/scripts/region.sh %s", hostnames ) ),
+        return createCommand( new RequestBuilder( String.format( ". /etc/profile && region.sh %s", hostnames ) ),
                 agents );
     }
 
 
+    //$HBASE_HOME/scripts/
     public static Command getConfigMasterTask( Set<Agent> agents, String hadoopNameNodeHostname,
                                                String hMasterMachineHostname ) {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && $HBASE_HOME/scripts/master.sh %s %s", hadoopNameNodeHostname,
-                        hMasterMachineHostname ) ), agents );
+                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
+                agents );
     }
 }
