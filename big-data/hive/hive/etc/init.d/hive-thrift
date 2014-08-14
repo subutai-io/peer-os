@@ -4,7 +4,7 @@
 NAME=hive-thrift
 PIDFILE=/var/run/$NAME/$NAME.pid
 DESC="Hive Thrift Server"
-CMD_PATT="hive-0"
+CMD_PATT="hive"
 . /lib/lsb/init-functions
 
 is_running()
