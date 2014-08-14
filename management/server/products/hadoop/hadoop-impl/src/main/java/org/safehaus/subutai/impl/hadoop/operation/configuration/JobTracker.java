@@ -45,6 +45,11 @@ public class JobTracker {
 				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "start &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
+
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 				} else if (command.hasCompleted()) {
@@ -81,6 +86,11 @@ public class JobTracker {
 				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "stop &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
+
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 				} else if (command.hasCompleted()) {
@@ -115,6 +125,11 @@ public class JobTracker {
 
 				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "restart &");
 				HadoopImpl.getCommandRunner().runCommand(command);
+
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
 
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));

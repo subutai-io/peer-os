@@ -46,6 +46,11 @@ public class NameNode {
 				Command command = Commands.getNameNodeCommand(config.getNameNode(), "start &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
+
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 				} else if (command.hasCompleted()) {
@@ -82,6 +87,11 @@ public class NameNode {
 				Command command = Commands.getNameNodeCommand(config.getNameNode(), "stop &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
+
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 				} else if (command.hasCompleted()) {
@@ -116,6 +126,11 @@ public class NameNode {
 
 				Command command = Commands.getNameNodeCommand(config.getNameNode(), "restart &");
 				HadoopImpl.getCommandRunner().runCommand(command);
+
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
 
 				if (command.hasSucceeded()) {
 					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
