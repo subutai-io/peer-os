@@ -1,6 +1,7 @@
 package org.safehaus.subutai.api.hive;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
@@ -55,6 +56,22 @@ public class Config implements ConfigBase {
     public String toString() {
         return "Config{" + "clusterName=" + clusterName + ", server=" + server
                 + ", clients=" + (clients != null ? clients.size() : 0) + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Config) {
+            Config o = (Config)obj;
+            return clusterName != null ? clusterName.equals(o.clusterName) : false;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.clusterName);
+        return hash;
     }
 
 }
