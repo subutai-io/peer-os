@@ -110,21 +110,39 @@ public class RestService {
             @QueryParam( "master" ) String master,
             @QueryParam( "backupMasters" ) String backupMasters,
             @QueryParam( "hadoopNameNode" ) String hadoopNameNode,
-            @QueryParam( "nodes" ) List<String> nodes,
-            @QueryParam( "quorum" ) List<String> quorum,
-            @QueryParam( "region" ) List<String> region
+            @QueryParam( "nodes" ) String nodes,
+            @QueryParam( "quorum" ) String quorum,
+            @QueryParam( "region" ) String region
     ) {
         HBaseConfig config = new HBaseConfig();
         config.setClusterName( clusterName );
         config.setMaster( master );
         config.setBackupMasters( backupMasters );
         config.setHadoopNameNode( hadoopNameNode );
-        config.getNodes().addAll( nodes );
-        config.getQuorum().addAll( quorum );
-        config.getRegion().addAll( region );
+
+        // BUG: Getting the params as list doesn't work. For example "List<String> nodes". To fix this we get a param
+        // as plain string and use splitting.
+        if ( !StringUtils.isEmpty( nodes ) ) {
+            for ( String node : nodes.split( "," ) ) {
+                config.getNodes().add( node );
+            }
+        }
+
+        if ( !StringUtils.isEmpty( quorum ) ) {
+            for ( String node : quorum.split( "," ) ) {
+                config.getQuorum().add( node );
+            }
+        }
+
+        if ( !StringUtils.isEmpty( region ) ) {
+            for ( String node : region.split( "," ) ) {
+                config.getRegion().add( node );
+            }
+        }
 
         UUID uuid = hbaseManager.installCluster( config );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
+
 }
