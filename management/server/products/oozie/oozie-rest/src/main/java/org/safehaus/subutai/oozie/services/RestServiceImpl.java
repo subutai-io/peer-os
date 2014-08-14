@@ -43,11 +43,10 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String installCluster( String clusterName, String domainInfo, String serverHostname,
+    public String installCluster( String clusterName, String serverHostname,
                                   String hadoopClusterName ) {
         OozieConfig config = new OozieConfig();
         config.setClusterName( clusterName );
-        config.setDomainInfo( domainInfo );
         config.setServer( serverHostname );
         Set<String> clients = new HashSet<String>();
         Config hadoopConfig = hadoopManager.getCluster( hadoopClusterName );
