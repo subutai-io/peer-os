@@ -63,6 +63,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String uninstallCluster( String clusterName ) {
-        return null;
+        UUID uuid = oozieManager.uninstallCluster( clusterName );
+        return uuid.toString();
     }
 }
