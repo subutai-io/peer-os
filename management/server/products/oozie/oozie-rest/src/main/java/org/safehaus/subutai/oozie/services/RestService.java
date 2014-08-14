@@ -8,11 +8,11 @@ import javax.ws.rs.PathParam;
 public interface RestService {
 
     @GET
-    @Path("install/{clusterName}")
+    @Path("install/{clusterName}/{domainName}/{serverHostname}/hadoopClusterName")
     public String installCluster(@PathParam("clusterName") String clusterName,
                                        @PathParam("domainName") String domainInfo,
                                        @PathParam( "serverHostname" ) String serverHostname,
-                                       @PathParam( "clientHostnames" )String... clientsHostnames);
+                                       @PathParam( "hadoopClusterName" )String hadoopClusterName);
 
     @GET
     @Path("uninstall/{clusterName}") //Maps for the `hello/John` in the URL
