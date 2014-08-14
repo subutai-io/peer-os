@@ -641,9 +641,11 @@ public class LxcManagerImpl implements LxcManager {
             throw new LxcCreateException( "LXC placement nodes are empty" );
         }
 
+        //resulting collection
+        Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
+
         //create containers
         CompletionService<LxcInfo> completer = new ExecutorCompletionService<>( executor );
-        Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
         List<LxcInfo> lxcInfos = new ArrayList<>();
         for ( Map.Entry<Agent, Map<String, Integer>> placementEntry : placementNodes.entrySet() ) {
             Agent physicalNode = placementEntry.getKey();
@@ -678,24 +680,7 @@ public class LxcManagerImpl implements LxcManager {
 
         if ( !result ) {
             //cleanup lxcs
-            Map<Agent, Set<String>> createdLxcFamilies = new HashMap<>();
-            for ( LxcInfo lxcInfo : lxcInfos ) {
-                Set<String> lxcHostnames = createdLxcFamilies.get( lxcInfo.getPhysicalAgent() );
-                if ( lxcHostnames == null ) {
-                    lxcHostnames = new HashSet<>();
-                    createdLxcFamilies.put( lxcInfo.getPhysicalAgent(), lxcHostnames );
-                }
-                lxcHostnames.add( lxcInfo.getLxcHostname() );
-            }
-            if ( !createdLxcFamilies.isEmpty() ) {
-                try {
-                    destroyLxcsByHostname( createdLxcFamilies );
-                }
-                catch ( LxcDestroyException ex ) {
-                    throw new LxcCreateException( "Not all lxcs created successfully. Use LXC module to cleanup" );
-                }
-            }
-            throw new LxcCreateException( "Not all lxcs created successfully" );
+            destroyLxcs( lxcInfos, "Not all lxcs created successfully" );
         }
 
 
@@ -770,27 +755,32 @@ public class LxcManagerImpl implements LxcManager {
 
         if ( !result ) {
             //cleanup lxcs
-            Map<Agent, Set<String>> createdLxcFamilies = new HashMap<>();
-            for ( LxcInfo lxcInfo : lxcInfos ) {
-                Set<String> lxcHostnames = createdLxcFamilies.get( lxcInfo.getPhysicalAgent() );
-                if ( lxcHostnames == null ) {
-                    lxcHostnames = new HashSet<>();
-                    createdLxcFamilies.put( lxcInfo.getPhysicalAgent(), lxcHostnames );
-                }
-                lxcHostnames.add( lxcInfo.getLxcHostname() );
-            }
-            if ( !createdLxcFamilies.isEmpty() ) {
-                try {
-                    destroyLxcsByHostname( createdLxcFamilies );
-                }
-                catch ( LxcDestroyException ex ) {
-                    throw new LxcCreateException(
-                            "Waiting interval for lxc agents timed out. Use LXC module to cleanup" );
-                }
-            }
-            throw new LxcCreateException( "Waiting interval for lxc agents timed out" );
+            destroyLxcs( lxcInfos, "Waiting interval for lxc agents timed out" );
         }
 
         return families;
+    }
+
+
+    private void destroyLxcs( List<LxcInfo> lxcInfos, String message ) throws LxcCreateException {
+        //cleanup lxcs
+        Map<Agent, Set<String>> createdLxcFamilies = new HashMap<>();
+        for ( LxcInfo lxcInfo : lxcInfos ) {
+            Set<String> lxcHostnames = createdLxcFamilies.get( lxcInfo.getPhysicalAgent() );
+            if ( lxcHostnames == null ) {
+                lxcHostnames = new HashSet<>();
+                createdLxcFamilies.put( lxcInfo.getPhysicalAgent(), lxcHostnames );
+            }
+            lxcHostnames.add( lxcInfo.getLxcHostname() );
+        }
+        if ( !createdLxcFamilies.isEmpty() ) {
+            try {
+                destroyLxcsByHostname( createdLxcFamilies );
+            }
+            catch ( LxcDestroyException ex ) {
+                throw new LxcCreateException( String.format( "%s. Use LXC module to cleanup", message ) );
+            }
+        }
+        throw new LxcCreateException( message );
     }
 }
