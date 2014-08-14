@@ -20,15 +20,18 @@ public class RestService {
 	private Spark sparkManager;
 	private AgentManager agentManager;
 
-	public Spark getSparkManager() {
-		return sparkManager;
-	}
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
+    public void setSparkManager( final Spark sparkManager ) {
+        this.sparkManager = sparkManager;
+    }
 
-	@GET
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    @GET
 	@Path ("list_clusters")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String listClusters() {
