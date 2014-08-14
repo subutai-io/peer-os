@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam;
 public interface RestService {
 
     @GET
-    @Path("install/{clusterName}/{serverHostname}/hadoopClusterName")
+    @Path("install/{clusterName}/{serverHostname}/{hadoopClusterName}")
     public String installCluster(@PathParam("clusterName") String clusterName,
                                        @PathParam( "serverHostname" ) String serverHostname,
                                        @PathParam( "hadoopClusterName" )String hadoopClusterName);
