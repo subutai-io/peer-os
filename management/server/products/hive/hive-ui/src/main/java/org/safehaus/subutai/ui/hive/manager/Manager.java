@@ -261,7 +261,8 @@ public class Manager {
 							restartBtn.setEnabled(started);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-					});
+                    });
+                    contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
