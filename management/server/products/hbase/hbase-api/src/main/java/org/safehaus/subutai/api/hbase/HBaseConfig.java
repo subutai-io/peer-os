@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.api.hbase;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,23 +9,20 @@ import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 
-/**
- * @author dilshat
- */
 public class HBaseConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "HBase";
     private int numberOfNodes = 4;
     private UUID uuid;
     private String master;
-    private Set<String> region;
-    private Set<String> quorum;
     private String backupMasters;
     private String domainInfo;
-    private Set<String> nodes;
     private String clusterName = "";
     private String hadoopNameNode;
 
+    private Set<String> nodes = new HashSet();
+    private Set<String> region = new HashSet();
+    private Set<String> quorum = new HashSet();;
 
     public HBaseConfig() {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
