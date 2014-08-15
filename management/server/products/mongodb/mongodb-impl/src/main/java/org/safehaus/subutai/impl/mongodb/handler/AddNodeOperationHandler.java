@@ -74,9 +74,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
             if ( nodeType == NodeType.DATA_NODE ) {
                 config.getDataNodes().add( agent );
+                config.setNumberOfDataNodes( config.getNumberOfDataNodes() + 1 );
             }
             else if ( nodeType == NodeType.ROUTER_NODE ) {
                 config.getRouterServers().add( agent );
+                config.setNumberOfRouters( config.getNumberOfRouters() + 1 );
             }
             po.addLog( "Lxc container created successfully" );
 

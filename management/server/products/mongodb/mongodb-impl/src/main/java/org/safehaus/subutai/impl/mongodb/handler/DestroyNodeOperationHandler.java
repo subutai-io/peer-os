@@ -83,6 +83,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         if ( nodeType == NodeType.CONFIG_NODE ) {
             config.getConfigServers().remove( agent );
+            config.setNumberOfConfigServers( config.getNumberOfConfigServers() - 1 );
             //restart routers
             po.addLog( "Restarting routers..." );
             Command stopRoutersCommand = Commands.getStopNodeCommand( config.getRouterServers() );
@@ -117,6 +118,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         }
         else if ( nodeType == NodeType.DATA_NODE ) {
             config.getDataNodes().remove( agent );
+            config.setNumberOfDataNodes( config.getNumberOfDataNodes() - 1 );
             //unregister from primary
             po.addLog( "Unregistering this node from replica set..." );
             Command findPrimaryNodeCommand = Commands.getFindPrimaryNodeCommand( agent, config.getDataNodePort() );
