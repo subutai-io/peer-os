@@ -208,13 +208,12 @@ public class OozieImpl implements Oozie {
 
                 po.addLog( "Updating db..." );
                 if ( dbManager.deleteInfo( OozieConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-                    po.addLog( "Cluster info deleted from DB" );
+                    po.addLogDone( "Cluster info deleted from DB\nDone" );
                 }
                 else {
                     po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
                 }
 
-                po.addLogDone( "Oozie cluster deleted" );
             }
         } );
 
@@ -255,7 +254,7 @@ public class OozieImpl implements Oozie {
                 commandRunner.runCommand( startServiceCommand );
 
                 if ( startServiceCommand.hasCompleted() ) {
-                    po.addLogDone( "Checking status..." );
+                    po.addLog( "Checking status..." );
 
                     Command checkCommand = Commands.getStatusServerCommand( servers );
                     commandRunner.runCommand( checkCommand );
