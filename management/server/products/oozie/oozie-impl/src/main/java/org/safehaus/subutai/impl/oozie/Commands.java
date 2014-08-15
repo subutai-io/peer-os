@@ -54,7 +54,7 @@ public class Commands extends CommandsSingleton {
     public static Command getStartServerCommand(Set<Agent> agents) {
         return createCommand(
                 new RequestBuilder(
-                        "service oozie-server start")
+                        "service oozie-server start &")
                 ,
                 agents
         );
