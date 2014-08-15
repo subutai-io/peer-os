@@ -15,7 +15,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.api.lucene.Lucene;
 import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+
+import com.google.common.base.Strings;
 
 
 public class RestService {
@@ -55,9 +56,7 @@ public class RestService {
     @GET
     @Path( "getCluster" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String getCluster(
-            @QueryParam( "clusterName" ) String clusterName
-    ) {
+    public String getCluster( @QueryParam( "clusterName" ) String clusterName ) {
         Config config = luceneManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
@@ -66,18 +65,20 @@ public class RestService {
 
     @GET
     @Path( "installCluster" )
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String installCluster(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "nodes" ) List<String> nodes
-    ) {
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String installCluster( @QueryParam( "clusterName" ) String clusterName,
+                                  @QueryParam( "nodes" ) String nodes ) {
 
         Config config = new Config();
         config.setClusterName( clusterName );
 
-        for ( String node : nodes ) {
-            Agent agent = agentManager.getAgentByHostname( node );
-            config.getNodes().add( agent );
+
+        // BUG: Getting the params as list doesn't work. For example "List<String> nodes". To fix this we get a param
+        // as plain string and use splitting.
+        if ( !Strings.isNullOrEmpty( nodes ) ) {
+            for ( String node : nodes.split( "," ) ) {
+                config.getNodes().add( agentManager.getAgentByHostname( node ) );
+            }
         }
 
         UUID uuid = luceneManager.installCluster( config );
@@ -89,9 +90,7 @@ public class RestService {
     @GET
     @Path( "uninstallCluster" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String uninstallCluster(
-            @QueryParam( "clusterName" ) String clusterName
-    ) {
+    public String uninstallCluster( @QueryParam( "clusterName" ) String clusterName ) {
         UUID uuid = luceneManager.uninstallCluster( clusterName );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -101,10 +100,7 @@ public class RestService {
     @GET
     @Path( "addNode" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String addNode(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "node" ) String node
-    ) {
+    public String addNode( @QueryParam( "clusterName" ) String clusterName, @QueryParam( "node" ) String node ) {
         UUID uuid = luceneManager.addNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -114,13 +110,9 @@ public class RestService {
     @GET
     @Path( "destroyNode" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public String destroyNode(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "node" ) String node
-    ) {
+    public String destroyNode( @QueryParam( "clusterName" ) String clusterName, @QueryParam( "node" ) String node ) {
         UUID uuid = luceneManager.destroyNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
-
 }
