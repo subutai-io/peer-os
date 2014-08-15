@@ -56,7 +56,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
 
     public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager ) {
-        setHeight( 100, Unit.PERCENTAGE );
+        setSizeFull();
 
         executor = Executors.newCachedThreadPool();
 
