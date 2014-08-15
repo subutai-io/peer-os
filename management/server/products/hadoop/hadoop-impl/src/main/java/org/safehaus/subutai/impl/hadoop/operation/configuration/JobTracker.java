@@ -7,14 +7,18 @@ import org.safehaus.subutai.impl.hadoop.Commands;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by daralbaev on 14.04.14.
  */
 public class JobTracker {
+	public static final int NUMBER_OF_RETRIES = 10;
+	public static final int SLEEP_SECONDS = 10;
 	private HadoopImpl parent;
 	private Config config;
 
@@ -27,6 +31,7 @@ public class JobTracker {
 		final ProductOperation po
 				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
 				String.format("Starting cluster's %s JobTracker", config.getClusterName()));
+		final Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "start &");
 
 		parent.getExecutor().execute(new Runnable() {
 
@@ -42,16 +47,37 @@ public class JobTracker {
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "start &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-				}
-
 				if (command.hasSucceeded()) {
-					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
+					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
+
+						po.addLog(String.format("Checking status for %d attempt.", i));
+						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
+							@Override
+							public void onComplete(NodeState state) {
+								if (NodeState.RUNNING.equals(state)) {
+									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+									isSuccessful.set(true);
+								}
+							}
+						}));
+
+						if (isSuccessful.get()) {
+							break;
+						} else {
+							try {
+								Thread.sleep(SLEEP_SECONDS * 1000);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+
+					if (!isSuccessful.get()) {
+						po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
+					}
 				} else if (command.hasCompleted()) {
 					po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
 				} else {
@@ -68,6 +94,7 @@ public class JobTracker {
 		final ProductOperation po
 				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
 				String.format("Stopping cluster's %s JobTracker", config.getClusterName()));
+		final Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "stop &");
 
 		parent.getExecutor().execute(new Runnable() {
 
@@ -83,16 +110,37 @@ public class JobTracker {
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "stop &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-				}
-
 				if (command.hasSucceeded()) {
-					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
+					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
+
+						po.addLog(String.format("Checking status for %d attempt.", i));
+						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
+							@Override
+							public void onComplete(NodeState state) {
+								if (NodeState.STOPPED.equals(state)) {
+									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+									isSuccessful.set(true);
+								}
+							}
+						}));
+
+						if (isSuccessful.get()) {
+							break;
+						} else {
+							try {
+								Thread.sleep(SLEEP_SECONDS * 1000);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+
+					if (!isSuccessful.get()) {
+						po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
+					}
 				} else if (command.hasCompleted()) {
 					po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
 				} else {
@@ -123,16 +171,43 @@ public class JobTracker {
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "restart &");
+				final Command command = Commands.getJobTrackerCommand(config.getJobTracker(), "restart &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-				}
-
 				if (command.hasSucceeded()) {
-					po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+					try {
+						Thread.sleep(SLEEP_SECONDS * 1000);
+					} catch (InterruptedException e) {
+					}
+
+					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
+					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
+
+						po.addLog(String.format("Checking status for %d attempt.", i));
+						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
+							@Override
+							public void onComplete(NodeState state) {
+								if (NodeState.RUNNING.equals(state)) {
+									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+									isSuccessful.set(true);
+								}
+							}
+						}));
+
+						if (isSuccessful.get()) {
+							break;
+						} else {
+							try {
+								Thread.sleep(SLEEP_SECONDS * 1000);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+
+					if (!isSuccessful.get()) {
+						po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
+					}
 				} else if (command.hasCompleted()) {
 					po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
 				} else {
@@ -176,7 +251,7 @@ public class JobTracker {
 						for (String status : array) {
 							if (status.contains("JobTracker")) {
 								String temp = status.
-										replaceAll("DataNode is ", "");
+										replaceAll("JobTracker is ", "");
 								if (temp.toLowerCase().contains("not")) {
 									nodeState = NodeState.STOPPED;
 								} else {
@@ -202,6 +277,5 @@ public class JobTracker {
 		});
 
 		return po.getId();
-
 	}
 }
