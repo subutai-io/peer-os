@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * Created by daralbaev on 12.04.14.
  */
 public class NameNode {
-	public static final int NUMBER_OF_RETRIES = 10;
+	public static final int NUMBER_OF_RETRIES = 30;
 	public static final int SLEEP_SECONDS = 10;
 
 	private HadoopImpl parent;

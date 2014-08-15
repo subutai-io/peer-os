@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by daralbaev on 14.04.14.
  */
 public class JobTracker {
-	public static final int NUMBER_OF_RETRIES = 10;
+	public static final int NUMBER_OF_RETRIES = 30;
 	public static final int SLEEP_SECONDS = 10;
 	private HadoopImpl parent;
 	private Config config;

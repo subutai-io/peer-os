@@ -33,7 +33,7 @@ public class CheckTask implements Runnable {
 		if (trackID != null) {
 			while (true) {
 				ProductOperationView prevPo = HadoopImpl.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-				if (prevPo.getState() == ProductOperationState.RUNNING) {
+				if (prevPo == null || prevPo.getState() == ProductOperationState.RUNNING) {
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException ex) {
