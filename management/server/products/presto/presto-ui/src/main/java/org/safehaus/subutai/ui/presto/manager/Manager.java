@@ -519,7 +519,7 @@ public class Manager {
 			public void itemClick(ItemClickEvent event) {
 				if (event.isDoubleClick()) {
 					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname);
+					Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname.replaceAll("Coordinator: ", ""));
 					if (lxcAgent != null) {
 						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), PrestoUI.getExecutor(), PrestoUI.getCommandRunner(), PrestoUI.getAgentManager());
 						contentRoot.getUI().addWindow(terminal.getWindow());
