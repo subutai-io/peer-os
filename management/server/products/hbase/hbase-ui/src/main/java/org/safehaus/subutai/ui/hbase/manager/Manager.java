@@ -138,6 +138,7 @@ public class Manager {
 							refreshClustersInfo();
 						}
 					});
+                    contentRoot.getUI().addWindow(window.getWindow());
 				} else {
 					show("Please, select cluster");
 				}
@@ -160,6 +161,7 @@ public class Manager {
 							refreshClustersInfo();
 						}
 					});
+                    contentRoot.getUI().addWindow(window.getWindow());
 				} else {
 					show("Please, select cluster");
 				}
