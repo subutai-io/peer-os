@@ -100,7 +100,7 @@ public class ConfigurationStep extends VerticalLayout {
             }
         } );
 
-        select.setItemCaptionPropertyId( "hostname" );
+//        select.setItemCaptionPropertyId( "hostname" );
         select.setRows( 7 );
         select.setNullSelectionAllowed( false );
         select.setMultiSelect( true );
