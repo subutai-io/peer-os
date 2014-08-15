@@ -278,9 +278,9 @@ public class Manager {
 						info.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (HBaseConfig config : clusters) {
-					if (config.getClusterName().equals(clusterInfo)) {
-						clusterCombo.setValue(config);
+                for(HBaseConfig c : clusters) {
+                    if(c.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(c);
 						return;
 					}
 				}
