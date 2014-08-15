@@ -49,45 +49,42 @@ public class JobTracker {
 
 				HadoopImpl.getCommandRunner().runCommand(command);
 
-				if (!command.hasSucceeded()) {
-					if (command.hasCompleted()) {
-						po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
-					} else {
+				if (command.hasSucceeded()) {
+					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
+					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
+
+						po.addLog(String.format("Checking status for %d attempt.", i));
+						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
+							@Override
+							public void onComplete(NodeState state) {
+								if (NodeState.RUNNING.equals(state)) {
+									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+									isSuccessful.set(true);
+								}
+							}
+						}));
+
+						if (isSuccessful.get()) {
+							break;
+						} else {
+							try {
+								Thread.sleep(SLEEP_SECONDS * 1000);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+
+					if (!isSuccessful.get()) {
 						po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
 					}
+				} else if (command.hasCompleted()) {
+					po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+				} else {
+					po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
 				}
 			}
 		});
-
-
-		final AtomicBoolean isSuccessful = new AtomicBoolean(false);
-		for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
-
-			po.addLog(String.format("Checking status for %d attempt.", i));
-			parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
-				@Override
-				public void onComplete(NodeState state) {
-					if (NodeState.RUNNING.equals(state)) {
-						po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
-						isSuccessful.set(true);
-					}
-				}
-			}));
-
-			if (isSuccessful.get()) {
-				break;
-			} else {
-				try {
-					Thread.sleep(SLEEP_SECONDS * 1000);
-				} catch (InterruptedException e) {
-					break;
-				}
-			}
-		}
-
-		if (!isSuccessful.get()) {
-			po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
-		}
 
 		return po.getId();
 	}
@@ -115,44 +112,42 @@ public class JobTracker {
 
 				HadoopImpl.getCommandRunner().runCommand(command);
 
-				if (!command.hasSucceeded()) {
-					if (command.hasCompleted()) {
-						po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
-					} else {
+				if (command.hasSucceeded()) {
+					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
+					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
+
+						po.addLog(String.format("Checking status for %d attempt.", i));
+						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
+							@Override
+							public void onComplete(NodeState state) {
+								if (NodeState.STOPPED.equals(state)) {
+									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+									isSuccessful.set(true);
+								}
+							}
+						}));
+
+						if (isSuccessful.get()) {
+							break;
+						} else {
+							try {
+								Thread.sleep(SLEEP_SECONDS * 1000);
+							} catch (InterruptedException e) {
+								break;
+							}
+						}
+					}
+
+					if (!isSuccessful.get()) {
 						po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
 					}
+				} else if (command.hasCompleted()) {
+					po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+				} else {
+					po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
 				}
 			}
 		});
-
-		final AtomicBoolean isSuccessful = new AtomicBoolean(false);
-		for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
-
-			po.addLog(String.format("Checking status for %d attempt.", i));
-			parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
-				@Override
-				public void onComplete(NodeState state) {
-					if (NodeState.STOPPED.equals(state)) {
-						po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
-						isSuccessful.set(true);
-					}
-				}
-			}));
-
-			if (isSuccessful.get()) {
-				break;
-			} else {
-				try {
-					Thread.sleep(SLEEP_SECONDS * 1000);
-				} catch (InterruptedException e) {
-					break;
-				}
-			}
-		}
-
-		if (!isSuccessful.get()) {
-			po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
-		}
 
 		return po.getId();
 	}
