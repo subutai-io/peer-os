@@ -2,17 +2,13 @@ package org.safehaus.subutai.hive.services;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.api.hive.Hive;
@@ -79,7 +75,7 @@ public class RestService {
 
         Config config = new Config();
         config.setClusterName( clusterName );
-        config.setClusterName( hadoopClusterName );
+        config.setHadoopClusterName(hadoopClusterName);
 
         Agent serverAgent = agentManager.getAgentByHostname( server );
         config.setServer( serverAgent );
