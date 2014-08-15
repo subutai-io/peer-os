@@ -217,7 +217,7 @@ public class JobTracker {
 	public UUID status() {
 
 		final ProductOperation po
-				= HadoopImpl.getTracker().createProductOperation(String.format("Getting status of clusters %s JobTracker", config.getClusterName()), Config.PRODUCT_KEY);
+				= parent.getTracker().createProductOperation(String.format("Getting status of clusters %s JobTracker", config.getClusterName()), Config.PRODUCT_KEY);
 
 		parent.getExecutor().execute(new Runnable() {
 
