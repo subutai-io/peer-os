@@ -21,7 +21,11 @@ sed -i '/2888/d' $ZOOKEEPER_CONF_DIR/zoo.cfg
 
 # write to zoo.cfg file
 i=1
+j=2888
+k=3888
 for arg; do
-   	echo "$i=$arg:2888:3888" >> $ZOOKEEPER_CONF_DIR/zoo.cfg
+   	echo "server.$i=$arg:$j:$k" >> $ZOOKEEPER_CONF_DIR/zoo.cfg
 	i=$((i + 1))
+	j=$((j + 1))
+	k=$((k + 1))
 done
