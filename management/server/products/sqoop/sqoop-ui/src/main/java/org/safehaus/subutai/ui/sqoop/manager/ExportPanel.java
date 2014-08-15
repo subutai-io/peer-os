@@ -76,8 +76,8 @@ public class ExportPanel extends ImportExportBase {
 		ls.add(usernameField);
 		ls.add(passwordField);
 		ls.add(hdfsPathField);
-        ls.add(buttons);
         ls.add(optionalParams);
+        ls.add(buttons);
 
 		addComponents(ls);
 	}

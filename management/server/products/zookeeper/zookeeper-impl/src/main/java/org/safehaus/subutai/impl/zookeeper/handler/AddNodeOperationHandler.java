@@ -19,8 +19,10 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 
 /**
@@ -188,7 +190,15 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
             Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
-            po.addLog( "Lxc container created successfully" );
+            po.addLog( "Lxc container created successfully\nRegistering hostnames in /etc/hosts..." );
+
+
+            if ( manager.getNetworkManager().configHostsOnAgents( Lists.newArrayList( config.getNodes() ), lxcAgent,
+                    Common.DEFAULT_DOMAIN_NAME ) ) {
+                po.addLogFailed( "Failed to register hostnames" );
+                return;
+            }
+
 
             reconfigureCluster( lxcAgent, config );
         }

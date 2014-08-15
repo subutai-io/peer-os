@@ -9,11 +9,13 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
+
 import java.util.ArrayList;
 import java.util.Set;
 
 import org.safehaus.subutai.shared.protocol.Util;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -27,110 +29,123 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
+
 /**
  * @author dilshat
  */
 public class StepSetConfig extends Panel {
 
-	public StepSetConfig(final Wizard wizard) {
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSizeFull();
-		verticalLayout.setHeight(100, Unit.PERCENTAGE);
-		verticalLayout.setMargin(true);
+    public StepSetConfig( final Wizard wizard ) {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSizeFull();
+        verticalLayout.setHeight( 100, Unit.PERCENTAGE );
+        verticalLayout.setMargin( true );
 
-		GridLayout grid = new GridLayout(10, 10);
-		grid.setSpacing(true);
-		grid.setSizeFull();
+        GridLayout grid = new GridLayout( 10, 10 );
+        grid.setSpacing( true );
+        grid.setSizeFull();
 
-		Panel panel = new Panel();
-		Label menu = new Label("Oozie Installation Wizard");
+        Panel panel = new Panel();
+        Label menu = new Label( "Oozie Installation Wizard" );
 
-		menu.setContentMode(ContentMode.HTML);
-		panel.setContent(menu);
-		grid.addComponent(menu, 0, 0, 2, 1);
-//		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
+        menu.setContentMode( ContentMode.HTML );
+        panel.setContent( menu );
+        grid.addComponent( menu, 0, 0, 2, 1 );
+        //		grid.setComponentAlignment(panel, Alignment.TOP_CENTER);
 
-		VerticalLayout vl = new VerticalLayout();
-		vl.setSizeFull();
-		vl.setSpacing(true);
+        VerticalLayout vl = new VerticalLayout();
+        vl.setSizeFull();
+        vl.setSpacing( true );
 
-		Label configServersLabel = new Label("<strong>Oozie Server</strong>");
-		configServersLabel.setContentMode(ContentMode.HTML);
-		vl.addComponent(configServersLabel);
+        Label configServersLabel = new Label( "<strong>Oozie Server</strong>" );
+        configServersLabel.setContentMode( ContentMode.HTML );
+        vl.addComponent( configServersLabel );
 
-		final Label server = new Label("Server");
-		vl.addComponent(server);
+        final Label server = new Label( "Server" );
+        vl.addComponent( server );
 
-		final ComboBox cbServers = new ComboBox();
-		for (String agent : wizard.getConfig().getHadoopNodes()) {
-			cbServers.addItem(agent);
-			cbServers.setItemCaption(agent, agent);
-			cbServers.setNullSelectionAllowed(false);
-		}
+        final ComboBox cbServers = new ComboBox();
+        cbServers.setImmediate( true );
+        cbServers.setTextInputAllowed( false );
+        cbServers.setRequired( true );
+        cbServers.setNullSelectionAllowed( false );
+        for ( String agent : wizard.getConfig().getHadoopNodes() ) {
+            cbServers.addItem( agent );
+            cbServers.setItemCaption( agent, agent );
+        }
 
-		vl.addComponent(cbServers);
+        vl.addComponent( cbServers );
 
-		final TwinColSelect selectClients = new TwinColSelect("", new ArrayList<String>());
-//		selectClients.setItemCaptionPropertyId("hostname");
-		selectClients.setRows(7);
-		selectClients.setNullSelectionAllowed(true);
-		selectClients.setMultiSelect(true);
-		selectClients.setImmediate(true);
-		selectClients.setLeftColumnCaption("Available nodes");
-		selectClients.setRightColumnCaption("Client nodes");
-		selectClients.setWidth(100, Unit.PERCENTAGE);
-		selectClients.setRequired(true);
-		selectClients.setContainerDataSource(
-				new BeanItemContainer<>(
-						String.class, wizard.getConfig().getHadoopNodes())
-		);
+        if ( !Strings.isNullOrEmpty( wizard.getConfig().getServer() ) ) {
+            cbServers.setValue( wizard.getConfig().getServer() );
+        }
 
-		vl.addComponent(selectClients);
+        final TwinColSelect selectClients = new TwinColSelect( "", new ArrayList<String>() );
+        //		selectClients.setItemCaptionPropertyId("hostname");
+        selectClients.setRows( 7 );
+        selectClients.setNullSelectionAllowed( true );
+        selectClients.setMultiSelect( true );
+        selectClients.setImmediate( true );
+        selectClients.setLeftColumnCaption( "Available nodes" );
+        selectClients.setRightColumnCaption( "Client nodes" );
+        selectClients.setWidth( 100, Unit.PERCENTAGE );
+        selectClients.setRequired( true );
+        selectClients
+                .setContainerDataSource( new BeanItemContainer<>( String.class, wizard.getConfig().getHadoopNodes() ) );
 
-		grid.addComponent(vl, 3, 0, 9, 9);
-		grid.setComponentAlignment(vl, Alignment.TOP_CENTER);
+        if ( !Util.isCollectionEmpty( wizard.getConfig().getClients() ) ) {
+            selectClients.setValue( wizard.getConfig().getClients() );
+        }
 
-		Button next = new Button("Next");
-		next.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.getConfig().setServer((String) cbServers.getValue());
-				wizard.getConfig().setClients((Set<String>) selectClients.getValue());
+        vl.addComponent( selectClients );
 
-				if (Util.isCollectionEmpty(wizard.getConfig().getClients())) {
-					show("Please select nodes for Oozie clients");
-				} else if (wizard.getConfig().getServer() == null) {
-					show("Please select node for Oozie server");
-				} else {
-					if (wizard.getConfig().getClients().contains(wizard.getConfig().getServer())) {
-						show("Oozie server and client can not be installed on the same host");
-					} else {
-						wizard.next();
-					}
-				}
-			}
-		});
+        grid.addComponent( vl, 3, 0, 9, 9 );
+        grid.setComponentAlignment( vl, Alignment.TOP_CENTER );
 
-		Button back = new Button("Back");
-		back.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.back();
-			}
-		});
+        Button next = new Button( "Next" );
+        next.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                wizard.getConfig().setServer( ( String ) cbServers.getValue() );
+                wizard.getConfig().setClients( ( Set<String> ) selectClients.getValue() );
 
-		verticalLayout.addComponent(grid);
+                if ( Util.isCollectionEmpty( wizard.getConfig().getClients() ) ) {
+                    show( "Please select nodes for Oozie clients" );
+                }
+                else if ( wizard.getConfig().getServer() == null ) {
+                    show( "Please select node for Oozie server" );
+                }
+                else {
+                    if ( wizard.getConfig().getClients().contains( wizard.getConfig().getServer() ) ) {
+                        show( "Oozie server and client can not be installed on the same host" );
+                    }
+                    else {
+                        wizard.next();
+                    }
+                }
+            }
+        } );
 
-		HorizontalLayout horizontalLayout = new HorizontalLayout();
-		horizontalLayout.addComponent(back);
-		horizontalLayout.addComponent(next);
-		verticalLayout.addComponent(horizontalLayout);
+        Button back = new Button( "Back" );
+        back.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                wizard.back();
+            }
+        } );
 
-		setContent(verticalLayout);
-	}
+        verticalLayout.addComponent( grid );
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.addComponent( back );
+        horizontalLayout.addComponent( next );
+        verticalLayout.addComponent( horizontalLayout );
 
+        setContent( verticalLayout );
+    }
+
+
+    private void show( String notification ) {
+        Notification.show( notification );
+    }
 }

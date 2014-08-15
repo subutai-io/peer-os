@@ -729,6 +729,11 @@
                   <artifactId>command-runner-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>command-runner-ui-old</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Agent Manager -->
                 <artifactItem>
