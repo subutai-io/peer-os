@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by daralbaev on 14.04.14.
  */
 public class JobTracker {
-	public static final int NUMBER_OF_RETRIES = 30;
+	public static final int NUMBER_OF_RETRIES = 10;
 	public static final int SLEEP_SECONDS = 10;
 	private HadoopImpl parent;
 	private Config config;
@@ -217,7 +217,8 @@ public class JobTracker {
 	public UUID status() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(String.format("Getting status of clusters %s JobTracker", config.getClusterName()), Config.PRODUCT_KEY);
+				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+				String.format("Getting status of clusters %s JobTracker", config.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
