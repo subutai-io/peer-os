@@ -28,6 +28,17 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
             return;
         }
 
+        // check if nodes are connected
+        for(Agent a : config.getNodes()) {
+            Agent agent = manager.getAgentManager().getAgentByHostname(a.getHostname());
+            if(agent == null) {
+                po.addLogFailed(String.format(
+                        "Node %s is not connected. Operations aborted.",
+                        a.getHostname()));
+                return;
+            }
+        }
+
         po.addLog("Uninstalling Flume...");
 
         Command cmd = manager.getCommandRunner().createCommand(
