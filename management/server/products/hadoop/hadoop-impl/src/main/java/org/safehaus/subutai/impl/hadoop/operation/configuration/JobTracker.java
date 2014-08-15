@@ -175,6 +175,11 @@ public class JobTracker {
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
+					try {
+						Thread.sleep(SLEEP_SECONDS * 1000);
+					} catch (InterruptedException e) {
+					}
+
 					final AtomicBoolean isSuccessful = new AtomicBoolean(false);
 					for (int i = 1; i <= NUMBER_OF_RETRIES; i++) {
 
@@ -246,7 +251,7 @@ public class JobTracker {
 						for (String status : array) {
 							if (status.contains("JobTracker")) {
 								String temp = status.
-										replaceAll("DataNode is ", "");
+										replaceAll("JobTracker is ", "");
 								if (temp.toLowerCase().contains("not")) {
 									nodeState = NodeState.STOPPED;
 								} else {
