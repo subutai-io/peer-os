@@ -613,6 +613,11 @@
         <artifactId>command-runner-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>command-runner-ui-old</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- Agent Manager -->
       <dependency>

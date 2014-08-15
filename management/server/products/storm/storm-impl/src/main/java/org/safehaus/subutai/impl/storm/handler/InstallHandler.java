@@ -97,7 +97,7 @@ public class InstallHandler extends AbstractHandler {
         allNodes.removeAll(skipped);
         if(allNodes.size() > 0) {
             String s = Commands.make(CommandType.INSTALL);
-            int t = (int)TimeUnit.MINUTES.toSeconds(15);
+            int t = (int)TimeUnit.MINUTES.toSeconds(25);
             cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(t), allNodes);
             manager.getCommandRunner().runCommand(cmd);

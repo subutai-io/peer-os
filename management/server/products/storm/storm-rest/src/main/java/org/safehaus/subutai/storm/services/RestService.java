@@ -2,17 +2,13 @@ package org.safehaus.subutai.storm.services;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.api.storm.Storm;
@@ -75,7 +71,7 @@ public class RestService {
             @QueryParam( "externalZookeeper" ) boolean externalZookeeper,
             @QueryParam( "zookeeperClusterName" ) String zookeeperClusterName,
             @QueryParam( "nimbus" ) String nimbus,
-            @QueryParam( "supervisors" ) List<String> supervisors
+            @QueryParam("supervisorsCount") String supervisorsCount
     ) {
 
         Config config = new Config();
@@ -86,14 +82,14 @@ public class RestService {
         Agent nimbusAgent = agentManager.getAgentByHostname( nimbus );
         config.setNimbus( nimbusAgent );
 
-        config.setSupervisorsCount( supervisors.size() );
-
-        for ( String hostname : supervisors ) {
-            Agent agent = agentManager.getAgentByHostname( hostname );
-            config.getSupervisors().add( agent );
+        try {
+            Integer c = Integer.valueOf(supervisorsCount);
+            config.setSupervisorsCount(c);
+        } catch(NumberFormatException ex) {
+            return JsonUtil.toJson("error", ex.getMessage());
         }
 
-        UUID uuid = stormManager.installCluster( config );
+        UUID uuid = stormManager.installCluster(config);
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
