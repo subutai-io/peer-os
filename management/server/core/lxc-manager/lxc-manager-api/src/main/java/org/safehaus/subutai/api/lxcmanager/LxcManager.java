@@ -10,8 +10,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
@@ -53,6 +53,18 @@ public interface LxcManager {
      * @return true if all went ok, false otherwise
      */
     public boolean cloneLxcOnHost( Agent physicalAgent, String lxcHostname );
+
+
+    /**
+     * Returns state of lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     *
+     * @return - {@code LxcState}
+     */
+    public LxcState checkLxcOnHost( Agent physicalAgent, String lxcHostname );
+
 
     /**
      * Starts lxc on a given physical server

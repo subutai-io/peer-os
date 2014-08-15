@@ -59,6 +59,12 @@ public class LxcManagerMock implements LxcManager {
 
 
     @Override
+    public LxcState checkLxcOnHost( final Agent physicalAgent, final String lxcHostname ) {
+        return LxcState.UNKNOWN;
+    }
+
+
+    @Override
     public boolean startLxcOnHost( Agent physicalAgent, String lxcHostname ) {
         return false;
     }

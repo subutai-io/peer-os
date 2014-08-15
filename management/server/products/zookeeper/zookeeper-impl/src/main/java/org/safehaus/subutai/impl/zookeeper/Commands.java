@@ -65,9 +65,8 @@ public class Commands extends CommandsSingleton {
 
     public static Command getUpdateSettingsCommand( Set<Agent> agents ) {
         StringBuilder zkNames = new StringBuilder();
-        int i = 0;
         for ( Agent agent : agents ) {
-            zkNames.append( agent.getHostname() ).append( ++i ).append( " " );
+            zkNames.append( agent.getHostname() ).append( " " );
         }
 
         Set<AgentRequestBuilder> requestBuilders = new HashSet<>();
@@ -93,7 +92,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents ) {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
-                agents );
+                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
+                                propertyName ) ), agents );
     }
 }
