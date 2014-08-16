@@ -13,6 +13,8 @@ public class Commands {
             case INSTALL:
             case PURGE:
                 sb = new StringBuilder(EXEC_PROFILE);
+                // NODE: fix related to apt-get update
+                if(type == CommandType.INSTALL) sb.append(" && sleep 20");
                 sb.append(" && apt-get --force-yes --assume-yes ");
                 sb.append(type.toString().toLowerCase()).append(" ");
                 sb.append(PACKAGE_NAME);

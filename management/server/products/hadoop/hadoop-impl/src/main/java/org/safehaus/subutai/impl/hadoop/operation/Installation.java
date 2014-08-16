@@ -72,6 +72,13 @@ public class Installation {
 					return;
 				}
 
+				//check if mongo cluster with the same name already exists
+				if (parent.getCluster(config.getClusterName()) != null) {
+					po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted",
+							config.getClusterName()));
+					return;
+				}
+
 				try {
 					po.addLog(String.format("Creating %d lxc containers...", config.getCountOfSlaveNodes() + 3));
 					Map<String, Set<Agent>> nodes = CustomPlacementStrategy.getNodes(
