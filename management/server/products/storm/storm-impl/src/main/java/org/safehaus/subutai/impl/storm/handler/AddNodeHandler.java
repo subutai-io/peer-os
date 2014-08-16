@@ -42,6 +42,7 @@ public class AddNodeHandler extends AbstractHandler {
                 return;
             }
         } else {
+            po.addLog("Creating container for new node...");
             InstallHelper helper = new InstallHelper(manager);
             try {
                 agent = helper.createContainer();
@@ -51,6 +52,7 @@ public class AddNodeHandler extends AbstractHandler {
                 po.addLogFailed("Failed to create container: " + ex.getMessage());
                 return;
             }
+            po.addLog("Container created. Host name is " + agent.getHostname());
         }
 
         Set<Agent> set = new HashSet<>();
