@@ -51,7 +51,8 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<Accumu
         Command stopCommand = Commands.getStopCommand( config.getMasterNode() );
         manager.getCommandRunner().runCommand( stopCommand );
 
-        if ( stopCommand.hasSucceeded() ) {
+        //  temporarily turning off until exit code ir fixed:  if ( stopCommand.hasSucceeded() ) {
+        if ( stopCommand.hasCompleted() ) {
             po.addLogDone( "Cluster stopped successfully" );
         }
         else {

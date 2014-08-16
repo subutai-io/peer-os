@@ -54,13 +54,15 @@ public class RestServiceImpl implements RestService {
         OozieConfig config = new OozieConfig();
         config.setClusterName( clusterName );
         config.setServer( serverHostname );
-        Set<String> clients = new HashSet<String>();
-
+        Set<String> clients = new HashSet<>();
+        Set<String> hadoopNodes = new HashSet<String>();
         for ( Agent agent : hadoopConfig.getAllNodes() ) {
             clients.add( agent.getHostname() );
+            hadoopNodes.add( agent.getHostname() );
         }
         clients.remove( serverHostname );
         config.setClients( clients );
+        config.setHadoopNodes( hadoopNodes );
 
         UUID uuid = this.oozieManager.installCluster( config );
         return JsonUtil.toJson( OPERATION_ID, uuid.toString() );

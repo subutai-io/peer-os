@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 
 import com.google.common.base.Strings;
 
@@ -57,7 +57,9 @@ public class RemovePropertyOperationHandler extends AbstractOperationHandler<Acc
 
             Command restartClusterCommand = Commands.getRestartCommand( config.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
-            if ( restartClusterCommand.hasSucceeded() ) {
+
+            //  temporarily turning off until exit code ir fixed:  if ( restartClusterCommand.hasSucceeded() ) {
+            if ( restartClusterCommand.hasCompleted() ) {
                 po.addLogDone( "Cluster restarted successfully" );
             }
             else {

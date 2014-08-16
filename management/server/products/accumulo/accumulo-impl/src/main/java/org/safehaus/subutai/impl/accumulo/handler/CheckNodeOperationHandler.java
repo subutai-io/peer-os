@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
@@ -57,7 +57,8 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
         Command checkNodeCommand = Commands.getStatusCommand( node );
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
-        if ( checkNodeCommand.hasSucceeded() ) {
+        //  temporarily turning off until exit code ir fixed:  if ( checkNodeCommand.hasSucceeded() ) {
+        if ( checkNodeCommand.hasCompleted() ) {
             po.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
