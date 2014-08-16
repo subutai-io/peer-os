@@ -17,21 +17,16 @@ class InstallHelper {
         this.manager = manager;
     }
 
-    Set<Agent> createSupervisorContainers(int count) throws LxcCreateException {
+    Set<Agent> createContainers(int count) throws LxcCreateException {
         Map<Agent, Set<Agent>> lxcs = manager.getLxcManager().createLxcs(count);
         Set<Agent> res = new HashSet<>();
         for(Set<Agent> s : lxcs.values()) res.addAll(s);
         return res;
     }
 
-    Agent createNimbusContainer() throws LxcCreateException {
-        Map<Agent, Set<Agent>> map = manager.getLxcManager().createLxcs(1);
-        Collection<Set<Agent>> coll = map.values();
-        if(coll.size() > 0) {
-            Set<Agent> set = coll.iterator().next();
-            if(set.size() > 0) return set.iterator().next();
-        }
-        return null;
+    Agent createContainer() throws LxcCreateException {
+        Set<Agent> s = createContainers(1);
+        return s.size() > 0 ? s.iterator().next() : null;
     }
 
     boolean installZookeeper(Agent agent) {

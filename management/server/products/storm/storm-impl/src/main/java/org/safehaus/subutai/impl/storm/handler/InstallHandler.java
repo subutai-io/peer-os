@@ -171,7 +171,7 @@ public class InstallHandler extends AbstractHandler {
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {
             po.addLog("Creating container for Nimbus node...");
-            Agent nimbus = helper.createNimbusContainer();
+            Agent nimbus = helper.createContainer();
             if(nimbus == null) {
                 po.addLogFailed("Failed to create nimbus node");
                 return false;
@@ -188,7 +188,7 @@ public class InstallHandler extends AbstractHandler {
         // create supervisor nodes
         po.addLog(String.format("Creating %s container(s) for supervisor nodes...",
                 config.getSupervisorsCount()));
-        Set<Agent> set = helper.createSupervisorContainers(config.getSupervisorsCount());
+        Set<Agent> set = helper.createContainers(config.getSupervisorsCount());
         if(set.size() != config.getSupervisorsCount())
             po.addLog("Not all nodes created. Created nodes count: " + set.size());
 
