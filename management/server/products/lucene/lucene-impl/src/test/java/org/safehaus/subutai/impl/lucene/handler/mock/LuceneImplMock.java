@@ -16,7 +16,6 @@ public class LuceneImplMock extends LuceneImpl {
 
     private Config clusterConfig = null;
 
-
     public LuceneImplMock() {
         super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
                 mock( Hadoop.class ) );
