@@ -116,7 +116,9 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
 
             Command restartClusterCommand = Commands.getRestartCommand( config.getMasterNode() );
             manager.getCommandRunner().runCommand( restartClusterCommand );
-            if ( restartClusterCommand.hasSucceeded() ) {
+
+            //  temporarily turning off until exit code ir fixed:  if ( restartClusterCommand.hasSucceeded() ) {
+            if ( restartClusterCommand.hasCompleted() ) {
                 po.addLog( "Cluster restarted successfully" );
             }
             else {
