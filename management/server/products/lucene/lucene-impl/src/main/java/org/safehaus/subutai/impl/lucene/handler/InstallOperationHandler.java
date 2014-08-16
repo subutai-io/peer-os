@@ -36,11 +36,18 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
             return;
         }
 
-        if ( manager.getCluster( clusterName) != null ) {
-            productOperation.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                    clusterName ) );
+        if ( manager.getCluster( clusterName ) != null ) {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name '%s' already exists\nInstallation aborted", clusterName ) );
             return;
         }
+
+        if ( manager.getHadoopManager().getCluster( config.getHadoopClusterName() ) == null ) {
+            productOperation.addLogFailed( String.format( "Hadoop cluster '%s' not found\nInstallation aborted",
+                    config.getHadoopClusterName() ) );
+            return;
+        }
+
 
         // Check if node agent is connected
         for ( Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); ) {
@@ -105,15 +112,15 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
             try {
                 manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
 
-                productOperation.addLogDone("Information updated in db");
+                productOperation.addLogDone( "Information updated in db" );
             }
             catch ( DBException e ) {
-                productOperation.addLogFailed(String.format( "Failed to update information in db, %s" , e.getMessage()));
+                productOperation
+                        .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
             }
         }
         else {
             productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
         }
-
     }
 }
