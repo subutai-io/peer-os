@@ -3,6 +3,7 @@ package org.safehaus.subutai.impl.storm.handler;
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.impl.storm.*;
 import org.safehaus.subutai.shared.operation.ProductOperation;
@@ -54,8 +55,14 @@ public class DestroyNodeHandler extends AbstractHandler {
             config.getSupervisors().remove(agent);
             boolean b = manager.getDbManager().saveInfo(Config.PRODUCT_NAME,
                     clusterName, config);
-            if(b) po.addLogDone("Saved cluster info");
-            else po.addLogFailed("Failed to save cluster info");
+            if(b) {
+                try {
+                    manager.getLxcManager().destroyLxcs(new HashSet<>(Arrays.asList(agent)));
+                } catch(LxcDestroyException ex) {
+                    po.addLog("Failed to destroy node: " + ex.getMessage());
+                }
+                po.addLogDone("Saved cluster info");
+            } else po.addLogFailed("Failed to save cluster info");
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Failed to remove node from cluster");

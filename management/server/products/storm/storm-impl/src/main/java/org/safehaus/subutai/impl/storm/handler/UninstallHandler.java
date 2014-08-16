@@ -5,6 +5,7 @@ import java.util.Set;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.impl.storm.CommandType;
 import org.safehaus.subutai.impl.storm.Commands;
@@ -58,8 +59,14 @@ public class UninstallHandler extends AbstractHandler {
                 }
             }
             boolean b = manager.getDbManager().deleteInfo(Config.PRODUCT_NAME, clusterName);
-            if(b) po.addLogDone("Cluster info deleted");
-            else po.addLogFailed("Failed to delete cluster info");
+            if(b) {
+                try {
+                    manager.getLxcManager().destroyLxcs(allNodes);
+                } catch(LxcDestroyException ex) {
+                    po.addLog("Failed to destroy nodes: " + ex.getMessage());
+                }
+                po.addLogDone("Cluster info deleted");
+            } else po.addLogFailed("Failed to delete cluster info");
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Failed to remove Storm on nodes");
