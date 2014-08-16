@@ -152,8 +152,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             }
             po.addLog( "Lxc containers created successfully\nRegistering hostnames in /etc/hosts..." );
 
-            if ( manager.getNetworkManager()
-                        .configHostsOnAgents( Lists.newArrayList( config.getNodes() ), Common.DEFAULT_DOMAIN_NAME ) ) {
+            if ( !manager.getNetworkManager()
+                         .configHostsOnAgents( Lists.newArrayList( config.getNodes() ), Common.DEFAULT_DOMAIN_NAME ) ) {
                 po.addLogFailed( "Failed to register hostnames" );
                 return;
             }
