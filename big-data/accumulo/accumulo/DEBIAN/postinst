@@ -24,6 +24,7 @@ ln -sf $accumuloConf/masters $accumuloHome/conf/
 ln -sf $accumuloConf/monitor_logger.xml $accumuloHome/conf/
 ln -sf $accumuloConf/slaves $accumuloHome/conf/
 ln -sf $accumuloConf/tracers $accumuloHome/conf/
+ln -sf $accumuloConf/monitor $accumuloHome/conf/
 
 if [ "x$JAVA_HOME" = "x" ];
 then
