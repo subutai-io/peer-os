@@ -38,8 +38,8 @@ public class RestService {
 
 
     @GET
-    @Path( "getClusters" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("getClusters")
+    @Produces({ MediaType.APPLICATION_JSON })
     public String getClusters() {
 
         List<Config> configs = luceneManager.getClusters();
@@ -54,9 +54,9 @@ public class RestService {
 
 
     @GET
-    @Path( "getCluster" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String getCluster( @QueryParam( "clusterName" ) String clusterName ) {
+    @Path("getCluster")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String getCluster( @QueryParam("clusterName") String clusterName ) {
         Config config = luceneManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
@@ -64,13 +64,15 @@ public class RestService {
 
 
     @GET
-    @Path( "installCluster" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String installCluster( @QueryParam( "clusterName" ) String clusterName,
-                                  @QueryParam( "nodes" ) String nodes ) {
+    @Path("installCluster")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String installCluster( @QueryParam("clusterName") String clusterName,
+                                  @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
+                                  @QueryParam("nodes") String nodes ) {
 
         Config config = new Config();
         config.setClusterName( clusterName );
+        config.setHadoopClusterName( hadoopClusterName );
 
 
         // BUG: Getting the params as list doesn't work. For example "List<String> nodes". To fix this we get a param
@@ -88,9 +90,9 @@ public class RestService {
 
 
     @GET
-    @Path( "uninstallCluster" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String uninstallCluster( @QueryParam( "clusterName" ) String clusterName ) {
+    @Path("uninstallCluster")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String uninstallCluster( @QueryParam("clusterName") String clusterName ) {
         UUID uuid = luceneManager.uninstallCluster( clusterName );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -98,9 +100,9 @@ public class RestService {
 
 
     @GET
-    @Path( "addNode" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String addNode( @QueryParam( "clusterName" ) String clusterName, @QueryParam( "node" ) String node ) {
+    @Path("addNode")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String addNode( @QueryParam("clusterName") String clusterName, @QueryParam("node") String node ) {
         UUID uuid = luceneManager.addNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -108,9 +110,9 @@ public class RestService {
 
 
     @GET
-    @Path( "destroyNode" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String destroyNode( @QueryParam( "clusterName" ) String clusterName, @QueryParam( "node" ) String node ) {
+    @Path("destroyNode")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String destroyNode( @QueryParam("clusterName") String clusterName, @QueryParam("node") String node ) {
         UUID uuid = luceneManager.destroyNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );

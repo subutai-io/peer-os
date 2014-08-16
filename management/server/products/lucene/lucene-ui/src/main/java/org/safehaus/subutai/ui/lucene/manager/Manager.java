@@ -130,7 +130,7 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
                     org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-                            LuceneUI.getHadoopManager().getCluster( config.getClusterName() );
+                            LuceneUI.getHadoopManager().getCluster( config.getHadoopClusterName() );
                     if ( hadoopConfig != null ) {
                         Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
@@ -235,7 +235,7 @@ public class Manager {
                 clusterCombo.addItem( luceneClusterInfo );
                 clusterCombo.setItemCaption( luceneClusterInfo,
                         String.format( "%s (%s)", luceneClusterInfo.getClusterName(),
-                                luceneClusterInfo.getLuceneClusterName() ) );
+                                luceneClusterInfo.getHadoopClusterName() ) );
             }
             if ( clusterInfo != null ) {
                 for ( Config luceneClusterInfo : clustersInfo ) {

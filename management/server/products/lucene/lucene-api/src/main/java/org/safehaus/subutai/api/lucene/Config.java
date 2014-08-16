@@ -12,20 +12,10 @@ public class Config implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Lucene";
 
+    private String hadoopClusterName = "";
     private String clusterName = "";
-    private String luceneClusterName = "";
 
     private Set<Agent> nodes = new HashSet<>();
-
-
-    public String getLuceneClusterName() {
-        return luceneClusterName;
-    }
-
-
-    public void setLuceneClusterName( final String luceneClusterName ) {
-        this.luceneClusterName = luceneClusterName;
-    }
 
 
     @Override
@@ -34,9 +24,18 @@ public class Config implements ConfigBase {
     }
 
 
-    public Config setClusterName( String clusterName ) {
+    public void setClusterName( final String clusterName ) {
         this.clusterName = clusterName;
-        return this;
+    }
+
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
     }
 
 
@@ -53,8 +52,8 @@ public class Config implements ConfigBase {
     @Override
     public String toString() {
         return "Config{" +
-                "clusterName='" + clusterName + '\'' +
-                ", luceneClusterName='" + luceneClusterName + '\'' +
+                "hadoopClusterName='" + hadoopClusterName + '\'' +
+                ", clusterName='" + clusterName + '\'' +
                 ", nodes=" + nodes +
                 '}';
     }
