@@ -264,8 +264,13 @@ public class OozieImpl implements Oozie {
                             config.getClusterName() ) );
                     return;
                 }
-                Set<Agent> servers = new HashSet<Agent>();
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
+
+                if ( serverAgent == null ) {
+                    po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    return;
+                }
+                Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
                 Command startServiceCommand = Commands.getStartServerCommand( servers );
                 commandRunner.runCommand( startServiceCommand );
@@ -308,8 +313,12 @@ public class OozieImpl implements Oozie {
                             config.getClusterName() ) );
                     return;
                 }
-                Set<Agent> servers = new HashSet<Agent>();
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
+                if ( serverAgent == null ) {
+                    po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    return;
+                }
+                Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
                 Command stopServiceCommand = Commands.getStopServerCommand( servers );
                 commandRunner.runCommand( stopServiceCommand );
@@ -341,8 +350,12 @@ public class OozieImpl implements Oozie {
                             config.getClusterName() ) );
                     return;
                 }
-                Set<Agent> servers = new HashSet<Agent>();
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
+                if ( serverAgent == null ) {
+                    po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
+                    return;
+                }
+                Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
                 Command statusServiceCommand = Commands.getStatusServerCommand( servers );
                 commandRunner.runCommand( statusServiceCommand );
