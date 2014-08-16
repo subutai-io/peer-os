@@ -73,6 +73,14 @@ public class OozieImpl implements Oozie {
                     return;
                 }
 
+
+                for ( String node : config.getHadoopNodes() ) {
+                    if ( agentManager.getAgentByHostname( node ) == null ) {
+                        po.addLogFailed( String.format( "Node %s not connected\nAborted", node ) );
+                        return;
+                    }
+                }
+
                 if ( dbManager.saveInfo( config.PRODUCT_KEY, config.getClusterName(), config ) ) {
                     po.addLog( "Cluster info saved to DB" );
 
@@ -173,6 +181,16 @@ public class OozieImpl implements Oozie {
                     return;
                 }
 
+                Set<String> nodes = new HashSet<String>();
+                nodes.addAll( config.getClients() );
+                nodes.add( config.getServer() );
+                for ( String node : nodes ) {
+                    if ( agentManager.getAgentByHostname( node ) == null ) {
+                        po.addLogFailed( String.format( "Node %s not connected\nAborted", node ) );
+                        return;
+                    }
+                }
+
                 Set<Agent> servers = new HashSet<Agent>();
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
                 servers.add( serverAgent );
@@ -213,7 +231,6 @@ public class OozieImpl implements Oozie {
                 else {
                     po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
                 }
-
             }
         } );
 
