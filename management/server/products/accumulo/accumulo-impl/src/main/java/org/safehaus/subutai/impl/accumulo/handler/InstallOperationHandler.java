@@ -188,7 +188,9 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                                                 Commands.getStartCommand( config.getMasterNode() );
                                         manager.getCommandRunner().runCommand( startClusterCommand );
 
-                                        if ( startClusterCommand.hasSucceeded() ) {
+                                        //  temporarily turning off until exit code ir fixed:  if (
+                                        // startClusterCommand.hasSucceeded() ) {
+                                        if ( startClusterCommand.hasCompleted() ) {
                                             po.addLog( "Cluster started successfully" );
                                         }
                                         else {
