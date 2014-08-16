@@ -18,6 +18,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 public class RestServiceImpl implements RestService {
 
     private Cassandra cassandraManager;
+    private static final String OPERATION_ID = "OPERATION_ID";
 
 
     public void setCassandraManager( Cassandra cassandraManager ) {
@@ -43,14 +44,14 @@ public class RestServiceImpl implements RestService {
         config.setNumberOfSeeds( Integer.parseInt( numberOfSeeds ) );
 
         UUID uuid = cassandraManager.installCluster( config );
-        return uuid.toString();
+        return JsonUtil.toJson( OPERATION_ID, uuid.toString() );
     }
 
 
     @Override
     public String uninstall( String clusterName ) {
         UUID uuid = cassandraManager.uninstallCluster( clusterName );
-        return uuid.toString();
+        return JsonUtil.toJson( OPERATION_ID, uuid.toString() );
     }
 
 
@@ -69,7 +70,7 @@ public class RestServiceImpl implements RestService {
 
             if ( agent != null ) {
                 return JsonUtil
-                        .toJson( "OPERATION_ID", cassandraManager.startCassandraService( agent.getUuid().toString() ) );
+                        .toJson( OPERATION_ID, cassandraManager.startCassandraService( agent.getUuid().toString() ) );
             }
             else {
                 return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
@@ -96,7 +97,7 @@ public class RestServiceImpl implements RestService {
 
             if ( agent != null ) {
                 return JsonUtil
-                        .toJson( "OPERATION_ID", cassandraManager.stopCassandraService( agent.getUuid().toString() ) );
+                        .toJson( OPERATION_ID, cassandraManager.stopCassandraService( agent.getUuid().toString() ) );
             }
             else {
                 return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
@@ -122,8 +123,8 @@ public class RestServiceImpl implements RestService {
             }
 
             if ( agent != null ) {
-                return JsonUtil.toJson( "OPERATION_ID",
-                        cassandraManager.statusCassandraService( agent.getUuid().toString() ) );
+                return JsonUtil
+                        .toJson( OPERATION_ID, cassandraManager.statusCassandraService( agent.getUuid().toString() ) );
             }
             else {
                 return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
