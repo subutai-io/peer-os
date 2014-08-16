@@ -52,6 +52,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>lxc-manager-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hadoop-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
