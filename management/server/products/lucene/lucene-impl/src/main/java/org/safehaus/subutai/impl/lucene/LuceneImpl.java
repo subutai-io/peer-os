@@ -33,12 +33,14 @@ public class LuceneImpl implements Lucene {
     private ExecutorService executor;
 
 
-    public LuceneImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
+    public LuceneImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+                       Hadoop hadoopManager ) {
         this.commands = new Commands( commandRunner );
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
+        this.hadoopManager = hadoopManager;
     }
 
 
