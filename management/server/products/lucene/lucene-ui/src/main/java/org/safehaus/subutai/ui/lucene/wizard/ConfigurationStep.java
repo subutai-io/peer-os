@@ -57,7 +57,7 @@ public class ConfigurationStep extends Panel {
         clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setLuceneClusterName( event.getProperty().getValue().toString().trim() );
+                wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
 
@@ -79,10 +79,10 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        Config info = LuceneUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        Config hadoopConfig = LuceneUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
 
-        if ( info != null ) {
-            hadoopClusters.setValue( info );
+        if ( hadoopConfig != null ) {
+            hadoopClusters.setValue( hadoopConfig );
         }
         else if ( clusters.size() > 0 ) {
             hadoopClusters.setValue( clusters.iterator().next() );
@@ -90,7 +90,7 @@ public class ConfigurationStep extends Panel {
 
         if ( hadoopClusters.getValue() != null ) {
             Config hadoopInfo = ( Config ) hadoopClusters.getValue();
-            wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+            wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
             select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
         }
 
@@ -101,7 +101,7 @@ public class ConfigurationStep extends Panel {
                     Config hadoopInfo = ( Config ) event.getProperty().getValue();
                     select.setValue( null );
                     select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
-                    wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
+                    wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                     wizard.getConfig().setNodes( new HashSet<Agent>() );
                 }
             }
@@ -133,10 +133,10 @@ public class ConfigurationStep extends Panel {
         next.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getLuceneClusterName() ) ) {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please, enter cluster name" );
                 }
-                else if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );
                 }
                 else if ( Util.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
