@@ -38,6 +38,27 @@ public class InstallHandler extends AbstractHandler {
             return;
         }
 
+        org.safehaus.subutai.api.hadoop.Config hc
+                = manager.getHadoopManager().getCluster(clusterName);
+        if(hc == null) {
+            po.addLogFailed(String.format("Hadoop cluster %s does not exist", clusterName));
+            return;
+        }
+        
+        for(Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+            Agent a = it.next();
+            if(!hc.getAllNodes().contains(a)) {
+                po.addLog(String.format("Node %s is not in Hadoop cluster %s",
+                        a.getHostname(), clusterName));
+                po.addLog("Removing from nodes list");
+                it.remove();
+            }
+        }
+        if(config.getNodes().isEmpty()) {
+            po.addLogFailed("No nodes to install");
+            return;
+        }
+
         // check if already installed
         String s = CommandFactory.build(CommandType.LIST, null);
         Command cmd = manager.getCommandRunner().createCommand(
