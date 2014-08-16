@@ -21,7 +21,7 @@ public class AddNodeHandler extends AbstractHandler {
         super(manager, clusterName);
         this.productOperation = manager.getTracker().createProductOperation(
                 Config.PRODUCT_NAME, "Add node to cluster: "
-                + hostname != null ? hostname : "new container will be created");
+                + (hostname != null ? hostname : "new container will be created"));
         this.hostname = hostname;
     }
 
