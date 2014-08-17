@@ -309,7 +309,7 @@ public class HBaseImpl implements HBase {
 
                 Agent master = agentManager.getAgentByHostname( config.getMaster() );
                 if ( master == null ) {
-                    po.addLogFailed( String.format( "Master node %s node connected", config.getMaster() ) );
+                    po.addLogFailed( String.format( "Master node %s not connected", config.getMaster() ) );
                     return;
                 }
 
@@ -345,7 +345,7 @@ public class HBaseImpl implements HBase {
 
                 Agent master = agentManager.getAgentByHostname( config.getMaster() );
                 if ( master == null ) {
-                    po.addLogFailed( String.format( "Master node %s node connected", config.getMaster() ) );
+                    po.addLogFailed( String.format( "Master node %s not connected", config.getMaster() ) );
                     return;
                 }
 
