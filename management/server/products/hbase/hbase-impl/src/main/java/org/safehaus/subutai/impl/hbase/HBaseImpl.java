@@ -343,16 +343,14 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                Set<Agent> allNodes;
-                try {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e ) {
-                    po.addLogFailed( e.getMessage() );
+                Agent master = agentManager.getAgentByHostname( config.getMaster() );
+                if ( master == null ) {
+                    po.addLogFailed( String.format( "Master node %s node connected", config.getMaster() ) );
                     return;
                 }
 
-                Command stopCommand = Commands.getStopCommand( allNodes );
+
+                Command stopCommand = Commands.getStopCommand( Sets.newHashSet( master ) );
                 commandRunner.runCommand( stopCommand );
 
                 if ( stopCommand.hasSucceeded() ) {
