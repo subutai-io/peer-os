@@ -80,7 +80,7 @@ public class UiUtil {
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
                                 new TerminalWindow( Util.wrapAgentToSet( lxcAgent ), AccumuloUI.getExecutor(),
-                                        AccumuloUI.getCommandRunner(), AccumuloUI.getAgentManager() );
+                                        AccumuloUI.getCommandRunner(), AccumuloUI.getAgentManager(), 90 );
                         table.getUI().addWindow( terminal.getWindow() );
                     }
                     else {

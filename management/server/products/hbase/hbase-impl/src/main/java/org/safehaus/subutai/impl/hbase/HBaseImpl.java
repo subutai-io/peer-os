@@ -1,9 +1,13 @@
 package org.safehaus.subutai.impl.hbase;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
@@ -15,6 +19,8 @@ import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import com.google.common.collect.Sets;
 
 
 public class HBaseImpl implements HBase {
@@ -71,8 +77,6 @@ public class HBaseImpl implements HBase {
     public UUID installCluster( final HBaseConfig config ) {
         final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY, "Installing HBase" );
 
-        final Set<Agent> allNodes = getAllNodes( config );
-
         executor.execute( new Runnable() {
 
             public void run() {
@@ -80,6 +84,20 @@ public class HBaseImpl implements HBase {
                         != null ) {
                     po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
+                    return;
+                }
+
+                Set<Agent> allNodes;
+                try {
+                    allNodes = getAllNodes( config );
+                }
+                catch ( Exception e ) {
+                    po.addLogFailed( e.getMessage() );
+                    return;
+                }
+
+                if ( agentManager.getAgentByHostname( config.getHadoopNameNode() ) == null ) {
+                    po.addLogFailed( String.format( "Hadoop NameNode %s not connected", config.getHadoopNameNode() ) );
                     return;
                 }
 
@@ -103,7 +121,7 @@ public class HBaseImpl implements HBase {
 
                     // Installing HBase
                     po.addLog( "Installing HBase on ..." );
-                    for(Agent agent : allNodes) {
+                    for ( Agent agent : allNodes ) {
                         po.addLog( agent.getHostname() );
                     }
                     Command installCommand = Commands.getInstallCommand( allNodes );
@@ -215,7 +233,14 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                final Set<Agent> allNodes = getAllNodes( config );
+                Set<Agent> allNodes;
+                try {
+                    allNodes = getAllNodes( config );
+                }
+                catch ( Exception e ) {
+                    po.addLogFailed( e.getMessage() );
+                    return;
+                }
 
                 po.addLog( "Uninstalling..." );
 
@@ -277,14 +302,18 @@ public class HBaseImpl implements HBase {
             public void run() {
                 HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
                 if ( config == null ) {
-                    po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                            config.getClusterName() ) );
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                final Set<Agent> allNodes = getAllNodes( config );
+                Agent master = agentManager.getAgentByHostname( config.getMaster() );
+                if ( master == null ) {
+                    po.addLogFailed( String.format( "Master node %s node connected", config.getMaster() ) );
+                    return;
+                }
 
-                Command startCommand = Commands.getStartCommand( allNodes );
+                Command startCommand = Commands.getStartCommand( Sets.newHashSet( master ) );
                 commandRunner.runCommand( startCommand );
 
                 if ( startCommand.hasSucceeded() ) {
@@ -292,7 +321,6 @@ public class HBaseImpl implements HBase {
                 }
                 else {
                     po.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
-                    return;
                 }
             }
         } );
@@ -310,22 +338,28 @@ public class HBaseImpl implements HBase {
             public void run() {
                 HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
                 if ( config == null ) {
-                    po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                            config.getClusterName() ) );
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                final Set<Agent> allNodes = getAllNodes( config );
+                Set<Agent> allNodes;
+                try {
+                    allNodes = getAllNodes( config );
+                }
+                catch ( Exception e ) {
+                    po.addLogFailed( e.getMessage() );
+                    return;
+                }
 
                 Command stopCommand = Commands.getStopCommand( allNodes );
                 commandRunner.runCommand( stopCommand );
 
                 if ( stopCommand.hasSucceeded() ) {
-                    po.addLogDone("Stop success..");
+                    po.addLogDone( "Stop success.." );
                 }
                 else {
-                    po.addLogFailed(String.format("Stop failed, %s", stopCommand.getAllErrors()));
-                    return;
+                    po.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
                 }
             }
         } );
@@ -343,14 +377,21 @@ public class HBaseImpl implements HBase {
             public void run() {
                 HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
                 if ( config == null ) {
-                    po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                            config.getClusterName() ) );
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                final Set<Agent> allNodes = getAllNodes(config);
-                if(allNodes == null || allNodes.isEmpty()) {
-                    po.addLogFailed("Nodes not connected");
+                Set<Agent> allNodes;
+                try {
+                    allNodes = getAllNodes( config );
+                }
+                catch ( Exception e ) {
+                    po.addLogFailed( e.getMessage() );
+                    return;
+                }
+                if ( allNodes == null || allNodes.isEmpty() ) {
+                    po.addLogFailed( "Nodes not connected" );
                     return;
                 }
 
@@ -358,11 +399,15 @@ public class HBaseImpl implements HBase {
                 commandRunner.runCommand( checkCommand );
 
                 if ( checkCommand.hasSucceeded() ) {
-                    po.addLogDone( "All nodes are running.." );
+                    StringBuilder status = new StringBuilder();
+                    for ( Agent agent : allNodes ) {
+                        status.append( agent.getHostname() ).append( ":\n" )
+                              .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
+                    }
+                    po.addLogDone( status.toString() );
                 }
                 else {
-                    po.addLogFailed(String.format("Check failed, %s", checkCommand.getAllErrors()));
-                    return;
+                    po.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
                 }
             }
         } );
@@ -371,23 +416,31 @@ public class HBaseImpl implements HBase {
     }
 
 
-    private Set<Agent> getAllNodes( HBaseConfig config ) {
-        final Set<Agent> allNodes = new HashSet<Agent>();
+    private Set<Agent> getAllNodes( HBaseConfig config ) throws Exception {
+        final Set<Agent> allNodes = new HashSet<>();
 
+        if ( agentManager.getAgentByHostname( config.getMaster() ) == null ) {
+            throw new Exception( String.format( "Master node %s not connected", config.getMaster() ) );
+        }
         allNodes.add( agentManager.getAgentByHostname( config.getMaster() ) );
+        if ( agentManager.getAgentByHostname( config.getBackupMasters() ) == null ) {
+            throw new Exception( String.format( "Backup master node %s not connected", config.getBackupMasters() ) );
+        }
         allNodes.add( agentManager.getAgentByHostname( config.getBackupMasters() ) );
 
         for ( String hostname : config.getRegion() ) {
+            if ( agentManager.getAgentByHostname( hostname ) == null ) {
+                throw new Exception( String.format( "Region server node %s not connected", hostname ) );
+            }
             allNodes.add( agentManager.getAgentByHostname( hostname ) );
         }
 
         for ( String hostname : config.getQuorum() ) {
+            if ( agentManager.getAgentByHostname( hostname ) == null ) {
+                throw new Exception( String.format( "Quorum node %s not connected", hostname ) );
+            }
             allNodes.add( agentManager.getAgentByHostname( hostname ) );
         }
-
-        Iterator<Agent> it = allNodes.iterator();
-        while(it.hasNext())
-            if(it.next() == null) it.remove();
 
         return allNodes;
     }
