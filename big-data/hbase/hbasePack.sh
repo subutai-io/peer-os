@@ -24,6 +24,7 @@ downloadFileAndMakeChanges() {
 	rm hbase-*.tar.gz
 
 	# move configuration files 
+	touch hbase-$hbaseVersion*/conf/backup-masters
 	mv hbase-$hbaseVersion*/conf/* $BASE/$fileName/etc/hbase/
 
 	# rename folder --remove hadoop1 from file name --
