@@ -32,7 +32,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
     public void run() {
         if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || Strings.isNullOrEmpty( config.getClusterName() )
                 || Util.isCollectionEmpty( config.getNodes() ) ) {
-            productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
+            productOperation.addLogFailed( "Malformed configuration. Not all parameters are given: "
+                    + " hadoopClusterName, clusterName or nodes. \nInstallation aborted" );
             return;
         }
 
