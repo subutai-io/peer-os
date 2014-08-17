@@ -94,6 +94,11 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
+                if ( agentManager.getAgentByHostname( config.getHadoopNameNode() ) == null ) {
+                    po.addLogFailed( String.format( "Hadoop NameNode %s not connected", config.getHadoopNameNode() ) );
+                    return;
+                }
+
                 if ( dbManager.saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
 
                     po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
