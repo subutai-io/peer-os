@@ -20,6 +20,8 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import com.google.common.collect.Sets;
+
 
 public class HBaseImpl implements HBase {
 
@@ -305,16 +307,13 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                Set<Agent> allNodes;
-                try {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e ) {
-                    po.addLogFailed( e.getMessage() );
+                Agent master = agentManager.getAgentByHostname( config.getMaster() );
+                if ( master == null ) {
+                    po.addLogFailed( String.format( "Master node %s node connected", config.getMaster() ) );
                     return;
                 }
 
-                Command startCommand = Commands.getStartCommand( allNodes );
+                Command startCommand = Commands.getStartCommand( Sets.newHashSet( master ) );
                 commandRunner.runCommand( startCommand );
 
                 if ( startCommand.hasSucceeded() ) {
