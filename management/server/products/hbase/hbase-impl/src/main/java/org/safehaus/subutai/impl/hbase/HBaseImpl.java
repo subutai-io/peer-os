@@ -1,9 +1,14 @@
 package org.safehaus.subutai.impl.hbase;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
@@ -103,7 +108,7 @@ public class HBaseImpl implements HBase {
 
                     // Installing HBase
                     po.addLog( "Installing HBase on ..." );
-                    for(Agent agent : allNodes) {
+                    for ( Agent agent : allNodes ) {
                         po.addLog( agent.getHostname() );
                     }
                     Command installCommand = Commands.getInstallCommand( allNodes );
@@ -321,10 +326,10 @@ public class HBaseImpl implements HBase {
                 commandRunner.runCommand( stopCommand );
 
                 if ( stopCommand.hasSucceeded() ) {
-                    po.addLogDone("Stop success..");
+                    po.addLogDone( "Stop success.." );
                 }
                 else {
-                    po.addLogFailed(String.format("Stop failed, %s", stopCommand.getAllErrors()));
+                    po.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
                     return;
                 }
             }
@@ -348,9 +353,9 @@ public class HBaseImpl implements HBase {
                     return;
                 }
 
-                final Set<Agent> allNodes = getAllNodes(config);
-                if(allNodes == null || allNodes.isEmpty()) {
-                    po.addLogFailed("Nodes not connected");
+                final Set<Agent> allNodes = getAllNodes( config );
+                if ( allNodes == null || allNodes.isEmpty() ) {
+                    po.addLogFailed( "Nodes not connected" );
                     return;
                 }
 
@@ -358,10 +363,15 @@ public class HBaseImpl implements HBase {
                 commandRunner.runCommand( checkCommand );
 
                 if ( checkCommand.hasSucceeded() ) {
-                    po.addLogDone( "All nodes are running.." );
+                    StringBuilder status = new StringBuilder();
+                    for ( Agent agent : allNodes ) {
+                        status.append( agent.getHostname() ).append( ":\n" )
+                              .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
+                    }
+                    po.addLogDone( status.toString() );
                 }
                 else {
-                    po.addLogFailed(String.format("Check failed, %s", checkCommand.getAllErrors()));
+                    po.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
                     return;
                 }
             }
@@ -386,8 +396,11 @@ public class HBaseImpl implements HBase {
         }
 
         Iterator<Agent> it = allNodes.iterator();
-        while(it.hasNext())
-            if(it.next() == null) it.remove();
+        while ( it.hasNext() ) {
+            if ( it.next() == null ) {
+                it.remove();
+            }
+        }
 
         return allNodes;
     }
