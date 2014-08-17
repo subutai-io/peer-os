@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
 import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -338,7 +339,7 @@ public class ElasticsearchImpl implements Elasticsearch {
                     po.addLogDone( "All nodes are running." );
                 }
                 else {
-                    po.addLogFailed( String.format( "Check status failed\n%s", checkStatusCommand.getAllErrors() ) );
+                    logStatusResults( po, checkStatusCommand );
                 }
             }
         } );
@@ -347,6 +348,27 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
+
+        String log = "";
+
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
+
+            String status = "UNKNOWN";
+            if ( e.getValue().getExitCode() == 0 ) {
+                status = "RUNNING";
+            } else if ( e.getValue().getExitCode() == 768 ) {
+                status = "NOT RUNNING";
+            }
+
+            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
+        }
+
+        po.addLogDone( log );
+    }
+
+
+    @Override
     public List<Config> getClusters() {
         return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
     }
