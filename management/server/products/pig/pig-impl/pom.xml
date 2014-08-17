@@ -11,8 +11,8 @@
 
     <artifactId>pig-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Pig</name>
-    <description>Subutai Pig</description>
+    <name>Subutai Pig Impl</name>
+    <description>Subutai Pig Impl</description>
 
     <dependencies>
         <dependency>
