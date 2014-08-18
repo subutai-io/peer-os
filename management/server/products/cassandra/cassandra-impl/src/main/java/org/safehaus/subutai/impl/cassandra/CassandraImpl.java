@@ -10,12 +10,12 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
@@ -80,8 +80,7 @@ public class CassandraImpl implements Cassandra {
 
                 try {
                     po.addLog(String.format("Creating %d lxc containers for Cassandra cluster...", config.getNumberOfNodes()));
-                    Map<Agent, Set<Agent>> lxcAgentsMap = CustomPlacementStrategy.createNodes(
-                            lxcManager, config.getNumberOfNodes());
+                    Map<Agent, Set<Agent>> lxcAgentsMap = lxcManager.createLxcs(config.getNumberOfNodes());
                     config.setNodes(new HashSet<Agent>());
 
                     for (Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet()) {
