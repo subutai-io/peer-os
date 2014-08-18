@@ -70,7 +70,7 @@ public class RestService {
             @QueryParam( "clusterName" ) String clusterName,
             @QueryParam( "hadoopClusterName" ) String hadoopClusterName,
             @QueryParam( "server" ) String server,
-            @QueryParam( "clients" ) List<String> clients
+            @QueryParam( "clients" ) String clients
     ) {
 
         Config config = new Config();
@@ -80,7 +80,7 @@ public class RestService {
         Agent serverAgent = agentManager.getAgentByHostname( server );
         config.setServer( serverAgent );
 
-        for ( String client : clients ) {
+        for ( String client : clients.split( "," ) ) {
             Agent agent = agentManager.getAgentByHostname( client );
             config.getClients().add( agent );
         }

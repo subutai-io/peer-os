@@ -69,13 +69,12 @@ public class RestService {
     @Produces({ MediaType.APPLICATION_JSON })
     public String installCluster(
             @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "nodes" ) List<String> nodes
+            @QueryParam( "nodes" ) String nodes
     ) {
-
         Config config = new Config();
         config.setClusterName( clusterName );
 
-        for ( String node : nodes ) {
+        for ( String node : nodes.split( "," ) ) {
             Agent agent = agentManager.getAgentByHostname( node );
             config.getNodes().add( agent );
         }

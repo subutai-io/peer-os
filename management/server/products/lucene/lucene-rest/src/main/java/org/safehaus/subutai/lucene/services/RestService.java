@@ -77,10 +77,8 @@ public class RestService {
 
         // BUG: Getting the params as list doesn't work. For example "List<String> nodes". To fix this we get a param
         // as plain string and use splitting.
-        if ( !Strings.isNullOrEmpty( nodes ) ) {
-            for ( String node : nodes.split( "," ) ) {
-                config.getNodes().add( agentManager.getAgentByHostname( node ) );
-            }
+        for ( String node : nodes.split( "," ) ) {
+            config.getNodes().add( agentManager.getAgentByHostname( node ) );
         }
 
         UUID uuid = luceneManager.installCluster( config );
