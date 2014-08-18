@@ -1,44 +1,24 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.lxcmanager.LxcState;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
 import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
+import org.safehaus.subutai.impl.strategy.RoundRobinStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 
 public class LxcManagerImpl implements LxcManager {
@@ -92,10 +72,15 @@ public class LxcManagerImpl implements LxcManager {
 
         LxcPlacementStrategy placementStrategy = new DefaultLxcPlacementStrategy( 1 );
         Map<Agent, Integer> serversSlots = placementStrategy.calculateSlots( metrics );
+        // set all values to some equal amount so that RR strategy works from UI
+        // TODO: remove this! This is for showing round-robin from UI
+        int max = Integer.MIN_VALUE;
+        for(Integer i : serversSlots.values()) if(i > max) max = i;
+        max = 10;
 
         if ( !serversSlots.isEmpty() ) {
             for ( Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet() ) {
-                bestServers.put( serverSlots.getKey(), serverSlots.getValue() );
+                bestServers.put(serverSlots.getKey(), max);
             }
         }
 
@@ -469,7 +454,7 @@ public class LxcManagerImpl implements LxcManager {
     public Map<Agent, Set<Agent>> createLxcs( int count ) throws LxcCreateException {
         Map<Agent, Set<Agent>> lxcAgents = new HashMap<>();
 
-        Map<String, Map<Agent, Set<Agent>>> families = createLxcsByStrategy( new DefaultLxcPlacementStrategy( count ) );
+        Map<String, Map<Agent, Set<Agent>>> families = createLxcsByStrategy(new RoundRobinStrategy(count));
 
         for ( Map.Entry<String, Map<Agent, Set<Agent>>> family : families.entrySet() ) {
             for ( Map.Entry<Agent, Set<Agent>> childs : family.getValue().entrySet() ) {
