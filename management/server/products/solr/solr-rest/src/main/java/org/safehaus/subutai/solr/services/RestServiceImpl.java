@@ -59,7 +59,7 @@ public class RestServiceImpl implements RestService {
         Config expandedConfig = new Config();
 
         expandedConfig.setClusterName( solrConfig.getClusterName() );
-        expandedConfig.setNumberOfNodes( solrConfig.getNumberOfNodes() );
+        expandedConfig.setNumberOfNodes( 1 );
 
         return wrapUUID( solrManager.installCluster( expandedConfig ) );
     }
