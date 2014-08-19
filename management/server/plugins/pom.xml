@@ -20,6 +20,9 @@
         <module>accumulo</module>
         <module>hadoop</module>
         <module>presto</module>
+        <module>oozie</module>
+        <module>cassandra</module>
+        <module>hbase</module>
     </modules>
 
 </project>
