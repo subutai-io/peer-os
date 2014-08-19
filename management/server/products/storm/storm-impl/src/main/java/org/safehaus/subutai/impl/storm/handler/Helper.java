@@ -31,51 +31,52 @@ class Helper {
 
     boolean installZookeeper(Agent agent) {
         UUID id = manager.getZookeeperManager().install(agent.getHostname());
-        CountDownLatch latch = new CountDownLatch(1);
-        new Thread(new OperationStatusChecker(latch, id)).start();
-        try {
-            latch.await(2, TimeUnit.MINUTES);
-        } catch(InterruptedException ex) {
-            return false;
-        }
-        return true;
+        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
+        return watchOperation(src, id, 2, TimeUnit.MINUTES);
     }
 
     boolean startZookeeper(Agent agent) {
         UUID id = manager.getZookeeperManager().start(agent.getHostname());
+        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
+        return watchOperation(src, id, 1, TimeUnit.MINUTES);
+    }
+
+    private boolean watchOperation(String source, UUID id, long timeout, TimeUnit unit) {
         CountDownLatch latch = new CountDownLatch(1);
-        new Thread(new OperationStatusChecker(latch, id)).start();
+        new Thread(new OperationStatusChecker(latch, source, id)).start();
         try {
-            latch.await(1, TimeUnit.MINUTES);
+            return latch.await(timeout, unit);
         } catch(InterruptedException ex) {
             return false;
         }
-        return true;
     }
 
     class OperationStatusChecker implements Runnable {
 
         final CountDownLatch latch;
+        final String source;
         final UUID trackerId;
 
-        public OperationStatusChecker(CountDownLatch latch, UUID trackerId) {
+        public OperationStatusChecker(CountDownLatch latch, String source, UUID trackerId) {
             this.latch = latch;
+            this.source = source;
             this.trackerId = trackerId;
         }
 
         @Override
         public void run() {
-            String zk = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
-            ProductOperationView p = null;
-            while(p == null || p.getState() == ProductOperationState.RUNNING) {
-                p = manager.getTracker().getProductOperation(zk, trackerId);
-                try {
-                    Thread.sleep(200);
-                } catch(InterruptedException ex) {
-                    break;
+            if(source != null && trackerId != null) {
+                ProductOperationView p = null;
+                while(p == null || p.getState() == ProductOperationState.RUNNING) {
+                    p = manager.getTracker().getProductOperation(source, trackerId);
+                    try {
+                        Thread.sleep(200);
+                    } catch(InterruptedException ex) {
+                        break;
+                    }
                 }
+                latch.countDown();
             }
-            latch.countDown();
         }
 
     }
