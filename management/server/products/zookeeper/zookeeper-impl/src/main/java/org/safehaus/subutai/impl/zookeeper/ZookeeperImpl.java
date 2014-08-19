@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -14,16 +13,7 @@ import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
-import org.safehaus.subutai.impl.zookeeper.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.AddPropertyOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.CheckNodeOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.InstallOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.RemovePropertyOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.SingleInstallation;
-import org.safehaus.subutai.impl.zookeeper.handler.StartNodeOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.StopNodeOperationHandler;
-import org.safehaus.subutai.impl.zookeeper.handler.UninstallOperationHandler;
+import org.safehaus.subutai.impl.zookeeper.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
@@ -213,4 +203,12 @@ public class ZookeeperImpl implements Zookeeper {
         executor.execute( h );
         return h.getTrackerId();
     }
+
+    @Override
+    public UUID start(String hostName) {
+        AbstractOperationHandler h = new StartStandalone(this, hostName);
+        executor.execute(h);
+        return h.getTrackerId();
+    }
+
 }

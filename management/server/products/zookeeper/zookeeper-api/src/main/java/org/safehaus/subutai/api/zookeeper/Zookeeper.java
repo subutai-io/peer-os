@@ -31,5 +31,7 @@ public interface Zookeeper extends ApiBase<Config> {
 
     public UUID install(String hostName);
 
+    public UUID start(String hostName);
+
 }
 
