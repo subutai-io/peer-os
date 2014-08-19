@@ -3,25 +3,22 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
-import org.safehaus.subutai.plugin.zookeeper.impl.ConfigParams;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperStandaloneSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
@@ -71,57 +68,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         }
         else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
             addWithHadoop( config );
-        }
-    }
-
-
-    private void reconfigureZkCluster( final ZookeeperClusterConfig config ) throws ClusterConfigurationException {
-
-        //reconfiguring cluster
-        po.addLog( "Reconfiguring cluster..." );
-
-        Command configureClusterCommand;
-        try {
-            configureClusterCommand = Commands.getConfigureClusterCommand( config.getNodes(),
-                    ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                    ZookeeperStandaloneSetupStrategy.prepareConfiguration( config.getNodes() ),
-                    ConfigParams.CONFIG_FILE_PATH.getParamValue() );
-        }
-        catch ( ClusterConfigurationException e ) {
-            throw new ClusterConfigurationException(
-                    String.format( "Error reconfiguring cluster %s", e.getMessage() ) );
-        }
-
-        manager.getCommandRunner().runCommand( configureClusterCommand );
-
-        if ( configureClusterCommand.hasSucceeded() ) {
-            po.addLog( "Cluster reconfigured\nRestarting cluster..." );
-            //restart all other nodes with new configuration
-            Command restartCommand = Commands.getRestartCommand( config.getNodes() );
-            final AtomicInteger count = new AtomicInteger();
-            manager.getCommandRunner().runCommand( restartCommand, new CommandCallback() {
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                    if ( agentResult.getStdOut().contains( "STARTED" ) ) {
-                        if ( count.incrementAndGet() == config.getNodes().size() ) {
-                            stop();
-                        }
-                    }
-                }
-            } );
-
-            if ( count.get() == config.getNodes().size() ) {
-                po.addLog( "Cluster successfully restarted" );
-            }
-            else {
-                po.addLog(
-                        String.format( "Failed to restart cluster, %s, skipping...", restartCommand.getAllErrors() ) );
-            }
-        }
-        else {
-
-            throw new ClusterConfigurationException(
-                    String.format( "Cluster reconfiguration failed, %s", configureClusterCommand.getAllErrors() ) );
         }
     }
 
@@ -180,9 +126,10 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             }
 
             config.getNodes().add( lxcAgent );
+            config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
             try {
-                reconfigureZkCluster( config );
+                new ClusterConfiguration( manager, po ).configureCluster( config );
             }
             catch ( ClusterConfigurationException e ) {
                 po.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
@@ -260,6 +207,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
 
         config.getNodes().add( lxcAgent );
+        config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
         po.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
@@ -271,7 +219,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Installation succeeded\nReconfiguring cluster..." );
 
             try {
-                reconfigureZkCluster( config );
+                new ClusterConfiguration( manager, po ).configureCluster( config );
             }
             catch ( ClusterConfigurationException e ) {
                 po.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
@@ -311,10 +259,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Lxc container created successfully" );
 
             config.getNodes().add( agent );
+            config.setNumberOfNodes( config.getNumberOfNodes() + 1 );
 
             //reconfigure cluster
             try {
-                reconfigureZkCluster( config );
+                new ClusterConfiguration( manager, po ).configureCluster( config );
             }
             catch ( ClusterConfigurationException e ) {
                 po.addLogFailed( String.format( "Error reconfiguring cluster, %s", e.getMessage() ) );
