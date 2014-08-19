@@ -385,19 +385,19 @@ public class ConfigurationStep extends Panel {
     }
 
 
-    private void setComboDS( ComboBox target, List<Agent> hadoopNodes ) {
+    private void setComboDS( ComboBox target, List<Agent> agents ) {
         target.removeAllItems();
         target.setValue( null );
-        for ( Agent agent : hadoopNodes ) {
+        for ( Agent agent : agents ) {
             target.addItem( agent );
             target.setItemCaption( agent, agent.getHostname() );
         }
     }
 
 
-    private void setTwinSelectDS( TwinColSelect target, List<Agent> hadoopNodes ) {
+    private void setTwinSelectDS( TwinColSelect target, List<Agent> agents ) {
         target.setValue( null );
-        target.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopNodes ) );
+        target.setContainerDataSource( new BeanItemContainer<>( Agent.class, agents ) );
     }
 
 
