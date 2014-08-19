@@ -20,3 +20,9 @@ fi
 if [ ! -f $ID_FILE ]; then
         touch $ID_DIR/$ID_FILE
 fi
+
+# clean id file
+> $ID_DIR/$ID_FILE
+
+# write arg 1 to file
+echo $1 >> $ID_DIR/$ID_FILE
