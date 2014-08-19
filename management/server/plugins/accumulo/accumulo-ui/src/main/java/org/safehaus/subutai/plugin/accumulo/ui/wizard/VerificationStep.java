@@ -60,9 +60,11 @@ public class VerificationStep extends Panel {
             }
         }
         else {
-            cfgView.addStringCfg( "Number of Hadoop slaves", wizard.getHadoopClusterConfig().getCountOfSlaveNodes()+ "" );
-            cfgView.addStringCfg( "Hadoop replication factor", wizard.getHadoopClusterConfig().getReplicationFactor()+ "" );
-            cfgView.addStringCfg( "Hadoop domain name", wizard.getHadoopClusterConfig().getDomainName()+ "" );
+            cfgView.addStringCfg( "Number of Hadoop slaves",
+                    wizard.getHadoopClusterConfig().getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Hadoop replication factor",
+                    wizard.getHadoopClusterConfig().getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Hadoop domain name", wizard.getHadoopClusterConfig().getDomainName() + "" );
             cfgView.addStringCfg( "Number of tracers", wizard.getConfig().getNumberOfTracers() + "" );
             cfgView.addStringCfg( "Number of slaves", wizard.getConfig().getNumberOfSlaves() + "" );
         }
@@ -74,7 +76,11 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick( Button.ClickEvent event ) {
 
-                UUID trackID = AccumuloUI.getAccumuloManager().installCluster( wizard.getConfig() );
+                UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
+                               AccumuloUI.getAccumuloManager().installCluster( wizard.getConfig() ) :
+                               AccumuloUI.getAccumuloManager()
+                                         .installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),
+                                                 wizard.getZookeeperClusterConfig() );
                 ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
                         AccumuloClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
