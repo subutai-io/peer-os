@@ -11,6 +11,7 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -44,11 +45,13 @@ public class AccumuloImpl implements Accumulo {
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
     private EnvironmentManager environmentManager;
+    private TemplateRegistryManager templateRegistryManager;
     private ExecutorService executor;
 
 
     public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager ) {
+                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager,
+                         TemplateRegistryManager templateRegistryManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
@@ -56,8 +59,14 @@ public class AccumuloImpl implements Accumulo {
         this.hadoopManager = hadoopManager;
         this.zkManager = zkManager;
         this.environmentManager = environmentManager;
+        this.templateRegistryManager = templateRegistryManager;
 
         Commands.init( commandRunner );
+    }
+
+
+    public TemplateRegistryManager getTemplateRegistryManager() {
+        return templateRegistryManager;
     }
 
 

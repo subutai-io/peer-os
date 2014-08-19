@@ -15,6 +15,7 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 
@@ -40,6 +41,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                                     final HadoopClusterConfig hadoopClusterConfig,
                                     final ZookeeperClusterConfig zookeeperClusterConfig ) {
         this( manager, config );
+        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop config is null" );
+        Preconditions.checkNotNull( zookeeperClusterConfig, "Zookeeper config is null" );
         this.hadoopClusterConfig = hadoopClusterConfig;
         this.zookeeperClusterConfig = zookeeperClusterConfig;
     }
@@ -63,11 +66,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        if ( manager.getCluster( clusterName ) != null ) {
-            po.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
-            return;
-        }
-
         if ( config.getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
             setupOverHadoopNZk();
         }
@@ -79,6 +77,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
 
     private void setupOverHadoopNZk() {
         try {
+            //setup up Accumulo cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, po );
             setupStrategy.setup();
 
@@ -109,7 +108,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
                     manager.getZkManager().getClusterSetupStrategy( env, zookeeperClusterConfig, po );
             zkClusterSetupStrategy.setup();
 
-            //setting up Accumulo cluster
+            //setup up Accumulo cluster
             ClusterSetupStrategy accumuloSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             accumuloSetupStrategy.setup();
 

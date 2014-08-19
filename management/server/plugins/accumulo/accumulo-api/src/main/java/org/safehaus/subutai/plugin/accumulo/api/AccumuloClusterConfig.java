@@ -34,6 +34,17 @@ public class AccumuloClusterConfig implements ConfigBase {
     private SetupType setupType;
     private String hadoopClusterName;
     private String zookeeperClusterName;
+    private String templateName;
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
 
 
     public String getHadoopClusterName() {
@@ -225,6 +236,7 @@ public class AccumuloClusterConfig implements ConfigBase {
                 ", setupType=" + setupType +
                 ", hadoopClusterName='" + hadoopClusterName + '\'' +
                 ", zookeeperClusterName='" + zookeeperClusterName + '\'' +
+                ", templateName='" + templateName + '\'' +
                 '}';
     }
 }
