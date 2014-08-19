@@ -11,9 +11,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.mahout.MahoutUI;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,21 +21,21 @@ public class AddNodeWindow extends Window {
 	private final TextArea outputTxtArea;
 	private final Label indicator;
 
-    private final ListSelect nodesList = new ListSelect();
-    private final String clusterName;
+	private final ListSelect nodesList = new ListSelect();
+	private final String clusterName;
 
-    private final ArrayList<String> selectedNodes = new ArrayList<>();
+	private final ArrayList<String> selectedNodes = new ArrayList<>();
 
 	public AddNodeWindow(final Config config, Set<Agent> nodes) {
 
 		super("Add New Node");
 
-        clusterName = config.getClusterName();
+		clusterName = config.getClusterName();
 
 		setModal(true);
 
-		setWidth( 700, Unit.PIXELS );
-		setHeight( 500, Unit.PIXELS );
+		setWidth(700, Unit.PIXELS);
+		setHeight(500, Unit.PIXELS);
 
 		GridLayout content = new GridLayout(1, 3);
 		content.setSizeFull();
@@ -50,8 +48,8 @@ public class AddNodeWindow extends Window {
 		content.addComponent(topContent);
 		topContent.addComponent(new Label("Nodes:"));
 
-        initNodesList( nodes );
-        topContent.addComponent( nodesList );
+		initNodesList(nodes);
+		topContent.addComponent(nodesList);
 
 		final Button addNodeBtn = new Button("Add");
 		addNodeBtn.addStyleName("default");
@@ -60,7 +58,7 @@ public class AddNodeWindow extends Window {
 		addNodeBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-                addButtonClicked();
+				addButtonClicked();
 			}
 		});
 
@@ -100,81 +98,80 @@ public class AddNodeWindow extends Window {
 	}
 
 
-    private void initNodesList( Set<Agent> nodes ) {
-        nodesList.setRows( 5 );
-        nodesList.setMultiSelect( true );
-        nodesList.setNullSelectionAllowed( false );
+	private void initNodesList(Set<Agent> nodes) {
+		nodesList.setRows(5);
+		nodesList.setMultiSelect(true);
+		nodesList.setNullSelectionAllowed(false);
 
-        for ( Agent node : nodes ) {
-            nodesList.addItem( node.getHostname() );
-        }
-    }
-
-
-    private void setSelectedNodes() {
-
-        selectedNodes.clear();
-
-        for ( Iterator i = nodesList.getItemIds().iterator(); i.hasNext(); ) {
-            Object id = i.next();
-            if ( nodesList.isSelected( id ) )
-            {
-               selectedNodes.add( (String) id );
-            }
-        }
-    }
+		for (Agent node : nodes) {
+			nodesList.addItem(node.getHostname());
+		}
+	}
 
 
-    private void addNode( String hostname ) {
+	private void setSelectedNodes() {
 
-        showProgress();
+		selectedNodes.clear();
 
-        final UUID trackID = MahoutUI.getMahoutManager().addNode( clusterName, hostname );
-
-        MahoutUI.getExecutor().execute( new Runnable() {
-            public void run() {
-                while ( true ) {
-                    ProductOperationView po = MahoutUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
-                    if (po != null) {
-                        setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                        if (po.getState() != ProductOperationState.RUNNING) {
-                            hideProgress();
-                            break;
-                        }
-                    } else {
-                        setOutput("Product operation not found. Check logs");
-                        break;
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        break;
-                    }
-                }
-
-                addSelectedNodes();
-            }
-        });
-
-    }
+		for (Iterator i = nodesList.getItemIds().iterator(); i.hasNext(); ) {
+			Object id = i.next();
+			if (nodesList.isSelected(id)) {
+				selectedNodes.add((String) id);
+			}
+		}
+	}
 
 
-    private void addButtonClicked() {
-        setSelectedNodes();
-        addSelectedNodes();
-    }
+	private void addNode(String hostname) {
+
+		showProgress();
+
+		final UUID trackID = MahoutUI.getMahoutManager().addNode(clusterName, hostname);
+
+		MahoutUI.getExecutor().execute(new Runnable() {
+			public void run() {
+				while (true) {
+					ProductOperationView po = MahoutUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+					if (po != null) {
+						setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
+						if (po.getState() != ProductOperationState.RUNNING) {
+							hideProgress();
+							break;
+						}
+					} else {
+						setOutput("Product operation not found. Check logs");
+						break;
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException ex) {
+						break;
+					}
+				}
+
+				addSelectedNodes();
+			}
+		});
+
+	}
 
 
-    private void addSelectedNodes() {
-        if ( selectedNodes.isEmpty() ) {
-            return;
-        }
+	private void addButtonClicked() {
+		setSelectedNodes();
+		addSelectedNodes();
+	}
 
-        String hostname = selectedNodes.get( 0 );
-        selectedNodes.remove( 0 );
 
-        addNode( hostname );
-    }
+	private void addSelectedNodes() {
+		if (selectedNodes.isEmpty()) {
+			return;
+		}
+
+		String hostname = selectedNodes.get(0);
+		selectedNodes.remove(0);
+
+		addNode(hostname);
+	}
 
 
 	@Override

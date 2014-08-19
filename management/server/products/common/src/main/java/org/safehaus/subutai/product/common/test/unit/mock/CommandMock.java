@@ -1,81 +1,71 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import java.util.Map;
-import java.util.UUID;
-
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandStatus;
 
+import java.util.Map;
+import java.util.UUID;
+
 
 public class CommandMock implements Command {
 
-    private String description;
-    private boolean succeeded;
+	private String description;
+	private boolean succeeded;
 
-    @Override
-    public String getDescription() {
-        return description;
-    }
+	@Override
+	public boolean hasCompleted() {
+		return false;
+	}
 
+	@Override
+	public boolean hasSucceeded() {
+		return succeeded;
+	}
 
-    public CommandMock setDescription( final String description ) {
-        this.description = description;
-        return this;
-    }
+	@Override
+	public CommandStatus getCommandStatus() {
+		return null;
+	}
 
+	@Override
+	public Map<UUID, AgentResult> getResults() {
+		return null;
+	}
 
-    @Override
-    public boolean hasCompleted() {
-        return false;
-    }
+	@Override
+	public UUID getCommandUUID() {
+		return null;
+	}
 
+	@Override
+	public Object getData() {
+		return null;
+	}
 
-    @Override
-    public boolean hasSucceeded() {
-        return succeeded;
-    }
+	@Override
+	public void setData(final Object data) {
 
+	}
 
-    public CommandMock setSucceeded( boolean succeeded ) {
-        this.succeeded = succeeded;
-        return this;
-    }
+	@Override
+	public String getAllErrors() {
+		return null;
+	}
 
+	@Override
+	public String getDescription() {
+		return description;
+	}
 
-    @Override
-    public CommandStatus getCommandStatus() {
-        return null;
-    }
+	public CommandMock setDescription(final String description) {
+		this.description = description;
+		return this;
+	}
 
-
-    @Override
-    public Map<UUID, AgentResult> getResults() {
-        return null;
-    }
-
-
-    @Override
-    public UUID getCommandUUID() {
-        return null;
-    }
-
-
-    @Override
-    public Object getData() {
-        return null;
-    }
-
-
-    @Override
-    public void setData( final Object data ) {
-
-    }
-
-
-    @Override
-    public String getAllErrors() {
-        return null;
-    }
+	public CommandMock setSucceeded(boolean succeeded) {
+		this.succeeded = succeeded;
+		return this;
+	}
 }

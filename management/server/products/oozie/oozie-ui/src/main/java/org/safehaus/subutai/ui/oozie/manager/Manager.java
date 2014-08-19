@@ -6,10 +6,12 @@
 package org.safehaus.subutai.ui.oozie.manager;
 
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.oozie.OozieConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -18,21 +20,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.oozie.OozieUI;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -72,7 +62,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (OozieConfig ) event.getProperty().getValue();
+				config = (OozieConfig) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -138,6 +128,95 @@ public class Manager {
 		contentRoot.addComponent(clientsTable, 0, 6, 0, 10);
 	}
 
+	private Table createServerTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Check", Button.class, null);
+		table.addContainerProperty("Start", Button.class, null);
+		table.addContainerProperty("Stop", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), OozieUI.getExecutor(), OozieUI.getCommandRunner(), OozieUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private Table createClientsTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), OozieUI.getExecutor(), OozieUI.getCommandRunner(), OozieUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateServerTable(serverTable, config.getServer());
+			populateClientsTable(clientsTable, config.getClients());
+		} else {
+			serverTable.removeAllItems();
+			clientsTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		List<OozieConfig> info = OozieUI.getOozieManager().getClusters();
+		OozieConfig clusterInfo = (OozieConfig) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		if (info != null && info.size() > 0) {
+			for (OozieConfig oozieConfig : info) {
+				clusterCombo.addItem(oozieConfig);
+				clusterCombo.setItemCaption(oozieConfig,
+						oozieConfig.getClusterName());
+			}
+			if (clusterInfo != null) {
+				for (OozieConfig oozieInfo : info) {
+					if (oozieInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(oozieInfo);
+						return;
+					}
+				}
+			} else {
+				clusterCombo.setValue(info.iterator().next());
+			}
+		}
+	}
+
 	public static void checkNodesStatus(Table table) {
 		for (Object o : table.getItemIds()) {
 			int rowId = (Integer) o;
@@ -145,10 +224,6 @@ public class Manager {
 			Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
 			checkBtn.click();
 		}
-	}
-
-	public Component getContent() {
-		return contentRoot;
 	}
 
 	private void show(String notification) {
@@ -169,9 +244,9 @@ public class Manager {
 
 		final Object rowId = table.addItem(new Object[] {
 						agentHostname,
-                        checkBtn,
-                        startBtn,
-                        stopBtn,
+						checkBtn,
+						startBtn,
+						stopBtn,
 						progressIcon},
 				null
 		);
@@ -247,93 +322,8 @@ public class Manager {
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateServerTable(serverTable, config.getServer());
-			populateClientsTable(clientsTable, config.getClients());
-		} else {
-			serverTable.removeAllItems();
-			clientsTable.removeAllItems();
-		}
-	}
-
-	public void refreshClustersInfo() {
-		List<OozieConfig> info = OozieUI.getOozieManager().getClusters();
-        OozieConfig clusterInfo = (OozieConfig) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (info != null && info.size() > 0) {
-			for (OozieConfig oozieConfig : info) {
-				clusterCombo.addItem(oozieConfig);
-				clusterCombo.setItemCaption(oozieConfig,
-						oozieConfig.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (OozieConfig oozieInfo : info) {
-					if (oozieInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(oozieInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(info.iterator().next());
-			}
-		}
-	}
-
-	private Table createServerTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Check", Button.class, null);
-		table.addContainerProperty("Start", Button.class, null);
-		table.addContainerProperty("Stop", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), OozieUI.getExecutor(), OozieUI.getCommandRunner(), OozieUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
-	}
-
-	private Table createClientsTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), OozieUI.getExecutor(), OozieUI.getCommandRunner(), OozieUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

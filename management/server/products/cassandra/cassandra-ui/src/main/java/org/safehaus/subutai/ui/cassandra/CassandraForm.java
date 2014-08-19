@@ -5,12 +5,11 @@
  */
 package org.safehaus.subutai.ui.cassandra;
 
-import org.safehaus.subutai.ui.cassandra.manager.Manager;
-import org.safehaus.subutai.ui.cassandra.wizard.Wizard;
-
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.subutai.ui.cassandra.manager.Manager;
+import org.safehaus.subutai.ui.cassandra.wizard.Wizard;
 
 /**
  * @author dilshat

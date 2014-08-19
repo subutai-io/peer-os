@@ -7,28 +7,28 @@ import java.util.UUID;
 
 
 public abstract class AbstractOperationHandler<T extends ApiBase> implements Runnable {
-    protected final T manager;
-    protected final String clusterName;
-    protected ProductOperation productOperation;
+	protected final T manager;
+	protected final String clusterName;
+	protected ProductOperation productOperation;
 
 
-    public AbstractOperationHandler( T manager, String clusterName ) {
-        this.manager = manager;
-        this.clusterName = clusterName;
-    }
+	public AbstractOperationHandler(T manager, String clusterName) {
+		this.manager = manager;
+		this.clusterName = clusterName;
+	}
 
 
-    public UUID getTrackerId() {
-        return productOperation.getId();
-    }
+	public UUID getTrackerId() {
+		return productOperation.getId();
+	}
 
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    public ProductOperation getProductOperation() {
-        return productOperation;
-    }
+	public ProductOperation getProductOperation() {
+		return productOperation;
+	}
 }

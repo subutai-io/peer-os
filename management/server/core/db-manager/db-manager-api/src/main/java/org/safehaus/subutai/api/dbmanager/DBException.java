@@ -6,7 +6,7 @@ package org.safehaus.subutai.api.dbmanager;
  */
 public class DBException extends Exception {
 
-    public DBException( final String message ) {
-        super( message );
-    }
+	public DBException(final String message) {
+		super(message);
+	}
 }

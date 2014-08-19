@@ -33,6 +33,30 @@ public class StormUI implements PortalModule {
 		StormUI.commandRunner = commandRunner;
 	}
 
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
+
+	public static Tracker getTracker() {
+		return tracker;
+	}
+
+	public static Storm getManager() {
+		return manager;
+	}
+
+	public static Zookeeper getZookeeper() {
+		return zookeeper;
+	}
+
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
+
+	public static ExecutorService getExecutor() {
+		return executor;
+	}
+
 	public void init() {
 		executor = Executors.newCachedThreadPool();
 	}
@@ -61,29 +85,5 @@ public class StormUI implements PortalModule {
 
 	public Component createComponent() {
 		return new StormForm();
-	}
-
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
-
-	public static Tracker getTracker() {
-		return tracker;
-	}
-
-	public static Storm getManager() {
-		return manager;
-	}
-
-	public static Zookeeper getZookeeper() {
-		return zookeeper;
-	}
-
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
-
-	public static ExecutorService getExecutor() {
-		return executor;
 	}
 }

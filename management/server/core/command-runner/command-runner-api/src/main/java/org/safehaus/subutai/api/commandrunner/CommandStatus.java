@@ -11,24 +11,24 @@ package org.safehaus.subutai.api.commandrunner;
  */
 public enum CommandStatus {
 
-    /**
-     * command just created
-     */
-    NEW,
-    /**
-     * command has been just sent to agents
-     */
-    RUNNING,
-    /**
-     * command had timed out before agent sent response
-     */
-    TIMEOUT,
-    /**
-     * command succeeded, exit code was 0
-     */
-    SUCCEEDED,
-    /**
-     * command failed, exit code was not 0 or agent interrupted command because of timeout
-     */
-    FAILED
+	/**
+	 * command just created
+	 */
+	NEW,
+	/**
+	 * command has been just sent to agents
+	 */
+	RUNNING,
+	/**
+	 * command had timed out before agent sent response
+	 */
+	TIMEOUT,
+	/**
+	 * command succeeded, exit code was 0
+	 */
+	SUCCEEDED,
+	/**
+	 * command failed, exit code was not 0 or agent interrupted command because of timeout
+	 */
+	FAILED
 }

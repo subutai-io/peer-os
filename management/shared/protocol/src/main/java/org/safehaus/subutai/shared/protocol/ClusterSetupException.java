@@ -6,7 +6,7 @@ package org.safehaus.subutai.shared.protocol;
  */
 public class ClusterSetupException extends Exception {
 
-    public ClusterSetupException( final String message ) {
-        super( message );
-    }
+	public ClusterSetupException(final String message) {
+		super(message);
+	}
 }

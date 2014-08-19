@@ -9,8 +9,8 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
 
 /**

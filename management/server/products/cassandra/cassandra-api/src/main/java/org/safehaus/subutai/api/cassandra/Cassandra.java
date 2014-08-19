@@ -14,15 +14,15 @@ import java.util.UUID;
  */
 public interface Cassandra extends ApiBase<Config> {
 
-    UUID startAllNodes(String clusterName);
+	UUID startAllNodes(String clusterName);
 
-    UUID checkAllNodes(String clusterName);
+	UUID checkAllNodes(String clusterName);
 
-    UUID stopAllNodes(String clusterName);
+	UUID stopAllNodes(String clusterName);
 
-    UUID startCassandraService(String agentUUID);
+	UUID startCassandraService(String agentUUID);
 
-    UUID stopCassandraService(String agentUUID);
+	UUID stopCassandraService(String agentUUID);
 
-    UUID statusCassandraService(String agentUUID);
+	UUID statusCassandraService(String agentUUID);
 }

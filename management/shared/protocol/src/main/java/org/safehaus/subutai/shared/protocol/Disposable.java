@@ -6,10 +6,9 @@
 package org.safehaus.subutai.shared.protocol;
 
 /**
- *
  * @author dilshat
  */
 public interface Disposable {
 
-    public void dispose();
+	public void dispose();
 }

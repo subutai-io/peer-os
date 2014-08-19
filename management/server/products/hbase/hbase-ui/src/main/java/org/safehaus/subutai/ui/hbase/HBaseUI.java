@@ -90,13 +90,12 @@ public class HBaseUI implements PortalModule {
 		return HBaseConfig.PRODUCT_KEY;
 	}
 
-
-	public Component createComponent() {
-		return new HBaseForm();
-	}
-
 	@Override
 	public File getImage() {
 		return FileUtil.getFile(HBaseUI.MODULE_IMAGE, this);
+	}
+
+	public Component createComponent() {
+		return new HBaseForm();
 	}
 }

@@ -8,11 +8,10 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 
 import java.util.UUID;
 
@@ -59,7 +58,7 @@ public class VerificationStep extends Panel {
 
 				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getAccumuloClusterConfig());
 				ProgressWindow window = new ProgressWindow(AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-                        AccumuloClusterConfig.PRODUCT_KEY);
+						AccumuloClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

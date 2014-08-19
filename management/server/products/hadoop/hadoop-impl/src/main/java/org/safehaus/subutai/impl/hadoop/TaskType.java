@@ -10,5 +10,5 @@ package org.safehaus.subutai.impl.hadoop;
  */
 public enum TaskType {
 
-    INSTALL, CONFIGURE, UNINSTALL, START, STOP, STATUS
+	INSTALL, CONFIGURE, UNINSTALL, START, STOP, STATUS
 }

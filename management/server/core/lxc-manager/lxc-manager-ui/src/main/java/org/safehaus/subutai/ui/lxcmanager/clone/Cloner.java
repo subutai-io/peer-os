@@ -112,21 +112,6 @@ public class Cloner extends VerticalLayout {
 		addComponent(lxcTable);
 	}
 
-
-	private TreeTable createLxcTable(String caption, int size) {
-		TreeTable table = new TreeTable(caption);
-		table.addContainerProperty(physicalHostLabel, String.class, null);
-		table.addContainerProperty("Lxc Host", String.class, null);
-		table.addContainerProperty(statusLabel, Embedded.class, null);
-		table.setWidth(100, Unit.PERCENTAGE);
-		table.setHeight(size, Unit.PIXELS);
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-		return table;
-	}
-
-
 	private void startCloneTask() {
 		Set<Agent> physicalAgents = Util.filterPhysicalAgents(agentTree.getSelectedAgents());
 		final String productName = textFieldLxcName.getValue().toString().trim();
@@ -247,6 +232,22 @@ public class Cloner extends VerticalLayout {
 		}
 	}
 
+	private TreeTable createLxcTable(String caption, int size) {
+		TreeTable table = new TreeTable(caption);
+		table.addContainerProperty(physicalHostLabel, String.class, null);
+		table.addContainerProperty("Lxc Host", String.class, null);
+		table.addContainerProperty(statusLabel, Embedded.class, null);
+		table.setWidth(100, Unit.PERCENTAGE);
+		table.setHeight(size, Unit.PIXELS);
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+		return table;
+	}
+
+	private void show(String msg) {
+		Notification.show(msg);
+	}
 
 	private void populateLxcTable(Map<Agent, List<String>> agents) {
 
@@ -267,10 +268,5 @@ public class Cloner extends VerticalLayout {
 				lxcTable.setChildrenAllowed(lxc, false);
 			}
 		}
-	}
-
-
-	private void show(String msg) {
-		Notification.show(msg);
 	}
 }

@@ -11,73 +11,73 @@ import com.vaadin.ui.Window;
  * Created by daralbaev on 08.06.14.
  */
 public class ConfirmationDialog {
-    private Window alert;
-    private Button cancel, ok;
-    private VerticalLayout l;
+	private Window alert;
+	private Button cancel, ok;
+	private VerticalLayout l;
 
-    public ConfirmationDialog(String caption, String yesLabel, String cancelLabel) {
-        l = new VerticalLayout();
-        l.setWidth("200px");
-        l.setMargin(true);
-        l.setSpacing(true);
+	public ConfirmationDialog(String caption, String yesLabel, String cancelLabel) {
+		l = new VerticalLayout();
+		l.setWidth("200px");
+		l.setMargin(true);
+		l.setSpacing(true);
 
-        alert = new Window(caption, l);
-        alert.setModal(true);
-        alert.setResizable(false);
-        alert.setDraggable(false);
-        alert.addStyleName("dialog");
-        alert.setClosable(false);
+		alert = new Window(caption, l);
+		alert.setModal(true);
+		alert.setResizable(false);
+		alert.setDraggable(false);
+		alert.addStyleName("dialog");
+		alert.setClosable(false);
 
-        cancel = new Button(cancelLabel);
-        ok = new Button(yesLabel);
-    }
+		cancel = new Button(cancelLabel);
+		ok = new Button(yesLabel);
+	}
 
-    public Window getAlert(){
+	public Window getAlert() {
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.setWidth("100%");
-        buttons.setSpacing(true);
-        l.addComponent(buttons);
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.setWidth("100%");
+		buttons.setSpacing(true);
+		l.addComponent(buttons);
 
-        cancel.addStyleName("small");
-        cancel.addStyleName("wide");
-        cancel.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                alert.close();
-            }
-        });
-        buttons.addComponent(cancel);
+		cancel.addStyleName("small");
+		cancel.addStyleName("wide");
+		cancel.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				alert.close();
+			}
+		});
+		buttons.addComponent(cancel);
 
 
-        ok.addStyleName("default");
-        ok.addStyleName("small");
-        ok.addStyleName("wide");
-        ok.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                alert.close();
-            }
-        });
-        buttons.addComponent(ok);
-        ok.focus();
+		ok.addStyleName("default");
+		ok.addStyleName("small");
+		ok.addStyleName("wide");
+		ok.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				alert.close();
+			}
+		});
+		buttons.addComponent(ok);
+		ok.focus();
 
-        alert.addShortcutListener(new ShortcutListener("Cancel",
-                ShortcutAction.KeyCode.ESCAPE, null) {
-            @Override
-            public void handleAction(Object sender, Object target) {
-                alert.close();
-            }
-        });
+		alert.addShortcutListener(new ShortcutListener("Cancel",
+				ShortcutAction.KeyCode.ESCAPE, null) {
+			@Override
+			public void handleAction(Object sender, Object target) {
+				alert.close();
+			}
+		});
 
-        return alert;
-    }
+		return alert;
+	}
 
-    public Button getOk() {
-        return ok;
-    }
+	public Button getOk() {
+		return ok;
+	}
 
-    public Button getCancel() {
-        return cancel;
-    }
+	public Button getCancel() {
+		return cancel;
+	}
 }

@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
  */
 public interface ConfigurationLoader {
 
-    public JsonObject getConfiguration( String hostname, String configPathFilename );
+	public JsonObject getConfiguration(String hostname, String configPathFilename);
 
-    public boolean setConfiguration( String hostname, String configFilePath, String jsonObjectConfig);
+	public boolean setConfiguration(String hostname, String configFilePath, String jsonObjectConfig);
 }

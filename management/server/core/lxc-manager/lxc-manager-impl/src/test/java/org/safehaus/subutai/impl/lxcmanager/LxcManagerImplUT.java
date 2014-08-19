@@ -6,26 +6,16 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcState;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
+import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import java.util.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -39,136 +29,135 @@ import static org.mockito.Mockito.when;
  */
 public class LxcManagerImplUT {
 
-    private LxcManager lxcManager;
+	private LxcManager lxcManager;
 
 
-    @Before
-    public void setUpMethod() {
-        Monitor monitor = mock( Monitor.class );
-        when( monitor.getData( any( String.class ), any( Metric.class ), any( Date.class ), any( Date.class ) ) )
-                .thenReturn( Collections.EMPTY_MAP );
-        lxcManager = new LxcManagerImpl( new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor );
-        ( ( LxcManagerImpl ) lxcManager ).init();
-    }
+	@Before
+	public void setUpMethod() {
+		Monitor monitor = mock(Monitor.class);
+		when(monitor.getData(any(String.class), any(Metric.class), any(Date.class), any(Date.class)))
+				.thenReturn(Collections.EMPTY_MAP);
+		lxcManager = new LxcManagerImpl(new AgentManagerFake(), MockUtils.getAutoCommandRunner(), monitor);
+		((LxcManagerImpl) lxcManager).init();
+	}
 
 
-    @After
-    public void tearDownMethod() {
+	@After
+	public void tearDownMethod() {
 
-        ( ( LxcManagerImpl ) lxcManager ).destroy();
-    }
-
-
-    @Test
-    public void testCloneLxcOnHost() {
-
-        boolean result =
-                lxcManager.cloneLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );
-
-        assertTrue( result );
-    }
+		((LxcManagerImpl) lxcManager).destroy();
+	}
 
 
-    @Test
-    public void testGetLxcOnPhysicalServers() {
+	@Test
+	public void testCloneLxcOnHost() {
 
-        Map<String, EnumMap<LxcState, List<String>>> result = lxcManager.getLxcOnPhysicalServers();
+		boolean result =
+				lxcManager.cloneLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
 
-        assertFalse( result.isEmpty() );
-    }
-
-
-    @Test
-    public void testGetPhysicalServerMetrics() {
-
-        Map<Agent, ServerMetric> result = lxcManager.getPhysicalServerMetrics();
-
-        assertFalse( result.isEmpty() );
-    }
+		assertTrue(result);
+	}
 
 
-    @Test
-    public void testGetPhysicalServersWithLxcSlots() {
+	@Test
+	public void testGetLxcOnPhysicalServers() {
 
-        Map<Agent, Integer> result = lxcManager.getPhysicalServersWithLxcSlots();
+		Map<String, EnumMap<LxcState, List<String>>> result = lxcManager.getLxcOnPhysicalServers();
 
-        assertTrue( result.entrySet().iterator().next().getValue() > 0 );
-    }
-
-
-    @Test
-    public void testStartLxcOnHost() {
-
-        boolean result =
-                lxcManager.startLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );
-
-        assertTrue( result );
-    }
+		assertFalse(result.isEmpty());
+	}
 
 
-    @Test
-    public void testStopLxcOnHost() {
-        LxcManager lxcManager = new LxcManagerImpl( new AgentManagerFake(),
-                MockUtils.getHardCodedCommandRunner( true, true, 0, "STOPPED", null ), mock( Monitor.class ) );
+	@Test
+	public void testGetPhysicalServerMetrics() {
 
-        boolean result =
-                lxcManager.stopLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );
+		Map<Agent, ServerMetric> result = lxcManager.getPhysicalServerMetrics();
 
-        assertTrue( result );
-    }
+		assertFalse(result.isEmpty());
+	}
 
 
-    @Test
-    public void testDestroyLxcOnHost() {
+	@Test
+	public void testGetPhysicalServersWithLxcSlots() {
 
-        boolean result =
-                lxcManager.destroyLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );
+		Map<Agent, Integer> result = lxcManager.getPhysicalServersWithLxcSlots();
 
-        assertTrue( result );
-    }
-
-
-    @Test
-    public void testCloneNStartLxcOnHost() {
-
-        boolean result =
-                lxcManager.cloneNStartLxcOnHost( MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname() );
-
-        assertTrue( result );
-    }
+		assertTrue(result.entrySet().iterator().next().getValue() > 0);
+	}
 
 
-    @Test
-    public void testDestroyLxcs() {
+	@Test
+	public void testStartLxcOnHost() {
 
-        boolean error = false;
-        try {
-            Set<String> lxcHostnames = new HashSet<>();
-            lxcHostnames.add( MockUtils.getLxcAgent().getHostname() );
-            lxcManager.destroyLxcsByHostname( lxcHostnames );
-        }
-        catch ( LxcDestroyException ex ) {
-            error = true;
-        }
-        assertFalse( error );
-    }
+		boolean result =
+				lxcManager.startLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
+
+		assertTrue(result);
+	}
 
 
-    @Test
-    public void testCreateLxcsByStrategy() throws LxcCreateException {
+	@Test
+	public void testStopLxcOnHost() {
+		LxcManager lxcManager = new LxcManagerImpl(new AgentManagerFake(),
+				MockUtils.getHardCodedCommandRunner(true, true, 0, "STOPPED", null), mock(Monitor.class));
 
-        Map<String, Map<Agent, Set<Agent>>> agentMap =
-                lxcManager.createLxcsByStrategy( new DefaultLxcPlacementStrategy( 1 ) );
+		boolean result =
+				lxcManager.stopLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
 
-        assertFalse( agentMap.isEmpty() );
-    }
+		assertTrue(result);
+	}
 
 
-    @Test
-    public void testCreateLxcs() throws LxcCreateException {
+	@Test
+	public void testDestroyLxcOnHost() {
 
-        Map<Agent, Set<Agent>> agentMap = lxcManager.createLxcs( 1 );
+		boolean result =
+				lxcManager.destroyLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
 
-        assertFalse( agentMap.isEmpty() );
-    }
+		assertTrue(result);
+	}
+
+
+	@Test
+	public void testCloneNStartLxcOnHost() {
+
+		boolean result =
+				lxcManager.cloneNStartLxcOnHost(MockUtils.getPhysicalAgent(), MockUtils.getLxcAgent().getHostname());
+
+		assertTrue(result);
+	}
+
+
+	@Test
+	public void testDestroyLxcs() {
+
+		boolean error = false;
+		try {
+			Set<String> lxcHostnames = new HashSet<>();
+			lxcHostnames.add(MockUtils.getLxcAgent().getHostname());
+			lxcManager.destroyLxcsByHostname(lxcHostnames);
+		} catch (LxcDestroyException ex) {
+			error = true;
+		}
+		assertFalse(error);
+	}
+
+
+	@Test
+	public void testCreateLxcsByStrategy() throws LxcCreateException {
+
+		Map<String, Map<Agent, Set<Agent>>> agentMap =
+				lxcManager.createLxcsByStrategy(new DefaultLxcPlacementStrategy(1));
+
+		assertFalse(agentMap.isEmpty());
+	}
+
+
+	@Test
+	public void testCreateLxcs() throws LxcCreateException {
+
+		Map<Agent, Set<Agent>> agentMap = lxcManager.createLxcs(1);
+
+		assertFalse(agentMap.isEmpty());
+	}
 }

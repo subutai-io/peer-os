@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -23,13 +23,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
-	private final Config config;
+	private final PrestoClusterConfig config;
 
-	public InstallOperationHandler(PrestoImpl manager, Config config) {
+	public InstallOperationHandler(PrestoImpl manager, PrestoClusterConfig config) {
 		super(manager, config.getClusterName());
 		this.config = config;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
-				String.format("Installing %s", Config.PRODUCT_KEY));
+		po = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
+				String.format("Installing %s", PrestoClusterConfig.PRODUCT_KEY));
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
 
 		po.addLog("Updating db...");
 		//save to db
-		if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+		if (manager.getDbManager().saveInfo(PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config)) {
 			po.addLog("Cluster info saved to DB\nInstalling Presto...");
 			//install presto
 

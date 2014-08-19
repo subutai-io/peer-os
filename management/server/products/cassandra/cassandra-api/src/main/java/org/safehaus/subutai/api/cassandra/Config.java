@@ -15,112 +15,112 @@ import java.util.Set;
  */
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Cassandra";
-    private String clusterName = "";
-    private String domainName = "";
-    private int numberOfSeeds;
-    private int numberOfNodes;
-    private Set<Agent> seedNodes;
-    private Set<Agent> nodes;
-    private String dataDirectory = "/var/lib/cassandra/data";
-    private String commitLogDirectory = "/var/lib/cassandra/commitlog";
-    private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
+	public static final String PRODUCT_KEY = "Cassandra";
+	private String clusterName = "";
+	private String domainName = "";
+	private int numberOfSeeds;
+	private int numberOfNodes;
+	private Set<Agent> seedNodes;
+	private Set<Agent> nodes;
+	private String dataDirectory = "/var/lib/cassandra/data";
+	private String commitLogDirectory = "/var/lib/cassandra/commitlog";
+	private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
 
-    public static String getProductKey() {
-        return PRODUCT_KEY;
-    }
+	public static String getProductKey() {
+		return PRODUCT_KEY;
+	}
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
 
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
+	@Override
+	public String getProductName() {
+		return PRODUCT_KEY;
+	}
 
-    public String getDataDirectory() {
-        return dataDirectory;
-    }
+	public String getDataDirectory() {
+		return dataDirectory;
+	}
 
-    public void setDataDirectory(String dataDirectory) {
-        this.dataDirectory = dataDirectory;
-    }
+	public void setDataDirectory(String dataDirectory) {
+		this.dataDirectory = dataDirectory;
+	}
 
-    public String getCommitLogDirectory() {
-        return commitLogDirectory;
-    }
+	public String getCommitLogDirectory() {
+		return commitLogDirectory;
+	}
 
-    public void setCommitLogDirectory(String commitLogDirectory) {
-        this.commitLogDirectory = commitLogDirectory;
-    }
+	public void setCommitLogDirectory(String commitLogDirectory) {
+		this.commitLogDirectory = commitLogDirectory;
+	}
 
-    public String getSavedCachesDirectory() {
-        return savedCachesDirectory;
-    }
+	public String getSavedCachesDirectory() {
+		return savedCachesDirectory;
+	}
 
-    public void setSavedCachesDirectory(String savedCachesDirectory) {
-        this.savedCachesDirectory = savedCachesDirectory;
-    }
+	public void setSavedCachesDirectory(String savedCachesDirectory) {
+		this.savedCachesDirectory = savedCachesDirectory;
+	}
 
-    public int getNumberOfSeeds() {
-        return numberOfSeeds;
-    }
+	public int getNumberOfSeeds() {
+		return numberOfSeeds;
+	}
 
-    public void setNumberOfSeeds(int numberOfSeeds) {
-        this.numberOfSeeds = numberOfSeeds;
-    }
+	public void setNumberOfSeeds(int numberOfSeeds) {
+		this.numberOfSeeds = numberOfSeeds;
+	}
 
-    public Set<Agent> getSeedNodes() {
-        return seedNodes;
-    }
+	public Set<Agent> getSeedNodes() {
+		return seedNodes;
+	}
 
-    public void setSeedNodes(Set<Agent> seedNodes) {
-        this.seedNodes = seedNodes;
-    }
+	public void setSeedNodes(Set<Agent> seedNodes) {
+		this.seedNodes = seedNodes;
+	}
 
-    public Set<Agent> getNodes() {
-        return nodes;
-    }
+	public Set<Agent> getNodes() {
+		return nodes;
+	}
 
-    public void setNodes(Set<Agent> nodes) {
-        this.nodes = nodes;
-    }
+	public void setNodes(Set<Agent> nodes) {
+		this.nodes = nodes;
+	}
 
-    public String getDomainName() {
-        return domainName;
-    }
+	public String getDomainName() {
+		return domainName;
+	}
 
-    public void setDomainName(String domainName) {
-        this.domainName = domainName;
-    }
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
+	}
 
-    public int getNumberOfNodes() {
-        return numberOfNodes;
-    }
+	public int getNumberOfNodes() {
+		return numberOfNodes;
+	}
 
-    public void setNumberOfNodes(int numberOfNodes) {
-        this.numberOfNodes = numberOfNodes;
-    }
+	public void setNumberOfNodes(int numberOfNodes) {
+		this.numberOfNodes = numberOfNodes;
+	}
 
-    @Override
-    public String toString() {
-        return "Config{" +
-                "clusterName='" + clusterName + '\'' +
-                ", domainName='" + domainName + '\'' +
-                ", numberOfSeeds=" + numberOfSeeds +
-                ", numberOfNodes=" + numberOfNodes +
-                ", dataDirectory='" + dataDirectory + '\'' +
-                ", commitLogDirectory='" + commitLogDirectory + '\'' +
-                ", savedCachesDirectory='" + savedCachesDirectory + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Config{" +
+				"clusterName='" + clusterName + '\'' +
+				", domainName='" + domainName + '\'' +
+				", numberOfSeeds=" + numberOfSeeds +
+				", numberOfNodes=" + numberOfNodes +
+				", dataDirectory='" + dataDirectory + '\'' +
+				", commitLogDirectory='" + commitLogDirectory + '\'' +
+				", savedCachesDirectory='" + savedCachesDirectory + '\'' +
+				'}';
+	}
 
-    public void reset() {
+	public void reset() {
 
-    }
+	}
 }

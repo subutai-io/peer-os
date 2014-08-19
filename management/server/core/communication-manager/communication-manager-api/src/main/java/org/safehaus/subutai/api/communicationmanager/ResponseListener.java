@@ -9,10 +9,10 @@ import org.safehaus.subutai.shared.protocol.Response;
  */
 public interface ResponseListener {
 
-    /**
-     * Response arrival event
-     *
-     * @param response - received response
-     */
-    public void onResponse( Response response );
+	/**
+	 * Response arrival event
+	 *
+	 * @param response - received response
+	 */
+	public void onResponse(Response response);
 }

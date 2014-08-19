@@ -5,30 +5,30 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 
-@Command(scope = "template", name = "destroy", description = "destroy clone")
+@Command (scope = "template", name = "destroy", description = "destroy clone")
 public class CloneDestroy extends OsgiCommandSupport {
 
-    private TemplateManager templateManager;
+	private TemplateManager templateManager;
 
-    @Argument(index = 0, required = true)
-    private String hostName;
-    @Argument(index = 1, required = true)
-    private String cloneName;
+	@Argument (index = 0, required = true)
+	private String hostName;
+	@Argument (index = 1, required = true)
+	private String cloneName;
 
-    public TemplateManager getTemplateManager() {
-        return templateManager;
-    }
+	public TemplateManager getTemplateManager() {
+		return templateManager;
+	}
 
-    public void setTemplateManager(TemplateManager templateManager) {
-        this.templateManager = templateManager;
-    }
+	public void setTemplateManager(TemplateManager templateManager) {
+		this.templateManager = templateManager;
+	}
 
-    @Override
-    protected Object doExecute() throws Exception {
-        boolean b = templateManager.cloneDestroy(hostName, cloneName);
-        if(b) System.out.println("Clone successfully destroyed");
-        else System.out.println("Failed to destroy");
-        return null;
-    }
+	@Override
+	protected Object doExecute() throws Exception {
+		boolean b = templateManager.cloneDestroy(hostName, cloneName);
+		if (b) System.out.println("Clone successfully destroyed");
+		else System.out.println("Failed to destroy");
+		return null;
+	}
 
 }

@@ -20,6 +20,8 @@
         <module>accumulo</module>
         <module>hadoop</module>
         <module>presto</module>
+        <module>spark</module>
+        <module>shark</module>
     </modules>
 
 </project>

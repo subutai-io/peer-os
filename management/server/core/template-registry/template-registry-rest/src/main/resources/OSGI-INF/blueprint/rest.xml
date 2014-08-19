@@ -7,23 +7,23 @@
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
-  <cxf:bus id="cxfBus1">
-    <cxf:features>
-      <cxf:logging />
-    </cxf:features>
-  </cxf:bus>
+    <cxf:bus id="cxfBus1">
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
 
-  <reference id="templateRegistryManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
+    <reference id="templateRegistryManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
 
-  <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.rest.templateregistry.RestServiceImpl">
-    <property name="templateRegistryManager" ref="templateRegistryManager" />
-  </bean>
+    <bean id="templateRegistryRestImpl" class="org.safehaus.subutai.rest.templateregistry.RestServiceImpl">
+        <property name="templateRegistryManager" ref="templateRegistryManager"/>
+    </bean>
 
-  <jaxrs:server address="/registry" id="registryRestService">
-    <jaxrs:serviceBeans>
-      <ref component-id="templateRegistryRestImpl" />
-    </jaxrs:serviceBeans>
-  </jaxrs:server>
+    <jaxrs:server address="/registry" id="registryRestService">
+        <jaxrs:serviceBeans>
+            <ref component-id="templateRegistryRestImpl"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
 
 </blueprint>

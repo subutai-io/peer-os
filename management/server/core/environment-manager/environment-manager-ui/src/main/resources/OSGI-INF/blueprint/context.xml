@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="environmentManager" availability="mandatory" interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
 
-  <bean id="module" scope="singleton" class="org.safehaus.subutai.dis.manager.EnvironmentManagerUI"
-        init-method="init" destroy-method="destroy">
-    <property name="environmentManager" ref="environmentManager" />
-  </bean>
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.dis.manager.EnvironmentManagerUI"
+          init-method="init" destroy-method="destroy">
+        <property name="environmentManager" ref="environmentManager"/>
+    </bean>
 
-  <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
 
 </blueprint>

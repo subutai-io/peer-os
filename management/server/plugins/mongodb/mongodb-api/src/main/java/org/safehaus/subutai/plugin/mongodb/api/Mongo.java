@@ -6,13 +6,13 @@
 package org.safehaus.subutai.plugin.mongodb.api;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+
+import java.util.UUID;
 
 
 /**
@@ -20,66 +20,60 @@ import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
  */
 public interface Mongo extends ApiBase<MongoClusterConfig> {
 
-    /**
-     * adds node to the specified cluster
-     *
-     * @param clusterName - name of cluster
-     * @param nodeType - type of node to add
-     *
-     * @return - UUID of operation to track
-     */
-    public UUID addNode( String clusterName, NodeType nodeType );
+	/**
+	 * adds node to the specified cluster
+	 *
+	 * @param clusterName - name of cluster
+	 * @param nodeType    - type of node to add
+	 * @return - UUID of operation to track
+	 */
+	public UUID addNode(String clusterName, NodeType nodeType);
 
-    /**
-     * destroys node in the specified cluster
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     *
-     * @return - UUID of operation to track
-     */
-    public UUID destroyNode( String clusterName, String lxcHostName );
+	/**
+	 * destroys node in the specified cluster
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID destroyNode(String clusterName, String lxcHostName);
 
-    /**
-     * Starts the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     *
-     * @return - UUID of operation to track
-     */
-    public UUID startNode( String clusterName, String lxcHostName );
+	/**
+	 * Starts the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID startNode(String clusterName, String lxcHostName);
 
-    /**
-     * Stops the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     *
-     * @return - UUID of operation to track
-     */
-    public UUID stopNode( String clusterName, String lxcHostName );
+	/**
+	 * Stops the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID stopNode(String clusterName, String lxcHostName);
 
-    /**
-     * Checks status of the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     *
-     * @return - UUID of operation to track
-     */
-    public UUID checkNode( String clusterName, String lxcHostName );
+	/**
+	 * Checks status of the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID checkNode(String clusterName, String lxcHostName);
 
-    /**
-     * Returns Mongo cluster setup strategy
-     *
-     * @param config - mongo cluster configuration
-     * @param po - product operation tracker
-     *
-     * @return - strategy
-     */
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MongoClusterConfig config,
-                                                         ProductOperation po );
+	/**
+	 * Returns Mongo cluster setup strategy
+	 *
+	 * @param config - mongo cluster configuration
+	 * @param po     - product operation tracker
+	 * @return - strategy
+	 */
+	public ClusterSetupStrategy getClusterSetupStrategy(Environment environment, MongoClusterConfig config,
+	                                                    ProductOperation po);
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config );
+	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(MongoClusterConfig config);
 }

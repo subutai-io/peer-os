@@ -2,24 +2,24 @@ package org.safehaus.subutai.impl.storm;
 
 public enum StormService {
 
-    NIMBUS("storm-nimbus"),
-    UI("storm-ui"),
-    SUPERVISOR("storm-supervisor");
+	NIMBUS("storm-nimbus"),
+	UI("storm-ui"),
+	SUPERVISOR("storm-supervisor");
 
-    private final String service;
+	private final String service;
 
-    private StormService(String service) {
-        this.service = service;
-    }
+	private StormService(String service) {
+		this.service = service;
+	}
 
-    public String getService() {
-        return service;
-    }
+	public String getService() {
+		return service;
+	}
 
-    @Override
-    public String toString() {
-        String s = super.toString();
-        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
-    }
+	@Override
+	public String toString() {
+		String s = super.toString();
+		return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+	}
 
 }

@@ -13,55 +13,55 @@ import java.util.UUID;
  */
 public class SlaveNode extends ClusterNode {
 
-    private Agent agent;
-    private boolean isDataNode;
+	private Agent agent;
+	private boolean isDataNode;
 
-    public SlaveNode(Config cluster, Agent agent, boolean isDataNode) {
-        super(cluster);
-        this.agent = agent;
-        this.isDataNode = isDataNode;
+	public SlaveNode(Config cluster, Agent agent, boolean isDataNode) {
+		super(cluster);
+		this.agent = agent;
+		this.isDataNode = isDataNode;
 
-        setHostname(agent.getHostname());
+		setHostname(agent.getHostname());
 
-        restartButton.setVisible(false);
-        startButton.setEnabled(false);
-        stopButton.setEnabled(false);
+		restartButton.setVisible(false);
+		startButton.setEnabled(false);
+		stopButton.setEnabled(false);
 
-        getStatus(null);
-    }
+		getStatus(null);
+	}
 
 
-    @Override
-    protected void getStatus(UUID trackID) {
-        setLoading(true);
+	@Override
+	protected void getStatus(UUID trackID) {
+		setLoading(true);
 
-        HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
+		HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
 
-            public void onComplete(NodeState state) {
-                synchronized (progressButton) {
-                    boolean isRunning = false;
-                    if (state == NodeState.RUNNING) {
-                        isRunning = true;
-                    } else if (state == NodeState.STOPPED) {
-                        isRunning = false;
-                    }
+			public void onComplete(NodeState state) {
+				synchronized (progressButton) {
+					boolean isRunning = false;
+					if (state == NodeState.RUNNING) {
+						isRunning = true;
+					} else if (state == NodeState.STOPPED) {
+						isRunning = false;
+					}
 
-                    setLoading(false);
-                    startButton.setVisible(isRunning);
-                    stopButton.setVisible(!isRunning);
-                }
-            }
-        }, trackID, agent, isDataNode));
-    }
+					setLoading(false);
+					startButton.setVisible(isRunning);
+					stopButton.setVisible(!isRunning);
+				}
+			}
+		}, trackID, agent, isDataNode));
+	}
 
-    @Override
-    protected void setLoading(boolean isLoading) {
-        startButton.setVisible(!isLoading);
-        stopButton.setVisible(!isLoading);
-        progressButton.setVisible(isLoading);
-    }
+	@Override
+	protected void setLoading(boolean isLoading) {
+		startButton.setVisible(!isLoading);
+		stopButton.setVisible(!isLoading);
+		progressButton.setVisible(isLoading);
+	}
 
-    public Agent getAgent() {
-        return agent;
-    }
+	public Agent getAgent() {
+		return agent;
+	}
 }

@@ -6,10 +6,9 @@
 package org.safehaus.subutai.impl.mongodb.common;
 
 /**
- *
  * @author dilshat
  */
 public enum CommandType {
 
-    START_CONFIG_SERVERS, START_ROUTERS, START_DATA_NODES, FIND_PRIMARY_NODE
+	START_CONFIG_SERVERS, START_ROUTERS, START_DATA_NODES, FIND_PRIMARY_NODE
 }

@@ -6,13 +6,12 @@
 package org.safehaus.subutai.configuration.manager.impl.command;
 
 
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -20,18 +19,18 @@ import com.google.common.collect.Sets;
  */
 public class Commands extends CommandsSingleton {
 
-    public static Command getCatCommand( Agent agent, String filePath ) {
+	public static Command getCatCommand(Agent agent, String filePath) {
 
-        return createCommand( new RequestBuilder( "cat " + filePath ).withTimeout( 90 ).withStdOutRedirection(
-                OutputRedirection.CAPTURE_AND_RETURN ), Sets.newHashSet( agent ) );
-    }
+		return createCommand(new RequestBuilder("cat " + filePath).withTimeout(90).withStdOutRedirection(
+				OutputRedirection.CAPTURE_AND_RETURN), Sets.newHashSet(agent));
+	}
 
 
-    public static Command getEchoCommand( Agent agent, String filePath, String content ) {
+	public static Command getEchoCommand(Agent agent, String filePath, String content) {
 
-        return createCommand( new RequestBuilder( "echo " + " '" + content + "' > " + filePath )
-                        .withTimeout( 90 )
-                        .withStdOutRedirection(OutputRedirection.CAPTURE_AND_RETURN ),
-                Sets.newHashSet( agent ) );
-    }
+		return createCommand(new RequestBuilder("echo " + " '" + content + "' > " + filePath)
+						.withTimeout(90)
+						.withStdOutRedirection(OutputRedirection.CAPTURE_AND_RETURN),
+				Sets.newHashSet(agent));
+	}
 }

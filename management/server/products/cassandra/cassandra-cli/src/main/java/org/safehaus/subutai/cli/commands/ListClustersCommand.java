@@ -12,39 +12,39 @@ import java.util.List;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
+@Command (scope = "cassandra", name = "list-clusters", description = "Gets the list of Cassandra clusters")
 public class ListClustersCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+	private static Cassandra cassandraManager;
+	private static Tracker tracker;
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public static Cassandra getCassandraManager() {
+		return cassandraManager;
+	}
 
-    public void setTracker(Tracker tracker) {
-        ListClustersCommand.tracker = tracker;
-    }
+	public void setCassandraManager(Cassandra cassandraManager) {
+		ListClustersCommand.cassandraManager = cassandraManager;
+	}
 
-    public void setCassandraManager(Cassandra cassandraManager) {
-        ListClustersCommand.cassandraManager = cassandraManager;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Cassandra getCassandraManager() {
-        return cassandraManager;
-    }
+	public void setTracker(Tracker tracker) {
+		ListClustersCommand.tracker = tracker;
+	}
 
-    protected Object doExecute() {
-        List<Config> list = cassandraManager.getClusters();
-        if (list.size() > 0) {
-            StringBuilder sb = new StringBuilder();
+	protected Object doExecute() {
+		List<Config> list = cassandraManager.getClusters();
+		if (list.size() > 0) {
+			StringBuilder sb = new StringBuilder();
 
-            for (Config config : list) {
-                sb.append(config.getClusterName()).append("\n");
-            }
-            System.out.println(sb.toString());
-        } else System.out.println("No clusters found...");
+			for (Config config : list) {
+				sb.append(config.getClusterName()).append("\n");
+			}
+			System.out.println(sb.toString());
+		} else System.out.println("No clusters found...");
 
-        return null;
-    }
+		return null;
+	}
 }

@@ -1,58 +1,56 @@
 package org.safehaus.subutai.cli.aptrepositorymanager;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import org.apache.felix.gogo.commands.Argument;
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
-@Command(scope = "apt", name = "read-files", description = "Read files inside deb package")
+@Command (scope = "apt", name = "read-files", description = "Read files inside deb package")
 public class ReadFilesCommand extends OsgiCommandSupport {
-    @Argument( index = 0, name = "package path", required = true, multiValued = false,
-            description = "path to package" )
-    String packagePath;
-    @Argument(index = 1, name = "file path(s)", required = true, multiValued = true,
-            description = "relative file path(s) to read")
-    Collection<String> filesPaths;
+	@Argument (index = 0, name = "package path", required = true, multiValued = false,
+			description = "path to package")
+	String packagePath;
+	@Argument (index = 1, name = "file path(s)", required = true, multiValued = true,
+			description = "relative file path(s) to read")
+	Collection<String> filesPaths;
 
-    private AptRepositoryManager aptRepositoryManager;
-    private AgentManager agentManager;
-
-
-    public void setAptRepositoryManager( final AptRepositoryManager aptRepositoryManager ) {
-        this.aptRepositoryManager = aptRepositoryManager;
-    }
+	private AptRepositoryManager aptRepositoryManager;
+	private AgentManager agentManager;
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
+	public void setAptRepositoryManager(final AptRepositoryManager aptRepositoryManager) {
+		this.aptRepositoryManager = aptRepositoryManager;
+	}
 
 
-    @Override
-    protected Object doExecute() {
-        List<String> filePathsList = new ArrayList<>( filesPaths );
-        try {
-            List<String> fileContents = aptRepositoryManager
-                    .readFileContents( agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME ), packagePath,
-                            filePathsList );
-            for ( int i = 0; i < fileContents.size(); i++ ) {
-                final String content = fileContents.get( i );
-                System.out.println( "File: " + filePathsList.get( i ) + " Content:\n" + content + "\n\n" );
-            }
-        }
-        catch ( AptRepoException e ) {
-            System.out.println( e );
-        }
-        return null;
-    }
+	public void setAgentManager(final AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
+
+
+	@Override
+	protected Object doExecute() {
+		List<String> filePathsList = new ArrayList<>(filesPaths);
+		try {
+			List<String> fileContents = aptRepositoryManager
+					.readFileContents(agentManager.getAgentByHostname(Common.MANAGEMENT_AGENT_HOSTNAME), packagePath,
+							filePathsList);
+			for (int i = 0; i < fileContents.size(); i++) {
+				final String content = fileContents.get(i);
+				System.out.println("File: " + filePathsList.get(i) + " Content:\n" + content + "\n\n");
+			}
+		} catch (AptRepoException e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 }

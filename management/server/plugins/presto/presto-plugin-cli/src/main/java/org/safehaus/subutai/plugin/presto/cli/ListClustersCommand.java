@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.presto.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 
 import java.util.List;
@@ -25,9 +25,9 @@ public class ListClustersCommand extends OsgiCommandSupport {
 	}
 
 	protected Object doExecute() {
-		List<Config> configList = prestoManager.getClusters();
+		List<PrestoClusterConfig> configList = prestoManager.getClusters();
 		if (!configList.isEmpty())
-			for (Config config : configList) {
+			for (PrestoClusterConfig config : configList) {
 				System.out.println(config.getClusterName());
 			}
 		else System.out.println("No Presto cluster");

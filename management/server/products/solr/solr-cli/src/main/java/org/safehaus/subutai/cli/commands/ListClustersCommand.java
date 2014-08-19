@@ -11,27 +11,27 @@ import java.util.List;
 /**
  * Displays the last log entries
  */
-@Command(scope = "solr", name = "list-clusters", description = "mydescription")
+@Command (scope = "solr", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
-    private Solr solrManager;
+	private Solr solrManager;
 
-    public Solr getSolrManager() {
-        return solrManager;
-    }
+	public Solr getSolrManager() {
+		return solrManager;
+	}
 
-    public void setSolrManager(Solr solrManager) {
-        this.solrManager = solrManager;
-    }
+	public void setSolrManager(Solr solrManager) {
+		this.solrManager = solrManager;
+	}
 
-    protected Object doExecute() {
-        List<Config> configList = solrManager.getClusters();
-        if (!configList.isEmpty())
-            for (Config config : configList) {
-                System.out.println(config.getClusterName());
-            }
-        else System.out.println("No Solr cluster");
+	protected Object doExecute() {
+		List<Config> configList = solrManager.getClusters();
+		if (!configList.isEmpty())
+			for (Config config : configList) {
+				System.out.println(config.getClusterName());
+			}
+		else System.out.println("No Solr cluster");
 
-        return null;
-    }
+		return null;
+	}
 }

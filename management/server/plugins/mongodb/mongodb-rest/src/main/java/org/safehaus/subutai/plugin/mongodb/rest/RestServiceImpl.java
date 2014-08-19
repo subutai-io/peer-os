@@ -8,23 +8,23 @@ import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 
 public class RestServiceImpl implements RestService {
 
-    private Mongo mongodbManager;
+	private Mongo mongodbManager;
 
-    public Mongo getMongodbManager() {
-        return mongodbManager;
-    }
+	public Mongo getMongodbManager() {
+		return mongodbManager;
+	}
 
-    public void setMongodbManager(Mongo mongodbManager) {
-        this.mongodbManager = mongodbManager;
-    }
+	public void setMongodbManager(Mongo mongodbManager) {
+		this.mongodbManager = mongodbManager;
+	}
 
-    @Override
-    public String installCluster(String clusterName) {
-        return null;
-    }
+	@Override
+	public String installCluster(String clusterName) {
+		return null;
+	}
 
-    @Override
-    public String uninstallCluster(String clusterName) {
-        return null;
-    }
+	@Override
+	public String uninstallCluster(String clusterName) {
+		return null;
+	}
 }

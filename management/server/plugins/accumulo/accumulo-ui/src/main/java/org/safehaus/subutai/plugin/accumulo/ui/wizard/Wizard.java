@@ -8,7 +8,6 @@ package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 
 
