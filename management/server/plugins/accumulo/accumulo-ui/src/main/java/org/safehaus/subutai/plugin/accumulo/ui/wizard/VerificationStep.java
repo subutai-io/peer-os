@@ -36,17 +36,17 @@ public class VerificationStep extends Panel {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
-		cfgView.addStringCfg("Instance name", wizard.getAccumuloClusterConfig().getInstanceName());
-		cfgView.addStringCfg("Password", wizard.getAccumuloClusterConfig().getPassword());
-		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
-		cfgView.addStringCfg("Master node", wizard.getAccumuloClusterConfig().getMasterNode().getHostname());
-		cfgView.addStringCfg("GC node", wizard.getAccumuloClusterConfig().getGcNode().getHostname());
-		cfgView.addStringCfg("Monitor node", wizard.getAccumuloClusterConfig().getMonitor().getHostname());
-		for (Agent agent : wizard.getAccumuloClusterConfig().getTracers()) {
+		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Instance name", wizard.getConfig().getInstanceName());
+		cfgView.addStringCfg("Password", wizard.getConfig().getPassword());
+		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Master node", wizard.getConfig().getMasterNode().getHostname());
+		cfgView.addStringCfg("GC node", wizard.getConfig().getGcNode().getHostname());
+		cfgView.addStringCfg("Monitor node", wizard.getConfig().getMonitor().getHostname());
+		for (Agent agent : wizard.getConfig().getTracers()) {
 			cfgView.addStringCfg("Tracers", agent.getHostname());
 		}
-		for (Agent agent : wizard.getAccumuloClusterConfig().getSlaves()) {
+		for (Agent agent : wizard.getConfig().getSlaves()) {
 			cfgView.addStringCfg("Slaves", agent.getHostname());
 		}
 
@@ -57,7 +57,7 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent event) {
 
-				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getAccumuloClusterConfig());
+				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getConfig());
 				ProgressWindow window = new ProgressWindow(AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
                         AccumuloClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {

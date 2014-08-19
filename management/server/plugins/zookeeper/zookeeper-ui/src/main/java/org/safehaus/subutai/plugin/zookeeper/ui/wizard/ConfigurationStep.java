@@ -143,21 +143,22 @@ public class ConfigurationStep extends Panel {
             hadoopClustersCombo.setRequired( true );
             hadoopClustersCombo.setNullSelectionAllowed( false );
 
-            List<HadoopClusterConfig> clusters = ZookeeperUI.getHadoopManager().getClusters();
-            if ( clusters.size() > 0 ) {
-                for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
+            List<HadoopClusterConfig> hadoopClusterConfigs = ZookeeperUI.getHadoopManager().getClusters();
+            if ( hadoopClusterConfigs.size() > 0 ) {
+                for ( HadoopClusterConfig hadoopClusterInfo : hadoopClusterConfigs ) {
                     hadoopClustersCombo.addItem( hadoopClusterInfo );
                     hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
                 }
             }
 
-            HadoopClusterConfig info = ZookeeperUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+            HadoopClusterConfig info =
+                    ZookeeperUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
 
             if ( info != null ) {
                 hadoopClustersCombo.setValue( info );
             }
-            else if ( clusters.size() > 0 ) {
-                hadoopClustersCombo.setValue( clusters.iterator().next() );
+            else if ( hadoopClusterConfigs.size() > 0 ) {
+                hadoopClustersCombo.setValue( hadoopClusterConfigs.iterator().next() );
             }
 
             if ( hadoopClustersCombo.getValue() != null ) {
@@ -265,12 +266,12 @@ public class ConfigurationStep extends Panel {
             } );
 
             //configuration servers number
-            List<Integer> s = new ArrayList<Integer>();
+            List<Integer> count = new ArrayList<>();
             for ( int i = 1; i < 50; i++ ) {
-                s.add( i );
+                count.add( i );
             }
 
-            ComboBox hadoopSlaveNodesComboBox = new ComboBox( "Choose number of Hadoop slave nodes", s );
+            ComboBox hadoopSlaveNodesComboBox = new ComboBox( "Choose number of Hadoop slave nodes", count );
             hadoopSlaveNodesComboBox.setImmediate( true );
             hadoopSlaveNodesComboBox.setTextInputAllowed( false );
             hadoopSlaveNodesComboBox.setNullSelectionAllowed( false );
@@ -285,7 +286,7 @@ public class ConfigurationStep extends Panel {
 
             //configuration replication factor
             ComboBox hadoopReplicationFactorComboBox =
-                    new ComboBox( "Choose replication factor for Hadoop slave nodes", s );
+                    new ComboBox( "Choose replication factor for Hadoop slave nodes", count );
             hadoopReplicationFactorComboBox.setImmediate( true );
             hadoopReplicationFactorComboBox.setTextInputAllowed( false );
             hadoopReplicationFactorComboBox.setNullSelectionAllowed( false );
@@ -306,9 +307,7 @@ public class ConfigurationStep extends Panel {
                 @Override
                 public void valueChange( Property.ValueChangeEvent event ) {
                     String value = event.getProperty().getValue().toString().trim();
-                    if ( !Util.isStringEmpty( value ) ) {
-                        wizard.getHadoopClusterConfig().setDomainName( value );
-                    }
+                    wizard.getHadoopClusterConfig().setDomainName( value );
                 }
             } );
 
@@ -357,11 +356,25 @@ public class ConfigurationStep extends Panel {
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                         show( "Please provide Zookeeper cluster name" );
                     }
+                    else if ( wizard.getConfig().getNumberOfNodes() <= 0 || wizard.getConfig().getNumberOfNodes()
+                            > HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + wizard.getHadoopClusterConfig()
+                                                                                               .getCountOfSlaveNodes
+                                                                                                       () ) {
+                        show( "Please enter number of ZK nodes not more then total number of Hadoop nodes" );
+                    }
                     else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
                         show( "Please provide Hadoop cluster name" );
                     }
+                    else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getDomainName() ) ) {
+                        show( "Please provide Hadoop cluster domain name" );
+                    }
+                    else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() < 0 ) {
+                        show( "Please provide #  of Hadoop slave nodes" );
+                    }
+                    else if ( wizard.getHadoopClusterConfig().getReplicationFactor() < 0 ) {
+                        show( "Please provide Hadoop cluster replicaton factor" );
+                    }
                     else {
-                        wizard.getConfig().setHadoopClusterName( wizard.getHadoopClusterConfig().getClusterName() );
                         wizard.next();
                     }
                 }

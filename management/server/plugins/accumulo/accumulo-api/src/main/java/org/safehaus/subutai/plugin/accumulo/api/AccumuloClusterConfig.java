@@ -206,20 +206,6 @@ public class AccumuloClusterConfig implements ConfigBase {
     }
 
 
-    public void reset() {
-        clusterName = "";
-        instanceName = "";
-        password = "";
-        masterNode = null;
-        gcNode = null;
-        monitor = null;
-        tracers = null;
-        slaves = null;
-        numberOfTracers = 1;
-        numberOfSlaves = 3;
-    }
-
-
     @Override
     public String toString() {
         return "AccumuloClusterConfig{" +
