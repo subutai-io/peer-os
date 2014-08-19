@@ -57,7 +57,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             return;
         }
         if ( nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7 ) {
-            po.addLogFailed( "Replica set cannot have more than 7 members.\nOperation aborted" );
+            po.addLogFailed( "Replica set cannot have more than 7 members" );
             return;
         }
         try {
