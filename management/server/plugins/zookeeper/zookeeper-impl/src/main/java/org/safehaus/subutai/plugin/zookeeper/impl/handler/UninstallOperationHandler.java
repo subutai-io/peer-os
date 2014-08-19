@@ -65,7 +65,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         }
         else {
             //just uninstall nodes
-            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
             Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
 

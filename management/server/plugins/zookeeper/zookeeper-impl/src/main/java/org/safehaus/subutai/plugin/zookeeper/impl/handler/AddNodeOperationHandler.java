@@ -261,7 +261,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
 
         config.getNodes().add( lxcAgent );
 
-        po.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
+        po.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
         //install
         Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );

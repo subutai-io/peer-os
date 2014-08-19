@@ -137,7 +137,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
         if ( configureClusterCommand.hasSucceeded() ) {
 
-            po.addLog( String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
+            po.addLog( String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
             //start all nodes
             Command startCommand = Commands.getStartCommand( zookeeperClusterConfig.getNodes() );
             final AtomicInteger count = new AtomicInteger();
@@ -153,10 +153,10 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
             } );
 
             if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
-                po.addLog( String.format( "Starting %s succeeded", ZookeeperClusterConfig.PRODUCT_KEY ) );
+                po.addLog( String.format( "Starting %s succeeded", ZookeeperClusterConfig.PRODUCT_NAME ) );
             }
             else {
-                po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
+                po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_NAME,
                         startCommand.getAllErrors() ) );
             }
         }

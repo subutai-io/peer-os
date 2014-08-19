@@ -104,7 +104,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
         }
         else {
             //just uninstall Zookeeper
-            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
             Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( uninstallCommand );
@@ -119,8 +119,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Zookee
                 }
             }
             else {
-                po.addLogFailed( "Uninstallation failed, command timed out" );
-                return;
+                po.addLog( "Uninstallation failed, command timed out, skipping..." );
             }
         }
 
