@@ -6,11 +6,15 @@ set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
 
+#connecting the container
+sleep 3
 spawn ssh "$user\@$ip"
-sleep 1
+sleep 3
 expect "password:"
+sleep 3
 send "$password\r";
-sleep 1
+sleep 3
+
 #updating apt-get
 expect "# " { send "apt-get update\r"  }
 sleep 1
