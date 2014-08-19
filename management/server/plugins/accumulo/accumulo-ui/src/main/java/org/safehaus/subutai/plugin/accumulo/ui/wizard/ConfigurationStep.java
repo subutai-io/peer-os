@@ -168,6 +168,7 @@ public class ConfigurationStep extends Panel {
                         wizard.getConfig().setMonitor( null );
                         wizard.getConfig().setTracers( null );
                         wizard.getConfig().setSlaves( null );
+                        wizard.getConfig().setHadoopClusterName( hadoopInfo.getClusterName() );
                     }
                 }
             } );
@@ -446,32 +447,29 @@ public class ConfigurationStep extends Panel {
 
             //Zookeeper settings
 
-            GridLayout withHadoopInstallationControls = new GridLayout( 1, 5 );
-            withHadoopInstallationControls.setSizeFull();
-            withHadoopInstallationControls.setSpacing( true );
-            withHadoopInstallationControls.setMargin( true );
 
             final TextField zkClusterNameTxtFld = new TextField( "Enter Zookeeper cluster name" );
             zkClusterNameTxtFld.setInputPrompt( "Zookeeper cluster name" );
             zkClusterNameTxtFld.setRequired( true );
             zkClusterNameTxtFld.setMaxLength( 20 );
-            zkClusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
+            zkClusterNameTxtFld.setValue( wizard.getZookeeperClusterConfig().getClusterName() );
             zkClusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
                 @Override
                 public void valueChange( Property.ValueChangeEvent event ) {
-                    wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                    wizard.getZookeeperClusterConfig()
+                          .setClusterName( event.getProperty().getValue().toString().trim() );
                 }
             } );
 
             //number of nodes
-            ComboBox nodesCountCombo =
+            ComboBox zkNodesCountCombo =
                     new ComboBox( "Choose number of Zookeeper nodes", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
-            nodesCountCombo.setImmediate( true );
-            nodesCountCombo.setTextInputAllowed( false );
-            nodesCountCombo.setNullSelectionAllowed( false );
-            nodesCountCombo.setValue( wizard.getZookeeperClusterConfig().getNumberOfNodes() );
+            zkNodesCountCombo.setImmediate( true );
+            zkNodesCountCombo.setTextInputAllowed( false );
+            zkNodesCountCombo.setNullSelectionAllowed( false );
+            zkNodesCountCombo.setValue( wizard.getZookeeperClusterConfig().getNumberOfNodes() );
 
-            nodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            zkNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
                 @Override
                 public void valueChange( Property.ValueChangeEvent event ) {
                     wizard.getZookeeperClusterConfig().setNumberOfNodes( ( Integer ) event.getProperty().getValue() );
@@ -518,12 +516,12 @@ public class ConfigurationStep extends Panel {
 
 
             //number of tracers
-            ComboBox tracersCountCombo = new ComboBox( "Choose number of Accumulo tracers", nodesCountRange );
-            tracersCountCombo.setImmediate( true );
-            tracersCountCombo.setTextInputAllowed( false );
-            tracersCountCombo.setNullSelectionAllowed( false );
-            tracersCountCombo.setValue( wizard.getConfig().getNumberOfTracers() );
-            tracersCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            ComboBox accumuloTracersCountCombo = new ComboBox( "Choose number of Accumulo tracers", nodesCountRange );
+            accumuloTracersCountCombo.setImmediate( true );
+            accumuloTracersCountCombo.setTextInputAllowed( false );
+            accumuloTracersCountCombo.setNullSelectionAllowed( false );
+            accumuloTracersCountCombo.setValue( wizard.getConfig().getNumberOfTracers() );
+            accumuloTracersCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
                 @Override
                 public void valueChange( Property.ValueChangeEvent event ) {
                     wizard.getConfig().setNumberOfTracers( ( Integer ) event.getProperty().getValue() );
@@ -531,12 +529,12 @@ public class ConfigurationStep extends Panel {
             } );
 
             //number of slaves
-            ComboBox slavesCountCombo = new ComboBox( "Choose number of Accumulo slaves", nodesCountRange );
-            slavesCountCombo.setImmediate( true );
-            slavesCountCombo.setTextInputAllowed( false );
-            slavesCountCombo.setNullSelectionAllowed( false );
-            slavesCountCombo.setValue( wizard.getConfig().getNumberOfSlaves() );
-            slavesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            ComboBox accumuloSlavesCountCombo = new ComboBox( "Choose number of Accumulo slaves", nodesCountRange );
+            accumuloSlavesCountCombo.setImmediate( true );
+            accumuloSlavesCountCombo.setTextInputAllowed( false );
+            accumuloSlavesCountCombo.setNullSelectionAllowed( false );
+            accumuloSlavesCountCombo.setValue( wizard.getConfig().getNumberOfSlaves() );
+            accumuloSlavesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
                 @Override
                 public void valueChange( Property.ValueChangeEvent event ) {
                     wizard.getConfig().setNumberOfSlaves( ( Integer ) event.getProperty().getValue() );
@@ -560,6 +558,9 @@ public class ConfigurationStep extends Panel {
 
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
+
+                    wizard.getConfig().setHadoopClusterName( wizard.getHadoopClusterConfig().getClusterName() );
+                    wizard.getConfig().setZookeeperClusterName( wizard.getZookeeperClusterConfig().getClusterName() );
 
                     if ( Strings.isNullOrEmpty( wizard.getZookeeperClusterConfig().getClusterName() ) ) {
                         show( "Please provide Zookeeper cluster name" );
@@ -616,11 +617,16 @@ public class ConfigurationStep extends Panel {
             buttons.addComponent( back );
             buttons.addComponent( next );
 
+            GridLayout withHadoopInstallationControls = new GridLayout( 1, 5 );
+            withHadoopInstallationControls.setSizeFull();
+            withHadoopInstallationControls.setSpacing( true );
+            withHadoopInstallationControls.setMargin( true );
+
             withHadoopInstallationControls.addComponent( new Label(
-                    "Please, specify installation settings for combo Hadoop+Zookeeper clusters installation" ) );
+                    "Please, specify installation settings for combo Hadoop+Zookeeper+Accumulo clusters installation" ) );
             withHadoopInstallationControls.addComponent( new Label( "Zookeeper settings" ) );
-            withHadoopInstallationControls.addComponent( accumuloPasswordTxtFld );
-            withHadoopInstallationControls.addComponent( slavesCountCombo );
+            withHadoopInstallationControls.addComponent( zkClusterNameTxtFld );
+            withHadoopInstallationControls.addComponent( zkNodesCountCombo );
             withHadoopInstallationControls.addComponent( new Label( "Hadoop settings" ) );
             withHadoopInstallationControls.addComponent( hadoopClusterNameTxtFld );
             withHadoopInstallationControls.addComponent( hadoopSlaveNodesComboBox );
@@ -630,8 +636,8 @@ public class ConfigurationStep extends Panel {
             withHadoopInstallationControls.addComponent( accumuloClusterNameTxtFld );
             withHadoopInstallationControls.addComponent( accumuloInstanceNameTxtFld );
             withHadoopInstallationControls.addComponent( accumuloPasswordTxtFld );
-            withHadoopInstallationControls.addComponent( tracersCountCombo );
-            withHadoopInstallationControls.addComponent( slavesCountCombo );
+            withHadoopInstallationControls.addComponent( accumuloTracersCountCombo );
+            withHadoopInstallationControls.addComponent( accumuloSlavesCountCombo );
 
             withHadoopInstallationControls.addComponent( buttons );
 
