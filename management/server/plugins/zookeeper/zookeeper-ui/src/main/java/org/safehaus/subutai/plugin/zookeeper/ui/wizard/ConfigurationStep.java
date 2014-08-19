@@ -356,11 +356,14 @@ public class ConfigurationStep extends Panel {
                     if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                         show( "Please provide Zookeeper cluster name" );
                     }
-                    else if ( wizard.getConfig().getNumberOfNodes() <= 0 || wizard.getConfig().getNumberOfNodes()
+                    else if ( wizard.getConfig().getNumberOfNodes() <= 0 ) {
+                        show( "Please enter number of ZK nodes" );
+                    }
+                    else if ( wizard.getConfig().getNumberOfNodes()
                             > HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + wizard.getHadoopClusterConfig()
                                                                                                .getCountOfSlaveNodes
                                                                                                        () ) {
-                        show( "Please enter number of ZK nodes not more then total number of Hadoop nodes" );
+                        show( "Number of ZK nodes must not exceed total number of Hadoop nodes" );
                     }
                     else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
                         show( "Please provide Hadoop cluster name" );
@@ -368,10 +371,10 @@ public class ConfigurationStep extends Panel {
                     else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getDomainName() ) ) {
                         show( "Please provide Hadoop cluster domain name" );
                     }
-                    else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() < 0 ) {
+                    else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() <= 0 ) {
                         show( "Please provide #  of Hadoop slave nodes" );
                     }
-                    else if ( wizard.getHadoopClusterConfig().getReplicationFactor() < 0 ) {
+                    else if ( wizard.getHadoopClusterConfig().getReplicationFactor() <= 0 ) {
                         show( "Please provide Hadoop cluster replicaton factor" );
                     }
                     else {
