@@ -63,7 +63,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<Zookeeper
         if (NodeState.STOPPED.equals(state)) {
             po.addLogDone(String.format("Node on %s stopped", lxcHostname));
         } else {
-            po.addLogFailed(String.format("Failed to stop node %s. %s",
+            po.addLogFailed(String.format("Failed to stop node %s, %s",
                     lxcHostname, stopCommand.getAllErrors()
             ));
         }
