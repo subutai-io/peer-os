@@ -372,7 +372,7 @@ public class ConfigurationStep extends Panel {
                         show( "Please provide Hadoop cluster domain name" );
                     }
                     else if ( wizard.getHadoopClusterConfig().getCountOfSlaveNodes() <= 0 ) {
-                        show( "Please provide #  of Hadoop slave nodes" );
+                        show( "Please provide number of Hadoop slave nodes" );
                     }
                     else if ( wizard.getHadoopClusterConfig().getReplicationFactor() <= 0 ) {
                         show( "Please provide Hadoop cluster replicaton factor" );

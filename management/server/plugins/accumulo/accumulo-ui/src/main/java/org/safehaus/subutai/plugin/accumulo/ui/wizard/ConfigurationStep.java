@@ -564,12 +564,14 @@ public class ConfigurationStep extends Panel {
                     if ( Strings.isNullOrEmpty( wizard.getZookeeperClusterConfig().getClusterName() ) ) {
                         show( "Please provide Zookeeper cluster name" );
                     }
-                    else if ( wizard.getZookeeperClusterConfig().getNumberOfNodes() <= 0
-                            || wizard.getZookeeperClusterConfig().getNumberOfNodes()
+                    else if ( wizard.getZookeeperClusterConfig().getNumberOfNodes() <= 0 ) {
+                        show( "Please enter number of ZK nodes" );
+                    }
+                    else if ( wizard.getZookeeperClusterConfig().getNumberOfNodes()
                             > HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY + wizard.getHadoopClusterConfig()
                                                                                                .getCountOfSlaveNodes
                                                                                                        () ) {
-                        show( "Please enter number of ZK nodes not more then total number of Hadoop nodes" );
+                        show( "Number of ZK nodes must not exceed total number of Hadoop nodes" );
                     }
                     else if ( Strings.isNullOrEmpty( wizard.getHadoopClusterConfig().getClusterName() ) ) {
                         show( "Please provide Hadoop cluster name" );
