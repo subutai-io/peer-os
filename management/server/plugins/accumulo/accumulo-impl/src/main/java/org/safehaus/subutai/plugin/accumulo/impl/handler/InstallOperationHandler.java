@@ -92,7 +92,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
     private void setupWithHadoopNZk() {
 
         try {
-            final String COMBO_TEMPLATE_NAME = "hadoopnzk";
+            final String COMBO_TEMPLATE_NAME = "hadoopnzknaccumulo";
             hadoopClusterConfig.setTemplateName( COMBO_TEMPLATE_NAME );
             //create environment
             Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(
