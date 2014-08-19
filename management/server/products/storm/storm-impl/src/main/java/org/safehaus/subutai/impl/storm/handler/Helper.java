@@ -9,11 +9,11 @@ import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-class InstallHelper {
+class Helper {
 
     final StormImpl manager;
 
-    public InstallHelper(StormImpl manager) {
+    public Helper(StormImpl manager) {
         this.manager = manager;
     }
 
@@ -35,6 +35,18 @@ class InstallHelper {
         new Thread(new OperationStatusChecker(latch, id)).start();
         try {
             latch.await(2, TimeUnit.MINUTES);
+        } catch(InterruptedException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    boolean startZookeeper(Agent agent) {
+        UUID id = manager.getZookeeperManager().start(agent.getHostname());
+        CountDownLatch latch = new CountDownLatch(1);
+        new Thread(new OperationStatusChecker(latch, id)).start();
+        try {
+            latch.await(1, TimeUnit.MINUTES);
         } catch(InterruptedException ex) {
             return false;
         }

@@ -43,7 +43,7 @@ public class AddNodeHandler extends AbstractHandler {
             }
         } else {
             po.addLog("Creating container for new node...");
-            InstallHelper helper = new InstallHelper(manager);
+            Helper helper = new Helper(manager);
             try {
                 agent = helper.createContainer();
                 if(agent == null)

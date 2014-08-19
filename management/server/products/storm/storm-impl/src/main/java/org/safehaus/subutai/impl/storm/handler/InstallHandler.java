@@ -167,7 +167,7 @@ public class InstallHandler extends AbstractHandler {
 
     private boolean prepareNodes(Config config) throws LxcCreateException {
         ProductOperation po = productOperation;
-        InstallHelper helper = new InstallHelper(manager);
+        Helper helper = new Helper(manager);
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {
             po.addLog("Creating container for Nimbus node...");

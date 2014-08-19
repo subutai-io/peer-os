@@ -47,6 +47,14 @@ public class StartHandler extends AbstractHandler {
                 : new StormService[]{StormService.SUPERVISOR};
         boolean result = true;
         for(StormService service : services) {
+            if(service == StormService.NIMBUS) {
+                Helper h = new Helper(manager);
+                if(!h.startZookeeper(agent)) {
+                    po.addLog("Failed to start Zookeeper on Nimbus");
+                    result = false;
+                    break;
+                }
+            }
             String s = Commands.make(CommandType.START, service);
             Command cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(s).withTimeout(60), set);
