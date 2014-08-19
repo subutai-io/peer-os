@@ -32,6 +32,28 @@ public class AccumuloClusterConfig implements ConfigBase {
     private int numberOfTracers = 1;
     private int numberOfSlaves = 3;
     private SetupType setupType;
+    private String hadoopClusterName;
+    private String zookeeperClusterName;
+
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
+
+
+    public String getZookeeperClusterName() {
+        return zookeeperClusterName;
+    }
+
+
+    public void setZookeeperClusterName( final String zookeeperClusterName ) {
+        this.zookeeperClusterName = zookeeperClusterName;
+    }
 
 
     public SetupType getSetupType() {
@@ -201,6 +223,8 @@ public class AccumuloClusterConfig implements ConfigBase {
                 ", numberOfTracers=" + numberOfTracers +
                 ", numberOfSlaves=" + numberOfSlaves +
                 ", setupType=" + setupType +
+                ", hadoopClusterName='" + hadoopClusterName + '\'' +
+                ", zookeeperClusterName='" + zookeeperClusterName + '\'' +
                 '}';
     }
 }

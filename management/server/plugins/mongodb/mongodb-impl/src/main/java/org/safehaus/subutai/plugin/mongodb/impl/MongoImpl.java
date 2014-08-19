@@ -43,6 +43,8 @@ import com.google.common.collect.Sets;
 /**
  * Implementation of Mongo interface. Implements all backend logic for mongo cluster management
  */
+
+//TODO: Add parameter validation
 public class MongoImpl implements Mongo {
 
     private CommandRunner commandRunner;

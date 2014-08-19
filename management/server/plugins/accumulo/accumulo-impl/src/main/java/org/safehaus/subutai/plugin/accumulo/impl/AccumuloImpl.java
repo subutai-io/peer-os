@@ -10,6 +10,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -33,6 +34,7 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
+//TODO: add parameter validation
 public class AccumuloImpl implements Accumulo {
 
     private CommandRunner commandRunner;
@@ -105,8 +107,23 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig ) {
-        //not implemented since in our use-case Accumulo always needs ZK and Hadoop clusters and can not be standalone
-        return null;
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, accumuloClusterConfig );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
+                                final HadoopClusterConfig hadoopClusterConfig,
+                                final ZookeeperClusterConfig zookeeperClusterConfig ) {
+        AbstractOperationHandler operationHandler =
+                new InstallOperationHandler( this, accumuloClusterConfig, hadoopClusterConfig, zookeeperClusterConfig );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
     }
 
 
@@ -128,19 +145,6 @@ public class AccumuloImpl implements Accumulo {
 
     public AccumuloClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
-    }
-
-
-    @Override
-    public UUID installCluster( final ZookeeperClusterConfig zookeeperClusterConfig,
-                                final HadoopClusterConfig hadoopClusterConfig,
-                                final AccumuloClusterConfig accumuloClusterConfig ) {
-        AbstractOperationHandler operationHandler =
-                new InstallOperationHandler( this, accumuloClusterConfig, zookeeperClusterConfig, hadoopClusterConfig );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
     }
 
 
@@ -220,17 +224,14 @@ public class AccumuloImpl implements Accumulo {
     }
 
 
-    public ClusterSetupStrategy getClusterSetupStrategy( AccumuloClusterConfig accumuloClusterConfig,
-                                                         HadoopClusterConfig hadoopClusterConfig,
-                                                         ZookeeperClusterConfig zookeeperClusterConfig,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
+                                                         AccumuloClusterConfig accumuloClusterConfig,
                                                          ProductOperation po ) {
         if ( accumuloClusterConfig.getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
-            return new AccumuloOverZkNHadoopSetupStrategy( po, accumuloClusterConfig, hadoopClusterConfig,
-                    zookeeperClusterConfig, this );
+            return new AccumuloOverZkNHadoopSetupStrategy( accumuloClusterConfig, po, this );
         }
         else {
-            return new AccumuloWithZkNHadoopSetupStrategy( po, accumuloClusterConfig, hadoopClusterConfig,
-                    zookeeperClusterConfig, this );
+            return new AccumuloWithZkNHadoopSetupStrategy( environment, accumuloClusterConfig, po, this );
         }
     }
 }

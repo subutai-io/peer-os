@@ -28,6 +28,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
 
 
     public InstallOperationHandler( ZookeeperImpl manager, ZookeeperClusterConfig config ) {
+
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( ZookeeperClusterConfig.PRODUCT_KEY,
@@ -60,8 +61,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
             return;
         }
 
-        if ( manager.getCluster( config.getClusterName() ) != null ) {
-            po.addLogFailed( String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
+        if ( manager.getCluster( clusterName ) != null ) {
+            po.addLogFailed( String.format( "Cluster with name '%s' already exists", clusterName ) );
             return;
         }
 

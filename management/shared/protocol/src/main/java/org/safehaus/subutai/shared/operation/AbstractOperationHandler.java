@@ -1,9 +1,12 @@
 package org.safehaus.subutai.shared.operation;
 
 
+import java.util.UUID;
+
 import org.safehaus.subutai.shared.protocol.ApiBase;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public abstract class AbstractOperationHandler<T extends ApiBase> implements Runnable {
@@ -13,6 +16,8 @@ public abstract class AbstractOperationHandler<T extends ApiBase> implements Run
 
 
     public AbstractOperationHandler( T manager, String clusterName ) {
+        Preconditions.checkNotNull( manager, "Manager is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         this.manager = manager;
         this.clusterName = clusterName;
     }

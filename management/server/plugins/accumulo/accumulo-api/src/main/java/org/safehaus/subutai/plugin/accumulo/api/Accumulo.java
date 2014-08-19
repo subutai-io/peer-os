@@ -18,8 +18,9 @@ import org.safehaus.subutai.shared.protocol.ApiBase;
  */
 public interface Accumulo extends ApiBase<AccumuloClusterConfig> {
 
-    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig,
-                                AccumuloClusterConfig accumuloClusterConfig );
+    public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
+                                final HadoopClusterConfig hadoopClusterConfig,
+                                final ZookeeperClusterConfig zookeeperClusterConfig );
 
     public UUID startCluster( String clusterName );
 

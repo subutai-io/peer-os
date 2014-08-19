@@ -36,6 +36,7 @@ import org.safehaus.subutai.shared.protocol.NodeGroup;
 import com.google.common.collect.Sets;
 
 
+//TODO: Add parameter validation
 public class ZookeeperImpl implements Zookeeper {
 
     private final CommandRunner commandRunner;
