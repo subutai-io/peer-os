@@ -1017,6 +1017,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Solr 2 -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Lucene -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
