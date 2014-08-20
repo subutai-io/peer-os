@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
+//TODO: Add parameter validation
 public class ZookeeperImpl implements Zookeeper {
 
 	private final CommandRunner commandRunner;

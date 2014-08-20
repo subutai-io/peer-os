@@ -16,37 +16,39 @@ import static junit.framework.Assert.assertTrue;
 
 public class InstallOperationHandlerTest {
 
-	@Test (expected = NullPointerException.class)
-	public void testWithNullConfig() {
-		new LuceneImplMock().installCluster(null);
-	}
+    @Test( expected = NullPointerException.class )
+    public void testWithNullConfig() {
+        new LuceneImplMock().installCluster( null );
+    }
 
 
-	@Test
-	public void testWithMalformedConfiguration() {
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(new LuceneImplMock(), new Config());
+    @Test
+    public void testWithMalformedConfiguration() {
+        Config      config = new Config();
+        config.setClusterName( "test" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( new LuceneImplMock(), config );
 
-		operationHandler.run();
+        operationHandler.run();
 
-		assertTrue(operationHandler.getProductOperation().getLog().contains("Malformed configuration"));
-		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
-	}
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "Malformed configuration" ) );
+        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+    }
 
 
-	@Test
-	@Ignore
-	public void testWithExistingCluster() {
-		Config config = new Config();
-		config.setClusterName("test-cluster");
-		config.getNodes().add(CommonMockBuilder.createAgent());
+    @Test
+    @Ignore
+    public void testWithExistingCluster() {
+        Config config = new Config();
+        config.setClusterName( "test-cluster" );
+        config.getNodes().add( CommonMockBuilder.createAgent() );
 
-		LuceneImpl impl = new LuceneImplMock().setClusterConfig(new Config());
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(impl, config);
+        LuceneImpl impl = new LuceneImplMock().setClusterConfig( new Config() );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( impl, config );
 
-		operationHandler.run();
+        operationHandler.run();
 
-		assertTrue(operationHandler.getProductOperation().getLog().contains("test-cluster"));
-		assertTrue(operationHandler.getProductOperation().getLog().contains("already exists"));
-		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
-	}
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "test-cluster" ) );
+        assertTrue( operationHandler.getProductOperation().getLog().contains( "already exists" ) );
+        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+    }
 }

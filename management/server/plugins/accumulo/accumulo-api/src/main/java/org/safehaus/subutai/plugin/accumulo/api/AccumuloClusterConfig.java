@@ -6,11 +6,11 @@
 package org.safehaus.subutai.plugin.accumulo.api;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 
 /**
@@ -18,189 +18,211 @@ import java.util.Set;
  */
 public class AccumuloClusterConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Accumulo2";
-	public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
-	public static final String PRODUCT_NAME = "accumulo";
-	private String clusterName = "";
-	private String instanceName = "";
-	private String password = "";
-	private Agent masterNode;
-	private Agent gcNode;
-	private Agent monitor;
-	private Set<Agent> tracers;
-	private Set<Agent> slaves;
-	private int numberOfTracers = 1;
-	private int numberOfSlaves = 3;
-	private SetupType setupType;
+    public static final String PRODUCT_KEY = "Accumulo2";
+    public static final int DEFAULT_ACCUMULO_MASTER_NODES_QUANTITY = 3;
+    public static final String PRODUCT_NAME = "accumulo";
+    private String clusterName = "";
+    private String instanceName = "";
+    private String password = "";
+    private Agent masterNode;
+    private Agent gcNode;
+    private Agent monitor;
+    private Set<Agent> tracers;
+    private Set<Agent> slaves;
+    private int numberOfTracers = 1;
+    private int numberOfSlaves = 3;
+    private SetupType setupType;
+    private String hadoopClusterName;
+    private String zookeeperClusterName;
+    private String templateName;
 
 
-	public SetupType getSetupType() {
-		return setupType;
-	}
+    public String getTemplateName() {
+        return templateName;
+    }
 
 
-	public void setSetupType(final SetupType setupType) {
-		this.setupType = setupType;
-	}
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
 
 
-	public int getNumberOfTracers() {
-		return numberOfTracers;
-	}
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
 
 
-	public void setNumberOfTracers(final int numberOfTracers) {
-		this.numberOfTracers = numberOfTracers;
-	}
+    public void setHadoopClusterName( final String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
 
-	public int getNumberOfSlaves() {
-		return numberOfSlaves;
-	}
+    public String getZookeeperClusterName() {
+        return zookeeperClusterName;
+    }
 
 
-	public void setNumberOfSlaves(final int numberOfSlaves) {
-		this.numberOfSlaves = numberOfSlaves;
-	}
+    public void setZookeeperClusterName( final String zookeeperClusterName ) {
+        this.zookeeperClusterName = zookeeperClusterName;
+    }
 
 
-	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<>();
-
-		if (masterNode != null) {
-			allNodes.add(masterNode);
-		}
-		if (gcNode != null) {
-			allNodes.add(gcNode);
-		}
-		if (monitor != null) {
-			allNodes.add(monitor);
-		}
-		if (tracers != null) {
-			allNodes.addAll(tracers);
-		}
-		if (slaves != null) {
-			allNodes.addAll(slaves);
-		}
-
-		return allNodes;
-	}
+    public SetupType getSetupType() {
+        return setupType;
+    }
 
 
-	public Agent getMasterNode() {
-		return masterNode;
-	}
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
+    }
 
 
-	public void setMasterNode(Agent masterNode) {
-		this.masterNode = masterNode;
-	}
+    public int getNumberOfTracers() {
+        return numberOfTracers;
+    }
 
 
-	public Agent getGcNode() {
-		return gcNode;
-	}
+    public void setNumberOfTracers( final int numberOfTracers ) {
+        this.numberOfTracers = numberOfTracers;
+    }
 
 
-	public void setGcNode(Agent gcNode) {
-		this.gcNode = gcNode;
-	}
+    public int getNumberOfSlaves() {
+        return numberOfSlaves;
+    }
 
 
-	public Agent getMonitor() {
-		return monitor;
-	}
+    public void setNumberOfSlaves( final int numberOfSlaves ) {
+        this.numberOfSlaves = numberOfSlaves;
+    }
 
 
-	public void setMonitor(Agent monitor) {
-		this.monitor = monitor;
-	}
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<>();
+
+        if ( masterNode != null ) {
+            allNodes.add( masterNode );
+        }
+        if ( gcNode != null ) {
+            allNodes.add( gcNode );
+        }
+        if ( monitor != null ) {
+            allNodes.add( monitor );
+        }
+        if ( tracers != null ) {
+            allNodes.addAll( tracers );
+        }
+        if ( slaves != null ) {
+            allNodes.addAll( slaves );
+        }
+
+        return allNodes;
+    }
 
 
-	public Set<Agent> getTracers() {
-		return tracers;
-	}
+    public Agent getMasterNode() {
+        return masterNode;
+    }
 
 
-	public void setTracers(Set<Agent> tracers) {
-		this.tracers = tracers;
-	}
+    public void setMasterNode( Agent masterNode ) {
+        this.masterNode = masterNode;
+    }
 
 
-	public Set<Agent> getSlaves() {
-		return slaves;
-	}
+    public Agent getGcNode() {
+        return gcNode;
+    }
 
 
-	public void setSlaves(Set<Agent> slaves) {
-		this.slaves = slaves;
-	}
+    public void setGcNode( Agent gcNode ) {
+        this.gcNode = gcNode;
+    }
 
 
-	public String getClusterName() {
-		return clusterName;
-	}
+    public Agent getMonitor() {
+        return monitor;
+    }
 
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public void setMonitor( Agent monitor ) {
+        this.monitor = monitor;
+    }
 
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_NAME;
-	}
+    public Set<Agent> getTracers() {
+        return tracers;
+    }
 
 
-	public String getInstanceName() {
-		return instanceName;
-	}
+    public void setTracers( Set<Agent> tracers ) {
+        this.tracers = tracers;
+    }
 
 
-	public void setInstanceName(String instanceName) {
-		this.instanceName = instanceName;
-	}
+    public Set<Agent> getSlaves() {
+        return slaves;
+    }
 
 
-	public String getPassword() {
-		return password;
-	}
+    public void setSlaves( Set<Agent> slaves ) {
+        this.slaves = slaves;
+    }
 
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getClusterName() {
+        return clusterName;
+    }
 
 
-	public void reset() {
-		clusterName = "";
-		instanceName = "";
-		password = "";
-		masterNode = null;
-		gcNode = null;
-		monitor = null;
-		tracers = null;
-		slaves = null;
-		numberOfTracers = 1;
-		numberOfSlaves = 3;
-	}
+    public void setClusterName( String clusterName ) {
+        this.clusterName = clusterName;
+    }
 
 
-	@Override
-	public String toString() {
-		return "AccumuloClusterConfig{" +
-				"clusterName='" + clusterName + '\'' +
-				", instanceName='" + instanceName + '\'' +
-				", password='" + password + '\'' +
-				", masterNode=" + masterNode +
-				", gcNode=" + gcNode +
-				", monitor=" + monitor +
-				", tracers=" + tracers +
-				", slaves=" + slaves +
-				", numberOfTracers=" + numberOfTracers +
-				", numberOfSlaves=" + numberOfSlaves +
-				", setupType=" + setupType +
-				'}';
-	}
+    @Override
+    public String getProductName() {
+        return PRODUCT_NAME;
+    }
+
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+
+    public void setInstanceName( String instanceName ) {
+        this.instanceName = instanceName;
+    }
+
+
+    public String getPassword() {
+        return password;
+    }
+
+
+    public void setPassword( String password ) {
+        this.password = password;
+    }
+
+
+    @Override
+    public String toString() {
+        return "AccumuloClusterConfig{" +
+                "clusterName='" + clusterName + '\'' +
+                ", instanceName='" + instanceName + '\'' +
+                ", password='" + password + '\'' +
+                ", masterNode=" + masterNode +
+                ", gcNode=" + gcNode +
+                ", monitor=" + monitor +
+                ", tracers=" + tracers +
+                ", slaves=" + slaves +
+                ", numberOfTracers=" + numberOfTracers +
+                ", numberOfSlaves=" + numberOfSlaves +
+                ", setupType=" + setupType +
+                ", hadoopClusterName='" + hadoopClusterName + '\'' +
+                ", zookeeperClusterName='" + zookeeperClusterName + '\'' +
+                ", templateName='" + templateName + '\'' +
+                '}';
+    }
 }

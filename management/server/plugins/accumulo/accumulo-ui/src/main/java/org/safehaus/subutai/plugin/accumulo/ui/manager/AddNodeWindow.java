@@ -35,7 +35,8 @@ public class AddNodeWindow extends Window {
 		super("Add New Node");
 		setModal(true);
 
-		setWidth(600, Unit.PIXELS);
+		setWidth(650, Unit.PIXELS);
+		setHeight(450, Unit.PIXELS);
 
 		GridLayout content = new GridLayout(1, 3);
 		content.setSizeFull();

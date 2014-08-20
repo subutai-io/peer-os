@@ -6,14 +6,21 @@
 package org.safehaus.subutai.plugin.accumulo.ui.wizard;
 
 
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
+import java.util.UUID;
+
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-import java.util.UUID;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 
 
 /**
@@ -21,73 +28,90 @@ import java.util.UUID;
  */
 public class VerificationStep extends Panel {
 
-	public VerificationStep(final Wizard wizard) {
+    public VerificationStep( final Wizard wizard ) {
 
-		setSizeFull();
+        setSizeFull();
 
-		GridLayout grid = new GridLayout(1, 5);
-		grid.setSpacing(true);
-		grid.setMargin(true);
-		grid.setSizeFull();
+        GridLayout grid = new GridLayout( 1, 5 );
+        grid.setSpacing( true );
+        grid.setMargin( true );
+        grid.setSizeFull();
 
-		Label confirmationLbl = new Label("<strong>Please verify the installation settings "
-				+ "(you may change them by clicking on Back button)</strong><br/>");
-		confirmationLbl.setContentMode(ContentMode.HTML);
+        Label confirmationLbl = new Label( "<strong>Please verify the installation settings "
+                + "(you may change them by clicking on Back button)</strong><br/>" );
+        confirmationLbl.setContentMode( ContentMode.HTML );
 
-		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
-		cfgView.addStringCfg("Instance name", wizard.getAccumuloClusterConfig().getInstanceName());
-		cfgView.addStringCfg("Password", wizard.getAccumuloClusterConfig().getPassword());
-		cfgView.addStringCfg("Cluster Name", wizard.getAccumuloClusterConfig().getClusterName());
-		cfgView.addStringCfg("Master node", wizard.getAccumuloClusterConfig().getMasterNode().getHostname());
-		cfgView.addStringCfg("GC node", wizard.getAccumuloClusterConfig().getGcNode().getHostname());
-		cfgView.addStringCfg("Monitor node", wizard.getAccumuloClusterConfig().getMonitor().getHostname());
-		for (Agent agent : wizard.getAccumuloClusterConfig().getTracers()) {
-			cfgView.addStringCfg("Tracers", agent.getHostname());
-		}
-		for (Agent agent : wizard.getAccumuloClusterConfig().getSlaves()) {
-			cfgView.addStringCfg("Slaves", agent.getHostname());
-		}
+        ConfigView cfgView = new ConfigView( "Installation configuration" );
+        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Instance name", wizard.getConfig().getInstanceName() );
+        cfgView.addStringCfg( "Password", wizard.getConfig().getPassword() );
+        cfgView.addStringCfg( "Hadoop cluster", wizard.getConfig().getHadoopClusterName() );
+        cfgView.addStringCfg( "Zookeeper cluster", wizard.getConfig().getZookeeperClusterName() );
 
-		Button install = new Button("Install");
-		install.addStyleName("default");
-		install.addClickListener(new Button.ClickListener() {
+        if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
+            cfgView.addStringCfg( "Master node", wizard.getConfig().getMasterNode().getHostname() );
+            cfgView.addStringCfg( "GC node", wizard.getConfig().getGcNode().getHostname() );
+            cfgView.addStringCfg( "Monitor node", wizard.getConfig().getMonitor().getHostname() );
+            for ( Agent agent : wizard.getConfig().getTracers() ) {
+                cfgView.addStringCfg( "Tracers", agent.getHostname() );
+            }
+            for ( Agent agent : wizard.getConfig().getSlaves() ) {
+                cfgView.addStringCfg( "Slaves", agent.getHostname() );
+            }
+        }
+        else {
+            cfgView.addStringCfg( "Number of Hadoop slaves",
+                    wizard.getHadoopClusterConfig().getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Hadoop replication factor",
+                    wizard.getHadoopClusterConfig().getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Hadoop domain name", wizard.getHadoopClusterConfig().getDomainName() + "" );
+            cfgView.addStringCfg( "Number of tracers", wizard.getConfig().getNumberOfTracers() + "" );
+            cfgView.addStringCfg( "Number of slaves", wizard.getConfig().getNumberOfSlaves() + "" );
+        }
 
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
+        Button install = new Button( "Install" );
+        install.addStyleName( "default" );
+        install.addClickListener( new Button.ClickListener() {
 
-				UUID trackID = AccumuloUI.getAccumuloManager().installCluster(wizard.getAccumuloClusterConfig());
-				ProgressWindow window = new ProgressWindow(AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
-						AccumuloClusterConfig.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						wizard.init();
-					}
-				});
-				getUI().addWindow(window.getWindow());
-			}
-		});
+            @Override
+            public void buttonClick( Button.ClickEvent event ) {
 
-		Button back = new Button("Back");
-		back.addStyleName("default");
-		back.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
-				wizard.back();
-			}
-		});
+                UUID trackID = wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP_N_ZK ?
+                               AccumuloUI.getAccumuloManager().installCluster( wizard.getConfig() ) :
+                               AccumuloUI.getAccumuloManager()
+                                         .installCluster( wizard.getConfig(), wizard.getHadoopClusterConfig(),
+                                                 wizard.getZookeeperClusterConfig() );
+                ProgressWindow window = new ProgressWindow( AccumuloUI.getExecutor(), AccumuloUI.getTracker(), trackID,
+                        AccumuloClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        wizard.init();
+                    }
+                } );
+                getUI().addWindow( window.getWindow() );
+            }
+        } );
 
-		HorizontalLayout buttons = new HorizontalLayout();
-		buttons.addComponent(back);
-		buttons.addComponent(install);
+        Button back = new Button( "Back" );
+        back.addStyleName( "default" );
+        back.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent event ) {
+                wizard.back();
+            }
+        } );
 
-		grid.addComponent(confirmationLbl, 0, 0);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent( back );
+        buttons.addComponent( install );
 
-		grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
+        grid.addComponent( confirmationLbl, 0, 0 );
 
-		grid.addComponent(buttons, 0, 4);
+        grid.addComponent( cfgView.getCfgTable(), 0, 1, 0, 3 );
 
-		setContent(grid);
-	}
+        grid.addComponent( buttons, 0, 4 );
+
+        setContent( grid );
+    }
 }
