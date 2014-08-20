@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
+import org.safehaus.subutai.plugin.solr.ui.SolrUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -18,7 +19,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
-import org.safehaus.subutai.plugin.solr.ui.SolrUI;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -77,7 +77,6 @@ public class Manager {
                 refreshUI();
             }
         } );
-
         controlsContent.addComponent( clusterCombo );
 
         Button refreshClustersBtn = new Button( "Refresh installations" );
@@ -88,8 +87,37 @@ public class Manager {
                 refreshClustersInfo();
             }
         } );
-
         controlsContent.addComponent( refreshClustersBtn );
+
+        Button destroyClusterBtn = new Button( "Destroy Installation" );
+        destroyClusterBtn.addStyleName( "default" );
+        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                ConfirmationDialog alert = new ConfirmationDialog(
+                        String.format( "Do you want to destroy the %s installation?",
+                                solrClusterConfig.getClusterName() ), "Yes", "No" );
+                alert.getOk().addClickListener( new Button.ClickListener() {
+                    @Override
+                    public void buttonClick( Button.ClickEvent clickEvent ) {
+                        UUID trackID = SolrUI.getSolrManager().uninstallCluster( solrClusterConfig.getClusterName() );
+                        final ProgressWindow window =
+                                new ProgressWindow( SolrUI.getExecutor(), SolrUI.getTracker(), trackID,
+                                        SolrClusterConfig.PRODUCT_KEY );
+                        window.getWindow().addCloseListener( new Window.CloseListener() {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent ) {
+                                refreshClustersInfo();
+                            }
+                        } );
+                        contentRoot.getUI().addWindow( window.getWindow() );
+                    }
+                } );
+
+                contentRoot.getUI().addWindow( alert.getAlert() );
+            }
+        } );
+        controlsContent.addComponent( destroyClusterBtn );
 
 
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -118,15 +146,13 @@ public class Manager {
             startBtn.addStyleName( "default" );
             final Button stopBtn = new Button( "Stop" );
             stopBtn.addStyleName( "default" );
-            final Button destroyBtn = new Button( "Destroy" );
-            destroyBtn.addStyleName( "default" );
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             stopBtn.setEnabled( false );
             startBtn.setEnabled( false );
             progressIcon.setVisible( false );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
+                    agent.getHostname(), checkBtn, startBtn, stopBtn, progressIcon
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
@@ -135,24 +161,23 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
 
-                    SolrUI.getExecutor()
-                          .execute( new CheckTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(
+                            new CheckTask( solrClusterConfig.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                              public void onComplete( NodeState state ) {
-                                  synchronized ( progressIcon ) {
-                                      if ( state == NodeState.RUNNING ) {
-                                          stopBtn.setEnabled( true );
-                                      }
-                                      else if ( state == NodeState.STOPPED ) {
-                                          startBtn.setEnabled( true );
-                                      }
-                                      destroyBtn.setEnabled( true );
-                                      progressIcon.setVisible( false );
-                                  }
-                              }
-                          } ) );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.RUNNING ) {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                else if ( state == NodeState.STOPPED ) {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
                 }
             } );
 
@@ -162,24 +187,23 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
 
-                    SolrUI.getExecutor()
-                          .execute( new StartTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(
+                            new StartTask( solrClusterConfig.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
 
-                              public void onComplete( NodeState state ) {
-                                  synchronized ( progressIcon ) {
-                                      if ( state == NodeState.RUNNING ) {
-                                          stopBtn.setEnabled( true );
-                                      }
-                                      else {
-                                          startBtn.setEnabled( true );
-                                      }
-                                      destroyBtn.setEnabled( true );
-                                      progressIcon.setVisible( false );
-                                  }
-                              }
-                          } ) );
+                                        public void onComplete( NodeState state ) {
+                                            synchronized ( progressIcon ) {
+                                                if ( state == NodeState.RUNNING ) {
+                                                    stopBtn.setEnabled( true );
+                                                }
+                                                else {
+                                                    startBtn.setEnabled( true );
+                                                }
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
                 }
             } );
 
@@ -189,51 +213,22 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startBtn.setEnabled( false );
                     stopBtn.setEnabled( false );
-                    destroyBtn.setEnabled( false );
 
-                    SolrUI.getExecutor()
-                          .execute( new StopTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                    SolrUI.getExecutor().execute(
+                            new StopTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                              public void onComplete( NodeState state ) {
-                                  synchronized ( progressIcon ) {
-                                      if ( state == NodeState.STOPPED ) {
-                                          startBtn.setEnabled( true );
-                                      }
-                                      else {
-                                          stopBtn.setEnabled( true );
-                                      }
-                                      destroyBtn.setEnabled( true );
-                                      progressIcon.setVisible( false );
-                                  }
-                              }
-                          } ) );
-                }
-            } );
-
-            destroyBtn.addClickListener( new Button.ClickListener() {
-                @Override
-                public void buttonClick( Button.ClickEvent clickEvent ) {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s node?", agent.getHostname() ), "Yes", "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID =
-                                    SolrUI.getSolrManager().destroyNode( solrClusterConfig.getClusterName(), agent.getHostname() );
-                            final ProgressWindow window =
-                                    new ProgressWindow( SolrUI.getExecutor(), SolrUI.getTracker(), trackID,
-                                            SolrClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    refreshClustersInfo();
+                                public void onComplete( NodeState state ) {
+                                    synchronized ( progressIcon ) {
+                                        if ( state == NodeState.STOPPED ) {
+                                            startBtn.setEnabled( true );
+                                        }
+                                        else {
+                                            stopBtn.setEnabled( true );
+                                        }
+                                        progressIcon.setVisible( false );
+                                    }
                                 }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
+                            } ) );
                 }
             } );
         }
@@ -280,7 +275,6 @@ public class Manager {
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
-        table.addContainerProperty( "Destroy", Button.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
