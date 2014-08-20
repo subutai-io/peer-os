@@ -358,11 +358,6 @@
                                     <artifactId>com.springsource.org.doomdark.uuid</artifactId>
                                     <version>${org.doomdark.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>-->
-                                <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-                                <!--<artifactId>javax.servlet</artifactId>-->
-                                <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
-                                <!--</artifactItem>-->
                                 <artifactItem>
                                     <groupId>org.elasticsearch</groupId>
                                     <artifactId>elasticsearch</artifactId>
@@ -375,11 +370,6 @@
                                     <artifactId>vaadin-themes</artifactId>
                                     <version>${vaadin.version}</version>
                                 </artifactItem>
-                                <!--<artifactItem>
-                                    <groupId>com.vaadin</groupId>
-                                    <artifactId>vaadin-theme-compiler</artifactId>
-                                    <version>${vaadin.version}</version>
-                                </artifactItem>-->
                                 <artifactItem>
                                     <groupId>com.vaadin</groupId>
                                     <artifactId>vaadin-shared</artifactId>
@@ -1373,54 +1363,54 @@
                                 <!-- Shark -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>shark-api</artifactId>
+                                    <artifactId>shark-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>shark-impl</artifactId>
+                                    <artifactId>shark-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>shark-ui</artifactId>
+                                    <artifactId>shark-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>shark-cli</artifactId>
+                                    <artifactId>shark-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>shark-rest</artifactId>
+                                    <artifactId>shark-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- Spark -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-api</artifactId>
+                                    <artifactId>spark-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-impl</artifactId>
+                                    <artifactId>spark-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-ui</artifactId>
+                                    <artifactId>spark-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-cli</artifactId>
+                                    <artifactId>spark-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>spark-rest</artifactId>
+                                    <artifactId>spark-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
