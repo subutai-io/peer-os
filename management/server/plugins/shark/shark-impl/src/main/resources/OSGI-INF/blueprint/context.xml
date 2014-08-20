@@ -12,7 +12,7 @@
     <reference id="sparkManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.spark.api.Spark"/>
 
-    <bean id="mahout-impl" scope="singleton" class="org.safehaus.subutai.plugin.shark.impl.SharkImpl"
+    <bean id="shark-impl" scope="singleton" class="org.safehaus.subutai.plugin.shark.impl.SharkImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
         <argument ref="agentManager"/>
@@ -21,5 +21,5 @@
         <argument ref="sparkManager"/>
     </bean>
 
-    <service ref="mahout-impl" interface="org.safehaus.subutai.plugin.shark.api.Shark"/>
+    <service ref="shark-impl" interface="org.safehaus.subutai.plugin.shark.api.Shark"/>
 </blueprint>
