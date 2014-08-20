@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.spark.manager;
+package org.safehaus.subutai.plugin.spark.ui.manager;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.spark.SparkUI;
 
 import java.util.Set;
 import java.util.UUID;

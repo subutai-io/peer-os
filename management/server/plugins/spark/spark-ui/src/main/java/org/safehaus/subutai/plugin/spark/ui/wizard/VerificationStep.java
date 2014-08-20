@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.spark.wizard;
+package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.spark.SparkUI;
 
 import java.util.UUID;
 

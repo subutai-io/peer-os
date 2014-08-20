@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.spark.manager;
+package org.safehaus.subutai.plugin.spark.ui.manager;
 
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
-import org.safehaus.subutai.ui.spark.SparkUI;
 
 import java.util.UUID;
 

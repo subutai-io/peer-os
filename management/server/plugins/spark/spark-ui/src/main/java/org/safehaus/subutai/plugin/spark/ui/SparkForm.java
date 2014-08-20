@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.ui.spark;
+package org.safehaus.subutai.plugin.spark.ui;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.ui.spark.manager.Manager;
-import org.safehaus.subutai.ui.spark.wizard.Wizard;
+import org.safehaus.subutai.plugin.spark.ui.manager.Manager;
+import org.safehaus.subutai.plugin.spark.ui.wizard.Wizard;
 
 /**
  * @author dilshat
