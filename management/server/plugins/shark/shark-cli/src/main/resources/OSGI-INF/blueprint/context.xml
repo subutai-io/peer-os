@@ -2,7 +2,7 @@
         >
 
     <reference id="sharkManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.shark.Shark"/>
+               interface="org.safehaus.subutai.plugin.shark.api.Shark"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="shark/list-clusters">
