@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -17,18 +17,18 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
     public StartNodeOperationHandler( SolrImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Starting node %s in %s", lxcHostname, clusterName ) );
     }
 
 
     @Override
     public void run() {
-        Config config = manager.getCluster( clusterName );
+        SolrClusterConfig solrClusterConfig = manager.getCluster( clusterName );
 
-        if ( config == null ) {
+        if ( solrClusterConfig == null ) {
             productOperation.addLogFailed(
-                    String.format( "Installation with name %s does not exist\nOperation aborted", clusterName ) );
+                    String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
@@ -36,11 +36,11 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
 
         if ( node == null ) {
             productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+                    String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
-        if ( !config.getNodes().contains( node ) ) {
+        if ( !solrClusterConfig.getNodes().contains( node ) ) {
             productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.solr.cli;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
@@ -45,7 +45,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         UUID uuid = solrManager.uninstallCluster(clusterName);
         int logSize = 0;
         while (!Thread.interrupted()) {
-            ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+            ProductOperationView po = tracker.getProductOperation( SolrClusterConfig.PRODUCT_KEY, uuid);
             if (po != null) {
                 if (logSize != po.getLog().length()) {
                     System.out.print(po.getLog().substring(logSize, po.getLog().length()));

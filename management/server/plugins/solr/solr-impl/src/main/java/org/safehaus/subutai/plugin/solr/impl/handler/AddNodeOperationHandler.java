@@ -1,33 +1,31 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import java.util.Map;
 import java.util.Set;
 
-import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
+import org.safehaus.subutai.plugin.solr.impl.SolrSetupStrategy;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {
 
     public AddNodeOperationHandler( SolrImpl manager, String clusterName ) {
         super( manager, clusterName );
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node to %s", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        Config config = manager.getCluster( clusterName );
+        SolrClusterConfig solrClusterConfig = manager.getCluster( clusterName );
 
-        if ( config == null ) {
+        if ( solrClusterConfig == null ) {
             productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
@@ -35,32 +33,23 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<SolrImpl> 
         try {
             productOperation.addLog( "Creating lxc container..." );
 
-            Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs( 1 );
+            Set<Agent> agents = manager.getContainerManager().clone( solrClusterConfig.getTemplateName(), 1, null,
+                    SolrSetupStrategy.getPlacementStrategy() );
 
-            Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+            Agent agent = agents.iterator().next();
 
-            config.getNodes().add( lxcAgent );
+            solrClusterConfig.getNodes().add( agent );
+            solrClusterConfig.setNumberOfNodes( solrClusterConfig.getNumberOfNodes() + 1 );
 
-            productOperation.addLog( "Lxc container created successfully\nInstalling Solr..." );
+            productOperation.addLog( "Lxc container created successfully\nSaving information to database..." );
 
-            Command installCommand = manager.getCommands().getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
-            manager.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() ) {
-                productOperation.addLog( "Installation succeeded\nSaving information to database..." );
-
-                try {
-                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
-                    productOperation.addLogDone( "Information saved to database" );
-                }
-                catch ( DBException e ) {
-                    productOperation.addLogFailed(
-                            String.format( "Failed to save information to database, %s", e.getMessage() ) );
-                }
+            try {
+                manager.getDbManager().saveInfo2( SolrClusterConfig.PRODUCT_KEY, clusterName, solrClusterConfig );
+                productOperation.addLogDone( "Information saved to database" );
             }
-            else {
+            catch ( DBException e ) {
                 productOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+                        .addLogFailed( String.format( "Failed to save information to database, %s", e.getMessage() ) );
             }
         }
         catch ( LxcCreateException ex ) {

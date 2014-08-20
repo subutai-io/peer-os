@@ -5,7 +5,7 @@
  */
 package org.safehaus.subutai.plugin.solr.ui.manager;
 
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
@@ -35,7 +35,7 @@ public class CheckTask implements Runnable {
 		NodeState state = NodeState.UNKNOWN;
 		long start = System.currentTimeMillis();
 		while (!Thread.interrupted()) {
-			ProductOperationView po = SolrUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			ProductOperationView po = SolrUI.getTracker().getProductOperation( SolrClusterConfig.PRODUCT_KEY, trackID);
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getLog().contains(NodeState.STOPPED.toString())) {

@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.solr.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 
 import java.util.List;
@@ -25,10 +25,10 @@ public class ListClustersCommand extends OsgiCommandSupport {
     }
 
     protected Object doExecute() {
-        List<Config> configList = solrManager.getClusters();
-        if (!configList.isEmpty())
-            for (Config config : configList) {
-                System.out.println(config.getClusterName());
+        List<SolrClusterConfig> solrClusterConfigList = solrManager.getClusters();
+        if (!solrClusterConfigList.isEmpty())
+            for (SolrClusterConfig solrClusterConfig : solrClusterConfigList ) {
+                System.out.println( solrClusterConfig.getClusterName());
             }
         else System.out.println("No Solr cluster");
 

@@ -9,12 +9,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 
-import java.util.Set;
-
 
 public class Commands extends CommandsSingleton {
 
-    public static final String INSTALL = "sleep 20 ; apt-get --force-yes --assume-yes install ksks-solr";
     public static final String START = "service solr start";
     public static final String STOP = "service solr stop";
     public static final String STATUS = "service solr status";
@@ -25,14 +22,9 @@ public class Commands extends CommandsSingleton {
     }
 
 
-    public Command getInstallCommand( Set<Agent> agents ) {
-        return createCommand(
-                new RequestBuilder( INSTALL ).withTimeout( 180 ).withStdOutRedirection( OutputRedirection.NO ), agents );
-    }
-
-
     public Command getStartCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( START ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ),
+        return createCommand(
+                new RequestBuilder( START ).withTimeout( 90 ).withStdOutRedirection( OutputRedirection.NO ),
                 Util.wrapAgentToSet( agent ) );
     }
 

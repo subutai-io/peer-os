@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.SolrImplMock;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -29,7 +29,7 @@ public class DestroyNodeOperationHandlerTest {
 
     @Test
     public void testFail() {
-        SolrImpl solrImpl = new SolrImplMock().setClusterConfig( new Config() );
+        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( solrImpl, "test-cluster", "test-lxc" );
 
         operationHandler.run();

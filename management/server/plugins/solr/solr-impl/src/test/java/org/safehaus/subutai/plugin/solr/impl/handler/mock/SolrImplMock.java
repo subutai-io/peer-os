@@ -2,9 +2,11 @@ package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
@@ -13,14 +15,17 @@ import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
+import static org.mockito.Mockito.mock;
+
 
 public class SolrImplMock extends SolrImpl {
 
-    private Config clusterConfig = null;
+    private SolrClusterConfig clusterSolrClusterConfig = null;
+
 
     public SolrImplMock() {
         super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
-                new LxcManagerMock() );
+                new LxcManagerMock(), mock( EnvironmentManager.class ), mock( ContainerManager.class ) );
     }
 
 
@@ -30,15 +35,15 @@ public class SolrImplMock extends SolrImpl {
     }
 
 
-    public SolrImplMock setClusterConfig( Config clusterConfig ) {
-        this.clusterConfig = clusterConfig;
+    public SolrImplMock setClusterSolrClusterConfig( SolrClusterConfig clusterSolrClusterConfig ) {
+        this.clusterSolrClusterConfig = clusterSolrClusterConfig;
         return this;
     }
 
 
     @Override
-    public Config getCluster( String clusterName ) {
-        return clusterConfig;
+    public SolrClusterConfig getCluster( String clusterName ) {
+        return clusterSolrClusterConfig;
     }
 
 
@@ -58,5 +63,4 @@ public class SolrImplMock extends SolrImpl {
         this.agentManager = agentManager;
         return this;
     }
-
 }

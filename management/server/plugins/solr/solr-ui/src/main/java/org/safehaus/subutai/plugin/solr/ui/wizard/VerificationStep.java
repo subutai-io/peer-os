@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.solr.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.plugin.solr.ui.SolrUI;
 
@@ -32,15 +32,15 @@ public class VerificationStep extends VerticalLayout {
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Installation Name", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Installation Name", wizard.getSolrClusterConfig().getClusterName());
 
 		Button install = new Button("Install");
 		install.addStyleName("default");
 		install.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = SolrUI.getSolrManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				UUID trackID = SolrUI.getSolrManager().installCluster(wizard.getSolrClusterConfig());
+				ProgressWindow window = new ProgressWindow(SolrUI.getExecutor(), SolrUI.getTracker(), trackID, SolrClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

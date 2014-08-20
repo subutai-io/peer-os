@@ -1,87 +1,43 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import java.util.Map;
-import java.util.Set;
-
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
-
-import com.google.common.base.Strings;
+import org.safehaus.subutai.shared.protocol.ClusterSetupException;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<SolrImpl> {
-    private final Config config;
+    private final SolrClusterConfig solrClusterConfig;
 
 
-    public InstallOperationHandler( SolrImpl manager, Config config ) {
-        super( manager, config.getClusterName() );
-        this.config = config;
-        productOperation = manager.getTracker().createProductOperation( Config.PRODUCT_KEY,
-                String.format( "Installing %s", Config.PRODUCT_KEY ) );
+    public InstallOperationHandler( SolrImpl manager, SolrClusterConfig solrClusterConfig ) {
+        super( manager, solrClusterConfig.getClusterName() );
+        this.solrClusterConfig = solrClusterConfig;
+        productOperation = manager.getTracker().createProductOperation( SolrClusterConfig.PRODUCT_KEY,
+                String.format( "Setting up %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) || config.getNumberOfNodes() <= 0 ) {
-            productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
-            return;
-        }
 
-        if ( manager.getCluster( config.getClusterName() ) != null ) {
-            productOperation.addLogFailed(
-                    String.format( "Installation with name '%s' already exists\nInstallation aborted",
-                            config.getClusterName() ) );
-            return;
-        }
+        productOperation.addLog( "Building environment..." );
 
         try {
-            productOperation.addLog( String.format( "Creating %d lxc containers...", config.getNumberOfNodes() ) );
-            Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs( config.getNumberOfNodes() );
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( solrClusterConfig ) );
 
-            for ( Map.Entry<Agent, Set<Agent>> entry : lxcAgentsMap.entrySet() ) {
-                config.getNodes().addAll( entry.getValue() );
-            }
+            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, solrClusterConfig, productOperation );
+            clusterSetupStrategy.setup();
 
-            productOperation.addLog( "Lxc containers created successfully\nInstalling Solr..." );
-
-
-            Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() ) {
-                productOperation.addLog( "Installation succeeded\nSaving information to database..." );
-
-                try {
-                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
-
-                    productOperation.addLogDone( "Information saved to database" );
-                }
-                catch ( DBException e ) {
-                    productOperation.addLogFailed(
-                            String.format( "Failed to save information to database, %s", e.getMessage() ) );
-
-                    try {
-                        manager.getLxcManager().destroyLxcs( lxcAgentsMap );
-                    }
-                    catch ( LxcDestroyException ignore ) {
-                    }
-                }
-            }
-            else {
-                productOperation
-                        .addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-            }
+            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( LxcCreateException ex ) {
-            productOperation.addLogFailed( ex.getMessage() );
+        catch ( EnvironmentBuildException | ClusterSetupException e ) {
+            productOperation.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 }

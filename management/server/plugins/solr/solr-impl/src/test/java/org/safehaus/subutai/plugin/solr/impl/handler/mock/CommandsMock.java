@@ -1,8 +1,6 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
@@ -19,12 +17,6 @@ public class CommandsMock extends Commands {
 
     public CommandsMock() {
         super( new CommandRunnerMock() );
-    }
-
-
-    @Override
-    public Command getInstallCommand( Set<Agent> agents ) {
-        return installCommand;
     }
 
 

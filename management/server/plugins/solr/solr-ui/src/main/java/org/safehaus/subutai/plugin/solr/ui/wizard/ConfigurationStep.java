@@ -35,11 +35,11 @@ public class ConfigurationStep extends VerticalLayout {
         clusterNameTxtFld.setInputPrompt( "Installation name" );
         clusterNameTxtFld.setRequired( true );
         clusterNameTxtFld.setMaxLength( 20 );
-        clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
+        clusterNameTxtFld.setValue( wizard.getSolrClusterConfig().getClusterName() );
         clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setClusterName( event.getProperty().getValue().toString().trim() );
+                wizard.getSolrClusterConfig().setClusterName( event.getProperty().getValue().toString().trim() );
             }
         } );
 
@@ -49,7 +49,7 @@ public class ConfigurationStep extends VerticalLayout {
         next.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+                if ( Strings.isNullOrEmpty( wizard.getSolrClusterConfig().getClusterName() ) ) {
                     show( "Please provide installation name" );
                 }
                 else {

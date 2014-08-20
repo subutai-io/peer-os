@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -44,7 +44,7 @@ public class Manager {
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private Config config;
+    private SolrClusterConfig solrClusterConfig;
 
 
     public Manager() {
@@ -73,7 +73,7 @@ public class Manager {
         clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                config = ( Config ) event.getProperty().getValue();
+                solrClusterConfig = ( SolrClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -138,7 +138,7 @@ public class Manager {
                     destroyBtn.setEnabled( false );
 
                     SolrUI.getExecutor()
-                          .execute( new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                          .execute( new CheckTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                               public void onComplete( NodeState state ) {
                                   synchronized ( progressIcon ) {
@@ -165,7 +165,7 @@ public class Manager {
                     destroyBtn.setEnabled( false );
 
                     SolrUI.getExecutor()
-                          .execute( new StartTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                          .execute( new StartTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                               public void onComplete( NodeState state ) {
                                   synchronized ( progressIcon ) {
@@ -192,7 +192,7 @@ public class Manager {
                     destroyBtn.setEnabled( false );
 
                     SolrUI.getExecutor()
-                          .execute( new StopTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                          .execute( new StopTask( solrClusterConfig.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
                               public void onComplete( NodeState state ) {
                                   synchronized ( progressIcon ) {
@@ -219,10 +219,10 @@ public class Manager {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
                             UUID trackID =
-                                    SolrUI.getSolrManager().destroyNode( config.getClusterName(), agent.getHostname() );
+                                    SolrUI.getSolrManager().destroyNode( solrClusterConfig.getClusterName(), agent.getHostname() );
                             final ProgressWindow window =
                                     new ProgressWindow( SolrUI.getExecutor(), SolrUI.getTracker(), trackID,
-                                            Config.PRODUCT_KEY );
+                                            SolrClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -241,8 +241,8 @@ public class Manager {
 
 
     private void refreshUI() {
-        if ( config != null ) {
-            populateTable( nodesTable, config.getNodes() );
+        if ( solrClusterConfig != null ) {
+            populateTable( nodesTable, solrClusterConfig.getNodes() );
         }
         else {
             nodesTable.removeAllItems();
@@ -251,16 +251,16 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = SolrUI.getSolrManager().getClusters();
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        List<SolrClusterConfig> mongoClusterInfos = SolrUI.getSolrManager().getClusters();
+        SolrClusterConfig clusterInfo = ( SolrClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( Config mongoClusterInfo : mongoClusterInfos ) {
+            for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos ) {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null ) {
-                for ( Config mongoClusterInfo : mongoClusterInfos ) {
+                for ( SolrClusterConfig mongoClusterInfo : mongoClusterInfos ) {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
                         clusterCombo.setValue( mongoClusterInfo );
                         return;

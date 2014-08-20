@@ -22,15 +22,6 @@ public class CommandsTest {
 
 
     @Test
-    public void getInstallCommand() {
-        Command command = commands.getInstallCommand( null );
-
-        assertNotNull( command );
-        assertEquals( Commands.INSTALL, command.getDescription() );
-    }
-
-
-    @Test
     public void getStartCommand() {
         Command command = commands.getStartCommand( null );
 

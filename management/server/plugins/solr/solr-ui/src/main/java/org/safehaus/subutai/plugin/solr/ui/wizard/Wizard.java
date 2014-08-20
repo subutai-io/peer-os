@@ -6,7 +6,7 @@
 package org.safehaus.subutai.plugin.solr.ui.wizard;
 
 
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -18,7 +18,7 @@ import com.vaadin.ui.GridLayout;
 public class Wizard {
     private final GridLayout grid;
     private int step = 1;
-    private Config config = new Config();
+    private SolrClusterConfig solrClusterConfig = new SolrClusterConfig();
 
 
     public Wizard() {
@@ -49,13 +49,13 @@ public class Wizard {
 
     protected void init() {
         step = 1;
-        config = new Config();
+        solrClusterConfig = new SolrClusterConfig();
         putForm();
     }
 
 
-    public Config getConfig() {
-        return config;
+    public SolrClusterConfig getSolrClusterConfig() {
+        return solrClusterConfig;
     }
 
 

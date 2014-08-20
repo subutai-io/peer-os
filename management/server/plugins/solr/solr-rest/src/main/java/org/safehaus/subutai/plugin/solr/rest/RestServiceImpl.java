@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -55,12 +55,12 @@ public class RestServiceImpl implements RestService {
     @Override
     public String createCluster( final String config ) {
         TrimmedSolrConfig solrConfig = gson.fromJson( config, TrimmedSolrConfig.class );
-        Config expandedConfig = new Config();
+        SolrClusterConfig expandedSolrClusterConfig = new SolrClusterConfig();
 
-        expandedConfig.setClusterName( solrConfig.getClusterName() );
-        expandedConfig.setNumberOfNodes( 1 );
+        expandedSolrClusterConfig.setClusterName( solrConfig.getClusterName() );
+        expandedSolrClusterConfig.setNumberOfNodes( 1 );
 
-        return wrapUUID( solrManager.installCluster( expandedConfig ) );
+        return wrapUUID( solrManager.installCluster( expandedSolrClusterConfig ) );
     }
 
 

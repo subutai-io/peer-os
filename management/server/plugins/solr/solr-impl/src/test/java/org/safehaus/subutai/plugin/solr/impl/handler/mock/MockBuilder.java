@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.plugin.solr.api.Config;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
@@ -19,9 +19,9 @@ public class MockBuilder {
 
     public static AbstractOperationHandler getInstallOperationWithResult( boolean success ) {
         SolrImpl solrImpl = new SolrImplMock().setCommands( getCommands( success ) );
-        Config config = new Config().setClusterName( "test-cluster" );
+        SolrClusterConfig solrClusterConfig = new SolrClusterConfig().setClusterName( "test-cluster" );
 
-        return new InstallOperationHandler( solrImpl, config );
+        return new InstallOperationHandler( solrImpl, solrClusterConfig );
     }
 
     public static AbstractOperationHandler getUninstallOperationWithResult( boolean success ) {
@@ -29,7 +29,7 @@ public class MockBuilder {
         DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
 
         SolrImpl solrImpl = new SolrImplMock()
-                .setClusterConfig( new Config() )
+                .setClusterSolrClusterConfig( new SolrClusterConfig() )
                 .setDbManager( dbManager );
 
         return new UninstallOperationHandler( solrImpl, "test-cluster" );
@@ -40,7 +40,7 @@ public class MockBuilder {
 
         SolrImpl solrImpl = new SolrImplMock()
                 .setCommands( getCommands( success ) )
-                .setClusterConfig( new Config() )
+                .setClusterSolrClusterConfig( new SolrClusterConfig() )
                 .setLxcManager( lxcManagerMock );
 
         return new AddNodeOperationHandler( solrImpl, "test-cluster" );

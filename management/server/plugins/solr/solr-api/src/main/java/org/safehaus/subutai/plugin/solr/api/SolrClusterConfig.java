@@ -16,9 +16,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 
-public class Config implements ConfigBase {
+public class SolrClusterConfig implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Solr";
+    public static final String PRODUCT_KEY = "Solr2";
+    public static final String PRODUCT_NAME = "Solr";
+    private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 1;
     private Set<Agent> nodes = new HashSet<>();
@@ -29,9 +31,19 @@ public class Config implements ConfigBase {
     }
 
 
-    public Config setClusterName( String clusterName ) {
+    public SolrClusterConfig setClusterName( String clusterName ) {
         this.clusterName = clusterName;
         return this;
+    }
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
     }
 
 
@@ -53,6 +65,11 @@ public class Config implements ConfigBase {
 
     public Set<Agent> getNodes() {
         return nodes;
+    }
+
+
+    public void setNodes( final Set<Agent> nodes ) {
+        this.nodes = nodes;
     }
 
 
