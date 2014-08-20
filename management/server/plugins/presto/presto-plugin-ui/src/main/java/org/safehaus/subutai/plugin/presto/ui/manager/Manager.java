@@ -12,7 +12,7 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -36,7 +36,7 @@ public class Manager {
 	private final ComboBox clusterCombo;
 	private final Table nodesTable;
 	private final String COORDINATOR_PREFIX = "Coordinator: ";
-	private Config config;
+	private PrestoClusterConfig config;
 
 	public Manager() {
 
@@ -64,7 +64,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				config = (PrestoClusterConfig) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -123,7 +123,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = PrestoUI.getPrestoManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, PrestoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -181,8 +181,67 @@ public class Manager {
 
 	}
 
-	public Component getContent() {
-		return contentRoot;
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Check", Button.class, null);
+		table.addContainerProperty("Start", Button.class, null);
+		table.addContainerProperty("Stop", Button.class, null);
+		table.addContainerProperty("Action", Button.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), PrestoUI.getExecutor(), PrestoUI.getCommandRunner(), PrestoUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(nodesTable, config.getWorkers(), config.getCoordinatorNode());
+		} else {
+			nodesTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		List<PrestoClusterConfig> clustersInfo = PrestoUI.getPrestoManager().getClusters();
+		PrestoClusterConfig clusterInfo = (PrestoClusterConfig) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (PrestoClusterConfig mongoClusterInfo : clustersInfo) {
+				clusterCombo.addItem(mongoClusterInfo);
+				clusterCombo.setItemCaption(mongoClusterInfo,
+						mongoClusterInfo.getClusterName());
+			}
+			if (clusterInfo != null) {
+				for (PrestoClusterConfig mongoClusterInfo : clustersInfo) {
+					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(mongoClusterInfo);
+						return;
+					}
+				}
+			} else {
+				clusterCombo.setValue(clustersInfo.iterator().next());
+			}
+		}
 	}
 
 	public void checkAllNodes() {
@@ -337,7 +396,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = PrestoUI.getPrestoManager().changeCoordinatorNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, PrestoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -361,7 +420,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = PrestoUI.getPrestoManager().destroyWorkerNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, PrestoClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -470,67 +529,8 @@ public class Manager {
 		});
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getWorkers(), config.getCoordinatorNode());
-		} else {
-			nodesTable.removeAllItems();
-		}
-	}
-
-	public void refreshClustersInfo() {
-		List<Config> clustersInfo = PrestoUI.getPrestoManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config mongoClusterInfo : clustersInfo) {
-				clusterCombo.addItem(mongoClusterInfo);
-				clusterCombo.setItemCaption(mongoClusterInfo,
-						mongoClusterInfo.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : clustersInfo) {
-					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(mongoClusterInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(clustersInfo.iterator().next());
-			}
-		}
-	}
-
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Check", Button.class, null);
-		table.addContainerProperty("Start", Button.class, null);
-		table.addContainerProperty("Stop", Button.class, null);
-		table.addContainerProperty("Action", Button.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = PrestoUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), PrestoUI.getExecutor(), PrestoUI.getCommandRunner(), PrestoUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

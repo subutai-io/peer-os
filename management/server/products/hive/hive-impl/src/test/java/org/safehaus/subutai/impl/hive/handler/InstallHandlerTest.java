@@ -11,48 +11,48 @@ import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 public class InstallHandlerTest {
 
-    private HiveImplMock mock = new HiveImplMock();
-    private AbstractHandler handler;
+	private HiveImplMock mock = new HiveImplMock();
+	private AbstractHandler handler;
 
-    @Before
-    public void setUp() {
-        mock = new HiveImplMock();
-    }
+	@Before
+	public void setUp() {
+		mock = new HiveImplMock();
+	}
 
-    @Test(expected = NullPointerException.class)
-    public void testWithNullConfig() {
-        handler = new InstallHandler(mock, null);
-        handler.run();
-    }
+	@Test (expected = NullPointerException.class)
+	public void testWithNullConfig() {
+		handler = new InstallHandler(mock, null);
+		handler.run();
+	}
 
-    @Test
-    public void testWithExistingConfig() {
-        Config config = new Config();
-        config.setClusterName("test-cluster");
-        mock.setConfig(config);
+	@Test
+	public void testWithExistingConfig() {
+		Config config = new Config();
+		config.setClusterName("test-cluster");
+		mock.setConfig(config);
 
-        handler = new InstallHandler(mock, config);
-        handler.run();
+		handler = new InstallHandler(mock, config);
+		handler.run();
 
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("exists"));
-        Assert.assertTrue(po.getLog().contains(config.getClusterName()));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
+		ProductOperation po = handler.getProductOperation();
+		Assert.assertTrue(po.getLog().toLowerCase().contains("exists"));
+		Assert.assertTrue(po.getLog().contains(config.getClusterName()));
+		Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+	}
 
-    @Test
-    public void testWithoutServerNode() {
-        Config config = new Config();
-        config.setClusterName("test-cluster");
-        config.setServer(CommonMockBuilder.createAgent());
+	@Test
+	public void testWithoutServerNode() {
+		Config config = new Config();
+		config.setClusterName("test-cluster");
+		config.setServer(CommonMockBuilder.createAgent());
 
-        handler = new InstallHandler(mock, config);
-        handler.run();
+		handler = new InstallHandler(mock, config);
+		handler.run();
 
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        Assert.assertTrue(po.getLog().contains(config.getServer().getHostname()));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
+		ProductOperation po = handler.getProductOperation();
+		Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
+		Assert.assertTrue(po.getLog().contains(config.getServer().getHostname()));
+		Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+	}
 
 }

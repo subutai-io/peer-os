@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * @author dilshat
  */
-public class Config implements ConfigBase {
+public class PrestoClusterConfig implements ConfigBase {
 
 	public static final String PRODUCT_KEY = "Presto2";
 	private String clusterName = "";

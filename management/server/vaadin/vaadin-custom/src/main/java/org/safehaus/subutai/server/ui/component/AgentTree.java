@@ -91,20 +91,6 @@ public final class AgentTree extends ConcurrentComponent
 		agentManager.addListener(this);
 	}
 
-	public Set<Agent> getSelectedAgents() {
-		return Collections.unmodifiableSet(selectedAgents);
-	}
-
-	@Override
-	public void onAgent(final Set<Agent> freshAgents) {
-		executeUpdate(new Runnable() {
-			@Override
-			public void run() {
-				refreshAgents(freshAgents);
-			}
-		});
-	}
-
 	public HierarchicalContainer getNodeContainer() {
 		container = new HierarchicalContainer();
 		container.addContainerProperty("value", Agent.class, null);
@@ -245,6 +231,20 @@ public final class AgentTree extends ConcurrentComponent
 				LOG.log(Level.SEVERE, "Error in refreshAgents", ex);
 			}
 		}
+	}
+
+	public Set<Agent> getSelectedAgents() {
+		return Collections.unmodifiableSet(selectedAgents);
+	}
+
+	@Override
+	public void onAgent(final Set<Agent> freshAgents) {
+		executeUpdate(new Runnable() {
+			@Override
+			public void run() {
+				refreshAgents(freshAgents);
+			}
+		});
 	}
 
 	public void dispose() {

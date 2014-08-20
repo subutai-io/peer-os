@@ -26,35 +26,6 @@ public class Wizard {
 		putForm();
 	}
 
-	public Component getContent() {
-		return vlayout;
-	}
-
-	public void next() {
-		step++;
-		putForm();
-	}
-
-	public void back() {
-		step--;
-		putForm();
-	}
-
-	public void cancel() {
-		step = 1;
-		putForm();
-	}
-
-	public void init() {
-		step = 1;
-		config = new HBaseConfig();
-		putForm();
-	}
-
-	public HBaseConfig getConfig() {
-		return config;
-	}
-
 	private void putForm() {
 		vlayout.removeAllComponents();
 		switch (step) {
@@ -92,6 +63,35 @@ public class Wizard {
 				break;
 			}
 		}
+	}
+
+	public Component getContent() {
+		return vlayout;
+	}
+
+	public void next() {
+		step++;
+		putForm();
+	}
+
+	public void back() {
+		step--;
+		putForm();
+	}
+
+	public void cancel() {
+		step = 1;
+		putForm();
+	}
+
+	public void init() {
+		step = 1;
+		config = new HBaseConfig();
+		putForm();
+	}
+
+	public HBaseConfig getConfig() {
+		return config;
 	}
 
 }

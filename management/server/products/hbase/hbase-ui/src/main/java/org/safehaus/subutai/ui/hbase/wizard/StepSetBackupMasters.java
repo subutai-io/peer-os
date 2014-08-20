@@ -6,19 +6,12 @@
 package org.safehaus.subutai.ui.hbase.wizard;
 
 
-import java.util.ArrayList;
-import java.util.UUID;
-
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 
 /**

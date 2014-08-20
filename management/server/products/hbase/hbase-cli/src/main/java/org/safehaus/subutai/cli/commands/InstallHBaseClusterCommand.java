@@ -9,29 +9,29 @@ import org.safehaus.subutai.api.tracker.Tracker;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hbase", name = "install-cluster", description = "Command to install HBase cluster")
+@Command (scope = "hbase", name = "install-cluster", description = "Command to install HBase cluster")
 public class InstallHBaseClusterCommand extends OsgiCommandSupport {
 
-    private Tracker tracker;
-    private HBase hbaseManager;
+	private Tracker tracker;
+	private HBase hbaseManager;
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
+	public void setTracker(Tracker tracker) {
+		this.tracker = tracker;
+	}
 
-    public HBase getHbaseManager() {
-        return hbaseManager;
-    }
+	public HBase getHbaseManager() {
+		return hbaseManager;
+	}
 
-    public void setHbaseManager(HBase hbaseManager) {
-        this.hbaseManager = hbaseManager;
-    }
+	public void setHbaseManager(HBase hbaseManager) {
+		this.hbaseManager = hbaseManager;
+	}
 
-    protected Object doExecute() {
+	protected Object doExecute() {
 
 //        List<Config> configs = hbaseManager.getClusters();
 //        Config config = new Config();
@@ -45,7 +45,7 @@ public class InstallHBaseClusterCommand extends OsgiCommandSupport {
 //        }
 //
 //        System.out.println(sb.toString());
-        System.out.println("install");
-        return null;
-    }
+		System.out.println("install");
+		return null;
+	}
 }

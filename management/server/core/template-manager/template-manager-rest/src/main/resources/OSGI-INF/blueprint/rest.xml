@@ -1,9 +1,9 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
            xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation=
-                "http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+                   "http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
                  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
                  http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
@@ -16,11 +16,11 @@
     <reference id="templateManager" availability="mandatory"
                interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
     <reference id="templateRegistry" availability="mandatory"
-                   interface ="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
+               interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="repoManager" availability="mandatory"
-               interface ="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
+               interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
 
     <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.rest.template.manager.RestServiceImpl">
         <property name="templateManager" ref="templateManager"/>
@@ -28,11 +28,11 @@
         <property name="aptRepoManager" ref="repoManager"/>
         <property name="agentManager" ref="agentManager"/>
     </bean>
-    
+
     <jaxrs:server address="/template" id="templateManagerRestService">
         <jaxrs:serviceBeans>
             <ref component-id="templateManagerRestServiceBean"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
-    
+
 </blueprint>

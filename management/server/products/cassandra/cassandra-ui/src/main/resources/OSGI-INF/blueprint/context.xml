@@ -12,7 +12,7 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.cassandra.CassandraUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager" />
+        <argument ref="agentManager"/>
         <argument ref="cassandraManager"/>
         <argument ref="tracker"/>
         <argument ref="commandRunner"/>

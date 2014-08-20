@@ -70,6 +70,14 @@ public class MainUI extends UI {
 		}
 	};
 
+	private static MainUI getInstance() {
+		return threadLocal.get();
+	}
+
+	private static void setInstance(MainUI application) {
+		threadLocal.set(application);
+	}
+
 	@Override
 	protected void init(VaadinRequest request) {
 		setInstance(this);
@@ -352,13 +360,5 @@ public class MainUI extends UI {
 						.removeStyleName("selected");
 			}
 		}
-	}
-
-	private static MainUI getInstance() {
-		return threadLocal.get();
-	}
-
-	private static void setInstance(MainUI application) {
-		threadLocal.set(application);
 	}
 }

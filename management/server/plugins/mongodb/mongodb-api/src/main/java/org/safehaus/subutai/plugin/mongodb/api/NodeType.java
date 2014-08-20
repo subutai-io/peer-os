@@ -11,5 +11,5 @@ package org.safehaus.subutai.plugin.mongodb.api;
  */
 public enum NodeType {
 
-    CONFIG_NODE, ROUTER_NODE, DATA_NODE
+	CONFIG_NODE, ROUTER_NODE, DATA_NODE
 }

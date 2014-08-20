@@ -23,35 +23,35 @@ public class VerificationStep extends VerticalLayout {
 				+ "(You may change them by clicking on Back button)</strong><br/>");
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
-        ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Cluster Name: ", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Number of Nodes: ", "" + wizard.getConfig().getNumberOfNodes() );
-        cfgView.addStringCfg( "Number of Master Nodes: ", "" + wizard.getConfig().getNumberOfMasterNodes() );
-        cfgView.addStringCfg( "Number of Data Nodes: ", "" + wizard.getConfig().getNumberOfDataNodes() );
-        cfgView.addStringCfg( "Number of Shards: ", "" + wizard.getConfig().getNumberOfShards() );
-        cfgView.addStringCfg( "Number of Replicas: ", "" + wizard.getConfig().getNumberOfReplicas() );
+		ConfigView cfgView = new ConfigView("Installation configuration");
+		cfgView.addStringCfg("Cluster Name: ", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Number of Nodes: ", "" + wizard.getConfig().getNumberOfNodes());
+		cfgView.addStringCfg("Number of Master Nodes: ", "" + wizard.getConfig().getNumberOfMasterNodes());
+		cfgView.addStringCfg("Number of Data Nodes: ", "" + wizard.getConfig().getNumberOfDataNodes());
+		cfgView.addStringCfg("Number of Shards: ", "" + wizard.getConfig().getNumberOfShards());
+		cfgView.addStringCfg("Number of Replicas: ", "" + wizard.getConfig().getNumberOfReplicas());
 
 		Button installButton = new Button("Install");
-		installButton.addStyleName( "default" );
-		installButton.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+		installButton.addStyleName("default");
+		installButton.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
 
-                UUID trackID = ElasticsearchUI.getElasticsearchManager().installCluster( wizard.getConfig() );
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().installCluster(wizard.getConfig());
 
-                ProgressWindow window =
-                        new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
-                                Config.PRODUCT_KEY );
+				ProgressWindow window =
+						new ProgressWindow(ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
+								Config.PRODUCT_KEY);
 
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        wizard.init();
-                    }
-                } );
-                getUI().addWindow( window.getWindow() );
-            }
-        } );
+				window.getWindow().addCloseListener(new Window.CloseListener() {
+					@Override
+					public void windowClose(Window.CloseEvent closeEvent) {
+						wizard.init();
+					}
+				});
+				getUI().addWindow(window.getWindow());
+			}
+		});
 
 		Button back = new Button("Back");
 		back.addStyleName("default");

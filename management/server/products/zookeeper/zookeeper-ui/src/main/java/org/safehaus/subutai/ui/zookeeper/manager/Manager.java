@@ -173,7 +173,7 @@ public class Manager {
 								contentRoot.getUI().addWindow(window.getWindow());
 							}
 						});
-                        contentRoot.getUI().addWindow(alert.getAlert());
+						contentRoot.getUI().addWindow(alert.getAlert());
 					} else {
 						org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager().getCluster(config.getClusterName());
 
@@ -287,6 +287,68 @@ public class Manager {
 		contentRoot.addComponent(nodesTable, 0, 2, 0, 10);
 	}
 
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Check", Button.class, null);
+		table.addContainerProperty("Start", Button.class, null);
+		table.addContainerProperty("Stop", Button.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = ZookeeperUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), ZookeeperUI.getExecutor(), ZookeeperUI.getCommandRunner(), ZookeeperUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(nodesTable, config.getNodes());
+		} else {
+			nodesTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		List<Config> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
+		Config clusterInfo = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
+			for (Config mongoClusterInfo : mongoClusterInfos) {
+				clusterCombo.addItem(mongoClusterInfo);
+				clusterCombo.setItemCaption(mongoClusterInfo,
+						mongoClusterInfo.getClusterName());
+			}
+			if (clusterInfo != null) {
+				for (Config mongoClusterInfo : mongoClusterInfos) {
+					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(mongoClusterInfo);
+						return;
+					}
+				}
+			} else {
+				clusterCombo.setValue(mongoClusterInfos.iterator().next());
+			}
+		}
+	}
+
 	public static void checkNodesStatus(Table table) {
 		for (Object o : table.getItemIds()) {
 			int rowId = (Integer) o;
@@ -315,10 +377,6 @@ public class Manager {
 			checkBtn.addStyleName("default");
 			checkBtn.click();
 		}
-	}
-
-	public Component getContent() {
-		return contentRoot;
 	}
 
 	private void show(String notification) {
@@ -459,66 +517,8 @@ public class Manager {
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getNodes());
-		} else {
-			nodesTable.removeAllItems();
-		}
-	}
-
-	public void refreshClustersInfo() {
-		List<Config> mongoClusterInfos = ZookeeperUI.getManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-			for (Config mongoClusterInfo : mongoClusterInfos) {
-				clusterCombo.addItem(mongoClusterInfo);
-				clusterCombo.setItemCaption(mongoClusterInfo,
-						mongoClusterInfo.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : mongoClusterInfos) {
-					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(mongoClusterInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(mongoClusterInfos.iterator().next());
-			}
-		}
-	}
-
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Check", Button.class, null);
-		table.addContainerProperty("Start", Button.class, null);
-		table.addContainerProperty("Stop", Button.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = ZookeeperUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), ZookeeperUI.getExecutor(), ZookeeperUI.getCommandRunner(), ZookeeperUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

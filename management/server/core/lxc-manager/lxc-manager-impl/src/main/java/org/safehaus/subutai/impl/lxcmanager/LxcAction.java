@@ -11,5 +11,5 @@ package org.safehaus.subutai.impl.lxcmanager;
  */
 public enum LxcAction {
 
-    CLONE, DESTROY, START
+	CLONE, DESTROY, START
 }

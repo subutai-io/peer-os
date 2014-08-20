@@ -11,7 +11,7 @@ package org.safehaus.subutai.api.lxcmanager;
  */
 public class LxcDestroyException extends Exception {
 
-    public LxcDestroyException( String message ) {
-        super( message );
-    }
+	public LxcDestroyException(String message) {
+		super(message);
+	}
 }

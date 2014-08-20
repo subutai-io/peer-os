@@ -5,19 +5,13 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
-import java.util.UUID;
-
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.oozie.OozieConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.ui.oozie.OozieUI;
 
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Window;
+import java.util.UUID;
 
 /**
  * @author dilshat

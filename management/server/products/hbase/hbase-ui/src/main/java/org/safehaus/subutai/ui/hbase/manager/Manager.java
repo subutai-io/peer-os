@@ -11,10 +11,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.api.hbase.HBaseType;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -23,6 +19,11 @@ import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.hbase.HBaseUI;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author dilshat
@@ -70,8 +71,8 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-                Object value = event.getProperty().getValue();
-                config = value != null ? (HBaseConfig)value : null;
+				Object value = event.getProperty().getValue();
+				config = value != null ? (HBaseConfig) value : null;
 				refreshUI();
 			}
 		});
@@ -126,7 +127,7 @@ public class Manager {
 							refreshClustersInfo();
 						}
 					});
-                    contentRoot.getUI().addWindow(window.getWindow());
+					contentRoot.getUI().addWindow(window.getWindow());
 				} else {
 					show("Please, select cluster");
 				}
@@ -149,7 +150,7 @@ public class Manager {
 							refreshClustersInfo();
 						}
 					});
-                    contentRoot.getUI().addWindow(window.getWindow());
+					contentRoot.getUI().addWindow(window.getWindow());
 				} else {
 					show("Please, select cluster");
 				}
@@ -197,53 +198,33 @@ public class Manager {
 
 	}
 
-	public static void checkNodesStatus(Table table) {
-		for (Object o : table.getItemIds()) {
-			int rowId = (Integer) o;
-			Item row = table.getItem(rowId);
-			Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
-			checkBtn.click();
-		}
-	}
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Type", HBaseType.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
 
-	public Component getContent() {
-		return contentRoot;
-	}
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
-
-	private void populateMasterTable(final Table table, Set<String> agents, final HBaseType type) {
-
-		table.removeAllItems();
-
-		for (final String hostname : agents) {
-			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
-			progressIcon.setVisible(false);
-
-            Agent a = HBaseUI.getAgentManager().getAgentByHostname(hostname);
-            if(a == null) continue;
-
-			final Object rowId = table.addItem(new Object[] {
-                a.getHostname(), type, progressIcon}, null);
-		}
-	}
-
-	private void populateTable(final Table table, Set<String> agents, final HBaseType type) {
-
-		table.removeAllItems();
-
-		for (final String hostname : agents) {
-			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
-			progressIcon.setVisible(false);
-
-            Agent a = HBaseUI.getAgentManager().getAgentByHostname(hostname);
-            if(a == null) continue;
-
-			final Object rowId = table.addItem(new Object[] {
-                a.getHostname(), type, progressIcon}, null);
-		}
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = HBaseUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HBaseUI.getExecutor(), HBaseUI.getCommandRunner(), HBaseUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
 	}
 
 	private void refreshUI() {
@@ -278,8 +259,8 @@ public class Manager {
 						info.getClusterName());
 			}
 			if (clusterInfo != null) {
-                for(HBaseConfig c : clusters) {
-                    if(c.getClusterName().equals(clusterInfo.getClusterName())) {
+				for (HBaseConfig c : clusters) {
+					if (c.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(c);
 						return;
 					}
@@ -290,33 +271,53 @@ public class Manager {
 		}
 	}
 
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Type", HBaseType.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
+	private void populateTable(final Table table, Set<String> agents, final HBaseType type) {
 
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = HBaseUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HBaseUI.getExecutor(), HBaseUI.getCommandRunner(), HBaseUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+		table.removeAllItems();
+
+		for (final String hostname : agents) {
+			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
+			progressIcon.setVisible(false);
+
+			Agent a = HBaseUI.getAgentManager().getAgentByHostname(hostname);
+			if (a == null) continue;
+
+			final Object rowId = table.addItem(new Object[] {
+					a.getHostname(), type, progressIcon}, null);
+		}
+	}
+
+	private void populateMasterTable(final Table table, Set<String> agents, final HBaseType type) {
+
+		table.removeAllItems();
+
+		for (final String hostname : agents) {
+			final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
+			progressIcon.setVisible(false);
+
+			Agent a = HBaseUI.getAgentManager().getAgentByHostname(hostname);
+			if (a == null) continue;
+
+			final Object rowId = table.addItem(new Object[] {
+					a.getHostname(), type, progressIcon}, null);
+		}
+	}
+
+	public static void checkNodesStatus(Table table) {
+		for (Object o : table.getItemIds()) {
+			int rowId = (Integer) o;
+			Item row = table.getItem(rowId);
+			Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
+			checkBtn.click();
+		}
+	}
+
+	public Component getContent() {
+		return contentRoot;
 	}
 
 

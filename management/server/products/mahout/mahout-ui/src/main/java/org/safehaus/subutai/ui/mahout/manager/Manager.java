@@ -146,8 +146,62 @@ public class Manager {
 
 	}
 
-	public Component getContent() {
-		return contentRoot;
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = MahoutUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MahoutUI.getExecutor(), MahoutUI.getCommandRunner(), MahoutUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(nodesTable, config.getNodes());
+		} else {
+			nodesTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		List<Config> clustersInfo = MahoutUI.getMahoutManager().getClusters();
+		Config clusterInfo = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (Config mongoClusterInfo : clustersInfo) {
+				clusterCombo.addItem(mongoClusterInfo);
+				clusterCombo.setItemCaption(mongoClusterInfo,
+						mongoClusterInfo.getClusterName());
+			}
+			if (clusterInfo != null) {
+				for (Config mongoClusterInfo : clustersInfo) {
+					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(mongoClusterInfo);
+						return;
+					}
+				}
+			} else {
+				clusterCombo.setValue(clustersInfo.iterator().next());
+			}
+		}
 	}
 
 	private void show(String notification) {
@@ -194,62 +248,8 @@ public class Manager {
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getNodes());
-		} else {
-			nodesTable.removeAllItems();
-		}
-	}
-
-	public void refreshClustersInfo() {
-		List<Config> clustersInfo = MahoutUI.getMahoutManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config mongoClusterInfo : clustersInfo) {
-				clusterCombo.addItem(mongoClusterInfo);
-				clusterCombo.setItemCaption(mongoClusterInfo,
-						mongoClusterInfo.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : clustersInfo) {
-					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(mongoClusterInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(clustersInfo.iterator().next());
-			}
-		}
-	}
-
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = MahoutUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MahoutUI.getExecutor(), MahoutUI.getCommandRunner(), MahoutUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

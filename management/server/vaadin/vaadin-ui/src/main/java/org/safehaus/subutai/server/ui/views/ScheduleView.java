@@ -1,11 +1,11 @@
 /**
  * DISCLAIMER
- * 
+ *
  * The quality of the code is such that you should not copy any of it as best
  * practice how to build Vaadin applications.
- * 
+ *
  * @author jouni@vaadin.com
- * 
+ *
  */
 
 package org.safehaus.subutai.server.ui.views;
@@ -19,28 +19,28 @@ import com.vaadin.ui.Window;
 
 public class ScheduleView extends CssLayout implements View {
 
-    private CssLayout catalog;
+	private CssLayout catalog;
 
-    private Window popup;
+	private Window popup;
 
-    // private CSSInject css;
+	// private CSSInject css;
 
-    @Override
-    public void enter(ViewChangeEvent event) {
-        setSizeFull();
-        addStyleName("schedule");
+	@Override
+	public void enter(ViewChangeEvent event) {
+		setSizeFull();
+		addStyleName("schedule");
 
-        // css = new CSSInject(UI.getCurrent());
+		// css = new CSSInject(UI.getCurrent());
 
-        TabSheet tabs = new TabSheet();
-        tabs.setSizeFull();
-        tabs.addStyleName("borderless");
-        addComponent(tabs);
-        tabs.addComponent(new Label("Shedule"));
+		TabSheet tabs = new TabSheet();
+		tabs.setSizeFull();
+		tabs.addStyleName("borderless");
+		addComponent(tabs);
+		tabs.addComponent(new Label("Shedule"));
 
-        catalog = new CssLayout();
-        catalog.setCaption("Catalog");
-        catalog.addStyleName("catalog");
-        tabs.addComponent(catalog);
-    }
+		catalog = new CssLayout();
+		catalog.setCaption("Catalog");
+		catalog.addStyleName("catalog");
+		tabs.addComponent(catalog);
+	}
 }

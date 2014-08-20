@@ -11,5 +11,5 @@ package org.safehaus.subutai.shared.operation;
  */
 public enum ProductOperationState {
 
-    RUNNING, SUCCEEDED, FAILED
+	RUNNING, SUCCEEDED, FAILED
 }

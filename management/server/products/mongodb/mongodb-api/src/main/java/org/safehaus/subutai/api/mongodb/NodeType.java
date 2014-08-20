@@ -6,10 +6,9 @@
 package org.safehaus.subutai.api.mongodb;
 
 /**
- *
  * @author dilshat
  */
 public enum NodeType {
 
-    CONFIG_NODE, ROUTER_NODE, DATA_NODE
+	CONFIG_NODE, ROUTER_NODE, DATA_NODE
 }

@@ -8,8 +8,8 @@ package org.safehaus.subutai.plugin.mongodb.ui.wizard;
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.plugin.mongodb.ui.MongoUI;
+import org.safehaus.subutai.shared.protocol.FileUtil;
 
 /**
  * @author dilshat

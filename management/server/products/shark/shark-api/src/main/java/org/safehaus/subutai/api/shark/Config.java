@@ -15,35 +15,35 @@ import java.util.Set;
  */
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Shark";
-    private String clusterName = "";
+	public static final String PRODUCT_KEY = "Shark";
+	private String clusterName = "";
 
-    private Set<Agent> nodes;
+	private Set<Agent> nodes;
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
 
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
+	@Override
+	public String getProductName() {
+		return PRODUCT_KEY;
+	}
 
-    public Set<Agent> getNodes() {
-        return nodes;
-    }
+	public Set<Agent> getNodes() {
+		return nodes;
+	}
 
-    public void setNodes(Set<Agent> nodes) {
-        this.nodes = nodes;
-    }
+	public void setNodes(Set<Agent> nodes) {
+		this.nodes = nodes;
+	}
 
-    @Override
-    public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
-    }
+	@Override
+	public String toString() {
+		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
+	}
 
 }

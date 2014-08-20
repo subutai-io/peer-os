@@ -5,7 +5,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.*;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -16,11 +15,13 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.hive.HiveUI;
 
+import java.util.*;
+
 public class Manager {
 
-	private GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table serverTable, clientsTable;
+	private GridLayout contentRoot;
 	private Config config;
 
 	public Manager() {
@@ -97,7 +98,7 @@ public class Manager {
 				}
 
 				org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
-                        config.getHadoopClusterName());
+						config.getHadoopClusterName());
 				if (hci == null) {
 					show("Hadoop cluster info not found");
 					return;
@@ -139,12 +140,80 @@ public class Manager {
 
 	}
 
-	public Component getContent() {
-		return contentRoot;
+	private Table createTableTemplate(String caption, boolean server) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		if (server) {
+			table.addContainerProperty("Check", Button.class, null);
+			table.addContainerProperty("Start", Button.class, null);
+			table.addContainerProperty("Stop", Button.class, null);
+			table.addContainerProperty("Restart", Button.class, null);
+		} else
+			table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+				Agent lxcAgent = HiveUI.getAgentManager().getAgentByHostname(lxcHostname);
+				if (lxcAgent != null) {
+					TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HiveUI.getExecutor(), HiveUI.getCommandRunner(), HiveUI.getAgentManager());
+					contentRoot.getUI().addWindow(terminal.getWindow());
+				} else {
+					show("Agent is not connected");
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(serverTable, true, config.getServer());
+			populateTable(clientsTable, false, config.getClients().toArray(new Agent[0]));
+		} else {
+			serverTable.removeAllItems();
+			clientsTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		Config current = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		List<Config> clustersInfo = HiveUI.getManager().getClusters();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (Config ci : clustersInfo) {
+				clusterCombo.addItem(ci);
+				String cap = String.format("%s [%s]", ci.getClusterName(),
+						ci.getHadoopClusterName());
+				clusterCombo.setItemCaption(ci, cap);
+			}
+			clusterCombo.setValue(current);
+		}
 	}
 
 	private void show(String notification) {
 		Notification.show(notification);
+	}
+
+	private void destroyClusterHandler() {
+
+		UUID trackID = HiveUI.getManager().uninstallCluster(config.getClusterName());
+
+		ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
+		window.getWindow().addCloseListener(new Window.CloseListener() {
+			@Override
+			public void windowClose(Window.CloseEvent closeEvent) {
+				refreshClustersInfo();
+			}
+		});
+		contentRoot.getUI().addWindow(window.getWindow());
 	}
 
 	private void populateTable(final Table table, boolean server, Agent... agents) {
@@ -171,13 +240,13 @@ public class Manager {
 			icon.setVisible(false);
 
 			final List items = new ArrayList();
-            items.add(agent.getHostname());
-            if(server) {
-                items.add(checkBtn);
-                items.add(startBtn);
-                items.add(stopBtn);
-                items.add(restartBtn);
-            } else {
+			items.add(agent.getHostname());
+			if (server) {
+				items.add(checkBtn);
+				items.add(startBtn);
+				items.add(stopBtn);
+				items.add(restartBtn);
+			} else {
 				items.add(destroyBtn);
 				destroyBtn.addClickListener(new Button.ClickListener() {
 					@Override
@@ -220,7 +289,7 @@ public class Manager {
 							config.getClusterName(), agent.getHostname());
 					HiveUI.getExecutor().execute(new Runnable() {
 
-                        @Override
+						@Override
 						public void run() {
 							ProductOperationView po = null;
 							while (po == null || po.getState() == ProductOperationState.RUNNING) {
@@ -261,8 +330,8 @@ public class Manager {
 							restartBtn.setEnabled(started);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-                    });
-                    contentRoot.getUI().addWindow(window.getWindow());
+					});
+					contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
@@ -288,8 +357,8 @@ public class Manager {
 							restartBtn.setEnabled(!stopped);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-                    });
-                    contentRoot.getUI().addWindow(window.getWindow());
+					});
+					contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
@@ -315,83 +384,15 @@ public class Manager {
 							restartBtn.setEnabled(true);
 							if (destroyBtn != null) destroyBtn.setEnabled(true);
 						}
-                    });
-                    contentRoot.getUI().addWindow(window.getWindow());
+					});
+					contentRoot.getUI().addWindow(window.getWindow());
 				}
 			});
 
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(serverTable, true, config.getServer());
-			populateTable(clientsTable, false, config.getClients().toArray(new Agent[0]));
-		} else {
-			serverTable.removeAllItems();
-			clientsTable.removeAllItems();
-		}
-	}
-
-	public void refreshClustersInfo() {
-		Config current = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		List<Config> clustersInfo = HiveUI.getManager().getClusters();
-		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config ci : clustersInfo) {
-                clusterCombo.addItem(ci);
-                String cap = String.format("%s [%s]", ci.getClusterName(),
-                        ci.getHadoopClusterName());
-                clusterCombo.setItemCaption(ci, cap);
-            }
-            clusterCombo.setValue(current);
-		}
-	}
-
-	private Table createTableTemplate(String caption, boolean server) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-        if(server) {
-            table.addContainerProperty("Check", Button.class, null);
-            table.addContainerProperty("Start", Button.class, null);
-            table.addContainerProperty("Stop", Button.class, null);
-            table.addContainerProperty("Restart", Button.class, null);
-        } else
-            table.addContainerProperty("Destroy", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-				Agent lxcAgent = HiveUI.getAgentManager().getAgentByHostname(lxcHostname);
-				if (lxcAgent != null) {
-					TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), HiveUI.getExecutor(), HiveUI.getCommandRunner(), HiveUI.getAgentManager());
-					contentRoot.getUI().addWindow(terminal.getWindow());
-				} else {
-					show("Agent is not connected");
-				}
-			}
-		});
-		return table;
-	}
-
-	private void destroyClusterHandler() {
-
-		UUID trackID = HiveUI.getManager().uninstallCluster(config.getClusterName());
-
-		ProgressWindow window = new ProgressWindow(HiveUI.getExecutor(), HiveUI.getTracker(), trackID, Config.PRODUCT_KEY);
-		window.getWindow().addCloseListener(new Window.CloseListener() {
-			@Override
-			public void windowClose(Window.CloseEvent closeEvent) {
-				refreshClustersInfo();
-			}
-		});
-		contentRoot.getUI().addWindow(window.getWindow());
+	public Component getContent() {
+		return contentRoot;
 	}
 }
