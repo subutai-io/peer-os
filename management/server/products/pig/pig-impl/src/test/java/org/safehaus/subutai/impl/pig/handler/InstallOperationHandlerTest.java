@@ -15,7 +15,7 @@ import static junit.framework.Assert.assertTrue;
 
 public class InstallOperationHandlerTest {
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void testWithNullConfig() {
         new PigImplMock().installCluster( null );
     }
@@ -23,7 +23,9 @@ public class InstallOperationHandlerTest {
 
     @Test
     public void testWithMalformedConfiguration() {
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( new PigImplMock(), new Config() );
+        Config config = new Config();
+        config.setClusterName( "test" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( new PigImplMock(), config );
 
         operationHandler.run();
 
@@ -46,5 +48,4 @@ public class InstallOperationHandlerTest {
         assertTrue( operationHandler.getProductOperation().getLog().contains( "already exists" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
-
 }

@@ -107,10 +107,6 @@ public class NodeSelectionStep extends Panel {
 		setContent(layout);
 	}
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
-
 	private TwinColSelect makeClientNodeSelector(final Wizard wizard) {
 		TwinColSelect tcs = new TwinColSelect("Nodes");
 		tcs.setItemCaptionPropertyId("hostname");
@@ -135,6 +131,10 @@ public class NodeSelectionStep extends Panel {
 			}
 		});
 		return tcs;
+	}
+
+	private void show(String notification) {
+		Notification.show(notification);
 	}
 
 }

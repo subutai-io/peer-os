@@ -11,27 +11,27 @@ import java.util.List;
 /**
  * Displays the last log entries
  */
-@Command(scope = "spark", name = "list-clusters", description = "mydescription")
+@Command (scope = "spark", name = "list-clusters", description = "mydescription")
 public class ListClustersCommand extends OsgiCommandSupport {
 
-    private Spark sparkManager;
+	private Spark sparkManager;
 
-    public Spark getSparkManager() {
-        return sparkManager;
-    }
+	public Spark getSparkManager() {
+		return sparkManager;
+	}
 
-    public void setSparkManager(Spark sparkManager) {
-        this.sparkManager = sparkManager;
-    }
+	public void setSparkManager(Spark sparkManager) {
+		this.sparkManager = sparkManager;
+	}
 
-    protected Object doExecute() {
-        List<Config> configList = sparkManager.getClusters();
-        if (!configList.isEmpty())
-            for (Config config : configList) {
-                System.out.println(config.getClusterName());
-            }
-        else System.out.println("No Spark cluster");
+	protected Object doExecute() {
+		List<Config> configList = sparkManager.getClusters();
+		if (!configList.isEmpty())
+			for (Config config : configList) {
+				System.out.println(config.getClusterName());
+			}
+		else System.out.println("No Spark cluster");
 
-        return null;
-    }
+		return null;
+	}
 }

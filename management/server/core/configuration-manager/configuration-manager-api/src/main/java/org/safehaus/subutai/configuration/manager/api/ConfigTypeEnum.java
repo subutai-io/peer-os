@@ -6,5 +6,5 @@ package org.safehaus.subutai.configuration.manager.api;
  */
 public enum ConfigTypeEnum {
 
-    YAML, PROPERTIES, XML, PLAIN, SH;
+	YAML, PROPERTIES, XML, PLAIN, SH;
 }

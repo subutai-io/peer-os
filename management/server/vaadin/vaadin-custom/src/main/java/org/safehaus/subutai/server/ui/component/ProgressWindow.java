@@ -134,16 +134,16 @@ public class ProgressWindow {
 		ok.setEnabled(false);
 	}
 
-	private void hideProgress() {
-		indicator.setVisible(false);
-		ok.setEnabled(true);
-	}
-
 	private void setOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
 			outputTxtArea.setValue(output);
 			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
 		}
+	}
+
+	private void hideProgress() {
+		indicator.setVisible(false);
+		ok.setEnabled(true);
 	}
 
 	public Window getWindow() {

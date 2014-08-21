@@ -23,46 +23,46 @@ import org.safehaus.subutai.ui.lxcmanager.manage.Manager;
  */
 public class LxcForm extends CustomComponent implements Disposable {
 
-    private final static String managerTabCaption = "Manage";
-    private final AgentTree agentTree;
+	private final static String managerTabCaption = "Manage";
+	private final AgentTree agentTree;
 
 
-    public LxcForm(AgentManager agentManager, LxcManager lxcManager) {
-        setHeight(100, Unit.PERCENTAGE);
+	public LxcForm(AgentManager agentManager, LxcManager lxcManager) {
+		setHeight(100, Unit.PERCENTAGE);
 
-        HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
-        horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
-        horizontalSplit.setSplitPosition(200, Unit.PIXELS);
-        agentTree = new AgentTree(agentManager);
-        horizontalSplit.setFirstComponent(agentTree);
+		HorizontalSplitPanel horizontalSplit = new HorizontalSplitPanel();
+		horizontalSplit.setStyleName(Runo.SPLITPANEL_SMALL);
+		horizontalSplit.setSplitPosition(200, Unit.PIXELS);
+		agentTree = new AgentTree(agentManager);
+		horizontalSplit.setFirstComponent(agentTree);
 
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSpacing(true);
-        verticalLayout.setSizeFull();
-        TabSheet commandsSheet = new TabSheet();
-        commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
-        commandsSheet.setSizeFull();
-        final Manager manager = new Manager(agentManager, lxcManager);
-        commandsSheet.addTab(new Cloner(lxcManager, agentTree), "Clone");
-        commandsSheet.addTab(manager, managerTabCaption);
-        commandsSheet.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
-            @Override
-            public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-                TabSheet tabsheet = event.getTabSheet();
-                String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
-                if (caption.equals(managerTabCaption)) {
-                    manager.getLxcInfo();
-                }
-            }
-        });
-        verticalLayout.addComponent(commandsSheet);
+		VerticalLayout verticalLayout = new VerticalLayout();
+		verticalLayout.setSpacing(true);
+		verticalLayout.setSizeFull();
+		TabSheet commandsSheet = new TabSheet();
+		commandsSheet.setStyleName(Runo.TABSHEET_SMALL);
+		commandsSheet.setSizeFull();
+		final Manager manager = new Manager(agentManager, lxcManager);
+		commandsSheet.addTab(new Cloner(lxcManager, agentTree), "Clone");
+		commandsSheet.addTab(manager, managerTabCaption);
+		commandsSheet.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
+			@Override
+			public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
+				TabSheet tabsheet = event.getTabSheet();
+				String caption = tabsheet.getTab(event.getTabSheet().getSelectedTab()).getCaption();
+				if (caption.equals(managerTabCaption)) {
+					manager.getLxcInfo();
+				}
+			}
+		});
+		verticalLayout.addComponent(commandsSheet);
 
-        horizontalSplit.setSecondComponent(verticalLayout);
-        setCompositionRoot(horizontalSplit);
-    }
+		horizontalSplit.setSecondComponent(verticalLayout);
+		setCompositionRoot(horizontalSplit);
+	}
 
 
-    public void dispose() {
-        agentTree.dispose();
-    }
+	public void dispose() {
+		agentTree.dispose();
+	}
 }

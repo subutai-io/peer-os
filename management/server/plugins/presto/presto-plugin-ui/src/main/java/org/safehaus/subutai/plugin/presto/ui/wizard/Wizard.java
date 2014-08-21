@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.presto.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 /**
  * @author dilshat
@@ -15,7 +15,7 @@ import org.safehaus.subutai.plugin.presto.api.Config;
 public class Wizard {
 	private final GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private PrestoClusterConfig config = new PrestoClusterConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -23,30 +23,6 @@ public class Wizard {
 		grid.setSizeFull();
 
 		putForm();
-	}
-
-	public Component getContent() {
-		return grid;
-	}
-
-	protected void next() {
-		step++;
-		putForm();
-	}
-
-	protected void back() {
-		step--;
-		putForm();
-	}
-
-	protected void init() {
-		step = 1;
-		config = new Config();
-		putForm();
-	}
-
-	public Config getConfig() {
-		return config;
 	}
 
 	private void putForm() {
@@ -73,6 +49,30 @@ public class Wizard {
 		if (component != null) {
 			grid.addComponent(component, 0, 1, 0, 19);
 		}
+	}
+
+	public Component getContent() {
+		return grid;
+	}
+
+	protected void next() {
+		step++;
+		putForm();
+	}
+
+	protected void back() {
+		step--;
+		putForm();
+	}
+
+	protected void init() {
+		step = 1;
+		config = new PrestoClusterConfig();
+		putForm();
+	}
+
+	public PrestoClusterConfig getConfig() {
+		return config;
 	}
 
 }

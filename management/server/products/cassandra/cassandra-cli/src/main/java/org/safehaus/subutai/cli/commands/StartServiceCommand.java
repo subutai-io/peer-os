@@ -15,48 +15,35 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "service-cassandra-start", description = "Command to start Cassandra service")
-public class StartServiceCommand extends OsgiCommandSupport
-{
+@Command (scope = "cassandra", name = "service-cassandra-start", description = "Command to start Cassandra service")
+public class StartServiceCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+	private static Cassandra cassandraManager;
+	private static Tracker tracker;
+	@Argument (index = 0, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
+	String agentUUID = null;
 
+	public static Cassandra getCassandraManager() {
+		return cassandraManager;
+	}
 
-    public Tracker getTracker()
-    {
-        return tracker;
-    }
+	public void setCassandraManager(Cassandra cassandraManager) {
+		StartServiceCommand.cassandraManager = cassandraManager;
+	}
 
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public void setTracker( Tracker tracker )
-    {
-        StartServiceCommand.tracker = tracker;
-    }
+	public void setTracker(Tracker tracker) {
+		StartServiceCommand.tracker = tracker;
+	}
 
+	protected Object doExecute() throws IOException {
 
-    public void setCassandraManager( Cassandra cassandraManager )
-    {
-        StartServiceCommand.cassandraManager = cassandraManager;
-    }
+		UUID uuid = cassandraManager.startCassandraService(agentUUID);
+		tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
 
-
-    public static Cassandra getCassandraManager()
-    {
-        return cassandraManager;
-    }
-
-
-    @Argument(index = 0, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
-    String agentUUID = null;
-
-
-    protected Object doExecute() throws IOException
-    {
-
-        UUID uuid = cassandraManager.startCassandraService( agentUUID );
-        tracker.printOperationLog( Config.PRODUCT_KEY, uuid, 30000 );
-
-        return null;
-    }
+		return null;
+	}
 }

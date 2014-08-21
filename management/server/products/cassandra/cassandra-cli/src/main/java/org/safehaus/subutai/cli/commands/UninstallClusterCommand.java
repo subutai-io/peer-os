@@ -13,35 +13,33 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
+@Command (scope = "cassandra", name = "uninstall-cluster", description = "Command to uninstall Cassandra cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
-    private Cassandra cassandraManager;
-    private Tracker tracker;
+	@Argument (index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
+	String clusterName = null;
+	private Cassandra cassandraManager;
+	private Tracker tracker;
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
-    }
+	public void setTracker(Tracker tracker) {
+		this.tracker = tracker;
+	}
 
-    public void setCassandraManager(Cassandra cassandraManager) {
-        this.cassandraManager = cassandraManager;
-    }
+	public Cassandra getCassandraManager() {
+		return cassandraManager;
+	}
 
-    public Cassandra getCassandraManager() {
-        return cassandraManager;
-    }
+	public void setCassandraManager(Cassandra cassandraManager) {
+		this.cassandraManager = cassandraManager;
+	}
 
-
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
-    String clusterName = null;
-
-    protected Object doExecute() {
-        UUID uuid = cassandraManager.uninstallCluster(clusterName);
-        tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
-        return null;
-    }
+	protected Object doExecute() {
+		UUID uuid = cassandraManager.uninstallCluster(clusterName);
+		tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
+		return null;
+	}
 }

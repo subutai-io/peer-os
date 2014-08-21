@@ -15,14 +15,13 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 	public static final String MASTER_NODE_TYPE = "master";
 	public static final String SLAVE_NODE_TYPE = "slave";
+	private final Map<String, Integer> nodesCount;
 	private float hddPerNodeMb;
 	private float hddReservedMb;
 	private float ramPerNodeMb;
 	private float ramReservedMb;
 	private float cpuPerNodePercentage;
 	private float cpuReservedPercentage;
-
-	private final Map<String, Integer> nodesCount;
 
 	public CustomPlacementStrategy(int masterNodes, int slaveNodes) {
 		this.nodesCount = new HashMap<>();

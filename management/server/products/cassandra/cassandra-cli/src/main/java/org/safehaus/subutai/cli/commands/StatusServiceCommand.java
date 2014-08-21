@@ -14,38 +14,35 @@ import java.util.UUID;
 /**
  * Displays the last log entries
  */
-@Command(scope = "cassandra", name = "service-cassandra-status", description = "Command to check Cassandra service")
+@Command (scope = "cassandra", name = "service-cassandra-status", description = "Command to check Cassandra service")
 public class StatusServiceCommand extends OsgiCommandSupport {
 
-    private static Cassandra cassandraManager;
-    private static Tracker tracker;
+	private static Cassandra cassandraManager;
+	private static Tracker tracker;
+	@Argument (index = 0, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
+	String agentUUID = null;
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public static Cassandra getCassandraManager() {
+		return cassandraManager;
+	}
 
-    public void setTracker(Tracker tracker) {
-        StatusServiceCommand.tracker = tracker;
-    }
+	public void setCassandraManager(Cassandra cassandraManager) {
+		StatusServiceCommand.cassandraManager = cassandraManager;
+	}
 
-    public void setCassandraManager(Cassandra cassandraManager) {
-        StatusServiceCommand.cassandraManager = cassandraManager;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public static Cassandra getCassandraManager() {
-        return cassandraManager;
-    }
+	public void setTracker(Tracker tracker) {
+		StatusServiceCommand.tracker = tracker;
+	}
 
+	protected Object doExecute() throws IOException {
 
-    @Argument(index = 0, name = "agentUUID", description = "UUID of the agent.", required = true, multiValued = false)
-    String agentUUID = null;
+		UUID uuid = cassandraManager.statusCassandraService(agentUUID);
+		tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
 
-
-    protected Object doExecute() throws IOException {
-
-        UUID uuid = cassandraManager.statusCassandraService(agentUUID);
-        tracker.printOperationLog(Config.PRODUCT_KEY, uuid, 30000);
-
-        return null;
-    }
+		return null;
+	}
 }

@@ -199,6 +199,9 @@ public class TerminalForm extends CustomComponent implements Disposable {
 		});
 	}
 
+	private void show(String msg) {
+		Notification.show(msg);
+	}
 
 	private void addOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
@@ -206,12 +209,6 @@ public class TerminalForm extends CustomComponent implements Disposable {
 			commandOutputTxtArea.setCursorPosition(commandOutputTxtArea.getValue().length() - 1);
 		}
 	}
-
-
-	private void show(String msg) {
-		Notification.show(msg);
-	}
-
 
 	public void dispose() {
 		agentTree.dispose();

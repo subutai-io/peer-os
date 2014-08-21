@@ -70,7 +70,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<Zookeepe
         if (ok.get()) {
             po.addLogDone(String.format("Node on %s started", lxcHostname));
         } else {
-            po.addLogFailed(String.format("Failed to start node %s. %s",
+            po.addLogFailed(String.format("Failed to start node %s, %s",
                     lxcHostname, startCommand.getAllErrors()
             ));
         }

@@ -10,10 +10,9 @@
 package org.safehaus.subutai.ui.oozie.wizard;
 
 
-import org.safehaus.subutai.api.oozie.OozieConfig;
-
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.subutai.api.oozie.OozieConfig;
 
 /**
  * @author dilshat
@@ -29,6 +28,33 @@ public class Wizard {
 		vlayout.setSizeFull();
 		vlayout.setMargin(true);
 		putForm();
+	}
+
+	private void putForm() {
+		vlayout.removeAllComponents();
+		switch (step) {
+			case 1: {
+				vlayout.addComponent(new StepStart(this));
+				break;
+			}
+			case 2: {
+				vlayout.addComponent(new ConfigurationStep(this));
+				break;
+			}
+			case 3: {
+				vlayout.addComponent(new StepSetConfig(this));
+				break;
+			}
+			case 4: {
+				vlayout.addComponent(new VerificationStep(this));
+				break;
+			}
+			default: {
+				step = 1;
+				vlayout.addComponent(new StepStart(this));
+				break;
+			}
+		}
 	}
 
 	public Component getContent() {
@@ -58,33 +84,6 @@ public class Wizard {
 
 	public OozieConfig getConfig() {
 		return config;
-	}
-
-	private void putForm() {
-		vlayout.removeAllComponents();
-		switch (step) {
-			case 1: {
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-			case 2: {
-				vlayout.addComponent(new ConfigurationStep(this));
-				break;
-			}
-			case 3: {
-				vlayout.addComponent(new StepSetConfig(this));
-				break;
-			}
-			case 4: {
-				vlayout.addComponent(new VerificationStep(this));
-				break;
-			}
-			default: {
-				step = 1;
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-		}
 	}
 
 }

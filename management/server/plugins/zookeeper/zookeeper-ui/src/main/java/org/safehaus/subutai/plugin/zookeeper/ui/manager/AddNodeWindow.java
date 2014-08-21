@@ -9,12 +9,11 @@ import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 
 import java.util.Set;
 import java.util.UUID;
@@ -75,7 +74,7 @@ public class AddNodeWindow extends Window {
 
 					public void run() {
 						while (track) {
-							ProductOperationView po = ZookeeperUI.getTracker().getProductOperation( ZookeeperClusterConfig.PRODUCT_KEY, trackID);
+							ProductOperationView po = ZookeeperUI.getTracker().getProductOperation(ZookeeperClusterConfig.PRODUCT_KEY, trackID);
 							if (po != null) {
 								setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
 								if (po.getState() != ProductOperationState.RUNNING) {
@@ -135,18 +134,8 @@ public class AddNodeWindow extends Window {
 		setContent(content);
 	}
 
-	@Override
-	public void close() {
-		super.close();
-		track = false;
-	}
-
 	private void showProgress() {
 		indicator.setVisible(true);
-	}
-
-	private void hideProgress() {
-		indicator.setVisible(false);
 	}
 
 	private void setOutput(String output) {
@@ -154,6 +143,16 @@ public class AddNodeWindow extends Window {
 			outputTxtArea.setValue(output);
 			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
 		}
+	}
+
+	private void hideProgress() {
+		indicator.setVisible(false);
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		track = false;
 	}
 
 }

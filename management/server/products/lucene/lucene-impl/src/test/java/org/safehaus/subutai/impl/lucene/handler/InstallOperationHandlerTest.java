@@ -24,7 +24,9 @@ public class InstallOperationHandlerTest {
 
     @Test
     public void testWithMalformedConfiguration() {
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( new LuceneImplMock(), new Config() );
+        Config      config = new Config();
+        config.setClusterName( "test" );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( new LuceneImplMock(), config );
 
         operationHandler.run();
 

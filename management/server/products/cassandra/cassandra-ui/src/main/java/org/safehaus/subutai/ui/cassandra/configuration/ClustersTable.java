@@ -11,14 +11,14 @@ import com.vaadin.ui.Table;
 public class ClustersTable extends Table {
 
 
-    public ClustersTable() {
-        setSizeFull();
-        addContainerProperty( "Environment", String.class, null );
-        addContainerProperty( "Configure", Button.class, null );
-    }
+	public ClustersTable() {
+		setSizeFull();
+		addContainerProperty("Environment", String.class, null);
+		addContainerProperty("Configure", Button.class, null);
+	}
 
 
-    public void refreshData( Object[] o ) {
-        addItem( o );
-    }
+	public void refreshData(Object[] o) {
+		addItem(o);
+	}
 }

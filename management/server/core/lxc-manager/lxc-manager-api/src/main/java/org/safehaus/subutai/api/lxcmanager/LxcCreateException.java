@@ -8,11 +8,10 @@ package org.safehaus.subutai.api.lxcmanager;
 
 /**
  * Exception which can be thrown while creating lxcs
- *
  */
 public class LxcCreateException extends Exception {
 
-    public LxcCreateException( String message ) {
-        super( message );
-    }
+	public LxcCreateException(String message) {
+		super(message);
+	}
 }

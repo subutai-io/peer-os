@@ -123,6 +123,16 @@ public class DataNode {
 
 	}
 
+	private void logCommand(Command command, ProductOperation po) {
+		if (command.hasSucceeded()) {
+			po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
+		} else if (command.hasCompleted()) {
+			po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
+		} else {
+			po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
+		}
+	}
+
 	public UUID unblock(final Agent agent) {
 
 		final ProductOperation po
@@ -163,15 +173,5 @@ public class DataNode {
 
 		return po.getId();
 
-	}
-
-	private void logCommand(Command command, ProductOperation po) {
-		if (command.hasSucceeded()) {
-			po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
-		} else if (command.hasCompleted()) {
-			po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
-		} else {
-			po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
-		}
 	}
 }

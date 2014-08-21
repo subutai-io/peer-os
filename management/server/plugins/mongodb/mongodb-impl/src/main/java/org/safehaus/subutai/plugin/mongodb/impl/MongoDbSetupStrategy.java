@@ -90,7 +90,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
         if ( mongoManager.getCluster( config.getClusterName() ) != null ) {
             throw new ClusterSetupException(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                    String.format( "Cluster with name '%s' already exists",
                             config.getClusterName() ) );
         }
 

@@ -6,11 +6,11 @@
 package org.safehaus.subutai.ui.cassandra.manager;
 
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.vaadin.data.Property;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.cassandra.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -19,21 +19,10 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.cassandra.CassandraUI;
 
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -93,9 +82,9 @@ public class Manager {
 					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
 					if (lxcAgent != null) {
 						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent),
-                                CassandraUI.getExecutor(),
-                                CassandraUI.getCommandRunner(),
-                                CassandraUI.getAgentManager());
+								CassandraUI.getExecutor(),
+								CassandraUI.getCommandRunner(),
+								CassandraUI.getAgentManager());
 						contentRoot.getUI().addWindow(terminal.getWindow());
 					} else {
 						show("Agent is not connected");

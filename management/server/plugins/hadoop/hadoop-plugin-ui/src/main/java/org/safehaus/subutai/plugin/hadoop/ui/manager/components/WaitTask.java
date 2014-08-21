@@ -13,8 +13,8 @@ import java.util.UUID;
  * Created by daralbaev on 17.04.14.
  */
 public class WaitTask implements Runnable {
-	private UUID trackID;
 	private final CompleteEvent completeEvent;
+	private UUID trackID;
 
 	public WaitTask(UUID trackID, CompleteEvent completeEvent) {
 		this.trackID = trackID;
@@ -25,7 +25,7 @@ public class WaitTask implements Runnable {
 	public void run() {
 		if (trackID != null) {
 			while (true) {
-				ProductOperationView po = HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID);
+				ProductOperationView po = HadoopUI.getTracker().getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
 				if (po.getState() == ProductOperationState.RUNNING) {
 					try {
 						Thread.sleep(1000);

@@ -5,7 +5,7 @@
  */
 package org.safehaus.subutai.plugin.presto.ui.manager;
 
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
@@ -36,7 +36,7 @@ public class StopTask implements Runnable {
 		NodeState state = NodeState.UNKNOWN;
 
 		while (!Thread.interrupted()) {
-			ProductOperationView po = PrestoUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			ProductOperationView po = PrestoUI.getTracker().getProductOperation(PrestoClusterConfig.PRODUCT_KEY, trackID);
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getState() == ProductOperationState.SUCCEEDED) {

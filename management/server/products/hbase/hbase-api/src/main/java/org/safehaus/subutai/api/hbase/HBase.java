@@ -16,26 +16,25 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public interface HBase extends ApiBase<HBaseConfig>
-{
+public interface HBase extends ApiBase<HBaseConfig> {
 
-    public UUID installCluster( HBaseConfig config );
+	public UUID installCluster(HBaseConfig config);
 
-    UUID startCluster( String clusterName );
+	public List<HBaseConfig> getClusters();
 
-    UUID stopCluster( String clusterName );
+	UUID startCluster(String clusterName);
 
-    //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
+	//    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 
-    //    UUID startNodes(String clusterName);
+	//    UUID startNodes(String clusterName);
 
-    //    UUID stopNodes(String clusterName);
+	//    UUID stopNodes(String clusterName);
 
-    UUID checkCluster( String clusterName );
+	UUID stopCluster(String clusterName);
 
-    public List<HBaseConfig> getClusters();
+	UUID checkCluster(String clusterName);
 
-    List<Config> getHadoopClusters();
+	List<Config> getHadoopClusters();
 
-    Config getHadoopCluster( String clusterName );
+	Config getHadoopCluster(String clusterName);
 }

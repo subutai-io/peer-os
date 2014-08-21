@@ -15,38 +15,38 @@ import java.util.UUID;
  */
 public interface ProductOperationView {
 
-    /**
-     * Returns product operation description
-     *
-     * @return product operation description
-     */
-    public String getDescription();
+	/**
+	 * Returns product operation description
+	 *
+	 * @return product operation description
+	 */
+	public String getDescription();
 
-    /**
-     * Returns product operation creation date
-     *
-     * @return product operation create date
-     */
-    public Date getCreateDate();
+	/**
+	 * Returns product operation creation date
+	 *
+	 * @return product operation create date
+	 */
+	public Date getCreateDate();
 
-    /**
-     * Returns id of product operation
-     *
-     * @return product operation id
-     */
-    public UUID getId();
+	/**
+	 * Returns id of product operation
+	 *
+	 * @return product operation id
+	 */
+	public UUID getId();
 
-    /**
-     * Returns product operation log
-     *
-     * @return log of product operation
-     */
-    public String getLog();
+	/**
+	 * Returns product operation log
+	 *
+	 * @return log of product operation
+	 */
+	public String getLog();
 
-    /**
-     * Returns state of product operation
-     *
-     * @return product operation state
-     */
-    public ProductOperationState getState();
+	/**
+	 * Returns state of product operation
+	 *
+	 * @return product operation state
+	 */
+	public ProductOperationState getState();
 }

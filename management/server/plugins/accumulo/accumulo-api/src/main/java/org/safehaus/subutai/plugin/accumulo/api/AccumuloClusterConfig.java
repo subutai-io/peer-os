@@ -32,6 +32,39 @@ public class AccumuloClusterConfig implements ConfigBase {
     private int numberOfTracers = 1;
     private int numberOfSlaves = 3;
     private SetupType setupType;
+    private String hadoopClusterName;
+    private String zookeeperClusterName;
+    private String templateName;
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
+
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( final String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
+
+
+    public String getZookeeperClusterName() {
+        return zookeeperClusterName;
+    }
+
+
+    public void setZookeeperClusterName( final String zookeeperClusterName ) {
+        this.zookeeperClusterName = zookeeperClusterName;
+    }
 
 
     public SetupType getSetupType() {
@@ -173,20 +206,6 @@ public class AccumuloClusterConfig implements ConfigBase {
     }
 
 
-    public void reset() {
-        clusterName = "";
-        instanceName = "";
-        password = "";
-        masterNode = null;
-        gcNode = null;
-        monitor = null;
-        tracers = null;
-        slaves = null;
-        numberOfTracers = 1;
-        numberOfSlaves = 3;
-    }
-
-
     @Override
     public String toString() {
         return "AccumuloClusterConfig{" +
@@ -201,6 +220,9 @@ public class AccumuloClusterConfig implements ConfigBase {
                 ", numberOfTracers=" + numberOfTracers +
                 ", numberOfSlaves=" + numberOfSlaves +
                 ", setupType=" + setupType +
+                ", hadoopClusterName='" + hadoopClusterName + '\'' +
+                ", zookeeperClusterName='" + zookeeperClusterName + '\'' +
+                ", templateName='" + templateName + '\'' +
                 '}';
     }
 }

@@ -6,22 +6,21 @@
 package org.safehaus.subutai.ui.oozie;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.ui.oozie.manager.Manager;
-import org.safehaus.subutai.ui.oozie.wizard.Wizard;
-
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.ui.oozie.manager.Manager;
+import org.safehaus.subutai.ui.oozie.wizard.Wizard;
 
 /**
  * @author dilshat
  */
 public class OozieForm extends CustomComponent {
 
-    private AgentManager agentManager;
 	private final Wizard wizard;
 	private final Manager manager;
+	private AgentManager agentManager;
 
 	public OozieForm() {
 		setSizeFull();

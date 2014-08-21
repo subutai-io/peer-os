@@ -8,12 +8,12 @@
         <groupId>org.safehaus.subutai</groupId>
         <version>2.0.0</version>
     </parent>
-    
+
     <artifactId>storm-api</artifactId>
     <packaging>bundle</packaging>
     <name>Subutai Storm Api</name>
     <description>Subutai Storm Api</description>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -44,5 +44,5 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-    
+
 </project>

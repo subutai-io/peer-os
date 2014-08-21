@@ -27,37 +27,6 @@ public class Installation {
 		this.config = config;
 	}
 
-	private void destroyLXC(ProductOperation po, String log) {
-		//destroy all lxcs also
-		try {
-			parent.getLxcManager().destroyLxcs(new HashSet<>(config.getAllNodes()));
-			if (parent.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-				po.addLogDone("Cluster info deleted from DB\nDone");
-			} else {
-				po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
-			}
-		} catch (LxcDestroyException ex) {
-			po.addLogFailed(log + "\nUse LXC module to cleanup");
-		}
-		po.addLogFailed(log);
-	}
-
-	private void setMasterNodes(Set<Agent> agents) {
-		if (agents != null && agents.size() >= 3) {
-			Agent[] arr = agents.toArray(new Agent[agents.size()]);
-			config.setNameNode(arr[0]);
-			config.setJobTracker(arr[1]);
-			config.setSecondaryNameNode(arr[2]);
-		}
-	}
-
-	private void setSlaveNodes(Set<Agent> agents) {
-		if (agents != null) {
-			config.getDataNodes().addAll(agents);
-			config.getTaskTrackers().addAll(agents);
-		}
-	}
-
 	public UUID execute() {
 		final ProductOperation po = parent.getTracker().createProductOperation(Config.PRODUCT_KEY, "Installation of Hadoop");
 
@@ -126,5 +95,36 @@ public class Installation {
 		});
 
 		return po.getId();
+	}
+
+	private void setMasterNodes(Set<Agent> agents) {
+		if (agents != null && agents.size() >= 3) {
+			Agent[] arr = agents.toArray(new Agent[agents.size()]);
+			config.setNameNode(arr[0]);
+			config.setJobTracker(arr[1]);
+			config.setSecondaryNameNode(arr[2]);
+		}
+	}
+
+	private void setSlaveNodes(Set<Agent> agents) {
+		if (agents != null) {
+			config.getDataNodes().addAll(agents);
+			config.getTaskTrackers().addAll(agents);
+		}
+	}
+
+	private void destroyLXC(ProductOperation po, String log) {
+		//destroy all lxcs also
+		try {
+			parent.getLxcManager().destroyLxcs(new HashSet<>(config.getAllNodes()));
+			if (parent.getDbManager().deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
+				po.addLogDone("Cluster info deleted from DB\nDone");
+			} else {
+				po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+			}
+		} catch (LxcDestroyException ex) {
+			po.addLogFailed(log + "\nUse LXC module to cleanup");
+		}
+		po.addLogFailed(log);
 	}
 }

@@ -11,39 +11,37 @@ import java.util.UUID;
  */
 public class Environment {
 
-    private UUID uuid;
-    private Set<Node> nodes;
-    private String name;
+	private UUID uuid;
+	private Set<Node> nodes;
+	private String name;
 
 
-    public String getName() {
-        return name;
-    }
+	public Environment(String name) {
+		this.uuid = UUID.randomUUID();
+		this.nodes = new HashSet<>();
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Set<Node> getNodes() {
+		return nodes;
+	}
 
 
-    public Environment( String name ) {
-        this.uuid = UUID.randomUUID();
-        this.nodes = new HashSet<>();
-        this.name = name;
-    }
+	public UUID getUuid() {
+		return uuid;
+	}
 
 
-    public Set<Node> getNodes() {
-        return nodes;
-    }
-
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Environment{" +
-                "uuid=" + uuid +
-                ", nodes=" + nodes +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Environment{" +
+				"uuid=" + uuid +
+				", nodes=" + nodes +
+				", name='" + name + '\'' +
+				'}';
+	}
 }
