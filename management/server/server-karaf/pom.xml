@@ -1077,6 +1077,32 @@
                   <artifactId>flume-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>flume-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>flume-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>flume-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>flume-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>flume-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>                
 
                 <!-- Hadoop -->
                 <artifactItem>
