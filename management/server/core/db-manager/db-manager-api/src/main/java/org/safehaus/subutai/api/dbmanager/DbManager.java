@@ -42,6 +42,7 @@ public interface DbManager {
 	 * @param info   - custom object
 	 * @return true if all went well and false if exception was raised
 	 */
+    @Deprecated
 	public boolean saveInfo(String source, String key, Object info);
 
 	public boolean saveEnvironmentInfo(String source, String key, Object info);
@@ -76,6 +77,7 @@ public interface DbManager {
 	 * @param key    - POJO key
 	 * @return true if all went well and false if exception was raised
 	 */
+    @Deprecated
 	public boolean deleteInfo(String source, String key);
 
 	public ResultSet executeQuery2(String cql, Object... values) throws DBException;
