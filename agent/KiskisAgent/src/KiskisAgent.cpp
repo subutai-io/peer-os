@@ -808,6 +808,7 @@ int main(int argc,char *argv[],char *envp[])
 							logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Execute operation is starting.."));
 							KAThread* mypointer = new KAThread;
 							mypointer->getLogger().setLogLevel(level);
+							command.setUuid(Uuid); /*command uuid should be set to agents uuid */	
 							pidList.push_back(mypointer->threadFunction(&messageQueue,&command,argv));
 							currentProcess++;
 							delete mypointer;
