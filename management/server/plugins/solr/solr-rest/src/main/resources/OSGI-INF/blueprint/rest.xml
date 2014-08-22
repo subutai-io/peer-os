@@ -22,7 +22,7 @@
     <property name="agentManager" ref="agentManager" />
   </bean>
 
-  <jaxrs:server address="/solr" id="solrRestService">
+  <jaxrs:server address="/solr2" id="solrRestService">
     <jaxrs:serviceBeans>
       <ref component-id="solrRestServiceImpl" />
     </jaxrs:serviceBeans>
