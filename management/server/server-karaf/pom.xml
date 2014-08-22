@@ -1000,27 +1000,27 @@
                                 <!-- Cassandra -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-api</artifactId>
+                                    <artifactId>cassandra-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-impl</artifactId>
+                                    <artifactId>cassandra-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-ui</artifactId>
+                                    <artifactId>cassandra-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-cli</artifactId>
+                                    <artifactId>cassandra-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-rest</artifactId>
+                                    <artifactId>cassandra-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
