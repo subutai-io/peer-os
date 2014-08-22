@@ -3,24 +3,27 @@
 
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
-
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
-
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
-
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
-
-    <bean id="flume-impl" scope="singleton" class="org.safehaus.subutai.impl.flume.FlumeImpl"
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+    
+    <bean id="flume-impl" scope="singleton" class="org.safehaus.subutai.plugin.flume.impl.FlumeImpl"
           init-method="init" destroy-method="destroy">
-        <argument ref="commandRunner"/>
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="dbManager"/>
+        <property name="commandRunner" ref="commandRunner"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="tracker" ref="tracker"/>
+        <property name="dbManager" ref="dbManager"/>
+        <property name="environmentManager" ref="environmentManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
-    <service ref="flume-impl" interface="org.safehaus.subutai.api.flume.Flume"/>
+    <service ref="flume-impl" interface="org.safehaus.subutai.plugin.flume.api.Flume"/>
 
 </blueprint>

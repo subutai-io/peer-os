@@ -1,11 +1,11 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.plugin.flume.impl.Commands;
-import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.impl.CommandType;
+import org.safehaus.subutai.plugin.flume.impl.Commands;
+import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -49,7 +49,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         if(cmd.hasCompleted()) {
             AgentResult res = cmd.getResults().get(agent.getUuid());
             if(res.getExitCode() != null && res.getExitCode() == 0)
-                if(res.getStdOut().contains("ksks-flume is not installed"))
+                if(res.getStdOut().contains("Flume is not installed"))
                     po.addLog("Flume is not installed on " + agent.getHostname());
                 else
                     po.addLog("Flume removed from " + agent.getHostname());

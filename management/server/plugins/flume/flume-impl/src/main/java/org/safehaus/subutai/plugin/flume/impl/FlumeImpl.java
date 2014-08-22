@@ -1,37 +1,20 @@
 package org.safehaus.subutai.plugin.flume.impl;
 
-import org.safehaus.subutai.plugin.flume.impl.handler.DestroyNodeHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.UninstallHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.InstallHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.StatusHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.StartHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.AddNodeHandler;
-import org.safehaus.subutai.plugin.flume.impl.handler.StopHandler;
 import java.util.*;
 import java.util.concurrent.*;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.plugin.flume.impl.handler.*;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
-public class FlumeImpl implements Flume {
+public class FlumeImpl extends FlumeBase implements Flume {
 
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private Tracker tracker;
-    private DbManager dbManager;
-
-    private ExecutorService executor;
-
-    public FlumeImpl(CommandRunner commandRunner, AgentManager agentManager, Tracker tracker, DbManager dbManager) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.tracker = tracker;
-        this.dbManager = dbManager;
+    public FlumeImpl() {
     }
 
     public void init() {
@@ -40,22 +23,6 @@ public class FlumeImpl implements Flume {
 
     public void destroy() {
         executor.shutdown();
-    }
-
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
-
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
-
-    public Tracker getTracker() {
-        return tracker;
-    }
-
-    public DbManager getDbManager() {
-        return dbManager;
     }
 
     @Override
@@ -125,6 +92,17 @@ public class FlumeImpl implements Flume {
     @Override
     public FlumeConfig getCluster(String clusterName) {
         return dbManager.getInfo(FlumeConfig.PRODUCT_KEY, clusterName, FlumeConfig.class);
+    }
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment env, FlumeConfig config, ProductOperation po) {
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            return new OverHadoopSetupStrategy(this, config, po);
+        else {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy(this, config, po);
+            s.setEnvironment(env);
+            return s;
+        }
     }
 
 }

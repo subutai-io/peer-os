@@ -1,11 +1,14 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.plugin.flume.impl.Commands;
-import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.plugin.flume.impl.CommandType;
+import org.safehaus.subutai.plugin.flume.impl.Commands;
+import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -23,59 +26,95 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
     @Override
     public void run() {
+        FlumeConfig config = manager.getCluster(clusterName);
+        if(config == null) {
+            productOperation.addLogFailed("Cluster not found: " + clusterName);
+            return;
+        }
+
+        boolean added = false;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            added = addOverHadoop();
+        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+            added = addWithHadoop();
+
+        if(added) productOperation.addLogDone(null);
+        else productOperation.addLogFailed(null);
+    }
+
+    boolean addOverHadoop() {
         ProductOperation po = this.productOperation;
         FlumeConfig config = manager.getCluster(clusterName);
         if(config == null) {
-            po.addLogFailed("Cluster does not exist: " + clusterName);
-            return;
+            po.addLog("Cluster does not exist: " + clusterName);
+            return false;
         }
         //check if node agent is connected
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) {
-            po.addLogFailed("Node is not connected: " + hostname);
-            return;
+            po.addLog("Node is not connected: " + hostname);
+            return false;
+        }
+
+        HadoopClusterConfig hc = manager.getHadoopManager().getCluster(config.getHadoopClusterName());
+        if(hc == null) {
+            po.addLog(String.format("Hadoop cluster %s not found", config.getHadoopClusterName()));
+            return false;
+        }
+        if(!hc.getAllNodes().contains(agent)) {
+            po.addLog("Node does not belong to Hadoop cluster");
+            return false;
         }
 
         Set<Agent> set = new HashSet<>(Arrays.asList(agent));
 
-        po.addLog("Checking prerequisites...");
+        po.addLog("Checking installed packages...");
         Command cmd = manager.getCommandRunner().createCommand(
                 new RequestBuilder(Commands.make(CommandType.STATUS)), set);
         manager.getCommandRunner().runCommand(cmd);
         if(!cmd.hasSucceeded()) {
-            po.addLogFailed("Failed to check installed packages");
-            return;
+            po.addLog("Failed to check installed packages");
+            return false;
         }
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
-        if(res.getStdOut().contains("ksks-flume")) {
-            po.addLogFailed("Flume already installed on " + hostname);
-            return;
-        } else if(!res.getStdOut().contains("ksks-hadoop")) {
-            po.addLogFailed("Hadoop not installed on " + hostname);
-            return;
-        }
-
-        config.getNodes().add(agent);
-
-        po.addLog("Updating db...");
-        if(manager.getDbManager().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config)) {
-            po.addLog("Cluster info updated in DB\nInstalling Flume...");
-
+        if(res.getStdOut().contains(Commands.PACKAGE_NAME))
+            po.addLog("Flume already installed on " + hostname);
+        else if(!res.getStdOut().contains("ksks-hadoop")) {
+            po.addLog("Hadoop not installed on " + hostname);
+            return false;
+        } else {
             cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(Commands.make(CommandType.INSTALL)),
                     set);
             manager.getCommandRunner().runCommand(cmd);
 
             if(cmd.hasSucceeded())
-                po.addLogDone("Installation succeeded");
+                po.addLogDone("Installed Flume");
             else {
                 po.addLog(cmd.getAllErrors());
-                po.addLogFailed("Installation failed");
+                po.addLog("Installation failed");
+                return false;
             }
-        } else
-            po.addLogFailed("Failed to update cluster info");
+        }
 
+        config.getNodes().add(agent);
+
+        po.addLog("Updating db...");
+        try {
+            manager.getDbManager().saveInfo2(FlumeConfig.PRODUCT_KEY,
+                    config.getClusterName(), config);
+            po.addLog("Cluster info updated");
+        } catch(DBException ex) {
+            po.addLog("Failed to update cluster info: " + ex.getMessage());
+        }
+
+        return true;
+    }
+
+    boolean addWithHadoop() {
+        // TODO:
+        return false;
     }
 
 }

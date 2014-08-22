@@ -9,8 +9,10 @@ public class FlumeImplMock extends FlumeImpl {
     private FlumeConfig config;
 
     public FlumeImplMock() {
-        super(new CommandRunnerMock(), new AgentManagerMock(),
-                new TrackerMock(), new DbManagerMock());
+        setCommandRunner(new CommandRunnerMock());
+        setAgentManager(new AgentManagerMock());
+        setTracker(new TrackerMock());
+        setDbManager(new DbManagerMock());
     }
 
     @Override

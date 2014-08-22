@@ -1,18 +1,18 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.plugin.flume.impl.Commands;
-import org.safehaus.subutai.plugin.flume.impl.CommandType;
-import java.util.Iterator;
-import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.plugin.flume.impl.*;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.*;
 
 public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final FlumeConfig config;
+    private HadoopClusterConfig hadoopConfig;
 
     public InstallHandler(FlumeImpl manager, FlumeConfig config) {
         super(manager, config.getClusterName());
@@ -21,88 +21,53 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
                 FlumeConfig.PRODUCT_KEY, "Install Flume cluster " + config.getClusterName());
     }
 
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
+    }
+
+    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
+    }
+
     @Override
     public void run() {
-        ProductOperation po = productOperation;
-        if(clusterName == null || clusterName.isEmpty() || config.getNodes() == null || config.getNodes().isEmpty()) {
-            po.addLogFailed("Invalid configuration");
-            return;
-        }
-        if(manager.getCluster(config.getClusterName()) != null) {
-            po.addLogFailed("Cluster already exists: " + clusterName);
-            return;
-        }
+        ClusterSetupStrategy s = null;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            s = manager.getClusterSetupStrategy(null, config, productOperation);
 
-        //check if node agent is connected
-        for(Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
-            Agent node = it.next();
-            if(manager.getAgentManager().getAgentByHostname(node.getHostname()) != null)
-                continue;
-            po.addLog(String.format(
-                    "Node %s is not connected. Omitting this node from installation",
-                    node.getHostname()));
-            it.remove();
-        }
-        if(config.getNodes().isEmpty()) {
-            po.addLogFailed("No nodes eligible for installation. Operation aborted");
-            return;
-        }
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
 
-        po.addLog("Checking prerequisites...");
-        //check installed ksks packages
-        Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(Commands.make(CommandType.STATUS)),
-                config.getNodes());
-        manager.getCommandRunner().runCommand(cmd);
-        if(!cmd.hasSucceeded()) {
-            po.addLogFailed("Failed to check installed packages");
-            return;
-        }
+            if(hadoopConfig == null) {
+                productOperation.addLogFailed("No Hadoop configuration specified");
+                return;
+            }
 
-        for(Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
-            Agent node = it.next();
-            AgentResult result = cmd.getResults().get(node.getUuid());
-
-            if(result.getStdOut().contains("ksks-flume")) {
-                po.addLog(String.format(
-                        "Node %s already has Flume installed. Omitting this node from installation",
-                        node.getHostname()));
-                it.remove();
-            } else if(!result.getStdOut().contains("ksks-hadoop")) {
-                po.addLog(String.format(
-                        "Node %s has no Hadoop installation. Omitting this node from installation",
-                        node.getHostname()));
-                it.remove();
+            // TODO: composite template name for Hadoop and Flume
+            String t = String.format("%s_%s", hadoopConfig.getTemplateName(),
+                    FlumeConfig.TEMPLATE_NAME);
+            hadoopConfig.setTemplateName(t);
+            try {
+                EnvironmentBlueprint eb = manager.getHadoopManager()
+                        .getDefaultEnvironmentBlueprint(hadoopConfig);
+                Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
+                s = manager.getClusterSetupStrategy(env, config, productOperation);
+            } catch(ClusterSetupException ex) {
+                productOperation.addLogFailed("Failed to prepare environment: " + ex.getMessage());
+                return;
+            } catch(EnvironmentBuildException ex) {
+                productOperation.addLogFailed("Failed to build environment: " + ex.getMessage());
+                return;
             }
         }
 
-        if(config.getNodes().isEmpty()) {
-            po.addLogFailed("No nodes eligible for installation. Operation aborted");
-            return;
+        try {
+            if(s == null) throw new ClusterSetupException("No setup strategy");
+
+            s.setup();
+            productOperation.addLogDone("Done");
+        } catch(ClusterSetupException ex) {
+            productOperation.addLogFailed("Failed to setup cluster: " + ex.getMessage());
         }
-
-        po.addLog("Updating db...");
-        boolean b = manager.getDbManager().saveInfo(FlumeConfig.PRODUCT_KEY,
-                config.getClusterName(), config);
-        if(!b) {
-            po.addLogFailed("Failed to save cluster info!");
-            return;
-        }
-        po.addLog("Cluster info successfully saved\nInstalling Flume...");
-
-        String s = Commands.make(CommandType.INSTALL);
-        cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(s).withTimeout(90),
-                config.getNodes());
-        manager.getCommandRunner().runCommand(cmd);
-
-        if(cmd.hasSucceeded())
-            po.addLogDone("Installation succeeded\nDone");
-        else {
-            po.addLog(cmd.getAllErrors());
-            po.addLogFailed("Installation failed");
-        }
-
     }
 
 }
