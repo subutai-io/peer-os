@@ -43,6 +43,7 @@ function master_import {
     else
       msg_error "Debian package of $package_name could not be installed, removing"
       subutai master_destroy
+      apt-get --assume-yes --force-yes purge $package_name
       exit 1
     fi
     popd
