@@ -1,11 +1,10 @@
 package org.safehaus.subutai.impl.flume.handler;
 
 import java.util.Iterator;
-
-import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.impl.flume.CommandType;
 import org.safehaus.subutai.impl.flume.Commands;
 import org.safehaus.subutai.impl.flume.FlumeImpl;
@@ -66,7 +65,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
             Agent node = it.next();
             AgentResult result = cmd.getResults().get(node.getUuid());
 
-            if(result.getStdOut().contains("ksks-flume")) {
+            if(result.getStdOut().contains(Commands.PACKAGE_NAME)) {
                 po.addLog(String.format(
                         "Node %s already has Flume installed. Omitting this node from installation",
                         node.getHostname()));

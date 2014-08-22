@@ -52,7 +52,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         }
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
-        if(res.getStdOut().contains("ksks-flume")) {
+        if(res.getStdOut().contains(Commands.PACKAGE_NAME)) {
             po.addLogFailed("Flume already installed on " + hostname);
             return;
         } else if(!res.getStdOut().contains("ksks-hadoop")) {
