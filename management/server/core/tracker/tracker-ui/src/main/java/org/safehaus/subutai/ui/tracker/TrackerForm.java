@@ -11,6 +11,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -165,22 +166,22 @@ public class TrackerForm extends CustomComponent {
 	}
 
 	private void getLimitCombo() {
-        limitCombo = new ComboBox( "Show last", Arrays.asList( "10", "50", "100", "ALL" ) );
-        limitCombo.setImmediate(true);
+		limitCombo = new ComboBox("Show last", Arrays.asList("10", "50", "100", "ALL"));
+		limitCombo.setImmediate(true);
 		limitCombo.setTextInputAllowed(false);
 		limitCombo.setNullSelectionAllowed(false);
 		limitCombo.setValue(limit);
 		limitCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			public void valueChange(Property.ValueChangeEvent event) {
-                onLimitValueChange( ( String ) event.getProperty().getValue() );
+				onLimitValueChange((String) event.getProperty().getValue());
 			}
 		});
 	}
 
 
-    private void onLimitValueChange(String value) {
-        limit = "ALL".equals( value ) ? Integer.MAX_VALUE : Integer.parseInt( value );
-    }
+	private void onLimitValueChange(String value) {
+		limit = "ALL".equals(value) ? Integer.MAX_VALUE : Integer.parseInt(value);
+	}
 
 
 	public void startTracking() {
@@ -252,9 +253,14 @@ public class TrackerForm extends CustomComponent {
 
 					sortNeeded = true;
 				} else {
-					if (!((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
-							progressIcon.getSource())) {
-						item.getItemProperty("Status").setValue(progressIcon);
+					try {
+						VaadinSession.getCurrent().getLockInstance().lock();
+						if (item.getItemProperty("Status") != null && !((Embedded) item.getItemProperty("Status").getValue()).getSource().equals(
+								progressIcon.getSource())) {
+							item.getItemProperty("Status").setValue(progressIcon);
+						}
+					} finally {
+						VaadinSession.getCurrent().getLockInstance().unlock();
 					}
 				}
 			}
@@ -286,7 +292,7 @@ public class TrackerForm extends CustomComponent {
 	private void setOutput(String output) {
 		if (!Strings.isNullOrEmpty(output)) {
 			outputTxtArea.setValue(output);
-			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
+			outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
 		}
 	}
 

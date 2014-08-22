@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.strategy;
 
 
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 
 
 abstract class MetricComparator {

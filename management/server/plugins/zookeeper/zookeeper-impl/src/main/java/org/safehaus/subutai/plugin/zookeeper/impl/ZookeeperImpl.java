@@ -10,7 +10,10 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
@@ -27,27 +30,46 @@ import org.safehaus.subutai.plugin.zookeeper.impl.handler.UninstallOperationHand
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+
+import com.google.common.collect.Sets;
 
 
 public class ZookeeperImpl implements Zookeeper {
 
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ContainerManager containerManager;
+    private final CommandRunner commandRunner;
+    private final AgentManager agentManager;
+    private final DbManager dbManager;
+    private final Tracker tracker;
+    private final ContainerManager containerManager;
+    private final EnvironmentManager environmentManager;
+    private final Hadoop hadoopManager;
     private ExecutorService executor;
 
 
-    public ZookeeperImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                          ContainerManager containerManager ) {
+    public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
+                          final Tracker tracker, final ContainerManager containerManager,
+                          final EnvironmentManager environmentManager, final Hadoop hadoopManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.containerManager = containerManager;
+        this.environmentManager = environmentManager;
+        this.hadoopManager = hadoopManager;
 
         Commands.init( commandRunner );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
     }
 
 
@@ -89,6 +111,16 @@ public class ZookeeperImpl implements Zookeeper {
     public UUID installCluster( ZookeeperClusterConfig config ) {
 
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig ) {
+
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopClusterConfig );
 
         executor.execute( operationHandler );
 
@@ -171,21 +203,21 @@ public class ZookeeperImpl implements Zookeeper {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final ZookeeperClusterConfig config, ProductOperation po ) {
-        if ( config.getSetupType() == SetupType.STANDALONE ) {
-            return new ZookeeperStandaloneSetupStrategy( config, po, containerManager, commandRunner );
-        }
-        else { //this is over Hadoop or with Hadoop
-            return null;
-        }
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final HadoopClusterConfig hadoopConfig,
-                                                         final ZookeeperClusterConfig zkConfig,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final ZookeeperClusterConfig config,
                                                          final ProductOperation po ) {
-        return null;
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
+            //this is a standalone ZK cluster setup
+            return new ZookeeperStandaloneSetupStrategy( environment, config, po, this );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            //this is a with-Hadoop ZK cluster setup
+            return new ZookeeperWithHadoopSetupStrategy( environment, config, po, this );
+        }
+        else {
+            //this is an over-Hadoop ZK cluster setup
+            return new ZookeeperOverHadoopSetupStrategy( config, po, this );
+        }
     }
 
 
@@ -218,5 +250,25 @@ public class ZookeeperImpl implements Zookeeper {
     @Override
     public ZookeeperClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
+    }
+
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
+
+
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+
+        //node group
+        NodeGroup nodesGroup = new NodeGroup();
+        nodesGroup.setName( "DEFAULT" );
+        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodesGroup.setTemplateName( config.getTemplateName() );
+        nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+
+        return environmentBlueprint;
     }
 }

@@ -8,6 +8,8 @@ package org.safehaus.subutai.plugin.accumulo.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 
 
@@ -15,6 +17,9 @@ import org.safehaus.subutai.shared.protocol.ApiBase;
  * @author dilshat
  */
 public interface Accumulo extends ApiBase<AccumuloClusterConfig> {
+
+    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig,
+                                AccumuloClusterConfig accumuloClusterConfig );
 
     public UUID startCluster( String clusterName );
 

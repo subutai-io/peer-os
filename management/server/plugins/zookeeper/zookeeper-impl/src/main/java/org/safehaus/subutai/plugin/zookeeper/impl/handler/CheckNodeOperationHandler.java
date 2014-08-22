@@ -13,7 +13,7 @@ import org.safehaus.subutai.shared.protocol.enums.NodeState;
 import java.util.UUID;
 
 /**
- * Created by dilshat on 5/7/14.
+ * Handles check node status operation
  */
 public class CheckNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;

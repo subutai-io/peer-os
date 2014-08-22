@@ -26,6 +26,10 @@ downloadFileAndMakeChanges() {
 	# replace configuration file
 	rm $BASE/$fileName/etc/elasticsearch/elasticsearch.yml
 	mv $BASE/$fileName/etc/elasticsearch/ksks-elasticsearch.yml $BASE/$fileName/etc/elasticsearch/elasticsearch.yml
+
+	# replace service script of elasticsearch
+	rm $BASE/$fileName/etc/init.d/elasticsearch
+	mv $BASE/$fileName/etc/init.d/ksks-elasticsearch $BASE/$fileName/etc/init.d/elasticsearch
 	popd
 }
 

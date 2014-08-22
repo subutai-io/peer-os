@@ -5,14 +5,19 @@
  */
 package org.safehaus.subutai.ui.oozie.wizard;
 
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.api.oozie.Config;
+import java.util.UUID;
+
+import org.safehaus.subutai.api.oozie.OozieConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.oozie.OozieUI;
 
-import java.util.UUID;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 
 /**
  * @author dilshat
@@ -34,9 +39,9 @@ public class VerificationStep extends Panel {
 
 		ConfigView cfgView = new ConfigView("Installation configuration");
 		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Server", wizard.getConfig().getServer().getHostname() + "\n");
-		for (Agent agent : wizard.getConfig().getClients()) {
-			cfgView.addStringCfg("Clients", agent.getHostname() + "\n");
+		cfgView.addStringCfg("Server", wizard.getConfig().getServer() + "\n");
+		for (String agent : wizard.getConfig().getClients()) {
+			cfgView.addStringCfg("Clients", agent + "\n");
 		}
 
 		Button install = new Button("Install");
@@ -45,7 +50,7 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = OozieUI.getOozieManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

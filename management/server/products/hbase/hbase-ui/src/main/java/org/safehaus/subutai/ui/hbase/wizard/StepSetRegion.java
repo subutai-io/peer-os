@@ -5,14 +5,22 @@
  */
 package org.safehaus.subutai.ui.hbase.wizard;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Util;
-
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.shared.protocol.Util;
+
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
@@ -64,7 +72,7 @@ public class StepSetRegion extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.getConfig().setRegion((Set<UUID>) select.getValue());
+				wizard.getConfig().setRegion((Set<String>) select.getValue());
 				if (Util.isCollectionEmpty(wizard.getConfig().getRegion())) {
 					show("Please add region servers");
 				} else {
@@ -90,7 +98,7 @@ public class StepSetRegion extends VerticalLayout {
 		verticalLayout.addComponent(horizontalLayout);
 
 		addComponent(verticalLayout);
-		select.setContainerDataSource(new BeanItemContainer<>(UUID.class, wizard.getConfig().getNodes()));
+		select.setContainerDataSource(new BeanItemContainer<>(String.class, wizard.getConfig().getNodes()));
 		select.setValue(wizard.getConfig().getRegion());
 	}
 

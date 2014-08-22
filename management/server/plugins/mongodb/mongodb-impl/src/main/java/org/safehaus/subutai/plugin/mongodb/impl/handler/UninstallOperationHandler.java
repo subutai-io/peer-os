@@ -3,16 +3,16 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles uninstall mongo cluster operation
  */
 public class UninstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
@@ -41,21 +41,21 @@ public class UninstallOperationHandler extends AbstractOperationHandler<MongoImp
 
         po.addLog( "Destroying lxc containers" );
         try {
-            for ( Agent agent : config.getAllNodes() ) {
-                manager.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
-            }
+            manager.getContainerManager().clonesDestroy( config.getAllNodes() );
             po.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex ) {
             po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
         }
 
-        po.addLog( "Updating db..." );
-        if ( manager.getDbManager().deleteInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-            po.addLogDone( "Cluster info deleted from DB\nDone" );
+        po.addLog( "Deleting cluster information from database.." );
+
+        try {
+            manager.getDbManager().deleteInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName() );
+            po.addLogDone( "Cluster info deleted from database" );
         }
-        else {
-            po.addLogFailed( "Error while deleting cluster info from DB. Check logs\nFailed" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Error while deleting cluster info from database, %s", e.getMessage() ) );
         }
     }
 }

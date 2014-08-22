@@ -47,6 +47,7 @@ public class VerificationStep extends Panel {
             cfgView.addStringCfg( "Number of nodes", wizard.getConfig().getNumberOfNodes() + "" );
         }
         else if ( wizard.getConfig().getSetupType() == SetupType.OVER_HADOOP ) {
+            cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
             for ( Agent node : wizard.getConfig().getNodes() ) {
                 cfgView.addStringCfg( "Nodes to install", node.getHostname() );
             }
@@ -68,7 +69,11 @@ public class VerificationStep extends Panel {
 
             @Override
             public void buttonClick( Button.ClickEvent event ) {
-                UUID trackID = ZookeeperUI.getManager().installCluster( wizard.getConfig() );
+                UUID trackID = wizard.getConfig().getSetupType() == SetupType.WITH_HADOOP ? ZookeeperUI.getManager()
+                                                                                                       .installCluster(
+                                                                                                               wizard.getConfig(),
+                                                                                                               wizard.getHadoopClusterConfig() ) :
+                               ZookeeperUI.getManager().installCluster( wizard.getConfig() );
 
                 ProgressWindow window =
                         new ProgressWindow( ZookeeperUI.getExecutor(), ZookeeperUI.getTracker(), trackID,

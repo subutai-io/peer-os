@@ -15,6 +15,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
@@ -30,12 +32,16 @@ import org.safehaus.subutai.plugin.mongodb.impl.handler.UninstallOperationHandle
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.NodeGroup;
+import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 /**
- * @author dilshat
+ * Implementation of Mongo interface. Implements all backend logic for mongo cluster management
  */
 public class MongoImpl implements Mongo {
 
@@ -44,18 +50,25 @@ public class MongoImpl implements Mongo {
     private DbManager dbManager;
     private Tracker tracker;
     private ContainerManager containerManager;
+    private EnvironmentManager environmentManager;
     private ExecutorService executor;
 
 
     public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                      ContainerManager containerManager ) {
+                      ContainerManager containerManager, EnvironmentManager environmentManager ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.containerManager = containerManager;
+        this.environmentManager = environmentManager;
 
         Commands.init( commandRunner );
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
     }
 
 
@@ -179,7 +192,45 @@ public class MongoImpl implements Mongo {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final MongoClusterConfig config, final ProductOperation po ) {
-        return new MongoDbSetupStrategy( po, agentManager, this, commandRunner, containerManager, config );
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MongoClusterConfig config,
+                                                         final ProductOperation po ) {
+        return new MongoDbSetupStrategy( environment, config, po, this );
+    }
+
+
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config ) {
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setLinkHosts( true );
+        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
+
+        //config servers
+        NodeGroup cfgServersGroup = new NodeGroup();
+        cfgServersGroup.setName( NodeType.CONFIG_NODE.name() );
+        cfgServersGroup.setNumberOfNodes( config.getNumberOfConfigServers() );
+        cfgServersGroup.setTemplateName( config.getTemplateName() );
+        cfgServersGroup.setPlacementStrategy(
+                MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.CONFIG_NODE ) );
+
+        //routers
+        NodeGroup routersGroup = new NodeGroup();
+        routersGroup.setName( NodeType.ROUTER_NODE.name() );
+        routersGroup.setNumberOfNodes( config.getNumberOfRouters() );
+        routersGroup.setTemplateName( config.getTemplateName() );
+        routersGroup.setPlacementStrategy(
+                MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.ROUTER_NODE ) );
+
+        //data nodes
+        NodeGroup dataNodesGroup = new NodeGroup();
+        dataNodesGroup.setName( NodeType.DATA_NODE.name() );
+        dataNodesGroup.setNumberOfNodes( config.getNumberOfDataNodes() );
+        dataNodesGroup.setTemplateName( config.getTemplateName() );
+        dataNodesGroup
+                .setPlacementStrategy( MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.DATA_NODE ) );
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( cfgServersGroup, routersGroup, dataNodesGroup ) );
+
+        return environmentBlueprint;
     }
 }

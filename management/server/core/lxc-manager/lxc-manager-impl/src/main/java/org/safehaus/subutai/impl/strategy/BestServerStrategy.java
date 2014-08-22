@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.strategy;
 
 import java.util.*;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class BestServerStrategy extends RoundRobinStrategy {

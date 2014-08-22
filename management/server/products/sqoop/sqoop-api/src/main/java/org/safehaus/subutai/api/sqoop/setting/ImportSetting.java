@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.sqoop.DataSourceType;
 public class ImportSetting extends CommonSetting {
 
     DataSourceType type;
-    Map<ImportParameter, Object> parameters;
+    Map<ImportParameter, Object> parameters = new EnumMap(ImportParameter.class);
 
     public DataSourceType getType() {
         return type;
@@ -18,8 +18,6 @@ public class ImportSetting extends CommonSetting {
     }
 
     public void addParameter(ImportParameter param, Object value) {
-        if(parameters == null)
-            parameters = new EnumMap<ImportParameter, Object>(ImportParameter.class);
         parameters.put(param, value);
     }
 

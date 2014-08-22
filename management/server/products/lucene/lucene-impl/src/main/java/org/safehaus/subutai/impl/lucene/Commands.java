@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class Commands extends CommandsSingleton {
 
-	public static final String INSTALL = "apt-get --force-yes --assume-yes install ksks-lucene";
+	public static final String INSTALL = "sleep 20; apt-get --force-yes --assume-yes install ksks-lucene";
 	public static final String UNINSTALL = "apt-get --force-yes --assume-yes purge ksks-lucene";
 	public static final String CHECK = "dpkg -l | grep '^ii' | grep ksks";
 

@@ -24,10 +24,9 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
- * @author dilshat
+ * Holds all mongo related commands
  */
 public class Commands extends CommandsSingleton {
-
 
     public static Command getSetReplicaSetNameCommand( String replicaSetName, Set<Agent> agents ) {
         return createCommand( "Set replica set name", new RequestBuilder(

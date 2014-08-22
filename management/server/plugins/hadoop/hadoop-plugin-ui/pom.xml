@@ -34,12 +34,10 @@
         <dependency>
             <groupId>org.safehaus.subutai</groupId>
             <artifactId>vaadin-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.safehaus.subutai</groupId>
             <artifactId>vaadin-custom</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

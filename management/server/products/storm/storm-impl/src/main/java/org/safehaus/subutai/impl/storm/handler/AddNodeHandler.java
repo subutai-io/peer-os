@@ -2,82 +2,73 @@ package org.safehaus.subutai.impl.storm.handler;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.impl.storm.CommandType;
 import org.safehaus.subutai.impl.storm.Commands;
 import org.safehaus.subutai.impl.storm.StormImpl;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class AddNodeHandler extends AbstractHandler {
 
-    private final ProductOperation po;
     private final String hostname;
 
     public AddNodeHandler(StormImpl manager, String clusterName, String hostname) {
         super(manager, clusterName);
-        this.po = manager.getTracker().createProductOperation(
-                Config.PRODUCT_NAME, "Add node to cluster: " + hostname);
+        this.productOperation = manager.getTracker().createProductOperation(
+                Config.PRODUCT_NAME, "Add node to cluster: "
+                + (hostname != null ? hostname : "new container will be created"));
         this.hostname = hostname;
     }
 
     @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
-    @Override
     public void run() {
+        ProductOperation po = productOperation;
         Config config = manager.getCluster(clusterName);
         if(config == null) {
             po.addLogFailed(String.format("Cluster '%s' does not exist", clusterName));
             return;
         }
 
-        Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) {
-            po.addLogFailed(String.format("Node '%s' is not connected", hostname));
-            return;
+        Agent agent;
+        if(hostname != null) {
+            agent = manager.getAgentManager().getAgentByHostname(hostname);
+            if(agent == null) {
+                po.addLogFailed(String.format("Node '%s' is not connected", hostname));
+                return;
+            }
+        } else {
+            po.addLog("Creating container for new node...");
+            InstallHelper helper = new InstallHelper(manager);
+            try {
+                agent = helper.createContainer();
+                if(agent == null)
+                    throw new LxcCreateException("returned value is null");
+            } catch(LxcCreateException ex) {
+                po.addLogFailed("Failed to create container: " + ex.getMessage());
+                return;
+            }
+            po.addLog("Container created. Host name is " + agent.getHostname());
         }
 
         Set<Agent> set = new HashSet<>();
         set.add(agent);
 
-        // check if Storm is already installed
-        po.addLog("Checking installed packages");
+        po.addLog("Installing Storm...");
+        String s = Commands.make(CommandType.INSTALL);
+        int t = (int)TimeUnit.MINUTES.toSeconds(25);
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(Commands.make(CommandType.LIST)), set);
+                new RequestBuilder(s).withTimeout(t), set);
         manager.getCommandRunner().runCommand(cmd);
-        boolean skipInstall = false;
-        if(cmd.hasSucceeded()) {
-            AgentResult res = cmd.getResults().get(agent.getUuid());
-            if(res.getStdOut().contains(Commands.PACKAGE_NAME)) {
-                skipInstall = true;
-                po.addLog("Storm already installed on " + hostname);
-            }
-        } else {
-            po.addLogFailed("Failed to check installed packages");
+        if(cmd.hasSucceeded())
+            po.addLog("Storm successfully installed on " + agent.getHostname());
+        else {
+            po.addLogFailed("Failed to install Storm on " + agent.getHostname());
             return;
-        }
-
-        if(!skipInstall) {
-            po.addLog("Installing Storm...");
-            String s = Commands.make(CommandType.INSTALL);
-            int t = (int)TimeUnit.MINUTES.toSeconds(15);
-            cmd = manager.getCommandRunner().createCommand(
-                    new RequestBuilder(s).withTimeout(t), set);
-            manager.getCommandRunner().runCommand(cmd);
-            if(cmd.hasSucceeded())
-                po.addLog("Storm successfully installed on " + hostname);
-            else {
-                po.addLogFailed("Failed to install Storm on " + hostname);
-                return;
-            }
         }
 
         // add node to collection and do configuration

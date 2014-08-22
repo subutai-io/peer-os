@@ -28,6 +28,7 @@
 # otherwise reset the ACCUMULO_HOME setting
 
 . /etc/accumulo/accumulo-env.sh
+. /etc/profile
 
 #pwd=`pwd -P`
 #ACCUMULO_HOME=`cd $pwd/.. ; pwd -P`

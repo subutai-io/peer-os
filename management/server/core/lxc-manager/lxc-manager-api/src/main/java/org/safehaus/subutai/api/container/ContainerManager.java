@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.manager.helper.PlacementStrategy;
+import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 
@@ -17,6 +17,9 @@ public interface ContainerManager {
     public Set<Agent> clone( UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
                              PlacementStrategy... strategy ) throws LxcCreateException;
 
+    /**
+     * Clones containers in parallel, simultaneously
+     */
     public Set<Agent> clone( String templateName, int nodesCount, Collection<Agent> hosts,
                              PlacementStrategy... strategy ) throws LxcCreateException;
 
@@ -26,5 +29,18 @@ public interface ContainerManager {
 
     public void cloneDestroy( String hostName, String cloneName ) throws LxcDestroyException;
 
-    public void cloneDestroyByHostname( Set<String> cloneNames ) throws LxcDestroyException;
+    /**
+     * Destroys containers in parallel, simultaneously
+     */
+    public void clonesDestroyByHostname( Set<String> cloneNames ) throws LxcDestroyException;
+
+    /**
+     * Destroys containers in parallel, simultaneously
+     */
+    public void clonesDestroy( Set<Agent> lxcAgents ) throws LxcDestroyException;
+
+    public void clonesDestroy( final String hostName, final Set<String> cloneNames ) throws LxcDestroyException;
+
+    public void clonesCreate( final String hostName, final String templateName, final Set<String> cloneNames )
+            throws LxcCreateException;
 }

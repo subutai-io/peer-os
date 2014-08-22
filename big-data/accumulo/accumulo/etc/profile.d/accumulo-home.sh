@@ -1,9 +1,10 @@
-accumuloHome="/opt/accumulo-1.6.0"
+#!/bin/sh
+accumuloHome="/opt/accumulo-1.4.2"
 export ACCUMULO_HOME=$accumuloHome
 
 path_content=$(echo $PATH)
 pattern="$accumuloHome/bin"
-if [[ $path_content != *$pattern* ]];
+if test "${path_content#*$pattern}" = "$path_content"
 then
 	export PATH=$PATH:$pattern
 fi

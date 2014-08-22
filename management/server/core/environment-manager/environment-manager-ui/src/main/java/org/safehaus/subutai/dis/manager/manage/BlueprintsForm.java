@@ -4,7 +4,7 @@ package org.safehaus.subutai.dis.manager.manage;
 import java.util.List;
 
 import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.dis.manager.EnvironmentManagerUI;
 import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
 

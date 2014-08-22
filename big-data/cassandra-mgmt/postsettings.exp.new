@@ -6,10 +6,11 @@ set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
 
+sleep 3
 spawn ssh "$user\@$ip"
-sleep 2
+sleep 3
 expect "password:"
-sleep 1
+sleep 3
 send "$password\r";
 
 #updating apt-get

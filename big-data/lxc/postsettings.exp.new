@@ -6,11 +6,15 @@ set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
 
+#connecting the container
+sleep 3
 spawn ssh "$user\@$ip"
-sleep 1
+sleep 3
 expect "password:"
+sleep 3
 send "$password\r";
-sleep 1
+sleep 3
+
 #updating apt-get
 expect "# " { send "apt-get update\r"  }
 sleep 1
@@ -32,9 +36,6 @@ expect "# " { send "echo \"Europe/Istanbul\" > /etc/timezone\r" }
 sleep 1
 expect "# " { send "dpkg-reconfigure -f noninteractive tzdata\r" }
 sleep 1
-#installing openjre-7 & ganglia
-#expect "# " { send "echo \"export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64\" >> /etc/profile\r" }
-#sleep 1
 expect "# " { send "dpkg -i ksks-logstash-1.0.1-amd64.deb\r"}
 sleep 1
 expect "# " { send "apt-get --assume-yes --force-yes install ganglia-monitor\r"}
@@ -47,10 +48,22 @@ expect "# " { send "dpkg -i jmxtrans-1.0.1-amd64.deb\r"}
 sleep 1
 expect "JVM Min/Max Heap size (MB): " { send "\r"}
 sleep 1
-#Editin collectd conf file using collectd-conf.sh
+#Editing collectd conf file using collectd-conf.sh
 expect "# " { send "./collectd-conf.sh\r" }
 sleep 1
 expect "# " { send "sed -i -e 's/^/#/' /etc/apt/sources.list \r" }
+sleep 1
+#Adding management server apt-get links
+expect "# " { send "echo \"deb http://gw.intra.lan:9999/ubuntu trusty main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb-src http://gw.intra.lan:9999/ubuntu/ trusty main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb http://gw.intra.lan:9999/ubuntu trusty-updates main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb-src http://gw.intra.lan:9999/ubuntu trusty-updates main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+#Adding 
+expect "# " { send "echo \"export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64\" >> /etc/profile.d/java-home.sh\r" }
 sleep 1
 #Cleaning archive folder
 expect "# " { send "python deleter.py\r" }

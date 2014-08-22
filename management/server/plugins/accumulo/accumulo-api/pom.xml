@@ -23,6 +23,14 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mgmt-shared-protocol</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hadoop-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>zookeeper-plugin-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

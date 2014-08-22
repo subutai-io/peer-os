@@ -83,4 +83,12 @@ public interface DbManager {
      * @return true if all went well and false if exception was raised
      */
     public boolean deleteInfo( String source, String key );
+
+    public ResultSet executeQuery2( String cql, Object... values ) throws DBException;
+
+    public void executeUpdate2( String cql, Object... values ) throws DBException;
+
+    public void saveInfo2( String source, String key, Object info ) throws DBException;
+
+    public void deleteInfo2( String source, String key ) throws DBException;
 }

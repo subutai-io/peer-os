@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by dilshat on 5/7/14.
+ * Handles start node operation
  */
 public class StartNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
     private final ProductOperation po;

@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.sqoop.Sqoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 
@@ -14,6 +15,7 @@ public abstract class SqoopBase implements Sqoop {
     protected AgentManager agentManager;
     protected Tracker tracker;
     protected DbManager dbManager;
+    protected Hadoop hadoopManager;
 
     protected ExecutorService executor;
 
@@ -55,6 +57,14 @@ public abstract class SqoopBase implements Sqoop {
 
     public void setDbManager(DbManager dbManager) {
         this.dbManager = dbManager;
+    }
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager) {
+        this.hadoopManager = hadoopManager;
     }
 
     public ExecutorService getExecutor() {

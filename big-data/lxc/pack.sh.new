@@ -70,21 +70,21 @@ cd $BASE
 fileName=`ls | awk '{print $1}' | head -1`
 echo "FILENAME: " $fileName
 
-cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/
-cp $SOURCE/var/lib/lxc/check.sh $BASE/$fileName/var/lib/lxc/
-cp $SOURCE/var/lib/lxc/README.md $BASE/$fileName/var/lib/lxc/
+cp $SOURCE/var/lib/lxc/check.sh $LXCSOURCE/$pattern/rootfs/etc/init.d/
+cp -a $LXCSOURCE/$pattern $BASE/$fileName/var/lib/lxc/ 
+#cp $SOURCE/var/lib/lxc/README.md $BASE/$fileName/var/lib/lxc/
 
 if ls *.deb ; then
         rm  *.deb
 fi
 
-cd $BASE/$fileName/var/lib/lxc/
+#cd $BASE/$fileName/var/lib/lxc/
+#cp check.sh $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/init.d/
 
-cp check.sh $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/init.d/
 cd $BASE/$fileName/var/lib/lxc/$pattern/rootfs/etc/
 sed -i '10 a\/etc/init.d/check.sh' rc.local
-sed -i '13 a\/. usr/bin/modifyHostname.sh' rc.local
-sed -i '14 a\/service logstash start' rc.local
+sed -i '13 a\/usr/bin/modifyHostname.sh' rc.local
+sed -i '14 a\service logstash start' rc.local
 
 cd $BASE/$fileName/var/lib/lxc/
 tar -cvpzf $pattern".tar.gz" $pattern/

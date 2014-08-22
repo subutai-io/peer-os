@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -27,7 +28,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles add mongo node operation
  */
 public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
@@ -38,7 +39,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
         super( manager, clusterName );
         this.nodeType = nodeType;
         po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
-                String.format( "Adding %s to %s", nodeType, clusterName ) );
+                String.format( "Adding %s to %s...", nodeType, clusterName ) );
     }
 
 
@@ -61,9 +62,9 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
         }
         try {
 
-            po.addLog( "Creating lxc container" );
+            po.addLog( "Creating lxc container..." );
 
-            Set<Agent> agents = manager.getContainerManager().clone( MongoDbSetupStrategy.TEMPLATE_NAME, 1, null,
+            Set<Agent> agents = manager.getContainerManager().clone( config.getTemplateName(), 1, null,
                     MongoDbSetupStrategy.getNodePlacementStrategyByNodeType( nodeType ) );
 
             Agent agent = agents.iterator().next();
@@ -77,20 +78,31 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             else if ( nodeType == NodeType.ROUTER_NODE ) {
                 config.getRouterServers().add( agent );
             }
-            po.addLog( "Lxc container created successfully\nUpdating db..." );
-            if ( manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-                po.addLog( "Cluster info updated in DB\nInstalling Mongo" );
-                //start addition of node
-                if ( nodeType == NodeType.DATA_NODE ) {
-                    addDataNode( po, config, agent );
+            po.addLog( "Lxc container created successfully\nConfiguring cluster..." );
+
+            boolean result = true;
+            //add node
+            if ( nodeType == NodeType.DATA_NODE ) {
+                result = addDataNode( po, config, agent );
+            }
+            else if ( nodeType == NodeType.ROUTER_NODE ) {
+                result = addRouter( po, config, agent );
+            }
+
+            if ( result ) {
+                po.addLog( "Updating cluster information in database..." );
+
+                try {
+                    manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                    po.addLogDone( "Cluster information updated in database" );
                 }
-                else if ( nodeType == NodeType.ROUTER_NODE ) {
-                    addRouter( po, config, agent );
+                catch ( DBException e ) {
+                    po.addLogFailed(
+                            String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
                 }
             }
             else {
-                po.addLogFailed(
-                        "Error while updating cluster info in DB. Check logs. Use LXC Module to cleanup\nFailed" );
+                po.addLogFailed( "Node addition failed" );
             }
         }
         catch ( LxcCreateException ex ) {
@@ -99,7 +111,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
     }
 
 
-    private void addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
+    private boolean addDataNode( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
         List<Command> commands = Commands.getAddDataNodeCommands( config, agent );
 
         boolean additionOK = true;
@@ -162,30 +174,31 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
                     manager.getCommandRunner().runCommand( registerSecondaryNodeWithPrimaryCommand );
                     if ( registerSecondaryNodeWithPrimaryCommand.hasSucceeded() ) {
-                        po.addLogDone( String.format( "Command %s succeeded\nNode addition succeeded",
+                        po.addLog( String.format( "Command %s succeeded",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription() ) );
+
+                        return true;
                     }
                     else {
-                        po.addLogFailed( String.format( "Command %s failed: %s\nNode addition failed",
+                        po.addLog( String.format( "Command %s failed: %s",
                                 registerSecondaryNodeWithPrimaryCommand.getDescription(),
                                 registerSecondaryNodeWithPrimaryCommand.getAllErrors() ) );
                     }
                 }
                 else {
-                    po.addLogFailed( "Could not find primary node\nNode addition failed" );
+                    po.addLog( "Could not find primary node" );
                 }
             }
             else {
-                po.addLogFailed( "Could not find primary node\nNode addition failed" );
+                po.addLog( "Could not find primary node" );
             }
         }
-        else {
-            po.addLogFailed( "Node addition failed" );
-        }
+
+        return false;
     }
 
 
-    private void addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
+    private boolean addRouter( ProductOperation po, final MongoClusterConfig config, Agent agent ) {
         List<Command> commands = Commands.getAddRouterCommands( config, agent );
 
         boolean additionOK = true;
@@ -221,11 +234,6 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             }
         }
 
-        if ( additionOK ) {
-            po.addLogDone( "Node addition succeeded" );
-        }
-        else {
-            po.addLogFailed( "Node addition failed" );
-        }
+        return additionOK;
     }
 }

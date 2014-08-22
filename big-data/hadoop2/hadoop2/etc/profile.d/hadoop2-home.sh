@@ -1,19 +1,17 @@
-#!/bin/bash
-set -e
-
+#!/bin/sh
 hadoopVersion=2.3.0
 hadoopHome="/opt/hadoop-$hadoopVersion"
 export HADOOP_HOME=$hadoopHome
 path_content=$(echo $PATH)
 
 pattern="$hadoopHome/bin"
-if [[ $path_content != *$pattern* ]];
+if test "${path_content#*$pattern}" = "$path_content"
 then
 	export PATH=$PATH:$pattern
 fi
 
 pattern="$hadoopHome/sbin"
-if [[ $path_content != *$pattern* ]];
+if test "${path_content#*$pattern}" = "$path_content"
 then
         export PATH=$PATH:$pattern
 fi

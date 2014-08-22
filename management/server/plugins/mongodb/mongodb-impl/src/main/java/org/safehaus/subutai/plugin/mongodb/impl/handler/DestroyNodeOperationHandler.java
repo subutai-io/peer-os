@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -23,7 +24,7 @@ import com.google.common.base.Strings;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles destroy mongo node operation
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
@@ -65,19 +66,15 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         final NodeType nodeType = config.getNodeType( agent );
         if ( nodeType == NodeType.CONFIG_NODE && config.getConfigServers().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last configuration server in the cluster. Please, destroy cluster instead\nOperation"
-                            + " aborted" );
+            po.addLogFailed( "This is the last configuration server in the cluster. Please, destroy cluster instead" );
             return;
         }
         else if ( nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last data node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last data node in the cluster. Please, destroy cluster instead" );
             return;
         }
         else if ( nodeType == NodeType.ROUTER_NODE && config.getRouterServers().size() == 1 ) {
-            po.addLogFailed(
-                    "This is the last router in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            po.addLogFailed( "This is the last router in the cluster. Please, destroy cluster instead" );
             return;
         }
 
@@ -175,13 +172,13 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             }
         }
         //update db
-        po.addLog( "Updating db..." );
-        if ( !manager.getDbManager().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
-            po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                    config.getClusterName() ) );
+        po.addLog( "Updating cluster information in database..." );
+        try {
+            manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            po.addLogDone( "Cluster information updated in database" );
         }
-        else {
-            po.addLogDone( "Done" );
+        catch ( DBException e ) {
+            po.addLogFailed( String.format( "Error while updating cluster information, %s", e.getMessage() ) );
         }
     }
 }

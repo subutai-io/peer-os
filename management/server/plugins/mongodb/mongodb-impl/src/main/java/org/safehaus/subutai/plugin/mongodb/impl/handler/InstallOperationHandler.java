@@ -3,6 +3,8 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -12,7 +14,7 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 /**
- * Created by dilshat on 7/21/14.
+ * Handles install mongo cluster operation
  */
 public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl> {
 
@@ -24,7 +26,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( MongoClusterConfig.PRODUCT_KEY,
-                String.format( "Installing %s", MongoClusterConfig.PRODUCT_KEY ) );
+                String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
 
@@ -36,20 +38,19 @@ public class InstallOperationHandler extends AbstractOperationHandler<MongoImpl>
 
     @Override
     public void run() {
-        ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( config, po );
+
+        po.addLog( "Building environment..." );
 
         try {
-            MongoClusterConfig finalConfig = ( MongoClusterConfig ) clusterSetupStrategy.setup();
+            Environment env = manager.getEnvironmentManager()
+                                     .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
 
-            if ( manager.getDbManager()
-                        .saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), finalConfig ) ) {
-                po.addLogDone( String.format( "Cluster %s setup successfully", clusterName ) );
-            }
-            else {
-                po.addLogFailed( "Failed to save cluster information to database" );
-            }
+            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
+            clusterSetupStrategy.setup();
+
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
-        catch ( ClusterSetupException e ) {
+        catch ( EnvironmentBuildException | ClusterSetupException e ) {
             po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }

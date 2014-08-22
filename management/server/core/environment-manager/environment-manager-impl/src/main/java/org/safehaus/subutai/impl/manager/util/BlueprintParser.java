@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.manager.util;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.EnvironmentBlueprint;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,7 +10,7 @@ import com.google.gson.JsonSyntaxException;
 
 
 /**
- * Created by bahadyr on 6/24/14.
+ * Blueprint Parser Utility class
  */
 public class BlueprintParser {
 
@@ -19,8 +19,7 @@ public class BlueprintParser {
 
     public EnvironmentBlueprint parseEnvironmentBlueprintText( final String blueprintStr ) {
         try {
-            EnvironmentBlueprint blueprint = gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
-            return blueprint;
+            return gson.fromJson( blueprintStr, EnvironmentBlueprint.class );
         }
         catch ( JsonSyntaxException e ) {
             System.out.println( "Error parsing blueprint" );
@@ -31,26 +30,17 @@ public class BlueprintParser {
 
     public String parseEnvironmentBlueprint( EnvironmentBlueprint blueprint ) {
         //TODO catch parse exception
-        String blueprintStr = gson.toJson( blueprint, EnvironmentBlueprint.class );
-        return blueprintStr;
+        return gson.toJson( blueprint, EnvironmentBlueprint.class );
     }
 
 
     public Environment parseEnvironment( final String blueprintStr ) {
         try {
-            Environment blueprint = gson.fromJson( blueprintStr, Environment.class );
-            return blueprint;
+            return gson.fromJson( blueprintStr, Environment.class );
         }
         catch ( JsonSyntaxException e ) {
             System.out.println( "Error parsing blueprint" );
         }
         return null;
-    }
-
-
-    public String parseEnvironment( Environment blueprint ) {
-        //TODO catch parse exception
-        String blueprintStr = gson.toJson( blueprint, Environment.class );
-        return blueprintStr;
     }
 }

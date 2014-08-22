@@ -5,13 +5,13 @@
  */
 package org.safehaus.subutai.plugin.mongodb.impl.common;
 
+
 /**
- * @author dilshat
+ * Holds some mongo configuration settings
  */
 public class Constants {
 
     public static final String DATA_NODE_CONF_FILE = "/etc/mongodb.conf";
     public static final String LOG_DIR = "/var/log/mongodb";
     public static final String CONFIG_DIR = "/data/configdb";
-
 }

@@ -1,11 +1,10 @@
 package org.safehaus.subutai.impl.sqoop.handler;
 
 import java.util.*;
-
-import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;
 import org.safehaus.subutai.impl.sqoop.CommandType;
 import org.safehaus.subutai.impl.sqoop.SqoopImpl;
@@ -28,13 +27,35 @@ public class InstallHandler extends AbstractHandler {
         this.config = config;
     }
 
+    @Override
     public void run() {
         if(getClusterConfig() != null) {
-            po.addLogFailed("Cluster already exists: " + config.getClusterName());
+            po.addLogFailed("Sqoop installation already exists: " + config.getClusterName());
             return;
         }
         if(checkNodes(config, true) == 0) {
             po.addLogFailed("No nodes are connected");
+            return;
+        }
+
+        org.safehaus.subutai.api.hadoop.Config hc
+                = manager.getHadoopManager().getCluster(clusterName);
+        if(hc == null) {
+            po.addLogFailed(String.format("Hadoop cluster %s does not exist", clusterName));
+            return;
+        }
+        
+        for(Iterator<Agent> it = config.getNodes().iterator(); it.hasNext();) {
+            Agent a = it.next();
+            if(!hc.getAllNodes().contains(a)) {
+                po.addLog(String.format("Node %s is not in Hadoop cluster %s",
+                        a.getHostname(), clusterName));
+                po.addLog("Removing from nodes list");
+                it.remove();
+            }
+        }
+        if(config.getNodes().isEmpty()) {
+            po.addLogFailed("No nodes to install");
             return;
         }
 
@@ -44,7 +65,7 @@ public class InstallHandler extends AbstractHandler {
                 new RequestBuilder(s), config.getNodes());
         manager.getCommandRunner().runCommand(cmd);
 
-        Set<UUID> skipInstall = new HashSet<UUID>();
+        Set<UUID> skipInstall = new HashSet<>();
         if(cmd.hasCompleted()) {
             Iterator<Agent> it = config.getNodes().iterator();
             while(it.hasNext()) {
@@ -109,8 +130,8 @@ public class InstallHandler extends AbstractHandler {
     private boolean saveClusterInfo(Config config) {
         boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
                 config.getClusterName(), config);
-        if(saved) po.addLog("Cluster info successfully saved");
-        else po.addLog("Failed to save cluster info");
+        if(saved) po.addLog("Installation info successfully saved");
+        else po.addLog("Failed to save installation info");
         return saved;
     }
 

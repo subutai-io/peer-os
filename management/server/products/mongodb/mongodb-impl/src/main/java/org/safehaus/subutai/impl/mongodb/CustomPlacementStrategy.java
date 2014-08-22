@@ -1,12 +1,11 @@
 package org.safehaus.subutai.impl.mongodb;
 
 import java.util.*;
-
-import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class CustomPlacementStrategy extends LxcPlacementStrategy {
@@ -66,9 +65,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
             n = Math.round((m.getFreeHddMb() - hddReservedMb) / hddPerNodeMb);
             if((min = Math.min(n, min)) <= 0) continue;
 
-            int unusedCpu = 100 - m.getCpuLoadPercent();
-            n = Math.round(unusedCpu - cpuReservedPercentage / cpuPerNodePercentage);
-            if((min = Math.min(n, min)) <= 0) continue;
+            // TODO: check cpu load when cpu load determination is reimplemented
 
             slots.put(e.getKey(), min);
         }
@@ -98,7 +95,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
                 hddReservedMb = GB2MB(10);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
-                cpuPerNodePercentage = 10;
+                cpuPerNodePercentage = 5;
                 cpuReservedPercentage = 10;
                 break;
             case ROUTER_NODE:
@@ -110,11 +107,11 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
                 cpuReservedPercentage = 10;
                 break;
             case DATA_NODE:
-                hddPerNodeMb = GB2MB(50);
-                hddReservedMb = GB2MB(20);
+                hddPerNodeMb = GB2MB(20);
+                hddReservedMb = GB2MB(30);
                 ramPerNodeMb = GB2MB(1);
                 ramReservedMb = GB2MB(1);
-                cpuPerNodePercentage = 10;
+                cpuPerNodePercentage = 5;
                 cpuReservedPercentage = 10;
                 break;
             default:

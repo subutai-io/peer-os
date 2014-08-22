@@ -19,7 +19,7 @@ public interface PackageManager {
      * Gets a list of packages matching a given pattern on a given host.
      *
      * @param hostname
-     * @param pattern package name pattern; normal shell wildcards are allowed
+     * @param namePattern package name pattern; normal shell wildcards are allowed
      * @return A collection of package information objects matching the given
      * pattern. If there are no matching packages on a host, an empty collection
      * is returned. Returns <code>null</code> if host name is invalid or is not

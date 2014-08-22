@@ -1,10 +1,8 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -27,18 +25,18 @@ public class EchoTextToFileCommand extends OsgiCommandSupport {
     @Argument( index = 3, name = "type", required = true, multiValued = false, description = "Configuration type" )
     String type;
 
-    private AgentManager agentManager;
+//    private AgentManager agentManager;
     private ConfigManager configManager;
 
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+//    public AgentManager getAgentManager() {
+//        return agentManager;
+//    }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
+//    public void setAgentManager( final AgentManager agentManager ) {
+//        this.agentManager = agentManager;
+//    }
 
 
     public ConfigManager getConfigManager() {
@@ -52,11 +50,11 @@ public class EchoTextToFileCommand extends OsgiCommandSupport {
 
 
     protected Object doExecute() {
-        Agent agent = agentManager.getAgentByHostname( hostname );
 
+//        Agent agent = agentManager.getAgentByHostname( hostname );
 
         boolean result = configManager
-                .injectConfiguration( agent, pathToFile, json, ConfigTypeEnum.valueOf( type ) );
+                .injectConfiguration( hostname, pathToFile, json, ConfigTypeEnum.valueOf( type ) );
 
         System.out.println( result );
 

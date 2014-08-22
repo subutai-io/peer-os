@@ -5,18 +5,18 @@
  */
 package org.safehaus.subutai.api.oozie;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
-
 import java.util.UUID;
+
+import org.safehaus.subutai.shared.protocol.ApiBase;
 
 /**
  * @author dilshat
  */
-public interface Oozie extends ApiBase<Config> {
+public interface Oozie extends ApiBase<OozieConfig> {
 
-    UUID startServer(Config config);
+    UUID startServer(OozieConfig config);
 
-    UUID stopServer(Config config);
+    UUID stopServer(OozieConfig config);
 
-    UUID checkServerStatus(Config config);
+    UUID checkServerStatus(OozieConfig config);
 }

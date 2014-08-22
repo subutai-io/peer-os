@@ -41,8 +41,8 @@ public class VerificationStep extends Panel {
         confirmationLbl.setContentMode( ContentMode.HTML );
 
         ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getLuceneClusterName() );
-        cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
         for ( Agent agent : wizard.getConfig().getNodes() ) {
             cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
         }

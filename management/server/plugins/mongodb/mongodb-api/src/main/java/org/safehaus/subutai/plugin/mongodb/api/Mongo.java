@@ -8,13 +8,15 @@ package org.safehaus.subutai.plugin.mongodb.api;
 
 import java.util.UUID;
 
+import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 
 /**
- * @author dilshat
+ * Mongo manager interface
  */
 public interface Mongo extends ApiBase<MongoClusterConfig> {
 
@@ -68,5 +70,16 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
      */
     public UUID checkNode( String clusterName, String lxcHostName );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( MongoClusterConfig config, ProductOperation po );
+    /**
+     * Returns Mongo cluster setup strategy
+     *
+     * @param config - mongo cluster configuration
+     * @param po - product operation tracker
+     *
+     * @return - strategy
+     */
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MongoClusterConfig config,
+                                                         ProductOperation po );
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config );
 }

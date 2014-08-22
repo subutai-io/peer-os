@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.datastax.driver.core.ResultSet;
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 
 
@@ -63,6 +64,30 @@ public class DbManagerMock implements DbManager {
     @Override
     public boolean deleteInfo( String source, String key ) {
         return deleteInfoResult;
+    }
+
+
+    @Override
+    public ResultSet executeQuery2( final String cql, final Object... values ) throws DBException {
+        return null;
+    }
+
+
+    @Override
+    public void executeUpdate2( final String cql, final Object... values ) throws DBException {
+
+    }
+
+
+    @Override
+    public void saveInfo2( final String source, final String key, final Object info ) throws DBException {
+
+    }
+
+
+    @Override
+    public void deleteInfo2( final String source, final String key ) throws DBException {
+
     }
 
 

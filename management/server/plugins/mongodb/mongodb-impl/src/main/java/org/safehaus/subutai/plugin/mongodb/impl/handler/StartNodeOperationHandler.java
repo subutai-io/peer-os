@@ -19,7 +19,7 @@ import org.safehaus.subutai.shared.protocol.enums.NodeState;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles start mongo node operation
  */
 public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImpl> {
     private final ProductOperation po;
