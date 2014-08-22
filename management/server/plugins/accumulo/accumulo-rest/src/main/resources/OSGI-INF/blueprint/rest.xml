@@ -6,19 +6,27 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <!-- 1 -->
-    <cxf:bus id="cxfBus1Cassandra">
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-    </cxf:bus>
-    <!-- 2 -->
-    <jaxrs:server address="/accumulo2" id="accumuloRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="accumuloRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <!-- Implementation of the rest service -->
-    <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.plugin.accumulo.rest.RestServiceImpl">
-    </bean>
+
+  <cxf:bus id="cxfBus1Cassandra">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="accumuloManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
+  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.plugin.accumulo.rest.RestServiceImpl">
+    <property name="accumuloManager" ref="accumuloManager" />
+    <property name="agentManager" ref="agentManager" />
+  </bean>
+
+  <jaxrs:server address="/accumulo2" id="accumuloRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="accumuloRestServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
 </blueprint>
