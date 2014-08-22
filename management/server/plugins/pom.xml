@@ -23,6 +23,9 @@
         <module>solr</module>
         <module>spark</module>
         <module>shark</module>
+        <module>cassandra</module>
+        <module>hbase</module>
+        <module>oozie</module>
     </modules>
 
 </project>
