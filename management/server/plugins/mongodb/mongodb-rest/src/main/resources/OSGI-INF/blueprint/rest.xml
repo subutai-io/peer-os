@@ -6,19 +6,25 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <cxf:bus id="cxfBus1">
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-    </cxf:bus>
-    <jaxrs:server address="/mongodb2" id="mongodbRestService">
-        <jaxrs:serviceBeans>
-            <ref component-id="mongodbRestServiceImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.plugin.mongodb.rest.RestServiceImpl">
-        <property name="mongodbManager" ref="mongodbManager"/>
-    </bean>
-    <reference id="mongodbManager" availability="mandatory"
-               interface="org.safehaus.subutai.plugin.mongodb.api.Mongo"/>
+  <cxf:bus id="cxfBus1">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <reference id="mongodbManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
+  <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.plugin.mongodb.rest.RestServiceImpl">
+    <property name="mongodbManager" ref="mongodbManager" />
+    <property name="agentManager" ref="agentManager" />
+  </bean>
+
+  <jaxrs:server address="/mongodb2" id="mongodbRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="mongodbRestServiceImpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
 </blueprint>
