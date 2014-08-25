@@ -4,139 +4,135 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import java.util.*;
+import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 
 public class ConfigurationStep extends VerticalLayout {
 
-	private final ComboBox hadoopClusters;
-	private final TwinColSelect select;
+    private final ComboBox hadoopClusters;
+    private final TwinColSelect select;
 
-	public ConfigurationStep(final Wizard wizard) {
+    public ConfigurationStep(final Wizard wizard) {
 
-		setSizeFull();
+        setSizeFull();
 
-		GridLayout content = new GridLayout(1, 2);
-		content.setSizeFull();
-		content.setSpacing(true);
-		content.setMargin(true);
+        GridLayout content = new GridLayout(1, 2);
+        content.setSizeFull();
+        content.setSpacing(true);
+        content.setMargin(true);
 
-		hadoopClusters = new ComboBox("Hadoop cluster");
-		select = new TwinColSelect("Nodes", new ArrayList<Agent>());
+        hadoopClusters = new ComboBox("Hadoop cluster");
+        select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
-		hadoopClusters.setImmediate(true);
-		hadoopClusters.setTextInputAllowed(false);
-		hadoopClusters.setRequired(true);
-		hadoopClusters.setNullSelectionAllowed(false);
+        hadoopClusters.setImmediate(true);
+        hadoopClusters.setTextInputAllowed(false);
+        hadoopClusters.setRequired(true);
+        hadoopClusters.setNullSelectionAllowed(false);
 
         List<HadoopClusterConfig> clusters = FlumeUI.getHadoopManager().getClusters();
-		if (clusters.size() > 0) {
+        if(clusters.size() > 0)
             for(HadoopClusterConfig hadoopClusterInfo : clusters) {
-				hadoopClusters.addItem(hadoopClusterInfo);
-				hadoopClusters.setItemCaption(hadoopClusterInfo,
-						hadoopClusterInfo.getClusterName());
-			}
-		}
+                hadoopClusters.addItem(hadoopClusterInfo);
+                hadoopClusters.setItemCaption(hadoopClusterInfo,
+                        hadoopClusterInfo.getClusterName());
+            }
 
         HadoopClusterConfig info = FlumeUI.getHadoopManager().getCluster(wizard.getConfig().getClusterName());
 
-		if (info != null) {
-			hadoopClusters.setValue(info);
-		} else if (clusters.size() > 0) {
-			hadoopClusters.setValue(clusters.iterator().next());
-		}
+        if(info != null)
+            hadoopClusters.setValue(info);
+        else if(clusters.size() > 0)
+            hadoopClusters.setValue(clusters.iterator().next());
 
-		if (hadoopClusters.getValue() != null) {
+        if(hadoopClusters.getValue() != null) {
             HadoopClusterConfig hadoopInfo = (HadoopClusterConfig)hadoopClusters.getValue();
-			wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-			select.setContainerDataSource(
-					new BeanItemContainer<>(
-							Agent.class, hadoopInfo.getAllNodes())
-			);
-		}
+            wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+            select.setContainerDataSource(
+                    new BeanItemContainer<>(
+                            Agent.class, hadoopInfo.getAllNodes())
+            );
+        }
 
-		hadoopClusters.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				if (event.getProperty().getValue() != null) {
+        hadoopClusters.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if(event.getProperty().getValue() != null) {
                     HadoopClusterConfig hadoopInfo = (HadoopClusterConfig)event.getProperty().getValue();
-					select.setValue(null);
-					select.setContainerDataSource(
-							new BeanItemContainer<>(
-									Agent.class, hadoopInfo.getAllNodes())
-					);
-					wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
-					wizard.getConfig().setNodes(new HashSet<Agent>());
-				}
-			}
-		});
+                    select.setValue(null);
+                    select.setContainerDataSource(
+                            new BeanItemContainer<>(
+                                    Agent.class, hadoopInfo.getAllNodes())
+                    );
+                    wizard.getConfig().setClusterName(hadoopInfo.getClusterName());
+                    wizard.getConfig().setNodes(new HashSet<Agent>());
+                }
+            }
+        });
 
-		select.setItemCaptionPropertyId("hostname");
-		select.setRows(7);
-		select.setMultiSelect(true);
-		select.setImmediate(true);
-		select.setLeftColumnCaption("Available Nodes");
-		select.setRightColumnCaption("Selected Nodes");
-		select.setWidth(100, Unit.PERCENTAGE);
-		select.setRequired(true);
-		if (!Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
-			select.setValue(wizard.getConfig().getNodes());
-		}
-		select.addValueChangeListener(new Property.ValueChangeListener() {
-			@Override
-			public void valueChange(Property.ValueChangeEvent event) {
-				if (event.getProperty().getValue() != null) {
-					Set<Agent> agentList = new HashSet((Collection) event.getProperty().getValue());
-					wizard.getConfig().setNodes(agentList);
-				}
-			}
-		});
+        select.setItemCaptionPropertyId("hostname");
+        select.setRows(7);
+        select.setMultiSelect(true);
+        select.setImmediate(true);
+        select.setLeftColumnCaption("Available Nodes");
+        select.setRightColumnCaption("Selected Nodes");
+        select.setWidth(100, Unit.PERCENTAGE);
+        select.setRequired(true);
+        if(!Util.isCollectionEmpty(wizard.getConfig().getNodes()))
+            select.setValue(wizard.getConfig().getNodes());
+        select.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if(event.getProperty().getValue() != null) {
+                    Set<Agent> agentList = new HashSet((Collection)event.getProperty().getValue());
+                    wizard.getConfig().setNodes(agentList);
+                }
+            }
+        });
 
-		Button next = new Button("Next");
-		next.addStyleName("default");
-		next.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
-					show("Please, select Hadoop cluster");
-				} else if (Util.isCollectionEmpty(wizard.getConfig().getNodes())) {
-					show("Please, select target nodes");
-				} else {
-					wizard.next();
-				}
-			}
-		});
+        Button next = new Button("Next");
+        next.addStyleName("default");
+        next.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(Util.isStringEmpty(wizard.getConfig().getClusterName()))
+                    show("Please, select Hadoop cluster");
+                else if(Util.isCollectionEmpty(wizard.getConfig().getNodes()))
+                    show("Please, select target nodes");
+                else
+                    wizard.next();
+            }
+        });
 
-		Button back = new Button("Back");
-		back.addStyleName("default");
-		back.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.back();
-			}
-		});
+        Button back = new Button("Back");
+        back.addStyleName("default");
+        back.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                wizard.back();
+            }
+        });
 
-		VerticalLayout layout = new VerticalLayout();
-		layout.setSpacing(true);
-		layout.addComponent(new Label("Please, specify installation settings"));
-		layout.addComponent(content);
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(true);
+        layout.addComponent(new Label("Please, specify installation settings"));
+        layout.addComponent(content);
 
-		HorizontalLayout buttons = new HorizontalLayout();
-		buttons.addComponent(back);
-		buttons.addComponent(next);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(back);
+        buttons.addComponent(next);
 
-		content.addComponent(hadoopClusters);
-		content.addComponent(select);
-		content.addComponent(buttons);
+        content.addComponent(hadoopClusters);
+        content.addComponent(select);
+        content.addComponent(buttons);
 
-		addComponent(layout);
+        addComponent(layout);
 
-	}
+    }
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
+    private void show(String notification) {
+        Notification.show(notification);
+    }
 
 }
