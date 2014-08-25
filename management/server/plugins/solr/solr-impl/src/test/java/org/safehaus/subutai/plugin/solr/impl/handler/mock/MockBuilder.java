@@ -24,27 +24,26 @@ public class MockBuilder {
         return new InstallOperationHandler( solrImpl, solrClusterConfig );
     }
 
+
     public static AbstractOperationHandler getUninstallOperationWithResult( boolean success ) {
 
         DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
 
-        SolrImpl solrImpl = new SolrImplMock()
-                .setClusterSolrClusterConfig( new SolrClusterConfig() )
-                .setDbManager( dbManager );
+        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
 
         return new UninstallOperationHandler( solrImpl, "test-cluster" );
     }
 
+
     public static AbstractOperationHandler getAddNodeOperationWithResult( boolean success ) {
         LxcManagerMock lxcManagerMock = new LxcManagerMock().setMockLxcMap( CommonMockBuilder.getLxcMap() );
 
-        SolrImpl solrImpl = new SolrImplMock()
-                .setCommands( getCommands( success ) )
-                .setClusterSolrClusterConfig( new SolrClusterConfig() )
-                .setLxcManager( lxcManagerMock );
+        SolrImpl solrImpl = new SolrImplMock().setCommands( getCommands( success ) )
+                                              .setClusterSolrClusterConfig( new SolrClusterConfig() );
 
         return new AddNodeOperationHandler( solrImpl, "test-cluster" );
     }
+
 
     private static Commands getCommands( boolean installSuccess ) {
         CommandMock installCommand = new CommandMock().setSucceeded( installSuccess );

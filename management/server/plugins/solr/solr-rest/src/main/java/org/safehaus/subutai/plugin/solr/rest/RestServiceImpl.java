@@ -1,15 +1,11 @@
 package org.safehaus.subutai.plugin.solr.rest;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.plugin.solr.api.Solr;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
 
 /**
@@ -18,14 +14,7 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Solr solrManager;
-    private AgentManager agentManager;
-
-
-    public void setAgentManager( final AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
 
 
     public void setSolrManager( Solr solrManager ) {
@@ -34,27 +23,25 @@ public class RestServiceImpl implements RestService {
 
 
     private String wrapUUID( UUID uuid ) {
-        Map map = new HashMap<>();
-        map.put( "OPERATION_ID", uuid );
-        return gson.toJson( map );
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 
     @Override
     public String listClusters() {
-        return gson.toJson( solrManager.getClusters() );
+        return JsonUtil.toJson( solrManager.getClusters() );
     }
 
 
     @Override
     public String getCluster( final String clustername ) {
-        return gson.toJson( solrManager.getCluster( clustername ) );
+        return JsonUtil.toJson( solrManager.getCluster( clustername ) );
     }
 
 
     @Override
     public String createCluster( final String config ) {
-        TrimmedSolrConfig solrConfig = gson.fromJson( config, TrimmedSolrConfig.class );
+        TrimmedSolrConfig solrConfig = JsonUtil.fromJson( config, TrimmedSolrConfig.class );
         SolrClusterConfig expandedSolrClusterConfig = new SolrClusterConfig();
 
         expandedSolrClusterConfig.setClusterName( solrConfig.getClusterName() );

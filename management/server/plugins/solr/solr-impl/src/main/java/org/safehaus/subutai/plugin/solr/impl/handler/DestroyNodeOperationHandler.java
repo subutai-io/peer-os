@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -61,11 +62,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
                             agent.getHostname() ) );
         }
         else {
-            if ( !manager.getLxcManager().destroyLxcOnHost( physicalAgent, agent.getHostname() ) ) {
-                productOperation.addLog( "Could not destroy lxc container. Use LXC module to cleanup, skipping..." );
-            }
-            else {
+            try {
+                manager.getContainerManager().cloneDestroy( physicalAgent.getHostname(), agent.getHostname() );
                 productOperation.addLog( "Lxc container destroyed successfully" );
+            }
+            catch ( LxcDestroyException e ) {
+                productOperation.addLog(
+                        String.format( "Could not destroy lxc container, %s. Use LXC module to cleanup, skipping...",
+                                e.getMessage() ) );
             }
         }
 
@@ -73,8 +77,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<SolrIm
         productOperation.addLog( "Saving information to database..." );
 
         try {
-            manager.getDbManager()
-                   .saveInfo2( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName(), solrClusterConfig );
+            manager.getPluginDAO()
+                   .saveInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName(), solrClusterConfig );
             productOperation.addLogDone( "Saved information to database" );
         }
         catch ( DBException e ) {
