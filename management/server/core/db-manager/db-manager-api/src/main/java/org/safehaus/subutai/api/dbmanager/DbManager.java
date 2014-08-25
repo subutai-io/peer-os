@@ -23,6 +23,7 @@ public interface DbManager {
 	 * @param values - bind parameters
 	 * @return - resultset
 	 */
+    @Deprecated
 	public ResultSet executeQuery(String cql, Object... values);
 
 	/**
@@ -32,6 +33,7 @@ public interface DbManager {
 	 * @param values - bind parameters
 	 * @return true if all went well and false if exception was raised
 	 */
+    @Deprecated
 	public boolean executeUpdate(String cql, Object... values);
 
 	/**
@@ -45,6 +47,7 @@ public interface DbManager {
     @Deprecated
 	public boolean saveInfo(String source, String key, Object info);
 
+    @Deprecated
 	public boolean saveEnvironmentInfo(String source, String key, Object info);
 
 	/**
@@ -55,8 +58,10 @@ public interface DbManager {
 	 * @param clazz  - class of POJO
 	 * @return - POJO
 	 */
+    @Deprecated
 	public <T> T getInfo(String source, String key, Class<T> clazz);
 
+    @Deprecated
 	public <T> T getEnvironmentInfo(String source, String key, Class<T> clazz);
 
 	/**
@@ -66,8 +71,10 @@ public interface DbManager {
 	 * @param clazz  - class of POJO
 	 * @return - list of POJOs
 	 */
+    @Deprecated
 	public <T> List<T> getInfo(String source, Class<T> clazz);
 
+    @Deprecated
 	public <T> List<T> getEnvironmentInfo(String source, Class<T> clazz);
 
 	/**
@@ -84,7 +91,9 @@ public interface DbManager {
 
 	public void executeUpdate2(String cql, Object... values) throws DBException;
 
+    @Deprecated
 	public void saveInfo2(String source, String key, Object info) throws DBException;
 
+    @Deprecated
 	public void deleteInfo2(String source, String key) throws DBException;
 }
