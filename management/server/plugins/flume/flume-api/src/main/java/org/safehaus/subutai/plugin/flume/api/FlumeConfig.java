@@ -64,9 +64,9 @@ public class FlumeConfig implements ConfigBase {
 
     @Override
     public String toString() {
-        int nodesCount = nodes != null ? nodes.size() : 0;
+        int c = nodes != null ? nodes.size() : 0;
         return "Config{" + "clusterName=" + clusterName + ", hadoopClusterName="
-                + hadoopClusterName + ", nodes=" + nodesCount + '}';
+                + hadoopClusterName + ", nodes=" + c + '}';
     }
 
 }

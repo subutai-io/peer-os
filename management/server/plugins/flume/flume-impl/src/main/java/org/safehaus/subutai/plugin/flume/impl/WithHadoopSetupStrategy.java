@@ -37,6 +37,9 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
         if(manager.getCluster(config.getClusterName()) != null)
             throw new ClusterSetupException("Cluster already exists: " + config.getClusterName());
 
+        if(environment == null)
+            throw new ClusterSetupException("Environment not specified");
+
         if(environment.getNodes().size() < config.getNodesCount())
             throw new ClusterSetupException(String.format(
                     "Environment has %d nodes instead of %d",

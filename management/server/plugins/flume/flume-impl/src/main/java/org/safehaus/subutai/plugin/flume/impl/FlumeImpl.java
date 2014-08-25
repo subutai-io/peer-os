@@ -34,7 +34,10 @@ public class FlumeImpl extends FlumeBase implements Flume {
 
     @Override
     public UUID installCluster(FlumeConfig config, HadoopClusterConfig hadoopConfig) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        InstallHandler h = new InstallHandler(this, config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     @Override
@@ -98,11 +101,12 @@ public class FlumeImpl extends FlumeBase implements Flume {
     public ClusterSetupStrategy getClusterSetupStrategy(Environment env, FlumeConfig config, ProductOperation po) {
         if(config.getSetupType() == SetupType.OVER_HADOOP)
             return new OverHadoopSetupStrategy(this, config, po);
-        else {
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
             WithHadoopSetupStrategy s = new WithHadoopSetupStrategy(this, config, po);
             s.setEnvironment(env);
             return s;
         }
+        return null;
     }
 
 }
