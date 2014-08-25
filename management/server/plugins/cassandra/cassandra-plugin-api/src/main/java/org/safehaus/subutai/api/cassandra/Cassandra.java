@@ -26,11 +26,11 @@ public interface Cassandra extends ApiBase<CassandraConfig> {
 
     UUID stopAllNodes( String clusterName );
 
-    UUID startCassandraService( String agentUUID );
+    UUID startCassandraService( String clusterName, String agentUUID );
 
-    UUID stopCassandraService( String agentUUID );
+    UUID stopCassandraService( String clusterName, String agentUUID );
 
-    UUID statusCassandraService( String agentUUID );
+    UUID statusCassandraService( String clusterName, String agentUUID );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraConfig config,
                                                          ProductOperation po );

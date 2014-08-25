@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 
 /**
  * @author dilshat
@@ -16,8 +18,10 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 public class CassandraConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Cassandra";
+    public static final String PRODUCT_NAME = "Cassandra";
     private String clusterName = "";
-    private String domainName = "";
+    private String templateName = PRODUCT_NAME;
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private int numberOfSeeds;
     private int numberOfNodes;
     private Set<Agent> seedNodes;
@@ -25,6 +29,17 @@ public class CassandraConfig implements ConfigBase {
     private String dataDirectory = "/var/lib/cassandra/data";
     private String commitLogDirectory = "/var/lib/cassandra/commitlog";
     private String savedCachesDirectory = "/var/lib/cassandra/saved_caches";
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
+
 
     public static String getProductKey() {
         return PRODUCT_KEY;
