@@ -93,7 +93,7 @@ public class Manager {
         } );
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        Button refreshClustersBtn = new Button( "Refresh Clusters" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener() {
 
@@ -104,7 +104,7 @@ public class Manager {
         } );
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check all" );
+        Button checkAllBtn = new Button( "Check All" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener() {
 
@@ -117,7 +117,7 @@ public class Manager {
         } );
         controlsContent.addComponent( checkAllBtn );
 
-        Button startClusterBtn = new Button( "Start cluster" );
+        Button startClusterBtn = new Button( "Start Cluster" );
         startClusterBtn.addStyleName( "default" );
         startClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -137,7 +137,7 @@ public class Manager {
         } );
         controlsContent.addComponent( startClusterBtn );
 
-        Button stopClusterBtn = new Button( "Stop cluster" );
+        Button stopClusterBtn = new Button( "Stop Cluster" );
         stopClusterBtn.addStyleName( "default" );
         stopClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -157,7 +157,7 @@ public class Manager {
         } );
         controlsContent.addComponent( stopClusterBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        Button destroyClusterBtn = new Button( "Destroy Cluster" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -395,24 +395,24 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
+        List<Config> accumuloClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( Config mongoClusterInfo : mongoClusterInfos ) {
+        if ( accumuloClusterInfos != null && accumuloClusterInfos.size() > 0 ) {
+            for ( Config mongoClusterInfo : accumuloClusterInfos ) {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null ) {
-                for ( Config mongoClusterInfo : mongoClusterInfos ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( mongoClusterInfo );
+                for ( Config accumuloClusterInfo : accumuloClusterInfos ) {
+                    if ( accumuloClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+                        clusterCombo.setValue( accumuloClusterInfo );
                         return;
                     }
                 }
             }
             else {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+                clusterCombo.setValue( accumuloClusterInfos.iterator().next() );
             }
         }
     }
@@ -430,6 +430,7 @@ public class Manager {
         int i = 0;
         for ( final Agent agent : agents ) {
             i++;
+            final Label ip = new Label( agent.getListIP().toString() );
             final Button checkBtn = new Button( "Check" );
             final Button destroyBtn = new Button( "Destroy" );
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -439,9 +440,9 @@ public class Manager {
 
             table.addItem( masters ? new Object[] {
                             ( i == 1 ? UiUtil.MASTER_PREFIX : i == 2 ? UiUtil.GC_PREFIX : UiUtil.MONITOR_PREFIX )
-                                    + agent.getHostname(), checkBtn, resultHolder, progressIcon
+                                    + agent.getHostname(), ip, checkBtn, resultHolder, progressIcon
                     } : new Object[] {
-                            agent.getHostname(), checkBtn, destroyBtn, resultHolder, progressIcon
+                            agent.getHostname(), ip, checkBtn, destroyBtn, resultHolder, progressIcon
                     }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
