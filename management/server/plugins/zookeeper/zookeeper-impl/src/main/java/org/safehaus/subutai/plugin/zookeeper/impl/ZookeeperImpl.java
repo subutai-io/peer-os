@@ -1,250 +1,298 @@
 package org.safehaus.subutai.plugin.zookeeper.impl;
 
 
-import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.impl.handler.*;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.AddPropertyOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.CheckNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.DestroyNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.RemovePropertyOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.StartNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.StopNodeOperationHandler;
+import org.safehaus.subutai.plugin.zookeeper.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.shared.protocol.NodeGroup;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 //TODO: Add parameter validation
 public class ZookeeperImpl implements Zookeeper {
 
-	private final CommandRunner commandRunner;
-	private final AgentManager agentManager;
-	private final DbManager dbManager;
-	private final Tracker tracker;
-	private final ContainerManager containerManager;
-	private final EnvironmentManager environmentManager;
-	private final Hadoop hadoopManager;
-	private ExecutorService executor;
+    private final CommandRunner commandRunner;
+    private final AgentManager agentManager;
+    private final Tracker tracker;
+    private final ContainerManager containerManager;
+    private final EnvironmentManager environmentManager;
+    private final Hadoop hadoopManager;
+    private ExecutorService executor;
+    private PluginDAO pluginDAO;
 
 
-	public ZookeeperImpl(final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
-	                     final Tracker tracker, final ContainerManager containerManager,
-	                     final EnvironmentManager environmentManager, final Hadoop hadoopManager) {
-		this.commandRunner = commandRunner;
-		this.agentManager = agentManager;
-		this.dbManager = dbManager;
-		this.tracker = tracker;
-		this.containerManager = containerManager;
-		this.environmentManager = environmentManager;
-		this.hadoopManager = hadoopManager;
+    public ZookeeperImpl( final CommandRunner commandRunner, final AgentManager agentManager, final DbManager dbManager,
+                          final Tracker tracker, final ContainerManager containerManager,
+                          final EnvironmentManager environmentManager, final Hadoop hadoopManager ) {
 
-		Commands.init(commandRunner);
-	}
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+        Preconditions.checkNotNull( containerManager, "Container manager is null" );
+        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
+        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
 
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.tracker = tracker;
+        this.containerManager = containerManager;
+        this.environmentManager = environmentManager;
+        this.hadoopManager = hadoopManager;
+        this.pluginDAO = new PluginDAO( dbManager );
 
-	public EnvironmentManager getEnvironmentManager() {
-		return environmentManager;
-	}
+        Commands.init( commandRunner );
+    }
 
 
-	public Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
 
 
-	public CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
 
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
 
 
-	public DbManager getDbManager() {
-		return dbManager;
-	}
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
 
 
-	public Tracker getTracker() {
-		return tracker;
-	}
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
 
 
-	public ContainerManager getContainerManager() {
-		return containerManager;
-	}
+    public Tracker getTracker() {
+        return tracker;
+    }
 
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
 
 
-	public void destroy() {
-		executor.shutdown();
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
 
-	public UUID installCluster(ZookeeperClusterConfig config) {
+    public void destroy() {
+        executor.shutdown();
+    }
 
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-		executor.execute(operationHandler);
+    public UUID installCluster( ZookeeperClusterConfig config ) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
 
-	public UUID uninstallCluster(String clusterName) {
+        executor.execute( operationHandler );
 
-		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+    public UUID uninstallCluster( String clusterName ) {
 
-	public List<ZookeeperClusterConfig> getClusters() {
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
-		return dbManager.getInfo(ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class);
-	}
+        executor.execute( operationHandler );
 
-	@Override
-	public ZookeeperClusterConfig getCluster(String clusterName) {
-		return dbManager.getInfo(ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class);
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID installCluster(ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig) {
 
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config, hadoopClusterConfig);
+    public List<ZookeeperClusterConfig> getClusters() {
 
-		executor.execute(operationHandler);
+        try {
+            return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, ZookeeperClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
+    }
 
-		return operationHandler.getTrackerId();
-	}
 
-	public UUID startNode(String clusterName, String lxcHostName) {
+    @Override
+    public ZookeeperClusterConfig getCluster( String clusterName ) {
+        try {
+            return pluginDAO.getInfo( ZookeeperClusterConfig.PRODUCT_KEY, clusterName, ZookeeperClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return null;
+        }
+    }
 
-		AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostName);
 
-		executor.execute(operationHandler);
+    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig ) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config, hadoopClusterConfig );
 
-	public UUID stopNode(String clusterName, String lxcHostName) {
+        executor.execute( operationHandler );
 
-		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostName);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+    public UUID startNode( String clusterName, String lxcHostName ) {
 
-	public UUID checkNode(String clusterName, String lxcHostName) {
+        AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostName );
 
-		AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostName);
+        executor.execute( operationHandler );
 
-		executor.execute(operationHandler);
+        return operationHandler.getTrackerId();
+    }
 
-		return operationHandler.getTrackerId();
-	}
 
-	public UUID addNode(String clusterName) {
+    public UUID stopNode( String clusterName, String lxcHostName ) {
 
-		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName);
+        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostName );
 
-		executor.execute(operationHandler);
+        executor.execute( operationHandler );
 
-		return operationHandler.getTrackerId();
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID addNode(String clusterName, String lxcHostname) {
 
-		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
+    public UUID checkNode( String clusterName, String lxcHostName ) {
 
-		executor.execute(operationHandler);
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostName );
 
-		return operationHandler.getTrackerId();
-	}
+        executor.execute( operationHandler );
 
-	public UUID destroyNode(String clusterName, String lxcHostName) {
+        return operationHandler.getTrackerId();
+    }
 
-		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostName);
 
-		executor.execute(operationHandler);
+    public UUID addNode( String clusterName ) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName );
 
-	@Override
-	public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue) {
+        executor.execute( operationHandler );
 
-		AbstractOperationHandler operationHandler =
-				new AddPropertyOperationHandler(this, clusterName, fileName, propertyName, propertyValue);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+    public UUID addNode( String clusterName, String lxcHostname ) {
 
-	@Override
-	public UUID removeProperty(String clusterName, String fileName, String propertyName) {
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
 
-		AbstractOperationHandler operationHandler =
-				new RemovePropertyOperationHandler(this, clusterName, fileName, propertyName);
+        executor.execute( operationHandler );
 
-		executor.execute(operationHandler);
+        return operationHandler.getTrackerId();
+    }
 
-		return operationHandler.getTrackerId();
-	}
 
-	@Override
-	public ClusterSetupStrategy getClusterSetupStrategy(final Environment environment,
-	                                                    final ZookeeperClusterConfig config,
-	                                                    final ProductOperation po) {
-		if (config.getSetupType() == SetupType.STANDALONE) {
-			//this is a standalone ZK cluster setup
-			return new ZookeeperStandaloneSetupStrategy(environment, config, po, this);
-		} else if (config.getSetupType() == SetupType.WITH_HADOOP) {
-			//this is a with-Hadoop ZK cluster setup
-			return new ZookeeperWithHadoopSetupStrategy(environment, config, po, this);
-		} else {
-			//this is an over-Hadoop ZK cluster setup
-			return new ZookeeperOverHadoopSetupStrategy(config, po, this);
-		}
-	}
+    public UUID destroyNode( String clusterName, String lxcHostName ) {
 
-	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(ZookeeperClusterConfig config) {
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostName );
 
+        executor.execute( operationHandler );
 
-		EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-		environmentBlueprint.setName(String.format("%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID()));
+        return operationHandler.getTrackerId();
+    }
 
-		//node group
-		NodeGroup nodesGroup = new NodeGroup();
-		nodesGroup.setName("DEFAULT");
-		nodesGroup.setNumberOfNodes(config.getNumberOfNodes());
-		nodesGroup.setTemplateName(config.getTemplateName());
-		nodesGroup.setPlacementStrategy(ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy());
 
+    @Override
+    public UUID addProperty( String clusterName, String fileName, String propertyName, String propertyValue ) {
 
-		environmentBlueprint.setNodeGroups(Sets.newHashSet(nodesGroup));
+        AbstractOperationHandler operationHandler =
+                new AddPropertyOperationHandler( this, clusterName, fileName, propertyName, propertyValue );
 
-		return environmentBlueprint;
-	}
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID removeProperty( String clusterName, String fileName, String propertyName ) {
+
+        AbstractOperationHandler operationHandler =
+                new RemovePropertyOperationHandler( this, clusterName, fileName, propertyName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final ZookeeperClusterConfig config,
+                                                         final ProductOperation po ) {
+        if ( config.getSetupType() == SetupType.STANDALONE ) {
+            //this is a standalone ZK cluster setup
+            return new ZookeeperStandaloneSetupStrategy( environment, config, po, this );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            //this is a with-Hadoop ZK cluster setup
+            return new ZookeeperWithHadoopSetupStrategy( environment, config, po, this );
+        }
+        else {
+            //this is an over-Hadoop ZK cluster setup
+            return new ZookeeperOverHadoopSetupStrategy( config, po, this );
+        }
+    }
+
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
+
+
+        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
+        environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
+
+        //node group
+        NodeGroup nodesGroup = new NodeGroup();
+        nodesGroup.setName( "DEFAULT" );
+        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodesGroup.setTemplateName( config.getTemplateName() );
+        nodesGroup.setPlacementStrategy( ZookeeperStandaloneSetupStrategy.getNodePlacementStrategy() );
+
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
+
+        return environmentBlueprint;
+    }
 }

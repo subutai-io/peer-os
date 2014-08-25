@@ -58,7 +58,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             po.addLog( "Deleting cluster information from database..." );
 
             try {
-                manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
                 po.addLogDone( "Cluster information deleted from database" );
             }
             catch ( DBException e ) {
@@ -84,7 +84,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
                 po.addLog( "Deleting cluster information from database..." );
 
                 try {
-                    manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                    manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
                     po.addLogDone( "Cluster information deleted from database" );
                 }
                 catch ( DBException e ) {

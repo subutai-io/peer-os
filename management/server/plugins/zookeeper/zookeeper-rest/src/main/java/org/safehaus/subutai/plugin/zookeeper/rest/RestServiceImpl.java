@@ -1,19 +1,15 @@
 package org.safehaus.subutai.plugin.zookeeper.rest;
 
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -22,8 +18,6 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private Zookeeper zookeeperManager;
     private AgentManager agentManager;
@@ -41,19 +35,19 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listClusters() {
-        return gson.toJson( zookeeperManager.getClusters() );
+        return JsonUtil.toJson( zookeeperManager.getClusters() );
     }
 
 
     @Override
     public String getCluster( final String source ) {
-        return gson.toJson( zookeeperManager.getCluster( source ) );
+        return JsonUtil.toJson( zookeeperManager.getCluster( source ) );
     }
 
 
     @Override
     public String createCluster( String config ) {
-        TrimmedZKConfig trimmedZKConfig = gson.fromJson( config, TrimmedZKConfig.class );
+        TrimmedZKConfig trimmedZKConfig = JsonUtil.fromJson( config, TrimmedZKConfig.class );
         ZookeeperClusterConfig expandedConfig = new ZookeeperClusterConfig();
 
         expandedConfig.setClusterName( trimmedZKConfig.getClusterName() );
@@ -73,9 +67,7 @@ public class RestServiceImpl implements RestService {
 
 
     private String wrapUUID( UUID uuid ) {
-        Map map = new HashMap<>();
-        map.put( "OPERATION_ID", uuid );
-        return gson.toJson( map );
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 

@@ -140,7 +140,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {
@@ -230,7 +230,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {
@@ -274,7 +274,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {
