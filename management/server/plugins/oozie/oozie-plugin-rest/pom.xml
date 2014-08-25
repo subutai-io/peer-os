@@ -10,8 +10,8 @@
   </parent>
 
   <artifactId>oozie-plugin-rest</artifactId>
-  <name>Subutai Oozie REST</name>
-  <description>Subutai Oozie REST</description>
+  <name>Subutai Oozie Plugin REST</name>
+  <description>Subutai Oozie Plugin REST</description>
   <packaging>bundle</packaging>
 
   <dependencies>

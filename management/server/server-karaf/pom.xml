@@ -1292,27 +1292,27 @@
                                 <!-- Oozie -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-api</artifactId>
+                                    <artifactId>oozie-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-impl</artifactId>
+                                    <artifactId>oozie-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-ui</artifactId>
+                                    <artifactId>oozie-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-cli</artifactId>
+                                    <artifactId>oozie-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-rest</artifactId>
+                                    <artifactId>oozie-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 

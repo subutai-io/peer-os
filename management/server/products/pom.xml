@@ -24,7 +24,6 @@
         <module>lucene</module>
         <module>mahout</module>
         <module>mongodb</module>
-        <module>oozie</module>
         <module>pig</module>
         <module>presto</module>
         <module>shark</module>

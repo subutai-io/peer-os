@@ -15,10 +15,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>oozie-api</module>
-        <module>oozie-impl</module>
-        <module>oozie-ui</module>
-        <module>oozie-cli</module>
-        <module>oozie-rest</module>
+        <module>oozie-plugin-api</module>
+        <module>oozie-plugin-impl</module>
+        <module>oozie-plugin-ui</module>
+        <module>oozie-plugin-cli</module>
+        <module>oozie-plugin-rest</module>
     </modules>
 </project>
