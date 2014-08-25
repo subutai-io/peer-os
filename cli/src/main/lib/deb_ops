@@ -73,6 +73,7 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (4) create debian package
   # ----------------------------------------------------------------------------
+  export TMPDIR="/var"
   dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
   check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
 
