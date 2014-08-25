@@ -1000,54 +1000,54 @@
                                 <!-- Cassandra -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-api</artifactId>
+                                    <artifactId>cassandra-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-impl</artifactId>
+                                    <artifactId>cassandra-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-ui</artifactId>
+                                    <artifactId>cassandra-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-cli</artifactId>
+                                    <artifactId>cassandra-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>cassandra-rest</artifactId>
+                                    <artifactId>cassandra-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
                                 <!-- HBase -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-api</artifactId>
+                                    <artifactId>hbase-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-impl</artifactId>
+                                    <artifactId>hbase-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-ui</artifactId>
+                                    <artifactId>hbase-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-cli</artifactId>
+                                    <artifactId>hbase-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-rest</artifactId>
+                                    <artifactId>hbase-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -1211,27 +1211,27 @@
                                 <!-- Mahout -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-api</artifactId>
+                                    <artifactId>mahout-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-impl</artifactId>
+                                    <artifactId>mahout-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-ui</artifactId>
+                                    <artifactId>mahout-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-cli</artifactId>
+                                    <artifactId>mahout-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-rest</artifactId>
+                                    <artifactId>mahout-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
@@ -1292,27 +1292,27 @@
                                 <!-- Oozie -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-api</artifactId>
+                                    <artifactId>oozie-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-impl</artifactId>
+                                    <artifactId>oozie-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-ui</artifactId>
+                                    <artifactId>oozie-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-cli</artifactId>
+                                    <artifactId>oozie-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>oozie-rest</artifactId>
+                                    <artifactId>oozie-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
