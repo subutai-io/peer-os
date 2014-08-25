@@ -1,20 +1,16 @@
 package org.safehaus.subutai.plugin.accumulo.rest;
 
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.shared.protocol.Agent;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -23,7 +19,6 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Accumulo accumuloManager;
     private AgentManager agentManager;
 
@@ -40,13 +35,13 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listClusters() {
-        return gson.toJson( accumuloManager.getClusters() );
+        return JsonUtil.toJson( accumuloManager.getClusters() );
     }
 
 
     @Override
     public String getCluster( final String source ) {
-        return gson.toJson( accumuloManager.getCluster( source ) );
+        return JsonUtil.toJson( accumuloManager.getCluster( source ) );
     }
 
 
@@ -57,9 +52,7 @@ public class RestServiceImpl implements RestService {
 
 
     private String wrapUUID( UUID uuid ) {
-        Map map = new HashMap<>();
-        map.put( "OPERATION_ID", uuid );
-        return gson.toJson( map );
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 
@@ -77,7 +70,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String createCluster( final String config ) {
-        TrimmedAccumuloConfig trimmedAccumuloConfig = gson.fromJson( config, TrimmedAccumuloConfig.class );
+        TrimmedAccumuloConfig trimmedAccumuloConfig = JsonUtil.fromJson( config, TrimmedAccumuloConfig.class );
         AccumuloClusterConfig expandedConfig = new AccumuloClusterConfig();
         expandedConfig.setClusterName( trimmedAccumuloConfig.getClusterName() );
         expandedConfig.setInstanceName( trimmedAccumuloConfig.getInstanceName() );

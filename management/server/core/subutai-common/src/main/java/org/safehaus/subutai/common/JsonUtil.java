@@ -1,22 +1,35 @@
 package org.safehaus.subutai.common;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.util.HashMap;
 
 
 public class JsonUtil {
 
-	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 
-	public static String toJson(Object key, Object value) {
+    public static String toJson( Object key, Object value ) {
 
-		HashMap<Object, Object> map = new HashMap();
-		map.put(key, value);
+        Map map = new HashMap();
+        map.put( key, value );
 
-		return GSON.toJson(map);
-	}
+        return GSON.toJson( map );
+    }
+
+
+    public static String toJson( Object value ) {
+
+        return GSON.toJson( value );
+    }
+
+
+    public static <T> T fromJson( String value, Class<T> clazz ) {
+
+        return GSON.fromJson( value, clazz );
+    }
 }
