@@ -5,18 +5,30 @@
  */
 package org.safehaus.subutai.api.oozie;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+
 
 /**
  * @author dilshat
  */
 public interface Oozie extends ApiBase<OozieConfig> {
 
-	UUID startServer(OozieConfig config);
+    UUID startServer( OozieConfig config );
 
-	UUID stopServer(OozieConfig config);
+    UUID stopServer( OozieConfig config );
 
-	UUID checkServerStatus(OozieConfig config);
+    UUID checkServerStatus( OozieConfig config );
+
+
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, OozieConfig config,
+                                                         ProductOperation po );
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieConfig config );
 }

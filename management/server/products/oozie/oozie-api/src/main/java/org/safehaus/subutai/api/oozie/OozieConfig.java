@@ -1,25 +1,30 @@
 package org.safehaus.subutai.api.oozie;
 
-import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 
 /**
  * @author dilshat
  */
 public class OozieConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Oozie";
-	String domainInfo;
+    public static final String PRODUCT_KEY = "Oozie";
+    public static final String PRODUCT_NAME = "Oozie";
+    private String templateName = PRODUCT_NAME;
+    private String domainName = Common.DEFAULT_DOMAIN_NAME;
 	private UUID uuid;
 	private String server;
 	private Set<String> clients;
 	private Set<String> hadoopNodes;
 	private String clusterName = "";
 
-	public OozieConfig() {
+
+    public OozieConfig() {
 		this.uuid = UUID.fromString(UUIDGenerator.getInstance().generateTimeBasedUUID().toString());
 	}
 
@@ -34,15 +39,15 @@ public class OozieConfig implements ConfigBase {
 	public void reset() {
 		this.server = null;
 		this.clients = null;
-		this.domainInfo = "";
+		this.domainName = "";
 	}
 
-	public String getDomainInfo() {
-		return domainInfo;
+	public String getDomainName() {
+		return domainName;
 	}
 
-	public void setDomainInfo(String domainInfo) {
-		this.domainInfo = domainInfo;
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
 	}
 
 	public String getServer() {
@@ -86,7 +91,7 @@ public class OozieConfig implements ConfigBase {
 	@Override
 	public String toString() {
 		return "OozieConfig{" +
-				"domainInfo='" + domainInfo + '\'' +
+				"domainName='" + domainName + '\'' +
 				", uuid=" + uuid +
 				", server='" + server + '\'' +
 				", clients=" + clients +
@@ -94,4 +99,14 @@ public class OozieConfig implements ConfigBase {
 				", clusterName='" + clusterName + '\'' +
 				'}';
 	}
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public void setTemplateName( final String templateName ) {
+        this.templateName = templateName;
+    }
 }
