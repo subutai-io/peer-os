@@ -1,21 +1,5 @@
 #!/bin/bash
 
-function get_lxc_list()
-{
-  echo "`lxc-ls -f | tail -n +3 | cut -d " " -f1`"
-}
-
-function destroy_all_lxcs()
-{
-  for lxc in $1
-  do
-     if [ "$lxc" != "master" ]
-     then
-       subutai destroy $lxc > /dev/null 2>&1 && echo "destroy $lxc"
-     fi
-  done
-}
-
 function master_destroy {
 
   if [ -z "`zfs list lxc/master`" ]; then
@@ -38,11 +22,11 @@ function master_destroy {
     esac
   done
 
-  lxc_list="`get_lxc_list`"
-  while [ "`echo $lxc_list | wc -w`" -gt 1 ]
+  # Destroy all children of master template
+  children_list=`zfs_get_children_list $container`
+  for child in $children_list
   do
-    lxc_list="`get_lxc_list`"
-    destroy_all_lxcs "$lxc_list"
+    subutai destroy -r $child
   done
  
   # Check if the package is installed
