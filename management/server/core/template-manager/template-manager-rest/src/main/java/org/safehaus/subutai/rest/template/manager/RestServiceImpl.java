@@ -24,6 +24,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+
 
 public class RestServiceImpl implements RestService {
 
@@ -92,15 +95,15 @@ public class RestServiceImpl implements RestService {
         try {
             aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
 
-            Path p = Paths.get( configDir, "config" );
-            List<String> conf = aptRepoManager.readFileContents( mgmt, path.toString(), Arrays.asList( p.toString() ) );
+            Path configPath = Paths.get( configDir, "config" );
+            Path packagesPath = Paths.get( configDir, "packages" );
+            List<String> files = aptRepoManager.readFileContents( mgmt, path.toString(),
+                    Arrays.asList( configPath.toString(), packagesPath.toString() ) );
 
-            p = Paths.get( configDir, "packages" );
-            List<String> pack = aptRepoManager.readFileContents( mgmt, path.toString(), Arrays.asList( p.toString() ) );
+            HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
+            String md5sum = md5.toString();
 
-            String md5sum = null;
-
-            templateRegistry.registerTemplate( mergeLines( conf ), mergeLines( pack ), md5sum );
+            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum );
         }
         catch ( AptRepoException ex ) {
             String m = "Failed to process deb package";
