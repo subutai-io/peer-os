@@ -7,7 +7,7 @@ package org.safehaus.subutai.ui.mahout.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.mahout.MahoutUI;
@@ -44,7 +44,7 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = MahoutUI.getMahoutManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, MahoutConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

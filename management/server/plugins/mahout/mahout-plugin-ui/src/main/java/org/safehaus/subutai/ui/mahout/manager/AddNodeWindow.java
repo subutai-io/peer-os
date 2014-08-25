@@ -1,19 +1,27 @@
 package org.safehaus.subutai.ui.mahout.manager;
 
-import com.google.common.base.Strings;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.api.mahout.Config;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.mahout.MahoutUI;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.UUID;
+import com.google.common.base.Strings;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Window;
 
 
 public class AddNodeWindow extends Window {
@@ -26,7 +34,7 @@ public class AddNodeWindow extends Window {
 
 	private final ArrayList<String> selectedNodes = new ArrayList<>();
 
-	public AddNodeWindow(final Config config, Set<Agent> nodes) {
+	public AddNodeWindow(final MahoutConfig config, Set<Agent> nodes) {
 
 		super("Add New Node");
 
@@ -131,7 +139,7 @@ public class AddNodeWindow extends Window {
 		MahoutUI.getExecutor().execute(new Runnable() {
 			public void run() {
 				while (true) {
-					ProductOperationView po = MahoutUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+					ProductOperationView po = MahoutUI.getTracker().getProductOperation( MahoutConfig.PRODUCT_KEY, trackID);
 					if (po != null) {
 						setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
 						if (po.getState() != ProductOperationState.RUNNING) {

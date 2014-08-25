@@ -9,7 +9,7 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -30,7 +30,7 @@ public class Manager {
 	private final GridLayout contentRoot;
 	private final ComboBox clusterCombo;
 	private final Table nodesTable;
-	private Config config;
+	private MahoutConfig config;
 
 	public Manager() {
 
@@ -58,7 +58,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				config = (MahoutConfig ) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -88,7 +88,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = MahoutUI.getMahoutManager().uninstallCluster(config.getClusterName());
-							ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, MahoutConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -182,17 +182,17 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<Config> clustersInfo = MahoutUI.getMahoutManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
+		List<MahoutConfig> clustersInfo = MahoutUI.getMahoutManager().getClusters();
+		MahoutConfig clusterInfo = (MahoutConfig ) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config mongoClusterInfo : clustersInfo) {
+			for (MahoutConfig mongoClusterInfo : clustersInfo) {
 				clusterCombo.addItem(mongoClusterInfo);
 				clusterCombo.setItemCaption(mongoClusterInfo,
 						mongoClusterInfo.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : clustersInfo) {
+				for (MahoutConfig mongoClusterInfo : clustersInfo) {
 					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(mongoClusterInfo);
 						return;
@@ -231,7 +231,7 @@ public class Manager {
 						@Override
 						public void buttonClick(Button.ClickEvent clickEvent) {
 							UUID trackID = MahoutUI.getMahoutManager().destroyNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID, MahoutConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {

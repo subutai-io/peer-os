@@ -2,7 +2,7 @@ package org.safehaus.subutai.mahout.services;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.api.mahout.Mahout;
 import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -40,10 +40,10 @@ public class RestService {
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getClusters() {
 
-		List<Config> configs = mahoutManager.getClusters();
+		List<MahoutConfig> configs = mahoutManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configs) {
+		for (MahoutConfig config : configs) {
 			clusterNames.add(config.getClusterName());
 		}
 
@@ -57,7 +57,7 @@ public class RestService {
 	public String getCluster(
 			@QueryParam ("clusterName") String clusterName
 	) {
-		Config config = mahoutManager.getCluster(clusterName);
+		MahoutConfig config = mahoutManager.getCluster(clusterName);
 
 		return JsonUtil.GSON.toJson(config);
 	}
@@ -70,7 +70,7 @@ public class RestService {
 			@QueryParam ("clusterName") String clusterName,
 			@QueryParam ("nodes") String nodes
 	) {
-		Config config = new Config();
+		MahoutConfig config = new MahoutConfig();
 		config.setClusterName(clusterName);
 
 		for (String node : nodes.split(",")) {

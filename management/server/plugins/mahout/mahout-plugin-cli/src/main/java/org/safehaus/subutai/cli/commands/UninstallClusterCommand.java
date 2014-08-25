@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.api.mahout.Mahout;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -43,7 +43,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 		UUID uuid = mahoutManager.uninstallCluster(clusterName);
 		int logSize = 0;
 		while (!Thread.interrupted()) {
-			ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+			ProductOperationView po = tracker.getProductOperation( MahoutConfig.PRODUCT_KEY, uuid);
 			if (po != null) {
 				if (logSize != po.getLog().length()) {
 					System.out.print(po.getLog().substring(logSize, po.getLog().length()));

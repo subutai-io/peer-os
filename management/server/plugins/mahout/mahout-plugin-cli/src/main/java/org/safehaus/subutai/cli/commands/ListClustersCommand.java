@@ -2,7 +2,7 @@ package org.safehaus.subutai.cli.commands;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.api.mahout.Mahout;
 
 import java.util.List;
@@ -25,9 +25,9 @@ public class ListClustersCommand extends OsgiCommandSupport {
 	}
 
 	protected Object doExecute() {
-		List<Config> configList = mahoutManager.getClusters();
+		List<MahoutConfig> configList = mahoutManager.getClusters();
 		if (!configList.isEmpty())
-			for (Config config : configList) {
+			for (MahoutConfig config : configList) {
 				System.out.println(config.getClusterName());
 			}
 		else System.out.println("No Mahout cluster");

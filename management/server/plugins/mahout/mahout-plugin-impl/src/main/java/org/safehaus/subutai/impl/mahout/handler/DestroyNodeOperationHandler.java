@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.mahout.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.impl.mahout.Commands;
 import org.safehaus.subutai.impl.mahout.MahoutImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -22,7 +22,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Mahout
 	public DestroyNodeOperationHandler(MahoutImpl manager, String clusterName, String lxcHostname) {
 		super(manager, clusterName);
 		this.lxcHostname = lxcHostname;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		po = manager.getTracker().createProductOperation( MahoutConfig.PRODUCT_KEY,
 				String.format("Destroying %s in %s", lxcHostname, clusterName));
 	}
 
@@ -33,7 +33,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Mahout
 
 	@Override
 	public void run() {
-		final Config config = manager.getCluster(clusterName);
+		final MahoutConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 			return;
@@ -76,7 +76,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Mahout
 			config.getNodes().remove(agent);
 			po.addLog("Updating db...");
 
-			if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+			if (manager.getDbManager().saveInfo( MahoutConfig.PRODUCT_KEY, config.getClusterName(), config)) {
 				po.addLogDone("Cluster info update in DB\nDone");
 			} else {
 				po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");

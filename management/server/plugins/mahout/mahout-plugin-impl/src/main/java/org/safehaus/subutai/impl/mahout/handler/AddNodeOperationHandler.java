@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.mahout.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.mahout.Config;
+import org.safehaus.subutai.api.mahout.MahoutConfig;
 import org.safehaus.subutai.impl.mahout.Commands;
 import org.safehaus.subutai.impl.mahout.MahoutImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -23,7 +23,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MahoutImpl
 	public AddNodeOperationHandler(MahoutImpl manager, String clusterName, String lxcHostname) {
 		super(manager, clusterName);
 		this.lxcHostname = lxcHostname;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		po = manager.getTracker().createProductOperation( MahoutConfig.PRODUCT_KEY,
 				String.format("Adding node to %s", clusterName));
 	}
 
@@ -34,7 +34,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MahoutImpl
 
 	@Override
 	public void run() {
-		Config config = manager.getCluster(clusterName);
+		MahoutConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 			return;
@@ -76,7 +76,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MahoutImpl
 		config.getNodes().add(agent);
 		po.addLog("Updating db...");
 		//save to db
-		if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+		if (manager.getDbManager().saveInfo( MahoutConfig.PRODUCT_KEY, config.getClusterName(), config)) {
 			po.addLog("Cluster info updated in DB\nInstalling Mahout...");
 			//install mahout
 
