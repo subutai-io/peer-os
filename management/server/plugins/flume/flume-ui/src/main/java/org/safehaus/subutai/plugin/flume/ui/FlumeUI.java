@@ -84,10 +84,12 @@ public class FlumeUI implements PortalModule {
 		return FileUtil.getFile(FlumeUI.MODULE_IMAGE, this);
 	}
 
+    @Override
 	public String getName() {
         return FlumeConfig.PRODUCT_KEY;
 	}
 
+    @Override
 	public Component createComponent() {
 		return new FlumeForm();
 	}

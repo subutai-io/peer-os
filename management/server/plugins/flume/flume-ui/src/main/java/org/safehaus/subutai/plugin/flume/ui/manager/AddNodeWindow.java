@@ -67,6 +67,7 @@ class AddNodeWindow extends Window {
 				final UUID trackID = FlumeUI.getManager().addNode(config.getClusterName(), agent.getHostname());
 				FlumeUI.getExecutor().execute(new Runnable() {
 
+                    @Override
 					public void run() {
 						while (track) {
                             ProductOperationView po = FlumeUI.getTracker().getProductOperation(FlumeConfig.PRODUCT_KEY, trackID);

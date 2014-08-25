@@ -7,7 +7,7 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 public class FlumeConfig implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Flume";
+    public static final String PRODUCT_KEY = "Flume2";
     public static final String TEMPLATE_NAME = "flume";
 
     private String clusterName = "";
