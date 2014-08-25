@@ -39,6 +39,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>oozie-plugin-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

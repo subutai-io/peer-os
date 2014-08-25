@@ -21,7 +21,6 @@
         <module>hive</module>
         <module>hivequery</module>
         <module>lucene</module>
-        <module>mahout</module>
         <module>mongodb</module>
         <module>pig</module>
         <module>presto</module>

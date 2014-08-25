@@ -9,16 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mahout-parent</artifactId>
-    <name>Subutai Mahout Parent</name>
-    <description>Subutai Mahout Parent</description>
+    <artifactId>mahout-plugin-parent</artifactId>
+    <name>Subutai Mahout Plugin Parent</name>
+    <description>Subutai Mahout Plugin Parent</description>
     <packaging>pom</packaging>
 
     <modules>
-        <module>mahout-api</module>
-        <module>mahout-impl</module>
-        <module>mahout-ui</module>
-        <module>mahout-cli</module>
-        <module>mahout-rest</module>
+        <module>mahout-plugin-api</module>
+        <module>mahout-plugin-impl</module>
+        <module>mahout-plugin-ui</module>
+        <module>mahout-plugin-cli</module>
+        <module>mahout-plugin-rest</module>
     </modules>
 </project>

@@ -26,6 +26,7 @@
         <module>cassandra</module>
         <module>hbase</module>
         <module>oozie</module>
+        <module>mahout</module>
     </modules>
 
 </project>

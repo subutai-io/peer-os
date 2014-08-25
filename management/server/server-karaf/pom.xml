@@ -1211,27 +1211,27 @@
                                 <!-- Mahout -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-api</artifactId>
+                                    <artifactId>mahout-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-impl</artifactId>
+                                    <artifactId>mahout-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-ui</artifactId>
+                                    <artifactId>mahout-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-cli</artifactId>
+                                    <artifactId>mahout-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>mahout-rest</artifactId>
+                                    <artifactId>mahout-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 

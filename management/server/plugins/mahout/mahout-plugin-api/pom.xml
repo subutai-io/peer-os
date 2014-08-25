@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-parent</artifactId>
+        <artifactId>mahout-plugin-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>mahout-impl</artifactId>
+    <artifactId>mahout-plugin-api</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Mahout</name>
-    <description>Subutai Mahout</description>
+    <name>Subutai Mahout Plugin Api</name>
+    <description>Subutai Mahout Plugin Api</description>
 
     <dependencies>
         <dependency>
@@ -20,37 +20,8 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mgmt-shared-protocol</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>agent-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mahout-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>tracker-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>db-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lxc-manager-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>command-runner-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -65,7 +36,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.impl.mahout</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.api.mahout</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
