@@ -40,6 +40,7 @@ public class AccumuloForm extends CustomComponent {
                 String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
                 if( caption.equals( "Manage" ) ) {
                     manager.refreshClustersInfo();
+                    manager.checkAll();
                 }
             }
         } );

@@ -89,6 +89,7 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( Config ) event.getProperty().getValue();
                 refreshUI();
+                checkAll();
             }
         } );
         controlsContent.addComponent( clusterCombo );
@@ -376,7 +377,7 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
+    public void refreshUI() {
         if ( config != null ) {
             populateTable( slavesTable, new ArrayList<>( config.getSlaves() ), false );
             populateTable( tracersTable, new ArrayList<>( config.getTracers() ), false );
@@ -556,5 +557,11 @@ public class Manager {
 
     public Component getContent() {
         return contentRoot;
+    }
+
+    public void checkAll(){
+        checkNodesStatus( mastersTable );
+        checkNodesStatus( slavesTable );
+        checkNodesStatus( tracersTable );
     }
 }
