@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.handler.InstallHandler;
 import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.shared.operation.*;
@@ -27,7 +27,9 @@ public class InstallHandlerTest {
 
     @Test
     public void testWithInvalidConfig() {
-        handler = new InstallHandler(mock, new FlumeConfig());
+        FlumeConfig config = new FlumeConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
+        handler = new InstallHandler(mock, config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
@@ -38,6 +40,7 @@ public class InstallHandlerTest {
     @Test
     public void testWithExistingCluster() {
         FlumeConfig config = new FlumeConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName("test-cluster");
         config.setNodes(new HashSet<>(Arrays.asList(CommonMockBuilder.createAgent())));
 

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.handler.AddNodeHandler;
 import org.junit.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
 import org.safehaus.subutai.shared.operation.*;
 
@@ -22,13 +22,15 @@ public class AddNodeHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not found"));
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
     @Test
     public void testWithExistingCluster() {
-        mock.setConfig(new FlumeConfig());
+        FlumeConfig config = new FlumeConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
+        mock.setConfig(config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
