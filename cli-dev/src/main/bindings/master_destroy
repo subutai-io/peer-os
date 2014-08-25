@@ -27,6 +27,7 @@ function master_destroy {
   local package_name=`get_package_name $container`
   local debian_root="$SUBUTAI_TMPDIR/$container"
   
+  # Confirm destroy operation
   echo WARNING: this destroys everything mercilessly
   while true; do
     read -p "Do you wish to destroy master template? [Y/N]" yn
@@ -47,7 +48,6 @@ function master_destroy {
   # Check if the package is installed
   is_package_installed $package_name
   if [ $? == 0  ]; then
-    # Confirm destroy operation
     apt-get --assume-yes --force-yes purge $package_name
   fi
 

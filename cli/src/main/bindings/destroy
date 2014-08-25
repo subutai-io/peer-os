@@ -10,17 +10,10 @@ function destroy_usage {
 }
 
 function destroy {
-  local clone="$1"
-
-  if [ "$clone" == "master" ]; then
-    msg_error "Use subutai master_destroy instead of subutai destroy"
-    exit 1
-  fi
-
   # Destruction Plan:
   # ----------------------------------------------------------------------------
   # (1) check that clone exists first, and find its parent
-  # (2) check if the clone has dependent child and abort if so
+  # (2) check if the clone has dependent child and abort if not called via recursive option
   # (3) Remove the debian package if installed
   # (4) release all holds on clone's rootfs snapshots
   # (5) destroy all snapshots on clones's rootfs
@@ -28,6 +21,34 @@ function destroy {
   # (7) destroy mounted partitions
   # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   # ----------------------------------------------------------------------------
+
+  # Parse provided arguments
+  local recursive="false"
+
+  shift_amount=0;
+  while getopts ":r" opt; do
+    case $opt in
+      r)
+        recursive="true"
+	;;
+      \?)
+        msg_error "Unrecognized option -$OPTARG"
+        exit 1
+        ;;
+    esac
+    shift_amount=$(($shift_amount + 1))
+  done
+
+  while [ -n "`echo $1 | grep -`" ]; do
+    shift
+  done
+
+  local clone="$1"
+
+  if [ "$clone" == "master" ]; then
+    msg_error "Use subutai master_destroy instead of subutai destroy"
+    exit 1
+  fi
 
   # (1) check that clone exists first: turn off if on
   lxc_assert "$clone" "`usage`"
@@ -38,16 +59,33 @@ function destroy {
   parent=`zfs_ctnr_from_ds $parent_snap`
 
   # (2) check if the clone has dependent children
-  # TODO: add a -r switch option to allow recursive destruction of children
   msg_info "    - checking if \"$clone\" has dependent children ..."
   zfs_get_children $clone
   child_count=$?
 
-  if [ $child_count -gt 0 ]; then
+  if [ $child_count -gt 0 -a $recursive == "false" ]; then
     msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
     exit 1
   fi
+  
+  local snap=
 
+  # we got a dataset instead of a clone name
+  if [ -n "`echo $clone | egrep 'lxc.*/'`" ]; then
+    snap="$clone@template"
+  else
+    snap="lxc/$clone@template"
+  fi
+
+  for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
+  do
+    child="`zfs_ctnr_from_ds $ds`"
+    if [ $recursive = "true" ]; then
+      msg_notice "          -> Recursive destroy call for $child"
+      subutai destroy -r $child
+    fi
+  done
+  
   # (3) Remove the debian package if installed
   local container=$clone
   local package_name=`get_package_name $container`
