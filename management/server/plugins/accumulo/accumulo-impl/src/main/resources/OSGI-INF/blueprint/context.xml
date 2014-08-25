@@ -15,8 +15,6 @@
              interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper" />
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
-  <reference id="templateRegistryManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager" />
 
   <bean id="accumulo-impl" scope="singleton" class="org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl"
         init-method="init" destroy-method="destroy">
@@ -27,7 +25,6 @@
     <argument ref="hadoopManager" />
     <argument ref="zkManager" />
     <argument ref="environmentManager" />
-    <argument ref="templateRegistryManager" />
   </bean>
 
   <service ref="accumulo-impl" interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo" />

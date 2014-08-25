@@ -9,6 +9,7 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -23,6 +24,7 @@ public class PluginDAO {
 
 
     public PluginDAO( final DbManager dbManager ) {
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
         this.dbManager = dbManager;
     }
 

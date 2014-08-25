@@ -98,7 +98,7 @@ public class ClusterConfiguration {
 
                                     po.addLog( "Updating information in database..." );
                                     try {
-                                        accumuloManager.getDbManager().saveInfo2( AccumuloClusterConfig.PRODUCT_KEY,
+                                        accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
                                                 accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
 
                                         po.addLog( "Updated information in database" );
@@ -241,7 +241,7 @@ public class ClusterConfiguration {
 
                                 po.addLog( "Updating information in database..." );
                                 try {
-                                    accumuloManager.getDbManager().saveInfo2( AccumuloClusterConfig.PRODUCT_KEY,
+                                    accumuloManager.getPluginDAO().saveInfo( AccumuloClusterConfig.PRODUCT_KEY,
                                             accumuloClusterConfig.getClusterName(), accumuloClusterConfig );
 
                                     po.addLog( "Updated information in database" );
@@ -327,8 +327,8 @@ public class ClusterConfiguration {
             po.addLog( "Updating database..." );
 
             try {
-                accumuloManager.getDbManager()
-                               .saveInfo2( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
+                accumuloManager.getPluginDAO()
+                               .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
                                        accumuloClusterConfig );
                 po.addLog( "Database information updated" );
             }
@@ -376,8 +376,9 @@ public class ClusterConfiguration {
 
         po.addLog( "Updating database..." );
         try {
-            accumuloManager.getDbManager()
-                           .deleteInfo2( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName() );
+            accumuloManager.getPluginDAO()
+                           .deleteInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName() );
+
             po.addLog( "Database information updated" );
         }
         catch ( DBException e ) {
