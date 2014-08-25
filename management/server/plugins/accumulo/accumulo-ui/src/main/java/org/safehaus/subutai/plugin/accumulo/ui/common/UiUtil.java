@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.accumulo.ui.common;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -79,7 +79,7 @@ public class UiUtil {
                     Agent lxcAgent = AccumuloUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Util.wrapAgentToSet( lxcAgent ), AccumuloUI.getExecutor(),
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), AccumuloUI.getExecutor(),
                                         AccumuloUI.getCommandRunner(), AccumuloUI.getAgentManager() );
                         table.getUI().addWindow( terminal.getWindow() );
                     }

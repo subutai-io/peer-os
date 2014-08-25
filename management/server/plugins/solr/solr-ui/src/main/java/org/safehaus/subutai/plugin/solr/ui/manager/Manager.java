@@ -17,9 +17,9 @@ import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -289,9 +289,8 @@ public class Manager {
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = SolrUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
-                        TerminalWindow terminal =
-                                new TerminalWindow( Util.wrapAgentToSet( lxcAgent ), SolrUI.getExecutor(),
-                                        SolrUI.getCommandRunner(), SolrUI.getAgentManager() );
+                        TerminalWindow terminal = new TerminalWindow( Sets.newHashSet( lxcAgent ), SolrUI.getExecutor(),
+                                SolrUI.getCommandRunner(), SolrUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
