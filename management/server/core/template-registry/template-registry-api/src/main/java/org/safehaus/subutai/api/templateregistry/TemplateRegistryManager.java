@@ -20,7 +20,7 @@ public interface TemplateRegistryManager {
      * @param configFile - template configuration file contents
      * @param packagesFile - template packages manifest file contents
      */
-    public void registerTemplate( String configFile, String packagesFile ) throws RegistryException;
+    public void registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
 
     /**
      * Removes template entry from registry

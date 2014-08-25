@@ -45,13 +45,14 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
-    public void registerTemplate( final String configFile, final String packagesFile ) throws RegistryException {
+    public void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
+            throws RegistryException {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
                 .checkArgument( !Strings.isNullOrEmpty( packagesFile ), "Packages file contents is null or empty" );
 
-        Template template = parseTemplate( configFile, packagesFile );
+        Template template = parseTemplate( configFile, packagesFile, md5sum );
 
         //save template to storage
         try {
@@ -65,7 +66,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
-    private Template parseTemplate( String configFile, String packagesFile ) throws RegistryException {
+    private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException {
         Properties properties = new Properties();
         try {
             properties.load( new ByteArrayInputStream( configFile.getBytes() ) );
@@ -77,7 +78,22 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             String subutaiGitUuid = properties.getProperty( "subutai.git.uuid" );
 
             Template template = new Template( lxcArch, lxcUtsname, subutaiConfigPath, subutaiParent, subutaiGitBranch,
-                    subutaiGitUuid, packagesFile );
+                    subutaiGitUuid, packagesFile, md5sum );
+
+            //check if template with such name already exists
+            if ( getTemplate( template.getTemplateName() ) != null ) {
+                throw new RegistryException(
+                        String.format( "Template with name %s already exists", template.getTemplateName() ) );
+            }
+
+            //check if template with supplied md5sum already exists
+            List<Template> allTemplates = getAllTemplates( template.getLxcArch() );
+            for ( Template templ : allTemplates ) {
+                if ( templ.getMd5sum().equalsIgnoreCase( template.getMd5sum() ) ) {
+                    throw new RegistryException( String.format( "Template %s with the same md5sum already exists",
+                            templ.getTemplateName() ) );
+                }
+            }
 
             if ( template.getParentTemplateName() == null ) {
 
