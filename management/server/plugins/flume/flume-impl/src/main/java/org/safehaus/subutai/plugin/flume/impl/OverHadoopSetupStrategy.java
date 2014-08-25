@@ -21,14 +21,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy {
     @Override
     public ConfigBase setup() throws ClusterSetupException {
 
-        if(config.getClusterName() == null || config.getClusterName().isEmpty())
-            throw new ClusterSetupException("Cluster name not specified");
-
-        if(config.getNodes() == null || config.getNodes().isEmpty())
-            throw new ClusterSetupException("Target nodes not specified");
-
-        if(manager.getCluster(config.getClusterName()) != null)
-            throw new ClusterSetupException("Cluster already exists: " + config.getClusterName());
+        checkConfig();
 
         //check if node agents are connected
         for(Agent a : config.getNodes()) {

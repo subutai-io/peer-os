@@ -28,14 +28,7 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
     @Override
     public ConfigBase setup() throws ClusterSetupException {
 
-        if(config.getClusterName() == null || config.getClusterName().isEmpty())
-            throw new ClusterSetupException("Cluster name not specified");
-
-        if(config.getNodesCount() <= 0)
-            throw new ClusterSetupException("Invalid number of nodes");
-
-        if(manager.getCluster(config.getClusterName()) != null)
-            throw new ClusterSetupException("Cluster already exists: " + config.getClusterName());
+        checkConfig();
 
         if(environment == null)
             throw new ClusterSetupException("Environment not specified");
