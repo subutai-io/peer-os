@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -13,7 +14,6 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import com.google.common.base.Strings;
 
@@ -54,8 +54,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<ZookeeperI
         if ( Strings.isNullOrEmpty( config.getClusterName() )
                 //either number of nodes to create or hadoop cluster nodes must be present
                 || ( config.getSetupType() == SetupType.STANDALONE && config.getNumberOfNodes() <= 0 ) || (
-                config.getSetupType() == SetupType.OVER_HADOOP && Util.isCollectionEmpty( config.getNodes() ) && Strings
-                        .isNullOrEmpty( config.getHadoopClusterName() ) ) ||
+                config.getSetupType() == SetupType.OVER_HADOOP && CollectionUtil.isCollectionEmpty( config.getNodes() )
+                        && Strings.isNullOrEmpty( config.getHadoopClusterName() ) ) ||
                 ( config.getSetupType() == SetupType.WITH_HADOOP && hadoopClusterConfig == null ) ) {
             po.addLogFailed( "Malformed configuration" );
             return;

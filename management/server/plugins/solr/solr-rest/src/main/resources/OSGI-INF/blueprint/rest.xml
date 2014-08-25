@@ -14,15 +14,12 @@
 
   <reference id="solrManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.solr.api.Solr" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <bean id="solrRestServiceImpl" class="org.safehaus.subutai.plugin.solr.rest.RestServiceImpl">
     <property name="solrManager" ref="solrManager" />
-    <property name="agentManager" ref="agentManager" />
   </bean>
 
-  <jaxrs:server address="/solr" id="solrRestService">
+  <jaxrs:server address="/solr2" id="solrRestService">
     <jaxrs:serviceBeans>
       <ref component-id="solrRestServiceImpl" />
     </jaxrs:serviceBeans>

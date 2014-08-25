@@ -12,13 +12,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ContiguousSet;
@@ -244,11 +244,11 @@ public class ConfigurationStep extends Panel {
             } );
 
             //restore tracers if back button is pressed
-            if ( !Util.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
+            if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
                 tracersSelect.setValue( wizard.getConfig().getTracers() );
             }
             //restore slaves if back button is pressed
-            if ( !Util.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
+            if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
                 slavesSelect.setValue( wizard.getConfig().getSlaves() );
             }
 
@@ -323,10 +323,10 @@ public class ConfigurationStep extends Panel {
                     else if ( wizard.getConfig().getMonitor() == null ) {
                         show( "Please, select monitor" );
                     }
-                    else if ( Util.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
+                    else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getTracers() ) ) {
                         show( "Please, select tracer(s)" );
                     }
-                    else if ( Util.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
+                    else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaves() ) ) {
                         show( "Please, select slave(s)" );
                     }
                     else {
@@ -623,7 +623,8 @@ public class ConfigurationStep extends Panel {
             withHadoopInstallationControls.setMargin( true );
 
             withHadoopInstallationControls.addComponent( new Label(
-                    "Please, specify installation settings for combo Hadoop+Zookeeper+Accumulo clusters installation" ) );
+                    "Please, specify installation settings for combo Hadoop+Zookeeper+Accumulo clusters installation"
+            ) );
             withHadoopInstallationControls.addComponent( new Label( "Zookeeper settings" ) );
             withHadoopInstallationControls.addComponent( zkClusterNameTxtFld );
             withHadoopInstallationControls.addComponent( zkNodesCountCombo );

@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.impl;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
@@ -11,7 +12,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
@@ -46,8 +46,8 @@ public class AccumuloOverZkNHadoopSetupStrategy implements ClusterSetupStrategy 
     public AccumuloClusterConfig setup() throws ClusterSetupException {
         if ( accumuloClusterConfig.getMasterNode() == null || accumuloClusterConfig.getGcNode() == null
                 || accumuloClusterConfig.getMonitor() == null || Strings
-                .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || Util
-                .isCollectionEmpty( accumuloClusterConfig.getTracers() ) || Util
+                .isNullOrEmpty( accumuloClusterConfig.getClusterName() ) || CollectionUtil
+                .isCollectionEmpty( accumuloClusterConfig.getTracers() ) || CollectionUtil
                 .isCollectionEmpty( accumuloClusterConfig.getSlaves() ) || Strings
                 .isNullOrEmpty( accumuloClusterConfig.getInstanceName() ) ||
                 Strings.isNullOrEmpty( accumuloClusterConfig.getPassword() ) ) {

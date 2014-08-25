@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.accumulo.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -8,11 +9,12 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
@@ -34,39 +36,47 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
-//TODO: add parameter validation
+
 public class AccumuloImpl implements Accumulo {
 
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
     private EnvironmentManager environmentManager;
-    private TemplateRegistryManager templateRegistryManager;
     private ExecutorService executor;
+    private PluginDAO pluginDAO;
 
 
     public AccumuloImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager,
-                         TemplateRegistryManager templateRegistryManager ) {
+                         Hadoop hadoopManager, Zookeeper zkManager, EnvironmentManager environmentManager ) {
+
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+        Preconditions.checkNotNull( hadoopManager, "Hadoop manager is null" );
+        Preconditions.checkNotNull( zkManager, "Zookeeper manager is null" );
+        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
+
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
-        this.dbManager = dbManager;
         this.tracker = tracker;
         this.hadoopManager = hadoopManager;
         this.zkManager = zkManager;
         this.environmentManager = environmentManager;
-        this.templateRegistryManager = templateRegistryManager;
+        this.pluginDAO = new PluginDAO( dbManager );
 
         Commands.init( commandRunner );
     }
 
 
-    public TemplateRegistryManager getTemplateRegistryManager() {
-        return templateRegistryManager;
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
     }
 
 
@@ -82,11 +92,6 @@ public class AccumuloImpl implements Accumulo {
 
     public AgentManager getAgentManager() {
         return agentManager;
-    }
-
-
-    public DbManager getDbManager() {
-        return dbManager;
     }
 
 
@@ -116,6 +121,8 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig ) {
+        Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster configuration is null" );
+
         AbstractOperationHandler operationHandler = new InstallOperationHandler( this, accumuloClusterConfig );
 
         executor.execute( operationHandler );
@@ -127,6 +134,10 @@ public class AccumuloImpl implements Accumulo {
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig,
                                 final HadoopClusterConfig hadoopClusterConfig,
                                 final ZookeeperClusterConfig zookeeperClusterConfig ) {
+        Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster configuration is null" );
+        Preconditions.checkNotNull( hadoopClusterConfig, "Hadoop cluster configuration is null" );
+        Preconditions.checkNotNull( zookeeperClusterConfig, "Zookeeper cluster configuration is null" );
+
         AbstractOperationHandler operationHandler =
                 new InstallOperationHandler( this, accumuloClusterConfig, hadoopClusterConfig, zookeeperClusterConfig );
 
@@ -138,6 +149,8 @@ public class AccumuloImpl implements Accumulo {
 
     public UUID uninstallCluster( final String clusterName ) {
 
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
         executor.execute( operationHandler );
@@ -148,16 +161,30 @@ public class AccumuloImpl implements Accumulo {
 
     public List<AccumuloClusterConfig> getClusters() {
 
-        return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, AccumuloClusterConfig.class );
+        try {
+            return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, AccumuloClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
     }
 
 
     public AccumuloClusterConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
+        try {
+            return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return null;
+        }
     }
 
 
     public UUID startCluster( final String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
 
@@ -168,6 +195,8 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID stopCluster( final String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
 
@@ -178,6 +207,9 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID checkNode( final String clusterName, final String lxcHostName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostName );
 
@@ -188,6 +220,9 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID addNode( final String clusterName, final String lxcHostname, final NodeType nodeType ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+        Preconditions.checkNotNull( nodeType, "Node type is null" );
 
         AbstractOperationHandler operationHandler =
                 new AddNodeOperationHandler( this, clusterName, lxcHostname, nodeType );
@@ -199,6 +234,9 @@ public class AccumuloImpl implements Accumulo {
 
 
     public UUID destroyNode( final String clusterName, final String lxcHostName, final NodeType nodeType ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostName ), "Lxc hostname is null or empty" );
+        Preconditions.checkNotNull( nodeType, "Node type is null" );
 
         AbstractOperationHandler operationHandler =
                 new DestroyNodeOperationHandler( this, clusterName, lxcHostName, nodeType );
@@ -211,6 +249,9 @@ public class AccumuloImpl implements Accumulo {
 
     @Override
     public UUID addProperty( final String clusterName, final String propertyName, final String propertyValue ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyName ), "Property name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyValue ), "Property value is null or empty" );
 
         AbstractOperationHandler operationHandler =
                 new AddPropertyOperationHandler( this, clusterName, propertyName, propertyValue );
@@ -223,6 +264,8 @@ public class AccumuloImpl implements Accumulo {
 
     @Override
     public UUID removeProperty( final String clusterName, final String propertyName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( propertyName ), "Property name is null or empty" );
 
         AbstractOperationHandler operationHandler =
                 new RemovePropertyOperationHandler( this, clusterName, propertyName );
@@ -236,6 +279,10 @@ public class AccumuloImpl implements Accumulo {
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment,
                                                          AccumuloClusterConfig accumuloClusterConfig,
                                                          ProductOperation po ) {
+        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation is null" );
+
         if ( accumuloClusterConfig.getSetupType() == SetupType.OVER_HADOOP_N_ZK ) {
             return new AccumuloOverZkNHadoopSetupStrategy( accumuloClusterConfig, po, this );
         }

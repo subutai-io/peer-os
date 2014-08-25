@@ -22,15 +22,14 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
         SolrClusterConfig solrClusterConfig = manager.getCluster( clusterName );
 
         if ( solrClusterConfig == null ) {
-            productOperation.addLogFailed(
-                    String.format( "Installation with name %s does not exist", clusterName ) );
+            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         productOperation.addLog( "Destroying lxc containers..." );
 
         try {
-            manager.getLxcManager().destroyLxcs( solrClusterConfig.getNodes() );
+            manager.getContainerManager().clonesDestroy( solrClusterConfig.getNodes() );
             productOperation.addLog( "Lxc containers successfully destroyed" );
         }
         catch ( LxcDestroyException ex ) {
@@ -40,7 +39,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl
         productOperation.addLog( "Updating db..." );
 
         try {
-            manager.getDbManager().deleteInfo2( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
+            manager.getPluginDAO().deleteInfo( SolrClusterConfig.PRODUCT_KEY, solrClusterConfig.getClusterName() );
             productOperation.addLogDone( "Information updated in database" );
         }
         catch ( DBException e ) {

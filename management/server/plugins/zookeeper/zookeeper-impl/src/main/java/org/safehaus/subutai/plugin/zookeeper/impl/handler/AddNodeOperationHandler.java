@@ -19,8 +19,9 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -84,7 +85,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         po.addLog( "Preparing for node addition..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Util.wrapAgentToSet( lxcAgent ) );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
@@ -140,7 +141,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {
@@ -186,7 +187,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         po.addLog( "Checking prerequisites..." );
 
         //check installed subutai packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Util.wrapAgentToSet( lxcAgent ) );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
@@ -212,7 +213,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
         po.addLog( String.format( "Installing %s...", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
         //install
-        Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
+        Command installCommand = Commands.getInstallCommand( Sets.newHashSet( lxcAgent ) );
         manager.getCommandRunner().runCommand( installCommand );
 
         if ( installCommand.hasCompleted() ) {
@@ -230,7 +231,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {
@@ -274,7 +275,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperI
             po.addLog( "Updating cluster information in database..." );
 
             try {
-                manager.getDbManager().saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                manager.getPluginDAO().saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                 po.addLogDone( "Cluster information updated in database" );
             }
             catch ( DBException e ) {

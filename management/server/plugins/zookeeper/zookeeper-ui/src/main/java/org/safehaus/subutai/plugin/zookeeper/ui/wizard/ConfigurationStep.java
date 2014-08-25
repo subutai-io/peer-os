@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
 import org.safehaus.subutai.plugin.zookeeper.ui.ZookeeperUI;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -191,7 +191,7 @@ public class ConfigurationStep extends Panel {
             hadoopNodesSelect.setWidth( 100, Unit.PERCENTAGE );
             hadoopNodesSelect.setRequired( true );
 
-            if ( !Util.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
+            if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
                 hadoopNodesSelect.setValue( wizard.getConfig().getNodes() );
             }
             hadoopNodesSelect.addValueChangeListener( new Property.ValueChangeListener() {
@@ -216,7 +216,7 @@ public class ConfigurationStep extends Panel {
                     else if ( Strings.isNullOrEmpty( wizard.getConfig().getHadoopClusterName() ) ) {
                         show( "Please, select Hadoop cluster" );
                     }
-                    else if ( Util.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
+                    else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
                         show( "Please, select zk nodes" );
                     }
                     else {

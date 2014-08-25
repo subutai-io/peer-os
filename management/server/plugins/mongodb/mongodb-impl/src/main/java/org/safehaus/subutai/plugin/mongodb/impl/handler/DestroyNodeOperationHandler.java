@@ -177,7 +177,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         //update db
         po.addLog( "Updating cluster information in database..." );
         try {
-            manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLogDone( "Cluster information updated in database" );
         }
         catch ( DBException e ) {
