@@ -14,12 +14,9 @@
 
   <reference id="mongodbManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.mongodb.api.Mongo" />
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
   <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.plugin.mongodb.rest.RestServiceImpl">
     <property name="mongodbManager" ref="mongodbManager" />
-    <property name="agentManager" ref="agentManager" />
   </bean>
 
   <jaxrs:server address="/mongodb2" id="mongodbRestService">

@@ -1,17 +1,12 @@
 package org.safehaus.subutai.plugin.mongodb.rest;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -20,9 +15,7 @@ import com.google.gson.GsonBuilder;
 
 public class RestServiceImpl implements RestService {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private Mongo mongodbManager;
-    private AgentManager agentManager;
 
 
     public void setMongodbManager( Mongo mongodbManager ) {
@@ -30,26 +23,21 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
-
-
     @Override
     public String listClusters() {
-        return gson.toJson( mongodbManager.getClusters() );
+        return JsonUtil.toJson( mongodbManager.getClusters() );
     }
 
 
     @Override
     public String getCluster( final String clusterName ) {
-        return gson.toJson( mongodbManager.getCluster( clusterName ) );
+        return JsonUtil.toJson( mongodbManager.getCluster( clusterName ) );
     }
 
 
     @Override
     public String createCluster( final String config ) {
-        TrimmedMongodbConfig mongodbConfig = gson.fromJson( config, TrimmedMongodbConfig.class );
+        TrimmedMongodbConfig mongodbConfig = JsonUtil.fromJson( config, TrimmedMongodbConfig.class );
         MongoClusterConfig expandedConfig = new MongoClusterConfig();
         expandedConfig.setClusterName( mongodbConfig.getClusterName() );
         expandedConfig.setDomainName( mongodbConfig.getDomainName() );
@@ -66,9 +54,7 @@ public class RestServiceImpl implements RestService {
 
 
     private String wrapUUID( UUID uuid ) {
-        Map map = new HashMap<>();
-        map.put( "OPERATION_ID", uuid );
-        return gson.toJson( map );
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 

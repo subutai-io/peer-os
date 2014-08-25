@@ -165,7 +165,7 @@ public class AccumuloImpl implements Accumulo {
             return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, AccumuloClusterConfig.class );
         }
         catch ( DBException e ) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 
