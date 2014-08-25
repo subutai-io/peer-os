@@ -6,13 +6,13 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.*;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 
 public class Manager {
 
@@ -54,7 +54,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if(config != null) {
-                    HadoopClusterConfig info = FlumeUI.getHadoopManager().getCluster(config.getClusterName());
+                    HadoopClusterConfig info = FlumeUI.getHadoopManager().getCluster(config.getHadoopClusterName());
                     if(info != null) {
                         Set<Agent> nodes = new HashSet<>(info.getAllNodes());
                         nodes.removeAll(config.getNodes());
