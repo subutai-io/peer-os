@@ -12,7 +12,7 @@
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.flume.FlumeUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.flume.ui.FlumeUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="tracker"/>

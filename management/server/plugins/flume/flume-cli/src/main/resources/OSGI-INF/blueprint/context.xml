@@ -2,11 +2,11 @@
         >
 
     <reference id="flumeManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.flume.Flume"/>
+               interface="org.safehaus.subutai.plugin.flume.api.Flume"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="flume/list-clusters">
-            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.plugin.flume.cli.ListClustersCommand">
                 <property name="flumeManager" ref="flumeManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="flume/uninstall-cluster">
-            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
+            <action class="org.safehaus.subutai.plugin.flume.cli.UninstallClusterCommand">
                 <property name="flumeManager" ref="flumeManager"/>
             </action>
         </command>
