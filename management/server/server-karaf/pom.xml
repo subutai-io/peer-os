@@ -1027,27 +1027,27 @@
                                 <!-- HBase -->
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-api</artifactId>
+                                    <artifactId>hbase-plugin-api</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-impl</artifactId>
+                                    <artifactId>hbase-plugin-impl</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-ui</artifactId>
+                                    <artifactId>hbase-plugin-ui</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-cli</artifactId>
+                                    <artifactId>hbase-plugin-cli</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.safehaus.subutai</groupId>
-                                    <artifactId>hbase-rest</artifactId>
+                                    <artifactId>hbase-plugin-rest</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
 
