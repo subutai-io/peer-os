@@ -35,6 +35,10 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             po.addLogFailed("Node is not connected: " + hostname);
             return;
         }
+        if(!config.getNodes().contains(agent)) {
+            po.addLogFailed("Node does not belong to Flume installation group");
+            return;
+        }
         if(config.getNodes().size() == 1) {
             po.addLogFailed("This is the last node in the cluster. Destroy cluster instead");
             return;
@@ -49,13 +53,13 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         if(cmd.hasCompleted()) {
             AgentResult res = cmd.getResults().get(agent.getUuid());
             if(res.getExitCode() != null && res.getExitCode() == 0)
-                if(res.getStdOut().contains("Flume is not installed"))
-                    po.addLog("Flume is not installed on " + agent.getHostname());
-                else
-                    po.addLog("Flume removed from " + agent.getHostname());
-            else
-                po.addLog(String.format("Error on node %s: %s",
-                        agent.getHostname(), res.getStdErr()));
+                po.addLog("Flume removed from " + agent.getHostname());
+            else {
+                po.addLog(res.getStdOut());
+                po.addLog(res.getStdErr());
+                po.addLogFailed("Failed to remove Flume on " + agent.getHostname());
+                return;
+            }
 
             config.getNodes().remove(agent);
 
