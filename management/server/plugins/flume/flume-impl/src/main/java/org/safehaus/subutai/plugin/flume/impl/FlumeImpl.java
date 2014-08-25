@@ -76,11 +76,6 @@ public class FlumeImpl extends FlumeBase implements Flume {
     }
 
     @Override
-    public UUID addNode(String clusterName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public UUID destroyNode(final String clusterName, final String hostname) {
         AbstractOperationHandler h = new DestroyNodeHandler(this, clusterName, hostname);
         executor.execute(h);

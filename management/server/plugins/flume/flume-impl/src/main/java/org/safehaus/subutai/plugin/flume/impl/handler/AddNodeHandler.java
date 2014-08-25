@@ -31,34 +31,24 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             productOperation.addLogFailed("Cluster not found: " + clusterName);
             return;
         }
+        //check if node agent is connected
+        Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
+        if(agent == null) {
+            productOperation.addLogFailed("Node is not connected: " + hostname);
+            return;
+        }
 
-        boolean added = false;
-        if(config.getSetupType() == SetupType.OVER_HADOOP)
-            added = addOverHadoop();
-        else if(config.getSetupType() == SetupType.WITH_HADOOP)
-            added = addWithHadoop();
+        boolean added = addNode(config, agent);
 
         if(added) productOperation.addLogDone(null);
         else productOperation.addLogFailed(null);
     }
 
-    boolean addOverHadoop() {
+    boolean addNode(FlumeConfig config, Agent agent) {
         ProductOperation po = this.productOperation;
-        FlumeConfig config = manager.getCluster(clusterName);
-        if(config == null) {
-            po.addLog("Cluster does not exist: " + clusterName);
-            return false;
-        }
-        //check if node agent is connected
-        Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
-        if(agent == null) {
-            po.addLog("Node is not connected: " + hostname);
-            return false;
-        }
-
         HadoopClusterConfig hc = manager.getHadoopManager().getCluster(config.getHadoopClusterName());
         if(hc == null) {
-            po.addLog(String.format("Hadoop cluster %s not found", config.getHadoopClusterName()));
+            po.addLog(String.format("Hadoop cluster '%s' not found", config.getHadoopClusterName()));
             return false;
         }
         if(!hc.getAllNodes().contains(agent)) {
@@ -78,42 +68,46 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         }
 
         AgentResult res = cmd.getResults().get(agent.getUuid());
-        if(res.getStdOut().contains(Commands.PACKAGE_NAME))
-            po.addLog("Flume already installed on " + hostname);
-        else if(!res.getStdOut().contains("ksks-hadoop")) {
+        if(!res.getStdOut().contains("ksks-hadoop")) {
             po.addLog("Hadoop not installed on " + hostname);
             return false;
-        } else {
+        }
+        boolean installed = res.getStdOut().contains(Commands.PACKAGE_NAME);
+        if(!installed && config.getSetupType() == SetupType.WITH_HADOOP) {
+            po.addLog("Flume not installed on " + hostname);
+            return false;
+        }
+
+        if(!installed && config.getSetupType() == SetupType.OVER_HADOOP) {
             cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(Commands.make(CommandType.INSTALL)),
                     set);
             manager.getCommandRunner().runCommand(cmd);
 
-            if(cmd.hasSucceeded())
-                po.addLogDone("Installed Flume");
-            else {
+            if(cmd.hasSucceeded()) {
+                installed = true;
+                po.addLog("Installed Flume");
+            } else {
                 po.addLog(cmd.getAllErrors());
                 po.addLog("Installation failed");
                 return false;
             }
         }
 
-        config.getNodes().add(agent);
+        if(installed) {
+            config.getNodes().add(agent);
 
-        po.addLog("Updating db...");
-        try {
-            manager.getDbManager().saveInfo2(FlumeConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info updated");
-        } catch(DBException ex) {
-            po.addLog("Failed to update cluster info: " + ex.getMessage());
+            po.addLog("Updating db...");
+            try {
+                manager.getDbManager().saveInfo2(FlumeConfig.PRODUCT_KEY,
+                        config.getClusterName(), config);
+                po.addLog("Cluster info updated");
+                return true;
+            } catch(DBException ex) {
+                po.addLog("Failed to update cluster info: " + ex.getMessage());
+                return false;
+            }
         }
-
-        return true;
-    }
-
-    boolean addWithHadoop() {
-        // TODO:
         return false;
     }
 
