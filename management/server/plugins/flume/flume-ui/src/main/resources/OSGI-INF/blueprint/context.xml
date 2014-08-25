@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="manager" availability="mandatory"
-               interface="org.safehaus.subutai.api.flume.Flume"/>
+               interface="org.safehaus.subutai.plugin.flume.api.Flume"/>
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.api.tracker.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 

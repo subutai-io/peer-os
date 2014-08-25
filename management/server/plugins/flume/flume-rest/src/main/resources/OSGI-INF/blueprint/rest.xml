@@ -10,9 +10,10 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
 
-  <reference id="flumeManager" availability="mandatory" interface="org.safehaus.subutai.plugin.flume.api.Flume" />
+  <reference id="flumeManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.flume.api.Flume" />
 
-  <bean id="restService" class="org.safehaus.subutai.flume.services.RestService">
+  <bean id="restService" class="org.safehaus.subutai.plugin.flume.rest.RestService">
     <property name="agentManager" ref="agentManager" />
     <property name="flumeManager" ref="flumeManager" />
   </bean>
