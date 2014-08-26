@@ -89,11 +89,12 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( Config ) event.getProperty().getValue();
                 refreshUI();
+                checkAll();
             }
         } );
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        Button refreshClustersBtn = new Button( "Refresh Clusters" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener() {
 
@@ -104,7 +105,7 @@ public class Manager {
         } );
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check all" );
+        Button checkAllBtn = new Button( "Check All" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener() {
 
@@ -117,7 +118,7 @@ public class Manager {
         } );
         controlsContent.addComponent( checkAllBtn );
 
-        Button startClusterBtn = new Button( "Start cluster" );
+        Button startClusterBtn = new Button( "Start Cluster" );
         startClusterBtn.addStyleName( "default" );
         startClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -137,7 +138,7 @@ public class Manager {
         } );
         controlsContent.addComponent( startClusterBtn );
 
-        Button stopClusterBtn = new Button( "Stop cluster" );
+        Button stopClusterBtn = new Button( "Stop Cluster" );
         stopClusterBtn.addStyleName( "default" );
         stopClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -157,7 +158,7 @@ public class Manager {
         } );
         controlsContent.addComponent( stopClusterBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        Button destroyClusterBtn = new Button( "Destroy Cluster" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -376,7 +377,10 @@ public class Manager {
     }
 
 
-    private void refreshUI() {
+    /**
+     * Refreshes whole UI.
+     */
+    public void refreshUI() {
         if ( config != null ) {
             populateTable( slavesTable, new ArrayList<>( config.getSlaves() ), false );
             populateTable( tracersTable, new ArrayList<>( config.getTracers() ), false );
@@ -394,35 +398,49 @@ public class Manager {
     }
 
 
+    /**
+     * Fetches saved cluster information and refreshes cluster list on UI.
+     */
     public void refreshClustersInfo() {
-        List<Config> mongoClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
+        List<Config> accumuloClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if ( mongoClusterInfos != null && mongoClusterInfos.size() > 0 ) {
-            for ( Config mongoClusterInfo : mongoClusterInfos ) {
+        if ( accumuloClusterInfos != null && accumuloClusterInfos.size() > 0 ) {
+            for ( Config mongoClusterInfo : accumuloClusterInfos ) {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo, mongoClusterInfo.getClusterName() );
             }
             if ( clusterInfo != null ) {
-                for ( Config mongoClusterInfo : mongoClusterInfos ) {
-                    if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                        clusterCombo.setValue( mongoClusterInfo );
+                for ( Config accumuloClusterInfo : accumuloClusterInfos ) {
+                    if ( accumuloClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
+                        clusterCombo.setValue( accumuloClusterInfo );
                         return;
                     }
                 }
             }
             else {
-                clusterCombo.setValue( mongoClusterInfos.iterator().next() );
+                clusterCombo.setValue( accumuloClusterInfos.iterator().next() );
             }
         }
     }
 
 
+    /**
+     * Checks status of nodes in this table.
+     *
+     * @param table Table type ( masters, tracer, slaves )
+     */
     public static void checkNodesStatus( Table table ) {
         UiUtil.clickAllButtonsInTable( table, "Check" );
     }
 
 
+    /**
+     * Populates table in manage tab of accumulo bundle.
+     * @param table Table type ( masters, tracer, slaves )
+     * @param agents List of agents in this table
+     * @param masters If table contains master services (master, monitor, gc ) true, else false
+     */
     private void populateTable( final Table table, List<Agent> agents, final boolean masters ) {
 
         table.removeAllItems();
@@ -430,6 +448,7 @@ public class Manager {
         int i = 0;
         for ( final Agent agent : agents ) {
             i++;
+            final Label ip = new Label( agent.getListIP().toString() );
             final Button checkBtn = new Button( "Check" );
             final Button destroyBtn = new Button( "Destroy" );
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -439,11 +458,12 @@ public class Manager {
 
             table.addItem( masters ? new Object[] {
                             ( i == 1 ? UiUtil.MASTER_PREFIX : i == 2 ? UiUtil.GC_PREFIX : UiUtil.MONITOR_PREFIX )
-                                    + agent.getHostname(), checkBtn, resultHolder, progressIcon
+                                    + agent.getHostname(), ip, checkBtn, resultHolder, progressIcon
                     } : new Object[] {
-                            agent.getHostname(), checkBtn, destroyBtn, resultHolder, progressIcon
+                            agent.getHostname(), ip, checkBtn, destroyBtn, resultHolder, progressIcon
                     }, null );
 
+            final int j = i;
             checkBtn.addClickListener( new Button.ClickListener() {
 
                 @Override
@@ -451,27 +471,32 @@ public class Manager {
                     progressIcon.setVisible( true );
 
                     AccumuloUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                        new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                                public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( masters ) {
-                                            resultHolder.setValue( parseMastersState( result ) );
+                            public void onComplete( String result ) {
+                                synchronized ( progressIcon ) {
+                                    if ( masters ) {
+                                        if ( j == 1) {
+                                            resultHolder.setValue( parseMasterState( result ) );
+                                        } else if ( j == 2 ){
+                                            resultHolder.setValue( parseGCState( result ) );
+                                        } else {
+                                            resultHolder.setValue( parseMonitorState( result ) );
                                         }
-                                        else if ( table == tracersTable ) {
-                                            resultHolder.setValue( parseTracersState( result ) );
-                                        }
-                                        else if ( table == slavesTable ) {
-                                            resultHolder.setValue( parseSlavesState( result ) );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
                                     }
+                                    else if ( table == tracersTable ) {
+                                        resultHolder.setValue( parseTracersState( result ) );
+                                    }
+                                    else if ( table == slavesTable ) {
+                                        resultHolder.setValue( parseSlavesState( result ) );
+                                    }
+                                    destroyBtn.setEnabled( true );
+                                    progressIcon.setVisible( false );
                                 }
-                            } ) );
+                            }
+                        } ) );
                 }
             } );
-
 
             destroyBtn.addClickListener( new Button.ClickListener() {
 
@@ -508,25 +533,54 @@ public class Manager {
     }
 
 
-    private String parseMastersState( String result ) {
+    /**
+     * Parses 'service accumulo status' command output and extracts master service status.
+     *
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Masters is Running or Master is NOT Running'
+     */
+    private String parseMasterState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
-        Matcher masterMatcher = masterPattern.matcher( result );
-        if ( masterMatcher.find() ) {
-            parsedResult.append( masterMatcher.group( 1 ) ).append( " " );
+        Matcher gcMathcer = masterPattern.matcher( result );
+        if ( gcMathcer.find() ) {
+            parsedResult.append( gcMathcer.group( 1 ) );
         }
-        Matcher gcMatcher = gcPattern.matcher( result );
-        if ( gcMatcher.find() ) {
-            parsedResult.append( gcMatcher.group( 1 ) ).append( " " );
-        }
-        Matcher monitorMatcher = monitorPattern.matcher( result );
-        if ( monitorMatcher.find() ) {
-            parsedResult.append( monitorMatcher.group( 1 ) ).append( " " );
-        }
-
         return parsedResult.toString();
     }
 
+    /**
+     *  Parses 'service accumulo status' command output and extracts gc service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'GC is Running or GC is NOT Running'
+     */
+    private String parseGCState( String result ) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher gcMathcer = gcPattern.matcher( result );
+        if ( gcMathcer.find() ) {
+            parsedResult.append( gcMathcer.group( 1 ) );
+        }
+        return parsedResult.toString();
+    }
 
+    /**
+     * Parses 'service accumulo status' command output and extracts monitor service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Monitor is Running or Monitor is NOT Running'
+     */
+    private String parseMonitorState( String result ) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher moniotorPattern = monitorPattern.matcher( result );
+        if ( moniotorPattern.find() ) {
+            parsedResult.append( moniotorPattern.group( 1 ) );
+        }
+        return parsedResult.toString();
+    }
+
+    /**
+     * Parses 'service accumulo status' command output and extracts tracer service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Tracer is Running or Tracer is NOT Running'
+     */
     private String parseTracersState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = tracerPattern.matcher( result );
@@ -537,23 +591,35 @@ public class Manager {
         return parsedResult.toString();
     }
 
-
+    /**
+     * Parses 'service accumulo status' command output and extracts logger & tablet server services' status.
+     * @param result The output of 'service accumulo status' command.
+     * @return
+     */
     private String parseSlavesState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher loggersMatcher = loggerPattern.matcher( result );
         if ( loggersMatcher.find() ) {
-            parsedResult.append( loggersMatcher.group( 1 ) ).append( " " );
+            parsedResult.append( loggersMatcher.group( 1 ) ).append( ", " );
         }
-        Matcher tablerServersMatcher = tabletServerPattern.matcher( result );
-        if ( tablerServersMatcher.find() ) {
-            parsedResult.append( tablerServersMatcher.group( 1 ) ).append( " " );
+        Matcher tabletServersMatcher = tabletServerPattern.matcher( result );
+        if ( tabletServersMatcher.find() ) {
+            parsedResult.append( tabletServersMatcher.group( 1 ) ).append( " " );
         }
-
         return parsedResult.toString();
     }
 
 
     public Component getContent() {
         return contentRoot;
+    }
+
+    /**
+     * Checks all nodes status on all tables.
+     */
+    public void checkAll(){
+        checkNodesStatus( mastersTable );
+        checkNodesStatus( slavesTable );
+        checkNodesStatus( tracersTable );
     }
 }

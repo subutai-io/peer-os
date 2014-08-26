@@ -1,6 +1,7 @@
 package org.safehaus.subutai.ui.accumulo.common;
 
 
+import com.vaadin.ui.PasswordField;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
@@ -57,6 +58,7 @@ public class UiUtil {
     public static Table createTableTemplate( String caption, boolean destroyButtonNeeded ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "IP", Label.class, null );
         table.addContainerProperty( "Check", Button.class, null );
         if ( destroyButtonNeeded ) {
             table.addContainerProperty( "Destroy", Button.class, null );
@@ -99,6 +101,12 @@ public class UiUtil {
         textField.setMaxLength( maxLength );
         textField.setRequired( true );
         return textField;
+    }
+
+    public static PasswordField getPassField( String caption ){
+        PasswordField passwordField = new PasswordField( caption );
+        passwordField.setRequired( true );
+        return passwordField;
     }
 
 
