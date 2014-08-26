@@ -67,23 +67,12 @@ function destroy {
     msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
     exit 1
   fi
-  
-  local snap=
-
-  # we got a dataset instead of a clone name
-  if [ -n "`echo $clone | egrep 'lxc.*/'`" ]; then
-    snap="$clone@template"
-  else
-    snap="lxc/$clone@template"
-  fi
-
-  for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
+ 
+  # Destroy all children of master template
+  children_list=`zfs_get_children_list $clone`
+  for child in $children_list 
   do
-    child="`zfs_ctnr_from_ds $ds`"
-    if [ $recursive = "true" ]; then
-      msg_notice "          -> Recursive destroy call for $child"
-      subutai destroy -r $child
-    fi
+    subutai destroy -r $child
   done
   
   # (3) Remove the debian package if installed
