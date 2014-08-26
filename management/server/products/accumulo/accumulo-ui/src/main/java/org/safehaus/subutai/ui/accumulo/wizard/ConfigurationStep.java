@@ -38,7 +38,9 @@ public class ConfigurationStep extends Panel {
 		final ComboBox monitorNodeCombo = UiUtil.getCombo("Monitor node");
 		//accumulo init controls
 		TextField instanceNameTxtFld = UiUtil.getTextField("Instance name", "Instance name", 20);
-		TextField passwordTxtFld = UiUtil.getTextField("Password", "Password", 20);
+        final PasswordField passwordField = UiUtil.getPassField( "Password" );
+        final PasswordField confirmPass = UiUtil.getPassField( "Confirm Password" );
+
 		//tracers
 		final TwinColSelect tracersSelect =
 				UiUtil.getTwinSelect("Tracers", "hostname", "Available Nodes", "Selected Nodes", 4);
@@ -205,14 +207,21 @@ public class ConfigurationStep extends Panel {
 			}
 		});
 
-		passwordTxtFld.setValue(wizard.getConfig().getPassword());
-		passwordTxtFld.addValueChangeListener(new Property.ValueChangeListener() {
+		passwordField.setValue(wizard.getConfig().getPassword());
+		passwordField.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
 				wizard.getConfig().setPassword(event.getProperty().getValue().toString().trim());
 			}
 		});
 
+        confirmPass.setValue(wizard.getConfig().getConfirmPassword());
+        confirmPass.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                wizard.getConfig().setConfirmPassword( ( event.getProperty().getValue().toString().trim() ) );
+            }
+        });
 
 		//add value change handler
 		tracersSelect.addValueChangeListener(new Property.ValueChangeListener() {
@@ -251,7 +260,9 @@ public class ConfigurationStep extends Panel {
 					show("Please, specify instance name");
 				} else if (Strings.isNullOrEmpty(wizard.getConfig().getPassword())) {
 					show("Please, specify password");
-				} else if (wizard.getConfig().getGcNode() == null) {
+				} else if (Strings.isNullOrEmpty(wizard.getConfig().getConfirmPassword() )) {
+                    show("Please, confirm password");
+                } else if (wizard.getConfig().getGcNode() == null) {
 					show("Please, select gc node");
 				} else if (wizard.getConfig().getMonitor() == null) {
 					show("Please, select monitor");
@@ -259,7 +270,9 @@ public class ConfigurationStep extends Panel {
 					show("Please, select tracer(s)");
 				} else if (Util.isCollectionEmpty(wizard.getConfig().getSlaves())) {
 					show("Please, select slave(s)");
-				} else {
+				} else if ( ! wizard.getConfig().getPassword().equals( wizard.getConfig().getConfirmPassword() ) ) {
+                    show("Passwords does not match !!!");
+                } else {
 					wizard.next();
 				}
 			}
@@ -299,7 +312,8 @@ public class ConfigurationStep extends Panel {
 		credentials.setMargin(new MarginInfo(true, false, false, false));
 		credentials.setSpacing(true);
 		credentials.addComponent(instanceNameTxtFld);
-		credentials.addComponent(passwordTxtFld);
+        credentials.addComponent( passwordField );
+        credentials.addComponent( confirmPass);
 
 		HorizontalLayout buttons = new HorizontalLayout();
 		buttons.setMargin(new MarginInfo(true, false, false, false));
