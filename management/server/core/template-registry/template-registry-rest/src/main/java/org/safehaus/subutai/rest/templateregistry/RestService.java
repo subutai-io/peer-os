@@ -21,7 +21,7 @@ public interface RestService {
     @Path("register_template")
     public Response registerTemplate( @QueryParam("config") String configFilePath,
                                       @QueryParam("packages") String packagesFilePath,
-                                      @QueryParam( "md5sum" ) String md5sum );
+                                      @QueryParam("md5sum") String md5sum );
 
     @GET
     @Path("unregister_template/{templateName}")
@@ -69,6 +69,17 @@ public interface RestService {
     @Path("get_template_tree")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getTemplateTree();
+
+    @GET
+    @Path( "is_template_in_use/{templateName}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public String isTemplateInUse( @PathParam( "templateName" ) String templateName );
+
+    @GET
+    @Path( "set_template_in_use/{templateName}/{isInUse}" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response setTemplateInUse( @PathParam( "templateName" ) String templateName,
+                                      @PathParam( "isInUse" ) String isInUse );
 
     @GET
     @Path("list_templates")

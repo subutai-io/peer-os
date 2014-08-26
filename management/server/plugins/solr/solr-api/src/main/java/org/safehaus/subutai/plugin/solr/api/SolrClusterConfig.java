@@ -19,7 +19,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class SolrClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Solr2";
-    public static final String PRODUCT_NAME = "Solr";
+    public static final String PRODUCT_NAME = "solr";
     private String templateName = PRODUCT_NAME;
     private String clusterName = "";
     private int numberOfNodes = 1;

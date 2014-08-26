@@ -136,4 +136,21 @@ public interface TemplateRegistryManager {
      * @return - list of {@code Template}
      */
     public List<Template> getAllTemplates( String lxcArch );
+
+
+    /**
+     * Update template usage on FAI servers
+     *
+     * @param templateName - target template
+     * @param inUse - true - template is in use, false - template is out of use
+     */
+    public void updateTemplateUsage( String templateName, boolean inUse ) throws RegistryException;
+
+
+    /**
+     * Indicates of template is in use on any of FAI servers
+     *
+     * @return true - in use, false - not in use
+     */
+    public boolean isTemplateInUse( String templateName) throws RegistryException;
 }

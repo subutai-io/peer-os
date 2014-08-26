@@ -46,7 +46,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
-    public void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
+    public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
             throws RegistryException {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
@@ -70,7 +70,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException {
         Properties properties = new Properties();
         try {
-            properties.load( new ByteArrayInputStream( configFile.getBytes( Charset.defaultCharset()) ) );
+            properties.load( new ByteArrayInputStream( configFile.getBytes( Charset.defaultCharset() ) ) );
             String lxcUtsname = properties.getProperty( "lxc.utsname" );
             String lxcArch = properties.getProperty( "lxc.arch" );
             String subutaiConfigPath = properties.getProperty( "subutai.config.path" );
@@ -313,5 +313,36 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         }
 
         return Collections.emptyList();
+    }
+
+
+    @Override
+    public synchronized void updateTemplateUsage( final String templateName, final boolean inUse )
+            throws RegistryException {
+        Template template = getTemplate( templateName );
+        if ( template == null ) {
+            throw new RegistryException( String.format( "Template %s not found", templateName ) );
+        }
+        else {
+            template.setInUseOnFAIs( inUse );
+            try {
+                templateDAO.saveTemplate( template );
+            }
+            catch ( DBException e ) {
+                throw new RegistryException( String.format( "Error saving template information, %s", e.getMessage() ) );
+            }
+        }
+    }
+
+
+    @Override
+    public boolean isTemplateInUse( String templateName ) throws RegistryException {
+        Template template = getTemplate( templateName );
+        if ( template == null ) {
+            throw new RegistryException( String.format( "Template %s not found", templateName ) );
+        }
+        else {
+            return template.isInUseOnFAIs();
+        }
     }
 }
