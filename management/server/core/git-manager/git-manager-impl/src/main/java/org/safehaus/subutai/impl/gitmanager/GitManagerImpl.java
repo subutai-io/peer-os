@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
  */
 public class GitManagerImpl implements GitManager {
 
-	private final String MASTER_BRANCH = "master";
-	private final String LINE_SEPARATOR = "\n";
+	private static final String MASTER_BRANCH = "master";
+	private static final String LINE_SEPARATOR = "\n";
 	private CommandRunner commandRunner;
 
 
@@ -138,7 +138,7 @@ public class GitManagerImpl implements GitManager {
 			if (command.hasCompleted()) {
 				AgentResult agentResult = command.getResults().get(host.getUuid());
 				throw new GitException(
-						String.format("Error while performing [git %s]: %s\n%s, exit code %s", gitCommand.getCommand(),
+						String.format("Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
 								agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode()));
 			} else {
 				throw new GitException(String.format("Error while performing [git %s]: Command timed out",

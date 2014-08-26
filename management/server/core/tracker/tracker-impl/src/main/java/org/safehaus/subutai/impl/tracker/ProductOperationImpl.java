@@ -82,7 +82,7 @@ public class ProductOperationImpl implements ProductOperation {
 
 
 	public Date createDate() {
-		return createDate;
+		return ( Date ) createDate.clone();
 	}
 
 
