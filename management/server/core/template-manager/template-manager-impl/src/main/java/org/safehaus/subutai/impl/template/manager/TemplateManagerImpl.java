@@ -34,8 +34,9 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         List<Template> parents = templateRegistry.getParentTemplates(templateName);
         for(Template p : parents) {
             boolean temp_exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
+            String pack_name = getPackageNameForTemplate(p.getTemplateName());
             if(!temp_exists) {
-                boolean b = scriptExecutor.execute(a, ActionType.IMPORT, p.getTemplateName());
+                boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack_name);
                 if(!b) {
                     logger.error("Failed to install parent templates: " + p.getTemplateName());
                     return false;
@@ -53,8 +54,9 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         List<Template> parents = templateRegistry.getParentTemplates(templateName);
         for(Template p : parents) {
             boolean temp_exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
+            String pack_name = getPackageNameForTemplate(p.getTemplateName());
             if(!temp_exists) {
-                boolean b = scriptExecutor.execute(a, ActionType.IMPORT, p.getTemplateName());
+                boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack_name);
                 if(!b) {
                     logger.error("Failed to install parent templates: " + p.getTemplateName());
                     return false;
@@ -144,6 +146,11 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         boolean b = scriptExecutor.execute(a, ActionType.EXPORT, templateName);
         if(b) return getExportedPackageFilePath(a, templateName);
         return null;
+    }
+
+    private String getPackageNameForTemplate(String templateName) {
+        // TODO: call get_package_name function in physical server
+        return templateName + "-subutai-template";
     }
 
     private String getExportedPackageFilePath(Agent a, String templateName) {
