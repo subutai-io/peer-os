@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
  * This is an implementation of AptRepositoryManager
  */
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
-	private final String LINE_SEPARATOR = "\n";
+	private static final String LINE_SEPARATOR = "\n";
 
 	private CommandRunner commandRunner;
 
@@ -81,7 +81,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
 			if (command.hasCompleted()) {
 				AgentResult agentResult = command.getResults().get(host.getUuid());
 				throw new AptRepoException(
-						String.format("Error while performing %s: %s\n%s, exit code %s", aptCommand.getCommand(),
+						String.format("Error while performing %s: %s%n%s, exit code %s", aptCommand.getCommand(),
 								agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode()));
 			} else {
 				throw new AptRepoException(

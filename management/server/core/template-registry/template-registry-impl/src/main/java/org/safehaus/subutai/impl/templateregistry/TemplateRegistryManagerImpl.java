@@ -7,6 +7,7 @@ package org.safehaus.subutai.impl.templateregistry;
 
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +70,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException {
         Properties properties = new Properties();
         try {
-            properties.load( new ByteArrayInputStream( configFile.getBytes() ) );
+            properties.load( new ByteArrayInputStream( configFile.getBytes( Charset.defaultCharset()) ) );
             String lxcUtsname = properties.getProperty( "lxc.utsname" );
             String lxcArch = properties.getProperty( "lxc.arch" );
             String subutaiConfigPath = properties.getProperty( "subutai.config.path" );

@@ -59,7 +59,7 @@ public class ProductOperationViewImpl implements ProductOperationView {
 
 
 	public Date getCreateDate() {
-		return createDate;
+		return ( Date ) createDate.clone();
 	}
 
 
