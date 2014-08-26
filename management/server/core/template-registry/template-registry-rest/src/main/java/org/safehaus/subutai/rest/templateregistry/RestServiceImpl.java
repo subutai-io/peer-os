@@ -150,10 +150,10 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response setTemplateInUse( final String templateName, final String isInUse ) {
+    public Response setTemplateInUse( final String faiHostname, final String templateName, final String isInUse ) {
         try {
 
-            templateRegistryManager.updateTemplateUsage( templateName, Boolean.parseBoolean( isInUse ) );
+            templateRegistryManager.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
 
             return Response.status( Response.Status.OK ).build();
         }

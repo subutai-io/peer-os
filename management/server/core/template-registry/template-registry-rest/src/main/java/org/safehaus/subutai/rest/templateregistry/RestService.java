@@ -76,9 +76,10 @@ public interface RestService {
     public String isTemplateInUse( @PathParam( "templateName" ) String templateName );
 
     @GET
-    @Path( "set_template_in_use/{templateName}/{isInUse}" )
+    @Path( "set_template_in_use/{faiHostname}/{templateName}/{isInUse}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response setTemplateInUse( @PathParam( "templateName" ) String templateName,
+    public Response setTemplateInUse( @PathParam( "faiHostname" ) String faiHostname,
+                                      @PathParam( "templateName" ) String templateName,
                                       @PathParam( "isInUse" ) String isInUse );
 
     @GET

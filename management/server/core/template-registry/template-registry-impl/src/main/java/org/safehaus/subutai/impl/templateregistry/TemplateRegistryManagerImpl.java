@@ -165,6 +165,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
         Template template = getTemplate( templateName, lxcArch );
 
         if ( template != null ) {
+            //check if template is used on FAIs
+
+            if ( template.isInUseOnFAIs() ) {
+                throw new RegistryException( String.format( "Template %s is in use on %s", template.getTemplateName(),
+                        template.getFaisUsingThisTemplate() ) );
+            }
+
             //check if template has children
             List<Template> children = getChildTemplates( templateName, lxcArch );
             if ( !children.isEmpty() ) {
@@ -298,6 +305,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public List<Template> getAllTemplates( final String lxcArch ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Lxc Arch is null or empty" );
+
         try {
             List<Template> allTemplates = templateDAO.getAllTemplates();
             List<Template> result = new ArrayList<>();
@@ -317,14 +326,18 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
 
     @Override
-    public synchronized void updateTemplateUsage( final String templateName, final boolean inUse )
-            throws RegistryException {
+    public synchronized void updateTemplateUsage( final String faiHostname, final String templateName,
+                                                  final boolean inUse ) throws RegistryException {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( faiHostname ), "FAI hostname is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
+
         Template template = getTemplate( templateName );
         if ( template == null ) {
             throw new RegistryException( String.format( "Template %s not found", templateName ) );
         }
         else {
-            template.setInUseOnFAIs( inUse );
+            template.setInUseOnFAI( faiHostname, inUse );
             try {
                 templateDAO.saveTemplate( template );
             }
@@ -337,6 +350,8 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     @Override
     public boolean isTemplateInUse( String templateName ) throws RegistryException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
+
         Template template = getTemplate( templateName );
         if ( template == null ) {
             throw new RegistryException( String.format( "Template %s not found", templateName ) );
