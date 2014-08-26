@@ -9,20 +9,20 @@ import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
 public class FlumeImplMock extends FlumeImpl {
 
-    private Config config;
+	private Config config;
 
-    public FlumeImplMock() {
-        super(new CommandRunnerMock(), new AgentManagerMock(),
-                new TrackerMock(), new DbManagerMock());
-    }
+	public FlumeImplMock() {
+		super(new CommandRunnerMock(), new AgentManagerMock(),
+				new TrackerMock(), new DbManagerMock());
+	}
 
-    @Override
-    public Config getCluster(String clusterName) {
-        return config;
-    }
+	@Override
+	public Config getCluster(String clusterName) {
+		return config;
+	}
 
-    public void setConfig(Config config) {
-        this.config = config;
-    }
+	public void setConfig(Config config) {
+		this.config = config;
+	}
 
 }

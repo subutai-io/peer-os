@@ -13,17 +13,17 @@ import com.vaadin.ui.VerticalLayout;
  */
 public abstract class ConcurrentComponent extends VerticalLayout {
 
-    protected void executeUpdate(Runnable update) {
-        UI application;
-        synchronized (this) {
-            application = UI.getCurrent();
-            if (application == null) {
-                update.run();
-                return;
-            }
-        }
-        synchronized (application) {
-            update.run();
-        }
-    }
+	protected void executeUpdate(Runnable update) {
+		UI application;
+		synchronized (this) {
+			application = UI.getCurrent();
+			if (application == null) {
+				update.run();
+				return;
+			}
+		}
+		synchronized (application) {
+			update.run();
+		}
+	}
 }

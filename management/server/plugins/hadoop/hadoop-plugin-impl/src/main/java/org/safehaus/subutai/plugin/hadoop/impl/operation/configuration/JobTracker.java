@@ -18,35 +18,35 @@ public class JobTracker {
 	private HadoopImpl parent;
 	private HadoopClusterConfig hadoopClusterConfig;
 
-	public JobTracker(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
+	public JobTracker(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig) {
 		this.parent = parent;
 		this.hadoopClusterConfig = hadoopClusterConfig;
 	}
 
 	public UUID start() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Starting cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if ( hadoopClusterConfig == null) {
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted",
-                            hadoopClusterConfig
-                            .getClusterName()));
+							hadoopClusterConfig
+									.getClusterName()));
 					return;
 				}
 
 				final Agent node = parent.getAgentManager().getAgentByHostname(
-                        hadoopClusterConfig.getJobTracker().getHostname());
+						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
-                            .getJobTracker().getHostname()));
+							.getJobTracker().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand( hadoopClusterConfig.getJobTracker(), "start");
+				Command command = Commands.getJobTrackerCommand(hadoopClusterConfig.getJobTracker(), "start");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
@@ -65,27 +65,27 @@ public class JobTracker {
 	public UUID stop() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Stopping cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if ( hadoopClusterConfig == null) {
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
-                            .getClusterName()));
+							.getClusterName()));
 					return;
 				}
 
 				final Agent node = parent.getAgentManager().getAgentByHostname(
-                        hadoopClusterConfig.getJobTracker().getHostname());
+						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
-                            .getJobTracker().getHostname()));
+							.getJobTracker().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand( hadoopClusterConfig.getJobTracker(), "stop");
+				Command command = Commands.getJobTrackerCommand(hadoopClusterConfig.getJobTracker(), "stop");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
@@ -103,27 +103,27 @@ public class JobTracker {
 
 	public UUID restart() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Restarting cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if ( hadoopClusterConfig == null) {
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
-                            .getClusterName()));
+							.getClusterName()));
 					return;
 				}
 
 				final Agent node = parent.getAgentManager().getAgentByHostname(
-                        hadoopClusterConfig.getJobTracker().getHostname());
+						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
-                            .getJobTracker().getHostname()));
+							.getJobTracker().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand( hadoopClusterConfig.getJobTracker(), "restart");
+				Command command = Commands.getJobTrackerCommand(hadoopClusterConfig.getJobTracker(), "restart");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
@@ -142,32 +142,32 @@ public class JobTracker {
 	public UUID status() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Getting status of clusters %s JobTracker", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if ( hadoopClusterConfig == null) {
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
-                            .getClusterName()));
+							.getClusterName()));
 					return;
 				}
 
 				final Agent node = parent.getAgentManager().getAgentByHostname(
-                        hadoopClusterConfig.getJobTracker().getHostname());
+						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
-                            .getJobTracker().getHostname()));
+							.getJobTracker().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getJobTrackerCommand( hadoopClusterConfig.getJobTracker(), "status");
+				Command command = Commands.getJobTrackerCommand(hadoopClusterConfig.getJobTracker(), "status");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				NodeState nodeState = NodeState.UNKNOWN;
 				if (command.hasCompleted()) {
-					AgentResult result = command.getResults().get( hadoopClusterConfig.getJobTracker().getUuid());
+					AgentResult result = command.getResults().get(hadoopClusterConfig.getJobTracker().getUuid());
 					if (result.getStdOut() != null && result.getStdOut().contains("JobTracker")) {
 						String[] array = result.getStdOut().split("\n");
 

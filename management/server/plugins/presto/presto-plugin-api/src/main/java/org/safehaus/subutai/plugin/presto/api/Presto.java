@@ -12,38 +12,38 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public interface Presto extends ApiBase<Config> {
+public interface Presto extends ApiBase<PrestoClusterConfig> {
 
-    public UUID addWorkerNode(String clusterName, String lxcHostname);
+	public UUID addWorkerNode(String clusterName, String lxcHostname);
 
-    public UUID destroyWorkerNode(String clusterName, String lxcHostname);
+	public UUID destroyWorkerNode(String clusterName, String lxcHostname);
 
-    public UUID changeCoordinatorNode(String clusterName, String newMasterHostname);
+	public UUID changeCoordinatorNode(String clusterName, String newMasterHostname);
 
-    /**
-     * Starts the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     * @return - UUID of operation to track
-     */
-    public UUID startNode(String clusterName, String lxcHostName);
+	/**
+	 * Starts the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID startNode(String clusterName, String lxcHostName);
 
-    /**
-     * Stops the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     * @return - UUID of operation to track
-     */
-    public UUID stopNode(String clusterName, String lxcHostName);
+	/**
+	 * Stops the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID stopNode(String clusterName, String lxcHostName);
 
-    /**
-     * Checks status of the specified node
-     *
-     * @param clusterName - name of cluster
-     * @param lxcHostName - hostname of node
-     * @return - UUID of operation to track
-     */
-    public UUID checkNode(String clusterName, String lxcHostName);
+	/**
+	 * Checks status of the specified node
+	 *
+	 * @param clusterName - name of cluster
+	 * @param lxcHostName - hostname of node
+	 * @return - UUID of operation to track
+	 */
+	public UUID checkNode(String clusterName, String lxcHostName);
 }

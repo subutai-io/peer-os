@@ -1,14 +1,14 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="monitor" availability="mandatory"
-             interface="org.safehaus.subutai.api.monitoring.Monitor"/>
+    <reference id="monitor" availability="mandatory"
+               interface="org.safehaus.subutai.api.monitoring.Monitor"/>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-      <command name="monitoring:all-metrics">
-          <action class="org.safehaus.subutai.cli.monitoring.AllMetricsCommand">
-              <property name="monitor" ref="monitor"/>
-          </action>
-      </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="monitoring:all-metrics">
+            <action class="org.safehaus.subutai.cli.monitoring.AllMetricsCommand">
+                <property name="monitor" ref="monitor"/>
+            </action>
+        </command>
+    </command-bundle>
 
 </blueprint>

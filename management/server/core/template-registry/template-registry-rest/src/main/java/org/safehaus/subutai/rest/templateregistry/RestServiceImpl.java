@@ -7,9 +7,11 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.api.templateregistry.RegistryException;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
@@ -44,11 +46,12 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response registerTemplate( final String configFilePath, final String packagesFilePath ) {
+    public Response registerTemplate( final String configFilePath, final String packagesFilePath,
+                                      final String md5sum ) {
         try {
 
             templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ) );
+                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
             return Response.status( Response.Status.OK ).build();
         }
@@ -132,6 +135,31 @@ public class RestServiceImpl implements RestService {
             }
         }
         return gson.toJson( uberTemplates );
+    }
+
+
+    @Override
+    public String isTemplateInUse( final String templateName ) {
+        try {
+            return JsonUtil.toJson( "RESULT", templateRegistryManager.isTemplateInUse( templateName ) );
+        }
+        catch ( RegistryException e ) {
+            return JsonUtil.toJson( "ERROR", e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public Response setTemplateInUse( final String faiHostname, final String templateName, final String isInUse ) {
+        try {
+
+            templateRegistryManager.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
+
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( RegistryException e ) {
+            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+        }
     }
 
 

@@ -35,7 +35,7 @@ public class WelcomeStep extends Panel {
         grid.setSizeFull();
 
         Label welcomeMsg = new Label( String.format( "<center><h2>Welcome to %s Installation Wizard!</h2>",
-                ZookeeperClusterConfig.PRODUCT_KEY ) );
+                ZookeeperClusterConfig.PRODUCT_NAME ) );
         welcomeMsg.setContentMode( ContentMode.HTML );
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 

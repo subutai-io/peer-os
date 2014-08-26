@@ -4,8 +4,8 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 
@@ -18,6 +18,8 @@ import java.util.UUID;
 @Command (scope = "hadoop", name = "uninstall-cluster", description = "Command to uninstall Hadoop cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
+	@Argument (index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
+	String clusterName = null;
 	private Hadoop hadoopManager;
 	private Tracker tracker;
 
@@ -29,23 +31,19 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 		this.tracker = tracker;
 	}
 
-	public void setHadoopManager(Hadoop hadoopManager) {
-		this.hadoopManager = hadoopManager;
-	}
-
 	public Hadoop getHadoopManager() {
 		return hadoopManager;
 	}
 
-
-	@Argument (index = 0, name = "clusterName", description = "The name of the cluster.", required = true, multiValued = false)
-	String clusterName = null;
+	public void setHadoopManager(Hadoop hadoopManager) {
+		this.hadoopManager = hadoopManager;
+	}
 
 	protected Object doExecute() {
 		UUID uuid = hadoopManager.uninstallCluster(clusterName);
 		int logSize = 0;
 		while (!Thread.interrupted()) {
-			ProductOperationView po = tracker.getProductOperation( HadoopClusterConfig.PRODUCT_KEY, uuid);
+			ProductOperationView po = tracker.getProductOperation(HadoopClusterConfig.PRODUCT_KEY, uuid);
 			if (po != null) {
 				if (logSize != po.getLog().length()) {
 					System.out.print(po.getLog().substring(logSize, po.getLog().length()));

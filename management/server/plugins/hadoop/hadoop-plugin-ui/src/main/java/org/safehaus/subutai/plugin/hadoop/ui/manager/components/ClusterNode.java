@@ -47,10 +47,6 @@ public class ClusterNode extends HorizontalLayout {
 		return hostname;
 	}
 
-	public void setHostname(String value) {
-		hostname.setValue(value);
-	}
-
 	private Embedded getProgressButton() {
 		progressButton = new Embedded("", new ThemeResource("img/spinner.gif"));
 		progressButton.setWidth(ICON_SIZE + 2, Unit.PIXELS);
@@ -85,6 +81,10 @@ public class ClusterNode extends HorizontalLayout {
 		restartButton.setHeight(ICON_SIZE, Unit.PIXELS);*/
 
 		return restartButton;
+	}
+
+	public void setHostname(String value) {
+		hostname.setValue(value);
 	}
 
 	public void addSlaveNode(ClusterNode slaveNode) {

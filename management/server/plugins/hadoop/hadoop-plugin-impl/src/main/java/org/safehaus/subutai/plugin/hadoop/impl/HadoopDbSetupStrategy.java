@@ -65,22 +65,6 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 		}
 	}
 
-
-	private void destroyLXC(ProductOperation po, String log) {
-		//destroy all lxcs also
-		po.addLog("Destroying lxc containers");
-		try {
-			for (Agent agent : hadoopClusterConfig.getAllNodes()) {
-				HadoopImpl.getContainerManager().cloneDestroy(agent.getParentHostName(), agent.getHostname());
-			}
-			po.addLog("Lxc containers successfully destroyed");
-		} catch (LxcDestroyException ex) {
-			po.addLog(String.format("%s, skipping...", ex.getMessage()));
-		}
-		po.addLogFailed(log);
-	}
-
-
 	@Override
 	public HadoopClusterConfig setup() throws ClusterSetupException {
 
@@ -124,7 +108,6 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 		return hadoopClusterConfig;
 	}
 
-
 	private void installHadoopCluster() throws ClusterSetupException {
 
 		po.addLog("Hadoop installation started");
@@ -147,5 +130,19 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 		} else {
 			destroyLXC(po, "Could not save cluster info to DB! Please see logs\nInstallation aborted");
 		}
+	}
+
+	private void destroyLXC(ProductOperation po, String log) {
+		//destroy all lxcs also
+		po.addLog("Destroying lxc containers");
+		try {
+			for (Agent agent : hadoopClusterConfig.getAllNodes()) {
+				HadoopImpl.getContainerManager().cloneDestroy(agent.getParentHostName(), agent.getHostname());
+			}
+			po.addLog("Lxc containers successfully destroyed");
+		} catch (LxcDestroyException ex) {
+			po.addLog(String.format("%s, skipping...", ex.getMessage()));
+		}
+		po.addLogFailed(log);
 	}
 }

@@ -1,9 +1,8 @@
 package org.safehaus.subutai.configuration.manager.impl.loaders;
 
 
-import org.safehaus.subutai.configuration.manager.api.TextInjector;
-
 import com.google.gson.JsonObject;
+import org.safehaus.subutai.configuration.manager.api.TextInjector;
 
 
 /**
@@ -11,23 +10,23 @@ import com.google.gson.JsonObject;
  */
 public class PlainConfigurationLoader implements ConfigurationLoader {
 
-    private TextInjector textInjector;
+	private TextInjector textInjector;
 
 
-    public PlainConfigurationLoader( final TextInjector textInjector ) {
-        this.textInjector = textInjector;
-    }
+	public PlainConfigurationLoader(final TextInjector textInjector) {
+		this.textInjector = textInjector;
+	}
 
 
-    @Override
-    public JsonObject getConfiguration( String hostname, String configPathFilename ) {
-        return null;
-    }
+	@Override
+	public JsonObject getConfiguration(String hostname, String configPathFilename) {
+		return null;
+	}
 
 
-    @Override
-    public boolean setConfiguration( String hostname, String configFilePath, String content ) {
-        textInjector.echoTextIntoAgent( hostname, configFilePath, content );
-        return true;
-    }
+	@Override
+	public boolean setConfiguration(String hostname, String configFilePath, String content) {
+		textInjector.echoTextIntoAgent(hostname, configFilePath, content);
+		return true;
+	}
 }

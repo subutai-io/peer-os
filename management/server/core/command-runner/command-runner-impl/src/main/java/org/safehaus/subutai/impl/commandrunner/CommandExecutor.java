@@ -6,11 +6,10 @@
 package org.safehaus.subutai.impl.commandrunner;
 
 
-import java.util.concurrent.ExecutorService;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 
-import com.google.common.base.Preconditions;
+import java.util.concurrent.ExecutorService;
 
 
 /**
@@ -18,34 +17,34 @@ import com.google.common.base.Preconditions;
  */
 public class CommandExecutor {
 
-    final private CommandImpl command;
-    final private ExecutorService executor;
-    final private CommandCallback callback;
+	final private CommandImpl command;
+	final private ExecutorService executor;
+	final private CommandCallback callback;
 
 
-    public CommandExecutor( CommandImpl command, ExecutorService executor, CommandCallback callback ) {
+	public CommandExecutor(CommandImpl command, ExecutorService executor, CommandCallback callback) {
 
-        Preconditions.checkNotNull( command, "Command is null" );
-        Preconditions.checkNotNull( executor, "Executor is null" );
-        Preconditions.checkNotNull( callback, "Callback is null" );
+		Preconditions.checkNotNull(command, "Command is null");
+		Preconditions.checkNotNull(executor, "Executor is null");
+		Preconditions.checkNotNull(callback, "Callback is null");
 
-        this.command = command;
-        this.executor = executor;
-        this.callback = callback;
-    }
-
-
-    public CommandImpl getCommand() {
-        return command;
-    }
+		this.command = command;
+		this.executor = executor;
+		this.callback = callback;
+	}
 
 
-    public ExecutorService getExecutor() {
-        return executor;
-    }
+	public CommandImpl getCommand() {
+		return command;
+	}
 
 
-    public CommandCallback getCallback() {
-        return callback;
-    }
+	public ExecutorService getExecutor() {
+		return executor;
+	}
+
+
+	public CommandCallback getCallback() {
+		return callback;
+	}
 }

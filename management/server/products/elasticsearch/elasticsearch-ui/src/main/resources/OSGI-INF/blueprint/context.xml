@@ -15,7 +15,7 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.elasticsearch.ElasticsearchUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager" />
+        <argument ref="agentManager"/>
         <argument ref="elasticsearchManager"/>
         <argument ref="tracker"/>
         <argument ref="commandRunner"/>

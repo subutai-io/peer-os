@@ -157,6 +157,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         }
         else if ( nodeType == NodeType.ROUTER_NODE ) {
             config.getRouterServers().remove( agent );
+            config.setNumberOfRouters( config.getNumberOfRouters() - 1 );
         }
         //destroy lxc
         po.addLog( "Destroying lxc container..." );

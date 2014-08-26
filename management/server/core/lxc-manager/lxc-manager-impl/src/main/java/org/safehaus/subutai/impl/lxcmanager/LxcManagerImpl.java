@@ -1,24 +1,46 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.lxcmanager.*;
+import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.api.lxcmanager.LxcState;
+import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
+import org.safehaus.subutai.common.StringUtil;
+import org.safehaus.subutai.common.UUIDUtil;
 import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.impl.strategy.RoundRobinStrategy;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class LxcManagerImpl implements LxcManager {
@@ -54,12 +76,6 @@ public class LxcManagerImpl implements LxcManager {
     }
 
 
-    @Override
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
-
-
     /**
      * Returns number of lxc slots that each currently connected physical server can host. This method uses default lxc
      * placement strategy for calculations
@@ -75,12 +91,16 @@ public class LxcManagerImpl implements LxcManager {
         // set all values to some equal amount so that RR strategy works from UI
         // TODO: remove this! This is for showing round-robin from UI
         int max = Integer.MIN_VALUE;
-        for(Integer i : serversSlots.values()) if(i > max) max = i;
+        for ( Integer i : serversSlots.values() ) {
+            if ( i > max ) {
+                max = i;
+            }
+        }
         max = 10;
 
         if ( !serversSlots.isEmpty() ) {
             for ( Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet() ) {
-                bestServers.put(serverSlots.getKey(), max);
+                bestServers.put( serverSlots.getKey(), max );
             }
         }
 
@@ -125,7 +145,7 @@ public class LxcManagerImpl implements LxcManager {
                                 //-/+ buffers/cache:       1829       5810
                                 String[] ramMetric = metric.split( "\\s+" );
                                 String freeRamMbStr = ramMetric[ramMetric.length - 1];
-                                if ( Util.isNumeric( freeRamMbStr ) ) {
+                                if ( StringUtil.isNumeric( freeRamMbStr ) ) {
                                     freeRamMb = Integer.parseInt( freeRamMbStr );
                                 }
                                 else {
@@ -137,7 +157,7 @@ public class LxcManagerImpl implements LxcManager {
                                 String[] hddMetric = metric.split( "\\s+" );
                                 if ( hddMetric.length == 6 ) {
                                     String hddMetricKbStr = hddMetric[3];
-                                    if ( Util.isNumeric( hddMetricKbStr ) ) {
+                                    if ( StringUtil.isNumeric( hddMetricKbStr ) ) {
                                         freeHddMb = Integer.parseInt( hddMetricKbStr ) / 1024;
                                     }
                                     else {
@@ -155,8 +175,8 @@ public class LxcManagerImpl implements LxcManager {
                                 if ( m.find() ) {
                                     String[] loads = m.group( 1 ).split( "," );
                                     if ( loads.length == 3 ) {
-                                        if ( Util.isNumeric( loads[0] ) && Util.isNumeric( loads[1] ) && Util
-                                                .isNumeric( loads[2] ) ) {
+                                        if ( StringUtil.isNumeric( loads[0] ) && StringUtil.isNumeric( loads[1] )
+                                                && StringUtil.isNumeric( loads[2] ) ) {
                                             loadAvg = ( Double.parseDouble( loads[0] ) + Double.parseDouble( loads[1] )
                                                     + Double.parseDouble( loads[2] ) ) / 3;
                                         }
@@ -173,7 +193,7 @@ public class LxcManagerImpl implements LxcManager {
                                 }
                             }
                             else if ( line == 4 ) {
-                                if ( Util.isNumeric( metric ) ) {
+                                if ( StringUtil.isNumeric( metric ) ) {
                                     numOfProc = Integer.parseInt( metric );
                                     if ( numOfProc > 0 ) {
                                         cpuLoadPercent = ( loadAvg / numOfProc ) * 100;
@@ -454,7 +474,7 @@ public class LxcManagerImpl implements LxcManager {
     public Map<Agent, Set<Agent>> createLxcs( int count ) throws LxcCreateException {
         Map<Agent, Set<Agent>> lxcAgents = new HashMap<>();
 
-        Map<String, Map<Agent, Set<Agent>>> families = createLxcsByStrategy(new RoundRobinStrategy(count));
+        Map<String, Map<Agent, Set<Agent>>> families = createLxcsByStrategy( new RoundRobinStrategy( count ) );
 
         for ( Map.Entry<String, Map<Agent, Set<Agent>>> family : families.entrySet() ) {
             for ( Map.Entry<Agent, Set<Agent>> childs : family.getValue().entrySet() ) {
@@ -620,94 +640,6 @@ public class LxcManagerImpl implements LxcManager {
     }
 
 
-    /*
-     *
-     * public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy ) throws
-     * LxcCreateException {
-     *
-     *
-     * if ( strategy == null ) { throw new LxcCreateException( "LXC placement strategy is null" ); }
-     *
-     * strategy.calculatePlacement( getPhysicalServerMetrics() ); Map<Agent, Map<String, Integer>> placementNodes =
-     * strategy.getPlacementInfoMap();
-     *
-     * //check placement info if ( placementNodes.isEmpty() ) { throw new LxcCreateException( "LXC placement nodes are
-     * empty" ); }
-     *
-     * //resulting collection Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
-     *
-     * //create containers CompletionService<LxcInfo> completer = new ExecutorCompletionService<>( executor );
-     * List<LxcInfo> lxcInfos = new ArrayList<>(); for ( Map.Entry<Agent, Map<String, Integer>> placementEntry :
-     * placementNodes.entrySet() ) { Agent physicalNode = placementEntry.getKey(); for ( Map.Entry<String, Integer>
-     * lxcEntry : placementEntry.getValue().entrySet() ) { String nodeType = lxcEntry.getKey(); Integer numOfLxcs =
-     * lxcEntry.getValue();
-     *
-     *
-     * for ( int i = 0; i < numOfLxcs; i++ ) {
-     *
-     * LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType ); lxcInfos.add(
-     * lxcInfo ); completer.submit( new LxcActor( lxcInfo, this, LxcAction.CLONE ) ); } } }
-     *
-     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
-     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
-     *
-     * boolean result = true; for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
-     *
-     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Not all lxcs created successfully" ); }
-     *
-     *
-     * //start containers for ( LxcInfo lxcInfo : lxcInfos ) { lxcInfo.setResult( false ); completer.submit( new
-     * LxcActor( lxcInfo, this, LxcAction.START ) ); }
-     *
-     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
-     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
-     *
-     * for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
-     *
-     * if ( result ) {
-     *
-     * //wait for lxc agents to connect long waitStart = System.currentTimeMillis(); while ( !Thread.interrupted() ) {
-     * result = true; for ( LxcInfo lxcInfo : lxcInfos ) { Agent lxcAgent = agentManager.getAgentByHostname(
-     * lxcInfo.getLxcHostname() ); if ( lxcAgent == null ) { result = false; break; } else { //populate families
-     *
-     * Map<Agent, Set<Agent>> family = families.get( lxcInfo.getNodeType() ); if ( family == null ) { family = new
-     * HashMap<>(); families.put( lxcInfo.getNodeType(), family ); } Set<Agent> childs = family.get(
-     * lxcInfo.getPhysicalAgent() ); if ( childs == null ) { childs = new HashSet<>(); family.put(
-     * lxcInfo.getPhysicalAgent(), childs ); }
-     *
-     * childs.add( lxcAgent ); } } if ( result ) { break; } else { if ( System.currentTimeMillis() - waitStart > Math
-     * .max( lxcInfos.size() * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) { break; } else { try {
-     * Thread.sleep( 1000 ); } catch ( InterruptedException ex ) { break; } } } } }
-     *
-     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Waiting interval for lxc agents timed out" ); }
-     *
-     * return families; }
-     */
-
-
-    private void destroyLxcs( List<LxcInfo> lxcInfos, String message ) throws LxcCreateException {
-        //cleanup lxcs
-        Map<Agent, Set<String>> createdLxcFamilies = new HashMap<>();
-        for ( LxcInfo lxcInfo : lxcInfos ) {
-            Set<String> lxcHostnames = createdLxcFamilies.get( lxcInfo.getPhysicalAgent() );
-            if ( lxcHostnames == null ) {
-                lxcHostnames = new HashSet<>();
-                createdLxcFamilies.put( lxcInfo.getPhysicalAgent(), lxcHostnames );
-            }
-            lxcHostnames.add( lxcInfo.getLxcHostname() );
-        }
-        if ( !createdLxcFamilies.isEmpty() ) {
-            try {
-                destroyLxcsByHostname( createdLxcFamilies );
-            }
-            catch ( LxcDestroyException ex ) {
-                throw new LxcCreateException( String.format( "%s. Use LXC module to cleanup", message ) );
-            }
-        }
-        throw new LxcCreateException( message );
-    }
-
-
     /**
      * Creates lxcs based on a supplied strategy.
      *
@@ -745,7 +677,8 @@ public class LxcManagerImpl implements LxcManager {
 
                 for ( int i = 0; i < numOfLxcs; i++ ) {
 
-                    LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType );
+                    LxcInfo lxcInfo =
+                            new LxcInfo( physicalNode, UUIDUtil.generateTimeBasedUUID().toString(), nodeType );
                     lxcInfos.add( lxcInfo );
                     if ( !cloneLxcOnHost( lxcInfo.getPhysicalAgent(), lxcInfo.getLxcHostname() ) ) {
                         destroyLxcs( lxcInfos, "Failed to clone containers" );
@@ -829,5 +762,99 @@ public class LxcManagerImpl implements LxcManager {
         }
 
         return families;
+    }
+
+
+    /*
+     *
+     * public Map<String, Map<Agent, Set<Agent>>> createLxcsByStrategy( LxcPlacementStrategy strategy ) throws
+     * LxcCreateException {
+     *
+     *
+     * if ( strategy == null ) { throw new LxcCreateException( "LXC placement strategy is null" ); }
+     *
+     * strategy.calculatePlacement( getPhysicalServerMetrics() ); Map<Agent, Map<String, Integer>> placementNodes =
+     * strategy.getPlacementInfoMap();
+     *
+     * //check placement info if ( placementNodes.isEmpty() ) { throw new LxcCreateException( "LXC placement nodes are
+     * empty" ); }
+     *
+     * //resulting collection Map<String, Map<Agent, Set<Agent>>> families = new HashMap<>();
+     *
+     * //create containers CompletionService<LxcInfo> completer = new ExecutorCompletionService<>( executor );
+     * List<LxcInfo> lxcInfos = new ArrayList<>(); for ( Map.Entry<Agent, Map<String, Integer>> placementEntry :
+     * placementNodes.entrySet() ) { Agent physicalNode = placementEntry.getKey(); for ( Map.Entry<String, Integer>
+     * lxcEntry : placementEntry.getValue().entrySet() ) { String nodeType = lxcEntry.getKey(); Integer numOfLxcs =
+     * lxcEntry.getValue();
+     *
+     *
+     * for ( int i = 0; i < numOfLxcs; i++ ) {
+     *
+     * LxcInfo lxcInfo = new LxcInfo( physicalNode, Util.generateTimeBasedUUID().toString(), nodeType ); lxcInfos.add(
+     * lxcInfo ); completer.submit( new LxcActor( lxcInfo, this, LxcAction.CLONE ) ); } } }
+     *
+     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
+     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
+     *
+     * boolean result = true; for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
+     *
+     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Not all lxcs created successfully" ); }
+     *
+     *
+     * //start containers for ( LxcInfo lxcInfo : lxcInfos ) { lxcInfo.setResult( false ); completer.submit( new
+     * LxcActor( lxcInfo, this, LxcAction.START ) ); }
+     *
+     * //wait for completion try { for ( LxcInfo ignore : lxcInfos ) { Future<LxcInfo> future = completer.take();
+     * future.get(); } } catch ( InterruptedException | ExecutionException ignore ) { }
+     *
+     * for ( LxcInfo lxcInfo : lxcInfos ) { result &= lxcInfo.isResult(); }
+     *
+     * if ( result ) {
+     *
+     * //wait for lxc agents to connect long waitStart = System.currentTimeMillis(); while ( !Thread.interrupted() ) {
+     * result = true; for ( LxcInfo lxcInfo : lxcInfos ) { Agent lxcAgent = agentManager.getAgentByHostname(
+     * lxcInfo.getLxcHostname() ); if ( lxcAgent == null ) { result = false; break; } else { //populate families
+     *
+     * Map<Agent, Set<Agent>> family = families.get( lxcInfo.getNodeType() ); if ( family == null ) { family = new
+     * HashMap<>(); families.put( lxcInfo.getNodeType(), family ); } Set<Agent> childs = family.get(
+     * lxcInfo.getPhysicalAgent() ); if ( childs == null ) { childs = new HashSet<>(); family.put(
+     * lxcInfo.getPhysicalAgent(), childs ); }
+     *
+     * childs.add( lxcAgent ); } } if ( result ) { break; } else { if ( System.currentTimeMillis() - waitStart > Math
+     * .max( lxcInfos.size() * 60 * 1000, Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000 ) ) { break; } else { try {
+     * Thread.sleep( 1000 ); } catch ( InterruptedException ex ) { break; } } } } }
+     *
+     * if ( !result ) { //cleanup lxcs destroyLxcs( lxcInfos, "Waiting interval for lxc agents timed out" ); }
+     *
+     * return families; }
+     */
+
+
+    @Override
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+
+    private void destroyLxcs( List<LxcInfo> lxcInfos, String message ) throws LxcCreateException {
+        //cleanup lxcs
+        Map<Agent, Set<String>> createdLxcFamilies = new HashMap<>();
+        for ( LxcInfo lxcInfo : lxcInfos ) {
+            Set<String> lxcHostnames = createdLxcFamilies.get( lxcInfo.getPhysicalAgent() );
+            if ( lxcHostnames == null ) {
+                lxcHostnames = new HashSet<>();
+                createdLxcFamilies.put( lxcInfo.getPhysicalAgent(), lxcHostnames );
+            }
+            lxcHostnames.add( lxcInfo.getLxcHostname() );
+        }
+        if ( !createdLxcFamilies.isEmpty() ) {
+            try {
+                destroyLxcsByHostname( createdLxcFamilies );
+            }
+            catch ( LxcDestroyException ex ) {
+                throw new LxcCreateException( String.format( "%s. Use LXC module to cleanup", message ) );
+            }
+        }
+        throw new LxcCreateException( message );
     }
 }

@@ -26,15 +26,15 @@ public class UIUtil {
 		return textArea;
 	}
 
+	public static Label getLabel(String text, float width) {
+		return getLabel(text, width, Sizeable.Unit.PIXELS);
+	}
+
 	public static Label getLabel(String text, float width, Sizeable.Unit sizeAble) {
 		Label label = new Label(text);
 		label.setWidth(width, sizeAble);
 		label.setContentMode(ContentMode.HTML);
 		return label;
-	}
-
-	public static Label getLabel(String text, float width) {
-		return getLabel(text, width, Sizeable.Unit.PIXELS);
 	}
 
 	public static AbstractTextField getTextField(String label, float width) {

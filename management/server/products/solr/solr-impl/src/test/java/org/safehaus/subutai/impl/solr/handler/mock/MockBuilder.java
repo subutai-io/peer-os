@@ -17,38 +17,38 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 public class MockBuilder {
 
-    public static AbstractOperationHandler getInstallOperationWithResult( boolean success ) {
-        SolrImpl solrImpl = new SolrImplMock().setCommands( getCommands( success ) );
-        Config config = new Config().setClusterName( "test-cluster" );
+	public static AbstractOperationHandler getInstallOperationWithResult(boolean success) {
+		SolrImpl solrImpl = new SolrImplMock().setCommands(getCommands(success));
+		Config config = new Config().setClusterName("test-cluster");
 
-        return new InstallOperationHandler( solrImpl, config );
-    }
+		return new InstallOperationHandler(solrImpl, config);
+	}
 
-    public static AbstractOperationHandler getUninstallOperationWithResult( boolean success ) {
+	private static Commands getCommands(boolean installSuccess) {
+		CommandMock installCommand = new CommandMock().setSucceeded(installSuccess);
 
-        DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
+		return new CommandsMock().setInstallCommand(installCommand);
+	}
 
-        SolrImpl solrImpl = new SolrImplMock()
-                .setClusterConfig( new Config() )
-                .setDbManager( dbManager );
+	public static AbstractOperationHandler getUninstallOperationWithResult(boolean success) {
 
-        return new UninstallOperationHandler( solrImpl, "test-cluster" );
-    }
+		DbManager dbManager = new DbManagerMock().setDeleteInfoResult(success);
 
-    public static AbstractOperationHandler getAddNodeOperationWithResult( boolean success ) {
-        LxcManagerMock lxcManagerMock = new LxcManagerMock().setMockLxcMap( CommonMockBuilder.getLxcMap() );
+		SolrImpl solrImpl = new SolrImplMock()
+				.setClusterConfig(new Config())
+				.setDbManager(dbManager);
 
-        SolrImpl solrImpl = new SolrImplMock()
-                .setCommands( getCommands( success ) )
-                .setClusterConfig( new Config() )
-                .setLxcManager( lxcManagerMock );
+		return new UninstallOperationHandler(solrImpl, "test-cluster");
+	}
 
-        return new AddNodeOperationHandler( solrImpl, "test-cluster" );
-    }
+	public static AbstractOperationHandler getAddNodeOperationWithResult(boolean success) {
+		LxcManagerMock lxcManagerMock = new LxcManagerMock().setMockLxcMap(CommonMockBuilder.getLxcMap());
 
-    private static Commands getCommands( boolean installSuccess ) {
-        CommandMock installCommand = new CommandMock().setSucceeded( installSuccess );
+		SolrImpl solrImpl = new SolrImplMock()
+				.setCommands(getCommands(success))
+				.setClusterConfig(new Config())
+				.setLxcManager(lxcManagerMock);
 
-        return new CommandsMock().setInstallCommand( installCommand );
-    }
+		return new AddNodeOperationHandler(solrImpl, "test-cluster");
+	}
 }

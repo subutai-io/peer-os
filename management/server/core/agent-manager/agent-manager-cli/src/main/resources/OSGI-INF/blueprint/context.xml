@@ -1,55 +1,55 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    >
+        >
 
-  <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-agent-by-hostname">
-      <action class="org.safehaus.subutai.cli.commands.GetAgentByHostnameCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-agent-by-hostname">
+            <action class="org.safehaus.subutai.cli.commands.GetAgentByHostnameCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-agent-by-uuid">
-      <action class="org.safehaus.subutai.cli.commands.GetAgentByUUIDCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-agent-by-uuid">
+            <action class="org.safehaus.subutai.cli.commands.GetAgentByUUIDCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-agents">
-      <action class="org.safehaus.subutai.cli.commands.GetAgentsCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-agents">
+            <action class="org.safehaus.subutai.cli.commands.GetAgentsCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-lxc-agents-by-parent-hostname">
-      <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsByParentHostnameCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-lxc-agents-by-parent-hostname">
+            <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsByParentHostnameCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-lxc-agents">
-      <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-lxc-agents">
+            <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="agent/get-physical-agents">
-      <action class="org.safehaus.subutai.cli.commands.GetPhysicalAgentsCommand">
-        <property name="agentManager" ref="agentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="agent/get-physical-agents">
+            <action class="org.safehaus.subutai.cli.commands.GetPhysicalAgentsCommand">
+                <property name="agentManager" ref="agentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
 </blueprint>

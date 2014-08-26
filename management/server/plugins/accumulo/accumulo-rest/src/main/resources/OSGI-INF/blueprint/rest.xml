@@ -1,24 +1,32 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
            xmlns:cxf="http://cxf.apache.org/blueprint/core"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-  <!-- 1 -->
+
   <cxf:bus id="cxfBus1Cassandra">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <!-- 2 -->
+
+  <reference id="accumuloManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.accumulo.api.Accumulo" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+
+  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.plugin.accumulo.rest.RestServiceImpl">
+    <property name="accumuloManager" ref="accumuloManager" />
+    <property name="agentManager" ref="agentManager" />
+  </bean>
+
   <jaxrs:server address="/accumulo2" id="accumuloRestService">
     <jaxrs:serviceBeans>
       <ref component-id="accumuloRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <!-- Implementation of the rest service -->
-  <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.plugin.accumulo.rest.RestServiceImpl">
-  </bean>
+
 </blueprint>

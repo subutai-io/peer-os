@@ -80,13 +80,13 @@ public class FlumeUI implements PortalModule {
 		return Config.PRODUCT_KEY;
 	}
 
+	public String getName() {
+		return Config.PRODUCT_KEY;
+	}
+
 	@Override
 	public File getImage() {
 		return FileUtil.getFile(FlumeUI.MODULE_IMAGE, this);
-	}
-
-	public String getName() {
-		return Config.PRODUCT_KEY;
 	}
 
 	public Component createComponent() {

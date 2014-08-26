@@ -11,19 +11,19 @@ package org.safehaus.subutai.ui.lxcmanager.common;
  */
 public enum Buttons {
 
-    INFO( "Info" ), START( "Start" ), STOP( "Stop" ), DESTROY( "Destroy" ), START_ALL( "Start All" ),
-    STOP_ALL( "Stop All" ), DESTROY_ALL( "Destroy All" );
+	INFO("Info"), START("Start"), STOP("Stop"), DESTROY("Destroy"), START_ALL("Start All"),
+	STOP_ALL("Stop All"), DESTROY_ALL("Destroy All");
 
-    private final String buttonLabel;
-
-
-    private Buttons( String buttonLabel ) {
-        this.buttonLabel = buttonLabel;
-    }
+	private final String buttonLabel;
 
 
-    public String getButtonLabel() {
-        return buttonLabel;
-    }
+	private Buttons(String buttonLabel) {
+		this.buttonLabel = buttonLabel;
+	}
+
+
+	public String getButtonLabel() {
+		return buttonLabel;
+	}
 
 }

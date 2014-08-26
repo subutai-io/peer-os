@@ -9,11 +9,11 @@ import org.junit.Test;
  */
 public class XMLConfigurationLoaderTest {
 
-    @Test
-    public void test() {
+	@Test
+	public void test() {
 //        XMLConfigurationLoader loader = new XMLConfigurationLoader();
 
 //        loader.loadConfig();
-    }
+	}
 
 }

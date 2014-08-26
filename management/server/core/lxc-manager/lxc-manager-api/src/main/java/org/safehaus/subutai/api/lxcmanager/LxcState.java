@@ -11,20 +11,18 @@ package org.safehaus.subutai.api.lxcmanager;
  */
 public enum LxcState {
 
-    UNKNOWN, RUNNING, STOPPED, FROZEN;
+	UNKNOWN, RUNNING, STOPPED, FROZEN;
 
 
-    public static LxcState parseState( String state ) {
-        if ( RUNNING.name().equalsIgnoreCase( state ) ) {
-            return RUNNING;
-        }
-        else if ( STOPPED.name().equalsIgnoreCase( state ) ) {
-            return STOPPED;
-        }
-        else if ( FROZEN.name().equalsIgnoreCase( state ) ) {
-            return FROZEN;
-        }
+	public static LxcState parseState(String state) {
+		if (RUNNING.name().equalsIgnoreCase(state)) {
+			return RUNNING;
+		} else if (STOPPED.name().equalsIgnoreCase(state)) {
+			return STOPPED;
+		} else if (FROZEN.name().equalsIgnoreCase(state)) {
+			return FROZEN;
+		}
 
-        return UNKNOWN;
-    }
+		return UNKNOWN;
+	}
 }

@@ -28,7 +28,9 @@ public class InstallHandlerTest {
 
     @Test
     public void testWithInvalidConfig() {
-        handler = new InstallHandler(mock, new Config());
+        Config config = new Config();
+        config.setClusterName( "test" );
+        handler = new InstallHandler(mock, config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();

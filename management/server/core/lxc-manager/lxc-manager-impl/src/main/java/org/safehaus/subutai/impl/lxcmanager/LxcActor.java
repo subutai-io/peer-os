@@ -6,9 +6,9 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import java.util.concurrent.Callable;
-
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
+
+import java.util.concurrent.Callable;
 
 
 /**
@@ -16,28 +16,26 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
  */
 public class LxcActor implements Callable<LxcInfo> {
 
-    private final LxcInfo info;
-    private final LxcManager lxcManager;
-    private final LxcAction lxcAction;
+	private final LxcInfo info;
+	private final LxcManager lxcManager;
+	private final LxcAction lxcAction;
 
 
-    public LxcActor( LxcInfo info, LxcManager lxcManager, LxcAction lxcAction ) {
-        this.info = info;
-        this.lxcManager = lxcManager;
-        this.lxcAction = lxcAction;
-    }
+	public LxcActor(LxcInfo info, LxcManager lxcManager, LxcAction lxcAction) {
+		this.info = info;
+		this.lxcManager = lxcManager;
+		this.lxcAction = lxcAction;
+	}
 
 
-    public LxcInfo call() throws Exception {
-        if ( lxcAction == LxcAction.CLONE ) {
-            info.setResult( lxcManager.cloneLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
-        }
-        else if ( lxcAction == LxcAction.START ) {
-            info.setResult( lxcManager.startLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
-        }
-        else if ( lxcAction == LxcAction.DESTROY ) {
-            info.setResult( lxcManager.destroyLxcOnHost( info.getPhysicalAgent(), info.getLxcHostname() ) );
-        }
-        return info;
-    }
+	public LxcInfo call() throws Exception {
+		if (lxcAction == LxcAction.CLONE) {
+			info.setResult(lxcManager.cloneLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+		} else if (lxcAction == LxcAction.START) {
+			info.setResult(lxcManager.startLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+		} else if (lxcAction == LxcAction.DESTROY) {
+			info.setResult(lxcManager.destroyLxcOnHost(info.getPhysicalAgent(), info.getLxcHostname()));
+		}
+		return info;
+	}
 }

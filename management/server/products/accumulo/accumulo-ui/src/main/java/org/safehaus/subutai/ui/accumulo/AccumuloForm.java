@@ -26,16 +26,25 @@ public class AccumuloForm extends CustomComponent {
 		verticalLayout.setSpacing(true);
 		verticalLayout.setSizeFull();
 
-		TabSheet mongoSheet = new TabSheet();
-		mongoSheet.setSizeFull();
+		TabSheet accumuloSheet = new TabSheet();
+		accumuloSheet.setSizeFull();
 
-		Manager manager = new Manager();
+		final Manager manager = new Manager();
 		Wizard wizard = new Wizard();
-		mongoSheet.addTab(wizard.getContent(), "Install");
-		mongoSheet.addTab(manager.getContent(), "Manage");
-		verticalLayout.addComponent(mongoSheet);
+		accumuloSheet.addTab( wizard.getContent(), "Install" );
+		accumuloSheet.addTab( manager.getContent(), "Manage" );
+        accumuloSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+		verticalLayout.addComponent(accumuloSheet);
 		setCompositionRoot(verticalLayout);
-
 		manager.refreshClustersInfo();
 	}
 }

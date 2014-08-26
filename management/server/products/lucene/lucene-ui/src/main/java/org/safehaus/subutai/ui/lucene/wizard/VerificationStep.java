@@ -6,20 +6,14 @@
 package org.safehaus.subutai.ui.lucene.wizard;
 
 
-import java.util.UUID;
-
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.*;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.lucene.LuceneUI;
 
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Window;
+import java.util.UUID;
 
 
 /**
@@ -27,63 +21,63 @@ import com.vaadin.ui.Window;
  */
 public class VerificationStep extends Panel {
 
-    public VerificationStep( final Wizard wizard ) {
+	public VerificationStep(final Wizard wizard) {
 
-        setSizeFull();
+		setSizeFull();
 
-        GridLayout grid = new GridLayout( 1, 5 );
-        grid.setSpacing( true );
-        grid.setMargin( true );
-        grid.setSizeFull();
+		GridLayout grid = new GridLayout(1, 5);
+		grid.setSpacing(true);
+		grid.setMargin(true);
+		grid.setSizeFull();
 
-        Label confirmationLbl = new Label( "<strong>Please verify the installation settings "
-                + "(you may change them by clicking on Back button)</strong><br/>" );
-        confirmationLbl.setContentMode( ContentMode.HTML );
+		Label confirmationLbl = new Label("<strong>Please verify the installation settings "
+				+ "(you may change them by clicking on Back button)</strong><br/>");
+		confirmationLbl.setContentMode(ContentMode.HTML);
 
-        ConfigView cfgView = new ConfigView( "Installation configuration" );
-        cfgView.addStringCfg( "Cluster Name", wizard.getConfig().getClusterName() );
-        cfgView.addStringCfg( "Hadoop cluster Name", wizard.getConfig().getHadoopClusterName() );
-        for ( Agent agent : wizard.getConfig().getNodes() ) {
-            cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
-        }
+		ConfigView cfgView = new ConfigView("Installation configuration");
+		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
+		cfgView.addStringCfg("Hadoop cluster Name", wizard.getConfig().getHadoopClusterName());
+		for (Agent agent : wizard.getConfig().getNodes()) {
+			cfgView.addStringCfg("Node to install", agent.getHostname() + "");
+		}
 
-        Button install = new Button( "Install" );
-        install.addStyleName( "default" );
-        install.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = LuceneUI.getLuceneManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( LuceneUI.getExecutor(), LuceneUI.getTracker(), trackID,
-                        Config.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        wizard.init();
-                    }
-                } );
-                getUI().addWindow( window.getWindow() );
-            }
-        } );
+		Button install = new Button("Install");
+		install.addStyleName("default");
+		install.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				UUID trackID = LuceneUI.getLuceneManager().installCluster(wizard.getConfig());
+				ProgressWindow window = new ProgressWindow(LuceneUI.getExecutor(), LuceneUI.getTracker(), trackID,
+						Config.PRODUCT_KEY);
+				window.getWindow().addCloseListener(new Window.CloseListener() {
+					@Override
+					public void windowClose(Window.CloseEvent closeEvent) {
+						wizard.init();
+					}
+				});
+				getUI().addWindow(window.getWindow());
+			}
+		});
 
-        Button back = new Button( "Back" );
-        back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                wizard.back();
-            }
-        } );
+		Button back = new Button("Back");
+		back.addStyleName("default");
+		back.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				wizard.back();
+			}
+		});
 
-        HorizontalLayout buttons = new HorizontalLayout();
-        buttons.addComponent( back );
-        buttons.addComponent( install );
+		HorizontalLayout buttons = new HorizontalLayout();
+		buttons.addComponent(back);
+		buttons.addComponent(install);
 
-        grid.addComponent( confirmationLbl, 0, 0 );
+		grid.addComponent(confirmationLbl, 0, 0);
 
-        grid.addComponent( cfgView.getCfgTable(), 0, 1, 0, 3 );
+		grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
 
-        grid.addComponent( buttons, 0, 4 );
+		grid.addComponent(buttons, 0, 4);
 
-        setContent( grid );
-    }
+		setContent(grid);
+	}
 }

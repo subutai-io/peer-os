@@ -1,8 +1,5 @@
 package org.safehaus.subutai.impl.storm.handler;
 
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.impl.storm.StormImpl;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
@@ -11,23 +8,23 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 class Helper {
 
-    final StormImpl manager;
+	final StormImpl manager;
 
     public Helper(StormImpl manager) {
         this.manager = manager;
     }
 
-    Set<Agent> createContainers(int count) throws LxcCreateException {
-        Map<Agent, Set<Agent>> lxcs = manager.getLxcManager().createLxcs(count);
-        Set<Agent> res = new HashSet<>();
-        for(Set<Agent> s : lxcs.values()) res.addAll(s);
-        return res;
-    }
+	Agent createContainer() throws LxcCreateException {
+		Set<Agent> s = createContainers(1);
+		return s.size() > 0 ? s.iterator().next() : null;
+	}
 
-    Agent createContainer() throws LxcCreateException {
-        Set<Agent> s = createContainers(1);
-        return s.size() > 0 ? s.iterator().next() : null;
-    }
+	Set<Agent> createContainers(int count) throws LxcCreateException {
+		Map<Agent, Set<Agent>> lxcs = manager.getLxcManager().createLxcs(count);
+		Set<Agent> res = new HashSet<>();
+		for (Set<Agent> s : lxcs.values()) res.addAll(s);
+		return res;
+	}
 
     boolean installZookeeper(Agent agent) {
         UUID id = manager.getZookeeperManager().install(agent.getHostname());
@@ -51,7 +48,7 @@ class Helper {
         }
     }
 
-    class OperationStatusChecker implements Runnable {
+	class OperationStatusChecker implements Runnable {
 
         final CountDownLatch latch;
         final String source;
@@ -79,5 +76,5 @@ class Helper {
             }
         }
 
-    }
+	}
 }

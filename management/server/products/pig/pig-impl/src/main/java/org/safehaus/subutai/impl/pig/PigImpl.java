@@ -1,11 +1,7 @@
 package org.safehaus.subutai.impl.pig;
 
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -16,100 +12,100 @@ import org.safehaus.subutai.impl.pig.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.pig.handler.InstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class PigImpl implements Pig {
 
-    protected Commands commands;
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ExecutorService executor;
+	protected Commands commands;
+	private CommandRunner commandRunner;
+	private AgentManager agentManager;
+	private DbManager dbManager;
+	private Tracker tracker;
+	private ExecutorService executor;
 
 
-    public PigImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
-        this.commands = new Commands( commandRunner );
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-    }
+	public PigImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+		this.commands = new Commands(commandRunner);
+		this.commandRunner = commandRunner;
+		this.agentManager = agentManager;
+		this.dbManager = dbManager;
+		this.tracker = tracker;
+	}
 
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
 
-    public void destroy() {
-        executor.shutdown();
-    }
+	public void destroy() {
+		executor.shutdown();
+	}
 
 
-    public Commands getCommands() {
-        return commands;
-    }
+	public Commands getCommands() {
+		return commands;
+	}
 
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public AgentManager getAgentManager() {
+		return agentManager;
+	}
 
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
+	public DbManager getDbManager() {
+		return dbManager;
+	}
 
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
 
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
 
-    @Override
-    public UUID installCluster( Config config ) {
+	@Override
+	public UUID installCluster(Config config) {
 
-        Preconditions.checkNotNull( config, "Configuration is null" );
+		Preconditions.checkNotNull(config, "Configuration is null");
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-        executor.execute( operationHandler );
+		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID uninstallCluster( final String clusterName ) {
-        return null;
-    }
+		return operationHandler.getTrackerId();
+	}
 
 
-    @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+	@Override
+	public UUID uninstallCluster(final String clusterName) {
+		return null;
+	}
 
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+	@Override
+	public List<Config> getClusters() {
+		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+	}
 
-        executor.execute( operationHandler );
+	@Override
+	public Config getCluster(String clusterName) {
+		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+	}
 
-        return operationHandler.getTrackerId();
-    }
+	@Override
+	public UUID destroyNode(final String clusterName, final String lxcHostname) {
 
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
 
-    @Override
-    public List<Config> getClusters() {
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
-    }
+		executor.execute(operationHandler);
 
-
-    @Override
-    public Config getCluster( String clusterName ) {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
-    }
+		return operationHandler.getTrackerId();
+	}
 }

@@ -10,8 +10,8 @@ package org.safehaus.subutai.impl.mongodb.common;
  */
 public class Constants {
 
-    public static final String DATA_NODE_CONF_FILE = "/etc/mongodb.conf";
-    public static final String LOG_DIR = "/var/log/mongodb";
-    public static final String CONFIG_DIR = "/data/configdb";
+	public static final String DATA_NODE_CONF_FILE = "/etc/mongodb.conf";
+	public static final String LOG_DIR = "/var/log/mongodb";
+	public static final String CONFIG_DIR = "/data/configdb";
 
 }

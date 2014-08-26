@@ -10,32 +10,32 @@ import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 public class DestroyNodeHandlerTest {
 
-    private HiveImplMock mock;
-    private AbstractHandler handler;
+	private HiveImplMock mock;
+	private AbstractHandler handler;
 
-    @Before
-    public void setUp() {
-        mock = new HiveImplMock();
-        handler = new DestroyNodeHandler(mock, "test-cluster", "test-host");
-    }
+	@Before
+	public void setUp() {
+		mock = new HiveImplMock();
+		handler = new DestroyNodeHandler(mock, "test-cluster", "test-host");
+	}
 
-    @Test
-    public void testWithoutConfig() {
-        handler.run();
+	@Test
+	public void testWithoutConfig() {
+		handler.run();
 
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
+		ProductOperation po = handler.getProductOperation();
+		Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
+		Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+	}
 
-    @Test
-    public void testNotConnected() {
-        mock.setConfig(new Config());
-        handler.run();
+	@Test
+	public void testNotConnected() {
+		mock.setConfig(new Config());
+		handler.run();
 
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
+		ProductOperation po = handler.getProductOperation();
+		Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
+		Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
+	}
 
 }

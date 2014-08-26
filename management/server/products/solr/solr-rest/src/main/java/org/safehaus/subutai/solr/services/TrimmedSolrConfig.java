@@ -8,16 +8,16 @@ package org.safehaus.subutai.solr.services;
 
 public class TrimmedSolrConfig {
 
-    private String clusterName = "";
-    private int numberOfNodes = 1;
+	private String clusterName = "";
+	private int numberOfNodes = 1;
 
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    public int getNumberOfNodes() {
-        return numberOfNodes;
-    }
+	public int getNumberOfNodes() {
+		return numberOfNodes;
+	}
 }

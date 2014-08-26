@@ -80,6 +80,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
 
         if ( nodeType == NodeType.CONFIG_NODE ) {
             config.getConfigServers().remove( agent );
+            config.setNumberOfConfigServers(config.getNumberOfConfigServers() - 1);
             //restart routers
             po.addLog( "Restarting routers..." );
             Command stopRoutersCommand = Commands.getStopNodeCommand( config.getRouterServers() );
@@ -114,6 +115,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         }
         else if ( nodeType == NodeType.DATA_NODE ) {
             config.getDataNodes().remove( agent );
+            config.setNumberOfDataNodes(config.getNumberOfDataNodes() - 1);
             //unregister from primary
             po.addLog( "Unregistering this node from replica set..." );
             Command findPrimaryNodeCommand = Commands.getFindPrimaryNodeCommand( agent, config.getDataNodePort() );
@@ -151,6 +153,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
             }
         }
         else if ( nodeType == NodeType.ROUTER_NODE ) {
+            config.setNumberOfRouters( config.getNumberOfRouters() - 1 );
             config.getRouterServers().remove( agent );
         }
         //destroy lxc
@@ -174,7 +177,7 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<MongoI
         //update db
         po.addLog( "Updating cluster information in database..." );
         try {
-            manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLogDone( "Cluster information updated in database" );
         }
         catch ( DBException e ) {

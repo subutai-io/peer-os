@@ -2,9 +2,9 @@ package org.safehaus.subutai.ui.elasticsearch;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
-import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.elasticsearch.Config;
+import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
@@ -23,8 +23,8 @@ public class ElasticsearchUI implements PortalModule {
 	private static Tracker tracker;
 	private static ExecutorService executor;
 
-	public ElasticsearchUI( AgentManager agentManager, Elasticsearch elasticsearchManager, Tracker tracker,
-                            CommandRunner commandRunner ) {
+	public ElasticsearchUI(AgentManager agentManager, Elasticsearch elasticsearchManager, Tracker tracker,
+	                       CommandRunner commandRunner) {
 		ElasticsearchUI.elasticsearchManager = elasticsearchManager;
 		ElasticsearchUI.agentManager = agentManager;
 		ElasticsearchUI.tracker = tracker;
@@ -56,7 +56,7 @@ public class ElasticsearchUI implements PortalModule {
 	}
 
 	public void destroy() {
-        elasticsearchManager = null;
+		elasticsearchManager = null;
 		agentManager = null;
 		tracker = null;
 		executor.shutdown();
@@ -73,7 +73,7 @@ public class ElasticsearchUI implements PortalModule {
 
 	@Override
 	public File getImage() {
-		return FileUtil.getFile( ElasticsearchUI.MODULE_IMAGE, this);
+		return FileUtil.getFile(ElasticsearchUI.MODULE_IMAGE, this);
 	}
 
 	public Component createComponent() {
