@@ -2,6 +2,8 @@ package org.safehaus.subutai.api.templateregistry;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +67,7 @@ public class Template {
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
     @Expose
-    private boolean inUseOnFAIs;
+    private Set<String> faisUsingThisTemplate = new HashSet<>();
 
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
@@ -100,12 +102,22 @@ public class Template {
 
 
     public boolean isInUseOnFAIs() {
-        return inUseOnFAIs;
+        return !faisUsingThisTemplate.isEmpty();
     }
 
 
-    public void setInUseOnFAIs( final boolean inUseOnFAIs ) {
-        this.inUseOnFAIs = inUseOnFAIs;
+    public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI ) {
+        if ( inUseOnFAI ) {
+            faisUsingThisTemplate.add( faiHostname );
+        }
+        else {
+            faisUsingThisTemplate.remove( faiHostname );
+        }
+    }
+
+
+    public Set<String> getFaisUsingThisTemplate() {
+        return Collections.unmodifiableSet( faisUsingThisTemplate );
     }
 
 
@@ -190,5 +202,35 @@ public class Template {
                 ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
                 ", products=" + products +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals( final Object o ) {
+        if ( this == o ) {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() ) {
+            return false;
+        }
+
+        final Template template = ( Template ) o;
+
+        if ( !lxcArch.equals( template.lxcArch ) ) {
+            return false;
+        }
+        if ( !templateName.equals( template.templateName ) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
     }
 }

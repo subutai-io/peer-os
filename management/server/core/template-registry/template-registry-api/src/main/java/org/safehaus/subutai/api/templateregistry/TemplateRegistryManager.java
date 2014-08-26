@@ -144,7 +144,7 @@ public interface TemplateRegistryManager {
      * @param templateName - target template
      * @param inUse - true - template is in use, false - template is out of use
      */
-    public void updateTemplateUsage( String templateName, boolean inUse ) throws RegistryException;
+    public void updateTemplateUsage( String faiHostname, String templateName, boolean inUse ) throws RegistryException;
 
 
     /**
@@ -152,5 +152,5 @@ public interface TemplateRegistryManager {
      *
      * @return true - in use, false - not in use
      */
-    public boolean isTemplateInUse( String templateName) throws RegistryException;
+    public boolean isTemplateInUse( String templateName ) throws RegistryException;
 }
