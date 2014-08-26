@@ -187,22 +187,10 @@ public class HadoopClusterConfig implements ConfigBase {
 		this.blockedAgents = blockedAgents;
 	}
 
-
 	@Override
-	public String toString() {
-		return "Config{" +
-				"clusterName='" + clusterName + '\'' +
-				", domainName='" + domainName + '\'' +
-				", nameNode=" + nameNode +
-				", jobTracker=" + jobTracker +
-				", secondaryNameNode=" + secondaryNameNode +
-				", dataNodes=" + dataNodes +
-				", taskTrackers=" + taskTrackers +
-				", replicationFactor=" + replicationFactor +
-				", countOfSlaveNodes=" + countOfSlaveNodes +
-				'}';
+	public int hashCode() {
+		return clusterName != null ? clusterName.hashCode() : 0;
 	}
-
 
 	@Override
 	public boolean equals(Object o) {
@@ -223,9 +211,18 @@ public class HadoopClusterConfig implements ConfigBase {
 		return true;
 	}
 
-
 	@Override
-	public int hashCode() {
-		return clusterName != null ? clusterName.hashCode() : 0;
+	public String toString() {
+		return "Config{" +
+				"clusterName='" + clusterName + '\'' +
+				", domainName='" + domainName + '\'' +
+				", nameNode=" + nameNode +
+				", jobTracker=" + jobTracker +
+				", secondaryNameNode=" + secondaryNameNode +
+				", dataNodes=" + dataNodes +
+				", taskTrackers=" + taskTrackers +
+				", replicationFactor=" + replicationFactor +
+				", countOfSlaveNodes=" + countOfSlaveNodes +
+				'}';
 	}
 }

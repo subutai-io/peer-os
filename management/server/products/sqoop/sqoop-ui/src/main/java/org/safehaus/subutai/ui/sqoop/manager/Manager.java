@@ -5,7 +5,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.*;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -13,6 +12,11 @@ import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 public class Manager {
 
@@ -39,7 +43,7 @@ public class Manager {
 		HorizontalLayout controlsContent = new HorizontalLayout();
 		controlsContent.setSpacing(true);
 
-        Label clusterNameLabel = new Label("Select Sqoop installation:");
+		Label clusterNameLabel = new Label("Select Sqoop installation:");
 		controlsContent.addComponent(clusterNameLabel);
 
 		clusterCombo = new ComboBox();
@@ -76,8 +80,63 @@ public class Manager {
 
 	}
 
-	public Component getContent() {
-		return contentRoot;
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Import", Button.class, null);
+		table.addContainerProperty("Export", Button.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+
+		table.setPageLength(10);
+		table.setSelectable(true);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = SqoopUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SqoopUI.getExecutor(), SqoopUI.getCommandRunner(), SqoopUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(nodesTable, config.getNodes());
+		} else {
+			nodesTable.removeAllItems();
+		}
+	}
+
+	public void refreshClustersInfo() {
+		Config current = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		List<Config> clustersInfo = SqoopUI.getManager().getClusters();
+		if (clustersInfo != null && clustersInfo.size() > 0) {
+			for (Config ci : clustersInfo) {
+				clusterCombo.addItem(ci);
+				clusterCombo.setItemCaption(ci, ci.getClusterName());
+			}
+			if (current != null) {
+				for (Config ci : clustersInfo) {
+					if (ci.getClusterName().equals(current.getClusterName())) {
+						clusterCombo.setValue(ci);
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	private void show(String notification) {
@@ -158,63 +217,8 @@ public class Manager {
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(nodesTable, config.getNodes());
-		} else {
-			nodesTable.removeAllItems();
-		}
+	public Component getContent() {
+		return contentRoot;
 	}
-
-	public void refreshClustersInfo() {
-		Config current = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		List<Config> clustersInfo = SqoopUI.getManager().getClusters();
-		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config ci : clustersInfo) {
-				clusterCombo.addItem(ci);
-				clusterCombo.setItemCaption(ci, ci.getClusterName());
-			}
-			if (current != null) {
-				for (Config ci : clustersInfo) {
-					if (ci.getClusterName().equals(current.getClusterName())) {
-						clusterCombo.setValue(ci);
-						return;
-					}
-				}
-			}
-		}
-	}
-
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Import", Button.class, null);
-		table.addContainerProperty("Export", Button.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-
-		table.setPageLength(10);
-		table.setSelectable(true);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = SqoopUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SqoopUI.getExecutor(), SqoopUI.getCommandRunner(), SqoopUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
-    }
 
 }

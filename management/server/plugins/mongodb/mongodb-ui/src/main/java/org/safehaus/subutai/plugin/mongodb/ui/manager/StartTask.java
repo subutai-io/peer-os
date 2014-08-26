@@ -8,11 +8,11 @@ package org.safehaus.subutai.plugin.mongodb.ui.manager;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.api.Timeouts;
+import org.safehaus.subutai.plugin.mongodb.ui.MongoUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.CompleteEvent;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
-import org.safehaus.subutai.plugin.mongodb.ui.MongoUI;
 
 import java.util.UUID;
 
@@ -46,7 +46,7 @@ public class StartTask implements Runnable {
 		}
 
 		while (!Thread.interrupted()) {
-			ProductOperationView po = MongoUI.getTracker().getProductOperation( MongoClusterConfig.PRODUCT_KEY, trackID);
+			ProductOperationView po = MongoUI.getTracker().getProductOperation(MongoClusterConfig.PRODUCT_KEY, trackID);
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getState() == ProductOperationState.SUCCEEDED) {

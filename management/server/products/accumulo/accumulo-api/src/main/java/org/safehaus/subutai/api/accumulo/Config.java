@@ -22,6 +22,7 @@ public class Config implements ConfigBase {
     private String clusterName = "";
     private String instanceName = "";
     private String password = "";
+    private String confirmPassword = "";
     private Agent masterNode;
     private Agent gcNode;
     private Agent monitor;
@@ -122,16 +123,23 @@ public class Config implements ConfigBase {
         return password;
     }
 
-
     public void setPassword( String password ) {
         this.password = password;
     }
 
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword( String confirmPassword ) {
+        this.confirmPassword = confirmPassword;
+    }
 
     public void reset() {
         clusterName = "";
         instanceName = "";
         password = "";
+        confirmPassword = "";
         masterNode = null;
         gcNode = null;
         monitor = null;
@@ -146,6 +154,7 @@ public class Config implements ConfigBase {
                 "clusterName='" + clusterName + '\'' +
                 ", instanceName='" + instanceName + '\'' +
                 ", password='" + password + '\'' +
+                ", confirmPassword='" + confirmPassword + '\'' +
                 ", masterNode=" + masterNode +
                 ", gcNode=" + gcNode +
                 ", monitor=" + monitor +

@@ -1,37 +1,38 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/build">
-      <action class="org.safehaus.subutai.cli.commands.BuildEnvironmentCommand">
-        <property name="environmentManager" ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="environment/build">
+            <action class="org.safehaus.subutai.cli.commands.BuildEnvironmentCommand">
+                <property name="environmentManager" ref="environmentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/ls">
-      <action class="org.safehaus.subutai.cli.commands.ListEnvironmentsCommand">
-        <property name="environmentManager" ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="environment/ls">
+            <action class="org.safehaus.subutai.cli.commands.ListEnvironmentsCommand">
+                <property name="environmentManager" ref="environmentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/destroy">
-      <action class="org.safehaus.subutai.cli.commands.DestroyEnvironmentCommand">
-        <property name="environmentManager" ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="environment/destroy">
+            <action class="org.safehaus.subutai.cli.commands.DestroyEnvironmentCommand">
+                <property name="environmentManager" ref="environmentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/describe">
-      <action class="org.safehaus.subutai.cli.commands.DescribeEnvironmentCommand">
-        <property name="environmentManager" ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="environment/describe">
+            <action class="org.safehaus.subutai.cli.commands.DescribeEnvironmentCommand">
+                <property name="environmentManager" ref="environmentManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <reference id="environmentManager" availability="mandatory" interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
 
 </blueprint>

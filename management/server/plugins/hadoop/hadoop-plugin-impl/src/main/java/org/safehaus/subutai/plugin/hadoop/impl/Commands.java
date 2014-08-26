@@ -12,13 +12,13 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class Commands {
 
-	public static Command getInstallCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getInstallCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Installing hadoop deb package",
 				new RequestBuilder("sleep 10;" +
 						"apt-get --force-yes --assume-yes install ksks-hadoop")
 						.withTimeout(180),
-				Sets.newHashSet( hadoopClusterConfig.getAllNodes())
+				Sets.newHashSet(hadoopClusterConfig.getAllNodes())
 		);
 	}
 
@@ -32,25 +32,25 @@ public class Commands {
 		);
 	}
 
-	public static Command getClearMastersCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getClearMastersCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Clear master nodes for NameNode",
 				new RequestBuilder(". /etc/profile && " +
 						"hadoop-master-slave.sh masters clear"),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
-	public static Command getClearSlavesCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getClearSlavesCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Clear slave nodes for NameNode and JobTracker",
 				new RequestBuilder(". /etc/profile && " +
 						"hadoop-master-slave.sh slaves clear"),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode(), hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode(), hadoopClusterConfig.getJobTracker())
 		);
 	}
 
-	public static Command getSetMastersCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getSetMastersCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Set masters for nodes",
 				new RequestBuilder(". /etc/profile && " +
@@ -60,7 +60,7 @@ public class Commands {
 								String.format("%s:%d", hadoopClusterConfig.getJobTracker().getHostname(), HadoopClusterConfig.JOB_TRACKER_PORT),
 								String.format("%d", hadoopClusterConfig.getReplicationFactor())
 						)),
-				Sets.newHashSet( hadoopClusterConfig.getAllNodes())
+				Sets.newHashSet(hadoopClusterConfig.getAllNodes())
 		);
 	}
 
@@ -78,7 +78,7 @@ public class Commands {
 		);
 	}
 
-	public static Command getAddSecondaryNamenodeCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getAddSecondaryNamenodeCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Set Secondary NameNode master for NameNode",
 				new RequestBuilder(String.format(
@@ -86,11 +86,11 @@ public class Commands {
 								"hadoop-master-slave.sh masters %s",
 						hadoopClusterConfig.getSecondaryNameNode().getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
-	public static Command getSetDataNodeCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getSetDataNodeCommand(HadoopClusterConfig hadoopClusterConfig) {
 
 		StringBuilder cmd = new StringBuilder();
 		for (Agent agent : hadoopClusterConfig.getDataNodes()) {
@@ -104,7 +104,7 @@ public class Commands {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Set DataNodes for NameNode",
 				new RequestBuilder(cmd.toString()),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
@@ -117,11 +117,11 @@ public class Commands {
 								"hadoop-master-slave.sh slaves %s; ",
 						agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
-	public static Command getSetTaskTrackerCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getSetTaskTrackerCommand(HadoopClusterConfig hadoopClusterConfig) {
 
 		StringBuilder cmd = new StringBuilder();
 		for (Agent agent : hadoopClusterConfig.getTaskTrackers()) {
@@ -135,7 +135,7 @@ public class Commands {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Set TaskTrackers for JobTracker",
 				new RequestBuilder(cmd.toString()),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 
@@ -148,7 +148,7 @@ public class Commands {
 								"hadoop-master-slave.sh slaves %s; ",
 						agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 
@@ -160,7 +160,7 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh slaves clear %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
@@ -172,7 +172,7 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh slaves clear %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 
@@ -183,7 +183,7 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh dfs.exclude clear %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
@@ -194,7 +194,7 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh mapred.exclude clear %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 
@@ -205,7 +205,7 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh dfs.exclude %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
@@ -216,34 +216,34 @@ public class Commands {
 						". /etc/profile && " +
 								"hadoop-master-slave.sh mapred.exclude %s", agent.getHostname()
 				)),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 
-	public static Command getFormatNameNodeCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getFormatNameNodeCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Format NameNode before first start",
 				new RequestBuilder(". /etc/profile && " +
 						"hadoop namenode -format"),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
-	public static Command getRefreshNameNodeCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getRefreshNameNodeCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Refresh NameNode",
 				new RequestBuilder(". /etc/profile && " +
 						"hadoop dfsadmin -refreshNodes"),
-				Sets.newHashSet( hadoopClusterConfig.getNameNode())
+				Sets.newHashSet(hadoopClusterConfig.getNameNode())
 		);
 	}
 
-	public static Command getRefreshJobTrackerCommand(HadoopClusterConfig hadoopClusterConfig ) {
+	public static Command getRefreshJobTrackerCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Refresh JobTracker",
 				new RequestBuilder(". /etc/profile && " +
 						"hadoop mradmin -refreshNodes"),
-				Sets.newHashSet( hadoopClusterConfig.getJobTracker())
+				Sets.newHashSet(hadoopClusterConfig.getJobTracker())
 		);
 	}
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mgmt-server-plugins-parent</artifactId>
+        <version>2.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>oozie-plugin-parent</artifactId>
+    <name>Subutai Oozie Plugin Parent</name>
+    <description>Subutai Oozie Plugin Parent</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>oozie-plugin-api</module>
+        <module>oozie-plugin-impl</module>
+        <module>oozie-plugin-ui</module>
+        <module>oozie-plugin-cli</module>
+        <module>oozie-plugin-rest</module>
+    </modules>
+</project>

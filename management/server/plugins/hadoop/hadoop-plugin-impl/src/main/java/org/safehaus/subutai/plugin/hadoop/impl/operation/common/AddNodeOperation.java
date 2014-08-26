@@ -23,11 +23,11 @@ public class AddNodeOperation {
 		commandList = new ArrayList<>();
 
 		commandList.add(Commands.getInstallCommand(agent));
-		commandList.add(Commands.getSetMastersCommand( hadoopClusterConfig, agent));
-		commandList.add(Commands.getExcludeDataNodeCommand( hadoopClusterConfig, agent));
-		commandList.add(Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, agent));
-		commandList.add(Commands.getSetDataNodeCommand( hadoopClusterConfig, agent));
-		commandList.add(Commands.getSetTaskTrackerCommand( hadoopClusterConfig, agent));
+		commandList.add(Commands.getSetMastersCommand(hadoopClusterConfig, agent));
+		commandList.add(Commands.getExcludeDataNodeCommand(hadoopClusterConfig, agent));
+		commandList.add(Commands.getExcludeTaskTrackerCommand(hadoopClusterConfig, agent));
+		commandList.add(Commands.getSetDataNodeCommand(hadoopClusterConfig, agent));
+		commandList.add(Commands.getSetTaskTrackerCommand(hadoopClusterConfig, agent));
 		commandList.add(Commands.getStartNameNodeCommand(agent));
 		commandList.add(Commands.getStartTaskTrackerCommand(agent));
 	}

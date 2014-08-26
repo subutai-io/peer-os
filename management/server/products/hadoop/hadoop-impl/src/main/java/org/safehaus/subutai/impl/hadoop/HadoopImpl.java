@@ -25,12 +25,28 @@ import java.util.concurrent.Executors;
 public class HadoopImpl implements Hadoop {
 	public static final String MODULE_NAME = "Hadoop";
 	private static CommandRunner commandRunner;
+	private static Tracker tracker;
 	private AgentManager agentManager;
 	private DbManager dbManager;
-	private static Tracker tracker;
 	private LxcManager lxcManager;
 	private NetworkManager networkManager;
 	private ExecutorService executor;
+
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
+
+	public void setCommandRunner(CommandRunner commandRunner) {
+		HadoopImpl.commandRunner = commandRunner;
+	}
+
+	public static Tracker getTracker() {
+		return tracker;
+	}
+
+	public void setTracker(Tracker tracker) {
+		this.tracker = tracker;
+	}
 
 	public void init() {
 		executor = Executors.newCachedThreadPool();
@@ -41,48 +57,28 @@ public class HadoopImpl implements Hadoop {
 		commandRunner = null;
 	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
-
-	public void setCommandRunner(CommandRunner commandRunner) {
-		HadoopImpl.commandRunner = commandRunner;
-	}
-
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
+	public DbManager getDbManager() {
+		return dbManager;
 	}
 
 	public void setDbManager(DbManager dbManager) {
 		this.dbManager = dbManager;
 	}
 
-	public void setTracker(Tracker tracker) {
-		this.tracker = tracker;
+	public LxcManager getLxcManager() {
+		return lxcManager;
 	}
 
 	public void setLxcManager(LxcManager lxcManager) {
 		this.lxcManager = lxcManager;
 	}
 
-	public void setNetworkManager(NetworkManager networkManager) {
-		this.networkManager = networkManager;
-	}
-
-	public DbManager getDbManager() {
-		return dbManager;
-	}
-
-	public static Tracker getTracker() {
-		return tracker;
-	}
-
-	public LxcManager getLxcManager() {
-		return lxcManager;
-	}
-
 	public NetworkManager getNetworkManager() {
 		return networkManager;
+	}
+
+	public void setNetworkManager(NetworkManager networkManager) {
+		this.networkManager = networkManager;
 	}
 
 	public ExecutorService getExecutor() {
@@ -93,6 +89,10 @@ public class HadoopImpl implements Hadoop {
 		return agentManager;
 	}
 
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
+
 	@Override
 	public UUID installCluster(final Config config) {
 		return new Installation(this, config).execute();
@@ -101,6 +101,16 @@ public class HadoopImpl implements Hadoop {
 	@Override
 	public UUID uninstallCluster(final String clusterName) {
 		return new Deletion(this).execute(clusterName);
+	}
+
+	@Override
+	public List<Config> getClusters() {
+		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+	}
+
+	@Override
+	public Config getCluster(String clusterName) {
+		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
 	}
 
 	@Override
@@ -181,15 +191,5 @@ public class HadoopImpl implements Hadoop {
 	@Override
 	public UUID unblockTaskTracker(Config config, Agent agent) {
 		return new TaskTracker(this, config).unblock(agent);
-	}
-
-	@Override
-	public List<Config> getClusters() {
-		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-	}
-
-	@Override
-	public Config getCluster(String clusterName) {
-		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
 	}
 }

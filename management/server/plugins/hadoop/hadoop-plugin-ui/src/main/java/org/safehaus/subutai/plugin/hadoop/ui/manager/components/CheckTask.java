@@ -45,7 +45,7 @@ public class CheckTask implements Runnable {
 
 		if (trackID != null) {
 			while (true) {
-				ProductOperationView prevPo = HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID);
+				ProductOperationView prevPo = HadoopUI.getTracker().getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
 				if (prevPo.getState() == ProductOperationState.RUNNING) {
 					try {
 						Thread.sleep(1000);
@@ -60,12 +60,12 @@ public class CheckTask implements Runnable {
 
 		NodeState state = NodeState.UNKNOWN;
 		if (agent != null) {
-			if (agent.equals( hadoopClusterConfig.getNameNode())) {
-				trackID = HadoopUI.getHadoopManager().statusNameNode( hadoopClusterConfig );
-			} else if (agent.equals( hadoopClusterConfig.getJobTracker())) {
-				trackID = HadoopUI.getHadoopManager().statusJobTracker( hadoopClusterConfig );
-			} else if (agent.equals( hadoopClusterConfig.getSecondaryNameNode())) {
-				trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode( hadoopClusterConfig );
+			if (agent.equals(hadoopClusterConfig.getNameNode())) {
+				trackID = HadoopUI.getHadoopManager().statusNameNode(hadoopClusterConfig);
+			} else if (agent.equals(hadoopClusterConfig.getJobTracker())) {
+				trackID = HadoopUI.getHadoopManager().statusJobTracker(hadoopClusterConfig);
+			} else if (agent.equals(hadoopClusterConfig.getSecondaryNameNode())) {
+				trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode(hadoopClusterConfig);
 			} else if (isDataNode != null) {
 				if (isDataNode) {
 					trackID = HadoopUI.getHadoopManager().statusDataNode(agent);
@@ -77,7 +77,7 @@ public class CheckTask implements Runnable {
 
 			long start = System.currentTimeMillis();
 			while (!Thread.interrupted()) {
-				ProductOperationView po = HadoopUI.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID);
+				ProductOperationView po = HadoopUI.getTracker().getProductOperation(HadoopClusterConfig.PRODUCT_KEY, trackID);
 				if (po != null) {
 					if (po.getState() != ProductOperationState.RUNNING) {
 						if (po.getLog().contains(NodeState.STOPPED.toString())) {

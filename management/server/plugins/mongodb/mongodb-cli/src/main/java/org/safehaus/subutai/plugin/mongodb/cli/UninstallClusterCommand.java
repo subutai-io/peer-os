@@ -19,34 +19,27 @@ import java.util.UUID;
 @Command (scope = "mongo", name = "uninstall-cluster", description = "Command to uninstall MongoDB cluster")
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
+	@Argument (index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+			multiValued = false)
+	String clusterName = null;
 	private Mongo mongoManager;
 	private Tracker tracker;
-
 
 	public Tracker getTracker() {
 		return tracker;
 	}
 
-
 	public void setTracker(Tracker tracker) {
 		this.tracker = tracker;
 	}
-
-
-	public void setMongoManager(Mongo mongoManager) {
-		this.mongoManager = mongoManager;
-	}
-
 
 	public Mongo getMongoManager() {
 		return mongoManager;
 	}
 
-
-	@Argument (index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-			multiValued = false)
-	String clusterName = null;
-
+	public void setMongoManager(Mongo mongoManager) {
+		this.mongoManager = mongoManager;
+	}
 
 	protected Object doExecute() {
 		UUID uuid = mongoManager.uninstallCluster(clusterName);

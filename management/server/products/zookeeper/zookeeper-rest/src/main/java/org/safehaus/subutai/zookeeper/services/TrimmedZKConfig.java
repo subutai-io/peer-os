@@ -14,28 +14,28 @@ import java.util.Set;
  */
 public class TrimmedZKConfig {
 
-    private String clusterName = "";
-    private int numberOfNodes = 3;
-    private Set<String> nodes;
-    private boolean isStandalone;
+	private String clusterName = "";
+	private int numberOfNodes = 3;
+	private Set<String> nodes;
+	private boolean isStandalone;
 
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    public int getNumberOfNodes() {
-        return numberOfNodes;
-    }
+	public int getNumberOfNodes() {
+		return numberOfNodes;
+	}
 
 
-    public Set<String> getNodes() {
-        return nodes;
-    }
+	public Set<String> getNodes() {
+		return nodes;
+	}
 
 
-    public boolean isStandalone() {
-        return isStandalone;
-    }
+	public boolean isStandalone() {
+		return isStandalone;
+	}
 }

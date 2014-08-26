@@ -18,12 +18,14 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 .v-popupview {
-	color: #1b699f;
+    color: #1b699f;
 }
+
 .v-popupview:hover {
-	color: #2483c4;
+    color: #2483c4;
 }
+
 .v-popupview-popup {
-	background: #fff;
-	padding: 3px;
+    background: #fff;
+    padding: 3px;
 }

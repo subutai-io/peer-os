@@ -8,51 +8,51 @@ import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
 public abstract class TemplateManagerBase implements TemplateManager {
 
-    CommandRunner commandRunner;
-    AgentManager agentManager;
-    TemplateRegistryManager templateRegistry;
-    AptRepositoryManager repoManager;
+	CommandRunner commandRunner;
+	AgentManager agentManager;
+	TemplateRegistryManager templateRegistry;
+	AptRepositoryManager repoManager;
 
-    ScriptExecutor scriptExecutor;
+	ScriptExecutor scriptExecutor;
 
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        this.commandRunner = commandRunner;
-    }
+	public void setCommandRunner(CommandRunner commandRunner) {
+		this.commandRunner = commandRunner;
+	}
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void setAgentManager(AgentManager agentManager) {
-        this.agentManager = agentManager;
-    }
+	public void setAgentManager(AgentManager agentManager) {
+		this.agentManager = agentManager;
+	}
 
-    public TemplateRegistryManager getTemplateRegistry() {
-        return templateRegistry;
-    }
+	public TemplateRegistryManager getTemplateRegistry() {
+		return templateRegistry;
+	}
 
-    public void setTemplateRegistry(TemplateRegistryManager templateRegistry) {
-        this.templateRegistry = templateRegistry;
-    }
+	public void setTemplateRegistry(TemplateRegistryManager templateRegistry) {
+		this.templateRegistry = templateRegistry;
+	}
 
-    public AptRepositoryManager getRepoManager() {
-        return repoManager;
-    }
+	public AptRepositoryManager getRepoManager() {
+		return repoManager;
+	}
 
-    public void setRepoManager(AptRepositoryManager repoManager) {
-        this.repoManager = repoManager;
-    }
+	public void setRepoManager(AptRepositoryManager repoManager) {
+		this.repoManager = repoManager;
+	}
 
-    public void init() {
-        scriptExecutor = new ScriptExecutor(commandRunner);
-    }
+	public void init() {
+		scriptExecutor = new ScriptExecutor(commandRunner);
+	}
 
-    public void destroy() {
+	public void destroy() {
 
-    }
+	}
 
 }

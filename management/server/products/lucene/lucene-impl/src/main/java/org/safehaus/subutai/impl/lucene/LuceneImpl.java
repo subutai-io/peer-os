@@ -1,11 +1,7 @@
 package org.safehaus.subutai.impl.lucene;
 
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -19,125 +15,124 @@ import org.safehaus.subutai.impl.lucene.handler.InstallOperationHandler;
 import org.safehaus.subutai.impl.lucene.handler.UninstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
-import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class LuceneImpl implements Lucene {
 
-    protected Commands commands;
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private Hadoop hadoopManager;
-    private ExecutorService executor;
+	protected Commands commands;
+	private CommandRunner commandRunner;
+	private AgentManager agentManager;
+	private DbManager dbManager;
+	private Tracker tracker;
+	private Hadoop hadoopManager;
+	private ExecutorService executor;
 
 
-    public LuceneImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
-                       Hadoop hadoopManager ) {
-        this.commands = new Commands( commandRunner );
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-        this.hadoopManager = hadoopManager;
-    }
+	public LuceneImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+	                  Hadoop hadoopManager) {
+		this.commands = new Commands(commandRunner);
+		this.commandRunner = commandRunner;
+		this.agentManager = agentManager;
+		this.dbManager = dbManager;
+		this.tracker = tracker;
+		this.hadoopManager = hadoopManager;
+	}
 
 
-    public Hadoop getHadoopManager() {
-        return hadoopManager;
-    }
+	public Hadoop getHadoopManager() {
+		return hadoopManager;
+	}
 
 
-    public Commands getCommands() {
-        return commands;
-    }
+	public Commands getCommands() {
+		return commands;
+	}
 
 
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public AgentManager getAgentManager() {
+		return agentManager;
+	}
 
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
+	public DbManager getDbManager() {
+		return dbManager;
+	}
 
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
 
-    public void destroy() {
-        executor.shutdown();
-    }
+	public void destroy() {
+		executor.shutdown();
+	}
 
 
-    @Override
-    public UUID installCluster( final Config config ) {
+	@Override
+	public UUID installCluster(final Config config) {
 
-        Preconditions.checkNotNull( config, "Configuration is null" );
+		Preconditions.checkNotNull(config, "Configuration is null");
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-        executor.execute( operationHandler );
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID uninstallCluster( final String clusterName ) {
-
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
 
-    @Override
-    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+	@Override
+	public UUID uninstallCluster(final String clusterName) {
 
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
-        executor.execute( operationHandler );
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
+	@Override
+	public List<Config> getClusters() {
+		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+	}
 
-    @Override
-    public UUID addNode( final String clusterName, final String lxcHostname ) {
+	@Override
+	public Config getCluster(String clusterName) {
+		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+	}
 
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+	@Override
+	public UUID addNode(final String clusterName, final String lxcHostname) {
 
-        executor.execute( operationHandler );
+		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
 
-        return operationHandler.getTrackerId();
-    }
+		executor.execute(operationHandler);
 
+		return operationHandler.getTrackerId();
+	}
 
-    @Override
-    public List<Config> getClusters() {
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
-    }
+	@Override
+	public UUID destroyNode(final String clusterName, final String lxcHostname) {
 
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
 
-    @Override
-    public Config getCluster( String clusterName ) {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
-    }
+		executor.execute(operationHandler);
+
+		return operationHandler.getTrackerId();
+	}
 }

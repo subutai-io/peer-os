@@ -21,20 +21,20 @@ public class Deletion {
 
 	public UUID execute(final String clusterName) {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Destroying cluster %s", clusterName));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				HadoopClusterConfig hadoopClusterConfig = parent.getDbManager().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
-				if ( hadoopClusterConfig == null) {
+				HadoopClusterConfig hadoopClusterConfig = parent.getDbManager().getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 					return;
 				}
 
 				po.addLog("Updating db...");
-				if (parent.getDbManager().deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName())) {
+				if (parent.getDbManager().deleteInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName())) {
 					po.addLogDone("Cluster info deleted from DB\nDone");
 				} else {
 					po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");

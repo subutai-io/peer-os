@@ -33,20 +33,11 @@ public class SshManager {
 		return false;
 	}
 
-	public boolean execute(Agent agent) {
-		if (agentList != null && !agentList.isEmpty() && agent != null) {
-			if (create(agent)) {
-				agentList.add(agent);
+	private boolean create() {
+		Command command = Commands.getCreateSSHCommand(agentList);
+		NetwokManagerImpl.getCommandRunner().runCommand(command);
 
-				if (read()) {
-					if (write()) {
-						return config();
-					}
-				}
-			}
-		}
-
-		return false;
+		return command.hasSucceeded();
 	}
 
 	private boolean read() {
@@ -78,22 +69,31 @@ public class SshManager {
 		return command.hasSucceeded();
 	}
 
-	private boolean create(Agent agent) {
-		Command command = Commands.getCreateSSHCommand(Arrays.asList(agent));
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
-
-		return command.hasSucceeded();
-	}
-
-	private boolean create() {
-		Command command = Commands.getCreateSSHCommand(agentList);
-		NetwokManagerImpl.getCommandRunner().runCommand(command);
-
-		return command.hasSucceeded();
-	}
-
 	private boolean config() {
 		Command command = Commands.getConfigSSHCommand(agentList);
+		NetwokManagerImpl.getCommandRunner().runCommand(command);
+
+		return command.hasSucceeded();
+	}
+
+	public boolean execute(Agent agent) {
+		if (agentList != null && !agentList.isEmpty() && agent != null) {
+			if (create(agent)) {
+				agentList.add(agent);
+
+				if (read()) {
+					if (write()) {
+						return config();
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private boolean create(Agent agent) {
+		Command command = Commands.getCreateSSHCommand(Arrays.asList(agent));
 		NetwokManagerImpl.getCommandRunner().runCommand(command);
 
 		return command.hasSucceeded();

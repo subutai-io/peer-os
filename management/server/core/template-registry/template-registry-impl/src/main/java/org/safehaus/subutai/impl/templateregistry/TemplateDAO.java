@@ -4,6 +4,7 @@ package org.safehaus.subutai.impl.templateregistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 
@@ -31,10 +32,10 @@ public class TemplateDAO {
     }
 
 
-    public List<Template> getAllTemplates() {
+    public List<Template> getAllTemplates() throws DBException {
         List<Template> list = new ArrayList<>();
         try {
-            ResultSet rs = dbManager.executeQuery( "select info from template_registry_info" );
+            ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info" );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -47,17 +48,18 @@ public class TemplateDAO {
             }
         }
         catch ( JsonSyntaxException ex ) {
-            throw new RuntimeException( String.format( "Error in getAllTemplates %s", ex ) );
+            throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
         }
+
         return list;
     }
 
 
-    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) {
+    public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException {
         List<Template> list = new ArrayList<>();
         if ( parentTemplateName != null && lxcArch != null ) {
             try {
-                ResultSet rs = dbManager.executeQuery( "select info from template_registry_info where parent = ?",
+                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where parent = ?",
                         String.format( "%s-%s", parentTemplateName.toLowerCase(), lxcArch.toLowerCase() ) );
                 if ( rs != null ) {
                     for ( Row row : rs ) {
@@ -71,17 +73,17 @@ public class TemplateDAO {
                 }
             }
             catch ( JsonSyntaxException ex ) {
-                throw new RuntimeException( String.format( "Error in getAllTemplates %s", ex ) );
+                throw new DBException( String.format( "Error in getAllTemplates %s", ex ) );
             }
         }
         return list;
     }
 
 
-    public Template getTemplateByName( String templateName, String lxcArch ) {
+    public Template getTemplateByName( String templateName, String lxcArch ) throws DBException {
         if ( templateName != null && lxcArch != null ) {
             try {
-                ResultSet rs = dbManager.executeQuery( "select info from template_registry_info where template = ?",
+                ResultSet rs = dbManager.executeQuery2( "select info from template_registry_info where template = ?",
                         String.format( "%s-%s", templateName.toLowerCase(), lxcArch.toLowerCase() ) );
                 if ( rs != null ) {
                     Row row = rs.one();
@@ -93,15 +95,16 @@ public class TemplateDAO {
                 }
             }
             catch ( JsonSyntaxException ex ) {
-                throw new RuntimeException( String.format( "Error in getTemplateByName %s", ex ) );
+                throw new DBException( String.format( "Error in getTemplateByName %s", ex ) );
             }
         }
         return null;
     }
 
 
-    public boolean saveTemplate( Template template ) {
-        return dbManager.executeUpdate( "insert into template_registry_info(template, parent, info) values(?,?,?)",
+    public void saveTemplate( Template template ) throws DBException {
+
+        dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
                 String.format( "%s-%s", template.getTemplateName().toLowerCase(), template.getLxcArch().toLowerCase() ),
                 Strings.isNullOrEmpty( template.getParentTemplateName() ) ? null :
                 String.format( "%s-%s", template.getParentTemplateName().toLowerCase(),
@@ -109,8 +112,9 @@ public class TemplateDAO {
     }
 
 
-    public boolean removeTemplate( Template template ) {
-        return dbManager.executeUpdate( "delete from template_registry_info where template = ?",
+    public void removeTemplate( Template template ) throws DBException {
+
+        dbManager.executeUpdate2( "delete from template_registry_info where template = ?",
                 String.format( "%s-%s", template.getTemplateName().toLowerCase(),
                         template.getLxcArch().toLowerCase() ) );
     }

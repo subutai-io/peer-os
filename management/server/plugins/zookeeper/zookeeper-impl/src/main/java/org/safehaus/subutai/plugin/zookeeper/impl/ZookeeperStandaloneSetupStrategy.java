@@ -3,11 +3,7 @@ package org.safehaus.subutai.plugin.zookeeper.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
@@ -17,9 +13,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.shared.protocol.PlacementStrategy;
-import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
@@ -100,7 +94,7 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
         try {
 
-            configureZkCluster();
+            new ClusterConfiguration( zookeeperManager, po ).configureCluster( zookeeperClusterConfig );
         }
         catch ( ClusterConfigurationException ex ) {
             throw new ClusterSetupException( ex.getMessage() );
@@ -109,8 +103,8 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
         po.addLog( "Saving cluster information to database..." );
 
         try {
-            zookeeperManager.getDbManager()
-                            .saveInfo2( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
+            zookeeperManager.getPluginDAO()
+                            .saveInfo( ZookeeperClusterConfig.PRODUCT_KEY, zookeeperClusterConfig.getClusterName(),
                                     zookeeperClusterConfig );
             po.addLog( "Cluster information saved to database" );
         }
@@ -121,79 +115,5 @@ public class ZookeeperStandaloneSetupStrategy implements ClusterSetupStrategy {
 
 
         return zookeeperClusterConfig;
-    }
-
-
-    private void configureZkCluster() throws ClusterConfigurationException {
-
-        po.addLog( "Configuring cluster..." );
-
-        Command configureClusterCommand = Commands.getConfigureClusterCommand( zookeeperClusterConfig.getNodes(),
-                ConfigParams.DATA_DIR.getParamValue() + "/" + ConfigParams.MY_ID_FILE.getParamValue(),
-                prepareConfiguration( zookeeperClusterConfig.getNodes() ),
-                ConfigParams.CONFIG_FILE_PATH.getParamValue() );
-
-        zookeeperManager.getCommandRunner().runCommand( configureClusterCommand );
-
-        if ( configureClusterCommand.hasSucceeded() ) {
-
-            po.addLog( String.format( "Cluster configured\nStarting %s...", ZookeeperClusterConfig.PRODUCT_KEY ) );
-            //start all nodes
-            Command startCommand = Commands.getStartCommand( zookeeperClusterConfig.getNodes() );
-            final AtomicInteger count = new AtomicInteger();
-            zookeeperManager.getCommandRunner().runCommand( startCommand, new CommandCallback() {
-                @Override
-                public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                    if ( agentResult.getStdOut().contains( "STARTED" ) ) {
-                        if ( count.incrementAndGet() == zookeeperClusterConfig.getNodes().size() ) {
-                            stop();
-                        }
-                    }
-                }
-            } );
-
-            if ( count.get() == zookeeperClusterConfig.getNodes().size() ) {
-                po.addLog( String.format( "Starting %s succeeded", ZookeeperClusterConfig.PRODUCT_KEY ) );
-            }
-            else {
-                po.addLog( String.format( "Starting %s failed, %s, skipping...", ZookeeperClusterConfig.PRODUCT_KEY,
-                        startCommand.getAllErrors() ) );
-            }
-        }
-        else {
-            throw new ClusterConfigurationException(
-                    String.format( "Failed to configure cluster, %s", configureClusterCommand.getAllErrors() ) );
-        }
-    }
-
-
-    //temporary workaround until we get full configuration injection working
-    public static String prepareConfiguration( Set<Agent> nodes ) throws ClusterConfigurationException {
-        String zooCfgFile = FileUtil.getContent( "conf/zoo.cfg", ZookeeperStandaloneSetupStrategy.class );
-
-        if ( Strings.isNullOrEmpty( zooCfgFile ) ) {
-            throw new ClusterConfigurationException( "Zoo.cfg resource is missing" );
-        }
-
-        zooCfgFile = zooCfgFile
-                .replace( "$" + ConfigParams.DATA_DIR.getPlaceHolder(), ConfigParams.DATA_DIR.getParamValue() );
-
-        /*
-        server.1=zookeeper1:2888:3888
-        server.2=zookeeper2:2888:3888
-        server.3=zookeeper3:2888:3888
-         */
-
-        StringBuilder serversBuilder = new StringBuilder();
-        int id = 0;
-        for ( Agent agent : nodes ) {
-            serversBuilder.append( "server." ).append( ++id ).append( "=" ).append( agent.getHostname() )
-                          .append( ConfigParams.PORTS.getParamValue() ).append( "\n" );
-        }
-
-        zooCfgFile = zooCfgFile.replace( "$" + ConfigParams.SERVERS.getPlaceHolder(), serversBuilder.toString() );
-
-
-        return zooCfgFile;
     }
 }

@@ -6,12 +6,12 @@
 package org.safehaus.subutai.ui.accumulo.manager;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.ui.accumulo.AccumuloUI;
+
+import java.util.UUID;
 
 
 /**
@@ -19,39 +19,38 @@ import org.safehaus.subutai.ui.accumulo.AccumuloUI;
  */
 public class CheckTask implements Runnable {
 
-    private final String clusterName, lxcHostname;
-    private final CompleteEvent completeEvent;
+	private final String clusterName, lxcHostname;
+	private final CompleteEvent completeEvent;
 
 
-    public CheckTask( String clusterName, String lxcHostname, CompleteEvent completeEvent ) {
-        this.clusterName = clusterName;
-        this.lxcHostname = lxcHostname;
-        this.completeEvent = completeEvent;
-    }
+	public CheckTask(String clusterName, String lxcHostname, CompleteEvent completeEvent) {
+		this.clusterName = clusterName;
+		this.lxcHostname = lxcHostname;
+		this.completeEvent = completeEvent;
+	}
 
 
-    public void run() {
+	public void run() {
 
-        UUID trackID = AccumuloUI.getAccumuloManager().checkNode( clusterName, lxcHostname );
+		UUID trackID = AccumuloUI.getAccumuloManager().checkNode(clusterName, lxcHostname);
 
-        long start = System.currentTimeMillis();
-        while ( !Thread.interrupted() ) {
-            ProductOperationView po = AccumuloUI.getTracker().getProductOperation( Config.PRODUCT_KEY, trackID );
-            if ( po != null ) {
-                if ( po.getState() != ProductOperationState.RUNNING ) {
-                    completeEvent.onComplete( po.getLog() );
-                    break;
-                }
-            }
-            try {
-                Thread.sleep( 1000 );
-            }
-            catch ( InterruptedException ex ) {
-                break;
-            }
-            if ( System.currentTimeMillis() - start > ( 30 + 3 ) * 1000 ) {
-                break;
-            }
-        }
-    }
+		long start = System.currentTimeMillis();
+		while (!Thread.interrupted()) {
+			ProductOperationView po = AccumuloUI.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			if (po != null) {
+				if (po.getState() != ProductOperationState.RUNNING) {
+					completeEvent.onComplete(po.getLog());
+					break;
+				}
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ex) {
+				break;
+			}
+			if (System.currentTimeMillis() - start > (30 + 3) * 1000) {
+				break;
+			}
+		}
+	}
 }

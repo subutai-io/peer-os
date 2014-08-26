@@ -3,19 +3,21 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
+import org.safehaus.subutai.plugin.accumulo.impl.ClusterConfiguration;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles destroy node operation.
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
     private final ProductOperation po;
@@ -26,6 +28,8 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
     public DestroyNodeOperationHandler( AccumuloImpl manager, String clusterName, String lxcHostname,
                                         NodeType nodeType ) {
         super( manager, clusterName );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+        Preconditions.checkNotNull( nodeType, "Node type is null" );
         this.lxcHostname = lxcHostname;
         this.nodeType = nodeType;
         po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
@@ -41,105 +45,61 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
 
     @Override
     public void run() {
+        //check of node type is allowed for removal
         if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) ) {
             po.addLogFailed( "Only tracer or slave node can be destroyed" );
             return;
         }
 
+        //check if cluster exists
         final AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
+        //check if node's agent is connected
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null ) {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
+
+        //check if node belongs to cluster
         if ( !accumuloClusterConfig.getAllNodes().contains( agent ) ) {
             po.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
+        //check if master node is connected
         if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() )
                 == null ) {
-            po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Master node %s is not connected",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }
 
+        //check if node is the last node of its role
         if ( nodeType == NodeType.TRACER ) {
             if ( accumuloClusterConfig.getTracers().size() == 1 ) {
-                po.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead\nOperation aborted" );
+                po.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead" );
                 return;
             }
-            accumuloClusterConfig.getTracers().remove( agent );
         }
         else {
             if ( accumuloClusterConfig.getSlaves().size() == 1 ) {
-                po.addLogFailed( "This is the last slave in the cluster, destroy cluster instead\nOperation aborted" );
+                po.addLogFailed( "This is the last slave in the cluster, destroy cluster instead" );
                 return;
             }
-            accumuloClusterConfig.getSlaves().remove( agent );
         }
 
-        boolean uninstall = !accumuloClusterConfig.getAllNodes().contains( agent );
-
-        if ( uninstall ) {
-            po.addLog( "Uninstalling Accumulo..." );
-
-            Command uninstallCommand = Commands.getUninstallCommand( Util.wrapAgentToSet( agent ) );
-            manager.getCommandRunner().runCommand( uninstallCommand );
-
-            if ( uninstallCommand.hasSucceeded() ) {
-                po.addLog( "Accumulo uninstallation succeeded" );
-            }
-            else {
-                po.addLog( String.format( "Accumulo uninstallation failed, %s, skipping...",
-                        uninstallCommand.getAllErrors() ) );
-            }
+        //remove node
+        try {
+            new ClusterConfiguration( po, manager ).removeNode( accumuloClusterConfig, agent, nodeType );
+            po.addLogDone( "Node removed successfully" );
         }
-
-        Command unregisterNodeCommand;
-        if ( nodeType == NodeType.TRACER ) {
-            unregisterNodeCommand = Commands.getClearTracerCommand( accumuloClusterConfig.getAllNodes(), agent );
-        }
-        else {
-            unregisterNodeCommand = Commands.getClearSlaveCommand( accumuloClusterConfig.getAllNodes(), agent );
-        }
-
-        po.addLog( "Unregistering node from cluster..." );
-        manager.getCommandRunner().runCommand( unregisterNodeCommand );
-
-        if ( unregisterNodeCommand.hasSucceeded() ) {
-            po.addLog( "Node unregistered successfully\nRestarting cluster..." );
-
-            Command restartClusterCommand = Commands.getRestartCommand( accumuloClusterConfig.getMasterNode() );
-            manager.getCommandRunner().runCommand( restartClusterCommand );
-            if ( restartClusterCommand.hasSucceeded() ) {
-                po.addLog( "Cluster restarted successfully" );
-            }
-            else {
-                po.addLog( String.format( "Cluster restart failed, %s, skipping...",
-                        restartClusterCommand.getAllErrors() ) );
-            }
-
-            po.addLog( "Updating db..." );
-            if ( manager.getDbManager()
-                        .saveInfo( AccumuloClusterConfig.PRODUCT_KEY, accumuloClusterConfig.getClusterName(),
-                                accumuloClusterConfig ) ) {
-                po.addLogDone( "Cluster info updated\nDone" );
-            }
-            else {
-                po.addLogFailed( String.format( "Error while updating cluster info [%s] in DB. Check logs\nFailed",
-                        accumuloClusterConfig.getClusterName() ) );
-            }
-        }
-        else {
-            po.addLogFailed( String.format( "Unregistering node failed, %s\nOperation aborted",
-                    unregisterNodeCommand.getAllErrors() ) );
+        catch ( ClusterConfigurationException e ) {
+            po.addLogFailed( String.format( "Node removal failed, %s", e.getMessage() ) );
         }
     }
 }

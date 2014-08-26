@@ -21,30 +21,6 @@ public class Wizard {
 		putForm();
 	}
 
-	public Component getContent() {
-		return grid;
-	}
-
-	protected void next() {
-		step++;
-		putForm();
-	}
-
-	protected void back() {
-		step--;
-		putForm();
-	}
-
-	protected void init() {
-		step = 1;
-		hadoopClusterConfig = new HadoopClusterConfig();
-		putForm();
-	}
-
-	public HadoopClusterConfig getHadoopClusterConfig() {
-		return hadoopClusterConfig;
-	}
-
 	private void putForm() {
 		grid.removeAllComponents();
 		Component component = null;
@@ -69,5 +45,29 @@ public class Wizard {
 		if (component != null) {
 			grid.addComponent(component);
 		}
+	}
+
+	public Component getContent() {
+		return grid;
+	}
+
+	protected void next() {
+		step++;
+		putForm();
+	}
+
+	protected void back() {
+		step--;
+		putForm();
+	}
+
+	protected void init() {
+		step = 1;
+		hadoopClusterConfig = new HadoopClusterConfig();
+		putForm();
+	}
+
+	public HadoopClusterConfig getHadoopClusterConfig() {
+		return hadoopClusterConfig;
 	}
 }

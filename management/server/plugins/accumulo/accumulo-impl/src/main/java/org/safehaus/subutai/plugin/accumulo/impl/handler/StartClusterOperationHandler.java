@@ -12,7 +12,7 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
 /**
- * Created by dilshat on 5/6/14.
+ * Handles start cluster operation
  */
 public class StartClusterOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
     private final ProductOperation po;
@@ -35,12 +35,12 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<Accum
     public void run() {
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() ) == null ) {
-            po.addLogFailed( String.format( "Master node '%s' is not connected\nOperation aborted",
+            po.addLogFailed( String.format( "Master node '%s' is not connected",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }

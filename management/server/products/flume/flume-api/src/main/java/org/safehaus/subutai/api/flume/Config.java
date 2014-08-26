@@ -10,41 +10,41 @@ import java.util.Set;
 
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Flume";
+	public static final String PRODUCT_KEY = "Flume";
 
-    private String clusterName = "";
+	private String clusterName = "";
 
-    private Set<Agent> nodes = new HashSet();
-
-
-    public String getClusterName() {
-        return clusterName;
-    }
+	private Set<Agent> nodes = new HashSet();
 
 
-    public void setClusterName( String clusterName ) {
-        this.clusterName = clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
 
 
-    public Set<Agent> getNodes() {
-        return nodes;
-    }
+	@Override
+	public String getProductName() {
+		return PRODUCT_KEY;
+	}
 
 
-    public void setNodes( Set<Agent> nodes ) {
-        this.nodes = nodes;
-    }
+	public Set<Agent> getNodes() {
+		return nodes;
+	}
 
 
-    @Override
-    public String toString() {
-        return "Config{" + "clusterName=" + clusterName + '}';
-    }
+	public void setNodes(Set<Agent> nodes) {
+		this.nodes = nodes;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Config{" + "clusterName=" + clusterName + '}';
+	}
 }

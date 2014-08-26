@@ -1,10 +1,9 @@
 package org.safehaus.subutai.dis.manager.window;
 
 
+import com.vaadin.ui.TextArea;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
-
-import com.vaadin.ui.TextArea;
 
 
 /**
@@ -13,33 +12,33 @@ import com.vaadin.ui.TextArea;
 public class EnvironmentDetails extends DetailsWindow {
 
 
-    public EnvironmentDetails( final String caption ) {
-        super( caption );
-    }
+	public EnvironmentDetails(final String caption) {
+		super(caption);
+	}
 
 
-    public void setContent( final Environment blueprint ) {
-        StringBuilder sb = new StringBuilder();
-        sb.append( blueprint.getName() ).append( "\n" );
-        if ( blueprint.getNodes() != null ) {
-                for ( Node node : blueprint.getNodes() ) {
-                    sb.append( node.getAgent().getHostname() ).append( "\n" );
-            }
-        }
+	public void setContent(final Environment blueprint) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(blueprint.getName()).append("\n");
+		if (blueprint.getNodes() != null) {
+			for (Node node : blueprint.getNodes()) {
+				sb.append(node.getAgent().getHostname()).append("\n");
+			}
+		}
 
-        TextArea area = getTextArea();
-        area.setValue( sb.toString() );
-        verticalLayout.addComponent( area );
+		TextArea area = getTextArea();
+		area.setValue(sb.toString());
+		verticalLayout.addComponent(area);
 
-    }
+	}
 
 
-    private TextArea getTextArea() {
-        TextArea textArea = new TextArea( "Blueprint" );
-        textArea.setSizeFull();
-        textArea.setRows( 20 );
-        textArea.setImmediate( true );
-        textArea.setWordwrap( false );
-        return textArea;
-    }
+	private TextArea getTextArea() {
+		TextArea textArea = new TextArea("Blueprint");
+		textArea.setSizeFull();
+		textArea.setRows(20);
+		textArea.setImmediate(true);
+		textArea.setWordwrap(false);
+		return textArea;
+	}
 }

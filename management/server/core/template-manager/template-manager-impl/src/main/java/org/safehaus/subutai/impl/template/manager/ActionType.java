@@ -9,7 +9,7 @@ enum ActionType {
     EXPORT("export"),
     IMPORT("import"),
     PROMOTE("promote"),
-    INSTALL_TEMPLATE("apt-get install", true),
+    INSTALL("apt-get --force-yes --assume-yes install", true),
     // list commands
     LIST_TEMPLATES("list -t"),
     LIST_CONTAINERS("list -c"),

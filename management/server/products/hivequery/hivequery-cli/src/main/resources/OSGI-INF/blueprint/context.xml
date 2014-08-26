@@ -21,7 +21,7 @@
             </action>
         </command>
         <command name="hivequery/run-query">
-        <action class="org.safehaus.subutai.cli.commands.RunQueryCommand">
+            <action class="org.safehaus.subutai.cli.commands.RunQueryCommand">
                 <property name="manager" ref="manager"/>
                 <property name="tracker" ref="tracker"/>
             </action>

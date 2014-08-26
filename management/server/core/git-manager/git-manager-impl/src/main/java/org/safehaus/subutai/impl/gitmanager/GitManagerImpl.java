@@ -1,6 +1,17 @@
 package org.safehaus.subutai.impl.gitmanager;
 
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.gitmanager.*;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,503 +19,486 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.gitmanager.GitBranch;
-import org.safehaus.subutai.api.gitmanager.GitChangedFile;
-import org.safehaus.subutai.api.gitmanager.GitCommand;
-import org.safehaus.subutai.api.gitmanager.GitException;
-import org.safehaus.subutai.api.gitmanager.GitFileStatus;
-import org.safehaus.subutai.api.gitmanager.GitManager;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-
 
 /**
  * This is an implementation of GitManager interface
  */
 public class GitManagerImpl implements GitManager {
 
-    private final String MASTER_BRANCH = "master";
-    private final String LINE_SEPARATOR = "\n";
-    private CommandRunner commandRunner;
+	private static final String MASTER_BRANCH = "master";
+	private static final String LINE_SEPARATOR = "\n";
+	private CommandRunner commandRunner;
 
 
-    public GitManagerImpl( final CommandRunner commandRunner ) {
-        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+	public GitManagerImpl(final CommandRunner commandRunner) {
+		Preconditions.checkNotNull(commandRunner, "Command Runner is null");
 
-        this.commandRunner = commandRunner;
-    }
+		this.commandRunner = commandRunner;
+	}
 
 
-    public void init() {}
+	public void init() {
+	}
 
 
-    public void destroy() {}
+	public void destroy() {
+	}
 
 
-    @Override
-    public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1 )
-            throws GitException {
-        return diffBranches( host, repositoryRoot, branchName1, MASTER_BRANCH );
-    }
+	@Override
+	public List<GitChangedFile> diffBranches(final Agent host, final String repositoryRoot, final String branchName1)
+			throws GitException {
+		return diffBranches(host, repositoryRoot, branchName1, MASTER_BRANCH);
+	}
 
 
-    @Override
-    public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1,
-                                              final String branchName2 ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName1 ), "Branch name 1 is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
+	@Override
+	public List<GitChangedFile> diffBranches(final Agent host, final String repositoryRoot, final String branchName1,
+	                                         final String branchName2) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName1), "Branch name 1 is null or empty");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName2), "Branch name 2 is null or empty");
 
-        Command diffCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git diff --name-status %s %s", branchName1, branchName2 ) )
-                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command diffCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git diff --name-status %s %s", branchName1, branchName2))
+						.withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( diffCommand, host, GitCommand.DIFF, false );
+		runCommand(diffCommand, host, GitCommand.DIFF, false);
 
-        StringTokenizer lines = new StringTokenizer( diffCommand.getResults().get( host.getUuid() ).getStdOut(), "\n" );
+		StringTokenizer lines = new StringTokenizer(diffCommand.getResults().get(host.getUuid()).getStdOut(), "\n");
 
-        List<GitChangedFile> gitChangedFiles = new ArrayList<>();
+		List<GitChangedFile> gitChangedFiles = new ArrayList<>();
 
-        while ( lines.hasMoreTokens() ) {
-            String line = lines.nextToken();
+		while (lines.hasMoreTokens()) {
+			String line = lines.nextToken();
 
-            if ( line != null ) {
-                String[] ss = line.split( "\\s+" );
-                if ( ss.length == 2 ) {
-                    gitChangedFiles.add( new GitChangedFile( convertStatus( ss[0] ), ss[1] ) );
-                }
-            }
-        }
+			if (line != null) {
+				String[] ss = line.split("\\s+");
+				if (ss.length == 2) {
+					gitChangedFiles.add(new GitChangedFile(convertStatus(ss[0]), ss[1]));
+				}
+			}
+		}
 
-        return gitChangedFiles;
-    }
+		return gitChangedFiles;
+	}
 
 
-    @Override
-    public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
-                            final String filePath ) throws GitException {
-        return diffFile( host, repositoryRoot, branchName1, MASTER_BRANCH, filePath );
-    }
+	@Override
+	public String diffFile(final Agent host, final String repositoryRoot, final String branchName1,
+	                       final String filePath) throws GitException {
+		return diffFile(host, repositoryRoot, branchName1, MASTER_BRANCH, filePath);
+	}
 
 
-    @Override
-    public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
-                            final String branchName2, final String filePath ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName1 ), "Branch name 1 is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName2 ), "Branch name 2 is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( filePath ), "File path is null or empty" );
+	@Override
+	public String diffFile(final Agent host, final String repositoryRoot, final String branchName1,
+	                       final String branchName2, final String filePath) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName1), "Branch name 1 is null or empty");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName2), "Branch name 2 is null or empty");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(filePath), "File path is null or empty");
 
-        Command diffCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git diff %s %s %s", branchName1, branchName2, filePath ) )
-                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command diffCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git diff %s %s %s", branchName1, branchName2, filePath))
+						.withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( diffCommand, host, GitCommand.DIFF, false );
+		runCommand(diffCommand, host, GitCommand.DIFF, false);
 
-        return diffCommand.getResults().get( host.getUuid() ).getStdOut();
-    }
+		return diffCommand.getResults().get(host.getUuid()).getStdOut();
+	}
 
 
-    @Override
-    public void init( final Agent host, final String repositoryRoot ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	@Override
+	public void init(final Agent host, final String repositoryRoot) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        Command initCommand = commandRunner
-                .createCommand( new RequestBuilder( "git init" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command initCommand = commandRunner
+				.createCommand(new RequestBuilder("git init").withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( initCommand, host, GitCommand.INIT );
-    }
+		runCommand(initCommand, host, GitCommand.INIT);
+	}
 
 
-    private void validateHostNRepoRoot( Agent host, String repositoryRoot ) {
-        Preconditions.checkNotNull( host, "Agent is null" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( repositoryRoot ), "Repository root is null or empty" );
-    }
+	private void validateHostNRepoRoot(Agent host, String repositoryRoot) {
+		Preconditions.checkNotNull(host, "Agent is null");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(repositoryRoot), "Repository root is null or empty");
+	}
 
 
-    private void runCommand( Command command, Agent host, GitCommand gitCommand ) throws GitException {
-        runCommand( command, host, gitCommand, true );
-    }
+	private void runCommand(Command command, Agent host, GitCommand gitCommand) throws GitException {
+		runCommand(command, host, gitCommand, true);
+	}
 
 
-    private void runCommand( Command command, Agent host, GitCommand gitCommand, boolean output ) throws GitException {
-        commandRunner.runCommand( command );
+	private void runCommand(Command command, Agent host, GitCommand gitCommand, boolean output) throws GitException {
+		commandRunner.runCommand(command);
 
-        if ( !command.hasSucceeded() ) {
-            if ( command.hasCompleted() ) {
-                AgentResult agentResult = command.getResults().get( host.getUuid() );
-                throw new GitException(
-                        String.format( "Error while performing [git %s]: %s\n%s, exit code %s", gitCommand.getCommand(),
-                                agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
-            }
-            else {
-                throw new GitException( String.format( "Error while performing [git %s]: Command timed out",
-                        gitCommand.getCommand() ) );
-            }
-        }
-        else if ( output ) {
-            AgentResult agentResult = command.getResults().get( host.getUuid() );
-            System.out.println( agentResult.getStdOut() );
-        }
-    }
+		if (!command.hasSucceeded()) {
+			if (command.hasCompleted()) {
+				AgentResult agentResult = command.getResults().get(host.getUuid());
+				throw new GitException(
+						String.format("Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
+								agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode()));
+			} else {
+				throw new GitException(String.format("Error while performing [git %s]: Command timed out",
+						gitCommand.getCommand()));
+			}
+		} else if (output) {
+			AgentResult agentResult = command.getResults().get(host.getUuid());
+			System.out.println(agentResult.getStdOut());
+		}
+	}
 
 
-    @Override
-    public void add( final Agent host, final String repositoryRoot, final List<String> filePaths ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+	@Override
+	public void add(final Agent host, final String repositoryRoot, final List<String> filePaths) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(filePaths != null && !filePaths.isEmpty(), "Files is null or empty");
 
-        Command addCommand = commandRunner
-                .createCommand( new RequestBuilder( "git add" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
-                        Sets.newHashSet( host ) );
+		Command addCommand = commandRunner
+				.createCommand(new RequestBuilder("git add").withCwd(repositoryRoot).withCmdArgs(filePaths),
+						Sets.newHashSet(host));
 
-        runCommand( addCommand, host, GitCommand.ADD );
-    }
+		runCommand(addCommand, host, GitCommand.ADD);
+	}
 
 
-    public void addAll( final Agent host, final String repositoryRoot ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	public void addAll(final Agent host, final String repositoryRoot) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        Command addCommand = commandRunner
-                .createCommand( new RequestBuilder( "git add -A" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command addCommand = commandRunner
+				.createCommand(new RequestBuilder("git add -A").withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( addCommand, host, GitCommand.ADD );
-    }
+		runCommand(addCommand, host, GitCommand.ADD);
+	}
 
 
-    @Override
-    public void delete( final Agent host, final String repositoryRoot, final List<String> filePaths )
-            throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+	@Override
+	public void delete(final Agent host, final String repositoryRoot, final List<String> filePaths)
+			throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(filePaths != null && !filePaths.isEmpty(), "Files is null or empty");
 
-        Command addCommand = commandRunner
-                .createCommand( new RequestBuilder( "git rm" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
-                        Sets.newHashSet( host ) );
+		Command addCommand = commandRunner
+				.createCommand(new RequestBuilder("git rm").withCwd(repositoryRoot).withCmdArgs(filePaths),
+						Sets.newHashSet(host));
 
-        runCommand( addCommand, host, GitCommand.DELETE );
-    }
+		runCommand(addCommand, host, GitCommand.DELETE);
+	}
 
 
-    @Override
-    public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
-                          final String message, boolean afterConflictResolved ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
+	@Override
+	public String commit(final Agent host, final String repositoryRoot, final List<String> filePaths,
+	                     final String message, boolean afterConflictResolved) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(filePaths != null && !filePaths.isEmpty(), "Files is null or empty");
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(message), "Message is null or empty");
 
-        Command addCommand = commandRunner.createCommand( new RequestBuilder(
-                String.format( "git commit -m \"%s\" %s", message, afterConflictResolved ? "-i" : "" ) )
-                .withCwd( repositoryRoot ).withCmdArgs( filePaths ), Sets.newHashSet( host ) );
+		Command addCommand = commandRunner.createCommand(new RequestBuilder(
+				String.format("git commit -m \"%s\" %s", message, afterConflictResolved ? "-i" : ""))
+				.withCwd(repositoryRoot).withCmdArgs(filePaths), Sets.newHashSet(host));
 
-        runCommand( addCommand, host, GitCommand.COMMIT, false );
-        //parse output to get commitAll id here
-        Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
+		runCommand(addCommand, host, GitCommand.COMMIT, false);
+		//parse output to get commitAll id here
+		Pattern p = Pattern.compile("(\\w+)]");
+		Matcher m = p.matcher(addCommand.getResults().get(host.getUuid()).getStdOut());
 
-        if ( m.find() ) {
-            return m.group( 1 );
-        }
+		if (m.find()) {
+			return m.group(1);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 
-    @Override
-    public String commitAll( final Agent host, final String repositoryRoot, final String message ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( message ), "Message is null or empty" );
+	@Override
+	public String commitAll(final Agent host, final String repositoryRoot, final String message) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(message), "Message is null or empty");
 
-        Command addCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git commit -a -m \"%s\"", message ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command addCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git commit -a -m \"%s\"", message)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( addCommand, host, GitCommand.COMMIT, false );
+		runCommand(addCommand, host, GitCommand.COMMIT, false);
 
-        //parse output to get commitAll id here
-        Pattern p = Pattern.compile( "(\\w+)]" );
-        Matcher m = p.matcher( addCommand.getResults().get( host.getUuid() ).getStdOut() );
+		//parse output to get commitAll id here
+		Pattern p = Pattern.compile("(\\w+)]");
+		Matcher m = p.matcher(addCommand.getResults().get(host.getUuid()).getStdOut());
 
-        if ( m.find() ) {
-            return m.group( 1 );
-        }
+		if (m.find()) {
+			return m.group(1);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 
-    @Override
-    public void clone( final Agent host, final String newBranchName, final String targetDir ) throws GitException {
-        validateHostNRepoRoot( host, targetDir );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newBranchName ), "Branch name is null or empty" );
+	@Override
+	public void clone(final Agent host, final String newBranchName, final String targetDir) throws GitException {
+		validateHostNRepoRoot(host, targetDir);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(newBranchName), "Branch name is null or empty");
 
-        Command cloneCommand = commandRunner.createCommand( new RequestBuilder(
-                String.format( "git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir ) )
-                .withTimeout( 180 ), Sets.newHashSet( host ) );
+		Command cloneCommand = commandRunner.createCommand(new RequestBuilder(
+				String.format("git clone -b %s %s %s", newBranchName, Common.GIT_REPO_URL, targetDir))
+				.withTimeout(180), Sets.newHashSet(host));
 
-        runCommand( cloneCommand, host, GitCommand.CLONE );
-    }
+		runCommand(cloneCommand, host, GitCommand.CLONE);
+	}
 
 
-    @Override
-    public void checkout( final Agent host, final String repositoryRoot, final String branchName, final boolean create )
-            throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void checkout(final Agent host, final String repositoryRoot, final String branchName, final boolean create)
+			throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        String command = create ? String.format( "git checkout --track -b %s", branchName ) :
-                         String.format( "git checkout %s", branchName );
-        Command checkoutCommand = commandRunner
-                .createCommand( new RequestBuilder( command ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		String command = create ? String.format("git checkout --track -b %s", branchName) :
+				String.format("git checkout %s", branchName);
+		Command checkoutCommand = commandRunner
+				.createCommand(new RequestBuilder(command).withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( checkoutCommand, host, GitCommand.CHECKOUT );
-    }
+		runCommand(checkoutCommand, host, GitCommand.CHECKOUT);
+	}
 
 
-    @Override
-    public void deleteBranch( final Agent host, final String repositoryRoot, final String branchName )
-            throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void deleteBranch(final Agent host, final String repositoryRoot, final String branchName)
+			throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        Command checkoutCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git branch -d %s", branchName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command checkoutCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git branch -d %s", branchName)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( checkoutCommand, host, GitCommand.BRANCH );
-    }
+		runCommand(checkoutCommand, host, GitCommand.BRANCH);
+	}
 
 
-    @Override
-    public void merge( final Agent host, final String repositoryRoot ) throws GitException {
-        merge( host, repositoryRoot, MASTER_BRANCH );
-    }
+	@Override
+	public void merge(final Agent host, final String repositoryRoot) throws GitException {
+		merge(host, repositoryRoot, MASTER_BRANCH);
+	}
 
 
-    @Override
-    public void merge( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void merge(final Agent host, final String repositoryRoot, final String branchName) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        Command mergeCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git merge %s", branchName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command mergeCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git merge %s", branchName)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( mergeCommand, host, GitCommand.MERGE );
-    }
+		runCommand(mergeCommand, host, GitCommand.MERGE);
+	}
 
 
-    @Override
-    public void pull( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void pull(final Agent host, final String repositoryRoot, final String branchName) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        Command pullCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git pull origin %s", branchName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command pullCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git pull origin %s", branchName)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( pullCommand, host, GitCommand.PULL );
-    }
+		runCommand(pullCommand, host, GitCommand.PULL);
+	}
 
 
-    @Override
-    public void pull( final Agent host, final String repositoryRoot ) throws GitException {
-        pull( host, repositoryRoot, MASTER_BRANCH );
-    }
+	@Override
+	public void pull(final Agent host, final String repositoryRoot) throws GitException {
+		pull(host, repositoryRoot, MASTER_BRANCH);
+	}
 
 
-    @Override
-    public GitBranch currentBranch( final Agent host, final String repositoryRoot ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	@Override
+	public GitBranch currentBranch(final Agent host, final String repositoryRoot) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        Command branchCommand = commandRunner
-                .createCommand( new RequestBuilder( "git branch" ).withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command branchCommand = commandRunner
+				.createCommand(new RequestBuilder("git branch").withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( branchCommand, host, GitCommand.BRANCH, false );
+		runCommand(branchCommand, host, GitCommand.BRANCH, false);
 
-        branchCommand.getResults().get( host.getUuid() ).getStdOut();
+		branchCommand.getResults().get(host.getUuid()).getStdOut();
 
-        StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
+		StringTokenizer lines =
+				new StringTokenizer(branchCommand.getResults().get(host.getUuid()).getStdOut(), LINE_SEPARATOR);
 
-        while ( lines.hasMoreTokens() ) {
-            String line = lines.nextToken();
+		while (lines.hasMoreTokens()) {
+			String line = lines.nextToken();
 
-            if ( line != null && line.startsWith( "*" ) ) {
-                return new GitBranch( line.substring( 2 ), true );
-            }
-        }
+			if (line != null && line.startsWith("*")) {
+				return new GitBranch(line.substring(2), true);
+			}
+		}
 
-        return new GitBranch( MASTER_BRANCH, true );
-    }
+		return new GitBranch(MASTER_BRANCH, true);
+	}
 
 
-    @Override
-    public List<GitBranch> listBranches( final Agent host, final String repositoryRoot, boolean remote )
-            throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	@Override
+	public List<GitBranch> listBranches(final Agent host, final String repositoryRoot, boolean remote)
+			throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        List<GitBranch> branches = new LinkedList<>();
+		List<GitBranch> branches = new LinkedList<>();
 
-        Command branchCommand = commandRunner
-                .createCommand( new RequestBuilder( remote ? "git branch -r" : "git branch" ).withCwd( repositoryRoot ),
-                        Sets.newHashSet( host ) );
+		Command branchCommand = commandRunner
+				.createCommand(new RequestBuilder(remote ? "git branch -r" : "git branch").withCwd(repositoryRoot),
+						Sets.newHashSet(host));
 
-        runCommand( branchCommand, host, GitCommand.BRANCH, false );
+		runCommand(branchCommand, host, GitCommand.BRANCH, false);
 
-        StringTokenizer lines =
-                new StringTokenizer( branchCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
+		StringTokenizer lines =
+				new StringTokenizer(branchCommand.getResults().get(host.getUuid()).getStdOut(), LINE_SEPARATOR);
 
-        while ( lines.hasMoreTokens() ) {
-            String line = lines.nextToken();
+		while (lines.hasMoreTokens()) {
+			String line = lines.nextToken();
 
-            if ( line != null ) {
-                branches.add( new GitBranch( line.substring( 2 ), line.startsWith( "*" ) ) );
-            }
-        }
+			if (line != null) {
+				branches.add(new GitBranch(line.substring(2), line.startsWith("*")));
+			}
+		}
 
-        return branches;
-    }
+		return branches;
+	}
 
 
-    @Override
-    public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void push(final Agent host, final String repositoryRoot, final String branchName) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        if ( branchName.toLowerCase().contains( MASTER_BRANCH ) ) {
-            throw new GitException( "Can not perform push to remote master branch" );
-        }
+		if (branchName.toLowerCase().contains(MASTER_BRANCH)) {
+			throw new GitException("Can not perform push to remote master branch");
+		}
 
-        Command pushCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git push origin %s", branchName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command pushCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git push origin %s", branchName)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( pushCommand, host, GitCommand.PUSH );
-    }
+		runCommand(pushCommand, host, GitCommand.PUSH);
+	}
 
 
-    @Override
-    public void undoSoft( final Agent host, final String repositoryRoot, final List<String> filePaths )
-            throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( filePaths != null && !filePaths.isEmpty(), "Files is null or empty" );
+	@Override
+	public void undoSoft(final Agent host, final String repositoryRoot, final List<String> filePaths)
+			throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(filePaths != null && !filePaths.isEmpty(), "Files is null or empty");
 
-        Command undoCommand = commandRunner.createCommand(
-                new RequestBuilder( "git checkout --" ).withCwd( repositoryRoot ).withCmdArgs( filePaths ),
-                Sets.newHashSet( host ) );
+		Command undoCommand = commandRunner.createCommand(
+				new RequestBuilder("git checkout --").withCwd(repositoryRoot).withCmdArgs(filePaths),
+				Sets.newHashSet(host));
 
-        runCommand( undoCommand, host, GitCommand.CHECKOUT );
-    }
+		runCommand(undoCommand, host, GitCommand.CHECKOUT);
+	}
 
 
-    @Override
-    public void undoHard( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( branchName ), "Branch name is null or empty" );
+	@Override
+	public void undoHard(final Agent host, final String repositoryRoot, final String branchName) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(branchName), "Branch name is null or empty");
 
-        Command undoCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git fetch origin && git reset --hard origin/%s", branchName ) )
-                        .withCwd( repositoryRoot ), Sets.newHashSet( host ) );
+		Command undoCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git fetch origin && git reset --hard origin/%s", branchName))
+						.withCwd(repositoryRoot), Sets.newHashSet(host));
 
-        runCommand( undoCommand, host, GitCommand.FETCH );
-    }
+		runCommand(undoCommand, host, GitCommand.FETCH);
+	}
 
 
-    @Override
-    public void undoHard( final Agent host, final String repositoryRoot ) throws GitException {
+	@Override
+	public void undoHard(final Agent host, final String repositoryRoot) throws GitException {
 
-        undoHard( host, repositoryRoot, MASTER_BRANCH );
-    }
+		undoHard(host, repositoryRoot, MASTER_BRANCH);
+	}
 
 
-    @Override
-    public void revertCommit( final Agent host, final String repositoryRoot, String commitId ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( commitId ), "Commit Id is null or empty" );
+	@Override
+	public void revertCommit(final Agent host, final String repositoryRoot, String commitId) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(commitId), "Commit Id is null or empty");
 
-        Command revertCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git revert %s", commitId ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command revertCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git revert %s", commitId)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( revertCommand, host, GitCommand.REVERT );
-    }
+		runCommand(revertCommand, host, GitCommand.REVERT);
+	}
 
 
-    @Override
-    public void stash( final Agent host, final String repositoryRoot ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	@Override
+	public void stash(final Agent host, final String repositoryRoot) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        Command stashCommand = commandRunner
-                .createCommand( new RequestBuilder( String.format( "git stash" ) ).withCwd( repositoryRoot ),
-                        Sets.newHashSet( host ) );
+		Command stashCommand = commandRunner
+				.createCommand(new RequestBuilder(String.format("git stash")).withCwd(repositoryRoot),
+						Sets.newHashSet(host));
 
-        runCommand( stashCommand, host, GitCommand.STASH );
-    }
+		runCommand(stashCommand, host, GitCommand.STASH);
+	}
 
 
-    @Override
-    public void unstash( final Agent host, final String repositoryRoot, final String stashName ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( stashName ), "Stash name is null or empty" );
+	@Override
+	public void unstash(final Agent host, final String repositoryRoot, final String stashName) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(stashName), "Stash name is null or empty");
 
-        Command stashCommand = commandRunner.createCommand(
-                new RequestBuilder( String.format( "git stash apply %s", stashName ) ).withCwd( repositoryRoot ),
-                Sets.newHashSet( host ) );
+		Command stashCommand = commandRunner.createCommand(
+				new RequestBuilder(String.format("git stash apply %s", stashName)).withCwd(repositoryRoot),
+				Sets.newHashSet(host));
 
-        runCommand( stashCommand, host, GitCommand.STASH );
-    }
+		runCommand(stashCommand, host, GitCommand.STASH);
+	}
 
 
-    @Override
-    public List<String> listStashes( final Agent host, final String repositoryRoot ) throws GitException {
-        validateHostNRepoRoot( host, repositoryRoot );
+	@Override
+	public List<String> listStashes(final Agent host, final String repositoryRoot) throws GitException {
+		validateHostNRepoRoot(host, repositoryRoot);
 
-        List<String> stashes = new LinkedList<>();
+		List<String> stashes = new LinkedList<>();
 
-        Command stashCommand = commandRunner
-                .createCommand( new RequestBuilder( "git stash list" ).withCwd( repositoryRoot ),
-                        Sets.newHashSet( host ) );
+		Command stashCommand = commandRunner
+				.createCommand(new RequestBuilder("git stash list").withCwd(repositoryRoot),
+						Sets.newHashSet(host));
 
-        runCommand( stashCommand, host, GitCommand.STASH, false );
+		runCommand(stashCommand, host, GitCommand.STASH, false);
 
-        StringTokenizer tok =
-                new StringTokenizer( stashCommand.getResults().get( host.getUuid() ).getStdOut(), LINE_SEPARATOR );
+		StringTokenizer tok =
+				new StringTokenizer(stashCommand.getResults().get(host.getUuid()).getStdOut(), LINE_SEPARATOR);
 
-        while ( tok.hasMoreTokens() ) {
-            stashes.add( tok.nextToken() );
-        }
+		while (tok.hasMoreTokens()) {
+			stashes.add(tok.nextToken());
+		}
 
-        return stashes;
-    }
+		return stashes;
+	}
 
 
-    private GitFileStatus convertStatus( String status ) {
-        switch ( status ) {
-            case "M":
-                return GitFileStatus.MODIFIED;
-            case "C":
-                return GitFileStatus.COPIED;
-            case "R":
-                return GitFileStatus.RENAMED;
-            case "A":
-                return GitFileStatus.ADDED;
-            case "D":
-                return GitFileStatus.DELETED;
-            case "U":
-                return GitFileStatus.UNMERGED;
-            case "X":
-                return GitFileStatus.UNVERSIONED;
-            default:
-                return GitFileStatus.UNMODIFIED;
-        }
-    }
+	private GitFileStatus convertStatus(String status) {
+		switch (status) {
+			case "M":
+				return GitFileStatus.MODIFIED;
+			case "C":
+				return GitFileStatus.COPIED;
+			case "R":
+				return GitFileStatus.RENAMED;
+			case "A":
+				return GitFileStatus.ADDED;
+			case "D":
+				return GitFileStatus.DELETED;
+			case "U":
+				return GitFileStatus.UNMERGED;
+			case "X":
+				return GitFileStatus.UNVERSIONED;
+			default:
+				return GitFileStatus.UNMODIFIED;
+		}
+	}
 }

@@ -1,13 +1,15 @@
 package org.safehaus.subutai.api.templateregistry;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Expose;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -15,142 +17,220 @@ import java.util.Set;
  */
 public class Template {
 
-	//name of template
-	@Expose
-	private String templateName;
-	//name of parent template
-	@Expose
-	private String parentTemplateName;
-	//lxc architecture e.g. amd64, i386
-	@Expose
-	private String lxcArch;
-	//lxc container name
-	@Expose
-	private String lxcUtsname;
-	//path to cfg files tracked by subutai
-	@Expose
-	private String subutaiConfigPath;
-	//name of parent template
-	@Expose
-	private String subutaiParent;
-	//name of git branch where template cfg files are versioned
-	@Expose
-	private String subutaiGitBranch;
-	//id of git commit which pushed template cfg files to git
-	@Expose
-	private String subutaiGitUuid;
-	//contents of packages manifest file
+    //name of template
+    @Expose
+    private String templateName;
 
-	private String packagesManifest;
-	@Expose
-	private List<Template> children;
-	@Expose
-	private Set<String> products;
+    //name of parent template
+    @Expose
+    private String parentTemplateName;
 
+    //lxc architecture e.g. amd64, i386
+    @Expose
+    private String lxcArch;
 
-	public Template(final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
-	                final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
-	                final String packagesManifest) {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(lxcUtsname), "Missing lxc.utsname parameter");
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(lxcArch), "Missing lxc.arch parameter");
-		Preconditions
-				.checkArgument(!Strings.isNullOrEmpty(subutaiConfigPath), "Missing subutai.config.path parameter");
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(subutaiParent), "Missing subutai.parent parameter");
-		Preconditions
-				.checkArgument(!Strings.isNullOrEmpty(subutaiGitBranch), "Missing subutai.git.branch parameter");
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(subutaiGitUuid), "Missing subutai.git.uuid parameter");
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(packagesManifest), "Missing packages manifest");
-		this.lxcArch = lxcArch;
-		this.lxcUtsname = lxcUtsname;
-		this.subutaiConfigPath = subutaiConfigPath;
-		this.subutaiParent = subutaiParent;
-		this.subutaiGitBranch = subutaiGitBranch;
-		this.subutaiGitUuid = subutaiGitUuid;
-		this.packagesManifest = packagesManifest;
-		this.templateName = lxcUtsname;
-		this.parentTemplateName = subutaiParent;
+    //lxc container name
+    @Expose
+    private String lxcUtsname;
 
-		if (templateName.equalsIgnoreCase(parentTemplateName)) {
-			parentTemplateName = null;
-		}
-	}
+    //path to cfg files tracked by subutai
+    @Expose
+    private String subutaiConfigPath;
+
+    //name of parent template
+    @Expose
+    private String subutaiParent;
+
+    //name of git branch where template cfg files are versioned
+    @Expose
+    private String subutaiGitBranch;
+
+    //id of git commit which pushed template cfg files to git
+    @Expose
+    private String subutaiGitUuid;
+
+    //contents of packages manifest file
+    private String packagesManifest;
+
+    //children of template, this property is calculated upon need and is null by default (see REST API for calculation)
+    @Expose
+    private List<Template> children;
+
+    //subutai products present only in this template excluding all subutai products present in the whole ancestry
+    // lineage above
+    @Expose
+    private Set<String> products;
+
+    //template's md5sum hash
+    @Expose
+    private String md5sum;
+
+    //indicates whether this template is in use on any of FAIs connected to Subutai
+    @Expose
+    private Set<String> faisUsingThisTemplate = new HashSet<>();
 
 
-	public void addChildren(List<Template> children) {
-		if (this.children == null) {
-			this.children = new ArrayList<>();
-		}
-		this.children.addAll(children);
-	}
+    public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
+                     final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
+                     final String packagesManifest, final String md5sum ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcUtsname ), "Missing lxc.utsname parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Missing lxc.arch parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiConfigPath ), "Missing subutai.config.path parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiParent ), "Missing subutai.parent parameter" );
+        Preconditions
+                .checkArgument( !Strings.isNullOrEmpty( subutaiGitBranch ), "Missing subutai.git.branch parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( subutaiGitUuid ), "Missing subutai.git.uuid parameter" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( packagesManifest ), "Missing packages manifest" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( md5sum ), "Missing md5sum" );
+
+        this.lxcArch = lxcArch;
+        this.lxcUtsname = lxcUtsname;
+        this.subutaiConfigPath = subutaiConfigPath;
+        this.subutaiParent = subutaiParent;
+        this.subutaiGitBranch = subutaiGitBranch;
+        this.subutaiGitUuid = subutaiGitUuid;
+        this.packagesManifest = packagesManifest;
+        this.templateName = lxcUtsname;
+        this.parentTemplateName = subutaiParent;
+        this.md5sum = md5sum;
+
+        if ( templateName.equalsIgnoreCase( parentTemplateName ) ) {
+            parentTemplateName = null;
+        }
+    }
 
 
-	public Set<String> getProducts() {
-		return products;
-	}
+    public boolean isInUseOnFAIs() {
+        return !faisUsingThisTemplate.isEmpty();
+    }
 
 
-	public void setProducts(final Set<String> products) {
-		this.products = products;
-	}
+    public void setInUseOnFAI( final String faiHostname, final boolean inUseOnFAI ) {
+        if ( inUseOnFAI ) {
+            faisUsingThisTemplate.add( faiHostname );
+        }
+        else {
+            faisUsingThisTemplate.remove( faiHostname );
+        }
+    }
 
 
-	public String getLxcArch() {
-		return lxcArch;
-	}
+    public Set<String> getFaisUsingThisTemplate() {
+        return Collections.unmodifiableSet( faisUsingThisTemplate );
+    }
 
 
-	public String getLxcUtsname() {
-		return lxcUtsname;
-	}
+    public void addChildren( List<Template> children ) {
+        if ( this.children == null ) {
+            this.children = new ArrayList<>();
+        }
+        this.children.addAll( children );
+    }
 
 
-	public String getSubutaiConfigPath() {
-		return subutaiConfigPath;
-	}
+    public String getMd5sum() {
+        return md5sum;
+    }
 
 
-	public String getSubutaiParent() {
-		return subutaiParent;
-	}
+    public Set<String> getProducts() {
+        return products;
+    }
 
 
-	public String getSubutaiGitBranch() {
-		return subutaiGitBranch;
-	}
+    public void setProducts( final Set<String> products ) {
+        this.products = products;
+    }
 
 
-	public String getSubutaiGitUuid() {
-		return subutaiGitUuid;
-	}
+    public String getLxcArch() {
+        return lxcArch;
+    }
 
 
-	public String getPackagesManifest() {
-		return packagesManifest;
-	}
+    public String getLxcUtsname() {
+        return lxcUtsname;
+    }
 
 
-	public String getTemplateName() {
-		return templateName;
-	}
+    public String getSubutaiConfigPath() {
+        return subutaiConfigPath;
+    }
 
 
-	public String getParentTemplateName() {
-		return parentTemplateName;
-	}
+    public String getSubutaiParent() {
+        return subutaiParent;
+    }
 
 
-	@Override
-	public String toString() {
-		return "Template{" +
-				"templateName='" + templateName + '\'' +
-				", parentTemplateName='" + parentTemplateName + '\'' +
-				", lxcArch='" + lxcArch + '\'' +
-				", lxcUtsname='" + lxcUtsname + '\'' +
-				", subutaiConfigPath='" + subutaiConfigPath + '\'' +
-				", subutaiParent='" + subutaiParent + '\'' +
-				", subutaiGitBranch='" + subutaiGitBranch + '\'' +
-				", subutaiGitUuid='" + subutaiGitUuid + '\'' +
-				", products=" + products +
-				'}';
-	}
+    public String getSubutaiGitBranch() {
+        return subutaiGitBranch;
+    }
+
+
+    public String getSubutaiGitUuid() {
+        return subutaiGitUuid;
+    }
+
+
+    public String getPackagesManifest() {
+        return packagesManifest;
+    }
+
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+
+    public String getParentTemplateName() {
+        return parentTemplateName;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Template{" +
+                "templateName='" + templateName + '\'' +
+                ", parentTemplateName='" + parentTemplateName + '\'' +
+                ", lxcArch='" + lxcArch + '\'' +
+                ", lxcUtsname='" + lxcUtsname + '\'' +
+                ", subutaiConfigPath='" + subutaiConfigPath + '\'' +
+                ", subutaiParent='" + subutaiParent + '\'' +
+                ", subutaiGitBranch='" + subutaiGitBranch + '\'' +
+                ", subutaiGitUuid='" + subutaiGitUuid + '\'' +
+                ", products=" + products +
+                '}';
+    }
+
+
+    @Override
+    public boolean equals( final Object o ) {
+        if ( this == o ) {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() ) {
+            return false;
+        }
+
+        final Template template = ( Template ) o;
+
+        if ( !lxcArch.equals( template.lxcArch ) ) {
+            return false;
+        }
+        if ( !templateName.equals( template.templateName ) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public int hashCode() {
+        int result = templateName.hashCode();
+        result = 31 * result + lxcArch.hashCode();
+        return result;
+    }
 }

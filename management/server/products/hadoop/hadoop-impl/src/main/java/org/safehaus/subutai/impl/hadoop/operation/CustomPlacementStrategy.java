@@ -1,6 +1,5 @@
 package org.safehaus.subutai.impl.hadoop.operation;
 
-import java.util.*;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
@@ -9,19 +8,20 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+
 class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 	public static final String MASTER_NODE_TYPE = "master";
 	public static final String SLAVE_NODE_TYPE = "slave";
 	private static final Logger logger = LoggerFactory.getLogger(CustomPlacementStrategy.class);
+	private final Map<String, Integer> nodesCount;
 	private float hddPerNodeMb;
 	private float hddReservedMb;
 	private float ramPerNodeMb;
 	private float ramReservedMb;
 	private float cpuPerNodePercentage;
 	private float cpuReservedPercentage;
-
-	private final Map<String, Integer> nodesCount;
 
 
 	public CustomPlacementStrategy(int masterNodes, int slaveNodes) {
@@ -62,10 +62,10 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 
 
 	public static Map<String, Set<Agent>> getNodes(LxcManager lxcManager, int masterNodes, int slaveNodes)
-            throws LxcCreateException {
+			throws LxcCreateException {
 
-        boolean useRoundRobin = true;
-        if(useRoundRobin) return createByRoundRobin(lxcManager, masterNodes, slaveNodes);
+		boolean useRoundRobin = true;
+		if (useRoundRobin) return createByRoundRobin(lxcManager, masterNodes, slaveNodes);
 
 		LxcPlacementStrategy strategy = new CustomPlacementStrategy(masterNodes, slaveNodes);
 		Map<String, Map<Agent, Set<Agent>>> nodes = lxcManager.createLxcsByStrategy(strategy);
@@ -85,44 +85,44 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 			}
 
 			Set<Agent> set = res.get(type);
-            if(set != null)
-                set.addAll(all);
-            else
-                res.put(type, all);
+			if (set != null)
+				set.addAll(all);
+			else
+				res.put(type, all);
 		}
 
 		return res;
 	}
 
-    private static Map<String, Set<Agent>> createByRoundRobin(LxcManager lxcManager, int masterNodes, int slaveNodes) throws LxcCreateException {
-        Map<String, Set<Agent>> res = new HashMap<>();
-        Map<Agent, Set<Agent>> allNodes = lxcManager.createLxcs(masterNodes + slaveNodes);
-        Set<Agent> all = new HashSet<>();
-        for(Set<Agent> s : allNodes.values()) all.addAll(s);
+	private static Map<String, Set<Agent>> createByRoundRobin(LxcManager lxcManager, int masterNodes, int slaveNodes) throws LxcCreateException {
+		Map<String, Set<Agent>> res = new HashMap<>();
+		Map<Agent, Set<Agent>> allNodes = lxcManager.createLxcs(masterNodes + slaveNodes);
+		Set<Agent> all = new HashSet<>();
+		for (Set<Agent> s : allNodes.values()) all.addAll(s);
 
-        // collect master nodes from different physical servers
-        Set<Agent> masters = new HashSet<>();
-        for(int i = 0; i < masterNodes; i++) {
-            Iterator<Agent> it = all.iterator();
-            if(it.hasNext()) {
-                masters.add(it.next());
-                it.remove();
-            }
-        }
-        res.put(MASTER_NODE_TYPE, masters);
+		// collect master nodes from different physical servers
+		Set<Agent> masters = new HashSet<>();
+		for (int i = 0; i < masterNodes; i++) {
+			Iterator<Agent> it = all.iterator();
+			if (it.hasNext()) {
+				masters.add(it.next());
+				it.remove();
+			}
+		}
+		res.put(MASTER_NODE_TYPE, masters);
 
-        Set<Agent> slaves = new HashSet<>();
-        for(int i = 0; i < slaveNodes; i++) {
-            Iterator<Agent> it = all.iterator();
-            if(it.hasNext()) {
-                slaves.add(it.next());
-                it.remove();
-            }
-        }
-        res.put(SLAVE_NODE_TYPE, slaves);
+		Set<Agent> slaves = new HashSet<>();
+		for (int i = 0; i < slaveNodes; i++) {
+			Iterator<Agent> it = all.iterator();
+			if (it.hasNext()) {
+				slaves.add(it.next());
+				it.remove();
+			}
+		}
+		res.put(SLAVE_NODE_TYPE, slaves);
 
-        return res;
-    }
+		return res;
+	}
 
 	@Override
 	public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> metrics) {
@@ -216,6 +216,10 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 		}
 	}
 
+	private int GB2MB(float gb) {
+		return Math.round(gb * 1024);
+	}
+
 	private Agent findBestServer(Map<Agent, Integer> map) {
 		int max = 0;
 		Agent best = null;
@@ -226,10 +230,6 @@ class CustomPlacementStrategy extends LxcPlacementStrategy {
 			}
 		}
 		return best;
-	}
-
-	private int GB2MB(float gb) {
-		return Math.round(gb * 1024);
 	}
 
 }

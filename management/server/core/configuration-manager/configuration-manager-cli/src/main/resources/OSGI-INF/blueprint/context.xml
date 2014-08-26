@@ -1,48 +1,48 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="textInjector" availability="mandatory"
-             interface="org.safehaus.subutai.configuration.manager.api.TextInjector" />
-  <reference id="configManager" availability="mandatory"
-             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+    <reference id="textInjector" availability="mandatory"
+               interface="org.safehaus.subutai.configuration.manager.api.TextInjector"/>
+    <reference id="configManager" availability="mandatory"
+               interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="config/cat">
-      <action class="org.safehaus.subutai.cli.commands.CatCommand">
-        <property name="textInjector" ref="textInjector" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="config/cat">
+            <action class="org.safehaus.subutai.cli.commands.CatCommand">
+                <property name="textInjector" ref="textInjector"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="config/echo">
-      <action class="org.safehaus.subutai.cli.commands.EchoCommand">
-        <property name="textInjector" ref="textInjector" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="config/echo">
+            <action class="org.safehaus.subutai.cli.commands.EchoCommand">
+                <property name="textInjector" ref="textInjector"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="config/get-config-template">
-      <action class="org.safehaus.subutai.cli.commands.GetConfigTemplateCommand">
-        <property name="textInjector" ref="textInjector" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="config/get-config-template">
+            <action class="org.safehaus.subutai.cli.commands.GetConfigTemplateCommand">
+                <property name="textInjector" ref="textInjector"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="config/get-config-json">
-      <action class="org.safehaus.subutai.cli.commands.GetConfigJsonCommand">
-        <property name="configManager" ref="configManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="config/get-config-json">
+            <action class="org.safehaus.subutai.cli.commands.GetConfigJsonCommand">
+                <property name="configManager" ref="configManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="config/echo-text-to-file">
-      <action class="org.safehaus.subutai.cli.commands.EchoTextToFileCommand">
-        <property name="configManager" ref="configManager" />
-      </action>
-    </command>
-  </command-bundle>
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+        <command name="config/echo-text-to-file">
+            <action class="org.safehaus.subutai.cli.commands.EchoTextToFileCommand">
+                <property name="configManager" ref="configManager"/>
+            </action>
+        </command>
+    </command-bundle>
 
 </blueprint>

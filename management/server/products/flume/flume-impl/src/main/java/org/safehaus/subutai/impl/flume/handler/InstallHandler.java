@@ -12,6 +12,8 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import java.util.Iterator;
+
 public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private final Config config;

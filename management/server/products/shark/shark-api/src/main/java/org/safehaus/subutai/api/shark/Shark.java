@@ -14,10 +14,10 @@ import java.util.UUID;
  */
 public interface Shark extends ApiBase<Config> {
 
-    public UUID addNode(String clusterName, String lxcHostname);
+	public UUID addNode(String clusterName, String lxcHostname);
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
+	public UUID destroyNode(String clusterName, String lxcHostname);
 
-    public UUID actualizeMasterIP(String clusterName);
+	public UUID actualizeMasterIP(String clusterName);
 
 }

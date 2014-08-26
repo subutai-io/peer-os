@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.hadoop.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import java.util.List;
 
@@ -28,8 +28,8 @@ public class ListClustersCommand extends OsgiCommandSupport {
 
 		List<HadoopClusterConfig> hadoopClusterConfigList = hadoopManager.getClusters();
 		if (!hadoopClusterConfigList.isEmpty())
-			for (HadoopClusterConfig hadoopClusterConfig : hadoopClusterConfigList ) {
-				System.out.println( hadoopClusterConfig.getClusterName());
+			for (HadoopClusterConfig hadoopClusterConfig : hadoopClusterConfigList) {
+				System.out.println(hadoopClusterConfig.getClusterName());
 			}
 		else System.out.println("No Hadoop cluster");
 

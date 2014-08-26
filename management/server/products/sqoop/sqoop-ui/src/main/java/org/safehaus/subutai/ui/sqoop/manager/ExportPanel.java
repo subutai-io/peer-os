@@ -4,12 +4,13 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ExportPanel extends ImportExportBase {
 
@@ -23,6 +24,20 @@ public class ExportPanel extends ImportExportBase {
 	public void setAgent(Agent agent) {
 		super.setAgent(agent);
 		init();
+	}
+
+	@Override
+	ExportSetting makeSettings() {
+		ExportSetting s = new ExportSetting();
+		s.setClusterName(clusterName);
+		s.setHostname(agent.getHostname());
+		s.setConnectionString(connStringField.getValue());
+		s.setTableName(tableField.getValue());
+		s.setUsername(usernameField.getValue());
+		s.setPassword(passwordField.getValue());
+		s.setHdfsPath(hdfsPathField.getValue());
+		s.setOptionalParameters(optionalParams.getValue());
+		return s;
 	}
 
 	@Override
@@ -41,7 +56,7 @@ public class ExportPanel extends ImportExportBase {
 		buttons.addComponent(UIUtil.getButton("Export", 120,
 				new Button.ClickListener() {
 
-                    @Override
+					@Override
 					public void buttonClick(Button.ClickEvent event) {
 						clearLogMessages();
 						if (!checkFields()) return;
@@ -52,7 +67,7 @@ public class ExportPanel extends ImportExportBase {
 						OperationWatcher watcher = new OperationWatcher(trackId);
 						watcher.setCallback(new OperationCallback() {
 
-                            @Override
+							@Override
 							public void onComplete() {
 								setFieldsEnabled(true);
 							}
@@ -63,7 +78,7 @@ public class ExportPanel extends ImportExportBase {
 				}));
 		buttons.addComponent(UIUtil.getButton("Cancel", 120, new Button.ClickListener() {
 
-            @Override
+			@Override
 			public void buttonClick(Button.ClickEvent event) {
 				detachFromParent();
 			}
@@ -76,24 +91,10 @@ public class ExportPanel extends ImportExportBase {
 		ls.add(usernameField);
 		ls.add(passwordField);
 		ls.add(hdfsPathField);
-        ls.add(optionalParams);
-        ls.add(buttons);
+		ls.add(optionalParams);
+		ls.add(buttons);
 
 		addComponents(ls);
-	}
-
-    @Override
-	ExportSetting makeSettings() {
-		ExportSetting s = new ExportSetting();
-		s.setClusterName(clusterName);
-		s.setHostname(agent.getHostname());
-		s.setConnectionString(connStringField.getValue());
-		s.setTableName(tableField.getValue());
-		s.setUsername(usernameField.getValue());
-		s.setPassword(passwordField.getValue());
-        s.setHdfsPath(hdfsPathField.getValue());
-        s.setOptionalParameters(optionalParams.getValue());
-		return s;
 	}
 
 	@Override

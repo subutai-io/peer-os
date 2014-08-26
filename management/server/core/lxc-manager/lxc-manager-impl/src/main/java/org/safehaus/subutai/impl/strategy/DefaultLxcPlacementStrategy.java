@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 
 /**
@@ -23,8 +23,6 @@ import org.safehaus.subutai.shared.protocol.Util;
  * connected physical host can accommodate
  */
 public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
-    Logger LOG = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
-
     public static final String defaultNodeType = "default";
     private final double MIN_HDD_LXC_MB = 5 * 1024;
     private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
@@ -33,6 +31,7 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
     private final double MIN_CPU_LXC_PERCENT = 5;           // 5%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
     private final int numOfNodes;
+    Logger LOG = Logger.getLogger( DefaultLxcPlacementStrategy.class.getName() );
 
 
     public DefaultLxcPlacementStrategy( int numOfNodes ) {
@@ -98,7 +97,7 @@ public class DefaultLxcPlacementStrategy extends LxcPlacementStrategy {
             if ( numOfAvailableLxcSlots >= numOfNodes ) {
 
                 for ( int i = 0; i < numOfNodes; i++ ) {
-                    Map<Agent, Integer> sortedBestServers = Util.sortMapByValueDesc( serversWithSlots );
+                    Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc( serversWithSlots );
 
                     Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
                     Agent physicalNode = entry.getKey();
