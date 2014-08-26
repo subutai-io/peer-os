@@ -50,11 +50,13 @@ public class OozieImpl implements Oozie {
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
-        this.executor = executor;
+//        this.executor = executor;
         this.commandRunner = commandRunner;
         this.lxcManager = lxcManager;
         this.environmentManager = environmentManager;
         this.containerManager = containerManager;
+
+        Commands.init( commandRunner );
     }
 
 
