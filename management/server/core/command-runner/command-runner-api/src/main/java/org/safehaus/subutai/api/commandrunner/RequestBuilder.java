@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
 public class RequestBuilder {
 
     //source of command
-    private final String source = "COMMAND-RUNNER";
+    private final static String source = "COMMAND-RUNNER";
 
     //the same for all commands
     private final Integer requestSequenceNumber = 1;
@@ -187,10 +187,11 @@ public class RequestBuilder {
 
     public RequestBuilder withConfPoints( String confPoints[] ) {
 
-        this.confPoints = confPoints;
+        this.confPoints = confPoints.clone();
 
         return this;
     }
+
 
     public Request build( UUID agentUUID, UUID taskUUID ) {
 

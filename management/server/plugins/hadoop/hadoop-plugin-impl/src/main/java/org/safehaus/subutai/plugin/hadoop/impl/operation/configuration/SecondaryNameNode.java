@@ -18,7 +18,7 @@ public class SecondaryNameNode {
 	private HadoopImpl parent;
 	private HadoopClusterConfig hadoopClusterConfig;
 
-	public SecondaryNameNode(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
+	public SecondaryNameNode(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig) {
 		this.parent = parent;
 		this.hadoopClusterConfig = hadoopClusterConfig;
 	}
@@ -26,33 +26,33 @@ public class SecondaryNameNode {
 	public UUID status() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Getting status of clusters %s Secondary NameNode", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if ( hadoopClusterConfig == null) {
+				if (hadoopClusterConfig == null) {
 					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted",
-                            hadoopClusterConfig
-                            .getClusterName()));
+							hadoopClusterConfig
+									.getClusterName()));
 					return;
 				}
 
 				final Agent node = parent.getAgentManager().getAgentByHostname(
-                        hadoopClusterConfig.getSecondaryNameNode().getHostname());
+						hadoopClusterConfig.getSecondaryNameNode().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
-                            .getSecondaryNameNode().getHostname()));
+							.getSecondaryNameNode().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getSecondaryNameNode(), "status");
+				Command command = Commands.getNameNodeCommand(hadoopClusterConfig.getSecondaryNameNode(), "status");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				NodeState nodeState = NodeState.UNKNOWN;
 				if (command.hasCompleted()) {
-					AgentResult result = command.getResults().get( hadoopClusterConfig.getSecondaryNameNode().getUuid());
+					AgentResult result = command.getResults().get(hadoopClusterConfig.getSecondaryNameNode().getUuid());
 					if (result.getStdOut() != null && result.getStdOut().contains("SecondaryNameNode")) {
 						String[] array = result.getStdOut().split("\n");
 

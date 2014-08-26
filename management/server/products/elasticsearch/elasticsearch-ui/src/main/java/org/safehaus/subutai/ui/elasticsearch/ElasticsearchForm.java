@@ -3,7 +3,6 @@ package org.safehaus.subutai.ui.elasticsearch;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-
 import org.safehaus.subutai.ui.elasticsearch.manager.Manager;
 import org.safehaus.subutai.ui.elasticsearch.wizard.Wizard;
 

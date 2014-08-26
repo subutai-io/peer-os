@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface HiveQuery extends ApiBase<Config> {
-    public boolean save(Config config);
+	public boolean save(Config config);
 
-    public boolean save(String name, String query, String description);
+	public boolean save(String name, String query, String description);
 
-    public UUID run(String hostname, String query);
+	public UUID run(String hostname, String query);
 
-    public List<Config> load();
+	public List<Config> load();
 
-    public List<org.safehaus.subutai.api.hadoop.Config> getHadoopClusters();
+	public List<org.safehaus.subutai.api.hadoop.Config> getHadoopClusters();
 }

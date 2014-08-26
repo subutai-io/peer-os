@@ -11,46 +11,46 @@ import java.net.URL;
 
 class HttpPost {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpPost.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HttpPost.class);
 
-    private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
+	private static final String URL = "http://127.0.0.1:9200/_all/logs/_search";
 
-    static String execute(String params) throws IOException {
+	static String execute(String params) throws IOException {
 
-        HttpURLConnection connect = getConnect();
+		HttpURLConnection connect = getConnect();
 
-        writeParams(connect, params);
+		writeParams(connect, params);
 
-        return readResponse(connect);
-    }
+		return readResponse(connect);
+	}
 
-    private static String readResponse(HttpURLConnection connect) throws IOException {
+	private static HttpURLConnection getConnect() throws IOException {
 
-        int responseCode = connect.getResponseCode();
-        LOG.info("responseCode: {}", responseCode);
+		URL url = new URL(URL);
 
-        return responseCode == HttpURLConnection.HTTP_OK
-                ? IOUtils.toString(connect.getInputStream(), "UTF-8")
-                : "";
-    }
+		HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+		connect.setRequestMethod("POST");
+		connect.setDoOutput(true);
 
-    private static void writeParams(HttpURLConnection connect, String params) throws IOException {
+		return connect;
+	}
 
-        DataOutputStream outputStream = new DataOutputStream(connect.getOutputStream());
-        outputStream.writeBytes(params);
-        outputStream.flush();
-        outputStream.close();
-    }
+	private static void writeParams(HttpURLConnection connect, String params) throws IOException {
 
-    private static HttpURLConnection getConnect() throws IOException {
+		DataOutputStream outputStream = new DataOutputStream(connect.getOutputStream());
+		outputStream.writeBytes(params);
+		outputStream.flush();
+		outputStream.close();
+	}
 
-        URL url = new URL(URL);
+	private static String readResponse(HttpURLConnection connect) throws IOException {
 
-        HttpURLConnection connect = (HttpURLConnection) url.openConnection();
-        connect.setRequestMethod("POST");
-        connect.setDoOutput(true);
+		int responseCode = connect.getResponseCode();
+		LOG.info("responseCode: {}", responseCode);
 
-        return connect;
-    }
+		return responseCode == HttpURLConnection.HTTP_OK
+				? IOUtils.toString(connect.getInputStream(), "UTF-8")
+				: "";
+	}
 
 }

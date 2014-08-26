@@ -132,18 +132,8 @@ public class AddNodeWindow extends Window {
 		setContent(content);
 	}
 
-	@Override
-	public void close() {
-		super.close();
-		track = false;
-	}
-
 	private void showProgress() {
 		indicator.setVisible(true);
-	}
-
-	private void hideProgress() {
-		indicator.setVisible(false);
 	}
 
 	private void setOutput(String output) {
@@ -151,6 +141,16 @@ public class AddNodeWindow extends Window {
 			outputTxtArea.setValue(output);
 			outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
 		}
+	}
+
+	private void hideProgress() {
+		indicator.setVisible(false);
+	}
+
+	@Override
+	public void close() {
+		super.close();
+		track = false;
 	}
 
 }

@@ -54,39 +54,6 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 		// for now, script is run in background
 	}
 
-
-	@Override
-	public boolean cloneDestroy(String hostName, String cloneName) {
-		Agent a = agentManager.getAgentByHostname(hostName);
-		return scriptExecutor.execute(a, ActionType.DESTROY, cloneName);
-	}
-
-
-	public boolean clonesDestroy(String hostName, Set<String> cloneNames) {
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(hostName), "Host server name is null or empty");
-		Preconditions.checkArgument(cloneNames != null && !cloneNames.isEmpty(), "Clone names is null or empty");
-
-		Agent a = agentManager.getAgentByHostname(hostName);
-
-		StringBuilder cmdBuilder = new StringBuilder();
-
-		int i = 0;
-		for (String cloneName : cloneNames) {
-
-			cmdBuilder.append("/usr/bin/subutai destroy ").append(cloneName);
-			if (++i < cloneNames.size()) {
-				cmdBuilder.append(" & ");
-			}
-		}
-
-		Command cmd = getCommandRunner()
-				.createCommand(new RequestBuilder(cmdBuilder.toString()).withTimeout(180), Sets.newHashSet(a));
-		getCommandRunner().runCommand(cmd);
-
-		return cmd.hasSucceeded();
-	}
-
-
 	public boolean clone(String hostName, String templateName, Set<String> cloneNames) {
 		Agent a = agentManager.getAgentByHostname(hostName);
 		List<Template> parents = templateRegistry.getParentTemplates(templateName);
@@ -115,6 +82,35 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 		return result;
 	}
 
+	@Override
+	public boolean cloneDestroy(String hostName, String cloneName) {
+		Agent a = agentManager.getAgentByHostname(hostName);
+		return scriptExecutor.execute(a, ActionType.DESTROY, cloneName);
+	}
+
+	public boolean clonesDestroy(String hostName, Set<String> cloneNames) {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(hostName), "Host server name is null or empty");
+		Preconditions.checkArgument(cloneNames != null && !cloneNames.isEmpty(), "Clone names is null or empty");
+
+		Agent a = agentManager.getAgentByHostname(hostName);
+
+		StringBuilder cmdBuilder = new StringBuilder();
+
+		int i = 0;
+		for (String cloneName : cloneNames) {
+
+			cmdBuilder.append("/usr/bin/subutai destroy ").append(cloneName);
+			if (++i < cloneNames.size()) {
+				cmdBuilder.append(" & ");
+			}
+		}
+
+		Command cmd = getCommandRunner()
+				.createCommand(new RequestBuilder(cmdBuilder.toString()).withTimeout(180), Sets.newHashSet(a));
+		getCommandRunner().runCommand(cmd);
+
+		return cmd.hasSucceeded();
+	}
 
 	@Override
 	public boolean cloneRename(String hostName, String oldName, String newName) {

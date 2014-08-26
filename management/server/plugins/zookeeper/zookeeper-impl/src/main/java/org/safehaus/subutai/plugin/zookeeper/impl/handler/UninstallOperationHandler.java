@@ -41,7 +41,10 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
-
+        //@todo may be we should always just uninstall ZK or check always it there are any other subutai packages
+        // installed on the same nodes
+        //because environment supplied initially could contain other products or other products might've been
+        // installed later
         if ( config.getSetupType() == SetupType.STANDALONE ) {
             po.addLog( "Destroying lxc containers" );
             try {
@@ -55,7 +58,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
             po.addLog( "Deleting cluster information from database..." );
 
             try {
-                manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
                 po.addLogDone( "Cluster information deleted from database" );
             }
             catch ( DBException e ) {
@@ -65,7 +68,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
         }
         else {
             //just uninstall nodes
-            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_KEY ) );
+            po.addLog( String.format( "Uninstalling %s", ZookeeperClusterConfig.PRODUCT_NAME ) );
 
             Command uninstallCommand = Commands.getUninstallCommand( config.getNodes() );
 
@@ -81,7 +84,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<Zookeepe
                 po.addLog( "Deleting cluster information from database..." );
 
                 try {
-                    manager.getDbManager().deleteInfo2( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
+                    manager.getPluginDAO().deleteInfo( ZookeeperClusterConfig.PRODUCT_KEY, config.getClusterName() );
                     po.addLogDone( "Cluster information deleted from database" );
                 }
                 catch ( DBException e ) {

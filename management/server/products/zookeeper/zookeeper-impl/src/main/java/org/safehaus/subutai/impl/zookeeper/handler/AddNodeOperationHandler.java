@@ -1,11 +1,8 @@
 package org.safehaus.subutai.impl.zookeeper.handler;
 
 
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
@@ -21,189 +18,181 @@ import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
  * Adds ne node to ZK cluster. Install over a newly created lxc or over an existing hadoop cluster node
  */
 public class AddNodeOperationHandler extends AbstractOperationHandler<ZookeeperImpl> {
-    private final ProductOperation po;
-    private String lxcHostname;
+	private final ProductOperation po;
+	private String lxcHostname;
 
 
-    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName ) {
-        super( manager, clusterName );
-        po = manager.getTracker()
-                    .createProductOperation( Config.PRODUCT_KEY, String.format( "Adding node to %s", clusterName ) );
-    }
+	public AddNodeOperationHandler(ZookeeperImpl manager, String clusterName) {
+		super(manager, clusterName);
+		po = manager.getTracker()
+				.createProductOperation(Config.PRODUCT_KEY, String.format("Adding node to %s", clusterName));
+	}
 
 
-    public AddNodeOperationHandler( ZookeeperImpl manager, String clusterName, String lxcHostname ) {
-        super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
-        po = manager.getTracker()
-                    .createProductOperation( Config.PRODUCT_KEY, String.format( "Adding node to %s", clusterName ) );
-    }
+	public AddNodeOperationHandler(ZookeeperImpl manager, String clusterName, String lxcHostname) {
+		super(manager, clusterName);
+		this.lxcHostname = lxcHostname;
+		po = manager.getTracker()
+				.createProductOperation(Config.PRODUCT_KEY, String.format("Adding node to %s", clusterName));
+	}
 
 
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
+	@Override
+	public UUID getTrackerId() {
+		return po.getId();
+	}
 
 
-    @Override
-    public void run() {
-        final Config config = manager.getCluster( clusterName );
-        if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-            return;
-        }
+	@Override
+	public void run() {
+		final Config config = manager.getCluster(clusterName);
+		if (config == null) {
+			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+			return;
+		}
 
-        if ( config.isStandalone() ) {
-            addStandalone( config );
-        }
-        else {
-            if ( Strings.isNullOrEmpty( lxcHostname ) ) {
-                po.addLogFailed( "Lxc hostname to install ZK is not specified" );
-                return;
-            }
-            addOverHadoop( config );
-        }
-    }
+		if (config.isStandalone()) {
+			addStandalone(config);
+		} else {
+			if (Strings.isNullOrEmpty(lxcHostname)) {
+				po.addLogFailed("Lxc hostname to install ZK is not specified");
+				return;
+			}
+			addOverHadoop(config);
+		}
+	}
 
+	private void addStandalone(final Config config) {
+		try {
 
-    private void addOverHadoop( final Config config ) {
+			//create lxc
+			po.addLog("Creating lxc container...");
 
-        po.addLog( "Installing over a hadoop cluster node..." );
+			Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs(1);
 
-        //check if node agent is connected
-        Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( lxcAgent == null ) {
-            po.addLogFailed( String.format( "Node %s is not connected", lxcHostname ) );
-            return;
-        }
+			Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
 
-        if ( config.getNodes().contains( lxcAgent ) ) {
-            po.addLogFailed(
-                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
-            return;
-        }
-
-        po.addLog( "Checking prerequisites..." );
-
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Util.wrapAgentToSet( lxcAgent ) );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
-
-        if ( !checkInstalledCommand.hasCompleted() ) {
-            po.addLogFailed( "Failed to check presence of installed subutai packages" );
-            return;
-        }
-
-        AgentResult result = checkInstalledCommand.getResults().get( lxcAgent.getUuid() );
-
-        if ( result.getStdOut().contains( "ksks-zookeeper" ) ) {
-            po.addLogFailed( String.format( "Node %s already has Zookeeper installed", lxcHostname ) );
-            return;
-        }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation", lxcHostname ) );
-            return;
-        }
-
-        reconfigureCluster( lxcAgent, config );
-    }
+			po.addLog("Lxc container created successfully\nRegistering hostnames in /etc/hosts...");
 
 
-    private void reconfigureCluster( final Agent lxcAgent, final Config config ) {
-
-        po.addLog( "Installing Zookeeper..." );
-
-        //install
-        Command installCommand = Commands.getInstallCommand( Util.wrapAgentToSet( lxcAgent ) );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasCompleted() ) {
-            po.addLog( "Installation succeeded\nReconfiguring cluster..." );
-
-            config.getNodes().add( lxcAgent );
-
-            //update settings
-            Command updateSettingsCommand = Commands.getUpdateSettingsCommand( config.getNodes() );
-            manager.getCommandRunner().runCommand( updateSettingsCommand );
-
-            if ( updateSettingsCommand.hasSucceeded() ) {
-                po.addLog( "Cluster reconfigured\nRestarting cluster..." );
-                //restart all nodes
-                Command restartCommand = Commands.getRestartCommand( config.getNodes() );
-                final AtomicInteger count = new AtomicInteger();
-                manager.getCommandRunner().runCommand( restartCommand, new CommandCallback() {
-                    @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                        if ( agentResult.getStdOut().contains( "STARTED" ) ) {
-                            if ( count.incrementAndGet() == config.getNodes().size() ) {
-                                stop();
-                            }
-                        }
-                    }
-                } );
-                if ( count.get() == config.getNodes().size() ) {
-                    po.addLog( "Cluster restarted successfully" );
-                }
-                else {
-                    po.addLog( String.format( "Failed to restart cluster, %s, skipping...",
-                            restartCommand.getAllErrors() ) );
-                }
-
-                po.addLog( "Updating information in database..." );
-
-                try {
-                    manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
-
-                    po.addLogDone( "Information in database updated successfully" );
-                }
-                catch ( DBException e ) {
-                    po.addLogFailed( String.format( "Failed to update information in database, %s", e.getMessage() ) );
-                }
-            }
-            else {
-                po.addLogFailed(
-                        String.format( "Failed to reconfigure cluster, %s", updateSettingsCommand.getAllErrors() ) );
-            }
-        }
-        else {
-            po.addLogFailed( String.format( "Installation failed, %s\nUse Terminal/LXC Module to cleanup",
-                    installCommand.getAllErrors() ) );
-        }
-    }
+			if (!manager.getNetworkManager().configHostsOnAgents(Lists.newArrayList(config.getNodes()), lxcAgent,
+					Common.DEFAULT_DOMAIN_NAME)) {
+				po.addLogFailed("Failed to register hostnames");
+				return;
+			}
 
 
-    private void addStandalone( final Config config ) {
-        try {
+			reconfigureCluster(lxcAgent, config);
+		} catch (LxcCreateException ex) {
+			po.addLogFailed(ex.getMessage());
+		}
+	}
 
-            //create lxc
-            po.addLog( "Creating lxc container..." );
+	private void addOverHadoop(final Config config) {
 
-            Map<Agent, Set<Agent>> lxcAgentsMap = manager.getLxcManager().createLxcs( 1 );
+		po.addLog("Installing over a hadoop cluster node...");
 
-            Agent lxcAgent = lxcAgentsMap.entrySet().iterator().next().getValue().iterator().next();
+		//check if node agent is connected
+		Agent lxcAgent = manager.getAgentManager().getAgentByHostname(lxcHostname);
+		if (lxcAgent == null) {
+			po.addLogFailed(String.format("Node %s is not connected", lxcHostname));
+			return;
+		}
 
-            po.addLog( "Lxc container created successfully\nRegistering hostnames in /etc/hosts..." );
+		if (config.getNodes().contains(lxcAgent)) {
+			po.addLogFailed(
+					String.format("Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName));
+			return;
+		}
 
+		po.addLog("Checking prerequisites...");
 
-            if ( !manager.getNetworkManager().configHostsOnAgents( Lists.newArrayList( config.getNodes() ), lxcAgent,
-                    Common.DEFAULT_DOMAIN_NAME ) ) {
-                po.addLogFailed( "Failed to register hostnames" );
-                return;
-            }
+		Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(lxcAgent));
+		manager.getCommandRunner().runCommand(checkInstalledCommand);
 
+		if (!checkInstalledCommand.hasCompleted()) {
+			po.addLogFailed("Failed to check presence of installed subutai packages");
+			return;
+		}
 
-            reconfigureCluster( lxcAgent, config );
-        }
-        catch ( LxcCreateException ex ) {
-            po.addLogFailed( ex.getMessage() );
-        }
-    }
+		AgentResult result = checkInstalledCommand.getResults().get(lxcAgent.getUuid());
+
+		if (result.getStdOut().contains("ksks-zookeeper")) {
+			po.addLogFailed(String.format("Node %s already has Zookeeper installed", lxcHostname));
+			return;
+		} else if (!result.getStdOut().contains("ksks-hadoop")) {
+			po.addLogFailed(String.format("Node %s has no Hadoop installation", lxcHostname));
+			return;
+		}
+
+		reconfigureCluster(lxcAgent, config);
+	}
+
+	private void reconfigureCluster(final Agent lxcAgent, final Config config) {
+
+		po.addLog("Installing Zookeeper...");
+
+		//install
+		Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+		manager.getCommandRunner().runCommand(installCommand);
+
+		if (installCommand.hasCompleted()) {
+			po.addLog("Installation succeeded\nReconfiguring cluster...");
+
+			config.getNodes().add(lxcAgent);
+
+			//update settings
+			Command updateSettingsCommand = Commands.getUpdateSettingsCommand(config.getNodes());
+			manager.getCommandRunner().runCommand(updateSettingsCommand);
+
+			if (updateSettingsCommand.hasSucceeded()) {
+				po.addLog("Cluster reconfigured\nRestarting cluster...");
+				//restart all nodes
+				Command restartCommand = Commands.getRestartCommand(config.getNodes());
+				final AtomicInteger count = new AtomicInteger();
+				manager.getCommandRunner().runCommand(restartCommand, new CommandCallback() {
+					@Override
+					public void onResponse(Response response, AgentResult agentResult, Command command) {
+						if (agentResult.getStdOut().contains("STARTED")) {
+							if (count.incrementAndGet() == config.getNodes().size()) {
+								stop();
+							}
+						}
+					}
+				});
+				if (count.get() == config.getNodes().size()) {
+					po.addLog("Cluster restarted successfully");
+				} else {
+					po.addLog(String.format("Failed to restart cluster, %s, skipping...",
+							restartCommand.getAllErrors()));
+				}
+
+				po.addLog("Updating information in database...");
+
+				try {
+					manager.getDbManager().saveInfo2(Config.PRODUCT_KEY, clusterName, config);
+
+					po.addLogDone("Information in database updated successfully");
+				} catch (DBException e) {
+					po.addLogFailed(String.format("Failed to update information in database, %s", e.getMessage()));
+				}
+			} else {
+				po.addLogFailed(
+						String.format("Failed to reconfigure cluster, %s", updateSettingsCommand.getAllErrors()));
+			}
+		} else {
+			po.addLogFailed(String.format("Installation failed, %s\nUse Terminal/LXC Module to cleanup",
+					installCommand.getAllErrors()));
+		}
+	}
 }

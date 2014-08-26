@@ -26,105 +26,105 @@
 -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://lucene.apache.org/nutch"
-  xmlns="http://lucene.apache.org/nutch"
-  elementFormDefault="qualified">
+           targetNamespace="http://lucene.apache.org/nutch"
+           xmlns="http://lucene.apache.org/nutch"
+           elementFormDefault="qualified">
 
-  <xs:element name="domains">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="tlds">
-          <xs:complexType>
+    <xs:element name="domains">
+        <xs:complexType>
             <xs:sequence>
-              <xs:element name="itlds">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="tld" maxOccurs="unbounded"
-                      type="gtld" />
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
+                <xs:element name="tlds">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="itlds">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="tld" maxOccurs="unbounded"
+                                                    type="gtld"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
 
-              <xs:element name="gtlds">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="tld" maxOccurs="unbounded"
-                      type="gtld" />
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
+                            <xs:element name="gtlds">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="tld" maxOccurs="unbounded"
+                                                    type="gtld"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
 
-              <xs:element name="cctlds">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="tld" maxOccurs="unbounded"
-                      type="cctld" />
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
+                            <xs:element name="cctlds">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="tld" maxOccurs="unbounded"
+                                                    type="cctld"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
 
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="suffixes">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="suffix" maxOccurs="unbounded"
+                                        type="sldType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
             </xs:sequence>
-          </xs:complexType>
-        </xs:element>
+        </xs:complexType>
+    </xs:element>
 
-        <xs:element name="suffixes">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="suffix" maxOccurs="unbounded"
-                type="sldType" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
+    <xs:complexType name="gtld">
+        <xs:sequence>
+            <xs:element name="status" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="INFRASTRUCTURE"/>
+                        <xs:enumeration value="SPONSORED"/>
+                        <xs:enumeration value="UNSPONSORED"/>
+                        <xs:enumeration value="STARTUP"/>
+                        <xs:enumeration value="PROPOSED"/>
+                        <xs:enumeration value="DELETED"/>
+                        <xs:enumeration value="PSEUDO_DOMAIN"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="boost" type="xs:float" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="domain" type="xs:string"/>
     </xs:complexType>
-  </xs:element>
 
-  <xs:complexType name="gtld">
-    <xs:sequence>
-      <xs:element name="status" minOccurs="0">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="INFRASTRUCTURE" />
-            <xs:enumeration value="SPONSORED" />
-            <xs:enumeration value="UNSPONSORED" />
-            <xs:enumeration value="STARTUP" />
-            <xs:enumeration value="PROPOSED" />
-            <xs:enumeration value="DELETED" />
-            <xs:enumeration value="PSEUDO_DOMAIN" />
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:element>
-      <xs:element name="boost" type="xs:float" minOccurs="0" />
-      <xs:element name="description" type="xs:string" minOccurs="0" />
-    </xs:sequence>
-    <xs:attribute name="domain" type="xs:string" />
-  </xs:complexType>
+    <xs:complexType name="cctld">
+        <xs:sequence>
+            <xs:element name="country" type="xs:string"/>
+            <xs:element name="status" type="statusType" minOccurs="0"/>
+            <xs:element name="boost" type="xs:float" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="domain" type="xs:string"/>
+    </xs:complexType>
 
-  <xs:complexType name="cctld">
-    <xs:sequence>
-      <xs:element name="country" type="xs:string" />
-      <xs:element name="status" type="statusType" minOccurs="0" />
-      <xs:element name="boost" type="xs:float" minOccurs="0" />
-      <xs:element name="description" type="xs:string" minOccurs="0" />
-    </xs:sequence>
-    <xs:attribute name="domain" type="xs:string" />
-  </xs:complexType>
+    <xs:complexType name="sldType">
+        <xs:sequence>
+            <xs:element name="status" type="statusType" minOccurs="0"/>
+            <xs:element name="boost" type="xs:float" minOccurs="0"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="domain" type="xs:string"/>
+    </xs:complexType>
 
-  <xs:complexType name="sldType">
-    <xs:sequence>
-      <xs:element name="status" type="statusType" minOccurs="0" />
-      <xs:element name="boost" type="xs:float" minOccurs="0" />
-      <xs:element name="description" type="xs:string" minOccurs="0" />
-    </xs:sequence>
-    <xs:attribute name="domain" type="xs:string" />
-  </xs:complexType>
-
-  <xs:simpleType name="statusType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="IN_USE" />
-      <xs:enumeration value="NOT_IN_USE" />
-      <xs:enumeration value="DELETED" />
-    </xs:restriction>
-  </xs:simpleType>
+    <xs:simpleType name="statusType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="IN_USE"/>
+            <xs:enumeration value="NOT_IN_USE"/>
+            <xs:enumeration value="DELETED"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

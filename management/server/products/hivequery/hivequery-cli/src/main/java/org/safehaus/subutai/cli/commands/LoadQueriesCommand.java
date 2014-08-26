@@ -11,24 +11,24 @@ import java.util.List;
 /**
  * Displays the last log entries
  */
-@Command(scope = "hivequery", name = "load-query", description = "Loads hive queries from db")
+@Command (scope = "hivequery", name = "load-query", description = "Loads hive queries from db")
 public class LoadQueriesCommand extends OsgiCommandSupport {
-    private HiveQuery manager;
+	private HiveQuery manager;
 
-    public HiveQuery getManager() {
-        return manager;
-    }
+	public HiveQuery getManager() {
+		return manager;
+	}
 
-    public void setManager(HiveQuery manager) {
-        this.manager = manager;
-    }
+	public void setManager(HiveQuery manager) {
+		this.manager = manager;
+	}
 
-    protected Object doExecute() throws Exception {
-        List<Config> list = manager.load();
-        for (Config query : list) {
-            System.out.println(query);
-        }
+	protected Object doExecute() throws Exception {
+		List<Config> list = manager.load();
+		for (Config query : list) {
+			System.out.println(query);
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

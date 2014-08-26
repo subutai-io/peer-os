@@ -14,37 +14,37 @@ import static junit.framework.Assert.assertTrue;
 
 public class UninstallOperationHandlerTest {
 
-    @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( new SolrImplMock(), "test-cluster" );
+	@Test
+	public void testWithoutCluster() {
+		AbstractOperationHandler operationHandler = new UninstallOperationHandler(new SolrImplMock(), "test-cluster");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "test-cluster" ) );
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("test-cluster"));
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not exist"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 
-    @Test
-    public void testClusterDeletionSuccess() {
-        AbstractOperationHandler operationHandler = MockBuilder.getUninstallOperationWithResult( true );
+	@Test
+	public void testClusterDeletionSuccess() {
+		AbstractOperationHandler operationHandler = MockBuilder.getUninstallOperationWithResult(true);
 
-        operationHandler.run();
+		operationHandler.run();
 
 //        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation info deleted" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED );
-    }
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED);
+	}
 
 
-    @Test
-    @Ignore
-    public void testClusterDeletionFail() {
-        AbstractOperationHandler operationHandler = MockBuilder.getUninstallOperationWithResult( false );
+	@Test
+	@Ignore
+	public void testClusterDeletionFail() {
+		AbstractOperationHandler operationHandler = MockBuilder.getUninstallOperationWithResult(false);
 
-        operationHandler.run();
+		operationHandler.run();
 
 //        assertTrue( operationHandler.getProductOperation().getLog().contains( "Error while deleting installation" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 }

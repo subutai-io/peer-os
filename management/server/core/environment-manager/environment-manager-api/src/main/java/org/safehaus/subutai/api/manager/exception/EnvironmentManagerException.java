@@ -6,23 +6,23 @@ package org.safehaus.subutai.api.manager.exception;
  */
 public class EnvironmentManagerException extends Exception {
 
-    private String message;
+	private String message;
 
 
-    public EnvironmentManagerException( String message ) {
-        super( message );
-        this.message = message;
-    }
+	public EnvironmentManagerException(String message) {
+		super(message);
+		this.message = message;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
 
-    @Override
-    public String toString() {
-        return "EnvironmentManagerException{" +
-                "message='" + message + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "EnvironmentManagerException{" +
+				"message='" + message + '\'' +
+				'}';
+	}
 }

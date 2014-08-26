@@ -6,5 +6,5 @@ package org.safehaus.subutai.ui.accumulo.manager;
  */
 public interface CompleteEvent {
 
-    public void onComplete( String status );
+	public void onComplete(String status);
 }

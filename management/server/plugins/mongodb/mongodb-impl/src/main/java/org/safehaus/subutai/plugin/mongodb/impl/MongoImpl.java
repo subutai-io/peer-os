@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.mongodb.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -14,10 +15,12 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
@@ -37,33 +40,48 @@ import org.safehaus.subutai.shared.protocol.NodeGroup;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
 /**
  * Implementation of Mongo interface. Implements all backend logic for mongo cluster management
  */
+
 public class MongoImpl implements Mongo {
 
     private CommandRunner commandRunner;
     private AgentManager agentManager;
-    private DbManager dbManager;
     private Tracker tracker;
     private ContainerManager containerManager;
     private EnvironmentManager environmentManager;
     private ExecutorService executor;
+    private PluginDAO pluginDAO;
 
 
     public MongoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
                       ContainerManager containerManager, EnvironmentManager environmentManager ) {
+
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+        Preconditions.checkNotNull( containerManager, "Container manager is null" );
+        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
+
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
-        this.dbManager = dbManager;
         this.tracker = tracker;
         this.containerManager = containerManager;
         this.environmentManager = environmentManager;
+        this.pluginDAO = new PluginDAO( dbManager );
 
         Commands.init( commandRunner );
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
     }
 
 
@@ -84,11 +102,6 @@ public class MongoImpl implements Mongo {
 
     public AgentManager getAgentManager() {
         return agentManager;
-    }
-
-
-    public DbManager getDbManager() {
-        return dbManager;
     }
 
 
@@ -119,17 +132,9 @@ public class MongoImpl implements Mongo {
     }
 
 
-    public UUID addNode( final String clusterName, final NodeType nodeType ) {
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, nodeType );
-
-        executor.execute( operationHandler );
-
-        return operationHandler.getTrackerId();
-    }
-
-
     public UUID uninstallCluster( final String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
@@ -139,7 +144,47 @@ public class MongoImpl implements Mongo {
     }
 
 
+    public List<MongoClusterConfig> getClusters() {
+
+        try {
+            return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
+    }
+
+
+    @Override
+    public MongoClusterConfig getCluster( String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
+        try {
+            return pluginDAO.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return null;
+        }
+    }
+
+
+    public UUID addNode( final String clusterName, final NodeType nodeType ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkNotNull( nodeType, "Node type is null" );
+
+
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, nodeType );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
     public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
 
@@ -149,19 +194,10 @@ public class MongoImpl implements Mongo {
     }
 
 
-    public List<MongoClusterConfig> getClusters() {
-
-        return dbManager.getInfo( MongoClusterConfig.PRODUCT_KEY, MongoClusterConfig.class );
-    }
-
-
-    @Override
-    public MongoClusterConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( MongoClusterConfig.PRODUCT_KEY, clusterName, MongoClusterConfig.class );
-    }
-
-
     public UUID startNode( final String clusterName, final String lxcHostname ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new StartNodeOperationHandler( this, clusterName, lxcHostname );
 
@@ -172,6 +208,9 @@ public class MongoImpl implements Mongo {
 
 
     public UUID stopNode( final String clusterName, final String lxcHostname ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new StopNodeOperationHandler( this, clusterName, lxcHostname );
 
@@ -182,6 +221,9 @@ public class MongoImpl implements Mongo {
 
 
     public UUID checkNode( final String clusterName, final String lxcHostname ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
+
 
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( this, clusterName, lxcHostname );
 
@@ -194,12 +236,18 @@ public class MongoImpl implements Mongo {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MongoClusterConfig config,
                                                          final ProductOperation po ) {
+        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( config, "Mongo cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation is null" );
+
         return new MongoDbSetupStrategy( environment, config, po, this );
     }
 
 
     @Override
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MongoClusterConfig config ) {
+        Preconditions.checkNotNull( config, "Mongo cluster config is null" );
+
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", MongoClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );

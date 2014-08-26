@@ -15,30 +15,30 @@ import com.google.common.base.Preconditions;
  */
 public class CacheEntryWithExpiryCallback<ValueType> extends CacheEntry<ValueType> {
 
-    /**
-     * callback to trigger when entry expires
-     */
-    private final EntryExpiryCallback<ValueType> expiryCallback;
+	/**
+	 * callback to trigger when entry expires
+	 */
+	private final EntryExpiryCallback<ValueType> expiryCallback;
 
 
-    /**
-     * Initialized the {@code CacheEntryWithExpiryCallback}
-     *
-     * @param value - entry value
-     * @param ttlMs - entry ttl in milliseconds
-     * @param expiryCallback -- callback to trigger when entry expires
-     */
-    public CacheEntryWithExpiryCallback( ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback ) {
-        super( value, ttlMs );
-        Preconditions.checkNotNull( expiryCallback, "Callback is null" );
-        this.expiryCallback = expiryCallback;
-    }
+	/**
+	 * Initialized the {@code CacheEntryWithExpiryCallback}
+	 *
+	 * @param value          - entry value
+	 * @param ttlMs          - entry ttl in milliseconds
+	 * @param expiryCallback -- callback to trigger when entry expires
+	 */
+	public CacheEntryWithExpiryCallback(ValueType value, long ttlMs, EntryExpiryCallback<ValueType> expiryCallback) {
+		super(value, ttlMs);
+		Preconditions.checkNotNull(expiryCallback, "Callback is null");
+		this.expiryCallback = expiryCallback;
+	}
 
 
-    /**
-     * triggers the entry expiry callback
-     */
-    public void callExpiryCallback() {
-        expiryCallback.onEntryExpiry( super.getValue() );
-    }
+	/**
+	 * triggers the entry expiry callback
+	 */
+	public void callExpiryCallback() {
+		expiryCallback.onEntryExpiry(super.getValue());
+	}
 }

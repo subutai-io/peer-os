@@ -20,6 +20,13 @@
         <module>accumulo</module>
         <module>hadoop</module>
         <module>presto</module>
+        <module>solr</module>
+        <module>spark</module>
+        <module>shark</module>
+        <module>cassandra</module>
+        <module>hbase</module>
+        <module>oozie</module>
+        <module>mahout</module>
     </modules>
 
 </project>

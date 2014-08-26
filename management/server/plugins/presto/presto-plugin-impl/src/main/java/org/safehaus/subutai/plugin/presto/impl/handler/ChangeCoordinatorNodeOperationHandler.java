@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -24,7 +24,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 	public ChangeCoordinatorNodeOperationHandler(PrestoImpl manager, String clusterName, String newCoordinatorHostname) {
 		super(manager, clusterName);
 		this.newCoordinatorHostname = newCoordinatorHostname;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		po = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
 				String.format("Changing coordinator to %s in %s", newCoordinatorHostname, clusterName));
 	}
 
@@ -35,7 +35,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
 	@Override
 	public void run() {
-		final Config config = manager.getCluster(clusterName);
+		final PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 			return;
@@ -114,7 +114,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
 				po.addLog("Updating db...");
 				//update db
-				if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, clusterName, config)) {
+				if (manager.getDbManager().saveInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, config)) {
 					po.addLogDone("Cluster info updated in DB\nDone");
 				} else {
 					po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");

@@ -45,7 +45,7 @@ function handleTooltip(event, pos, item) {
 function createYLabel(chart) {
     var yaxisLabel = $("<div></div>")
         .text("$yTitle")
-        .appendTo(chart );
+        .appendTo(chart);
 
     yaxisLabel.css({
         "position": "absolute",
@@ -70,7 +70,9 @@ function createYLabel(chart) {
 var chart = $("#chart");
 
 var plot = $.plot(chart,
-    [ { data: $data, label: "$label" } ],
+    [
+        { data: $data, label: "$label" }
+    ],
     {
         xaxis: {
             mode: "time",

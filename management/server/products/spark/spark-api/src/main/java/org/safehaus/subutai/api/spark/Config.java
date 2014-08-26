@@ -16,56 +16,56 @@ import java.util.Set;
  */
 public class Config implements ConfigBase {
 
-    public static final String PRODUCT_KEY = "Spark";
-    private String clusterName = "";
+	public static final String PRODUCT_KEY = "Spark";
+	private String clusterName = "";
 
-    private Agent masterNode;
-    private Set<Agent> slaves;
+	private Agent masterNode;
+	private Set<Agent> slaves;
 
-    public Agent getMasterNode() {
-        return masterNode;
-    }
+	public Agent getMasterNode() {
+		return masterNode;
+	}
 
-    public void setMasterNode(Agent masterNode) {
-        this.masterNode = masterNode;
-    }
+	public void setMasterNode(Agent masterNode) {
+		this.masterNode = masterNode;
+	}
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
-    }
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
 
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
+	@Override
+	public String getProductName() {
+		return PRODUCT_KEY;
+	}
 
-    public Set<Agent> getSlaveNodes() {
-        return slaves;
-    }
+	public Set<Agent> getSlaveNodes() {
+		return slaves;
+	}
 
-    public void setSlaveNodes(Set<Agent> slaves) {
-        this.slaves = slaves;
-    }
+	public void setSlaveNodes(Set<Agent> slaves) {
+		this.slaves = slaves;
+	}
 
-    public Set<Agent> getAllNodes() {
-        Set<Agent> allNodes = new HashSet<Agent>();
-        if (slaves != null) {
-            allNodes.addAll(slaves);
-        }
-        if (masterNode != null) {
-            allNodes.add(masterNode);
-        }
+	public Set<Agent> getAllNodes() {
+		Set<Agent> allNodes = new HashSet<Agent>();
+		if (slaves != null) {
+			allNodes.addAll(slaves);
+		}
+		if (masterNode != null) {
+			allNodes.add(masterNode);
+		}
 
-        return allNodes;
-    }
+		return allNodes;
+	}
 
-    @Override
-    public String toString() {
-        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
-    }
+	@Override
+	public String toString() {
+		return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
+	}
 
 }

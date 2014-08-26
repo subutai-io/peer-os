@@ -11,41 +11,41 @@ package org.safehaus.subutai.impl.dbmanager;
  */
 public class MyPojo {
 
-    private final String content;
+	private final String content;
 
 
-    public MyPojo( String test ) {
-        this.content = test;
-    }
+	public MyPojo(String test) {
+		this.content = test;
+	}
 
 
-    @Override
-    public int hashCode() {
-        return 5;
-    }
+	@Override
+	public int hashCode() {
+		return 5;
+	}
 
 
-    @Override
-    public boolean equals( Object obj ) {
-        if ( obj == null ) {
-            return false;
-        }
-        if ( getClass() != obj.getClass() ) {
-            return false;
-        }
-        final MyPojo other = ( MyPojo ) obj;
-        return !( ( this.content == null ) ? ( other.getContent() != null ) :
-                  !this.content.equals( other.getContent() ) );
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final MyPojo other = (MyPojo) obj;
+		return !((this.content == null) ? (other.getContent() != null) :
+				!this.content.equals(other.getContent()));
+	}
 
 
-    public String getContent() {
-        return content;
-    }
+	public String getContent() {
+		return content;
+	}
 
 
-    @Override
-    public String toString() {
-        return "MyPojo{" + "content=" + content + '}';
-    }
+	@Override
+	public String toString() {
+		return "MyPojo{" + "content=" + content + '}';
+	}
 }

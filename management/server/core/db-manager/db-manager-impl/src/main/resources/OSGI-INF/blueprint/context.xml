@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+<blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+    <!-- Allow the use of system properties -->
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
 
-  <cm:property-placeholder persistent-id="CassConfig" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="cassandraHost" value="localhost" />
-      <cm:property name="cassandraPort" value="9042" />
-      <cm:property name="cassandraKeyspace" value="kiskis" />
-    </cm:default-properties>
-  </cm:property-placeholder>
+    <cm:property-placeholder persistent-id="CassConfig" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="cassandraHost" value="localhost"/>
+            <cm:property name="cassandraPort" value="9042"/>
+            <cm:property name="cassandraKeyspace" value="kiskis"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
 
-  <bean id="dbManager" class="org.safehaus.subutai.impl.dbmanager.DbManagerImpl"
-        init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
-    <property name="cassandraHost" value="${cassandraHost}" />
-    <property name="cassandraPort" value="${cassandraPort}" />
-    <property name="cassandraKeyspace" value="${cassandraKeyspace}" />
-  </bean>
-  <service ref="dbManager"
-           interface="org.safehaus.subutai.api.dbmanager.DbManager">
-    <service-properties>
-      <entry key="service.exported.interfaces" value="*" />
-    </service-properties>
-  </service>
+    <bean id="dbManager" class="org.safehaus.subutai.impl.dbmanager.DbManagerImpl"
+          init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
+        <property name="cassandraHost" value="${cassandraHost}"/>
+        <property name="cassandraPort" value="${cassandraPort}"/>
+        <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>
+    </bean>
+    <service ref="dbManager"
+             interface="org.safehaus.subutai.api.dbmanager.DbManager">
+        <service-properties>
+            <entry key="service.exported.interfaces" value="*"/>
+        </service-properties>
+    </service>
 </blueprint>

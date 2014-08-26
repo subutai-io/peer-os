@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,10 +22,10 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandStatus;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.common.UUIDUtil;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Request;
 import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -54,9 +55,9 @@ public class CommandImpl implements Command {
     //status of command
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
     //number of requests completed so far
-    private volatile int requestsCompleted = 0;
+    private AtomicInteger requestsCompleted = new AtomicInteger();
     //number of requests succeeded so far
-    private volatile int requestsSucceeded = 0;
+    private AtomicInteger requestsSucceeded = new AtomicInteger();
     //custom object assigned to this command
     private Object data;
     //indicates if this command is broadcast command
@@ -77,7 +78,7 @@ public class CommandImpl implements Command {
 
         this.description = null;
         this.broadcastCommand = true;
-        this.commandUUID = Util.generateTimeBasedUUID();
+        this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = requestsCount;
         this.timeout = requestBuilder.getTimeout();
 
@@ -99,7 +100,7 @@ public class CommandImpl implements Command {
         Preconditions.checkArgument( agents != null && !agents.isEmpty(), "Agents are null or empty" );
 
         this.description = description;
-        this.commandUUID = Util.generateTimeBasedUUID();
+        this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = agents.size();
         this.timeout = requestBuilder.getTimeout();
 
@@ -121,7 +122,7 @@ public class CommandImpl implements Command {
                 "Request Builders are null or empty" );
 
         this.description = description;
-        this.commandUUID = Util.generateTimeBasedUUID();
+        this.commandUUID = UUIDUtil.generateTimeBasedUUID();
         this.requestsCount = requestBuilders.size();
 
         int maxTimeout = 0;
@@ -282,7 +283,7 @@ public class CommandImpl implements Command {
      * Increments count of completed requests
      */
     public void incrementCompletedRequestsCount() {
-        requestsCompleted++;
+        requestsCompleted.incrementAndGet();
     }
 
 
@@ -290,7 +291,17 @@ public class CommandImpl implements Command {
      * Increments count of succeeded requests
      */
     public void incrementSucceededRequestsCount() {
-        requestsSucceeded++;
+        requestsSucceeded.incrementAndGet();
+    }
+
+
+    /**
+     * Returns number of requests completed so far
+     *
+     * @return - number of completed requests
+     */
+    public int getRequestsCompleted() {
+        return requestsCompleted.get();
     }
 
 
@@ -305,22 +316,12 @@ public class CommandImpl implements Command {
 
 
     /**
-     * Returns number of requests completed so far
-     *
-     * @return - number of completed requests
-     */
-    public int getRequestsCompleted() {
-        return requestsCompleted;
-    }
-
-
-    /**
      * Returns number of requests succeeded so far
      *
      * @return - number of succeeded requests
      */
     public int getRequestsSucceeded() {
-        return requestsSucceeded;
+        return requestsSucceeded.get();
     }
 
 

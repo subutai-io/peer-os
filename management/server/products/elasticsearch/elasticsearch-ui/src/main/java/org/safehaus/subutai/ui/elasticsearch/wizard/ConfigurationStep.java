@@ -29,73 +29,73 @@ public class ConfigurationStep extends VerticalLayout {
 		});
 
 
-        ComboBox nodesCountCombo = new ComboBox("Number of nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        nodesCountCombo.setImmediate(true);
-        nodesCountCombo.setTextInputAllowed(false);
-        nodesCountCombo.setNullSelectionAllowed(false);
-        nodesCountCombo.setValue(wizard.getConfig());
+		ComboBox nodesCountCombo = new ComboBox("Number of nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		nodesCountCombo.setImmediate(true);
+		nodesCountCombo.setTextInputAllowed(false);
+		nodesCountCombo.setNullSelectionAllowed(false);
+		nodesCountCombo.setValue(wizard.getConfig());
 
-        nodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
-            }
-        });
-
-
-        ComboBox mastersCountCombo = new ComboBox("Number of master nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        mastersCountCombo.setImmediate( true );
-        mastersCountCombo.setTextInputAllowed( false );
-        mastersCountCombo.setNullSelectionAllowed( false );
-        mastersCountCombo.setValue( wizard.getConfig() );
-
-        mastersCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setNumberOfMasterNodes( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
-
-        ComboBox dataNodesCountCombo = new ComboBox("Number of data nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        dataNodesCountCombo.setImmediate( true );
-        dataNodesCountCombo.setTextInputAllowed( false );
-        dataNodesCountCombo.setNullSelectionAllowed( false );
-        dataNodesCountCombo.setValue( wizard.getConfig() );
-
-        dataNodesCountCombo.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setNumberOfDataNodes( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
+		nodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfNodes((Integer) event.getProperty().getValue());
+			}
+		});
 
 
-        ComboBox numberOfShardsCombo = new ComboBox("Number of shards:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        numberOfShardsCombo.setImmediate( true );
-        numberOfShardsCombo.setTextInputAllowed( false );
-        numberOfShardsCombo.setNullSelectionAllowed( false );
-        numberOfShardsCombo.setValue( wizard.getConfig() );
+		ComboBox mastersCountCombo = new ComboBox("Number of master nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		mastersCountCombo.setImmediate(true);
+		mastersCountCombo.setTextInputAllowed(false);
+		mastersCountCombo.setNullSelectionAllowed(false);
+		mastersCountCombo.setValue(wizard.getConfig());
 
-        numberOfShardsCombo.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setNumberOfShards( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
+		mastersCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfMasterNodes((Integer) event.getProperty().getValue());
+			}
+		});
+
+		ComboBox dataNodesCountCombo = new ComboBox("Number of data nodes:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		dataNodesCountCombo.setImmediate(true);
+		dataNodesCountCombo.setTextInputAllowed(false);
+		dataNodesCountCombo.setNullSelectionAllowed(false);
+		dataNodesCountCombo.setValue(wizard.getConfig());
+
+		dataNodesCountCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfDataNodes((Integer) event.getProperty().getValue());
+			}
+		});
 
 
-        ComboBox numberOfReplicasCombo = new ComboBox("Number of replicas:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-        numberOfReplicasCombo.setImmediate( true );
-        numberOfReplicasCombo.setTextInputAllowed( false );
-        numberOfReplicasCombo.setNullSelectionAllowed( false );
-        numberOfReplicasCombo.setValue( wizard.getConfig() );
+		ComboBox numberOfShardsCombo = new ComboBox("Number of shards:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		numberOfShardsCombo.setImmediate(true);
+		numberOfShardsCombo.setTextInputAllowed(false);
+		numberOfShardsCombo.setNullSelectionAllowed(false);
+		numberOfShardsCombo.setValue(wizard.getConfig());
 
-        numberOfReplicasCombo.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                wizard.getConfig().setNumberOfReplicas( ( Integer ) event.getProperty().getValue() );
-            }
-        } );
+		numberOfShardsCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfShards((Integer) event.getProperty().getValue());
+			}
+		});
+
+
+		ComboBox numberOfReplicasCombo = new ComboBox("Number of replicas:", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		numberOfReplicasCombo.setImmediate(true);
+		numberOfReplicasCombo.setTextInputAllowed(false);
+		numberOfReplicasCombo.setNullSelectionAllowed(false);
+		numberOfReplicasCombo.setValue(wizard.getConfig());
+
+		numberOfReplicasCombo.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				wizard.getConfig().setNumberOfReplicas((Integer) event.getProperty().getValue());
+			}
+		});
 
 		Button next = new Button("Next");
 		next.addStyleName("default");

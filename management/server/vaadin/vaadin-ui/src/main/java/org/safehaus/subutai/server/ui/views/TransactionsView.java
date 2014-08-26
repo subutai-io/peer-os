@@ -1,11 +1,11 @@
 /**
  * DISCLAIMER
- * 
+ *
  * The quality of the code is such that you should not copy any of it as best
  * practice how to build Vaadin applications.
- * 
+ *
  * @author jouni@vaadin.com
- * 
+ *
  */
 
 package org.safehaus.subutai.server.ui.views;
@@ -16,10 +16,10 @@ import com.vaadin.ui.VerticalLayout;
 
 public class TransactionsView extends VerticalLayout implements View {
 
-    @Override
-    public void enter(ViewChangeEvent event) {
+	@Override
+	public void enter(ViewChangeEvent event) {
 
-        setSizeFull();
-        addStyleName("transactions");
-    }
+		setSizeFull();
+		addStyleName("transactions");
+	}
 }
