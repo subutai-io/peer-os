@@ -14,21 +14,28 @@
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
   <reference id="configManager" availability="mandatory"
-             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>
+             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+  <reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.container.ContainerManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.impl.cassandra.CassandraImpl"
         init-method="init" destroy-method="destroy">
-    <property name="tracker" ref="tracker" />
     <property name="dbManager" ref="dbManager" />
+    <property name="tracker" ref="tracker" />
     <property name="lxcManager" ref="lxcManager" />
     <property name="networkManager" ref="networkManager" />
     <property name="commandRunner" ref="commandRunner" />
     <property name="agentManager" ref="agentManager" />
+    <property name="containerManager" ref="containerManager" />
+    <property name="environmentManager" ref="environmentManager" />
+
   </bean>
 
   <bean id="cassandra-configuration-logic" scope="singleton"
         class="org.safehaus.subutai.impl.cassandra.configuration.logic.ConfigurationLogicImpl">
-      <property name="configManager" ref="configManager"/>
+    <property name="configManager" ref="configManager" />
   </bean>
 
   <service ref="cassandra-configuration-logic" interface="org.safehaus.subutai.api.cassandra.ConfigurationLogic" />

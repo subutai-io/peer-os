@@ -52,10 +52,11 @@ public class HBaseImpl implements HBase {
         this.hadoopManager = hadoopManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
-        this.executor = executor;
+//        this.executor = executor;
         this.commandRunner = commandRunner;
         this.environmentManager = environmentManager;
         this.containerManager = containerManager;
+        Commands.init( commandRunner );
     }
 
 

@@ -57,12 +57,13 @@ public class CassandraImpl implements Cassandra {
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.lxcManager = lxcManager;
-        this.executor = executor;
+//        this.executor = executor;
         this.networkManager = networkManager;
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.environmentManager = environmentManager;
         this.containerManager = containerManager;
+        Commands.init( commandRunner );
     }
 
 
