@@ -16,7 +16,7 @@
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
-  <bean id="hbase-impl" scope="singleton" class="org.safehaus.subutai.impl.hbase.HBaseImpl"
+  <bean id="hbase-impl" scope="singleton" class="org.safehaus.subutai.plugin.hbase.impl.HBaseImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="agentManager" />
     <argument ref="hadoopManager" />
@@ -27,6 +27,6 @@
     <argument ref="environmentManager" />
   </bean>
 
-  <service ref="hbase-impl" interface="org.safehaus.subutai.api.hbase.HBase" />
+  <service ref="hbase-impl" interface="org.safehaus.subutai.plugin.hbase.api.HBase" />
 
 </blueprint>
