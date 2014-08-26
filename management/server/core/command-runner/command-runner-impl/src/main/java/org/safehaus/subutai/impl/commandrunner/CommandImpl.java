@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -54,9 +55,9 @@ public class CommandImpl implements Command {
     //status of command
     private volatile CommandStatus commandStatus = CommandStatus.NEW;
     //number of requests completed so far
-    private volatile int requestsCompleted = 0;
+    private AtomicInteger requestsCompleted = new AtomicInteger();
     //number of requests succeeded so far
-    private volatile int requestsSucceeded = 0;
+    private AtomicInteger requestsSucceeded = new AtomicInteger();
     //custom object assigned to this command
     private Object data;
     //indicates if this command is broadcast command
@@ -282,7 +283,7 @@ public class CommandImpl implements Command {
      * Increments count of completed requests
      */
     public void incrementCompletedRequestsCount() {
-        requestsCompleted++;
+        requestsCompleted.incrementAndGet();
     }
 
 
@@ -290,7 +291,7 @@ public class CommandImpl implements Command {
      * Increments count of succeeded requests
      */
     public void incrementSucceededRequestsCount() {
-        requestsSucceeded++;
+        requestsSucceeded.incrementAndGet();
     }
 
 
@@ -300,7 +301,7 @@ public class CommandImpl implements Command {
      * @return - number of completed requests
      */
     public int getRequestsCompleted() {
-        return requestsCompleted;
+        return requestsCompleted.get();
     }
 
 
@@ -320,7 +321,7 @@ public class CommandImpl implements Command {
      * @return - number of succeeded requests
      */
     public int getRequestsSucceeded() {
-        return requestsSucceeded;
+        return requestsSucceeded.get();
     }
 
 

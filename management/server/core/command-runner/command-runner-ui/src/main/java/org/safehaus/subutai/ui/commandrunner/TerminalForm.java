@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -43,7 +44,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
 
     final CommandRunner commandRunner;
     final AgentManager agentManager;
-    private volatile int taskCount = 0;
+    private AtomicInteger taskCount = new AtomicInteger(  );
     private ExecutorService executor;
     private AgentTree agentTree;
     private TerminalControl commandOutputTxtArea;
@@ -157,14 +158,14 @@ public class TerminalForm extends CustomComponent implements Disposable {
             RequestBuilder requestBuilder = new RequestBuilder( command );
 
             if ( requestTypeCombo.getValue() == RequestType.TERMINATE_REQUEST ) {
-                requestBuilder.withPid( Integer.valueOf( programTxtFld.getValue() ) );
+                requestBuilder.withPid( Integer.parseInt( programTxtFld.getValue() ) );
                 requestBuilder.withType( RequestType.TERMINATE_REQUEST );
             }
             else if ( requestTypeCombo.getValue() == RequestType.PS_REQUEST ) {
                 requestBuilder.withType( RequestType.PS_REQUEST );
             }
 
-            requestBuilder.withTimeout( Integer.valueOf( timeoutTxtFld.getValue() ) );
+            requestBuilder.withTimeout( Integer.parseInt( timeoutTxtFld.getValue() ) );
             requestBuilder.withCwd( workDirTxtFld.getValue() );
 
             //			getUI().setPollInterval(Common.REFRESH_UI_SEC * 1000);
@@ -196,7 +197,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
             return false;
         }
         else {
-            int timeout = Integer.valueOf( timeoutTxtFld.getValue() );
+            int timeout = Integer.parseInt( timeoutTxtFld.getValue() );
             if ( timeout <= 0 || timeout > Common.MAX_COMMAND_TIMEOUT_SEC ) {
                 show( "Please, enter timeout value between 0 and " + Common.MAX_COMMAND_TIMEOUT_SEC + "\\n" );
             }
@@ -215,7 +216,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
         final Command command = commandRunner.createCommand( requestBuilder, agents );
         final String[] output = { "" };
         indicator.setVisible( true );
-        taskCount++;
+        taskCount.incrementAndGet();
         executor.execute( new Runnable() {
 
             public void run() {
@@ -240,8 +241,8 @@ public class TerminalForm extends CustomComponent implements Disposable {
                     }
                 } );
 
-                taskCount--;
-                if ( taskCount == 0 ) {
+                taskCount.decrementAndGet();
+                if ( taskCount.get() == 0 ) {
                     show( output[0] );
                     indicator.setVisible( false );
                 }
