@@ -18,22 +18,27 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 .v-tabsheet-borderless .v-tabsheet-tabitemcell-first {
-	padding-left: 7px;
-	background: url(img/framed/tab-first-left.png) no-repeat -3px 0;
+    padding-left: 7px;
+    background: url(img/framed/tab-first-left.png) no-repeat -3px 0;
 }
+
 .v-tabsheet-borderless .v-tabsheet-tabitemcell-selected-first {
-	background: url(img/framed/tab-first-left-sel.png) no-repeat -3px 0;
+    background: url(img/framed/tab-first-left-sel.png) no-repeat -3px 0;
 }
+
 .v-tabsheet-borderless .v-tabsheet-spacertd div {
-	margin-right: 0;
+    margin-right: 0;
 }
+
 .v-tabsheet-borderless .v-tabsheet-spacertd {
-	background: transparent;
+    background: transparent;
 }
+
 .v-tabsheet-borderless .v-tabsheet-content {
-	border: none;
+    border: none;
 }
+
 .v-tabsheet-borderless .v-tabsheet-deco {
-	height: 0;
-	border-top: none;
+    height: 0;
+    border-top: none;
 }

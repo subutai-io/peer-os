@@ -6,13 +6,13 @@
 package org.safehaus.subutai.plugin.zookeeper.api;
 
 
-import java.util.UUID;
-
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+
+import java.util.UUID;
 
 
 /**
@@ -20,25 +20,25 @@ import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
  */
 public interface Zookeeper extends ApiBase<ZookeeperClusterConfig> {
 
-    public UUID installCluster( ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig );
+	public UUID installCluster(ZookeeperClusterConfig config, HadoopClusterConfig hadoopClusterConfig);
 
-    public UUID startNode( String clusterName, String lxcHostname );
+	public UUID startNode(String clusterName, String lxcHostname);
 
-    public UUID stopNode( String clusterName, String lxcHostname );
+	public UUID stopNode(String clusterName, String lxcHostname);
 
-    public UUID checkNode( String clusterName, String lxcHostname );
+	public UUID checkNode(String clusterName, String lxcHostname);
 
-    public UUID addNode( String clusterName );
+	public UUID addNode(String clusterName);
 
-    public UUID addNode( String clusterName, String lxcHostname );
+	public UUID addNode(String clusterName, String lxcHostname);
 
-    public UUID destroyNode( String clusterName, String lxcHostname );
+	public UUID destroyNode(String clusterName, String lxcHostname);
 
-    public UUID addProperty( String clusterName, String fileName, String propertyName, String propertyValue );
+	public UUID addProperty(String clusterName, String fileName, String propertyName, String propertyValue);
 
-    public UUID removeProperty( String clusterName, String fileName, String propertyName );
+	public UUID removeProperty(String clusterName, String fileName, String propertyName);
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, ZookeeperClusterConfig config,
-                                                         ProductOperation po );
+	public ClusterSetupStrategy getClusterSetupStrategy(Environment environment, ZookeeperClusterConfig config,
+	                                                    ProductOperation po);
 }
 

@@ -6,14 +6,15 @@ package org.safehaus.subutai.configuration.manager.api;
  */
 public interface TextInjector {
 
-    public boolean echoTextIntoAgent( String hostname, String pathToFile, String content );
+	public boolean echoTextIntoAgent(String hostname, String pathToFile, String content);
 
-    /**
-     * Gets the content of the given file on given agent.
-     * @param pathToFile
-     * @return
-     */
-    public String catFile( String hostname, String pathToFile );
+	/**
+	 * Gets the content of the given file on given agent.
+	 *
+	 * @param pathToFile
+	 * @return
+	 */
+	public String catFile(String hostname, String pathToFile);
 
-    public String getConfigTemplate(String path);
+	public String getConfigTemplate(String path);
 }

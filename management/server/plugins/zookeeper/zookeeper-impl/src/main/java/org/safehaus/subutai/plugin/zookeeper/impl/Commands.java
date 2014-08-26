@@ -14,15 +14,13 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+
+import com.google.common.collect.Sets;
 
 
 /**
- * @author dilshat
- *
- *
- *         * @todo refactor addPropertyCommand & removePropertyCommand to not use custom scripts
+ * @author dilshat <p/> <p/> * @todo refactor addPropertyCommand & removePropertyCommand to not use custom scripts
  */
 public class Commands extends CommandsSingleton {
 
@@ -60,12 +58,12 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStopCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( "service zookeeper stop" ), Util.wrapAgentToSet( agent ) );
+        return createCommand( new RequestBuilder( "service zookeeper stop" ), Sets.newHashSet( agent ) );
     }
 
 
     public static Command getStatusCommand( Agent agent ) {
-        return createCommand( new RequestBuilder( "service zookeeper status" ), Util.wrapAgentToSet( agent ) );
+        return createCommand( new RequestBuilder( "service zookeeper status" ), Sets.newHashSet( agent ) );
     }
 
 
@@ -94,7 +92,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getRemovePropertyCommand( String fileName, String propertyName, Set<Agent> agents ) {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName, propertyName ) ),
-                agents );
+                        String.format( ". /etc/profile && zookeeper-property.sh remove %s %s", fileName,
+                                propertyName ) ), agents );
     }
 }

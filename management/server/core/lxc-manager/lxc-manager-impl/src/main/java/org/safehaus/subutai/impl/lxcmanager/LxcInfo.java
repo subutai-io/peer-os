@@ -14,40 +14,40 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class LxcInfo {
 
-    private final Agent physicalAgent;
-    private final String lxcHostname;
-    private final String nodeType;
-    private boolean result;
+	private final Agent physicalAgent;
+	private final String lxcHostname;
+	private final String nodeType;
+	private boolean result;
 
 
-    public LxcInfo( Agent physicalAgent, String lxcHostname, String nodeType ) {
-        this.physicalAgent = physicalAgent;
-        this.lxcHostname = lxcHostname;
-        this.nodeType = nodeType;
-    }
+	public LxcInfo(Agent physicalAgent, String lxcHostname, String nodeType) {
+		this.physicalAgent = physicalAgent;
+		this.lxcHostname = lxcHostname;
+		this.nodeType = nodeType;
+	}
 
 
-    public String getNodeType() {
-        return nodeType;
-    }
+	public String getNodeType() {
+		return nodeType;
+	}
 
 
-    public boolean isResult() {
-        return result;
-    }
+	public boolean isResult() {
+		return result;
+	}
 
 
-    public void setResult( boolean result ) {
-        this.result = result;
-    }
+	public void setResult(boolean result) {
+		this.result = result;
+	}
 
 
-    public Agent getPhysicalAgent() {
-        return physicalAgent;
-    }
+	public Agent getPhysicalAgent() {
+		return physicalAgent;
+	}
 
 
-    public String getLxcHostname() {
-        return lxcHostname;
-    }
+	public String getLxcHostname() {
+		return lxcHostname;
+	}
 }

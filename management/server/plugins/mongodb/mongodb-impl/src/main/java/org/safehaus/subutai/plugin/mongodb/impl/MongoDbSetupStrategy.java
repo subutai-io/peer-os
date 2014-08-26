@@ -90,8 +90,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
 
         if ( mongoManager.getCluster( config.getClusterName() ) != null ) {
             throw new ClusterSetupException(
-                    String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                            config.getClusterName() ) );
+                    String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
         if ( environment.getNodes().isEmpty() ) {
@@ -186,7 +185,7 @@ public class MongoDbSetupStrategy implements ClusterSetupStrategy {
         po.addLog( "Saving cluster information to database..." );
 
         try {
-            mongoManager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            mongoManager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
             po.addLog( "Cluster information saved to database" );
         }
         catch ( DBException e ) {

@@ -5,10 +5,11 @@
  */
 package org.safehaus.subutai.shared.protocol.enums;
 
+
 /**
  * @author dilshat
  */
 public enum NodeState {
 
-    STOPPED, RUNNING, NodeState, UNKNOWN
+    STOPPED, RUNNING, UNKNOWN
 }

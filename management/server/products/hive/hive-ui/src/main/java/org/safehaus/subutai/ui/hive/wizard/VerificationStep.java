@@ -2,11 +2,12 @@ package org.safehaus.subutai.ui.hive.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import java.util.UUID;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.hive.HiveUI;
+
+import java.util.UUID;
 
 public class VerificationStep extends Panel {
 
@@ -27,7 +28,7 @@ public class VerificationStep extends Panel {
 		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
 		cfgView.addStringCfg("Server node", wizard.getConfig().getServer().getHostname());
 		for (Agent agent : wizard.getConfig().getClients()) {
-            cfgView.addStringCfg("Node(s) to install", agent.getHostname());
+			cfgView.addStringCfg("Node(s) to install", agent.getHostname());
 		}
 
 		Button install = new Button("Install");

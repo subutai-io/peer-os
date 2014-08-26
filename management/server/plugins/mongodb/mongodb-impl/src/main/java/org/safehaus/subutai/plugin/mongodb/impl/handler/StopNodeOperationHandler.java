@@ -10,7 +10,8 @@ import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -55,7 +56,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<MongoImpl
         }
 
         po.addLog( "Stopping node..." );
-        Command stopNodeCommand = Commands.getStopNodeCommand( Util.wrapAgentToSet( node ) );
+        Command stopNodeCommand = Commands.getStopNodeCommand( Sets.newHashSet( node ) );
         manager.getCommandRunner().runCommand( stopNodeCommand );
 
         if ( stopNodeCommand.hasSucceeded() ) {

@@ -15,27 +15,27 @@ import static junit.framework.Assert.assertTrue;
 public class DestroyNodeOperationHandlerTest {
 
 
-    @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( new PigImplMock(), "test-cluster",
-                "lxc-host" );
+	@Test
+	public void testWithoutCluster() {
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(new PigImplMock(), "test-cluster",
+				"lxc-host");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not exist"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 
-    @Test
-    public void testWithExistingCluster() {
-        PigImpl pigImpl = new PigImplMock().setClusterConfig( new Config() );
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( pigImpl, "test-cluster", "lxc-host" );
+	@Test
+	public void testWithExistingCluster() {
+		PigImpl pigImpl = new PigImplMock().setClusterConfig(new Config());
+		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(pigImpl, "test-cluster", "lxc-host");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not connected"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 }

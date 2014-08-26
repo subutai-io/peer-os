@@ -14,25 +14,25 @@ import java.util.List;
  * Time: 10:08 PM
  */
 public class InstallHadoopOperation {
-    private final Config config;
-    private List<Command> commandList;
+	private final Config config;
+	private List<Command> commandList;
 
-    public InstallHadoopOperation(Config config) {
+	public InstallHadoopOperation(Config config) {
 
-        this.config = config;
-        commandList = new ArrayList<Command>();
+		this.config = config;
+		commandList = new ArrayList<Command>();
 
-        commandList.add(Commands.getInstallCommand(config));
-        commandList.add(Commands.getClearMastersCommand(config));
-        commandList.add(Commands.getClearSlavesCommand(config));
-        commandList.add(Commands.getSetMastersCommand(config));
-        commandList.add(Commands.getAddSecondaryNamenodeCommand(config));
-        commandList.add(Commands.getSetDataNodeCommand(config));
-        commandList.add(Commands.getSetTaskTrackerCommand(config));
-        commandList.add(Commands.getFormatNameNodeCommand(config));
-    }
+		commandList.add(Commands.getInstallCommand(config));
+		commandList.add(Commands.getClearMastersCommand(config));
+		commandList.add(Commands.getClearSlavesCommand(config));
+		commandList.add(Commands.getSetMastersCommand(config));
+		commandList.add(Commands.getAddSecondaryNamenodeCommand(config));
+		commandList.add(Commands.getSetDataNodeCommand(config));
+		commandList.add(Commands.getSetTaskTrackerCommand(config));
+		commandList.add(Commands.getFormatNameNodeCommand(config));
+	}
 
-    public List<Command> getCommandList() {
-        return commandList;
-    }
+	public List<Command> getCommandList() {
+		return commandList;
+	}
 }

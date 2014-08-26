@@ -36,7 +36,9 @@
 
     <property>
         <name>oozie.service.SchemaService.wf.ext.schemas</name>
-        <value>shell-action-0.1.xsd,shell-action-0.2.xsd,email-action-0.1.xsd,hive-action-0.2.xsd,hive-action-0.3.xsd,sqoop-action-0.2.xsd,sqoop-action-0.3.xsd,ssh-action-0.1.xsd,distcp-action-0.1.xsd</value>
+        <value>
+            shell-action-0.1.xsd,shell-action-0.2.xsd,email-action-0.1.xsd,hive-action-0.2.xsd,hive-action-0.3.xsd,sqoop-action-0.2.xsd,sqoop-action-0.3.xsd,ssh-action-0.1.xsd,distcp-action-0.1.xsd
+        </value>
     </property>
 
     <property>
@@ -51,7 +53,7 @@
         <name>oozie.systemmode</name>
         <value>NORMAL</value>
         <description>
-            System mode for  Oozie at startup.
+            System mode for Oozie at startup.
         </description>
     </property>
 
@@ -105,12 +107,13 @@
     </property>
 
     <property>
-		<name>oozie.service.coord.normal.default.timeout
-		</name>
-		<value>120</value>
-		<description>Default timeout for a coordinator action input check (in minutes) for normal job.
-            -1 means infinite timeout</description>
-	</property>
+        <name>oozie.service.coord.normal.default.timeout
+        </name>
+        <value>120</value>
+        <description>Default timeout for a coordinator action input check (in minutes) for normal job.
+            -1 means infinite timeout
+        </description>
+    </property>
 
     <property>
         <name>oozie.db.schema.name</name>
@@ -157,12 +160,12 @@
 
     <property>
         <name>oozie.service.JPAService.jdbc.password</name>
-        <value> </value>
+        <value></value>
         <description>
             DB user password.
 
             IMPORTANT: if password is emtpy leave a 1 space string, the service trims the value,
-                       if empty Configuration assumes it is NULL.
+            if empty Configuration assumes it is NULL.
         </description>
     </property>
 
@@ -170,7 +173,7 @@
         <name>oozie.service.JPAService.pool.max.active.conn</name>
         <value>10</value>
         <description>
-             Max number of connections.
+            Max number of connections.
         </description>
     </property>
 
@@ -208,7 +211,7 @@
 
     <property>
         <name>oozie.service.HadoopAccessorService.jobTracker.whitelist</name>
-        <value> </value>
+        <value></value>
         <description>
             Whitelisted job tracker for Oozie service.
         </description>
@@ -216,7 +219,7 @@
 
     <property>
         <name>oozie.service.HadoopAccessorService.nameNode.whitelist</name>
-        <value> </value>
+        <value></value>
         <description>
             Whitelisted job tracker for Oozie service.
         </description>
@@ -286,13 +289,13 @@
     </property>
 
     <property>
-      <name>oozie.authentication.cookie.domain</name>
-      <value></value>
-      <description>
-        The domain to use for the HTTP cookie that stores the authentication token.
-        In order to authentiation to work correctly across multiple hosts
-        the domain must be correctly set.
-      </description>
+        <name>oozie.authentication.cookie.domain</name>
+        <value></value>
+        <description>
+            The domain to use for the HTTP cookie that stores the authentication token.
+            In order to authentiation to work correctly across multiple hosts
+            the domain must be correctly set.
+        </description>
     </property>
 
     <property>

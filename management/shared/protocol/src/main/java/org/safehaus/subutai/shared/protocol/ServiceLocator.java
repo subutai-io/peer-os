@@ -12,13 +12,13 @@ import javax.naming.NamingException;
  */
 public class ServiceLocator {
 
-    public static <T> T getService(Class<T> clazz) {
-        try {
-            InitialContext ctx = new InitialContext();
-            String jndiName = "osgi:service/" + clazz.getName();
-            return clazz.cast(ctx.lookup(jndiName));
-        } catch (NamingException ex) {
-            return null;
-        }
-    }
+	public static <T> T getService(Class<T> clazz) {
+		try {
+			InitialContext ctx = new InitialContext();
+			String jndiName = "osgi:service/" + clazz.getName();
+			return clazz.cast(ctx.lookup(jndiName));
+		} catch (NamingException ex) {
+			return null;
+		}
+	}
 }

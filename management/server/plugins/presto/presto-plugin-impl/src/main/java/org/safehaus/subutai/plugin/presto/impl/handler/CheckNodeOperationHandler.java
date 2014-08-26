@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -21,7 +21,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
 	public CheckNodeOperationHandler(PrestoImpl manager, String clusterName, String lxcHostname) {
 		super(manager, clusterName);
 		this.lxcHostname = lxcHostname;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		po = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
 				String.format("Checking state of %s in %s", lxcHostname, clusterName));
 
 	}
@@ -33,7 +33,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
 
 	@Override
 	public void run() {
-		Config config = manager.getCluster(clusterName);
+		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
 			return;

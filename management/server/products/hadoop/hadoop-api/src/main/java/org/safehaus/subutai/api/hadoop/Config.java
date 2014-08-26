@@ -1,218 +1,215 @@
 package org.safehaus.subutai.api.hadoop;
 
 
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
  * Created by daralbaev on 02.04.14.
  */
 public class Config implements ConfigBase {
-    public static final String PRODUCT_KEY = "Hadoop";
-    public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
-    public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
+	public static final String PRODUCT_KEY = "Hadoop";
+	public static final String PRODUCT_PACKAGE = (Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
+	public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
 
-    private String clusterName, domainName;
-    private Agent nameNode, jobTracker, secondaryNameNode;
-    private List<Agent> dataNodes, taskTrackers;
-    private Integer replicationFactor, countOfSlaveNodes;
-    private Set<Agent> blockedAgents;
-
-
-    public Config() {
-        domainName = Common.DEFAULT_DOMAIN_NAME;
-        dataNodes = new ArrayList<Agent>();
-        taskTrackers = new ArrayList<Agent>();
-        blockedAgents = new HashSet<Agent>();
-    }
+	private String clusterName, domainName;
+	private Agent nameNode, jobTracker, secondaryNameNode;
+	private List<Agent> dataNodes, taskTrackers;
+	private Integer replicationFactor, countOfSlaveNodes;
+	private Set<Agent> blockedAgents;
 
 
-    public List<Agent> getAllNodes() {
-        Set<Agent> allAgents = new HashSet<Agent>();
-        if ( dataNodes != null ) {
-            allAgents.addAll( dataNodes );
-        }
-        if ( taskTrackers != null ) {
-            allAgents.addAll( taskTrackers );
-        }
-
-        if ( nameNode != null ) {
-            allAgents.add( nameNode );
-        }
-        if ( jobTracker != null ) {
-            allAgents.add( jobTracker );
-        }
-        if ( secondaryNameNode != null ) {
-            allAgents.add( secondaryNameNode );
-        }
-
-        return new ArrayList<Agent>( allAgents );
-    }
+	public Config() {
+		domainName = Common.DEFAULT_DOMAIN_NAME;
+		dataNodes = new ArrayList<Agent>();
+		taskTrackers = new ArrayList<Agent>();
+		blockedAgents = new HashSet<Agent>();
+	}
 
 
-    public List<Agent> getAllSlaveNodes() {
-        Set<Agent> allAgents = new HashSet<Agent>();
-        if ( dataNodes != null ) {
-            allAgents.addAll( dataNodes );
-        }
-        if ( taskTrackers != null ) {
-            allAgents.addAll( taskTrackers );
-        }
+	public List<Agent> getAllNodes() {
+		Set<Agent> allAgents = new HashSet<Agent>();
+		if (dataNodes != null) {
+			allAgents.addAll(dataNodes);
+		}
+		if (taskTrackers != null) {
+			allAgents.addAll(taskTrackers);
+		}
 
-        return new ArrayList<Agent>( allAgents );
-    }
+		if (nameNode != null) {
+			allAgents.add(nameNode);
+		}
+		if (jobTracker != null) {
+			allAgents.add(jobTracker);
+		}
+		if (secondaryNameNode != null) {
+			allAgents.add(secondaryNameNode);
+		}
 
-
-    public String getClusterName() {
-        return clusterName;
-    }
-
-
-    public void setClusterName( String clusterName ) {
-        this.clusterName = clusterName;
-    }
-
-
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
+		return new ArrayList<Agent>(allAgents);
+	}
 
 
-    public String getDomainName() {
-        return domainName;
-    }
+	public List<Agent> getAllSlaveNodes() {
+		Set<Agent> allAgents = new HashSet<Agent>();
+		if (dataNodes != null) {
+			allAgents.addAll(dataNodes);
+		}
+		if (taskTrackers != null) {
+			allAgents.addAll(taskTrackers);
+		}
+
+		return new ArrayList<Agent>(allAgents);
+	}
 
 
-    public void setDomainName( String domainName ) {
-        this.domainName = domainName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    public Agent getNameNode() {
-        return nameNode;
-    }
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
 
 
-    public void setNameNode( Agent nameNode ) {
-        this.nameNode = nameNode;
-    }
+	@Override
+	public String getProductName() {
+		return PRODUCT_KEY;
+	}
 
 
-    public Agent getJobTracker() {
-        return jobTracker;
-    }
+	public String getDomainName() {
+		return domainName;
+	}
 
 
-    public void setJobTracker( Agent jobTracker ) {
-        this.jobTracker = jobTracker;
-    }
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
+	}
 
 
-    public Agent getSecondaryNameNode() {
-        return secondaryNameNode;
-    }
+	public Agent getNameNode() {
+		return nameNode;
+	}
 
 
-    public void setSecondaryNameNode( Agent secondaryNameNode ) {
-        this.secondaryNameNode = secondaryNameNode;
-    }
+	public void setNameNode(Agent nameNode) {
+		this.nameNode = nameNode;
+	}
 
 
-    public List<Agent> getDataNodes() {
-        return dataNodes;
-    }
+	public Agent getJobTracker() {
+		return jobTracker;
+	}
 
 
-    public void setDataNodes( List<Agent> dataNodes ) {
-        this.dataNodes = dataNodes;
-    }
+	public void setJobTracker(Agent jobTracker) {
+		this.jobTracker = jobTracker;
+	}
 
 
-    public List<Agent> getTaskTrackers() {
-        return taskTrackers;
-    }
+	public Agent getSecondaryNameNode() {
+		return secondaryNameNode;
+	}
 
 
-    public void setTaskTrackers( List<Agent> taskTrackers ) {
-        this.taskTrackers = taskTrackers;
-    }
+	public void setSecondaryNameNode(Agent secondaryNameNode) {
+		this.secondaryNameNode = secondaryNameNode;
+	}
 
 
-    public Integer getReplicationFactor() {
-        return replicationFactor;
-    }
+	public List<Agent> getDataNodes() {
+		return dataNodes;
+	}
 
 
-    public void setReplicationFactor( Integer replicationFactor ) {
-        this.replicationFactor = replicationFactor;
-    }
+	public void setDataNodes(List<Agent> dataNodes) {
+		this.dataNodes = dataNodes;
+	}
 
 
-    public Integer getCountOfSlaveNodes() {
-        return countOfSlaveNodes;
-    }
+	public List<Agent> getTaskTrackers() {
+		return taskTrackers;
+	}
 
 
-    public void setCountOfSlaveNodes( Integer countOfSlaveNodes ) {
-        this.countOfSlaveNodes = countOfSlaveNodes;
-    }
+	public void setTaskTrackers(List<Agent> taskTrackers) {
+		this.taskTrackers = taskTrackers;
+	}
 
 
-    public Set<Agent> getBlockedAgents() {
-        return blockedAgents;
-    }
+	public Integer getReplicationFactor() {
+		return replicationFactor;
+	}
 
 
-    public void setBlockedAgents( HashSet<Agent> blockedAgents ) {
-        this.blockedAgents = blockedAgents;
-    }
+	public void setReplicationFactor(Integer replicationFactor) {
+		this.replicationFactor = replicationFactor;
+	}
 
 
-    @Override
-    public String toString() {
-        return "Config{" +
-                "clusterName='" + clusterName + '\'' +
-                ", domainName='" + domainName + '\'' +
-                ", nameNode=" + nameNode +
-                ", jobTracker=" + jobTracker +
-                ", secondaryNameNode=" + secondaryNameNode +
-                ", dataNodes=" + dataNodes +
-                ", taskTrackers=" + taskTrackers +
-                ", replicationFactor=" + replicationFactor +
-                ", countOfSlaveNodes=" + countOfSlaveNodes +
-                '}';
-    }
+	public Integer getCountOfSlaveNodes() {
+		return countOfSlaveNodes;
+	}
 
 
-    @Override
-    public boolean equals( Object o ) {
-        if ( this == o ) {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() ) {
-            return false;
-        }
-
-        Config config = ( Config ) o;
-
-        if ( clusterName != null ? !clusterName.equals( config.clusterName ) : config.clusterName != null ) {
-            return false;
-        }
-
-        return true;
-    }
+	public void setCountOfSlaveNodes(Integer countOfSlaveNodes) {
+		this.countOfSlaveNodes = countOfSlaveNodes;
+	}
 
 
-    @Override
-    public int hashCode() {
-        return clusterName != null ? clusterName.hashCode() : 0;
-    }
+	public Set<Agent> getBlockedAgents() {
+		return blockedAgents;
+	}
+
+
+	public void setBlockedAgents(HashSet<Agent> blockedAgents) {
+		this.blockedAgents = blockedAgents;
+	}
+
+	@Override
+	public int hashCode() {
+		return clusterName != null ? clusterName.hashCode() : 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		Config config = (Config) o;
+
+		if (clusterName != null ? !clusterName.equals(config.clusterName) : config.clusterName != null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Config{" +
+				"clusterName='" + clusterName + '\'' +
+				", domainName='" + domainName + '\'' +
+				", nameNode=" + nameNode +
+				", jobTracker=" + jobTracker +
+				", secondaryNameNode=" + secondaryNameNode +
+				", dataNodes=" + dataNodes +
+				", taskTrackers=" + taskTrackers +
+				", replicationFactor=" + replicationFactor +
+				", countOfSlaveNodes=" + countOfSlaveNodes +
+				'}';
+	}
 }

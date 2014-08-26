@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
-  <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.impl.gitmanager.GitManagerImpl"
-        init-method="init" destroy-method="destroy">
-    <argument ref="commandRunner" />
-  </bean>
+    <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.impl.gitmanager.GitManagerImpl"
+          init-method="init" destroy-method="destroy">
+        <argument ref="commandRunner"/>
+    </bean>
 
-  <service ref="gitmanager" interface="org.safehaus.subutai.api.gitmanager.GitManager" />
+    <service ref="gitmanager" interface="org.safehaus.subutai.api.gitmanager.GitManager"/>
 
 </blueprint>

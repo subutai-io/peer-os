@@ -6,5 +6,5 @@ package org.safehaus.subutai.impl.container;
  */
 public enum ContainerAction {
 
-    CREATE, DESTROY
+	CREATE, DESTROY
 }

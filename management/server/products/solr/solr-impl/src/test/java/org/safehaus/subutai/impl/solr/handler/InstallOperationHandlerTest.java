@@ -15,7 +15,7 @@ import static junit.framework.Assert.assertTrue;
 
 public class InstallOperationHandlerTest {
 
-    @Test( expected = NullPointerException.class )
+    @Test(expected = NullPointerException.class)
     public void testWithNullConfig() {
         new SolrImplMock().installCluster( null );
     }
@@ -23,7 +23,10 @@ public class InstallOperationHandlerTest {
 
     @Test
     public void testWithMalformedConfiguration() {
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( new SolrImplMock(), new Config() );
+        Config config = new Config();
+        config.setClusterName( "test" );
+        config.setNumberOfNodes( -1 );
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( new SolrImplMock(), config );
 
         operationHandler.run();
 

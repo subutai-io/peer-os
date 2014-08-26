@@ -11,54 +11,54 @@ import java.util.concurrent.Executors;
 
 public abstract class HiveQueryBase implements HiveQuery {
 
-    protected static CommandRunner commandRunner;
-    protected static DbManager dbManager;
-    protected static Tracker tracker;
-    protected static AgentManager agentManager;
+	protected static CommandRunner commandRunner;
+	protected static DbManager dbManager;
+	protected static Tracker tracker;
+	protected static AgentManager agentManager;
 
-    protected ExecutorService executor;
+	protected ExecutorService executor;
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public static CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public void destroy() {
-        executor.shutdown();
-    }
+	public void setCommandRunner(CommandRunner commandRunner) {
+		HiveQueryBase.commandRunner = commandRunner;
+	}
 
-    public static CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public static Tracker getTracker() {
+		return tracker;
+	}
 
-    public void setCommandRunner(CommandRunner commandRunner) {
-        HiveQueryBase.commandRunner = commandRunner;
-    }
+	public void setTracker(Tracker tracker) {
+		HiveQueryImpl.tracker = tracker;
+	}
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
+	public static AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public void setDbManager(DbManager dbManager) {
-        HiveQueryBase.dbManager = dbManager;
-    }
+	public void setAgentManager(AgentManager agentManager) {
+		HiveQueryBase.agentManager = agentManager;
+	}
 
-    public void setTracker(Tracker tracker) {
-        HiveQueryImpl.tracker = tracker;
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
+	public void destroy() {
+		executor.shutdown();
+	}
 
-    public ExecutorService getExecutor() {
-        return executor;
-    }
+	public DbManager getDbManager() {
+		return dbManager;
+	}
 
-    public static AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public void setDbManager(DbManager dbManager) {
+		HiveQueryBase.dbManager = dbManager;
+	}
 
-    public void setAgentManager(AgentManager agentManager) {
-        HiveQueryBase.agentManager = agentManager;
-    }
+	public ExecutorService getExecutor() {
+		return executor;
+	}
 }

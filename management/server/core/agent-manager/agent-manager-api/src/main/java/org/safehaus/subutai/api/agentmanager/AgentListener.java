@@ -1,9 +1,9 @@
 package org.safehaus.subutai.api.agentmanager;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import java.util.Set;
 
 
 /**
@@ -13,5 +13,5 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public interface AgentListener {
 
-    public void onAgent( Set<Agent> freshAgents );
+	public void onAgent(Set<Agent> freshAgents);
 }

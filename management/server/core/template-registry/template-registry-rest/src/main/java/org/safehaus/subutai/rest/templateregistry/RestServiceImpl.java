@@ -44,11 +44,12 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response registerTemplate( final String configFilePath, final String packagesFilePath ) {
+    public Response registerTemplate( final String configFilePath, final String packagesFilePath,
+                                      final String md5sum ) {
         try {
 
             templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ) );
+                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
 
             return Response.status( Response.Status.OK ).build();
         }

@@ -6,10 +6,6 @@
 package org.safehaus.subutai.impl.commandrunner;
 
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
@@ -17,6 +13,10 @@ import org.safehaus.subutai.api.commandrunner.CommandStatus;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,100 +29,100 @@ import static org.mockito.Mockito.when;
  */
 public class CommandImplUT {
 
-    private final String SOME_DUMMY_OUTPUT = "some dummy output";
+	private final String SOME_DUMMY_OUTPUT = "some dummy output";
 
-    private final UUID agentUUID = UUID.randomUUID();
-    private CommandImpl command;
-
-
-    @Before
-    public void beforeMethod() {
-        Set<Agent> agents = MockUtils.getAgents( agentUUID );
-        RequestBuilder requestBuilder = MockUtils.getRequestBuilder( "pwd", 1, agents );
-        command = new CommandImpl( null, requestBuilder, agents );
-    }
+	private final UUID agentUUID = UUID.randomUUID();
+	private CommandImpl command;
 
 
-    @Test(expected = NullPointerException.class)
-    public void constructorShouldFailNullBuilder() {
-        new CommandImpl( null, mock( Set.class ) );
-    }
+	@Before
+	public void beforeMethod() {
+		Set<Agent> agents = MockUtils.getAgents(agentUUID);
+		RequestBuilder requestBuilder = MockUtils.getRequestBuilder("pwd", 1, agents);
+		command = new CommandImpl(null, requestBuilder, agents);
+	}
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldFailNullAgentBuilder() {
-        new CommandImpl( null, null );
-    }
+	@Test (expected = NullPointerException.class)
+	public void constructorShouldFailNullBuilder() {
+		new CommandImpl(null, mock(Set.class));
+	}
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldFailEmptyAgentBuilder() {
-        Set<AgentRequestBuilder> ag = new HashSet<>();
-        new CommandImpl( null, ag );
-    }
+	@Test (expected = IllegalArgumentException.class)
+	public void constructorShouldFailNullAgentBuilder() {
+		new CommandImpl(null, null);
+	}
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldFailNullAgents() {
-        new CommandImpl( null, mock( RequestBuilder.class ), null );
-    }
+	@Test (expected = IllegalArgumentException.class)
+	public void constructorShouldFailEmptyAgentBuilder() {
+		Set<AgentRequestBuilder> ag = new HashSet<>();
+		new CommandImpl(null, ag);
+	}
 
 
-    @Test
-    public void shouldReturnSameNumberOfRequestAsAgents() {
-
-        assertEquals( 1, command.getRequests().size() );
-    }
-
-
-    @Test
-    public void shouldCompleteCommand() {
-
-        command.appendResult( MockUtils.getTimedOutResponse( agentUUID, command.getCommandUUID() ) );
-
-        assertTrue( command.hasCompleted() );
-    }
+	@Test (expected = IllegalArgumentException.class)
+	public void constructorShouldFailNullAgents() {
+		new CommandImpl(null, mock(RequestBuilder.class), null);
+	}
 
 
-    @Test
-    public void shouldSucceedCommandStatus() {
+	@Test
+	public void shouldReturnSameNumberOfRequestAsAgents() {
 
-        command.appendResult( MockUtils.getSucceededResponse( agentUUID, command.getCommandUUID() ) );
-
-        assertEquals( CommandStatus.SUCCEEDED, command.getCommandStatus() );
-    }
+		assertEquals(1, command.getRequests().size());
+	}
 
 
-    @Test
-    public void shouldFailCommandStatus() {
+	@Test
+	public void shouldCompleteCommand() {
 
-        command.appendResult( MockUtils.getFailedResponse( agentUUID, command.getCommandUUID() ) );
+		command.appendResult(MockUtils.getTimedOutResponse(agentUUID, command.getCommandUUID()));
 
-        assertEquals( CommandStatus.FAILED, command.getCommandStatus() );
-    }
-
-
-    @Test
-    public void shouldCollectCommandOutput() {
-
-        Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
-        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
-
-        command.appendResult( response );
-
-        assertEquals( SOME_DUMMY_OUTPUT, command.getResults().get( agentUUID ).getStdOut() );
-    }
+		assertTrue(command.hasCompleted());
+	}
 
 
-    @Test
-    public void shouldCollectAllCommandOutput() {
+	@Test
+	public void shouldSucceedCommandStatus() {
 
-        Response response = MockUtils.getIntermediateResponse( agentUUID, command.getCommandUUID() );
-        when( response.getStdOut() ).thenReturn( SOME_DUMMY_OUTPUT );
+		command.appendResult(MockUtils.getSucceededResponse(agentUUID, command.getCommandUUID()));
 
-        command.appendResult( response );
-        command.appendResult( response );
+		assertEquals(CommandStatus.SUCCEEDED, command.getCommandStatus());
+	}
 
-        assertEquals( SOME_DUMMY_OUTPUT + SOME_DUMMY_OUTPUT, command.getResults().get( agentUUID ).getStdOut() );
-    }
+
+	@Test
+	public void shouldFailCommandStatus() {
+
+		command.appendResult(MockUtils.getFailedResponse(agentUUID, command.getCommandUUID()));
+
+		assertEquals(CommandStatus.FAILED, command.getCommandStatus());
+	}
+
+
+	@Test
+	public void shouldCollectCommandOutput() {
+
+		Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
+		when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
+
+		command.appendResult(response);
+
+		assertEquals(SOME_DUMMY_OUTPUT, command.getResults().get(agentUUID).getStdOut());
+	}
+
+
+	@Test
+	public void shouldCollectAllCommandOutput() {
+
+		Response response = MockUtils.getIntermediateResponse(agentUUID, command.getCommandUUID());
+		when(response.getStdOut()).thenReturn(SOME_DUMMY_OUTPUT);
+
+		command.appendResult(response);
+		command.appendResult(response);
+
+		assertEquals(SOME_DUMMY_OUTPUT + SOME_DUMMY_OUTPUT, command.getResults().get(agentUUID).getStdOut());
+	}
 }
