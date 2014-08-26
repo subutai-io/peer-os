@@ -3,12 +3,14 @@ package org.safehaus.subutai.plugin.flume.ui.wizard;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 public class Wizard {
 
     private final GridLayout grid;
     private int step = 1;
     private FlumeConfig config = new FlumeConfig();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
     public Wizard() {
         grid = new GridLayout(1, 20);
@@ -36,11 +38,16 @@ public class Wizard {
     protected void init() {
         step = 1;
         config = new FlumeConfig();
+        hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
     public FlumeConfig getConfig() {
         return config;
+    }
+
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
     }
 
     private void putForm() {

@@ -31,20 +31,33 @@ public class WelcomeStep extends VerticalLayout {
 
         Button next = new Button("Start over-Hadoop installation");
         next.addStyleName("default");
-        next.setWidth(100, Unit.PIXELS);
         grid.addComponent(next, 6, 4, 6, 4);
         grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
         next.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                wizard.init();
-                wizard.getConfig().setSetupType(SetupType.OVER_HADOOP);
-                wizard.next();
+                clickHandler(wizard, SetupType.OVER_HADOOP);
             }
         });
+
+        Button next2 = new Button("Start with-Hadoop installation");
+        next2.setStyleName("default");
+        next2.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                clickHandler(wizard, SetupType.WITH_HADOOP);
+            }
+        });
+        grid.addComponent(next2, 7, 4, 7, 4);
+        grid.setComponentAlignment(next2, Alignment.BOTTOM_RIGHT);
 
         addComponent(grid);
     }
 
+    private void clickHandler(Wizard wizard, SetupType type) {
+        wizard.init();
+        wizard.getConfig().setSetupType(type);
+        wizard.next();
+    }
 }
