@@ -4,11 +4,13 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
@@ -20,10 +22,7 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.*;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,6 +37,7 @@ public class HadoopImpl implements Hadoop {
 	private static NetworkManager networkManager;
 	private static ExecutorService executor;
 	private static EnvironmentManager environmentManager;
+	private static PluginDAO pluginDAO;
 
 
 	public HadoopImpl(AgentManager agentManager, Tracker tracker, CommandRunner commandRunner, DbManager dbManager,
@@ -51,6 +51,7 @@ public class HadoopImpl implements Hadoop {
 		HadoopImpl.networkManager = networkManager;
 		HadoopImpl.containerManager = containerManager;
 		HadoopImpl.environmentManager = environmentManager;
+		pluginDAO = new PluginDAO(dbManager);
 	}
 
 
@@ -104,6 +105,9 @@ public class HadoopImpl implements Hadoop {
 		return environmentManager;
 	}
 
+	public static PluginDAO getPluginDAO() {
+		return pluginDAO;
+	}
 
 	@Override
 	public UUID installCluster(final HadoopClusterConfig hadoopClusterConfig) {
@@ -118,12 +122,20 @@ public class HadoopImpl implements Hadoop {
 
 	@Override
 	public List<HadoopClusterConfig> getClusters() {
-		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
+		try {
+			return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
+		} catch (DBException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override
 	public HadoopClusterConfig getCluster(String clusterName) {
-		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
+		try {
+			return pluginDAO.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
+		} catch (DBException e) {
+			return null;
+		}
 	}
 
 	@Override

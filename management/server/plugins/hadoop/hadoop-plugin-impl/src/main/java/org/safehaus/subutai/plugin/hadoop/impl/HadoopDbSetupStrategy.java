@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
@@ -90,7 +91,6 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 					}
 					hadoopClusterConfig = config.init();
 
-
 					po.addLog("Lxc containers created successfully");
 
 					//continue installation here
@@ -111,10 +111,7 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 	private void installHadoopCluster() throws ClusterSetupException {
 
 		po.addLog("Hadoop installation started");
-		if (HadoopImpl.getDbManager().saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-				hadoopClusterConfig)) {
-			po.addLog("Cluster info saved to DB");
-
+		try {
 			InstallHadoopOperation installOperation = new InstallHadoopOperation(hadoopClusterConfig);
 			for (Command command : installOperation.getCommandList()) {
 				po.addLog((String.format("%s started...", command.getDescription())));
@@ -127,7 +124,11 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 							String.format("%s failed, %s", command.getDescription(), command.getAllErrors()));
 				}
 			}
-		} else {
+
+			HadoopImpl.getPluginDAO().saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+					hadoopClusterConfig);
+			po.addLog("Cluster info saved to DB");
+		} catch (DBException e) {
 			destroyLXC(po, "Could not save cluster info to DB! Please see logs\nInstallation aborted");
 		}
 	}

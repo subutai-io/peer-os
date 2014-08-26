@@ -87,7 +87,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 			if (serverSlots == null || serverSlots.isEmpty()) return;
 
 			int available = 0;
-			for (Integer i : serverSlots.values()) available += i.intValue();
+			for (Integer i : serverSlots.values()) available += i;
 			if (available < nodesCount.get(type)) return;
 
 			calculatePlacement(type, serverSlots);
@@ -129,7 +129,7 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 			Map<String, Integer> info = getPlacementInfoMap().get(physicalNode);
 			int cnt = 1;
 			if (info != null && info.get(type) != null)
-				cnt = info.get(type).intValue() + 1;
+				cnt = info.get(type) + 1;
 			addPlacementInfo(physicalNode, type, cnt);
 		}
 	}
@@ -138,9 +138,9 @@ public class CustomPlacementStrategy extends LxcPlacementStrategy {
 		int max = 0;
 		Agent best = null;
 		for (Map.Entry<Agent, Integer> e : map.entrySet()) {
-			if (e.getValue().intValue() > max) {
+			if (e.getValue() > max) {
 				best = e.getKey();
-				max = e.getValue().intValue();
+				max = e.getValue();
 			}
 		}
 		return best;

@@ -21,9 +21,9 @@ public class Installation {
 	}
 
 	public UUID execute() {
-		final ProductOperation po = parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY, "Installation of Hadoop");
+		final ProductOperation po = HadoopImpl.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY, "Installation of Hadoop");
 
-		parent.getExecutor().execute(new Runnable() {
+		HadoopImpl.getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
 				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, hadoopClusterConfig);
