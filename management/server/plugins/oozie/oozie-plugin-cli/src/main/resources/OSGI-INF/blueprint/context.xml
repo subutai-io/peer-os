@@ -2,11 +2,11 @@
         >
 
     <reference id="oozieManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.oozie.Oozie"/>
+               interface="org.safehaus.subutai.plugin.oozie.api.Oozie"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="oozie/list-clusters">
-            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.plugin.oozie.cli.ListClustersCommand">
                 <property name="oozieManager" ref="oozieManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="oozie/uninstall-cluster">
-            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
+            <action class="org.safehaus.subutai.plugin.oozie.cli.UninstallClusterCommand">
                 <property name="oozieManager" ref="oozieManager"/>
             </action>
         </command>
