@@ -34,6 +34,9 @@
 #	NOTE: Debian package will be created under $SUBUTAI_TMPDIR directory
 #
 
+# Set TMPDIR variable to enfore dpkg-deb to use the specified directory while building the debian package for its temporary files
+export TMPDIR="/var"
+
 function deb_pkg {
   local lxc="$1"
   
@@ -73,7 +76,6 @@ function deb_pkg {
   # ----------------------------------------------------------------------------
   # (4) create debian package
   # ----------------------------------------------------------------------------
-  export TMPDIR="/var"
   dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
   check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
 
