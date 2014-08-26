@@ -29,6 +29,7 @@ public class InstallHandlerTest {
     public void testWithInvalidConfig() {
         FlumeConfig config = new FlumeConfig();
         config.setSetupType(SetupType.OVER_HADOOP);
+        config.setClusterName("test-cluster");
         handler = new InstallHandler(mock, config);
         handler.run();
 
