@@ -446,6 +446,7 @@ public class Manager {
                             agent.getHostname(), ip, checkBtn, destroyBtn, resultHolder, progressIcon
                     }, null );
 
+            final int j = i;
             checkBtn.addClickListener( new Button.ClickListener() {
 
                 @Override
@@ -453,27 +454,32 @@ public class Manager {
                     progressIcon.setVisible( true );
 
                     AccumuloUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
+                        new CheckTask( config.getClusterName(), agent.getHostname(), new CompleteEvent() {
 
-                                public void onComplete( String result ) {
-                                    synchronized ( progressIcon ) {
-                                        if ( masters ) {
-                                            resultHolder.setValue( parseMastersState( result ) );
+                            public void onComplete( String result ) {
+                                synchronized ( progressIcon ) {
+                                    if ( masters ) {
+                                        if ( j == 1) {
+                                            resultHolder.setValue( parseMasterState( result ) );
+                                        } else if ( j == 2 ){
+                                            resultHolder.setValue( parseGCState( result ) );
+                                        } else {
+                                            resultHolder.setValue( parseMonitorState( result ) );
                                         }
-                                        else if ( table == tracersTable ) {
-                                            resultHolder.setValue( parseTracersState( result ) );
-                                        }
-                                        else if ( table == slavesTable ) {
-                                            resultHolder.setValue( parseSlavesState( result ) );
-                                        }
-                                        destroyBtn.setEnabled( true );
-                                        progressIcon.setVisible( false );
                                     }
+                                    else if ( table == tracersTable ) {
+                                        resultHolder.setValue( parseTracersState( result ) );
+                                    }
+                                    else if ( table == slavesTable ) {
+                                        resultHolder.setValue( parseSlavesState( result ) );
+                                    }
+                                    destroyBtn.setEnabled( true );
+                                    progressIcon.setVisible( false );
                                 }
-                            } ) );
+                            }
+                        } ) );
                 }
             } );
-
 
             destroyBtn.addClickListener( new Button.ClickListener() {
 
@@ -509,22 +515,30 @@ public class Manager {
         }
     }
 
-
-    private String parseMastersState( String result ) {
+    private String parseMasterState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
-        Matcher masterMatcher = masterPattern.matcher( result );
-        if ( masterMatcher.find() ) {
-            parsedResult.append( masterMatcher.group( 1 ) ).append( " " );
+        Matcher gcMathcer = masterPattern.matcher( result );
+        if ( gcMathcer.find() ) {
+            parsedResult.append( gcMathcer.group( 1 ) );
         }
-        Matcher gcMatcher = gcPattern.matcher( result );
-        if ( gcMatcher.find() ) {
-            parsedResult.append( gcMatcher.group( 1 ) ).append( " " );
-        }
-        Matcher monitorMatcher = monitorPattern.matcher( result );
-        if ( monitorMatcher.find() ) {
-            parsedResult.append( monitorMatcher.group( 1 ) ).append( " " );
-        }
+        return parsedResult.toString();
+    }
 
+    private String parseGCState( String result ) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher gcMathcer = gcPattern.matcher( result );
+        if ( gcMathcer.find() ) {
+            parsedResult.append( gcMathcer.group( 1 ) );
+        }
+        return parsedResult.toString();
+    }
+
+    private String parseMonitorState( String result ) {
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher moniotorPattern = monitorPattern.matcher( result );
+        if ( moniotorPattern.find() ) {
+            parsedResult.append( moniotorPattern.group( 1 ) );
+        }
         return parsedResult.toString();
     }
 
@@ -544,7 +558,7 @@ public class Manager {
         StringBuilder parsedResult = new StringBuilder();
         Matcher loggersMatcher = loggerPattern.matcher( result );
         if ( loggersMatcher.find() ) {
-            parsedResult.append( loggersMatcher.group( 1 ) ).append( " " );
+            parsedResult.append( loggersMatcher.group( 1 ) ).append( ", " );
         }
         Matcher tablerServersMatcher = tabletServerPattern.matcher( result );
         if ( tablerServersMatcher.find() ) {
