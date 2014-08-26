@@ -50,14 +50,17 @@ public class CassandraImpl implements Cassandra {
     private ContainerManager containerManager;
 
 
-    public CassandraImpl( final DbManager dbManager, final Tracker tracker, final LxcManager lxcManager,
-                          final ExecutorService executor, final NetworkManager networkManager,
-                          final CommandRunner commandRunner, final AgentManager agentManager,
-                          final EnvironmentManager environmentManager, final ContainerManager containerManager ) {
+    public CassandraImpl( DbManager dbManager,
+                          Tracker tracker,
+                          LxcManager lxcManager,
+                          NetworkManager networkManager,
+                          CommandRunner commandRunner,
+                          AgentManager agentManager,
+                          EnvironmentManager environmentManager,
+                          ContainerManager containerManager ) {
         this.dbManager = dbManager;
         this.tracker = tracker;
         this.lxcManager = lxcManager;
-//        this.executor = executor;
         this.networkManager = networkManager;
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
