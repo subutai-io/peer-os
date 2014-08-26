@@ -63,6 +63,9 @@ public class Template {
     @Expose
     private String md5sum;
 
+    //indicates whether this template is in use on any of FAIs connected to Subutai
+    private boolean inUseOnFAIs;
+
 
     public Template( final String lxcArch, final String lxcUtsname, final String subutaiConfigPath,
                      final String subutaiParent, final String subutaiGitBranch, final String subutaiGitUuid,
@@ -92,6 +95,16 @@ public class Template {
         if ( templateName.equalsIgnoreCase( parentTemplateName ) ) {
             parentTemplateName = null;
         }
+    }
+
+
+    public boolean isInUseOnFAIs() {
+        return inUseOnFAIs;
+    }
+
+
+    public void setInUseOnFAIs( final boolean inUseOnFAIs ) {
+        this.inUseOnFAIs = inUseOnFAIs;
     }
 
 
