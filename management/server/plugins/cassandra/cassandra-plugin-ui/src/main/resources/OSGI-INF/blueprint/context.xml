@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="cassandraManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.cassandra.Cassandra"/>
+               interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra"/>
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="tracker" availability="mandatory"
@@ -10,7 +10,7 @@
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.cassandra.CassandraUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraUI"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager" />
         <argument ref="cassandraManager"/>

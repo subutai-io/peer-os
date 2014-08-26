@@ -20,7 +20,7 @@
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
 
-  <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.impl.cassandra.CassandraImpl"
+  <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
         init-method="init" destroy-method="destroy">
     <argument ref="dbManager" />
     <argument ref="tracker" />
@@ -34,11 +34,11 @@
   </bean>
 
   <bean id="cassandra-configuration-logic" scope="singleton"
-        class="org.safehaus.subutai.impl.cassandra.configuration.logic.ConfigurationLogicImpl">
+        class="org.safehaus.subutai.plugin.cassandra.impl.logic.ConfigurationLogicImpl">
     <property name="configManager" ref="configManager" />
   </bean>
 
-  <service ref="cassandra-configuration-logic" interface="org.safehaus.subutai.api.cassandra.ConfigurationLogic" />
-  <service ref="cassandra-impl" interface="org.safehaus.subutai.api.cassandra.Cassandra" />
+  <service ref="cassandra-configuration-logic" interface="org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic" />
+  <service ref="cassandra-impl" interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />
 
 </blueprint>

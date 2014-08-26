@@ -46,7 +46,10 @@ public class MahoutImpl implements Mahout {
     private ExecutorService executor;
 
 
-    public MahoutImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
+    public MahoutImpl( CommandRunner commandRunner,
+                       AgentManager agentManager,
+                       DbManager dbManager,
+                       Tracker tracker ) {
         this.commandRunner = commandRunner;
         this.agentManager = agentManager;
         this.dbManager = dbManager;
