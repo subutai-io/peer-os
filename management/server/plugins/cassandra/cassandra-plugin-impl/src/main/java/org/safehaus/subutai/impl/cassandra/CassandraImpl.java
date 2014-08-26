@@ -133,7 +133,7 @@ public class CassandraImpl implements Cassandra {
 
 
     public void init() {
-        Commands.init( commandRunner );
+//        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 

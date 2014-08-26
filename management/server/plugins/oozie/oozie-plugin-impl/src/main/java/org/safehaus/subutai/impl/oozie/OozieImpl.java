@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
 
 public class OozieImpl implements Oozie {
 
-    public AgentManager agentManager;
+    private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
@@ -44,13 +44,16 @@ public class OozieImpl implements Oozie {
     private ContainerManager containerManager;
 
 
-    public OozieImpl( final AgentManager agentManager, final DbManager dbManager, final Tracker tracker,
-                      final ExecutorService executor, final CommandRunner commandRunner, final LxcManager lxcManager,
-                      final EnvironmentManager environmentManager, final ContainerManager containerManager ) {
+    public OozieImpl( final AgentManager agentManager,
+                      final DbManager dbManager,
+                      final Tracker tracker,
+                      final CommandRunner commandRunner,
+                      final LxcManager lxcManager,
+                      final EnvironmentManager environmentManager,
+                      final ContainerManager containerManager ) {
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
-//        this.executor = executor;
         this.commandRunner = commandRunner;
         this.lxcManager = lxcManager;
         this.environmentManager = environmentManager;
@@ -121,7 +124,7 @@ public class OozieImpl implements Oozie {
 
 
     public void init() {
-        Commands.init( commandRunner );
+        //        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
