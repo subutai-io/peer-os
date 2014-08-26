@@ -31,6 +31,6 @@ public class HBaseSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ConfigBase setup() throws ClusterSetupException {
-        return null;
+        return config;
     }
 }

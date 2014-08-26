@@ -15,12 +15,12 @@ import org.safehaus.subutai.shared.operation.ProductOperation;
 public class UninstallOperationHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
-    private CassandraConfig config;
+    private String clusterName;
 
 
     public UninstallOperationHandler( final CassandraImpl manager, final String clusterName) {
         super( manager, clusterName );
-        this.config = config;
+        this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
