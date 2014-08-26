@@ -3,6 +3,9 @@ package org.safehaus.subutai.impl.container;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.container.ContainerManager;
@@ -14,10 +17,6 @@ import org.safehaus.subutai.shared.protocol.PlacementStrategy;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
@@ -225,7 +224,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 	@Override
 	public void clonesDestroy(final String hostName, final Set<String> cloneNames) throws LxcDestroyException {
-		boolean result = templateManager.clonesDestroy(hostName, cloneNames);
+		boolean result = templateManager.cloneDestroy(hostName, cloneNames);
 		if (!result) {
 			throw new LxcDestroyException(
 					String.format("Not all containers from %s are destroyed. Use LXC module to cleanup",

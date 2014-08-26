@@ -40,7 +40,7 @@ public interface TemplateManager {
 	 */
 	public boolean cloneDestroy(String hostName, String cloneName);
 
-	public boolean clonesDestroy(String hostName, Set<String> cloneNames);
+	public boolean cloneDestroy(String hostName, Set<String> cloneNames);
 
 	/**
 	 * Renames an instance container.
