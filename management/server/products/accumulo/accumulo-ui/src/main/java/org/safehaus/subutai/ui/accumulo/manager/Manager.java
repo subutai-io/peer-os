@@ -377,6 +377,9 @@ public class Manager {
     }
 
 
+    /**
+     * Refreshes whole UI.
+     */
     public void refreshUI() {
         if ( config != null ) {
             populateTable( slavesTable, new ArrayList<>( config.getSlaves() ), false );
@@ -395,6 +398,9 @@ public class Manager {
     }
 
 
+    /**
+     * Fetches saved cluster information and refreshes cluster list on UI.
+     */
     public void refreshClustersInfo() {
         List<Config> accumuloClusterInfos = AccumuloUI.getAccumuloManager().getClusters();
         Config clusterInfo = ( Config ) clusterCombo.getValue();
@@ -419,11 +425,22 @@ public class Manager {
     }
 
 
+    /**
+     * Checks status of nodes in this table.
+     *
+     * @param table Table type ( masters, tracer, slaves )
+     */
     public static void checkNodesStatus( Table table ) {
         UiUtil.clickAllButtonsInTable( table, "Check" );
     }
 
 
+    /**
+     * Populates table in manage tab of accumulo bundle.
+     * @param table Table type ( masters, tracer, slaves )
+     * @param agents List of agents in this table
+     * @param masters If table contains master services (master, monitor, gc ) true, else false
+     */
     private void populateTable( final Table table, List<Agent> agents, final boolean masters ) {
 
         table.removeAllItems();
@@ -515,6 +532,13 @@ public class Manager {
         }
     }
 
+
+    /**
+     * Parses 'service accumulo status' command output and extracts master service status.
+     *
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Masters is Running or Master is NOT Running'
+     */
     private String parseMasterState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher gcMathcer = masterPattern.matcher( result );
@@ -524,6 +548,11 @@ public class Manager {
         return parsedResult.toString();
     }
 
+    /**
+     *  Parses 'service accumulo status' command output and extracts gc service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'GC is Running or GC is NOT Running'
+     */
     private String parseGCState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher gcMathcer = gcPattern.matcher( result );
@@ -533,6 +562,11 @@ public class Manager {
         return parsedResult.toString();
     }
 
+    /**
+     * Parses 'service accumulo status' command output and extracts monitor service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Monitor is Running or Monitor is NOT Running'
+     */
     private String parseMonitorState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher moniotorPattern = monitorPattern.matcher( result );
@@ -542,7 +576,11 @@ public class Manager {
         return parsedResult.toString();
     }
 
-
+    /**
+     * Parses 'service accumulo status' command output and extracts tracer service status.
+     * @param result The output of 'service accumulo status' command.
+     * @return 'Tracer is Running or Tracer is NOT Running'
+     */
     private String parseTracersState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = tracerPattern.matcher( result );
@@ -553,18 +591,21 @@ public class Manager {
         return parsedResult.toString();
     }
 
-
+    /**
+     * Parses 'service accumulo status' command output and extracts logger & tablet server services' status.
+     * @param result The output of 'service accumulo status' command.
+     * @return
+     */
     private String parseSlavesState( String result ) {
         StringBuilder parsedResult = new StringBuilder();
         Matcher loggersMatcher = loggerPattern.matcher( result );
         if ( loggersMatcher.find() ) {
             parsedResult.append( loggersMatcher.group( 1 ) ).append( ", " );
         }
-        Matcher tablerServersMatcher = tabletServerPattern.matcher( result );
-        if ( tablerServersMatcher.find() ) {
-            parsedResult.append( tablerServersMatcher.group( 1 ) ).append( " " );
+        Matcher tabletServersMatcher = tabletServerPattern.matcher( result );
+        if ( tabletServersMatcher.find() ) {
+            parsedResult.append( tabletServersMatcher.group( 1 ) ).append( " " );
         }
-
         return parsedResult.toString();
     }
 
@@ -573,6 +614,9 @@ public class Manager {
         return contentRoot;
     }
 
+    /**
+     * Checks all nodes status on all tables.
+     */
     public void checkAll(){
         checkNodesStatus( mastersTable );
         checkNodesStatus( slavesTable );
