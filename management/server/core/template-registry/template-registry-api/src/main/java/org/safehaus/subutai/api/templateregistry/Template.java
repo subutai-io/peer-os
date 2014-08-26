@@ -64,6 +64,7 @@ public class Template {
     private String md5sum;
 
     //indicates whether this template is in use on any of FAIs connected to Subutai
+    @Expose
     private boolean inUseOnFAIs;
 
 
