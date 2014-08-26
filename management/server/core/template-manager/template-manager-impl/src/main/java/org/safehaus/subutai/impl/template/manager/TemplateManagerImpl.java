@@ -78,7 +78,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     }
 
     @Override
-    public boolean clonesDestroy(String hostName, Set<String> cloneNames) {
+    public boolean cloneDestroy(String hostName, Set<String> cloneNames) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(hostName), "Host server name is null or empty");
         Preconditions.checkArgument(cloneNames != null && !cloneNames.isEmpty(), "Clone names is null or empty");
 
