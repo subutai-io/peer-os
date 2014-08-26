@@ -2,7 +2,6 @@ package org.safehaus.subutai.impl.template.manager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -62,17 +61,14 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         Agent a = agentManager.getAgentByHostname(hostName);
 
         StringBuilder cmdBuilder = new StringBuilder();
-
-        int i = 0;
         for(String cloneName : cloneNames) {
-
-            cmdBuilder.append("/usr/bin/subutai destroy ").append(cloneName);
-            if(++i < cloneNames.size())
-                cmdBuilder.append(" & ");
+            if(cmdBuilder.length() > 0) cmdBuilder.append(" & ");
+            cmdBuilder.append(ActionType.DESTROY.buildCommand(cloneName));
         }
 
-        Command cmd = getCommandRunner()
-                .createCommand(new RequestBuilder(cmdBuilder.toString()).withTimeout(180), Sets.newHashSet(a));
+        Command cmd = getCommandRunner().createCommand(
+                new RequestBuilder(cmdBuilder.toString()).withTimeout(180),
+                new HashSet<>(Arrays.asList(a)));
         getCommandRunner().runCommand(cmd);
 
         return cmd.hasSucceeded();
@@ -95,14 +91,8 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 
         boolean result = true;
         for(String cloneName : cloneNames) {
-            String command = String.format("/usr/bin/subutai clone %s %s &", templateName, cloneName);
-            Command cmd = getCommandRunner()
-                    .createCommand(new RequestBuilder(command).withTimeout(180), Sets.newHashSet(a));
-            getCommandRunner().runCommand(cmd);
-
-            result &= cmd.hasSucceeded();
+            result &= scriptExecutor.execute(a, ActionType.CLONE, templateName, cloneName, "&");
         }
-
         return result;
     }
 
