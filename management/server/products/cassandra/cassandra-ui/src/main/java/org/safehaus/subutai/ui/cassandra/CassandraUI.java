@@ -5,10 +5,7 @@
  */
 package org.safehaus.subutai.ui.cassandra;
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
@@ -17,7 +14,9 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author dilshat

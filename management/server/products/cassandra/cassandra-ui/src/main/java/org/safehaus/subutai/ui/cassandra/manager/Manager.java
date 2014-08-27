@@ -92,7 +92,10 @@ public class Manager {
 					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
 					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
 					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), CassandraUI.getExecutor(), CassandraUI.getCommandRunner(), CassandraUI.getAgentManager());
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent),
+                                CassandraUI.getExecutor(),
+                                CassandraUI.getCommandRunner(),
+                                CassandraUI.getAgentManager());
 						contentRoot.getUI().addWindow(terminal.getWindow());
 					} else {
 						show("Agent is not connected");
