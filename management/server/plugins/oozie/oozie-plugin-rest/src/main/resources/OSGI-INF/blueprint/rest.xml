@@ -11,7 +11,7 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <jaxrs:server address="/oozie" id="oozieRestService">
+  <jaxrs:server address="/oozie-plugin" id="oozieRestService">
     <jaxrs:serviceBeans>
       <ref component-id="oozieRestServiceImpl" />
     </jaxrs:serviceBeans>

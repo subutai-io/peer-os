@@ -14,7 +14,7 @@
     <property name="hbaseManager" ref="hbaseManager" />
   </bean>
 
-  <jaxrs:server address="/hbase" id="hbaseRestService">
+  <jaxrs:server address="/hbase-plugin" id="hbaseRestService">
     <jaxrs:serviceBeans>
       <ref component-id="restService" />
     </jaxrs:serviceBeans>

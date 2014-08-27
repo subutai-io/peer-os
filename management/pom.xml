@@ -1148,7 +1148,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Mahout -->
+      <!-- Mahout plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>mahout-plugin-api</artifactId>
@@ -1172,6 +1172,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>mahout-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Mahout old -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1256,7 +1283,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- HBase -->
+      <!-- HBase plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>hbase-plugin-api</artifactId>
@@ -1283,7 +1310,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Cassandra -->
+      <!-- HBase old -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Cassandra plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>cassandra-plugin-api</artifactId>
@@ -1307,6 +1361,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>cassandra-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Cassandra old -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1334,6 +1415,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>oozie-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Oozie old -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1601,7 +1709,7 @@
             <!-- Produces XML report -->
             <xmlOutput>true</xmlOutput>
             <!-- Configures the directory in which the XML report is created -->
-            <findbugsXmlOutputDirectory>${project.basedir}/findbugs</findbugsXmlOutputDirectory>
+            <findbugsXmlOutputDirectory>${project.build.directory}/target/findbugs</findbugsXmlOutputDirectory>
           </configuration>
           <executions>
             <!--
@@ -1624,9 +1732,9 @@
             <transformationSets>
               <transformationSet>
                 <!-- Configures the source directory of XML files. -->
-                <dir>${project.basedir}/findbugs</dir>
+                <dir>${project.build.directory}/target/findbugs</dir>
                 <!-- Configures the directory in which the FindBugs report is written.-->
-                <outputDir>${project.basedir}/findbugs</outputDir>
+                <outputDir>${project.build.directory}/target/findbugs</outputDir>
                 <!-- Selects the used stylesheet. -->
                 <!-- <stylesheet>fancy-hist.xsl</stylesheet> -->
                 <stylesheet>default.xsl</stylesheet>
@@ -1635,7 +1743,8 @@
                 <!--<stylesheet>summary.xsl</stylesheet>-->
                 <fileMappers>
                   <!-- Configures the file extension of the output files. -->
-                  <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                  <fileMapper
+                      implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
                     <targetExtension>.html</targetExtension>
                   </fileMapper>
                 </fileMappers>

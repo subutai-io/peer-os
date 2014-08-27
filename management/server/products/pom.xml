@@ -31,6 +31,10 @@
         <module>storm</module>
         <module>zookeeper</module>
         <module>elasticsearch</module>
+        <module>cassandra</module>
+        <module>oozie</module>
+        <module>hbase</module>
+        <module>mahout</module>
     </modules>
 
 </project>
