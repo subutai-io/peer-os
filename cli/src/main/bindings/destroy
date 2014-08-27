@@ -27,7 +27,7 @@ function destroy {
   local force="false"
 
   shift_amount=0;
-  while getopts ":r" opt; do
+  while getopts ":rf" opt; do
     case $opt in
       r)
         recursive="true"
