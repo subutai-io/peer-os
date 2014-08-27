@@ -2,7 +2,7 @@
 
 
 function master_create {
-  if [ "`is_system_locked`" == "true" ]
+  if [ "`is_system_all_locked`" == "true" ]
   then
      echo "System locked by a subutai process"
      exit 1
