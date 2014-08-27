@@ -39,14 +39,6 @@ function import {
   lxc_assert_no $container
   zfs_assert_nods lxc/$container
 
-  # check to make sure container is registered as a template
-  if [ "`is_registered $container`" == "false" ]; then
-    msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: \"$container\" is registered"
-  fi
-
   if [ -f "$debian_file" ]; then
     is_local="true"
   else
@@ -62,11 +54,28 @@ function import {
     subutai master_import
     exit $?
   fi
-  
+
+  if [ $is_local == "true" ]; then
+    if [ "`are_md5sums_equal $container`" == true ];then
+      msg_info "    - check passed: local \"$container\" package is same with the registered package"
+    else
+      msg_error "A template $container is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$container*\" and import again"
+      exit 1
+    fi
+  else
+      # check to make sure container is registered as a template
+    if [ "`is_registered $container`" == "false" ]; then
+      msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+      exit 1
+    else
+      msg_info "    - check passed: \"$container\" is registered"
+    fi
+  fi
+
+ 
   # ----------------------------------------------------------------------------
   # (2) Install the debian package if subutai import not called during a debian package installation
   # ----------------------------------------------------------------------------
-  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     msg_info "subutai import called from command line"
 
