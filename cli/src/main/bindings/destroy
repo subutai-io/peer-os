@@ -95,7 +95,13 @@ function destroy {
   # (3) Remove the debian package if installed
   local container=$clone
   local package_name=`get_package_name $container`
-  
+ 
+  if [ "`is_dpkg_locked`" == "true" ]
+  then
+    echo "$1 import FAILED! dpkg is locked by process!"
+    exit 1
+  fi
+ 
   # Check if the package is installed
   is_package_installed $package_name
   if [ $? = 0  ]; then

@@ -76,6 +76,12 @@ function import {
       msg_error "Template $container seems already installed, please destroy first"
       exit 1
     fi
+    
+    if [ "`is_dpkg_locked`" == "true" ]
+    then
+       echo "$1 import FAILED! dpkg is locked by process!"
+       exit 1
+    fi
 
     if [ "$is_local" == "true" ]
     then
