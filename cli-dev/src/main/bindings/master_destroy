@@ -26,7 +26,6 @@ function master_destroy {
     read -p "Do you wish to destroy master template? [Y/N]" yn
     case $yn in
       [Yy]* ) break;;
-<<<<<<< HEAD
       [Nn]* ) unlock_subutai_system
              if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi 
              exit 1;;
