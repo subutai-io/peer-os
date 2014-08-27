@@ -1,22 +1,24 @@
 package org.safehaus.subutai.plugin.mahout.rest;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
-import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
+import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 
+@Path( "mahout" )
 public class RestService {
 
 	private static final String OPERATION_ID = "OPERATION_ID";

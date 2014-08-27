@@ -1002,7 +1002,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Cassandra -->
+                <!-- Cassandra plugin -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>cassandra-plugin-api</artifactId>
@@ -1029,7 +1029,34 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- HBase -->
+                <!-- Cassandra old -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>cassandra-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>cassandra-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>cassandra-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>cassandra-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>cassandra-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- HBase plugin -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hbase-plugin-api</artifactId>
@@ -1053,6 +1080,33 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hbase-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- HBase old -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hbase-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hbase-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hbase-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hbase-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hbase-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -1213,7 +1267,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Mahout -->
+                <!-- Mahout plugin -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mahout-plugin-api</artifactId>
@@ -1237,6 +1291,33 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mahout-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Mahout old -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>mahout-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>mahout-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>mahout-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>mahout-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>mahout-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
@@ -1294,7 +1375,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Oozie -->
+                <!-- Oozie plugin-->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>oozie-plugin-api</artifactId>
@@ -1318,6 +1399,33 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>oozie-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- Oozie old -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>oozie-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>oozie-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>oozie-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>oozie-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>oozie-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

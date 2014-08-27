@@ -18,6 +18,7 @@ import org.safehaus.subutai.common.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 
 
+@Path( "hbase" )
 public class RestService {
 
     private static final String OPERATION_ID = "OPERATION_ID";
