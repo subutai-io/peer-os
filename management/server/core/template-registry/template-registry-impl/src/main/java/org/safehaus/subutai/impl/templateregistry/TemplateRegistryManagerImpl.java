@@ -24,6 +24,7 @@ import org.safehaus.subutai.api.templateregistry.RegistryException;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
+import org.safehaus.subutai.common.StringUtil;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
@@ -106,7 +107,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             //check if template with supplied md5sum already exists
             List<Template> allTemplates = getAllTemplates( template.getLxcArch() );
             for ( Template templ : allTemplates ) {
-                if ( templ.getMd5sum().equalsIgnoreCase( template.getMd5sum() ) ) {
+                if ( StringUtil.areStringsEqual( templ.getMd5sum(), template.getMd5sum() ) ) {
                     throw new RegistryException( String.format( "Template %s with the same md5sum already exists",
                             templ.getTemplateName() ) );
                 }
@@ -117,6 +118,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
                 template.setProducts( getPackagesDiff( null, template ) );
             }
             else {
+
                 Template parentTemplate = getTemplate( template.getParentTemplateName() );
 
                 template.setProducts( getPackagesDiff( parentTemplate, template ) );
