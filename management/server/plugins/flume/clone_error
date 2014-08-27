@@ -1,9 +1,0 @@
-
-Installation of Hadoop
-State: FAILED
-Logs:
-Creating 6 servers...
-Destroying lxc containers
-Lxc containers successfully destroyed
-Destroying lxc containers after cluster installation failure.
-org.safehaus.subutai.api.lxcmanager.LxcCreateException: Waiting interval for lxc agents timed out. Use LXC module to cleanup nodes {py803618909=[hadoop1, hadoop2], py330846542=[hadoop3]}

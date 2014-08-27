@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.handler.UninstallHandler;
 import org.junit.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
 import org.safehaus.subutai.shared.operation.*;
 
@@ -28,7 +28,9 @@ public class UninstallHandlerTest {
 
     @Test
     public void testWithExistingCluster() {
-        mock.setConfig(new FlumeConfig());
+        FlumeConfig config = new FlumeConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
+        mock.setConfig(config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();

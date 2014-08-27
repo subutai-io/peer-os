@@ -3,7 +3,9 @@ package org.safehaus.subutai.plugin.flume.impl.handler;
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
 import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
@@ -45,26 +47,24 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             return;
         }
 
-        po.addLog("Uninstalling Flume...");
-        Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(Commands.make(CommandType.PURGE)),
-                new HashSet<>(Arrays.asList(agent)));
-        manager.getCommandRunner().runCommand(cmd);
-
-        if(cmd.hasCompleted()) {
-            AgentResult res = cmd.getResults().get(agent.getUuid());
-            if(res.getExitCode() != null && res.getExitCode() == 0)
-                po.addLog("Flume removed from " + agent.getHostname());
-            else {
-                po.addLog(res.getStdOut());
-                po.addLog(res.getStdErr());
-                po.addLogFailed("Failed to remove Flume on " + agent.getHostname());
-                return;
+        boolean ok = false;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            ok = uninstallFlume(agent);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+            try {
+                manager.getContainerManager().cloneDestroy(
+                        agent.getParentHostName(), agent.getHostname());
+                ok = true;
+            } catch(LxcDestroyException ex) {
+                String m = "Failed to destroy " + agent.getHostname();
+                po.addLog(m);
+                manager.getLogger().error(m, ex);
             }
+        else po.addLog("Unsupported setup type: " + config.getSetupType());
 
-            config.getNodes().remove(agent);
-
+        if(ok) {
             po.addLog("Updating db...");
+            config.getNodes().remove(agent);
             try {
                 manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config);
                 po.addLogDone("Cluster info updated");
@@ -72,9 +72,24 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
                 po.addLogFailed("Failed to save cluster info");
                 manager.getLogger().error("Failed to save cluster info", ex);
             }
+        } else po.addLogFailed(null);
+    }
+
+    private boolean uninstallFlume(Agent agent) {
+        ProductOperation po = productOperation;
+        po.addLog("Uninstalling Flume...");
+        Command cmd = manager.getCommandRunner().createCommand(
+                new RequestBuilder(Commands.make(CommandType.PURGE)),
+                new HashSet<>(Arrays.asList(agent)));
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(cmd.hasSucceeded()) {
+            po.addLog("Flume removed from " + agent.getHostname());
+            return true;
         } else {
             po.addLog(cmd.getAllErrors());
-            po.addLogFailed("Uninstallation failed");
+            po.addLog("Uninstallation failed");
+            return false;
         }
     }
 
