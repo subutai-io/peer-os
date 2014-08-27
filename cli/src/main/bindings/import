@@ -111,7 +111,7 @@ function import {
 
       dpkg -i $debian_file
       if [ $? -eq 0 ]; then
-        msg_info "Debian package of $package_name is installed succesfully from local"
+        msg_ok "Debian package of $package_name is installed succesfully from local"
         unlock_container_read $container
         if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
         exit 0
@@ -136,7 +136,7 @@ function import {
 
       apt-get --assume-yes --force-yes install $package_name
       if [ $? -eq 0 ]; then
-       msg_info "Debian package of $package_name is installed succesfully from repo"
+       msg_ok "Debian package of $package_name is installed succesfully from repo"
        unlock_container_read $container
        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
        exit 0
