@@ -6,7 +6,8 @@
 package org.safehaus.subutai.impl.manager;
 
 
-import com.google.common.base.Strings;
+import java.util.List;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -21,7 +22,7 @@ import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.util.BlueprintParser;
 import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
-import java.util.List;
+import com.google.common.base.Strings;
 
 
 /**
@@ -86,6 +87,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 			//TODO environmentDAO.deleteEnvironmentInfo( environment.getName() );
 			return true;
 		} catch (EnvironmentDestroyException e) {
+
 			e.printStackTrace();
 		}
 		return false;

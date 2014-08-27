@@ -35,26 +35,26 @@ public class AddNodeHandler extends AbstractHandler {
 			return;
 		}
 
-		Agent agent;
-		if (hostname != null) {
-			agent = manager.getAgentManager().getAgentByHostname(hostname);
-			if (agent == null) {
-				po.addLogFailed(String.format("Node '%s' is not connected", hostname));
-				return;
-			}
-		} else {
-			po.addLog("Creating container for new node...");
-			InstallHelper helper = new InstallHelper(manager);
-			try {
-				agent = helper.createContainer();
-				if (agent == null)
-					throw new LxcCreateException("returned value is null");
-			} catch (LxcCreateException ex) {
-				po.addLogFailed("Failed to create container: " + ex.getMessage());
-				return;
-			}
-			po.addLog("Container created. Host name is " + agent.getHostname());
-		}
+        Agent agent;
+        if(hostname != null) {
+            agent = manager.getAgentManager().getAgentByHostname(hostname);
+            if(agent == null) {
+                po.addLogFailed(String.format("Node '%s' is not connected", hostname));
+                return;
+            }
+        } else {
+            po.addLog("Creating container for new node...");
+            Helper helper = new Helper(manager);
+            try {
+                agent = helper.createContainer();
+                if(agent == null)
+                    throw new LxcCreateException("returned value is null");
+            } catch(LxcCreateException ex) {
+                po.addLogFailed("Failed to create container: " + ex.getMessage());
+                return;
+            }
+            po.addLog("Container created. Host name is " + agent.getHostname());
+        }
 
 		Set<Agent> set = new HashSet<>();
 		set.add(agent);

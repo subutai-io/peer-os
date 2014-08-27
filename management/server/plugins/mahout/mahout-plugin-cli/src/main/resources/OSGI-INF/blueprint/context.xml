@@ -2,11 +2,11 @@
         >
 
     <reference id="mahoutManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.mahout.Mahout"/>
+               interface="org.safehaus.subutai.plugin.mahout.api.Mahout"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="mahout/list-clusters">
-            <action class="org.safehaus.subutai.cli.commands.ListClustersCommand">
+            <action class="org.safehaus.subutai.plugin.mahout.cli.ListClustersCommand">
                 <property name="mahoutManager" ref="mahoutManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="mahout/uninstall-cluster">
-            <action class="org.safehaus.subutai.cli.commands.UninstallClusterCommand">
+            <action class="org.safehaus.subutai.plugin.mahout.cli.UninstallClusterCommand">
                 <property name="mahoutManager" ref="mahoutManager"/>
             </action>
         </command>
