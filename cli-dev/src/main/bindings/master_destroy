@@ -26,7 +26,7 @@ function master_destroy {
     read -p "Do you wish to destroy master template? [Y/N]" yn
     case $yn in
       [Yy]* ) break;;
-      [Nn]* )unlock_subutai_system
+      [Nn]* ) unlock_subutai_system
              if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi 
              exit 1;;
       * ) echo "Please answer yes or no.";;
@@ -64,6 +64,12 @@ function master_destroy {
   rm -rf $debian_root
   unlock_container_read $container
   if [ $? != 0 ]; then echo "Master cannot be unlocked!"; exit 1; fi
+  unlock_subutai_system
+  if [ $? != 0 ]; then 
+    echo "System cannot be unlocked!"
+    exit 1
+  fi
+  msg_ok "Destruction of \"master\" completed succesfully "
 }
 
 
