@@ -99,7 +99,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
             po.addLog("Updating db...");
             try {
-                manager.getDbManager().saveInfo2(FlumeConfig.PRODUCT_KEY,
+                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
                         config.getClusterName(), config);
                 po.addLog("Cluster info updated");
                 return true;

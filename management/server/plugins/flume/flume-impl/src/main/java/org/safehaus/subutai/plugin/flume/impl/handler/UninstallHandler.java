@@ -1,10 +1,11 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.plugin.flume.impl.Commands;
-import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.impl.CommandType;
+import org.safehaus.subutai.plugin.flume.impl.Commands;
+import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -59,10 +60,13 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
             }
 
             po.addLog("Updating db...");
-            if(manager.getDbManager().deleteInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName()))
+            try {
+                manager.getPluginDao().deleteInfo(FlumeConfig.PRODUCT_KEY, clusterName);
                 po.addLogDone("Cluster info deleted from DB\nDone");
-            else
+            } catch(DBException ex) {
                 po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                manager.getLogger().error("Failed to delete cluster info", ex);
+            }
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Uninstallation failed");

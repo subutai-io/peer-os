@@ -2,10 +2,10 @@ package org.safehaus.subutai.plugin.flume.impl;
 
 import java.util.*;
 import java.util.concurrent.*;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.plugin.flume.api.Flume;
-import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.plugin.flume.api.*;
 import org.safehaus.subutai.plugin.flume.impl.handler.*;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -19,6 +19,7 @@ public class FlumeImpl extends FlumeBase implements Flume {
 
     public void init() {
         executor = Executors.newCachedThreadPool();
+        pluginDao = new PluginDAO(dbManager);
     }
 
     public void destroy() {
@@ -84,12 +85,22 @@ public class FlumeImpl extends FlumeBase implements Flume {
 
     @Override
     public List<FlumeConfig> getClusters() {
-        return dbManager.getInfo(FlumeConfig.PRODUCT_KEY, FlumeConfig.class);
+        try {
+            return pluginDao.getInfo(FlumeConfig.PRODUCT_KEY, FlumeConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get clusters info", ex);
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public FlumeConfig getCluster(String clusterName) {
-        return dbManager.getInfo(FlumeConfig.PRODUCT_KEY, clusterName, FlumeConfig.class);
+        try {
+            return pluginDao.getInfo(FlumeConfig.PRODUCT_KEY, clusterName, FlumeConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get cluster info", ex);
+            return null;
+        }
     }
 
     @Override

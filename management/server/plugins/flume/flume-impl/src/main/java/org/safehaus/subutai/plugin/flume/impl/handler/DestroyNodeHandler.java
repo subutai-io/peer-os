@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.flume.impl.handler;
 
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
@@ -64,10 +65,13 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             config.getNodes().remove(agent);
 
             po.addLog("Updating db...");
-            if(manager.getDbManager().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config))
+            try {
+                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY, config.getClusterName(), config);
                 po.addLogDone("Cluster info updated");
-            else
+            } catch(DBException ex) {
                 po.addLogFailed("Failed to save cluster info");
+                manager.getLogger().error("Failed to save cluster info", ex);
+            }
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Uninstallation failed");

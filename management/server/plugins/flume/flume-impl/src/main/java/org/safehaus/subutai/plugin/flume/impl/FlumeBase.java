@@ -6,14 +6,20 @@ import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class FlumeBase {
+
+    static final Logger logger = LoggerFactory.getLogger(FlumeImpl.class);
 
     CommandRunner commandRunner;
     AgentManager agentManager;
     Tracker tracker;
     DbManager dbManager;
+    PluginDAO pluginDao;
     EnvironmentManager environmentManager;
     Hadoop hadoopManager;
 
@@ -51,6 +57,10 @@ public abstract class FlumeBase {
         this.dbManager = dbManager;
     }
 
+    public PluginDAO getPluginDao() {
+        return pluginDao;
+    }
+
     public EnvironmentManager getEnvironmentManager() {
         return environmentManager;
     }
@@ -71,4 +81,7 @@ public abstract class FlumeBase {
         return executor;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
 }

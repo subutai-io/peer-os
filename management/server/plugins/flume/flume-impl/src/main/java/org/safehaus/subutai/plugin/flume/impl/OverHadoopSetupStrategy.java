@@ -72,7 +72,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy {
             po.addLog("Installation succeeded");
             po.addLog("Saving to db...");
             try {
-                manager.getDbManager().saveInfo2(FlumeConfig.PRODUCT_KEY,
+                manager.getPluginDao().saveInfo(FlumeConfig.PRODUCT_KEY,
                         config.getClusterName(), config);
                 po.addLog("Cluster info successfully saved");
             } catch(DBException ex) {
