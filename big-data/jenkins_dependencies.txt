@@ -4,4 +4,19 @@ Each dependency is seperated with a space so that a developer can copy and
 paste the below dependencies while running "apt-get"
 
 Package Dependency List:
-subversion
+subversion 	1.8.8-1ubuntu3.1
+deb-conf 	1.5.51ubuntu2
+debhelper 	9.20131227ubuntu1
+debianutils 	4.4
+dpkg 		1.17.5ubuntu5.3
+dpkg-dev 	1.17.5ubuntu5.3
+lib-dpkg-perl 	1.17.5ubuntu5.3
+expect		5.45-5ubuntu1
+squid3		3.1.19-1ubuntu3.12.04.2
+squid3-common	3.1.19-1ubuntu3.12.04.2
+squid-langpack  20111114-1
+libcppunit-dev	1.13.1-2ubuntu1 	
+libc-ares-dev	1.10.0-2
+bridge-utils	1.5-6ubuntu2
+lxc		1.0.5-0ubuntu0.1
+protobuf	2.5.0(need to be build from source)

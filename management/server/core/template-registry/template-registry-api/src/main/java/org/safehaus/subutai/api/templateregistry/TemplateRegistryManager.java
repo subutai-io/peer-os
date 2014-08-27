@@ -141,6 +141,7 @@ public interface TemplateRegistryManager {
     /**
      * Update template usage on FAI servers
      *
+     * @param faiHostname - hostname of FAI
      * @param templateName - target template
      * @param inUse - true - template is in use, false - template is out of use
      */

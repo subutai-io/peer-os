@@ -32,6 +32,11 @@ public class TemplateDAO {
     }
 
 
+    /**
+     * Returns all registered templates from database
+     *
+     * @return {@code List<Template>}
+     */
     public List<Template> getAllTemplates() throws DBException {
         List<Template> list = new ArrayList<>();
         try {
@@ -55,6 +60,14 @@ public class TemplateDAO {
     }
 
 
+    /**
+     * Returns child templates of supplied parent
+     *
+     * @param parentTemplateName - name of parent template
+     * @param lxcArch - lxc arch of template
+     *
+     * @return {@code List<Template>}
+     */
     public List<Template> geChildTemplates( String parentTemplateName, String lxcArch ) throws DBException {
         List<Template> list = new ArrayList<>();
         if ( parentTemplateName != null && lxcArch != null ) {
@@ -80,6 +93,14 @@ public class TemplateDAO {
     }
 
 
+    /**
+     * Returns template by name
+     *
+     * @param templateName - template name
+     * @param lxcArch -- lxc arch of template
+     *
+     * @return {@code Template}
+     */
     public Template getTemplateByName( String templateName, String lxcArch ) throws DBException {
         if ( templateName != null && lxcArch != null ) {
             try {
@@ -102,6 +123,11 @@ public class TemplateDAO {
     }
 
 
+    /**
+     * Saves template to database
+     *
+     * @param template - template to save
+     */
     public void saveTemplate( Template template ) throws DBException {
 
         dbManager.executeUpdate2( "insert into template_registry_info(template, parent, info) values(?,?,?)",
@@ -112,6 +138,11 @@ public class TemplateDAO {
     }
 
 
+    /**
+     * Deletes template from database
+     *
+     * @param template - template to delete
+     */
     public void removeTemplate( Template template ) throws DBException {
 
         dbManager.executeUpdate2( "delete from template_registry_info where template = ?",
