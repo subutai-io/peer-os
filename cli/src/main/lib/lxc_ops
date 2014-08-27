@@ -46,7 +46,7 @@ function lxc_wait_net {
     ipv4=`lxc-ls -f | grep $lxc | awk '{print $3}'`
 
     if [ "$ipv4" != "-" ]; then
-      msg_notice "    - container \"$lxc\" online with ip = $ipv4"
+      msg_info "    - container \"$lxc\" online with ip = $ipv4"
       break
     fi
     

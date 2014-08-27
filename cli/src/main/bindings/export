@@ -94,7 +94,8 @@ function export {
   cp /var/lib/lxc/$container/packages  $debian_root
 
   pkg=`deb_pkg $container`
-  msg_info "Generated debian package: $pkg"
+  check_status "debian package $pkg generated" "$?"
+  
   # Remove debian root directory after debian package generation
   rm -rf $debian_root
 }

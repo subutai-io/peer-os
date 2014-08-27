@@ -187,6 +187,8 @@ function promote {
   zfs snapshot lxc-data/$lxc_template-home@template
   zfs hold keep lxc-data/$lxc_template-home@template
   zfs set readonly=on lxc-data/$lxc_template-home
+
+  msg_ok "Successfully promoted $lxc_template"
 }
 
 

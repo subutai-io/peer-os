@@ -52,7 +52,7 @@ function send_n_register {
   local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
 
   if [ "$TEST_MODE" == "true" ]; then
-    msg_notice "${FUNCNAME[0]} called in TEST mode"
+    msg_info "${FUNCNAME[0]} called in TEST mode"
     return
   fi
 

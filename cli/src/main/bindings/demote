@@ -73,6 +73,8 @@ function demote {
   zfs release keep "$root_snap"
   zfs destroy "$root_snap"
   zfs set readonly=off "lxc/$temp"
+
+  msg_ok "Successfully demoted $temp"
 }
 
 

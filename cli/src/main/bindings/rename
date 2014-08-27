@@ -68,7 +68,7 @@ function rename {
   lxc_assert_no "$dst" "`usage`"
   lxc_stop "$src"
   lxc_rename "$src" "$dst"
-
+  check_status "container $src is renamed to $dst succesfully" "$?"
 }
 
 

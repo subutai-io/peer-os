@@ -81,7 +81,7 @@ function import {
     then
       dpkg -i $debian_file
       if [ $? -eq 0 ]; then
-        msg_ok "Debian package of $package_name is installed succesfully from local"
+        msg_info "Debian package of $package_name is installed succesfully from local"
         exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
@@ -93,7 +93,7 @@ function import {
     then
       apt-get --assume-yes --force-yes install $package_name
       if [ $? -eq 0 ]; then
-       msg_ok "Debian package of $package_name is installed succesfully from repo"
+       msg_info "Debian package of $package_name is installed succesfully from repo"
        exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
@@ -140,7 +140,7 @@ function import {
   deltas=$debian_root/deltas
 
   mkdir -p $lxc_rootfs
-  echo lxc_rootfs = $lxc_rootfs
+  msg_info "lxc_rootfs = $lxc_rootfs"
   cp $config $lxc_home;
   cp $debian_root/fstab $lxc_home;
   cp $debian_root/packages $lxc_home;

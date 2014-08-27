@@ -44,7 +44,7 @@ function zfs_get_children {
   local count=0
   for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
   do
-    msg_notice "        -> \"`zfs_ctnr_from_ds $ds`\" is a child of $parent"
+    msg_info "        -> \"`zfs_ctnr_from_ds $ds`\" is a child of $parent"
     count=`expr $count + 1`
   done
 

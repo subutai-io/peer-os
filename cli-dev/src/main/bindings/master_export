@@ -28,7 +28,7 @@ function master_export {
   local debian_root="$SUBUTAI_TMPDIR/$container"
 
   if [ -f "$debian_file" ]; then
-    msg_notice "It seems the debian package file has already been generated"
+    msg_error "It seems the debian package file has already been generated"
     msg_error "Run rm -rf $debian_root* and try again"
     exit 1
   fi
