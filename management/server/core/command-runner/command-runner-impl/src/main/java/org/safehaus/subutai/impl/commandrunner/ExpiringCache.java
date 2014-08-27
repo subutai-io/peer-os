@@ -20,157 +20,167 @@ import java.util.concurrent.Executors;
  */
 public class ExpiringCache<KeyType, ValueType> {
 
-	private static final long evictionRunIntervalMs = 10;
-	private final Map<KeyType, CacheEntry<ValueType>> entries = new ConcurrentHashMap<>();
+    private static final long evictionRunIntervalMs = 10;
+    private final Map<KeyType, CacheEntry<ValueType>> entries = new ConcurrentHashMap<>();
 
-	private ExecutorService evictor;
-
-
-	/**
-	 * Initializes {@code ExpiringCache}. Starts evictor executor service
-	 */
-	public ExpiringCache() {
-
-		evictor = Executors.newCachedThreadPool();
-
-		evictor.execute(new Runnable() {
-
-			public void run() {
-				while (!Thread.interrupted()) {
-					try {
-						for (Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it = entries.entrySet().iterator();
-						     it.hasNext(); ) {
-							final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
-							if (entry.getValue().isExpired()) {
-								it.remove();
-								if (entry.getValue() instanceof CacheEntryWithExpiryCallback) {
-									evictor.execute(new Runnable() {
-
-										public void run() {
-											try {
-												((CacheEntryWithExpiryCallback) entry.getValue())
-														.callExpiryCallback();
-											} catch (Exception e) {
-											}
-										}
-									});
-								}
-							}
-						}
-
-						Thread.sleep(evictionRunIntervalMs);
-					} catch (InterruptedException ex) {
-						break;
-					}
-				}
-			}
-		});
-	}
+    private ExecutorService evictor;
 
 
-	/**
-	 * Returns entry or null if missing or expired. Resets lifespan of entry
-	 *
-	 * @param key - key for the entry
-	 * @return value of entry or null
-	 */
-	public ValueType get(KeyType key) {
-		if (key != null) {
-			CacheEntry<ValueType> entry = entries.get(key);
-			if (entry != null && !entry.isExpired()) {
-				entry.resetCreationTimestamp();
-				return entry.getValue();
-			}
-		}
-		return null;
-	}
+    /**
+     * Initializes {@code ExpiringCache}. Starts evictor executor service
+     */
+    public ExpiringCache() {
+
+        evictor = Executors.newCachedThreadPool();
+
+        evictor.execute( new Runnable() {
+
+            public void run() {
+                while ( !Thread.interrupted() ) {
+                    try {
+                        for ( Iterator<Map.Entry<KeyType, CacheEntry<ValueType>>> it = entries.entrySet().iterator();
+                              it.hasNext(); ) {
+                            final Map.Entry<KeyType, CacheEntry<ValueType>> entry = it.next();
+                            if ( entry.getValue().isExpired() ) {
+                                it.remove();
+                                if ( entry.getValue() instanceof CacheEntryWithExpiryCallback ) {
+                                    evictor.execute( new Runnable() {
+
+                                        public void run() {
+                                            try {
+                                                ( ( CacheEntryWithExpiryCallback ) entry.getValue() )
+                                                        .callExpiryCallback();
+                                            }
+                                            catch ( Exception e ) {
+                                            }
+                                        }
+                                    } );
+                                }
+                            }
+                        }
+
+                        Thread.sleep( evictionRunIntervalMs );
+                    }
+                    catch ( InterruptedException ex ) {
+                        break;
+                    }
+                }
+            }
+        } );
+    }
 
 
-	/**
-	 * adds entry to the cache.
-	 *
-	 * @param key   - key for the entry
-	 * @param value - entry value
-	 * @param ttlMs - time-to-live in milliseconds
-	 * @return - return true if added successfully and false in case of error
-	 */
-	public boolean put(KeyType key, ValueType value, long ttlMs) {
-		if (key != null && value != null && ttlMs > 0) {
-			entries.put(key, new CacheEntry<>(value, ttlMs));
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Returns entry or null if missing or expired. Resets lifespan of entry
+     *
+     * @param key - key for the entry
+     *
+     * @return value of entry or null
+     */
+    public ValueType get( KeyType key ) {
+        if ( key != null ) {
+            CacheEntry<ValueType> entry = entries.get( key );
+            if ( entry != null && !entry.isExpired() ) {
+                entry.resetCreationTimestamp();
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
 
 
-	/**
-	 * adds entry to the cache.
-	 *
-	 * @param key      - key for the entry
-	 * @param value    - entry value
-	 * @param ttlMs    - time-to-live in milliseconds
-	 * @param callback - expiry callback which is called when entry is being evicted
-	 * @return - return true if added successfully and false in case of error
-	 */
-	public boolean put(KeyType key, ValueType value, long ttlMs, EntryExpiryCallback<ValueType> callback) {
-		if (key != null && value != null && ttlMs > 0) {
-			entries.put(key, new CacheEntryWithExpiryCallback<>(value, ttlMs, callback));
-			return true;
-		}
-		return false;
-	}
+    /**
+     * adds entry to the cache.
+     *
+     * @param key - key for the entry
+     * @param value - entry value
+     * @param ttlMs - time-to-live in milliseconds
+     *
+     * @return - return true if added successfully and false in case of error
+     */
+    public boolean put( KeyType key, ValueType value, long ttlMs ) {
+        if ( key != null && value != null && ttlMs > 0 ) {
+            entries.put( key, new CacheEntry<>( value, ttlMs ) );
+            return true;
+        }
+        return false;
+    }
 
 
-	/**
-	 * Removes and return value from the cache by key or null if missing.
-	 *
-	 * @param key - entry key
-	 * @return entry value
-	 */
-	public ValueType remove(KeyType key) {
-		if (key != null) {
-			CacheEntry<ValueType> entry = entries.remove(key);
-			if (entry != null) {
-				return entry.getValue();
-			}
-		}
-		return null;
-	}
+    /**
+     * adds entry to the cache.
+     *
+     * @param key - key for the entry
+     * @param value - entry value
+     * @param ttlMs - time-to-live in milliseconds
+     * @param callback - expiry callback which is called when entry is being evicted
+     *
+     * @return - return true if added successfully and false in case of error
+     */
+    public boolean put( KeyType key, ValueType value, long ttlMs, EntryExpiryCallback<ValueType> callback ) {
+        if ( key != null && value != null && ttlMs > 0 ) {
+            entries.put( key, new CacheEntryWithExpiryCallback<>( value, ttlMs, callback ) );
+            return true;
+        }
+        return false;
+    }
 
 
-	/**
-	 * Returns map of entries.
-	 *
-	 * @return map of entries
-	 */
-	public Map<KeyType, CacheEntry<ValueType>> getEntries() {
-		return Collections.unmodifiableMap(entries);
-	}
+    /**
+     * Removes and return value from the cache by key or null if missing.
+     *
+     * @param key - entry key
+     *
+     * @return entry value
+     */
+    public ValueType remove( KeyType key ) {
+        if ( key != null ) {
+            CacheEntry<ValueType> entry = entries.remove( key );
+            if ( entry != null ) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
 
 
-	/**
-	 * Clears all cache entries.
-	 */
-	public void clear() {
-		entries.clear();
-	}
+    /**
+     * Returns map of entries.
+     *
+     * @return map of entries
+     */
+    public Map<KeyType, CacheEntry<ValueType>> getEntries() {
+        return Collections.unmodifiableMap( entries );
+    }
 
 
-	/**
-	 * Returns number of cache entries.
-	 *
-	 * @return number of cache entries
-	 */
-	public int size() {
-		return entries.size();
-	}
+    /**
+     * Clears all cache entries.
+     */
+    public void clear() {
+        entries.clear();
+    }
 
 
-	public void dispose() {
-		try {
-			evictor.shutdown();
-			entries.clear();
-		} catch (Exception e) {
-		}
-	}
+    /**
+     * Returns number of cache entries.
+     *
+     * @return number of cache entries
+     */
+    public int size() {
+        return entries.size();
+    }
+
+
+    /**
+     * Disposes cache
+     */
+    public void dispose() {
+        try {
+            evictor.shutdown();
+            entries.clear();
+        }
+        catch ( Exception e ) {
+        }
+    }
 }
