@@ -100,7 +100,7 @@ public class GitManagerImpl implements GitManager {
             if ( line != null ) {
                 String[] ss = line.split( "\\s+" );
                 if ( ss.length == 2 ) {
-                    gitChangedFiles.add( new GitChangedFile( convertStatus( ss[0] ), ss[1] ) );
+                    gitChangedFiles.add( new GitChangedFile( GitFileStatus.parse( ss[0] ), ss[1] ) );
                 }
             }
         }
@@ -688,27 +688,5 @@ public class GitManagerImpl implements GitManager {
         }
 
         return stashes;
-    }
-
-
-    private GitFileStatus convertStatus( String status ) {
-        switch ( status ) {
-            case "M":
-                return GitFileStatus.MODIFIED;
-            case "C":
-                return GitFileStatus.COPIED;
-            case "R":
-                return GitFileStatus.RENAMED;
-            case "A":
-                return GitFileStatus.ADDED;
-            case "D":
-                return GitFileStatus.DELETED;
-            case "U":
-                return GitFileStatus.UNMERGED;
-            case "X":
-                return GitFileStatus.UNVERSIONED;
-            default:
-                return GitFileStatus.UNMODIFIED;
-        }
     }
 }
