@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,7 @@ import com.google.common.collect.Sets;
 public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
 
     private final TemplateDAO templateDAO;
+    private static final Logger LOG = Logger.getLogger(TemplateRegistryManagerImpl.class.getName());
 
 
     public TemplateRegistryManagerImpl( final DbManager dbManager ) {
@@ -55,6 +57,12 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     @Override
     public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
             throws RegistryException {
+
+        LOG.warning( configFile );
+        LOG.warning( "================");
+        LOG.warning( packagesFile );
+        LOG.warning( "================");
+        LOG.warning( md5sum );
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( configFile ), "Config file contents is null or empty" );
         Preconditions
