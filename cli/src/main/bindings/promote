@@ -25,7 +25,7 @@ function promote_usage {
 function promote {
   if [ "`is_system_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
@@ -81,18 +81,18 @@ function promote {
 
   if [ "`are_containers_locked_read $lxc`" == "true" ]
   then
-     echo "Container(s) locked by a subutai process"
+     msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
 
   lock_container_read $lxc
-  if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   # The master is already a template
   if [ "$lxc" == "master" ]; then
     msg_error "The master is already a template. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -105,7 +105,7 @@ function promote {
   if [ "`zfs_is_template $lxc`" == "true" ]; then
     msg_error "Container \"$lxc\" is already a template. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$lxc\" is NOT a template"
@@ -115,7 +115,7 @@ function promote {
   if [ "`is_registered $lxc`" == "true" ]; then
     msg_error "A template with name \"$lxc\" is registered. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$lxc\" is NOT registered"
@@ -127,7 +127,7 @@ function promote {
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -213,7 +213,7 @@ function promote {
 
   msg_ok "Successfully promoted $lxc_template"
   unlock_container_read $lxc
-  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

@@ -15,7 +15,7 @@ function clone_usage {
 function clone {
   if [ "`is_system_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
@@ -24,7 +24,7 @@ function clone {
   
   if [ "`are_containers_locked_write $parent $child`" == "true" ]
   then
-     echo "Container(s) locked by a subutai process"
+     msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
 
@@ -39,7 +39,7 @@ function clone {
   fi
   
   lock_container_write $parent $child
-  if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   lxc_clone $parent $child "`usage`"
@@ -47,7 +47,7 @@ function clone {
 
   msg_ok "Successfully cloned $child container from $parent"
   unlock_container_write $child
-  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

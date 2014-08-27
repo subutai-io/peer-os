@@ -21,12 +21,12 @@ function master_import {
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
     if [ "`is_system_all_locked`" == "true" ]
     then
-       echo "System locked by a subutai process"
+       msg_error "System locked by a subutai process"
        exit 1
     fi
 
     lock_subutai_system
-    if [ $? != 0 ]; then echo "System cannot be locked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
 
     msg_info "subutai master_import called from command line"
     local debian_package_name=`get_debian_package_name $container`
@@ -36,7 +36,7 @@ function master_import {
     if [ ! -f "$debian_file" ]; then
       msg_error "Could not find template file \"$debian_file\". Aborting ..."
       unlock_subutai_system
-      if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
       exit 1
     fi
 
@@ -45,7 +45,7 @@ function master_import {
     if [ $? = 0  ]; then
       msg_error "Template $container seems already installed, please destroy first"
       unlock_subutai_system
-      if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
       exit 1
     fi
 
@@ -53,14 +53,14 @@ function master_import {
     if [ $? -eq 0 ]; then
       msg_ok "Debian package of $package_name is installed succesfully"
       unlock_subutai_system
-      if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
       exit 0
     else
       msg_error "Debian package of $package_name could not be installed, removing"
       subutai master_destroy
       apt-get --assume-yes --force-yes purge $package_name
       unlock_subutai_system
-      if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
       exit 1
     fi
     popd

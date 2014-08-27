@@ -10,7 +10,7 @@ function lxc_assert_name {
   if [ -n "`echo $lxc | grep '-'`" ]; then
     msg_error "Arg \"$lxc\" contains illegal dash character."
     unlock_container_read $1
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 }
@@ -72,14 +72,14 @@ function lxc_assert_no {
   if [ -z "$lxc" ]; then
     msg_error "No value provided for container's name. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "$usage"
   fi
   lxc-info -n $lxc > /dev/null 2>&1
   if [ $? == 0 ]; then
     msg_error "Container \"$lxc\" exists. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "$usage"
   else
     msg_info "    - check passed: container \"$lxc\" does NOT exist."
@@ -94,7 +94,7 @@ function lxc_assert {
   if [ -z "$lxc" ]; then
     msg_error "No value provided for container's name. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "$usage"
   fi
 
@@ -102,7 +102,7 @@ function lxc_assert {
   if [ $? != 0 ]; then
     msg_error "Container \"$lxc\" does NOT exist. Aborting ..."
     unlock_container_read $lxc
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "$usage"
   else
     msg_info "    - check passed: container \"$lxc\" exists."
@@ -190,14 +190,14 @@ function lxc_clone {
   if [ -z "$parent" ]; then
     msg_error "Parameters not provided. Aborting ..."
     unlock_container_read $child
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
   if [ -z "$child" ]; then
     msg_error "Child parameter not provided. Aborting ..."
     unlock_container_read $parent
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -215,7 +215,7 @@ function lxc_clone {
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is not a template"
     unlock_container_read $child
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - parent \"$parent\" is a template"
@@ -275,14 +275,14 @@ function lxc_copy {
   if [ -z "$parent" ]; then
     msg_error "Parameters not provided. Aborting ..."
     unlock_container_read $child
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
   if [ -z "$child" ]; then
     msg_error "Child parameter not provided. Aborting ..."
     unlock_container_read $parent
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -300,7 +300,7 @@ function lxc_copy {
   if [ "`zfs_is_template $parent`" == "true" ]; then
     msg_error "Parent \"$parent\" must not be a template for a copy op"
     unlock_container_read $child
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - parent \"$parent\" is not a template"
@@ -345,14 +345,14 @@ function lxc_rename {
   if [ -z "$src" ]; then
     msg_error "Parameters not provided for source container. Aborting ..."
     unlock_container_read $dst
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
   if [ -z "$dst" ]; then
     msg_error "Parameters not provided for destination container. Aborting ..."
     unlock_container_read $src
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -370,7 +370,7 @@ function lxc_rename {
   if [ "`zfs_is_template $src`" == "true" ]; then
     msg_error "Source \"$src\" must not be a template for a rename op"
     unlock_container_read $dst
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 

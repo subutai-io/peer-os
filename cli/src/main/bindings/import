@@ -26,7 +26,7 @@ function import_usage {
 function import {
   if [ "`is_system_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
@@ -57,8 +57,8 @@ function import {
   fi
 
   if [ "$container" = "master" ];then
-    subutai master_import
-    exit $?
+    msg_error "Please use subutai master_import command!"
+    exit 1
   fi
 
   if [ $is_local == "true" ]; then
@@ -107,20 +107,20 @@ function import {
       fi
      
       lock_container_read $container
-      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
       dpkg -i $debian_file
       if [ $? -eq 0 ]; then
         msg_ok "Debian package of $package_name is installed succesfully from local"
         unlock_container_read $container
-        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
         exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
         subutai destroy $container
         apt-get --assume-yes --force-yes purge $package_name
         unlock_container_read $container
-        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 	exit 1
       fi
     elif [ "`is_registered $container`" == "true" ]
@@ -132,26 +132,26 @@ function import {
       fi
 
       lock_container_read $container
-      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
       apt-get --assume-yes --force-yes install $package_name
       if [ $? -eq 0 ]; then
        msg_ok "Debian package of $package_name is installed succesfully from repo"
        unlock_container_read $container
-       if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+       if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
        exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
         subutai destroy $container
         apt-get --assume-yes --force-yes purge $package_name
         unlock_container_read $container
-        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
         exit 1
       fi
     else
       msg_error "Package $package_name is not found!"
       unlock_container_read $container
-      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
       exit 1
     fi
   else
@@ -169,7 +169,7 @@ function import {
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     apt-get --assume-yes --force-yes purge $package_name
     unlock_container_read $container
-    if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -180,7 +180,7 @@ function import {
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
     apt-get --assume-yes --force-yes purge $package_name
     unlock_container_read $container
-    if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is registered"

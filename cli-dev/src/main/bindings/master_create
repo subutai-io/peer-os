@@ -4,12 +4,12 @@
 function master_create {
   if [ "`is_system_all_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
   lock_subutai_system
-  if [ $? != 0 ]; then echo "System cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
 
   # Check for Master Existence
   # ---------------------------------------------------------------------------
@@ -103,7 +103,7 @@ function master_create {
   addmount master var lxc-data
   
   unlock_subutai_system
-  if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
 }
 
 function master_create_description {

@@ -25,7 +25,7 @@ function export_usage {
 function export {
   if [ "`is_system_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
@@ -33,12 +33,12 @@ function export {
 
   if [ "`are_containers_locked_write $container`" == "true" ]
   then
-     echo "Container(s) locked by a subutai process"
+     msg_error "Container(s) locked by a subutai process"
      exit 1
   fi
 
   lock_container_write $container
-  if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   # ----------------------------------------------------------------------------
   # (1) perform some sanity checks
@@ -49,7 +49,7 @@ function export {
   if [ "$container" == "master" ]; then
     echo "Please use master_export command!"
     unlock_container_write $container
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -60,7 +60,7 @@ function export {
     msg_error "It seems the debian file has already been generated"
     msg_error "Destroy $SUBUTAI_TMPDIR/$container and the peer debian file first"
     unlock_container_write $container
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -68,7 +68,7 @@ function export {
   if [ "`zfs_is_template $container`" == "false" ]; then
     msg_error "Container \"$container\" is NOT a template. Aborting ..."
     unlock_container_write $container
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$container\" is a template"
@@ -80,7 +80,7 @@ function export {
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     unlock_container_write $container
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -90,7 +90,7 @@ function export {
   if [ "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
     unlock_container_write $container
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is registered"
@@ -124,7 +124,7 @@ function export {
   # Remove debian root directory after debian package generation
   rm -rf $debian_root
   unlock_container_write $container
-  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

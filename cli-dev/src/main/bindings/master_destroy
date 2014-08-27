@@ -3,13 +3,13 @@
 function master_destroy {
 
   if [ -z "`zfs list lxc/master`" ]; then
-    echo No zfs dataset \'lxc/master\' found - aborting ...
+    msg_error No zfs dataset \'lxc/master\' found - aborting ...
     exit 1
   fi
 
   if [ "`is_system_all_locked`" == "true" ]
   then
-     echo "System locked by a subutai process"
+     msg_error "System locked by a subutai process"
      exit 1
   fi
 
@@ -18,7 +18,7 @@ function master_destroy {
   local debian_root="$SUBUTAI_TMPDIR/$container"
   
   lock_subutai_system
-  if [ $? != 0 ]; then echo "System cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
   
   # Confirm destroy operation
   echo WARNING: this destroys everything mercilessly
@@ -26,6 +26,7 @@ function master_destroy {
     read -p "Do you wish to destroy master template? [Y/N]" yn
     case $yn in
       [Yy]* ) break;;
+<<<<<<< HEAD
       [Nn]* ) unlock_subutai_system
              if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi 
              exit 1;;
@@ -62,14 +63,11 @@ function master_destroy {
   
   # Remove relevant directories under $SUBUTAI_TMPDIR if any
   rm -rf $debian_root
-  unlock_container_read $container
-  if [ $? != 0 ]; then echo "Master cannot be unlocked!"; exit 1; fi
   unlock_subutai_system
-  if [ $? != 0 ]; then 
-    echo "System cannot be unlocked!"
-    exit 1
-  fi
+  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+
   msg_ok "Destruction of \"master\" completed succesfully "
+
 }
 
 
