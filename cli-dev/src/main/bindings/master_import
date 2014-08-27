@@ -19,7 +19,7 @@ function master_import {
   
   msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    if [ "`is_system_locked`" == "true" ]
+    if [ "`is_system_all_locked`" == "true" ]
     then
        echo "System locked by a subutai process"
        exit 1

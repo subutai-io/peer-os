@@ -7,7 +7,7 @@ function master_destroy {
     exit 1
   fi
 
-  if [ "`is_system_locked`" == "true" ]
+  if [ "`is_system_all_locked`" == "true" ]
   then
      echo "System locked by a subutai process"
      exit 1
@@ -62,7 +62,7 @@ function master_destroy {
   
   # Remove relevant directories under $SUBUTAI_TMPDIR if any
   rm -rf $debian_root
-  container_unlock_common $container
+  unlock_container_read $container
   if [ $? != 0 ]; then echo "Master cannot be unlocked!"; exit 1; fi
 }
 

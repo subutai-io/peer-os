@@ -22,7 +22,7 @@ function clone {
   local parent="$1"
   local child="$2"
   
-  if [ "`are_containers_locked_clone $parent $child`" == "true" ]
+  if [ "`are_containers_locked_write $parent $child`" == "true" ]
   then
      echo "Container(s) locked by a subutai process"
      exit 1
