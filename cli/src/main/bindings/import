@@ -58,8 +58,8 @@ function import {
   if [ $is_local == "true" ]; then
     if [ "`are_md5sums_equal $container`" == true ];then
       msg_info "    - check passed: local \"$container\" package is same with the registered package"
-    else
-      msg_error "A template $container is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$container*\" and import again"
+    elif [ "`is_registered $container`" == true -a "`are_md5sums_equal $container`" == false  ]; then
+      msg_error "A template $container is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$container-*\" and import again"
       exit 1
     fi
   else
