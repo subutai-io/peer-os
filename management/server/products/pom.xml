@@ -35,6 +35,7 @@
         <module>oozie</module>
         <module>hbase</module>
         <module>mahout</module>
+        <module>common</module>
     </modules>
 
 </project>
