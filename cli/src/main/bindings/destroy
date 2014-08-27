@@ -24,6 +24,7 @@ function destroy {
 
   # Parse provided arguments
   local recursive="false"
+  local force="false"
 
   shift_amount=0;
   while getopts ":r" opt; do
@@ -31,6 +32,9 @@ function destroy {
       r)
         recursive="true"
 	;;
+      f)
+        force="true"
+        ;;
       \?)
         msg_error "Unrecognized option -$OPTARG"
         exit 1
@@ -63,16 +67,29 @@ function destroy {
   zfs_get_children $clone
   child_count=$?
 
-  if [ $child_count -gt 0 -a $recursive == "false" ]; then
-    msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
-    exit 1
+  if [ $child_count -gt 0 ]; then
+    if [ $recursive == "false" ]; then
+      msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
+      exit 1
+    elif [ $recursive == "true" -a $force == "false" ]; then
+      # Confirm recursive destroy operation
+      echo WARNING: this destroys $clone along with its all child templates and containers
+      while true; do
+        read -p "Do you wish to destroy $clone template? [Y/N]" yn
+        case $yn in
+          [Yy]* ) break;;
+          [Nn]* ) exit 1;;
+          * ) echo "Please answer yes or no.";;
+        esac
+      done
+    fi
   fi
  
   # Destroy all children of master template
   children_list=`zfs_get_children_list $clone`
   for child in $children_list 
   do
-    subutai destroy -r $child
+    subutai destroy -r -f $child
   done
   
   # (3) Remove the debian package if installed
