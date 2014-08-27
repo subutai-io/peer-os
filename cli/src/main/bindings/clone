@@ -13,8 +13,20 @@ function clone_usage {
 
 
 function clone {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     echo "System locked by a subutai process"
+     exit 1
+  fi
+
   local parent="$1"
   local child="$2"
+  
+  if [ "`are_containers_locked_clone $parent $child`" == "true" ]
+  then
+     echo "Container(s) locked by a subutai process"
+     exit 1
+  fi
 
   if [ -z "$parent" ]; then
     msg_error "Parameters not provided. Aborting ..."
@@ -25,12 +37,17 @@ function clone {
     msg_error "Child parameter not provided. Aborting ..."
     show_usage "`usage`"
   fi
+  
+  lock_container_write $parent $child
+  if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
 
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
   lxc_clone $parent $child "`usage`"
   git_child_branch $child
 
   msg_ok "Successfully cloned $child container from $parent"
+  unlock_container_write $child
+  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

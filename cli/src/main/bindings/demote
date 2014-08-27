@@ -12,17 +12,36 @@ function demote_usage {
 
 
 function demote {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     echo "System locked by a subutai process"
+     exit 1
+  fi
+
   local temp="$1"
+
+  if [ "`are_containers_locked_read $temp`" == "true" ]
+  then
+     echo "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_read $temp
+  if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
 
   #check for master	
   if [ $temp == "master" ]; then
     msg_error "Master templated cannot be demoted. Aborting ..."
+    unlock_container_read $temp
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
   # check to make sure we have a template name - usage if not
   if [ -z "$temp" ]; then
     msg_error "Template argument not provided. Aborting ..."
+    unlock_container_read $temp
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     show_usage "`demote_usage`"
   fi
 
@@ -30,6 +49,8 @@ function demote {
   lxc_assert "$temp"
   if [ "false" == "`zfs_is_template $temp`" ]; then
     msg_error "Supplied template name \"$temp\" is not a template. Aborting ..."
+    unlock_container_read $temp
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -37,9 +58,13 @@ function demote {
   local child_count="$?"
   if [ "$child_count" -gt 0 ]; then
     msg_error "Template \"$temp\" cannot be demoted with $child_count children."
+    unlock_container_read $temp
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   elif [ "true" == "`is_registered $temp`" ]; then
     msg_error "Cannot demote registered template \"$temp\""
+    unlock_container_read $temp
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "Demoting template \"$temp\" with no children."
@@ -75,6 +100,8 @@ function demote {
   zfs set readonly=off "lxc/$temp"
 
   msg_ok "Successfully demoted $temp"
+  unlock_container_read $temp
+  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

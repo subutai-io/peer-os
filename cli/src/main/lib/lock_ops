@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# ==========================================================================
+# Set of functions that process locking functionality with a mix of utility
+# functions.
+# ==========================================================================
+
+function lock_subutai_system {
+  touch /root/locking/lockfiles/system_lock
+}
+
+function unlock_subutai_system {
+  rm /root/locking/lockfiles/system_lock
+}
+
+function is_system_locked {
+  (ls /root/locking/lockfiles/system_lock || ls /root/locking/lockfiles/1/*) \
+    > /dev/null 2>&1
+  if [ $? == 0 ]
+  then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+function lock_container_write {
+  touch /root/locking/lockfiles/1/$1-$2
+}
+
+function lock_container_read {
+  touch /root/locking/lockfiles/1/$1-$2
+  touch /root/locking/lockfiles/2/$1-$2
+}
+
+function unlock_container_write {
+  removing=`ls /root/locking/lockfiles/1/ | grep -e "\b$1\b"`
+  rm /root/locking/lockfiles/1/$removing  > /dev/null 2>&1 || echo ""
+}
+
+function unlock_container_read {
+  removing=`ls /root/locking/lockfiles/1/ | grep -e "\b$1\b"`
+  rm /root/locking/lockfiles/1/$removing > /dev/null 2>&1 || echo ""
+  rm /root/locking/lockfiles/2/$removing > /dev/null 2>&1 || echo ""
+}
+
+function are_containers_locked_write {
+  if [[ -z "$2" ]]
+  then
+    ls /root/locking/lockfiles/2/ | grep -e "\b$1\b" > /dev/null 2>&1
+    if [ $? == 0 ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  else
+    (ls /root/locking/lockfiles/2/ | grep -e "\b$1\b" \
+     || ls /root/locking/lockfiles/2/ | grep -e "\b$2\b") \
+      > /dev/null 2>&1
+    if [ $? == 0 ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  fi
+}
+
+function are_containers_locked_read {
+  if [[ -z "$2" ]]
+  then
+    ls /root/locking/lockfiles/1/ | grep -e "\b$1\b" > /dev/null 2>&1
+    if [ $? == 0 ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  else
+    (ls /root/locking/lockfiles/1/ | grep -e "\b$1\b" \
+     || ls /root/locking/lockfiles/1/ | grep -e "\b$2\b") \
+      > /dev/null 2>&1
+    if [ $? == 0 ]
+    then
+      echo "true"
+    else
+      echo "false"
+    fi
+  fi
+}
+

@@ -19,6 +19,15 @@ function usage {
 
 function master_export {
 
+  if [ "`is_system_locked`" == "true" ]
+  then
+     echo "System locked by a subutai process"
+     exit 1
+  fi
+
+  lock_subutai_system
+  if [ $? != 0 ]; then echo "System cannot be locked!"; exit 1; fi
+
   # ---------------------------------------------------------------------------
   # (1) perform some sanity checks
   # ---------------------------------------------------------------------------
@@ -30,6 +39,8 @@ function master_export {
   if [ -f "$debian_file" ]; then
     msg_error "It seems the debian package file has already been generated"
     msg_error "Run rm -rf $debian_root* and try again"
+    unlock_subutai_system
+    if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -83,6 +94,8 @@ function master_export {
   pkg=`deb_pkg $container`
   # Remove debian root directory after debian package generation
   rm -rf $debian_root
+  unlock_subutai_system
+  if [ $? != 0 ]; then echo "System cannot be unlocked!"; exit 1; fi
 
 }
 

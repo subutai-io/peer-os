@@ -49,8 +49,19 @@ function destroy {
 
   local clone="$1"
 
+  if [ "`are_containers_locked_read $clone`" == "true" ]
+  then
+     echo "Container locked by a subutai process"
+     exit 1
+  fi
+  
+  lock_container_read $clone
+  if [ $? != 0 ]; then echo "Container cannot be locked!"; exit 1; fi
+
   if [ "$clone" == "master" ]; then
     msg_error "Use subutai master_destroy instead of subutai destroy"
+    unlock_container_read $clone
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -70,6 +81,8 @@ function destroy {
   if [ $child_count -gt 0 ]; then
     if [ $recursive == "false" ]; then
       msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
+      unlock_container_read $clone
+      if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
       exit 1
     elif [ $recursive == "true" -a $force == "false" ]; then
       # Confirm recursive destroy operation
@@ -78,7 +91,9 @@ function destroy {
         read -p "Do you wish to destroy $clone template? [Y/N]" yn
         case $yn in
           [Yy]* ) break;;
-          [Nn]* ) exit 1;;
+          [Nn]* )unlock_container_read $clone
+                 if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi 
+                 exit 1;;
           * ) echo "Please answer yes or no.";;
         esac
       done
@@ -99,6 +114,8 @@ function destroy {
   if [ "`is_dpkg_locked`" == "true" ]
   then
     echo "$1 import FAILED! dpkg is locked by process!"
+    unlock_container_read $clone
+    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
  
@@ -132,6 +149,8 @@ function destroy {
   # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
+  unlock_container_read $clone
+  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
   exit 0
 }
 

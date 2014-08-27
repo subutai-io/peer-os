@@ -24,6 +24,12 @@ function import_usage {
 # (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
 
 function import {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     echo "System locked by a subutai process"
+     exit 1
+  fi
+
   local container="$1"
   local debian_package_name=`get_debian_package_name $container`
   local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
@@ -85,30 +91,58 @@ function import {
 
     if [ "$is_local" == "true" ]
     then
+      if [ "`are_containers_locked_read $container`" == "true" ]
+      then
+         echo "Container(s) locked by a subutai process"
+         exit 1
+      fi
+     
+      lock_container_read $container
+      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+
       dpkg -i $debian_file
       if [ $? -eq 0 ]; then
         msg_info "Debian package of $package_name is installed succesfully from local"
+        unlock_container_read $container
+        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
         exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
         subutai destroy $container
         apt-get --assume-yes --force-yes purge $package_name
+        unlock_container_read $container
+        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
 	exit 1
       fi
     elif [ "`is_registered $container`" == "true" ]
     then
+      if [ "`are_containers_locked_read $container`" == "true" ]
+      then
+         echo "Container(s) locked by a subutai process"
+         exit 1
+      fi
+
+      lock_container_read $container
+      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
+
       apt-get --assume-yes --force-yes install $package_name
       if [ $? -eq 0 ]; then
        msg_info "Debian package of $package_name is installed succesfully from repo"
+       unlock_container_read $container
+       if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
        exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
         subutai destroy $container
         apt-get --assume-yes --force-yes purge $package_name
+        unlock_container_read $container
+        if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
         exit 1
       fi
     else
       msg_error "Package $package_name is not found!"
+      unlock_container_read $container
+      if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
       exit 1
     fi
   else
@@ -125,6 +159,8 @@ function import {
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
     apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $container
+    if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -134,6 +170,8 @@ function import {
   if [ "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
     apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $container
+    if [ $? != 0 ]; then echo "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is registered"
@@ -157,7 +195,6 @@ function import {
   zfs recv lxc/$container-opt < $deltas/opt.delta
   zfs recv lxc-data/$container-var < $deltas/var.delta
   zfs recv lxc-data/$container-home < $deltas/home.delta
-
 }
 
 
