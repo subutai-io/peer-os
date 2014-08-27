@@ -51,17 +51,17 @@ function destroy {
 
   if [ "`are_containers_locked_read $clone`" == "true" ]
   then
-     echo "Container locked by a subutai process"
+     msg_error "Container locked by a subutai process"
      exit 1
   fi
   
   lock_container_read $clone
-  if [ $? != 0 ]; then echo "Container cannot be locked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Container cannot be locked!"; exit 1; fi
 
   if [ "$clone" == "master" ]; then
     msg_error "Use subutai master_destroy instead of subutai destroy"
     unlock_container_read $clone
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -82,7 +82,7 @@ function destroy {
     if [ $recursive == "false" ]; then
       msg_error "Cannot destroy \"$clone\", it has $child_count child containers."
       unlock_container_read $clone
-      if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+      if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
       exit 1
     elif [ $recursive == "true" -a $force == "false" ]; then
       # Confirm recursive destroy operation
@@ -92,7 +92,7 @@ function destroy {
         case $yn in
           [Yy]* ) break;;
           [Nn]* )unlock_container_read $clone
-                 if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi 
+                 if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi 
                  exit 1;;
           * ) echo "Please answer yes or no.";;
         esac
@@ -115,7 +115,7 @@ function destroy {
   then
     echo "$1 import FAILED! dpkg is locked by process!"
     unlock_container_read $clone
-    if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
  
@@ -150,7 +150,7 @@ function destroy {
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
   unlock_container_read $clone
-  if [ $? != 0 ]; then echo "Container(s) cannot be unlocked!"; exit 1; fi
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
   exit 0
 }
 
