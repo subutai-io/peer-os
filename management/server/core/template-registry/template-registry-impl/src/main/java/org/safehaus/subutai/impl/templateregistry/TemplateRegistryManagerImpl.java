@@ -45,6 +45,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Registers template in registry/database
+     *
+     * @param configFile - template configuration file contents
+     * @param packagesFile - template packages manifest file contents
+     * @param md5sum - template file's md5 hash
+     */
     @Override
     public synchronized void registerTemplate( final String configFile, final String packagesFile, final String md5sum )
             throws RegistryException {
@@ -67,6 +74,15 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns template parsing supplied  contents of config file , packages file and md5sum
+     *
+     * @param configFile - template configuration file contents
+     * @param packagesFile - template packages manifest file contents
+     * @param md5sum - template file's md5 hash
+     *
+     * @return {@code Template}
+     */
     private Template parseTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException {
         Properties properties = new Properties();
         try {
@@ -150,12 +166,23 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Deletes template from registry
+     *
+     * @param templateName - name of template to remove
+     */
     @Override
     public void unregisterTemplate( final String templateName ) throws RegistryException {
         unregisterTemplate( templateName, Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Deletes template from registry
+     *
+     * @param templateName - name of template to remove
+     * @param lxcArch - lxc architecture
+     */
     @Override
     public void unregisterTemplate( final String templateName, final String lxcArch ) throws RegistryException {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
@@ -195,12 +222,27 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns template by name
+     *
+     * @param templateName - name of template
+     *
+     * @return {@code Template}
+     */
     @Override
     public Template getTemplate( final String templateName ) {
         return getTemplate( templateName, Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Returns template by name and lxc arch
+     *
+     * @param templateName - name of template
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code Template}
+     */
     @Override
     public Template getTemplate( final String templateName, String lxcArch ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
@@ -216,12 +258,27 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns child templates
+     *
+     * @param parentTemplateName - parent template name
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getChildTemplates( final String parentTemplateName ) {
         return getChildTemplates( parentTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Returns child templates
+     *
+     * @param parentTemplateName - parent template name
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getChildTemplates( final String parentTemplateName, String lxcArch ) {
         Preconditions
@@ -237,12 +294,27 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns parent template
+     *
+     * @param childTemplateName - child template name
+     *
+     * @return {@code Template}
+     */
     @Override
     public Template getParentTemplate( final String childTemplateName ) {
         return getParentTemplate( childTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Returns parent template
+     *
+     * @param childTemplateName - child template name
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code Template}
+     */
     @Override
     public Template getParentTemplate( final String childTemplateName, final String lxcArch ) {
         Preconditions
@@ -261,6 +333,11 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns template tree
+     *
+     * @return {@code TemplateTree}
+     */
     @Override
     public TemplateTree getTemplateTree() {
         //retrieve all templates and fill template tree
@@ -277,12 +354,27 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns parent templates
+     *
+     * @param childTemplateName - name of template whose parents to return
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getParentTemplates( String childTemplateName ) {
         return getParentTemplates( childTemplateName, Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Returns parent templates
+     *
+     * @param childTemplateName - name of template whose parents to return
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getParentTemplates( final String childTemplateName, final String lxcArch ) {
         List<Template> parents = new ArrayList<>();
@@ -297,12 +389,24 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Returns all templates
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getAllTemplates() {
         return getAllTemplates( Common.DEFAULT_LXC_ARCH );
     }
 
 
+    /**
+     * Returns all templates
+     *
+     * @param lxcArch - lxc architecture
+     *
+     * @return {@code List<Template>}
+     */
     @Override
     public List<Template> getAllTemplates( final String lxcArch ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcArch ), "Lxc Arch is null or empty" );
@@ -325,6 +429,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Updates template usage on FAIs
+     *
+     * @param faiHostname - fai hostname
+     * @param templateName - target template
+     * @param inUse - true - template is in use, false - template is out of use
+     */
     @Override
     public synchronized void updateTemplateUsage( final String faiHostname, final String templateName,
                                                   final boolean inUse ) throws RegistryException {
@@ -348,6 +459,13 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
     }
 
 
+    /**
+     * Indicates if template is in use on any of FAIs
+     *
+     * @param templateName - name of template
+     *
+     * @return true - in use, false - not in use
+     */
     @Override
     public boolean isTemplateInUse( String templateName ) throws RegistryException {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Template name is null or empty" );
