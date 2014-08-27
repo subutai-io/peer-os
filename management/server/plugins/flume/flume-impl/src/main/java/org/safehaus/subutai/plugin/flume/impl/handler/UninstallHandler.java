@@ -2,7 +2,9 @@ package org.safehaus.subutai.plugin.flume.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
 import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
@@ -27,14 +29,37 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
             return;
         }
 
+        boolean ok = false;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            ok = uninstallFlume(config);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+            ok = destroyNodes(config);
+        else
+            po.addLog("Unsupported setup type: " + config.getSetupType());
+
+        if(ok) {
+            po.addLog("Updating db...");
+            try {
+                manager.getPluginDao().deleteInfo(FlumeConfig.PRODUCT_KEY, clusterName);
+                po.addLogDone("Cluster info deleted from DB\nDone");
+            } catch(DBException ex) {
+                po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                manager.getLogger().error("Failed to delete cluster info", ex);
+            }
+        } else po.addLogFailed(null);
+    }
+
+    private boolean uninstallFlume(FlumeConfig config) {
+
+        ProductOperation po = productOperation;
         // check if nodes are connected
         for(Agent a : config.getNodes()) {
             Agent agent = manager.getAgentManager().getAgentByHostname(a.getHostname());
             if(agent == null) {
-                po.addLogFailed(String.format(
+                po.addLog(String.format(
                         "Node %s is not connected. Operations aborted.",
                         a.getHostname()));
-                return;
+                return false;
             }
         }
 
@@ -49,28 +74,33 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
             for(Agent agent : config.getNodes()) {
                 AgentResult result = cmd.getResults().get(agent.getUuid());
                 if(result.getExitCode() != null && result.getExitCode() == 0)
-                    if(result.getStdOut().contains("Flume is not installed"))
-                        po.addLog("Flume not installed on " + agent.getHostname());
-                    else
-                        po.addLog(String.format("Flume removed from node %s",
-                                agent.getHostname()));
+                    po.addLog(String.format("Flume removed from node %s",
+                            agent.getHostname()));
                 else
-                    po.addLog(String.format("Error on node %s: %s",
+                    po.addLog(String.format("Failed to remove Flume on %s: %s",
                             agent.getHostname(), result.getStdErr()));
             }
-
-            po.addLog("Updating db...");
-            try {
-                manager.getPluginDao().deleteInfo(FlumeConfig.PRODUCT_KEY, clusterName);
-                po.addLogDone("Cluster info deleted from DB\nDone");
-            } catch(DBException ex) {
-                po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
-                manager.getLogger().error("Failed to delete cluster info", ex);
-            }
+            return true;
         } else {
             po.addLog(cmd.getAllErrors());
-            po.addLogFailed("Uninstallation failed");
+            po.addLog("Uninstallation failed");
+            return false;
         }
+    }
+
+    private boolean destroyNodes(FlumeConfig config) {
+        ProductOperation po = productOperation;
+        for(Agent a : config.getNodes()) {
+            try {
+                manager.getContainerManager().cloneDestroy(a.getParentHostName(), a.getHostname());
+                po.addLog(String.format("Container %s destroyed", a.getHostname()));
+            } catch(LxcDestroyException ex) {
+                String m = "Failed to destroy container " + a.getHostname();
+                po.addLog(m);
+                manager.getLogger().error(m, ex);
+            }
+        }
+        return true;
     }
 
 }

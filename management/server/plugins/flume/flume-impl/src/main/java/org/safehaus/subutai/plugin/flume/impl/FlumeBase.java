@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.flume.impl;
 import java.util.concurrent.ExecutorService;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -21,6 +22,7 @@ public abstract class FlumeBase {
     DbManager dbManager;
     PluginDAO pluginDao;
     EnvironmentManager environmentManager;
+    ContainerManager containerManager;
     Hadoop hadoopManager;
 
     ExecutorService executor;
@@ -67,6 +69,14 @@ public abstract class FlumeBase {
 
     public void setEnvironmentManager(EnvironmentManager environmentManager) {
         this.environmentManager = environmentManager;
+    }
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+    public void setContainerManager(ContainerManager containerManager) {
+        this.containerManager = containerManager;
     }
 
     public Hadoop getHadoopManager() {

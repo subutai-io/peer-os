@@ -45,7 +45,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
             }
 
             // TODO: composite template name for Hadoop and Flume
-            String t = String.format("%s_%s", hadoopConfig.getTemplateName(),
+            String t = String.format("%s%s", hadoopConfig.getTemplateName(),
                     FlumeConfig.TEMPLATE_NAME);
             hadoopConfig.setTemplateName(t);
             try {

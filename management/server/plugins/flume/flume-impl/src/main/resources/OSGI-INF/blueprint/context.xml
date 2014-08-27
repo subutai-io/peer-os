@@ -11,6 +11,8 @@
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="environmentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.container.ContainerManager"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
     
@@ -21,6 +23,7 @@
         <property name="tracker" ref="tracker"/>
         <property name="dbManager" ref="dbManager"/>
         <property name="environmentManager" ref="environmentManager"/>
+        <property name="containerManager" ref="containerManager"/>
         <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
