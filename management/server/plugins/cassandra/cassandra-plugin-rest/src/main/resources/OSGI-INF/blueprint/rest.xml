@@ -13,7 +13,7 @@
         </cxf:features>
     </cxf:bus>
 
-    <jaxrs:server address="/cassandra" id="cassandraRestService">
+    <jaxrs:server address="/cassandra-plugin" id="cassandraRestService">
         <jaxrs:serviceBeans>
             <ref component-id="cassandraRestServiceImpl"/>
         </jaxrs:serviceBeans>

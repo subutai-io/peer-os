@@ -100,7 +100,7 @@
                     <manifestLocation>META-INF</manifestLocation>
                     <unpackBundle>true</unpackBundle>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.cli.oozie</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.cli.plugin.oozie</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
