@@ -204,7 +204,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         }
         finally {
 
-            commandRunner.runCommand( commandRunner.createCommand(
+            commandRunner.runCommandAsync( commandRunner.createCommand(
                     new RequestBuilder( String.format( "rm -rf %s/%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano ) ),
                     Sets.newHashSet( agent ) ) );
         }
