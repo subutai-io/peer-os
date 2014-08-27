@@ -26,7 +26,7 @@ function master_destroy {
   children_list=`zfs_get_children_list $container`
   for child in $children_list
   do
-    subutai destroy -r $child
+    subutai destroy -r -f $child
   done
  
   # Check if the package is installed
