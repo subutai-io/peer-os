@@ -749,6 +749,23 @@
       <!-- Config Point Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>config-point-tracker-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!--Pet Core -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
         <artifactId>pet-core-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -770,28 +787,6 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>pet-core-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Configuration Manager -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>configuration-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>configuration-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>configuration-manager-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>configuration-manager-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
