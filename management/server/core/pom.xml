@@ -33,5 +33,6 @@
         <module>template-manager</module>
         <module>file-tracker</module>
         <module>config-point-tracker</module>
+        <module>pet_core</module>
     </modules>
 </project>
