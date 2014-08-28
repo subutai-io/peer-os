@@ -20,9 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-/**
- * Created by dilshat on 5/7/14.
- */
 public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;

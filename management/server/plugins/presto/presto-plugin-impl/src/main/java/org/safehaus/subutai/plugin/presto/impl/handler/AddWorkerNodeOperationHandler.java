@@ -16,10 +16,6 @@ import org.safehaus.subutai.shared.protocol.Response;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
-/**
- * Created by dilshat on 5/7/14.
- */
 public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;

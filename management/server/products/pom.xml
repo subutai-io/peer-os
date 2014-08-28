@@ -31,10 +31,13 @@
         <module>storm</module>
         <module>zookeeper</module>
         <module>elasticsearch</module>
+<<<<<<< HEAD
         <module>cassandra</module>
         <module>oozie</module>
         <module>hbase</module>
         <module>mahout</module>
+=======
+>>>>>>> SUBUTAI-710 adding unit test to presto plugin
         <module>common</module>
     </modules>
 

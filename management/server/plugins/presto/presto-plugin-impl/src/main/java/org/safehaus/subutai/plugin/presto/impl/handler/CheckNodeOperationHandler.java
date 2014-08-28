@@ -13,9 +13,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 import java.util.UUID;
 
 
-/**
- * Created by dilshat on 5/7/14.
- */
 public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;
