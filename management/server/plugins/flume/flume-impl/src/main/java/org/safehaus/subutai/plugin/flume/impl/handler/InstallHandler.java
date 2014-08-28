@@ -19,7 +19,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
         super(manager, config.getClusterName());
         this.config = config;
         this.productOperation = manager.getTracker().createProductOperation(
-                FlumeConfig.PRODUCT_KEY, "Install Flume cluster " + config.getClusterName());
+                FlumeConfig.PRODUCT_KEY, "Install Flume instances: " + config.getClusterName());
     }
 
     public HadoopClusterConfig getHadoopConfig() {
@@ -44,6 +44,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
                 return;
             }
 
+            po.addLog("Preparing environment...");
             // TODO: composite template name for Hadoop and Flume
             String t = String.format("%s%s", hadoopConfig.getTemplateName(),
                     FlumeConfig.TEMPLATE_NAME);
@@ -60,6 +61,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
                 po.addLogFailed("Failed to build environment: " + ex.getMessage());
                 return;
             }
+            po.addLog("Environment preparation completed");
         }
 
         try {
