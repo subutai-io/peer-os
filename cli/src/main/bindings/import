@@ -26,8 +26,8 @@ function import_usage {
 function import {
   if [ "`is_system_locked`" == "true" ]
   then
-     msg_error "System locked by a subutai process"
-     exit 1
+    msg_error "System locked by a subutai process"
+    exit 1
   fi
 
   local container="$1"
@@ -94,16 +94,16 @@ function import {
     
     if [ "`is_dpkg_locked`" == "true" ]
     then
-       msg_error "$1 import FAILED! dpkg is locked by process!"
-       exit 1
+      msg_error "$1 import FAILED! dpkg is locked by process!"
+      exit 1
     fi
 
     if [ "$is_local" == "true" ]
     then
       if [ "`are_containers_locked_read $container`" == "true" ]
       then
-         msg_error "Container(s) locked by a subutai process"
-         exit 1
+        msg_error "Container(s) locked by a subutai process"
+        exit 1
       fi
      
       lock_container_read $container
@@ -127,8 +127,8 @@ function import {
     then
       if [ "`are_containers_locked_read $container`" == "true" ]
       then
-         msg_error "Container(s) locked by a subutai process"
-         exit 1
+        msg_error "Container(s) locked by a subutai process"
+        exit 1
       fi
 
       lock_container_read $container
@@ -142,10 +142,10 @@ function import {
        exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
-        subutai destroy $container
-        apt-get --assume-yes --force-yes purge $package_name
         unlock_container_read $container
         if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+	subutai destroy $container
+        apt-get --assume-yes --force-yes purge $package_name
         exit 1
       fi
     else

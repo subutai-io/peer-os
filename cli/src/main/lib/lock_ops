@@ -49,13 +49,13 @@ function lock_container_read {
 
 function unlock_container_write {
   removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
-  rm $SUBUTAI_LOCK_PATH/write/$removing  > /dev/null 2>&1 || echo ""
+  rm $SUBUTAI_LOCK_PATH/write/$removing  > /dev/null 2>&1
 }
 
 function unlock_container_read {
   removing=`ls $SUBUTAI_LOCK_PATH/write/ | grep -e "\b$1\b"`
-  rm $SUBUTAI_LOCK_PATH/write/$removing > /dev/null 2>&1 || echo ""
-  rm $SUBUTAI_LOCK_PATH/read/$removing > /dev/null 2>&1 || echo ""
+  rm $SUBUTAI_LOCK_PATH/write/$removing > /dev/null 2>&1
+  rm $SUBUTAI_LOCK_PATH/read/$removing > /dev/null 2>&1
 }
 
 function are_containers_locked_write {
