@@ -13,4 +13,10 @@ public class PetImpl implements PetManager {
     public String getPetName() {
         return "hello kitty!";
     }
+
+
+    @Override
+    public String helloPet( final String name ) {
+        return "Hello dear " + name + "!";
+    }
 }

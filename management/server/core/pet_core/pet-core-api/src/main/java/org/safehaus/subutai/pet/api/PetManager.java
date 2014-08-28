@@ -8,4 +8,6 @@ public interface PetManager {
 
     public String getPetName();
 
+    public String helloPet( String name );
+
 }

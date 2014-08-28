@@ -19,5 +19,6 @@
         <module>pet-core-impl</module>
         <module>pet-core-ui</module>
         <module>pet-core-cli</module>
+        <module>pet-core-rest</module>
     </modules>
 </project>
