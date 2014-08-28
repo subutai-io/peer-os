@@ -3,6 +3,8 @@ package org.safehaus.subutai.impl.cassandra;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
@@ -15,9 +17,9 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.AgentUtil;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
 public class CassandraImpl implements Cassandra {
@@ -197,7 +199,7 @@ public class CassandraImpl implements Cassandra {
                         StringBuilder sb = new StringBuilder();
 //                        sb.append('"');
                         for (Agent seed : config.getSeedNodes()) {
-                            sb.append(Util.getAgentIpByMask(seed, Common.IP_MASK)).append(",");
+                            sb.append(AgentUtil.getAgentIpByMask(seed, Common.IP_MASK)).append(",");
                         }
                         sb.replace(sb.toString().length() - 1, sb.toString().length(), "");
 //                        sb.append('"');
@@ -337,7 +339,7 @@ public class CassandraImpl implements Cassandra {
             Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
 
             public void run() {
-                Command startServiceCommand = Commands.getStartCommand(Util.wrapAgentToSet(agent));
+                Command startServiceCommand = Commands.getStartCommand(Sets.newHashSet(agent));
                 commandRunner.runCommand(startServiceCommand);
                 if (startServiceCommand.hasSucceeded()) {
                     AgentResult ar = startServiceCommand.getResults().get(agent.getUuid());
@@ -363,7 +365,7 @@ public class CassandraImpl implements Cassandra {
             Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
 
             public void run() {
-                Command stopServiceCommand = Commands.getStopCommand(Util.wrapAgentToSet(agent));
+                Command stopServiceCommand = Commands.getStopCommand(Sets.newHashSet(agent));
                 commandRunner.runCommand(stopServiceCommand);
                 if (stopServiceCommand.hasSucceeded()) {
                     AgentResult ar = stopServiceCommand.getResults().get(agent.getUuid());
@@ -386,7 +388,7 @@ public class CassandraImpl implements Cassandra {
             Agent agent = agentManager.getAgentByUUID(UUID.fromString(agentUUID));
 
             public void run() {
-                Command statusServiceCommand = Commands.getStatusCommand(Util.wrapAgentToSet(agent));
+                Command statusServiceCommand = Commands.getStatusCommand(Sets.newHashSet(agent));
                 commandRunner.runCommand(statusServiceCommand);
                 if (statusServiceCommand.hasSucceeded()) {
                     AgentResult ar = statusServiceCommand.getResults().get(agent.getUuid());
