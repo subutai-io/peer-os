@@ -250,6 +250,9 @@ public class CommandImpl implements Command {
     }
 
 
+    /**
+     * Updates relevant {@code AgentResult} for agent associated with this response
+     */
     public void appendResult( Response response ) {
         if ( response != null && response.getUuid() != null ) {
 
@@ -381,6 +384,11 @@ public class CommandImpl implements Command {
     }
 
 
+    /**
+     * Indicates if this command is broadcast command or not
+     *
+     * @return true - broadcast command, false - not broadcast command
+     */
     public boolean isBroadcastCommand() {
         return broadcastCommand;
     }

@@ -6,12 +6,13 @@
 package org.safehaus.subutai.impl.commandrunner;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.UUID;
+
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.shared.protocol.Response;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -19,65 +20,77 @@ import java.util.UUID;
  */
 public class AgentResultImpl implements AgentResult {
 
-	//tagent UUID
-	private final UUID agentUUID;
-	//std out of command execution
-	private final StringBuilder stdOut = new StringBuilder();
-	//std err of command execution
-	private final StringBuilder stdErr = new StringBuilder();
-	//exit code of command execution
-	private Integer exitCode;
+    //tagent UUID
+    private final UUID agentUUID;
+    //std out of command execution
+    private final StringBuilder stdOut = new StringBuilder();
+    //std err of command execution
+    private final StringBuilder stdErr = new StringBuilder();
+    //exit code of command execution
+    private Integer exitCode;
 
 
-	/**
-	 * Constructor
-	 *
-	 * @param agentUUID - UUID of agent
-	 */
-	public AgentResultImpl(UUID agentUUID) {
-		Preconditions.checkNotNull(agentUUID, "Agent UUID is null");
+    /**
+     * Constructor
+     *
+     * @param agentUUID - UUID of agent
+     */
+    public AgentResultImpl( UUID agentUUID ) {
+        Preconditions.checkNotNull( agentUUID, "Agent UUID is null" );
 
-		this.agentUUID = agentUUID;
-	}
-
-
-	/**
-	 * When a response arrives this method is called by command runner to append results of command execution to this
-	 * object
-	 *
-	 * @param response - received response
-	 */
-	public void appendResults(Response response) {
-		if (response != null && exitCode == null && agentUUID.equals(response.getUuid())) {
-			if (!Strings.isNullOrEmpty(response.getStdOut())) {
-				stdOut.append(response.getStdOut());
-			}
-			if (!Strings.isNullOrEmpty(response.getStdErr())) {
-				stdErr.append(response.getStdErr());
-			}
-			if (response.isFinal() && response.getExitCode() != null) {
-				exitCode = response.getExitCode();
-			}
-		}
-	}
+        this.agentUUID = agentUUID;
+    }
 
 
-	public Integer getExitCode() {
-		return exitCode;
-	}
+    /**
+     * When a response arrives this method is called by command runner to append results of command execution to this
+     * object
+     *
+     * @param response - received response
+     */
+    public void appendResults( Response response ) {
+        if ( response != null && exitCode == null && agentUUID.equals( response.getUuid() ) ) {
+            if ( !Strings.isNullOrEmpty( response.getStdOut() ) ) {
+                stdOut.append( response.getStdOut() );
+            }
+            if ( !Strings.isNullOrEmpty( response.getStdErr() ) ) {
+                stdErr.append( response.getStdErr() );
+            }
+            if ( response.isFinal() && response.getExitCode() != null ) {
+                exitCode = response.getExitCode();
+            }
+        }
+    }
 
 
-	public String getStdOut() {
-		return stdOut.toString();
-	}
+    /**
+     * Returns command exit code
+     */
+    public Integer getExitCode() {
+        return exitCode;
+    }
 
 
-	public String getStdErr() {
-		return stdErr.toString();
-	}
+    /**
+     * Returns command cumulative std output
+     */
+    public String getStdOut() {
+        return stdOut.toString();
+    }
 
 
-	public UUID getAgentUUID() {
-		return agentUUID;
-	}
+    /**
+     * Returns command cumulative err output
+     */
+    public String getStdErr() {
+        return stdErr.toString();
+    }
+
+
+    /**
+     * Returns target agent uuid
+     */
+    public UUID getAgentUUID() {
+        return agentUUID;
+    }
 }

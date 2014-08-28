@@ -6,8 +6,9 @@
 package org.safehaus.subutai.api.commandrunner;
 
 
-import com.google.common.base.Preconditions;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import com.google.common.base.Preconditions;
 
 
 /**
@@ -16,25 +17,30 @@ import org.safehaus.subutai.shared.protocol.Agent;
  */
 public class AgentRequestBuilder extends RequestBuilder {
 
-	//target agent
-	private final Agent agent;
+    //target agent
+    private final Agent agent;
 
 
-	/**
-	 * Constructor
-	 *
-	 * @param agent   - target agent
-	 * @param command - command to run
-	 */
-	public AgentRequestBuilder(Agent agent, String command) {
-		super(command);
-		Preconditions.checkNotNull(agent, "Agent is null");
+    /**
+     * Constructor
+     *
+     * @param agent - target agent
+     * @param command - command to run
+     */
+    public AgentRequestBuilder( Agent agent, String command ) {
+        super( command );
+        Preconditions.checkNotNull( agent, "Agent is null" );
 
-		this.agent = agent;
-	}
+        this.agent = agent;
+    }
 
 
-	public Agent getAgent() {
-		return agent;
-	}
+    /**
+     * Returns target agent
+     *
+     * @return - agent
+     */
+    public Agent getAgent() {
+        return agent;
+    }
 }
