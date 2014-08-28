@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+  <!--<reference id="petManager" availability="mandatory"
+             interface="org.safehaus.subutai.pet.api.PetManager"/>
+-->
+  <bean id="petImpl" scope="singleton" class="org.safehaus.subutai.pet.impl.PetImpl">
 
-    <service ref="environmentManager" interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
-
-    <reference id="dbManager" availability="mandatory" interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
-    <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
-    <reference id="containerManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.container.ContainerManager"/>
-    <reference id="templateRegistryManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
-    <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
-
-    <bean id="environmentManager" scope="singleton" class="org.safehaus.subutai.impl.manager.EnvironmentManagerImpl">
-        <argument ref="containerManager"/>
-        <argument ref="templateRegistryManager"/>
-        <argument ref="dbManager"/>
-        <argument ref="agentManager"/>
-        <argument ref="networkManager"/>
-    </bean>
+    <!--<argument ref="petManager"/>-->
+  </bean>
 
 </blueprint>
