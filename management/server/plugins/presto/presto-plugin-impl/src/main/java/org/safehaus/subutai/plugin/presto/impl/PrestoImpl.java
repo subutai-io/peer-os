@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.impl.handler.*;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -64,16 +64,7 @@ public class PrestoImpl implements Presto {
 		executor.shutdown();
 	}
 
-	public List<Config> getClusters() {
-		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-	}
-
-	@Override
-	public Config getCluster(String clusterName) {
-		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-	}
-
-	public UUID installCluster(final Config config) {
+	public UUID installCluster(final PrestoClusterConfig config) {
 
 		Preconditions.checkNotNull(config, "Configuration is null");
 
@@ -91,6 +82,15 @@ public class PrestoImpl implements Presto {
 		executor.execute(operationHandler);
 
 		return operationHandler.getTrackerId();
+	}
+
+	public List<PrestoClusterConfig> getClusters() {
+		return dbManager.getInfo(PrestoClusterConfig.PRODUCT_KEY, PrestoClusterConfig.class);
+	}
+
+	@Override
+	public PrestoClusterConfig getCluster(String clusterName) {
+		return dbManager.getInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class);
 	}
 
 	public UUID addWorkerNode(final String clusterName, final String lxcHostname) {

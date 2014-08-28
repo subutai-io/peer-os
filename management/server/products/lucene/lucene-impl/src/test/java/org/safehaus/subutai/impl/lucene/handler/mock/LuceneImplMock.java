@@ -14,22 +14,22 @@ import static org.mockito.Mockito.mock;
 
 public class LuceneImplMock extends LuceneImpl {
 
-    private Config clusterConfig = null;
+	private Config clusterConfig = null;
 
-    public LuceneImplMock() {
-        super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
-                mock( Hadoop.class ) );
-    }
-
-
-    public LuceneImplMock setClusterConfig( Config clusterConfig ) {
-        this.clusterConfig = clusterConfig;
-        return this;
-    }
+	public LuceneImplMock() {
+		super(new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
+				mock(Hadoop.class));
+	}
 
 
-    @Override
-    public Config getCluster( String clusterName ) {
-        return clusterConfig;
-    }
+	public LuceneImplMock setClusterConfig(Config clusterConfig) {
+		this.clusterConfig = clusterConfig;
+		return this;
+	}
+
+
+	@Override
+	public Config getCluster(String clusterName) {
+		return clusterConfig;
+	}
 }

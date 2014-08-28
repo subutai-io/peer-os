@@ -14,7 +14,8 @@ import java.util.UUID;
 import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -37,12 +38,12 @@ public class AgentManagerFake implements AgentManager {
 
 
     public Set<Agent> getPhysicalAgents() {
-        return Util.wrapAgentToSet( MockUtils.getPhysicalAgent() );
+        return Sets.newHashSet( MockUtils.getPhysicalAgent() );
     }
 
 
     public Set<Agent> getLxcAgents() {
-        return Util.wrapAgentToSet( MockUtils.getLxcAgent() );
+        return Sets.newHashSet( MockUtils.getLxcAgent() );
     }
 
 

@@ -177,53 +177,31 @@ public class Manager {
 
 	}
 
-	public Component getContent() {
-		return contentRoot;
-	}
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
 
-	private void show(String notification) {
-		Notification.show(notification);
-	}
-
-	private void populateTable(final Table table, Set<Agent> agents) {
-
-		table.removeAllItems();
-
-		for (final Agent agent : agents) {
-			final Button destroyBtn = new Button("Destroy");
-			destroyBtn.addStyleName("default");
-
-			table.addItem(new Object[] {
-							agent.getHostname() + String.format( " [%s]", agent.getListIP().get(0) ),
-							destroyBtn
-					},
-					null
-			);
-
-			destroyBtn.addClickListener(new Button.ClickListener() {
-				@Override
-				public void buttonClick(Button.ClickEvent clickEvent) {
-					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
-							"Yes", "No");
-					alert.getOk().addClickListener(new Button.ClickListener() {
-						@Override
-						public void buttonClick(Button.ClickEvent clickEvent) {
-							UUID trackID = SharkUI.getSharkManager().destroyNode(config.getClusterName(), agent.getHostname());
-							ProgressWindow window = new ProgressWindow(SharkUI.getExecutor(), SharkUI.getTracker(), trackID, Config.PRODUCT_KEY);
-							window.getWindow().addCloseListener(new Window.CloseListener() {
-								@Override
-								public void windowClose(Window.CloseEvent closeEvent) {
-									refreshClustersInfo();
-								}
-							});
-							contentRoot.getUI().addWindow(window.getWindow());
-						}
-					});
-
-					contentRoot.getUI().addWindow(alert.getAlert());
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = SharkUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SharkUI.getExecutor(), SharkUI.getCommandRunner(), SharkUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
 				}
-			});
-		}
+			}
+		});
+		return table;
 	}
 
 	private void refreshUI() {
@@ -258,31 +236,53 @@ public class Manager {
 		}
 	}
 
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
+	private void show(String notification) {
+		Notification.show(notification);
+	}
 
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = SharkUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), SharkUI.getExecutor(), SharkUI.getCommandRunner(), SharkUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
+	private void populateTable(final Table table, Set<Agent> agents) {
+
+		table.removeAllItems();
+
+		for (final Agent agent : agents) {
+			final Button destroyBtn = new Button("Destroy");
+			destroyBtn.addStyleName("default");
+
+			table.addItem(new Object[] {
+							agent.getHostname() + String.format(" [%s]", agent.getListIP().get(0)),
+							destroyBtn
+					},
+					null
+			);
+
+			destroyBtn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent clickEvent) {
+					ConfirmationDialog alert = new ConfirmationDialog(String.format("Do you want to destroy the %s node?", agent.getHostname()),
+							"Yes", "No");
+					alert.getOk().addClickListener(new Button.ClickListener() {
+						@Override
+						public void buttonClick(Button.ClickEvent clickEvent) {
+							UUID trackID = SharkUI.getSharkManager().destroyNode(config.getClusterName(), agent.getHostname());
+							ProgressWindow window = new ProgressWindow(SharkUI.getExecutor(), SharkUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							window.getWindow().addCloseListener(new Window.CloseListener() {
+								@Override
+								public void windowClose(Window.CloseEvent closeEvent) {
+									refreshClustersInfo();
+								}
+							});
+							contentRoot.getUI().addWindow(window.getWindow());
+						}
+					});
+
+					contentRoot.getUI().addWindow(alert.getAlert());
 				}
-			}
-		});
-		return table;
+			});
+		}
+	}
+
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

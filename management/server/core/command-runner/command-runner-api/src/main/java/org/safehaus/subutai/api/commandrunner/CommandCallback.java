@@ -37,6 +37,11 @@ public class CommandCallback {
     }
 
 
+    /**
+     * Indicates if this callback is stopped from being triggered by associated command's responses
+     *
+     * @return true - callback is stopped from being triggered, true- callback continues to be triggered
+     */
     public final boolean isStopped() {
         return stopped;
     }

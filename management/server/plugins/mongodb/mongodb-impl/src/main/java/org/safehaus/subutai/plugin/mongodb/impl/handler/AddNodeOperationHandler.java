@@ -56,8 +56,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
             po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
+        if ( nodeType == NodeType.CONFIG_NODE ) {
+            po.addLogFailed( "Can not add config server" );
+            return;
+        }
         if ( nodeType == NodeType.DATA_NODE && config.getDataNodes().size() == 7 ) {
-            po.addLogFailed( "Replica set cannot have more than 7 members.\nOperation aborted" );
+            po.addLogFailed( "Replica set cannot have more than 7 members" );
             return;
         }
         try {
@@ -71,12 +75,11 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
 
             if ( nodeType == NodeType.DATA_NODE ) {
                 config.getDataNodes().add( agent );
-            }
-            else if ( nodeType == NodeType.CONFIG_NODE ) {
-                config.getConfigServers().add( agent );
+                config.setNumberOfDataNodes( config.getNumberOfDataNodes() + 1 );
             }
             else if ( nodeType == NodeType.ROUTER_NODE ) {
                 config.getRouterServers().add( agent );
+                config.setNumberOfRouters( config.getNumberOfRouters() + 1 );
             }
             po.addLog( "Lxc container created successfully\nConfiguring cluster..." );
 
@@ -93,12 +96,12 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<MongoImpl>
                 po.addLog( "Updating cluster information in database..." );
 
                 try {
-                    manager.getDbManager().saveInfo2( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+                    manager.getPluginDAO().saveInfo( MongoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
                     po.addLogDone( "Cluster information updated in database" );
                 }
                 catch ( DBException e ) {
-                    po.addLogFailed(
-                            String.format( "Error while updating cluster information in database, %s", e.getMessage() ) );
+                    po.addLogFailed( String.format( "Error while updating cluster information in database, %s",
+                            e.getMessage() ) );
                 }
             }
             else {

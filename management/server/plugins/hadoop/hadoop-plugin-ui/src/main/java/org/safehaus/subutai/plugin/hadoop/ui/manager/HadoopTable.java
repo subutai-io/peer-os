@@ -21,18 +21,16 @@ import java.util.UUID;
  * Created by daralbaev on 12.04.14.
  */
 public class HadoopTable extends TreeTable {
-	private static final Action UNINSTALL_ITEM_ACTION = new Action("Uninstall cluster");
-	private static final Action ADD_ITEM_ACTION = new Action("Add new node");
-	private static final Action EXCLUDE_ITEM_ACTION = new Action("Exclude node");
-	private static final Action INCLUDE_ITEM_ACTION = new Action("Include node");
-
 	public static final String CLUSTER_NAME_PROPERTY = "Cluster Name";
 	public static final String DOMAIN_NAME_PROPERTY = "Domain Name";
 	public static final String NAMENODE_PROPERTY = "NameNode/DataNodes";
 	public static final String SECONDARY_NAMENODE_PROPERTY = "Secondary NameNode";
 	public static final String JOBTRACKER_PROPERTY = "JobTracker/TaskTrackers";
 	public static final String REPLICATION_PROPERTY = "Replication Factor";
-
+	private static final Action UNINSTALL_ITEM_ACTION = new Action("Uninstall cluster");
+	private static final Action ADD_ITEM_ACTION = new Action("Add new node");
+	private static final Action EXCLUDE_ITEM_ACTION = new Action("Exclude node");
+	private static final Action INCLUDE_ITEM_ACTION = new Action("Include node");
 	private Embedded indicator;
 
 	public HadoopTable(String caption, final Embedded indicator) {
@@ -53,6 +51,35 @@ public class HadoopTable extends TreeTable {
 		addContainerProperty(REPLICATION_PROPERTY, Integer.class, null);
 
 		addActionHandler(new Action.Handler() {
+
+			public Action[] getActions(Object target, Object sender) {
+
+				if (target != null) {
+					Item row = getItem(target);
+
+					if (areChildrenAllowed(target)) {
+						if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
+							return new Action[] {UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
+						}
+					}
+
+					if (!areChildrenAllowed(target)) {
+						if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
+								row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
+							return new Action[] {INCLUDE_ITEM_ACTION};
+						}
+					}
+
+					if (!areChildrenAllowed(target)) {
+						if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
+								row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
+							return new Action[] {EXCLUDE_ITEM_ACTION};
+						}
+					}
+				}
+
+				return null;
+			}
 
 			public void handleAction(Action action, Object sender, Object target) {
 				if (action == UNINSTALL_ITEM_ACTION) {
@@ -114,35 +141,6 @@ public class HadoopTable extends TreeTable {
 						}
 					}));
 				}
-			}
-
-			public Action[] getActions(Object target, Object sender) {
-
-				if (target != null) {
-					Item row = getItem(target);
-
-					if (areChildrenAllowed(target)) {
-						if (!Strings.isNullOrEmpty((String) row.getItemProperty(DOMAIN_NAME_PROPERTY).getValue())) {
-							return new Action[] {UNINSTALL_ITEM_ACTION, ADD_ITEM_ACTION};
-						}
-					}
-
-					if (!areChildrenAllowed(target)) {
-						if (row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue() != null &&
-								row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue().toString().equalsIgnoreCase("Blocked")) {
-							return new Action[] {INCLUDE_ITEM_ACTION};
-						}
-					}
-
-					if (!areChildrenAllowed(target)) {
-						if (row.getItemProperty(NAMENODE_PROPERTY).getValue() != null ||
-								row.getItemProperty(JOBTRACKER_PROPERTY).getValue() != null) {
-							return new Action[] {EXCLUDE_ITEM_ACTION};
-						}
-					}
-				}
-
-				return null;
 			}
 		});
 

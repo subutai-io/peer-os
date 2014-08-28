@@ -74,7 +74,7 @@ public class Manager {
 					Agent lxcAgent = ElasticsearchUI.getAgentManager().getAgentByHostname(lxcHostname);
 					if (lxcAgent != null) {
 						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), ElasticsearchUI
-                                .getExecutor(), ElasticsearchUI.getCommandRunner(), ElasticsearchUI.getAgentManager());
+								.getExecutor(), ElasticsearchUI.getCommandRunner(), ElasticsearchUI.getAgentManager());
 						contentRoot.getUI().addWindow(terminal.getWindow());
 					} else {
 						show("Agent is not connected");
@@ -129,7 +129,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = ElasticsearchUI.getElasticsearchManager().checkAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -145,29 +145,29 @@ public class Manager {
 	}
 
 
-    private void getStartAllButton() {
-        Button startAllBtn = new Button( "Start all" );
-        startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = ElasticsearchUI.getElasticsearchManager().startAllNodes( config.getClusterName() );
-                ProgressWindow window =
-                        new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
-                                Config.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        refreshClustersInfo();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
-            }
-        } );
+	private void getStartAllButton() {
+		Button startAllBtn = new Button("Start all");
+		startAllBtn.addStyleName("default");
+		startAllBtn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent clickEvent) {
+				UUID trackID = ElasticsearchUI.getElasticsearchManager().startAllNodes(config.getClusterName());
+				ProgressWindow window =
+						new ProgressWindow(ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID,
+								Config.PRODUCT_KEY);
+				window.getWindow().addCloseListener(new Window.CloseListener() {
+					@Override
+					public void windowClose(Window.CloseEvent closeEvent) {
+						refreshClustersInfo();
+					}
+				});
+				contentRoot.getUI().addWindow(window.getWindow());
+			}
+		});
 
-        controlsContent.addComponent( startAllBtn );
-        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
-    }
+		controlsContent.addComponent(startAllBtn);
+		controlsContent.setComponentAlignment(startAllBtn, Alignment.MIDDLE_CENTER);
+	}
 
 
 	private void getStopAllButton() {
@@ -177,7 +177,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = ElasticsearchUI.getElasticsearchManager().stopAllNodes(config.getClusterName());
-				ProgressWindow window = new ProgressWindow( ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -208,7 +208,7 @@ public class Manager {
 							UUID trackID = ElasticsearchUI.getElasticsearchManager().uninstallCluster(config.getClusterName());
 
 							ProgressWindow window = new ProgressWindow(
-                                    ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
+									ElasticsearchUI.getExecutor(), ElasticsearchUI.getTracker(), trackID, Config.PRODUCT_KEY);
 
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
@@ -244,32 +244,31 @@ public class Manager {
 	}
 
 
-    public void refreshClustersInfo() {
-        List<Config> configList = ElasticsearchUI.getElasticsearchManager().getClusters();
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
-        clusterCombo.removeAllItems();
+	public void refreshClustersInfo() {
+		List<Config> configList = ElasticsearchUI.getElasticsearchManager().getClusters();
+		Config clusterInfo = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
 
-        if ( configList == null || configList.isEmpty() ) {
-            return;
-        }
+		if (configList == null || configList.isEmpty()) {
+			return;
+		}
 
-        for ( Config config : configList ) {
-            clusterCombo.addItem( config );
-            clusterCombo.setItemCaption( config, config.getClusterName() );
-        }
+		for (Config config : configList) {
+			clusterCombo.addItem(config);
+			clusterCombo.setItemCaption(config, config.getClusterName());
+		}
 
-        if ( clusterInfo != null ) {
-            for ( Config cassandraInfo : configList ) {
-                if ( cassandraInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
-                    clusterCombo.setValue( cassandraInfo );
-                    return;
-                }
-            }
-        }
-        else {
-            clusterCombo.setValue( configList.iterator().next() );
-        }
-    }
+		if (clusterInfo != null) {
+			for (Config cassandraInfo : configList) {
+				if (cassandraInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+					clusterCombo.setValue(cassandraInfo);
+					return;
+				}
+			}
+		} else {
+			clusterCombo.setValue(configList.iterator().next());
+		}
+	}
 
 	private void populateTable(final Table table, Set<Agent> agents) {
 		table.removeAllItems();

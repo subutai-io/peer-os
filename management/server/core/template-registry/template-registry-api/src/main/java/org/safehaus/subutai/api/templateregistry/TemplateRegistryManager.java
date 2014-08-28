@@ -20,14 +20,14 @@ public interface TemplateRegistryManager {
      * @param configFile - template configuration file contents
      * @param packagesFile - template packages manifest file contents
      */
-    public void registerTemplate( String configFile, String packagesFile );
+    public void registerTemplate( String configFile, String packagesFile, String md5sum ) throws RegistryException;
 
     /**
      * Removes template entry from registry
      *
      * @param templateName - name of template to remove
      */
-    public void unregisterTemplate( String templateName );
+    public void unregisterTemplate( String templateName ) throws RegistryException;
 
     /**
      * Removes template entry from registry
@@ -35,7 +35,7 @@ public interface TemplateRegistryManager {
      * @param templateName - name of template to remove
      * @param lxcArch - lxc architecture
      */
-    public void unregisterTemplate( String templateName, String lxcArch );
+    public void unregisterTemplate( String templateName, String lxcArch ) throws RegistryException;
 
     /**
      * Returns template by name
@@ -136,4 +136,22 @@ public interface TemplateRegistryManager {
      * @return - list of {@code Template}
      */
     public List<Template> getAllTemplates( String lxcArch );
+
+
+    /**
+     * Update template usage on FAI servers
+     *
+     * @param faiHostname - hostname of FAI
+     * @param templateName - target template
+     * @param inUse - true - template is in use, false - template is out of use
+     */
+    public void updateTemplateUsage( String faiHostname, String templateName, boolean inUse ) throws RegistryException;
+
+
+    /**
+     * Indicates of template is in use on any of FAI servers
+     *
+     * @return true - in use, false - not in use
+     */
+    public boolean isTemplateInUse( String templateName ) throws RegistryException;
 }

@@ -7,12 +7,12 @@ package org.safehaus.subutai.plugin.accumulo.ui;
 
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;

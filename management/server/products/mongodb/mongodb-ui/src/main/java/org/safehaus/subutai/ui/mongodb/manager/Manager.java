@@ -247,6 +247,82 @@ public class Manager {
 		contentRoot.addComponent(dataNodesTable, 0, 8, 0, 10);
 	}
 
+	private Table createTableTemplate(String caption) {
+		final Table table = new Table(caption);
+		table.addContainerProperty("Host", String.class, null);
+		table.addContainerProperty("Check", Button.class, null);
+		table.addContainerProperty("Start", Button.class, null);
+		table.addContainerProperty("Stop", Button.class, null);
+		table.addContainerProperty("Destroy", Button.class, null);
+		table.addContainerProperty("Status", Embedded.class, null);
+		table.setSizeFull();
+		table.setPageLength(10);
+		table.setSelectable(false);
+		table.setImmediate(true);
+
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if (event.isDoubleClick()) {
+					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
+					Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
+					if (lxcAgent != null) {
+						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MongoUI.getExecutor(), MongoUI.getCommandRunner(), MongoUI.getAgentManager());
+						contentRoot.getUI().addWindow(terminal.getWindow());
+					} else {
+						show("Agent is not connected");
+					}
+				}
+			}
+		});
+		return table;
+	}
+
+	private void refreshUI() {
+		if (config != null) {
+			populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
+			populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
+			populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
+			replicaSetName.setValue(config.getReplicaSetName());
+			domainName.setValue(config.getDomainName());
+			cfgSrvPort.setValue(config.getCfgSrvPort() + "");
+			routerPort.setValue(config.getRouterPort() + "");
+			dataNodePort.setValue(config.getDataNodePort() + "");
+		} else {
+			configServersTable.removeAllItems();
+			routersTable.removeAllItems();
+			dataNodesTable.removeAllItems();
+			replicaSetName.setValue("");
+			domainName.setValue("");
+			cfgSrvPort.setValue("");
+			routerPort.setValue("");
+			dataNodePort.setValue("");
+		}
+	}
+
+	public void refreshClustersInfo() {
+		List<Config> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
+		Config clusterInfo = (Config) clusterCombo.getValue();
+		clusterCombo.removeAllItems();
+		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
+			for (Config mongoClusterInfo : mongoClusterInfos) {
+				clusterCombo.addItem(mongoClusterInfo);
+				clusterCombo.setItemCaption(mongoClusterInfo,
+						mongoClusterInfo.getClusterName());
+			}
+			if (clusterInfo != null) {
+				for (Config mongoClusterInfo : mongoClusterInfos) {
+					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+						clusterCombo.setValue(mongoClusterInfo);
+						return;
+					}
+				}
+			} else {
+				clusterCombo.setValue(mongoClusterInfos.iterator().next());
+			}
+		}
+	}
+
 	public static void checkNodesStatus(Table table) {
 		for (Object o : table.getItemIds()) {
 			int rowId = (Integer) o;
@@ -272,10 +348,6 @@ public class Manager {
 			Button checkBtn = (Button) (row.getItemProperty("Stop").getValue());
 			checkBtn.click();
 		}
-	}
-
-	public Component getContent() {
-		return contentRoot;
 	}
 
 	private void show(String notification) {
@@ -411,80 +483,8 @@ public class Manager {
 		}
 	}
 
-	private void refreshUI() {
-		if (config != null) {
-			populateTable(configServersTable, config.getConfigServers(), NodeType.CONFIG_NODE);
-			populateTable(routersTable, config.getRouterServers(), NodeType.ROUTER_NODE);
-			populateTable(dataNodesTable, config.getDataNodes(), NodeType.DATA_NODE);
-			replicaSetName.setValue(config.getReplicaSetName());
-			domainName.setValue(config.getDomainName());
-			cfgSrvPort.setValue(config.getCfgSrvPort() + "");
-			routerPort.setValue(config.getRouterPort() + "");
-			dataNodePort.setValue(config.getDataNodePort() + "");
-		} else {
-			configServersTable.removeAllItems();
-			routersTable.removeAllItems();
-			dataNodesTable.removeAllItems();
-			replicaSetName.setValue("");
-			domainName.setValue("");
-			cfgSrvPort.setValue("");
-			routerPort.setValue("");
-			dataNodePort.setValue("");
-		}
-	}
-
-	public void refreshClustersInfo() {
-		List<Config> mongoClusterInfos = MongoUI.getMongoManager().getClusters();
-		Config clusterInfo = (Config) clusterCombo.getValue();
-		clusterCombo.removeAllItems();
-		if (mongoClusterInfos != null && mongoClusterInfos.size() > 0) {
-			for (Config mongoClusterInfo : mongoClusterInfos) {
-				clusterCombo.addItem(mongoClusterInfo);
-				clusterCombo.setItemCaption(mongoClusterInfo,
-						mongoClusterInfo.getClusterName());
-			}
-			if (clusterInfo != null) {
-				for (Config mongoClusterInfo : mongoClusterInfos) {
-					if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
-						clusterCombo.setValue(mongoClusterInfo);
-						return;
-					}
-				}
-			} else {
-				clusterCombo.setValue(mongoClusterInfos.iterator().next());
-			}
-		}
-	}
-
-	private Table createTableTemplate(String caption) {
-		final Table table = new Table(caption);
-		table.addContainerProperty("Host", String.class, null);
-		table.addContainerProperty("Check", Button.class, null);
-		table.addContainerProperty("Start", Button.class, null);
-		table.addContainerProperty("Stop", Button.class, null);
-		table.addContainerProperty("Destroy", Button.class, null);
-		table.addContainerProperty("Status", Embedded.class, null);
-		table.setSizeFull();
-		table.setPageLength(10);
-		table.setSelectable(false);
-		table.setImmediate(true);
-
-		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if (event.isDoubleClick()) {
-					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-					Agent lxcAgent = MongoUI.getAgentManager().getAgentByHostname(lxcHostname);
-					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), MongoUI.getExecutor(), MongoUI.getCommandRunner(), MongoUI.getAgentManager());
-						contentRoot.getUI().addWindow(terminal.getWindow());
-					} else {
-						show("Agent is not connected");
-					}
-				}
-			}
-		});
-		return table;
+	public Component getContent() {
+		return contentRoot;
 	}
 
 }

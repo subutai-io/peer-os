@@ -9,26 +9,24 @@ import org.safehaus.subutai.api.commandrunner.CommandStatus;
  */
 public class CommandExecutorExpiryCallback implements EntryExpiryCallback<CommandExecutor> {
 
-    @Override
-    public void onEntryExpiry( final CommandExecutor entry ) {
-        try {
-            //obtain command lock
-            entry.getCommand().getUpdateLock();
-            try {
-                //set command status to TIMEOUT if it is not completed or interrupted yet
-                if ( !( entry.getCommand().hasCompleted() || entry.getCallback().isStopped() ) ) {
-                    entry.getCommand().setCommandStatus( CommandStatus.TIMEOUT );
-                }
-                //call this to notify all waiting threads that command timed out
-                entry.getCommand().notifyWaitingThreads();
-                //shutdown command executor
-                entry.getExecutor().shutdown();
-            }
-            finally {
-                entry.getCommand().releaseUpdateLock();
-            }
-        }
-        catch ( Exception e ) {
-        }
-    }
+	@Override
+	public void onEntryExpiry(final CommandExecutor entry) {
+		try {
+			//obtain command lock
+			entry.getCommand().getUpdateLock();
+			try {
+				//set command status to TIMEOUT if it is not completed or interrupted yet
+				if (!(entry.getCommand().hasCompleted() || entry.getCallback().isStopped())) {
+					entry.getCommand().setCommandStatus(CommandStatus.TIMEOUT);
+				}
+				//call this to notify all waiting threads that command timed out
+				entry.getCommand().notifyWaitingThreads();
+				//shutdown command executor
+				entry.getExecutor().shutdown();
+			} finally {
+				entry.getCommand().releaseUpdateLock();
+			}
+		} catch (Exception e) {
+		}
+	}
 }

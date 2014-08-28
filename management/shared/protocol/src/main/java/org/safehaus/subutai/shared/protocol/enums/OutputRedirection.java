@@ -9,5 +9,5 @@ package org.safehaus.subutai.shared.protocol.enums;
  */
 public enum OutputRedirection {
 
-    CAPTURE, CAPTURE_AND_RETURN, RETURN, NO
+	CAPTURE, CAPTURE_AND_RETURN, RETURN, NO
 }

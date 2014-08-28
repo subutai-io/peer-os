@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="tracker" availability="mandatory"
+             interface="org.safehaus.subutai.api.tracker.Tracker" />
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.dbmanager.DbManager" />
+  <reference id="lxcManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
+  <reference id="networkManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.networkmanager.NetworkManager" />
+  <reference id="commandRunner" availability="mandatory"
+             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+  <reference id="agentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+  <reference id="configManager" availability="mandatory"
+             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+  <reference id="containerManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.container.ContainerManager" />
+  <reference id="environmentManager" availability="mandatory"
+             interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
+
+  <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
+        init-method="init" destroy-method="destroy">
+    <argument ref="dbManager" />
+    <argument ref="tracker" />
+    <argument ref="lxcManager" />
+    <argument ref="networkManager" />
+    <argument ref="commandRunner" />
+    <argument ref="agentManager" />
+    <argument ref="containerManager" />
+    <argument ref="environmentManager" />
+
+  </bean>
+
+  <bean id="cassandra-configuration-logic" scope="singleton"
+        class="org.safehaus.subutai.plugin.cassandra.impl.logic.ConfigurationLogicImpl">
+    <property name="configManager" ref="configManager" />
+  </bean>
+
+  <service ref="cassandra-configuration-logic" interface="org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic" />
+  <service ref="cassandra-impl" interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />
+
+</blueprint>

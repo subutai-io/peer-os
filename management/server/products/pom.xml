@@ -16,17 +16,12 @@
 
     <modules>
         <module>accumulo</module>
-        <module>cassandra</module>
-        <module>common</module>
         <module>flume</module>
         <module>hadoop</module>
-        <module>hbase</module>
         <module>hive</module>
         <module>hivequery</module>
         <module>lucene</module>
-        <module>mahout</module>
         <module>mongodb</module>
-        <module>oozie</module>
         <module>pig</module>
         <module>presto</module>
         <module>shark</module>
@@ -36,6 +31,11 @@
         <module>storm</module>
         <module>zookeeper</module>
         <module>elasticsearch</module>
+        <module>cassandra</module>
+        <module>oozie</module>
+        <module>hbase</module>
+        <module>mahout</module>
+        <module>common</module>
     </modules>
 
 </project>

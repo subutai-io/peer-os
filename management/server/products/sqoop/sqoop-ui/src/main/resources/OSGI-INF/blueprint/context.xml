@@ -14,7 +14,7 @@
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.sqoop.SqoopUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager" />
+        <argument ref="agentManager"/>
         <argument ref="tracker"/>
         <argument ref="manager"/>
         <argument ref="hadoopManager"/>

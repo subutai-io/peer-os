@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.presto.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -45,7 +45,7 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = PrestoUI.getPrestoManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, PrestoClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

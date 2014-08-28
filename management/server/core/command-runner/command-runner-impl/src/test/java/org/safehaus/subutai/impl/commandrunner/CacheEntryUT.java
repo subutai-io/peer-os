@@ -6,16 +6,11 @@
 package org.safehaus.subutai.impl.commandrunner;
 
 
+import org.junit.Test;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
-import org.safehaus.subutai.impl.commandrunner.CacheEntry;
-import org.safehaus.subutai.impl.commandrunner.CacheEntryWithExpiryCallback;
-import org.safehaus.subutai.impl.commandrunner.EntryExpiryCallback;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -23,78 +18,78 @@ import static org.junit.Assert.assertTrue;
  */
 public class CacheEntryUT {
 
-    private final Object SOME_VALUE = new Object();
+	private final Object SOME_VALUE = new Object();
 
-    private final Integer TIME_TO_LIVE_MS = 100;
-
-
-    @Test(expected = NullPointerException.class)
-    public void constructorShouldFailNullValue() {
-        new CacheEntry( null, TIME_TO_LIVE_MS );
-    }
+	private final Integer TIME_TO_LIVE_MS = 100;
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldFailZeroTtl() {
-        new CacheEntry( SOME_VALUE, 0 );
-    }
+	@Test (expected = NullPointerException.class)
+	public void constructorShouldFailNullValue() {
+		new CacheEntry(null, TIME_TO_LIVE_MS);
+	}
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void constructorShouldFailNegativeTtl() {
-        new CacheEntry( SOME_VALUE, -10 );
-    }
+	@Test (expected = IllegalArgumentException.class)
+	public void constructorShouldFailZeroTtl() {
+		new CacheEntry(SOME_VALUE, 0);
+	}
 
 
-    @Test
-    public void shouldReturnValue() {
-        CacheEntry cacheEntry = new CacheEntry( SOME_VALUE, TIME_TO_LIVE_MS );
-
-        assertEquals( SOME_VALUE, cacheEntry.getValue() );
-    }
+	@Test (expected = IllegalArgumentException.class)
+	public void constructorShouldFailNegativeTtl() {
+		new CacheEntry(SOME_VALUE, -10);
+	}
 
 
-    @Test
-    public void entryShouldBeExpired() throws InterruptedException {
-        CacheEntry cacheEntry = new CacheEntry( SOME_VALUE, TIME_TO_LIVE_MS );
+	@Test
+	public void shouldReturnValue() {
+		CacheEntry cacheEntry = new CacheEntry(SOME_VALUE, TIME_TO_LIVE_MS);
 
-        Thread.sleep( 101 );
-
-        assertTrue( cacheEntry.isExpired() );
-    }
+		assertEquals(SOME_VALUE, cacheEntry.getValue());
+	}
 
 
-    @Test
-    public void entryShouldNotBeExpired() throws InterruptedException {
-        CacheEntry cacheEntry = new CacheEntry( SOME_VALUE, TIME_TO_LIVE_MS );
+	@Test
+	public void entryShouldBeExpired() throws InterruptedException {
+		CacheEntry cacheEntry = new CacheEntry(SOME_VALUE, TIME_TO_LIVE_MS);
 
-        Thread.sleep( 90 );
+		Thread.sleep(101);
 
-        assertFalse( cacheEntry.isExpired() );
-    }
-
-
-    @Test(expected = NullPointerException.class)
-    public void entryWithCallbackShouldFailNullCallback() throws InterruptedException {
-        new CacheEntryWithExpiryCallback( SOME_VALUE, TIME_TO_LIVE_MS, null );
-    }
+		assertTrue(cacheEntry.isExpired());
+	}
 
 
-    @Test
-    public void entryWithCallbackShouldCallCallback() throws InterruptedException {
+	@Test
+	public void entryShouldNotBeExpired() throws InterruptedException {
+		CacheEntry cacheEntry = new CacheEntry(SOME_VALUE, TIME_TO_LIVE_MS);
 
-        final AtomicInteger count = new AtomicInteger();
-        EntryExpiryCallback ENTRY_EXPIRY_CALLBACK = new EntryExpiryCallback() {
+		Thread.sleep(90);
 
-            public void onEntryExpiry( Object entry ) {
-                count.incrementAndGet();
-            }
-        };
-        CacheEntryWithExpiryCallback cacheEntry =
-                new CacheEntryWithExpiryCallback( SOME_VALUE, TIME_TO_LIVE_MS, ENTRY_EXPIRY_CALLBACK );
+		assertFalse(cacheEntry.isExpired());
+	}
 
-        cacheEntry.callExpiryCallback();
 
-        assertEquals( 1, count.get() );
-    }
+	@Test (expected = NullPointerException.class)
+	public void entryWithCallbackShouldFailNullCallback() throws InterruptedException {
+		new CacheEntryWithExpiryCallback(SOME_VALUE, TIME_TO_LIVE_MS, null);
+	}
+
+
+	@Test
+	public void entryWithCallbackShouldCallCallback() throws InterruptedException {
+
+		final AtomicInteger count = new AtomicInteger();
+		EntryExpiryCallback ENTRY_EXPIRY_CALLBACK = new EntryExpiryCallback() {
+
+			public void onEntryExpiry(Object entry) {
+				count.incrementAndGet();
+			}
+		};
+		CacheEntryWithExpiryCallback cacheEntry =
+				new CacheEntryWithExpiryCallback(SOME_VALUE, TIME_TO_LIVE_MS, ENTRY_EXPIRY_CALLBACK);
+
+		cacheEntry.callExpiryCallback();
+
+		assertEquals(1, count.get());
+	}
 }

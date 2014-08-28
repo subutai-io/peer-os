@@ -94,5 +94,12 @@ public interface CommandRunner {
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders );
 
 
+    /**
+     * Creates broadcast command. Command is sent to all connected agents
+     *
+     * @param requestBuilder - request builder
+     *
+     * @return - command
+     */
     public Command createBroadcastCommand( RequestBuilder requestBuilder );
 }

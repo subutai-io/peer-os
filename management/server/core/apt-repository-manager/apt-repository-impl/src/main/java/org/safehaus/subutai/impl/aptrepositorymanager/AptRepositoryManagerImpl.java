@@ -6,25 +6,35 @@
 package org.safehaus.subutai.impl.aptrepositorymanager;
 
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import org.safehaus.subutai.api.aptrepositorymanager.AptCommand;
+import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
+import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
+import org.safehaus.subutai.api.aptrepositorymanager.PackageInfo;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.shared.protocol.settings.Common;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import org.safehaus.subutai.api.aptrepositorymanager.*;
-import org.safehaus.subutai.api.commandrunner.*;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**
  * This is an implementation of AptRepositoryManager
  */
 public class AptRepositoryManagerImpl implements AptRepositoryManager {
-    private final String LINE_SEPARATOR = "\n";
+    private static final String LINE_SEPARATOR = "\n";
 
     private CommandRunner commandRunner;
 
@@ -36,6 +46,14 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
+    /**
+     * Returns list of packages in apt repository
+     *
+     * @param agent - agent of node where apt repository resides
+     * @param pattern - pattern to search for in packages names, might be empty
+     *
+     * @return - list of packages {@code PackageInfo}
+     */
     @Override
     public List<PackageInfo> listPackages( Agent agent, final String pattern ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
@@ -72,7 +90,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
             if ( command.hasCompleted() ) {
                 AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new AptRepoException(
-                        String.format( "Error while performing %s: %s\n%s, exit code %s", aptCommand.getCommand(),
+                        String.format( "Error while performing %s: %s%n%s, exit code %s", aptCommand.getCommand(),
                                 agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
             }
             else {
@@ -87,6 +105,14 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
+    /**
+     * Adds debian packages to apt repository. As a result of this call all connected agents will execute apt-get
+     * update.
+     *
+     * @param agent - agent of node where apt repository resides
+     * @param pathToPackageFile - absolute path to debian package file
+     * @param deleteSourcePackage - indicates whether to delete source package after addition to apt repo
+     */
     @Override
     public void addPackageByPath( Agent agent, final String pathToPackageFile, boolean deleteSourcePackage )
             throws AptRepoException {
@@ -97,13 +123,11 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         Preconditions.checkArgument( packageFile.exists(), "Package file does not exist" );
         Preconditions.checkArgument( !packageFile.isDirectory(), "Package file is directory" );
 
-        Path pathToDebPack = Paths.get(Common.APT_REPO_AMD64_PACKAGES_SUBPATH,
-                packageFile.getName());
+        Path pathToDebPack = Paths.get( Common.APT_REPO_AMD64_PACKAGES_SUBPATH, packageFile.getName() );
         Command command = commandRunner.createCommand( new RequestBuilder(
                 //reprepro includedeb trusty amd64/trusty/*.deb
                 String.format( "cp %s %s && reprepro includedeb %s %s%s", pathToPackageFile,
-                        Common.APT_REPO_PATH + Common.APT_REPO_AMD64_PACKAGES_SUBPATH, Common.APT_REPO,
-                        pathToDebPack,
+                        Common.APT_REPO_PATH + Common.APT_REPO_AMD64_PACKAGES_SUBPATH, Common.APT_REPO, pathToDebPack,
                         deleteSourcePackage ? String.format( " && rm -f %s", pathToPackageFile ) : "" ) )
                 .withCwd( Common.APT_REPO_PATH ).withTimeout( 120 ), Sets.newHashSet( agent ) );
 
@@ -112,6 +136,12 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
+    /**
+     * Removes package from apt repository.As a result of this call all connected agents will execute apt-get
+     *
+     * @param agent - agent of node where apt repository resides
+     * @param packageName - name of package to delete
+     */
     @Override
     public void removePackageByName( Agent agent, final String packageName ) throws AptRepoException {
         Preconditions.checkNotNull( agent, "Agent is null" );
@@ -126,6 +156,15 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
+    /**
+     * Returns contents of files inside debian packages
+     *
+     * @param agent -agent of node where package resides
+     * @param pathToPackageFile - absolute path to debian package file
+     * @param pathsToFilesInsidePackage - relative paths to files whose contents to return
+     *
+     * @return - list of contents of files in the same order as in  @pathsToFilesInsidePackage argument
+     */
     @Override
     public List<String> readFileContents( Agent agent, final String pathToPackageFile,
                                           final List<String> pathsToFilesInsidePackage ) throws AptRepoException {
@@ -165,7 +204,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
         }
         finally {
 
-            commandRunner.runCommand( commandRunner.createCommand(
+            commandRunner.runCommandAsync( commandRunner.createCommand(
                     new RequestBuilder( String.format( "rm -rf %s/%s", Common.TMP_DEB_PACKAGE_UNPACK_PATH, nano ) ),
                     Sets.newHashSet( agent ) ) );
         }
@@ -184,6 +223,7 @@ public class AptRepositoryManagerImpl implements AptRepositoryManager {
     }
 
 
+    //sends broadcase command to all currently connected agents
     private void broadcastAptGetUpdateCommand() {
         Command command =
                 commandRunner.createBroadcastCommand( new RequestBuilder( "apt-get update" ).withTimeout( 90 ) );

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.plugin.presto.api.Config;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
@@ -25,7 +25,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 	public AddWorkerNodeOperationHandler(PrestoImpl manager, String clusterName, String lxcHostname) {
 		super(manager, clusterName);
 		this.lxcHostname = lxcHostname;
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		po = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
 				String.format("Adding node %s to %s", lxcHostname, clusterName));
 
 	}
@@ -37,7 +37,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
 	@Override
 	public void run() {
-		Config config = manager.getCluster(clusterName);
+		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 			return;
@@ -84,7 +84,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 		config.getWorkers().add(agent);
 		po.addLog("Updating db...");
 		//save to db
-		if (manager.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+		if (manager.getDbManager().saveInfo(PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config)) {
 			po.addLog("Cluster info updated in DB");
 			//install presto
 

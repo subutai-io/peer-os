@@ -136,12 +136,26 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     }
 
 
+    /**
+     * Returns boradcast command for the supplied request
+     *
+     * @param requestBuilder - request builder
+     *
+     * @return - {@code Command}
+     */
     public Command createBroadcastCommand( RequestBuilder requestBuilder ) {
         Set<Agent> agents = agentManager.getAgents();
         return new CommandImpl( requestBuilder, agents.size() );
     }
 
 
+    /**
+     * Runs command asynchronously to the calling party. Result of command can be checked later using the associated
+     * command object
+     *
+     * @param command - command to run
+     * @param commandCallback - callback to trigger on every response
+     */
     public void runCommandAsync( final Command command, CommandCallback commandCallback ) {
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
@@ -176,37 +190,79 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     }
 
 
+    /**
+     * Creates command using supplied request for the supplied set of agents
+     *
+     * @param requestBuilder - request builder
+     * @param agents - target agents
+     */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
         return new CommandImpl( null, requestBuilder, agents );
     }
 
 
+    /**
+     * Creates command using supplied request for the supplied set of agents
+     *
+     * @param description - command description
+     * @param requestBuilder - request builder
+     * @param agents - target agents
+     */
     public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
         return new CommandImpl( description, requestBuilder, agents );
     }
 
 
+    /**
+     * Creates command using supplied agent request builders
+     *
+     * @param agentRequestBuilders - agent request builders
+     */
     public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders ) {
         return new CommandImpl( null, agentRequestBuilders );
     }
 
 
+    /**
+     * Creates command using supplied agent request builders
+     *
+     * @param description - command description
+     * @param agentRequestBuilders - agent request builders
+     */
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
         return new CommandImpl( description, agentRequestBuilders );
     }
 
 
+    /**
+     * Runs command synchronously. Call returns after final response is received or stop() method is called from inside
+     * a callback
+     *
+     * @param command - command to run
+     * @param commandCallback - - callback to trigger on every response
+     */
     public void runCommand( Command command, CommandCallback commandCallback ) {
         runCommandAsync( command, commandCallback );
         ( ( CommandImpl ) command ).waitCompletion();
     }
 
 
+    /**
+     * Runs command asynchronously to the calling party. Result of command can be checked later using the associated
+     * command object
+     *
+     * @param command - command to run
+     */
     public void runCommandAsync( Command command ) {
         runCommandAsync( command, new CommandCallback() );
     }
 
 
+    /**
+     * Runs command synchronously. Call returns after final response is received
+     *
+     * @param command - command to run
+     */
     public void runCommand( Command command ) {
         runCommandAsync( command, new CommandCallback() );
         ( ( CommandImpl ) command ).waitCompletion();

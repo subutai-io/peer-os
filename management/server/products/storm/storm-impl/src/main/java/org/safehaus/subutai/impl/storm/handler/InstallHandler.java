@@ -1,15 +1,23 @@
 package org.safehaus.subutai.impl.storm.handler;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.api.commandrunner.*;
+import org.safehaus.subutai.api.commandrunner.AgentResult;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.impl.storm.*;
+import org.safehaus.subutai.impl.storm.CommandType;
+import org.safehaus.subutai.impl.storm.Commands;
+import org.safehaus.subutai.impl.storm.StormImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.protocol.Agent;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class InstallHandler extends AbstractHandler {
 
@@ -167,7 +175,7 @@ public class InstallHandler extends AbstractHandler {
 
     private boolean prepareNodes(Config config) throws LxcCreateException {
         ProductOperation po = productOperation;
-        InstallHelper helper = new InstallHelper(manager);
+        Helper helper = new Helper(manager);
         // if no external Zookeeper instance specified, create new nimbus node
         if(!config.isExternalZookeeper()) {
             po.addLog("Creating container for Nimbus node...");

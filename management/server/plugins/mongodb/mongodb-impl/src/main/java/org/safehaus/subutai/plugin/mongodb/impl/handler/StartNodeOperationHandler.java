@@ -14,8 +14,9 @@ import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.shared.protocol.enums.NodeState;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -63,16 +64,14 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<MongoImp
         NodeType nodeType = config.getNodeType( node );
 
         if ( nodeType == NodeType.CONFIG_NODE ) {
-            startNodeCommand =
-                    Commands.getStartConfigServerCommand( config.getCfgSrvPort(), Util.wrapAgentToSet( node ) );
+            startNodeCommand = Commands.getStartConfigServerCommand( config.getCfgSrvPort(), Sets.newHashSet( node ) );
         }
         else if ( nodeType == NodeType.DATA_NODE ) {
-            startNodeCommand =
-                    Commands.getStartDataNodeCommand( config.getDataNodePort(), Util.wrapAgentToSet( node ) );
+            startNodeCommand = Commands.getStartDataNodeCommand( config.getDataNodePort(), Sets.newHashSet( node ) );
         }
         else {
             startNodeCommand = Commands.getStartRouterCommand( config.getRouterPort(), config.getCfgSrvPort(),
-                    config.getDomainName(), config.getConfigServers(), Util.wrapAgentToSet( node ) );
+                    config.getDomainName(), config.getConfigServers(), Sets.newHashSet( node ) );
         }
         po.addLog( "Starting node..." );
         manager.getCommandRunner().runCommand( startNodeCommand, new CommandCallback() {

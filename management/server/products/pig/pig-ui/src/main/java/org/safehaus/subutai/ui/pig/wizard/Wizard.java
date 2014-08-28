@@ -26,30 +26,6 @@ public class Wizard {
 
 	}
 
-	public Component getContent() {
-		return grid;
-	}
-
-	protected void next() {
-		step++;
-		putForm();
-	}
-
-	protected void back() {
-		step--;
-		putForm();
-	}
-
-	protected void init() {
-		step = 1;
-		config = new Config();
-		putForm();
-	}
-
-	public Config getConfig() {
-		return config;
-	}
-
 	private void putForm() {
 		grid.removeComponent(0, 1);
 		Component component = null;
@@ -74,6 +50,30 @@ public class Wizard {
 		if (component != null) {
 			grid.addComponent(component, 0, 1, 0, 19);
 		}
+	}
+
+	public Component getContent() {
+		return grid;
+	}
+
+	protected void next() {
+		step++;
+		putForm();
+	}
+
+	protected void back() {
+		step--;
+		putForm();
+	}
+
+	protected void init() {
+		step = 1;
+		config = new Config();
+		putForm();
+	}
+
+	public Config getConfig() {
+		return config;
 	}
 
 }

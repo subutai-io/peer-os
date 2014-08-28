@@ -15,7 +15,7 @@ public class TrackerUI implements PortalModule {
 
 	public static final String MODULE_IMAGE = "tracker.png";
 	public static final String MODULE_NAME = "Tracker";
-	public static TrackerForm trackerForm;
+	private static TrackerForm trackerForm;
 	private static Tracker tracker;
 	private static ExecutorService executor;
 

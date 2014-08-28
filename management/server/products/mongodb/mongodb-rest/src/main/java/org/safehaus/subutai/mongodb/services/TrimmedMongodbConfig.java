@@ -14,58 +14,58 @@ import org.safehaus.subutai.shared.protocol.settings.Common;
  */
 public class TrimmedMongodbConfig {
 
-    private String clusterName = "";
-    private String replicaSetName = "repl";
-    private String domainName = Common.DEFAULT_DOMAIN_NAME;
-    private int numberOfConfigServers = 3;
-    private int numberOfRouters = 2;
-    private int numberOfDataNodes = 3;
-    private int cfgSrvPort = 27019;
-    private int routerPort = 27018;
-    private int dataNodePort = 27017;
+	private String clusterName = "";
+	private String replicaSetName = "repl";
+	private String domainName = Common.DEFAULT_DOMAIN_NAME;
+	private int numberOfConfigServers = 3;
+	private int numberOfRouters = 2;
+	private int numberOfDataNodes = 3;
+	private int cfgSrvPort = 27019;
+	private int routerPort = 27018;
+	private int dataNodePort = 27017;
 
 
-    public String getClusterName() {
-        return clusterName;
-    }
+	public String getClusterName() {
+		return clusterName;
+	}
 
 
-    public String getReplicaSetName() {
-        return replicaSetName;
-    }
+	public String getReplicaSetName() {
+		return replicaSetName;
+	}
 
 
-    public String getDomainName() {
-        return domainName;
-    }
+	public String getDomainName() {
+		return domainName;
+	}
 
 
-    public int getNumberOfConfigServers() {
-        return numberOfConfigServers;
-    }
+	public int getNumberOfConfigServers() {
+		return numberOfConfigServers;
+	}
 
 
-    public int getNumberOfRouters() {
-        return numberOfRouters;
-    }
+	public int getNumberOfRouters() {
+		return numberOfRouters;
+	}
 
 
-    public int getNumberOfDataNodes() {
-        return numberOfDataNodes;
-    }
+	public int getNumberOfDataNodes() {
+		return numberOfDataNodes;
+	}
 
 
-    public int getCfgSrvPort() {
-        return cfgSrvPort;
-    }
+	public int getCfgSrvPort() {
+		return cfgSrvPort;
+	}
 
 
-    public int getRouterPort() {
-        return routerPort;
-    }
+	public int getRouterPort() {
+		return routerPort;
+	}
 
 
-    public int getDataNodePort() {
-        return dataNodePort;
-    }
+	public int getDataNodePort() {
+		return dataNodePort;
+	}
 }

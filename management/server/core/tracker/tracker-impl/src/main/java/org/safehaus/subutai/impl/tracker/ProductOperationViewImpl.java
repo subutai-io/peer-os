@@ -6,15 +6,13 @@
 package org.safehaus.subutai.impl.tracker;
 
 
-import java.util.Date;
-import java.util.UUID;
-
-
+import com.google.common.base.Preconditions;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 
-import com.google.common.base.Preconditions;
+import java.util.Date;
+import java.util.UUID;
 
 
 /**
@@ -22,91 +20,91 @@ import com.google.common.base.Preconditions;
  */
 public class ProductOperationViewImpl implements ProductOperationView {
 
-    /**
-     * id of product operation
-     */
-    private final UUID id;
-    /**
-     * description of product operation
-     */
-    private final String description;
-    /**
-     * log of product operation
-     */
-    private final String log;
-    /**
-     * state of product operation
-     */
-    private final ProductOperationState state;
-    /**
-     * Creation date of product operation
-     */
-    private final Date createDate;
+	/**
+	 * id of product operation
+	 */
+	private final UUID id;
+	/**
+	 * description of product operation
+	 */
+	private final String description;
+	/**
+	 * log of product operation
+	 */
+	private final String log;
+	/**
+	 * state of product operation
+	 */
+	private final ProductOperationState state;
+	/**
+	 * Creation date of product operation
+	 */
+	private final Date createDate;
 
 
-    public ProductOperationViewImpl( ProductOperation po ) {
-        Preconditions.checkNotNull( po, "Product operation is null" );
+	public ProductOperationViewImpl(ProductOperation po) {
+		Preconditions.checkNotNull(po, "Product operation is null");
 
-        id = po.getId();
-        description = po.getDescription();
-        log = po.getLog();
-        state = po.getState();
-        createDate = po.createDate();
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
+		id = po.getId();
+		description = po.getDescription();
+		log = po.getLog();
+		state = po.getState();
+		createDate = po.createDate();
+	}
 
 
-    public Date getCreateDate() {
-        return createDate;
-    }
+	public String getDescription() {
+		return description;
+	}
 
 
-    public UUID getId() {
-        return id;
-    }
+	public Date getCreateDate() {
+		return ( Date ) createDate.clone();
+	}
 
 
-    public String getLog() {
-        return log;
-    }
+	public UUID getId() {
+		return id;
+	}
 
 
-    public ProductOperationState getState() {
-        return state;
-    }
+	public String getLog() {
+		return log;
+	}
 
 
-    @Override
-    public int hashCode() {
-        return 3;
-    }
+	public ProductOperationState getState() {
+		return state;
+	}
 
 
-    @Override
-    public boolean equals( Object obj ) {
-        if ( obj == null ) {
-            return false;
-        }
-        if ( getClass() != obj.getClass() ) {
-            return false;
-        }
-        final ProductOperationViewImpl other = ( ProductOperationViewImpl ) obj;
-        return !( this.id != other.id && ( this.id == null || !this.id.equals( other.id ) ) );
-    }
+	@Override
+	public int hashCode() {
+		return 3;
+	}
 
 
-    @Override
-    public String toString() {
-        return "ProductOperationViewImpl{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", log='" + log + '\'' +
-                ", state=" + state +
-                ", createDate=" + createDate +
-                '}';
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ProductOperationViewImpl other = (ProductOperationViewImpl) obj;
+		return !(this.id != other.id && (this.id == null || !this.id.equals(other.id)));
+	}
+
+
+	@Override
+	public String toString() {
+		return "ProductOperationViewImpl{" +
+				"id=" + id +
+				", description='" + description + '\'' +
+				", log='" + log + '\'' +
+				", state=" + state +
+				", createDate=" + createDate +
+				'}';
+	}
 }

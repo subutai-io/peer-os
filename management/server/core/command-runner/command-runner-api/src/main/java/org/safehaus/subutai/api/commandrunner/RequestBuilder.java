@@ -26,7 +26,7 @@ import com.google.common.base.Strings;
 public class RequestBuilder {
 
     //source of command
-    private final String source = "COMMAND-RUNNER";
+    private final static String source = "COMMAND-RUNNER";
 
     //the same for all commands
     private final Integer requestSequenceNumber = 1;
@@ -83,6 +83,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Returns command explicit timeout in seconds
+     *
+     * @return - timeout {@code Integer}
+     */
     public Integer getTimeout() {
         return timeout;
     }
@@ -97,6 +102,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command type
+     *
+     * @param type - {@code RequestType}
+     */
     public RequestBuilder withType( RequestType type ) {
         Preconditions.checkNotNull( type, "Request Type is null" );
 
@@ -106,6 +116,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command std output redirection
+     *
+     * @param outputRedirection - {@code OutputRedirection}
+     */
     public RequestBuilder withStdOutRedirection( OutputRedirection outputRedirection ) {
         Preconditions.checkNotNull( outputRedirection, "Std Out Redirection is null" );
 
@@ -115,6 +130,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command err output redirection
+     *
+     * @param errRedirection - {@code OutputRedirection}
+     */
     public RequestBuilder withStdErrRedirection( OutputRedirection errRedirection ) {
         Preconditions.checkNotNull( errRedirection, "Std Err Redirection is null" );
 
@@ -124,6 +144,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command timeout
+     *
+     * @param timeout - command timeout in seconds
+     */
     public RequestBuilder withTimeout( int timeout ) {
         Preconditions.checkArgument( timeout > 0 && timeout <= Common.MAX_COMMAND_TIMEOUT_SEC,
                 String.format( "Timeout is not in range 1 to %s", Common.MAX_COMMAND_TIMEOUT_SEC ) );
@@ -134,6 +159,12 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command std output redirection file path Only actual if {@code outputRedirection} is  CAPTURE or
+     * CAPTURE_AND_RETURN
+     *
+     * @param stdOutPath - path to file to redirect std output
+     */
     public RequestBuilder withStdOutPath( String stdOutPath ) {
 
         this.stdOutPath = stdOutPath;
@@ -142,6 +173,12 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command err output redirection file path Only actual if {@code errRedirection} is  CAPTURE or
+     * CAPTURE_AND_RETURN
+     *
+     * @param stdErrPath - path to file to redirect err output
+     */
     public RequestBuilder withErrPath( String stdErrPath ) {
 
         this.stdErrPath = stdErrPath;
@@ -150,6 +187,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets user under which to run command
+     *
+     * @param runAs - user
+     */
     public RequestBuilder withRunAs( String runAs ) {
 
         Preconditions.checkArgument( !Strings.isNullOrEmpty( runAs ), "Run As is null or empty" );
@@ -160,6 +202,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets command line arguments for command
+     *
+     * @param cmdArgs - command line arguments
+     */
     public RequestBuilder withCmdArgs( List<String> cmdArgs ) {
 
         this.cmdArgs = cmdArgs;
@@ -168,6 +215,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets environment variables for command
+     *
+     * @param envVars - environment variables
+     */
     public RequestBuilder withEnvVars( Map<String, String> envVars ) {
 
         this.envVars = envVars;
@@ -176,6 +228,11 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets PID of process to terminate. This is actual only for command with type TERMINATE_REQUEST
+     *
+     * @param pid - pid of process to terminate
+     */
     public RequestBuilder withPid( int pid ) {
         Preconditions.checkArgument( pid > 0, "PID is less then or equal to 0" );
 
@@ -185,13 +242,24 @@ public class RequestBuilder {
     }
 
 
+    /**
+     * Sets configuration points to track. This is actual for command with type INOTIFY_REQUEST or
+     * INOTIFY_CANCEL_REQUEST
+     */
     public RequestBuilder withConfPoints( String confPoints[] ) {
 
-        this.confPoints = confPoints;
+        this.confPoints = confPoints.clone();
 
         return this;
     }
 
+
+    /**
+     * Builds and returns Request object
+     *
+     * @param agentUUID - target agent UUID
+     * @param taskUUID - command UUID
+     */
     public Request build( UUID agentUUID, UUID taskUUID ) {
 
         return new Request( source, type, agentUUID, taskUUID, requestSequenceNumber, cwd, command, outputRedirection,

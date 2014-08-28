@@ -63,21 +63,33 @@ public class AgentResultImpl implements AgentResult {
     }
 
 
+    /**
+     * Returns command exit code
+     */
     public Integer getExitCode() {
         return exitCode;
     }
 
 
+    /**
+     * Returns command cumulative std output
+     */
     public String getStdOut() {
         return stdOut.toString();
     }
 
 
+    /**
+     * Returns command cumulative err output
+     */
     public String getStdErr() {
         return stdErr.toString();
     }
 
 
+    /**
+     * Returns target agent uuid
+     */
     public UUID getAgentUUID() {
         return agentUUID;
     }

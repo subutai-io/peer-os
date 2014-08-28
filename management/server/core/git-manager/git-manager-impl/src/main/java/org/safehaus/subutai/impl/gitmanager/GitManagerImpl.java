@@ -31,8 +31,8 @@ import com.google.common.collect.Sets;
  */
 public class GitManagerImpl implements GitManager {
 
-    private final String MASTER_BRANCH = "master";
-    private final String LINE_SEPARATOR = "\n";
+    private static final String MASTER_BRANCH = "master";
+    private static final String LINE_SEPARATOR = "\n";
     private CommandRunner commandRunner;
 
 
@@ -43,12 +43,23 @@ public class GitManagerImpl implements GitManager {
     }
 
 
-    public void init() {}
+    public void init() {
+    }
 
 
-    public void destroy() {}
+    public void destroy() {
+    }
 
 
+    /**
+     * Returns list of files changed between specified branch and master branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     *
+     * @return - list of {@code GitChangedFile}
+     */
     @Override
     public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1 )
             throws GitException {
@@ -56,6 +67,16 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Returns list of files changed between specified branches
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param branchName2 - name of branch 2
+     *
+     * @return - list of {@code GitChangedFile}
+     */
     @Override
     public List<GitChangedFile> diffBranches( final Agent host, final String repositoryRoot, final String branchName1,
                                               final String branchName2 ) throws GitException {
@@ -79,7 +100,7 @@ public class GitManagerImpl implements GitManager {
             if ( line != null ) {
                 String[] ss = line.split( "\\s+" );
                 if ( ss.length == 2 ) {
-                    gitChangedFiles.add( new GitChangedFile( convertStatus( ss[0] ), ss[1] ) );
+                    gitChangedFiles.add( new GitChangedFile( GitFileStatus.parse( ss[0] ), ss[1] ) );
                 }
             }
         }
@@ -88,6 +109,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Returns diff in file between specified branch and master branch
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param filePath - relative (to repo root) file path
+     */
     @Override
     public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
                             final String filePath ) throws GitException {
@@ -95,6 +123,16 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Returns diff in file between specified branches
+     *
+     * @param repositoryRoot - path to repo
+     * @param branchName1 - name of branch 1
+     * @param branchName2 - name of branch 2
+     * @param filePath - relative (to repo root) file path
+     *
+     * @return - differences in file {@code String}
+     */
     @Override
     public String diffFile( final Agent host, final String repositoryRoot, final String branchName1,
                             final String branchName2, final String filePath ) throws GitException {
@@ -113,6 +151,12 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Initializes empty git repo in the specified directory
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     @Override
     public void init( final Agent host, final String repositoryRoot ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -142,7 +186,7 @@ public class GitManagerImpl implements GitManager {
             if ( command.hasCompleted() ) {
                 AgentResult agentResult = command.getResults().get( host.getUuid() );
                 throw new GitException(
-                        String.format( "Error while performing [git %s]: %s\n%s, exit code %s", gitCommand.getCommand(),
+                        String.format( "Error while performing [git %s]: %s%n%s, exit code %s", gitCommand.getCommand(),
                                 agentResult.getStdOut(), agentResult.getStdErr(), agentResult.getExitCode() ) );
             }
             else {
@@ -157,6 +201,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Prepares specified files for commit
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param filePaths - paths to files to prepare for commit
+     */
     @Override
     public void add( final Agent host, final String repositoryRoot, final List<String> filePaths ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -170,6 +221,12 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Prepares all files in repo for commit
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     public void addAll( final Agent host, final String repositoryRoot ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
 
@@ -180,6 +237,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Deletes specified files from repo
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param filePaths - paths to files to prepare for commit
+     */
     @Override
     public void delete( final Agent host, final String repositoryRoot, final List<String> filePaths )
             throws GitException {
@@ -194,6 +258,17 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Commits specified files
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param filePaths - paths to files to prepare for commit
+     * @param message - commit message
+     * @param afterConflictResolved - indicates if this commit is done after conflict resolution
+     *
+     * @return - commit id {@code String}
+     */
     @Override
     public String commit( final Agent host, final String repositoryRoot, final List<String> filePaths,
                           final String message, boolean afterConflictResolved ) throws GitException {
@@ -218,6 +293,15 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Commits all files in repo
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param message -  commit message
+     *
+     * @return - commit id {@code String}
+     */
     @Override
     public String commitAll( final Agent host, final String repositoryRoot, final String message ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -241,6 +325,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Clones repo from remote master branch
+     *
+     * @param host - agent of node
+     * @param newBranchName - branch name to create
+     * @param targetDir - target directory for the repo
+     */
     @Override
     public void clone( final Agent host, final String newBranchName, final String targetDir ) throws GitException {
         validateHostNRepoRoot( host, targetDir );
@@ -254,6 +345,14 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Switches to branch or creates new local branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name
+     * @param create - true: create new local branch; false: switch to the specified branch
+     */
     @Override
     public void checkout( final Agent host, final String repositoryRoot, final String branchName, final boolean create )
             throws GitException {
@@ -269,6 +368,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Delete local branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name
+     */
     @Override
     public void deleteBranch( final Agent host, final String repositoryRoot, final String branchName )
             throws GitException {
@@ -283,12 +389,25 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Merges current branch with master branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     @Override
     public void merge( final Agent host, final String repositoryRoot ) throws GitException {
         merge( host, repositoryRoot, MASTER_BRANCH );
     }
 
 
+    /**
+     * Merges current branch with specified branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repot
+     * @param branchName - branch name
+     */
     @Override
     public void merge( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -302,6 +421,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Pulls from remote branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name to pull from
+     */
     @Override
     public void pull( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -315,12 +441,26 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Pulls from remote master branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     @Override
     public void pull( final Agent host, final String repositoryRoot ) throws GitException {
         pull( host, repositoryRoot, MASTER_BRANCH );
     }
 
 
+    /**
+     * Return current branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     *
+     * @return - current branch  {@code GitBranch}
+     */
     @Override
     public GitBranch currentBranch( final Agent host, final String repositoryRoot ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -347,6 +487,15 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Returns list of branches in the repo
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param remote - true: return remote branches; false: return local branches
+     *
+     * @return - list of branches {@code List}
+     */
     @Override
     public List<GitBranch> listBranches( final Agent host, final String repositoryRoot, boolean remote )
             throws GitException {
@@ -375,6 +524,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Pushes to remote branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName - branch name to push to
+     */
     @Override
     public void push( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -392,6 +548,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Undoes all uncommitted changes to specified files
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param filePaths - paths to files to undo changes to
+     */
     @Override
     public void undoSoft( final Agent host, final String repositoryRoot, final List<String> filePaths )
             throws GitException {
@@ -406,6 +569,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Brings current branch to the state of the specified remote branch, effectively undoing all local changes
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param branchName - remote branch whose state to restore current branch to
+     */
     @Override
     public void undoHard( final Agent host, final String repositoryRoot, final String branchName ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -419,6 +589,12 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Brings current branch to the state of remote master branch, effectively undoing all local changes
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     @Override
     public void undoHard( final Agent host, final String repositoryRoot ) throws GitException {
 
@@ -426,6 +602,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Reverts the specified commit
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param commitId - commit id to revert
+     */
     @Override
     public void revertCommit( final Agent host, final String repositoryRoot, String commitId ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -439,6 +622,12 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Stashes all changes in current branch and reverts it to HEAD commit
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     */
     @Override
     public void stash( final Agent host, final String repositoryRoot ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -451,6 +640,13 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Applies all stashed changes to current branch
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     * @param stashName - name of stash to apply
+     */
     @Override
     public void unstash( final Agent host, final String repositoryRoot, final String stashName ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -464,6 +660,14 @@ public class GitManagerImpl implements GitManager {
     }
 
 
+    /**
+     * Returns list of stashes in the repo
+     *
+     * @param host - agent of node
+     * @param repositoryRoot - path to repo
+     *
+     * @return - list of stashes {@code List}
+     */
     @Override
     public List<String> listStashes( final Agent host, final String repositoryRoot ) throws GitException {
         validateHostNRepoRoot( host, repositoryRoot );
@@ -484,27 +688,5 @@ public class GitManagerImpl implements GitManager {
         }
 
         return stashes;
-    }
-
-
-    private GitFileStatus convertStatus( String status ) {
-        switch ( status ) {
-            case "M":
-                return GitFileStatus.MODIFIED;
-            case "C":
-                return GitFileStatus.COPIED;
-            case "R":
-                return GitFileStatus.RENAMED;
-            case "A":
-                return GitFileStatus.ADDED;
-            case "D":
-                return GitFileStatus.DELETED;
-            case "U":
-                return GitFileStatus.UNMERGED;
-            case "X":
-                return GitFileStatus.UNVERSIONED;
-            default:
-                return GitFileStatus.UNMODIFIED;
-        }
     }
 }

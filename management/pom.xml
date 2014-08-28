@@ -217,10 +217,6 @@
       <!--command-runner-impl-->
 
       <!--command-runner-ui-->
-      <!--<dependency>-->
-      <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-      <!--<artifactId>javax.servlet</artifactId>-->
-      <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
       <!--</dependency>-->
       <dependency>
         <groupId>javax.annotation</groupId>
@@ -936,6 +932,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Shark 2-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>shark-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>shark-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>shark-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>shark-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>shark-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Spark -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -960,6 +983,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>spark-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Spark 2 -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>spark-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>spark-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>spark-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>spark-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>spark-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1017,6 +1067,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Solr 2 -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>solr-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Lucene -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1071,7 +1148,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Mahout -->
+      <!-- Mahout plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>mahout-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Mahout old -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>mahout-api</artifactId>
@@ -1179,7 +1283,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- HBase -->
+      <!-- HBase plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hbase-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- HBase old -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>hbase-api</artifactId>
@@ -1206,7 +1337,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Cassandra -->
+      <!-- Cassandra plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>cassandra-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Cassandra old -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>cassandra-api</artifactId>
@@ -1234,6 +1392,33 @@
       </dependency>
 
       <!-- Oozie -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Oozie old -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>oozie-api</artifactId>
@@ -1505,6 +1690,85 @@
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.8</version>
         </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.5.4</version>
+          <configuration>
+            <!--
+                Enables analysis which takes more memory but finds more bugs.
+                If you run out of memory, changes the value of the effort element
+                to 'Low'.
+            -->
+            <effort>Max</effort>
+            <!-- Build doesn't fail if problems are found -->
+            <failOnError>false</failOnError>
+            <!-- Reports all bugs (other values are medium and max) -->
+            <threshold>Low</threshold>
+            <!-- Produces XML report -->
+            <xmlOutput>true</xmlOutput>
+            <!-- Configures the directory in which the XML report is created -->
+            <findbugsXmlOutputDirectory>${project.build.directory}/target/findbugs</findbugsXmlOutputDirectory>
+          </configuration>
+          <executions>
+            <!--
+                Ensures that FindBugs inspects source code when project is compiled.
+            -->
+            <execution>
+              <id>analyze-compile</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>xml-maven-plugin</artifactId>
+          <version>1.0</version>
+          <configuration>
+            <transformationSets>
+              <transformationSet>
+                <!-- Configures the source directory of XML files. -->
+                <dir>${project.build.directory}/target/findbugs</dir>
+                <!-- Configures the directory in which the FindBugs report is written.-->
+                <outputDir>${project.build.directory}/target/findbugs</outputDir>
+                <!-- Selects the used stylesheet. -->
+                <!-- <stylesheet>fancy-hist.xsl</stylesheet> -->
+                <stylesheet>default.xsl</stylesheet>
+                <!--<stylesheet>plain.xsl</stylesheet>-->
+                <!--<stylesheet>fancy.xsl</stylesheet>-->
+                <!--<stylesheet>summary.xsl</stylesheet>-->
+                <fileMappers>
+                  <!-- Configures the file extension of the output files. -->
+                  <fileMapper
+                      implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+                    <targetExtension>.html</targetExtension>
+                  </fileMapper>
+                </fileMappers>
+              </transformationSet>
+            </transformationSets>
+          </configuration>
+          <executions>
+            <!-- Ensures that the XSLT transformation is run when the project is compiled. -->
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>transform</goal>
+              </goals>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>com.google.code.findbugs</groupId>
+              <artifactId>findbugs</artifactId>
+              <version>2.0.3</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
       </plugins>
     </pluginManagement>
   </build>

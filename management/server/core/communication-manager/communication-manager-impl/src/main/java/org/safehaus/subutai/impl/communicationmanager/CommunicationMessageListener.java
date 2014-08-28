@@ -18,7 +18,6 @@ import org.safehaus.subutai.shared.protocol.Response;
 import org.safehaus.subutai.shared.protocol.enums.ResponseType;
 
 import org.apache.activemq.command.ActiveMQMessage;
-import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.activemq.command.RemoveInfo;
 
 
@@ -63,9 +62,6 @@ class CommunicationMessageListener implements MessageListener {
                     LOG.log( Level.WARNING, "Could not parse response{0}", jsonCmd );
                 }
             }
-            else if ( message instanceof ActiveMQTextMessage ) {
-                ActiveMQTextMessage msg = ( ActiveMQTextMessage ) message;
-            }
             else if ( message instanceof ActiveMQMessage ) {
                 ActiveMQMessage aMsg = ( ActiveMQMessage ) message;
 
@@ -77,7 +73,6 @@ class CommunicationMessageListener implements MessageListener {
                     notifyListeners( agentDisconnect );
                 }
             }
-
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in onMessage", ex );

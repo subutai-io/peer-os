@@ -116,114 +116,95 @@ public class HadoopImpl implements Hadoop {
 		return new Deletion(this).execute(clusterName);
 	}
 
-
-	@Override
-	public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).start();
-	}
-
-
-	@Override
-	public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).stop();
-	}
-
-
-	@Override
-	public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).restart();
-	}
-
-
-	@Override
-	public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).status();
-	}
-
-
-	@Override
-	public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new SecondaryNameNode(this, hadoopClusterConfig).status();
-	}
-
-
-	@Override
-	public UUID statusDataNode(Agent agent) {
-		return new DataNode(this, null).status(agent);
-	}
-
-
-	@Override
-	public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).start();
-	}
-
-
-	@Override
-	public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).stop();
-	}
-
-
-	@Override
-	public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).restart();
-	}
-
-
-	@Override
-	public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).status();
-	}
-
-
-	@Override
-	public UUID statusTaskTracker(Agent agent) {
-		return new TaskTracker(this, null).status(agent);
-	}
-
-
-	@Override
-	public UUID addNode(String clusterName) {
-		return new Adding(this, clusterName).execute();
-	}
-
-
-	@Override
-	public UUID blockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig).block(agent);
-	}
-
-
-	@Override
-	public UUID blockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig).block(agent);
-	}
-
-
-	@Override
-	public UUID unblockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig).unblock(agent);
-	}
-
-
-	@Override
-	public UUID unblockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig).unblock(agent);
-	}
-
-
 	@Override
 	public List<HadoopClusterConfig> getClusters() {
 		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class);
 	}
-
 
 	@Override
 	public HadoopClusterConfig getCluster(String clusterName) {
 		return dbManager.getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
 	}
 
+	@Override
+	public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).start();
+	}
+
+	@Override
+	public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).stop();
+	}
+
+	@Override
+	public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).restart();
+	}
+
+	@Override
+	public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new NameNode(this, hadoopClusterConfig).status();
+	}
+
+	@Override
+	public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig) {
+		return new SecondaryNameNode(this, hadoopClusterConfig).status();
+	}
+
+	@Override
+	public UUID statusDataNode(Agent agent) {
+		return new DataNode(this, null).status(agent);
+	}
+
+	@Override
+	public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).start();
+	}
+
+	@Override
+	public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).stop();
+	}
+
+	@Override
+	public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).restart();
+	}
+
+	@Override
+	public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig) {
+		return new JobTracker(this, hadoopClusterConfig).status();
+	}
+
+	@Override
+	public UUID statusTaskTracker(Agent agent) {
+		return new TaskTracker(this, null).status(agent);
+	}
+
+	@Override
+	public UUID addNode(String clusterName) {
+		return new Adding(this, clusterName).execute();
+	}
+
+	@Override
+	public UUID blockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+		return new DataNode(this, hadoopClusterConfig).block(agent);
+	}
+
+	@Override
+	public UUID blockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+		return new TaskTracker(this, hadoopClusterConfig).block(agent);
+	}
+
+	@Override
+	public UUID unblockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+		return new DataNode(this, hadoopClusterConfig).unblock(agent);
+	}
+
+	@Override
+	public UUID unblockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
+		return new TaskTracker(this, hadoopClusterConfig).unblock(agent);
+	}
 
 	@Override
 	public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,

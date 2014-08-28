@@ -2,7 +2,7 @@ package org.safehaus.subutai.api.aptrepositorymanager;
 
 
 /**
- * Created by dilshat on 6/23/14.
+ * Contains deb package info
  */
 public class PackageInfo {
     private String status;

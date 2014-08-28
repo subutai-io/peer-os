@@ -25,127 +25,127 @@ import java.util.concurrent.Executors;
  */
 public class SparkImpl implements Spark {
 
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ExecutorService executor;
+	private CommandRunner commandRunner;
+	private AgentManager agentManager;
+	private DbManager dbManager;
+	private Tracker tracker;
+	private ExecutorService executor;
 
-    public SparkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
+	public SparkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+		this.commandRunner = commandRunner;
+		this.agentManager = agentManager;
+		this.dbManager = dbManager;
+		this.tracker = tracker;
 
-        Commands.init(commandRunner);
-    }
+		Commands.init(commandRunner);
+	}
 
-    public CommandRunner getCommandRunner() {
-        return commandRunner;
-    }
+	public CommandRunner getCommandRunner() {
+		return commandRunner;
+	}
 
-    public AgentManager getAgentManager() {
-        return agentManager;
-    }
+	public AgentManager getAgentManager() {
+		return agentManager;
+	}
 
-    public DbManager getDbManager() {
-        return dbManager;
-    }
+	public DbManager getDbManager() {
+		return dbManager;
+	}
 
-    public Tracker getTracker() {
-        return tracker;
-    }
+	public Tracker getTracker() {
+		return tracker;
+	}
 
-    public void init() {
-        executor = Executors.newCachedThreadPool();
-    }
+	public void init() {
+		executor = Executors.newCachedThreadPool();
+	}
 
-    public void destroy() {
-        executor.shutdown();
-    }
+	public void destroy() {
+		executor.shutdown();
+	}
 
-    public List<Config> getClusters() {
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-    }
+	public UUID installCluster(final Config config) {
 
-    @Override
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-    }
+		Preconditions.checkNotNull(config, "Configuration is null");
 
-    public UUID installCluster(final Config config) {
+		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-        Preconditions.checkNotNull(config, "Configuration is null");
+		executor.execute(operationHandler);
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+		return operationHandler.getTrackerId();
+	}
 
-        executor.execute(operationHandler);
+	public UUID uninstallCluster(final String clusterName) {
 
-        return operationHandler.getTrackerId();
-    }
+		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
-    public UUID uninstallCluster(final String clusterName) {
+		executor.execute(operationHandler);
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+		return operationHandler.getTrackerId();
+	}
 
-        executor.execute(operationHandler);
+	public List<Config> getClusters() {
+		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+	}
 
-        return operationHandler.getTrackerId();
-    }
+	@Override
+	public Config getCluster(String clusterName) {
+		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+	}
 
-    public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
+	public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler(this, clusterName, lxcHostname);
+		AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler(this, clusterName, lxcHostname);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
-    public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
+	public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new DestroySlaveNodeOperationHandler(this, clusterName, lxcHostname);
+		AbstractOperationHandler operationHandler = new DestroySlaveNodeOperationHandler(this, clusterName, lxcHostname);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
-    public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
+	public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
 
-        AbstractOperationHandler operationHandler = new ChangeMasterNodeOperationHandler(this, clusterName, newMasterHostname, keepSlave);
+		AbstractOperationHandler operationHandler = new ChangeMasterNodeOperationHandler(this, clusterName, newMasterHostname, keepSlave);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
-    public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
+	public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
 
-        AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname, master);
+		AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname, master);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
+		return operationHandler.getTrackerId();
 
-    }
+	}
 
-    public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
+	public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
 
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname, master);
+		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname, master);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
-    public UUID checkNode(final String clusterName, final String lxcHostname) {
+	public UUID checkNode(final String clusterName, final String lxcHostname) {
 
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
+		AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
 
-        executor.execute(operationHandler);
+		executor.execute(operationHandler);
 
-        return operationHandler.getTrackerId();
-    }
+		return operationHandler.getTrackerId();
+	}
 
 }

@@ -2,7 +2,7 @@ package org.safehaus.subutai.api.aptrepositorymanager;
 
 
 /**
- * Created by dilshat on 6/23/14.
+ * Enumeration for apt commands
  */
 public enum AptCommand {
     LIST_PACKAGES( "list packages" ),

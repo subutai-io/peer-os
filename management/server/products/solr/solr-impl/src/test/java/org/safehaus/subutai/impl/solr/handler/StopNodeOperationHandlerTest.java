@@ -15,26 +15,26 @@ import static junit.framework.Assert.assertTrue;
 public class StopNodeOperationHandlerTest {
 
 
-    @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( new SolrImplMock(), "test-cluster", "test-lxc" );
+	@Test
+	public void testWithoutCluster() {
+		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(new SolrImplMock(), "test-cluster", "test-lxc");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not exist"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 
-    @Test
-    public void testFail() {
-        SolrImpl solrImpl = new SolrImplMock().setClusterConfig( new Config() );
-        AbstractOperationHandler operationHandler = new StopNodeOperationHandler( solrImpl, "test-cluster", "test-lxc" );
+	@Test
+	public void testFail() {
+		SolrImpl solrImpl = new SolrImplMock().setClusterConfig(new Config());
+		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(solrImpl, "test-cluster", "test-lxc");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not connected"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 }

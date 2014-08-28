@@ -13,36 +13,36 @@ import static junit.framework.Assert.assertTrue;
 
 public class AddNodeOperationHandlerTest {
 
-    @Test
-    public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( new SolrImplMock(), "test-cluster" );
+	@Test
+	public void testWithoutCluster() {
+		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(new SolrImplMock(), "test-cluster");
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
-
-
-    @Test
-    public void testSuccess() {
-        AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult( true );
-
-        operationHandler.run();
-
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation succeeded" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("not exist"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 
-    @Test
-    public void testFail() {
-        AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult( false );
+	@Test
+	public void testSuccess() {
+		AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult(true);
 
-        operationHandler.run();
+		operationHandler.run();
 
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "Installation failed" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+		assertTrue(operationHandler.getProductOperation().getLog().contains("Installation succeeded"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.SUCCEEDED);
+	}
+
+
+	@Test
+	public void testFail() {
+		AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult(false);
+
+		operationHandler.run();
+
+		assertTrue(operationHandler.getProductOperation().getLog().contains("Installation failed"));
+		assertEquals(operationHandler.getProductOperation().getState(), ProductOperationState.FAILED);
+	}
 
 }

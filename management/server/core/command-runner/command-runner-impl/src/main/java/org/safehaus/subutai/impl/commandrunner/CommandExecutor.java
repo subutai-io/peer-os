@@ -35,16 +35,31 @@ public class CommandExecutor {
     }
 
 
+    /**
+     * Returns associated command
+     *
+     * @return {@code Command}
+     */
     public CommandImpl getCommand() {
         return command;
     }
 
 
+    /**
+     * Returns associated executor service
+     *
+     * @return {@code ExecutorService}
+     */
     public ExecutorService getExecutor() {
         return executor;
     }
 
 
+    /**
+     * Returns associated callback
+     *
+     * @return {@code CommandCallback}
+     */
     public CommandCallback getCallback() {
         return callback;
     }

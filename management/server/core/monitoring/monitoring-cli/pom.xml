@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -19,16 +19,16 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.apache.karaf.shell</groupId>
-          <artifactId>org.apache.karaf.shell.console</artifactId>
+            <groupId>org.apache.karaf.shell</groupId>
+            <artifactId>org.apache.karaf.shell.console</artifactId>
         </dependency>
         <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>mgmt-shared-protocol</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
         </dependency>
         <dependency>
-          <groupId>${project.groupId}</groupId>
-          <artifactId>monitoring-api</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>monitoring-api</artifactId>
         </dependency>
     </dependencies>
 

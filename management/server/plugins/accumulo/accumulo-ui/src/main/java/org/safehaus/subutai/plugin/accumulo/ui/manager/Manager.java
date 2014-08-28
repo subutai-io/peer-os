@@ -19,7 +19,6 @@ import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.plugin.accumulo.ui.common.UiUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -186,6 +185,7 @@ public class Manager {
                             contentRoot.getUI().addWindow( window.getWindow() );
                         }
                     } );
+                    contentRoot.getUI().addWindow( alert.getAlert() );
                 }
                 else {
                     Notification.show( "Please, select cluster" );
@@ -204,32 +204,24 @@ public class Manager {
 
                     HadoopClusterConfig hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
-                    ZookeeperClusterConfig zkConfig =
-                            AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
-                    if ( hadoopConfig != null ) {
-                        if ( zkConfig != null ) {
-                            Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                            availableNodes.retainAll( zkConfig.getNodes() );
-                            availableNodes.removeAll( accumuloClusterConfig.getTracers() );
-                            if ( availableNodes.isEmpty() ) {
-                                Notification.show( "All Hadoop nodes already have tracers installed" );
-                                return;
-                            }
 
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    refreshClustersInfo();
-                                }
-                            } );
+                    if ( hadoopConfig != null ) {
+                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        availableNodes.removeAll( accumuloClusterConfig.getTracers() );
+                        if ( availableNodes.isEmpty() ) {
+                            Notification.show( "All Hadoop nodes already have tracers installed" );
+                            return;
                         }
-                        else {
-                            Notification.show( String.format( "Zookeeper cluster %s not found",
-                                    accumuloClusterConfig.getClusterName() ) );
-                        }
+
+                        AddNodeWindow addNodeWindow =
+                                new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.TRACER );
+                        contentRoot.getUI().addWindow( addNodeWindow );
+                        addNodeWindow.addCloseListener( new Window.CloseListener() {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent ) {
+                                refreshClustersInfo();
+                            }
+                        } );
                     }
                     else {
                         Notification.show( String
@@ -253,32 +245,23 @@ public class Manager {
 
                     HadoopClusterConfig hadoopConfig =
                             AccumuloUI.getHadoopManager().getCluster( accumuloClusterConfig.getClusterName() );
-                    ZookeeperClusterConfig zkConfig =
-                            AccumuloUI.getZookeeperManager().getCluster( accumuloClusterConfig.getClusterName() );
                     if ( hadoopConfig != null ) {
-                        if ( zkConfig != null ) {
-                            Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
-                            availableNodes.retainAll( zkConfig.getNodes() );
-                            availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
-                            if ( availableNodes.isEmpty() ) {
-                                Notification.show( "All Hadoop nodes already have slaves installed" );
-                                return;
-                            }
+                        Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        availableNodes.removeAll( accumuloClusterConfig.getSlaves() );
+                        if ( availableNodes.isEmpty() ) {
+                            Notification.show( "All Hadoop nodes already have slaves installed" );
+                            return;
+                        }
 
-                            AddNodeWindow addNodeWindow =
-                                    new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
-                            contentRoot.getUI().addWindow( addNodeWindow );
-                            addNodeWindow.addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                        }
-                        else {
-                            Notification.show( String.format( "Zookeeper cluster %s not found",
-                                    accumuloClusterConfig.getClusterName() ) );
-                        }
+                        AddNodeWindow addNodeWindow =
+                                new AddNodeWindow( accumuloClusterConfig, availableNodes, NodeType.LOGGER );
+                        contentRoot.getUI().addWindow( addNodeWindow );
+                        addNodeWindow.addCloseListener( new Window.CloseListener() {
+                            @Override
+                            public void windowClose( Window.CloseEvent closeEvent ) {
+                                refreshClustersInfo();
+                            }
+                        } );
                     }
                     else {
                         Notification.show( String
@@ -306,7 +289,7 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( accumuloClusterConfig != null ) {
-                    String propertyName = ( String ) propertyNameTextField.getValue();
+                    String propertyName = propertyNameTextField.getValue();
                     if ( Strings.isNullOrEmpty( propertyName ) ) {
                         Notification.show( "Please, specify property name to remove" );
                     }

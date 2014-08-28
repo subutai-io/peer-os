@@ -35,6 +35,11 @@ public class AgentRequestBuilder extends RequestBuilder {
     }
 
 
+    /**
+     * Returns target agent
+     *
+     * @return - agent
+     */
     public Agent getAgent() {
         return agent;
     }
