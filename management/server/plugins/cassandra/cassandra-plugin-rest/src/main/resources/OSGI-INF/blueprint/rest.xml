@@ -13,16 +13,16 @@
         </cxf:features>
     </cxf:bus>
 
-    <jaxrs:server address="/cassandra" id="cassandraRestService">
+    <jaxrs:server address="/cassandra-plugin" id="cassandraRestService">
         <jaxrs:serviceBeans>
             <ref component-id="cassandraRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.cassandra.services.RestServiceImpl">
+    <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.plugin.cassandra.rest.RestServiceImpl">
         <property name="cassandraManager" ref="cassandraManager"/>
     </bean>
 
     <reference id="cassandraManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.cassandra.Cassandra"/>
+               interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra"/>
 </blueprint>

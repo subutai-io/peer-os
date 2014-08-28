@@ -26,6 +26,10 @@ export SUBUTAI_EMAIL=subutai@safehaus.org
 # for git and other services later on.
 export SUBUTAI_AUTH_KEY=/root/.ssh/id_dsa.pub
 
+#This variable is used for locking mechanism for concurrent operations 
+#on the same container/template
+export SUBUTAI_LOCK_PATH=/var/lock/subutai/
+
 # A colon separated list of non-overlapping configuration paths which
 # need to be tracked in templates for changes via git. By default /etc
 # is versioned on each container. Use the subutai-config-path utility

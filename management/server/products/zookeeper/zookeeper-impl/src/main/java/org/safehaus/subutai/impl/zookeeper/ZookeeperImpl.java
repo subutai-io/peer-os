@@ -1,6 +1,10 @@
 package org.safehaus.subutai.impl.zookeeper;
 
 
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -187,10 +191,18 @@ public class ZookeeperImpl implements Zookeeper {
 		return operationHandler.getTrackerId();
 	}
 
-	@Override
-	public UUID install(String hostName) {
-		AbstractOperationHandler h = new SingleInstallation(this, hostName);
-		executor.execute(h);
-		return h.getTrackerId();
-	}
+    @Override
+    public UUID install( String hostName ) {
+        AbstractOperationHandler h = new SingleInstallation( this, hostName );
+        executor.execute( h );
+        return h.getTrackerId();
+    }
+
+    @Override
+    public UUID start(String hostName) {
+        AbstractOperationHandler h = new StartStandalone(this, hostName);
+        executor.execute(h);
+        return h.getTrackerId();
+    }
+
 }

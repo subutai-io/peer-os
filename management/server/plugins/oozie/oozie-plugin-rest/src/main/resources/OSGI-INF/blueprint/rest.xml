@@ -11,17 +11,17 @@
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
-  <jaxrs:server address="/oozie" id="oozieRestService">
+  <jaxrs:server address="/oozie-plugin" id="oozieRestService">
     <jaxrs:serviceBeans>
       <ref component-id="oozieRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <bean id="oozieRestServiceImpl" class="org.safehaus.subutai.oozie.services.RestServiceImpl">
+  <bean id="oozieRestServiceImpl" class="org.safehaus.plugin.oozie.rest.RestServiceImpl">
     <property name="oozieManager" ref="oozieManager" />
     <property name="hadoopManager" ref="hadoopManager" />
   </bean>
   <reference id="oozieManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.oozie.Oozie" />
+             interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
   <reference id="hadoopManager" availability="mandatory"
              interface="org.safehaus.subutai.api.hadoop.Hadoop" />
 </blueprint>

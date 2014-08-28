@@ -23,7 +23,22 @@ function register_usage {
 # (3) generate the debian file deltas, and package info
 
 function register {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
   local container="$1"
+
+  if [ "`are_containers_locked_write $container`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_write $container
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   # ----------------------------------------------------------------------------
   # (1) perform some sanity checks
@@ -37,11 +52,15 @@ function register {
   if [ ! -f $debian_file ]; then
     msg_error "It seems the debian file has not been generated"
     msg_error "Please invoke export $container first"
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
   # check to make sure the container is a template
   if [ "`zfs_is_template $container`" == "false" ]; then
     msg_error "Container \"$container\" is NOT a template. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$container\" is a template"
@@ -49,9 +68,11 @@ function register {
   # check to make sure container is NOT registered as a template
   if [ "`is_registered $container`" == "true" ]; then
     msg_error "Container \"$container\" is registered as template already. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
     else
-    msg_info "    - check passed: \"$container\" is registered"
+    msg_info "    - check passed: \"$container\" is not registered"
   fi
 
   parent=`zfs_get_parent $container`
@@ -59,6 +80,8 @@ function register {
   # check to make sure the parent is a template
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -67,8 +90,10 @@ function register {
   # check to make sure the parent is registered if container itself is not master
   if [ $container != "master" -a "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    unlock_container_write $container
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
-  else
+  elif [ $container != "master" ]; then
     msg_info "    - check passed: parent \"$parent\" is registered"
   fi
 
@@ -86,6 +111,9 @@ function register {
      grep subutai.template.package | awk '{print $3}'`"
   
   send_n_register $pkg $SUBUTAI_TMPDIR/$container 
+
+  unlock_container_write $container
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

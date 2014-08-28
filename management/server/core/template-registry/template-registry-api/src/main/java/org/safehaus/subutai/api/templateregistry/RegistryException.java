@@ -2,7 +2,7 @@ package org.safehaus.subutai.api.templateregistry;
 
 
 /**
- * Created by dilshat on 8/25/14.
+ * Represents exception thrown by some methods of {@code TemplateRegistryManager}
  */
 public class RegistryException extends Exception {
 

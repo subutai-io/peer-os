@@ -8,13 +8,13 @@
             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
 
-  <reference id="hbaseManager" availability="mandatory" interface="org.safehaus.subutai.api.hbase.HBase" />
+  <reference id="hbaseManager" availability="mandatory" interface="org.safehaus.subutai.plugin.hbase.api.HBase" />
 
-  <bean id="restService" class="org.safehaus.subutai.hbase.services.RestService">
+  <bean id="restService" class="org.safehaus.plugin.hbase.rest.RestService">
     <property name="hbaseManager" ref="hbaseManager" />
   </bean>
 
-  <jaxrs:server address="/hbase" id="hbaseRestService">
+  <jaxrs:server address="/hbase-plugin" id="hbaseRestService">
     <jaxrs:serviceBeans>
       <ref component-id="restService" />
     </jaxrs:serviceBeans>

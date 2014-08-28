@@ -20,6 +20,12 @@ function rename_usage {
 #     - source container parent MUST be present in the template registry
 
 function rename {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
   OPTIND=0
   if [ "$1" == "rename" ]; then
     shift
@@ -27,6 +33,15 @@ function rename {
 
   local src="$1"
   local dst="$2"
+
+  if [ "`are_containers_locked_read $src $dst`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_read $src $dst
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
 
   if [ "$TEST_MODE" == "true" ]; then
     echo ---- TEST_MODE DUMP ----
@@ -40,6 +55,8 @@ function rename {
   # The master is already a template
   if [ "$src" == "master" ]; then
     msg_error "Awe dude come on. Lay off the master. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -52,6 +69,8 @@ function rename {
   # check to make sure the source container is NOT already a template
   if [ "`zfs_is_template $src`" == "true" ]; then
     msg_error "Container \"$src\" is a template. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$src\" is NOT a template"
@@ -60,6 +79,8 @@ function rename {
   # check to make sure container is NOT registered as a template
   if [ "`is_registered $lxc`" == "true" ]; then
     msg_error "A template with name \"$src\" is registered. Aborting ..."
+    unlock_container_read $src
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$src\" is NOT registered"
@@ -68,7 +89,10 @@ function rename {
   lxc_assert_no "$dst" "`usage`"
   lxc_stop "$src"
   lxc_rename "$src" "$dst"
-
+  check_status "container $src is renamed to $dst succesfully" "$?"
+  
+  unlock_container_read $src
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 
