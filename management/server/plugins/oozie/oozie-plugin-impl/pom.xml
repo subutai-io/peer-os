@@ -66,7 +66,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.impl.oozie</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.impl.plugin.oozie</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>
