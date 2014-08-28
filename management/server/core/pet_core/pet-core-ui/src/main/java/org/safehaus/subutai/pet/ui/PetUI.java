@@ -14,7 +14,7 @@ import com.vaadin.ui.Component;
  */
 public class PetUI implements PortalModule {
 
-    public static final String MODULE_IMAGE = "env.png";
+    public static final String MODULE_IMAGE = "pet.png";
     public static final String MODULE_NAME = "Pet";
 
 
