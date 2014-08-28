@@ -5,6 +5,8 @@ import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.shared.protocol.Agent;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ public class AgentManagerMock implements AgentManager {
 
 	@Override
 	public Agent getAgentByHostname(String hostname) {
+//        return new Agent(UUID.randomUUID(), hostname, "", "00:00:00:00", Arrays.asList("127.0.0.1", "127.0.0.1"), true, "transportId");
 		return null;
 	}
 

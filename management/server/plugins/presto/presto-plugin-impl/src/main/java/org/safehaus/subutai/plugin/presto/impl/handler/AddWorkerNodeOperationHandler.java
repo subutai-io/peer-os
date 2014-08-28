@@ -15,9 +15,7 @@ import org.safehaus.subutai.shared.protocol.Util;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 	private final String lxcHostname;
@@ -37,14 +35,16 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
 	@Override
 	public void run() {
+        productOperation = po;
 		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
 			return;
 		}
 
-		if (manager.getAgentManager().getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
-			po.addLogFailed(String.format("Coordinator node %s is not connected\nOperation aborted", config.getCoordinatorNode().getHostname()));
+
+		if (config.getCoordinatorNode()  == null) {
+			po.addLogFailed(String.format("Coordinator node is not connected\nOperation aborted"));
 			return;
 		}
 
@@ -60,7 +60,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 			return;
 		}
 
-		po.addLog("Checking prerequisites...");
+		po.addLog("Checking prerequisites...\n");
 
 		//check installed ksks packages
 		Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(agent));

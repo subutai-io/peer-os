@@ -15,9 +15,7 @@ import org.safehaus.subutai.shared.protocol.Util;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class StartNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 	private final String lxcHostname;
@@ -36,6 +34,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<PrestoIm
 
 	@Override
 	public void run() {
+        productOperation  = po;
 		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));

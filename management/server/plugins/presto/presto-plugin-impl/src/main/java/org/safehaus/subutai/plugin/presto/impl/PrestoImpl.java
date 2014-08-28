@@ -20,9 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author dilshat
- */
+
 public class PrestoImpl implements Presto {
 
 	private CommandRunner commandRunner;

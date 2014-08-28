@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
+import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
@@ -11,9 +12,7 @@ import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class StopNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 	private final String lxcHostname;
@@ -33,13 +32,16 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<PrestoImp
 
 	@Override
 	public void run() {
+        productOperation = po;
 		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
 			return;
 		}
 
-		Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
+        AgentManager man = manager.getAgentManager();
+        Agent node = man.getAgentByHostname( lxcHostname );
+//		Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
 		if (node == null) {
 			po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
 			return;

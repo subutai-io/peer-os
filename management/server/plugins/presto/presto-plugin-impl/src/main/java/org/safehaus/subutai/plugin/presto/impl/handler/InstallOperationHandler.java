@@ -18,9 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 	private final PrestoClusterConfig config;
@@ -39,6 +37,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
 
 	@Override
 	public void run() {
+        productOperation = po;
 		if (Strings.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getWorkers()) || config.getCoordinatorNode() == null) {
 			po.addLogFailed("Malformed configuration\nInstallation aborted");
 			return;
