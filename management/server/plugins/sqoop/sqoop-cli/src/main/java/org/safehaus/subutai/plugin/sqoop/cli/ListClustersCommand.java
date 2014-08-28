@@ -1,9 +1,9 @@
-package org.safehaus.subutai.cli.commands;
+package org.safehaus.subutai.plugin.sqoop.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.api.sqoop.Sqoop;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ public class ListClustersCommand extends OsgiCommandSupport {
 	}
 
 	protected Object doExecute() {
-		List<Config> configList = sqoopManager.getClusters();
+		List<SqoopConfig> configList = sqoopManager.getClusters();
 		if (!configList.isEmpty())
-			for (Config config : configList) {
+			for (SqoopConfig config : configList) {
 				System.out.println(config.getClusterName());
 			}
 		else System.out.println("No Sqoop cluster");

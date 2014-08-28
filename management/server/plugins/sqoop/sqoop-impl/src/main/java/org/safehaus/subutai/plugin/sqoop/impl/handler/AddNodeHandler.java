@@ -1,12 +1,12 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.impl.sqoop.CommandFactory;
-import org.safehaus.subutai.impl.sqoop.CommandType;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -21,7 +21,7 @@ public class AddNodeHandler extends AbstractHandler {
 
 	@Override
 	public void run() {
-		Config config = getClusterConfig();
+		SqoopConfig config = getClusterConfig();
 		if (config == null) {
 			po.addLogFailed("Sqoop installation does not exist: " + clusterName);
 			return;
@@ -74,13 +74,13 @@ public class AddNodeHandler extends AbstractHandler {
 		}
 	}
 
-	private void addNode(Agent agent, Config config) {
+	private void addNode(Agent agent, SqoopConfig config) {
 		if (config.getNodes() == null) config.setNodes(new HashSet<Agent>(4));
 		config.getNodes().add(agent);
 	}
 
-	private boolean saveConfig(Config config) {
-		boolean b = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
+	private boolean saveConfig(SqoopConfig config) {
+		boolean b = manager.getDbManager().saveInfo(SqoopConfig.PRODUCT_KEY,
 				config.getClusterName(), config);
 		po.addLog(b ? "Installation info successfully saved"
 				: "Failed to save installation info");

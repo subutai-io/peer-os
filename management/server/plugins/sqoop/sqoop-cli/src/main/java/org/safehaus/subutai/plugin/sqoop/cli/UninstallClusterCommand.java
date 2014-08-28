@@ -1,10 +1,10 @@
-package org.safehaus.subutai.cli.commands;
+package org.safehaus.subutai.plugin.sqoop.cli;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.api.sqoop.Sqoop;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
@@ -43,7 +43,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 		UUID uuid = sqoopManager.uninstallCluster(clusterName);
 		int logSize = 0;
 		while (!Thread.interrupted()) {
-			ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+			ProductOperationView po = tracker.getProductOperation(SqoopConfig.PRODUCT_KEY, uuid);
 			if (po != null) {
 				if (logSize != po.getLog().length()) {
 					System.out.print(po.getLog().substring(logSize, po.getLog().length()));

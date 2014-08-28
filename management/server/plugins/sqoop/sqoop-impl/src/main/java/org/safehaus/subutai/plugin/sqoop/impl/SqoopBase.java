@@ -1,11 +1,11 @@
-package org.safehaus.subutai.impl.sqoop;
+package org.safehaus.subutai.plugin.sqoop.impl;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.sqoop.Sqoop;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 

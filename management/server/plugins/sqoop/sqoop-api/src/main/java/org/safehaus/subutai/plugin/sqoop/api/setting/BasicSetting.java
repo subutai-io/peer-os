@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.sqoop.setting;
+package org.safehaus.subutai.plugin.sqoop.api.setting;
 
 public class BasicSetting {
 

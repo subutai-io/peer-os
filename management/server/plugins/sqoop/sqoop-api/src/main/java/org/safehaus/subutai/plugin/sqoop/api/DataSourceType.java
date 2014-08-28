@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.sqoop;
+package org.safehaus.subutai.plugin.sqoop.api;
 
 public enum DataSourceType {
 

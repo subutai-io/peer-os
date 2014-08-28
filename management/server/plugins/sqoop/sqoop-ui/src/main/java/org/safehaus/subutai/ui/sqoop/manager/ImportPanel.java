@@ -2,9 +2,9 @@ package org.safehaus.subutai.ui.sqoop.manager;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.sqoop.DataSourceType;
-import org.safehaus.subutai.api.sqoop.setting.ImportParameter;
-import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
 
 import java.util.ArrayList;

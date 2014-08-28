@@ -1,6 +1,6 @@
-package org.safehaus.subutai.api.sqoop.setting;
+package org.safehaus.subutai.plugin.sqoop.api.setting;
 
-import org.safehaus.subutai.api.sqoop.DataSourceType;
+import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
 
 import java.util.EnumMap;
 import java.util.Map;

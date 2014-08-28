@@ -2,12 +2,12 @@ package org.safehaus.subutai.sqoop.services;
 
 import org.apache.commons.lang3.StringUtils;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.api.sqoop.DataSourceType;
-import org.safehaus.subutai.api.sqoop.Sqoop;
-import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
-import org.safehaus.subutai.api.sqoop.setting.ImportParameter;
-import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
+import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -45,10 +45,10 @@ public class RestService {
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getClusters() {
 
-		List<Config> configs = sqoopManager.getClusters();
+		List<SqoopConfig> configs = sqoopManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configs) {
+		for (SqoopConfig config : configs) {
 			clusterNames.add(config.getClusterName());
 		}
 
@@ -62,7 +62,7 @@ public class RestService {
 	public String getCluster(
 			@QueryParam ("clusterName") String clusterName
 	) {
-		Config config = sqoopManager.getCluster(clusterName);
+		SqoopConfig config = sqoopManager.getCluster(clusterName);
 
 		return JsonUtil.GSON.toJson(config);
 	}
@@ -76,7 +76,7 @@ public class RestService {
 			@QueryParam ("nodes") String nodes
 	) {
 
-		Config config = new Config();
+		SqoopConfig config = new SqoopConfig();
 		config.setClusterName(clusterName);
 
 		if (nodes != null) {

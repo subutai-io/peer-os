@@ -1,55 +1,58 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.impl.sqoop.CommandFactory;
-import org.safehaus.subutai.impl.sqoop.CommandType;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class CheckHandler extends AbstractHandler {
+public class ExportHandler extends AbstractHandler {
 
-	public CheckHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
+	private ExportSetting settings;
+
+	public ExportHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
 		super(manager, clusterName, po);
+	}
+
+	public ExportSetting getSettings() {
+		return settings;
+	}
+
+	public void setSettings(ExportSetting settings) {
+		this.settings = settings;
+		this.hostname = settings.getHostname();
 	}
 
 	@Override
 	public void run() {
-		Config config = getClusterConfig();
-		if (config == null) {
-			po.addLogFailed("Sqoop installation not found: " + clusterName);
-			return;
-		}
 		Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
 		if (agent == null) {
 			po.addLogFailed("Node is not connected");
 			return;
 		}
 
-		String s = CommandFactory.build(CommandType.LIST, null);
+		String s = CommandFactory.build(CommandType.EXPORT, settings);
 		Command cmd = manager.getCommandRunner().createCommand(
-				new RequestBuilder(s),
+				new RequestBuilder(s).withTimeout(60),
 				new HashSet<>(Arrays.asList(agent)));
 
 		manager.getCommandRunner().runCommand(cmd);
 
 		AgentResult res = cmd.getResults().get(agent.getUuid());
 		if (cmd.hasSucceeded()) {
-			if (res.getStdOut().contains(CommandFactory.PACKAGE_NAME))
-				po.addLogDone("Sqoop installed on " + hostname);
-			else
-				po.addLogFailed("Sqoop not installed on " + hostname);
+			po.addLog(res.getStdOut());
+			po.addLogDone("Export completed on " + hostname);
 		} else {
 			po.addLog(res.getStdOut());
 			po.addLogFailed(res.getStdErr());
 		}
-
 	}
 
 }

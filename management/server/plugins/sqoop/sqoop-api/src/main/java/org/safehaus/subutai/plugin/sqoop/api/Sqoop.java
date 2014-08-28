@@ -1,12 +1,12 @@
-package org.safehaus.subutai.api.sqoop;
+package org.safehaus.subutai.plugin.sqoop.api;
 
-import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
-import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
 
-public interface Sqoop extends ApiBase<Config> {
+public interface Sqoop extends ApiBase<SqoopConfig> {
 
 	public UUID isInstalled(String clusterName, String hostname);
 

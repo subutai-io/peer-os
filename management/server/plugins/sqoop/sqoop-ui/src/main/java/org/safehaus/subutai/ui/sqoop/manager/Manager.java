@@ -5,7 +5,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.sqoop.Config;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -25,7 +25,7 @@ public class Manager {
 	private final Table nodesTable;
 	private final ImportPanel importPanel;
 	private final ExportPanel exportPanel;
-	private Config config;
+	private SqoopConfig config;
 
 	public Manager() {
 
@@ -54,7 +54,7 @@ public class Manager {
 
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (Config) event.getProperty().getValue();
+				config = (SqoopConfig) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -120,16 +120,16 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		Config current = (Config) clusterCombo.getValue();
+		SqoopConfig current = (SqoopConfig) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
-		List<Config> clustersInfo = SqoopUI.getManager().getClusters();
+		List<SqoopConfig> clustersInfo = SqoopUI.getManager().getClusters();
 		if (clustersInfo != null && clustersInfo.size() > 0) {
-			for (Config ci : clustersInfo) {
+			for (SqoopConfig ci : clustersInfo) {
 				clusterCombo.addItem(ci);
 				clusterCombo.setItemCaption(ci, ci.getClusterName());
 			}
 			if (current != null) {
-				for (Config ci : clustersInfo) {
+				for (SqoopConfig ci : clustersInfo) {
 					if (ci.getClusterName().equals(current.getClusterName())) {
 						clusterCombo.setValue(ci);
 						return;
@@ -199,7 +199,7 @@ public class Manager {
 							UUID trackID = SqoopUI.getManager().destroyNode(
 									config.getClusterName(),
 									agent.getHostname());
-							ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, SqoopConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {

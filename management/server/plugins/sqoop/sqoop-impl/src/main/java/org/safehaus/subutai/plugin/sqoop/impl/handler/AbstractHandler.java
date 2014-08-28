@@ -1,7 +1,7 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -29,9 +29,9 @@ abstract class AbstractHandler implements Runnable {
 		this.hostname = hostname;
 	}
 
-	Config getClusterConfig() {
-		return manager.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName,
-				Config.class);
+	SqoopConfig getClusterConfig() {
+		return manager.getDbManager().getInfo(SqoopConfig.PRODUCT_KEY, clusterName,
+				SqoopConfig.class);
 	}
 
 	/**
@@ -41,7 +41,7 @@ abstract class AbstractHandler implements Runnable {
 	 * @param removeDisconnected
 	 * @return number of connected nodes
 	 */
-	int checkNodes(Config config, boolean removeDisconnected) {
+	int checkNodes(SqoopConfig config, boolean removeDisconnected) {
 		int connected = 0;
 		Iterator<Agent> it = config.getNodes().iterator();
 		while (it.hasNext()) {

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,27 +7,27 @@ import java.util.UUID;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.impl.sqoop.CommandFactory;
-import org.safehaus.subutai.impl.sqoop.CommandType;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class InstallHandler extends AbstractHandler {
 
-	private Config config;
+	private SqoopConfig config;
 
 	public InstallHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
 		super(manager, clusterName, po);
 	}
 
-	public Config getConfig() {
+	public SqoopConfig getConfig() {
 		return config;
 	}
 
-	public void setConfig(Config config) {
+	public void setConfig(SqoopConfig config) {
 		this.config = config;
 	}
 
@@ -131,8 +131,8 @@ public class InstallHandler extends AbstractHandler {
 		}
 	}
 
-	private boolean saveClusterInfo(Config config) {
-		boolean saved = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
+	private boolean saveClusterInfo(SqoopConfig config) {
+		boolean saved = manager.getDbManager().saveInfo(SqoopConfig.PRODUCT_KEY,
 				config.getClusterName(), config);
 		if (saved) po.addLog("Installation info successfully saved");
 		else po.addLog("Failed to save installation info");

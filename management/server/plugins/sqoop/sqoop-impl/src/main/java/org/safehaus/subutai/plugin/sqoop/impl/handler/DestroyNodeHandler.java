@@ -1,11 +1,11 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.impl.sqoop.CommandFactory;
-import org.safehaus.subutai.impl.sqoop.CommandType;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
@@ -20,7 +20,7 @@ public class DestroyNodeHandler extends AbstractHandler {
 
 	@Override
 	public void run() {
-		Config config = getClusterConfig();
+		SqoopConfig config = getClusterConfig();
 		if (config == null) {
 			po.addLogFailed("Sqoop installation not found: " + clusterName);
 			return;
@@ -44,10 +44,10 @@ public class DestroyNodeHandler extends AbstractHandler {
 
 			boolean b;
 			if (config.getNodes().isEmpty())
-				b = manager.getDbManager().deleteInfo(Config.PRODUCT_KEY,
+				b = manager.getDbManager().deleteInfo(SqoopConfig.PRODUCT_KEY,
 						clusterName);
 			else
-				b = manager.getDbManager().saveInfo(Config.PRODUCT_KEY,
+				b = manager.getDbManager().saveInfo(SqoopConfig.PRODUCT_KEY,
 						config.getClusterName(), config);
 			if (b) po.addLogDone("Installation info successfully updated");
 			else po.addLogFailed("Failed to update installation info");

@@ -2,7 +2,7 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.sqoop.Config;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
@@ -38,7 +38,7 @@ public class VerificationStep extends Panel {
 			public void buttonClick(Button.ClickEvent event) {
 
 				UUID trackID = SqoopUI.getManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, SqoopConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

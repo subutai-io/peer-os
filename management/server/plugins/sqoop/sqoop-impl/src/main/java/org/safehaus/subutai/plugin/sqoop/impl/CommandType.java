@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.sqoop;
+package org.safehaus.subutai.plugin.sqoop.impl;
 
 public enum CommandType {
 

@@ -1,9 +1,9 @@
-package org.safehaus.subutai.impl.sqoop;
+package org.safehaus.subutai.plugin.sqoop.impl;
 
-import org.safehaus.subutai.api.sqoop.setting.CommonSetting;
-import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
-import org.safehaus.subutai.api.sqoop.setting.ImportParameter;
-import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 
 public class CommandFactory {
 

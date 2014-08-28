@@ -2,12 +2,12 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.api.sqoop.Config;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
 public class Wizard {
 	private final GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private SqoopConfig config = new SqoopConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -59,11 +59,11 @@ public class Wizard {
 
 	protected void init() {
 		step = 1;
-		config = new Config();
+		config = new SqoopConfig();
 		putForm();
 	}
 
-	public Config getConfig() {
+	public SqoopConfig getConfig() {
 		return config;
 	}
 

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.ui.sqoop.manager;
 
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.sqoop.Config;
-import org.safehaus.subutai.api.sqoop.setting.CommonSetting;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -139,7 +139,7 @@ public abstract class ImportExportBase extends VerticalLayout {
 			String m = "";
 			while (true) {
 				ProductOperationView po = SqoopUI.getTracker().getProductOperation(
-						Config.PRODUCT_KEY, trackId);
+						SqoopConfig.PRODUCT_KEY, trackId);
 				if (po == null) break;
 
 				if (po.getLog() != null) {

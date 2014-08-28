@@ -1,31 +1,31 @@
-package org.safehaus.subutai.impl.sqoop.handler;
+package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
-import org.safehaus.subutai.impl.sqoop.CommandFactory;
-import org.safehaus.subutai.impl.sqoop.CommandType;
-import org.safehaus.subutai.impl.sqoop.SqoopImpl;
+import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
+import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
+import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class ExportHandler extends AbstractHandler {
+public class ImportHandler extends AbstractHandler {
 
-	private ExportSetting settings;
+	private ImportSetting settings;
 
-	public ExportHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
+	public ImportHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
 		super(manager, clusterName, po);
 	}
 
-	public ExportSetting getSettings() {
+	public ImportSetting getSettings() {
 		return settings;
 	}
 
-	public void setSettings(ExportSetting settings) {
+	public void setSettings(ImportSetting settings) {
 		this.settings = settings;
 		this.hostname = settings.getHostname();
 	}
@@ -38,7 +38,7 @@ public class ExportHandler extends AbstractHandler {
 			return;
 		}
 
-		String s = CommandFactory.build(CommandType.EXPORT, settings);
+		String s = CommandFactory.build(CommandType.IMPORT, settings);
 		Command cmd = manager.getCommandRunner().createCommand(
 				new RequestBuilder(s).withTimeout(60),
 				new HashSet<>(Arrays.asList(agent)));
@@ -48,7 +48,7 @@ public class ExportHandler extends AbstractHandler {
 		AgentResult res = cmd.getResults().get(agent.getUuid());
 		if (cmd.hasSucceeded()) {
 			po.addLog(res.getStdOut());
-			po.addLogDone("Export completed on " + hostname);
+			po.addLogDone("Import completed on " + hostname);
 		} else {
 			po.addLog(res.getStdOut());
 			po.addLogFailed(res.getStdErr());
