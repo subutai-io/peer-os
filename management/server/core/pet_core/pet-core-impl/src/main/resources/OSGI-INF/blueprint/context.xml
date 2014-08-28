@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <service ref="petManager" interface="org.safehaus.subutai.pet.api.PetManager"/>
+
+    <bean id="petManager" scope="singleton" class="org.safehaus.subutai.pet.impl.PetImpl">
+    </bean>
+
+</blueprint>
