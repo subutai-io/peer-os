@@ -3,7 +3,7 @@
 function master_destroy {
 
   if [ -z "`zfs list lxc/master`" ]; then
-    msg_error No zfs dataset \'lxc/master\' found - aborting ...
+    msg_error "No zfs dataset \"lxc/master\" found - aborting ..."
     exit 1
   fi
 
