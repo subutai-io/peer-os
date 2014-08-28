@@ -1391,7 +1391,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Oozie -->
+      <!-- Oozie plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>oozie-plugin-api</artifactId>

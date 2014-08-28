@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-plugin-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>oozie-plugin-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
 
-    <artifactId>oozie-plugin-impl</artifactId>
-    <packaging>bundle</packaging>
-    <name>Subutai Oozie Plugin</name>
-    <description>Subutai Oozie Plugin</description>
+  <artifactId>oozie-plugin-impl</artifactId>
+  <packaging>bundle</packaging>
+  <name>Subutai Oozie Plugin</name>
+  <description>Subutai Oozie Plugin</description>
 
     <dependencies>
         <dependency>
@@ -59,21 +59,21 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.impl.oozie</Bundle-SymbolicName>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.impl.plugin.oozie</Bundle-SymbolicName>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

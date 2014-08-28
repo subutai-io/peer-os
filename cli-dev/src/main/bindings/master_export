@@ -19,6 +19,15 @@ function usage {
 
 function master_export {
 
+  if [ "`is_system_all_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  lock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
+
   # ---------------------------------------------------------------------------
   # (1) perform some sanity checks
   # ---------------------------------------------------------------------------
@@ -28,8 +37,10 @@ function master_export {
   local debian_root="$SUBUTAI_TMPDIR/$container"
 
   if [ -f "$debian_file" ]; then
-    msg_notice "It seems the debian package file has already been generated"
+    msg_error "It seems the debian package file has already been generated"
     msg_error "Run rm -rf $debian_root* and try again"
+    unlock_subutai_system
+    if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -39,7 +50,7 @@ function master_export {
   zfs send "lxc/master@template" > "$deltas/rootfs.delta"
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-    msg_ok "Exported $size delta for rootfs"
+    msg_info "Exported $size delta for rootfs"
   else
     msg_error "Delta generation for rootfs failed"
   fi
@@ -47,7 +58,7 @@ function master_export {
   zfs send "lxc/master-opt@template" > "$deltas/opt.delta"
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-    msg_ok "Exported $size delta for opt"
+    msg_info "Exported $size delta for opt"
   else
     msg_error "Delta generation for opt failed"
   fi
@@ -55,7 +66,7 @@ function master_export {
   zfs send "lxc-data/master-var@template" > "$deltas/var.delta"
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-    msg_ok "Exported $size delta for var"
+    msg_info "Exported $size delta for var"
   else
     msg_error "Delta generation for opt failed"
   fi
@@ -63,7 +74,7 @@ function master_export {
   zfs send "lxc-data/master-home@template" > "$deltas/home.delta"
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-    msg_ok "Exported $size delta for home"
+    msg_info "Exported $size delta for home"
   else
     msg_error "Delta generation for opt failed"
   fi
@@ -81,8 +92,12 @@ function master_export {
   msg_info "Building debian package file for master"
 
   pkg=`deb_pkg $container`
+  check_status "debian package $pkg generated" "$?"
+
   # Remove debian root directory after debian package generation
   rm -rf $debian_root
+  unlock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
 
 }
 
