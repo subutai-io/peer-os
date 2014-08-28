@@ -28,13 +28,8 @@ abstract class FlumeSetupStrategy implements ClusterSetupStrategy {
             throw new ClusterSetupException(m + String.format(
                     "Cluster '%s' already exists", config.getClusterName()));
 
-        if(config.getSetupType() == SetupType.OVER_HADOOP) {
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
             if(config.getNodes() == null || config.getNodes().isEmpty())
                 throw new ClusterSetupException(m + "Target nodes not specified");
-        } else {
-            int c = config.getNodesCount();
-            if(c <= 0)
-                throw new ClusterSetupException(m + "Invalid number of nodes");
-        }
     }
 }

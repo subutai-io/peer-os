@@ -27,7 +27,7 @@ public class ConfigurationStep extends VerticalLayout {
         layout.addComponent(new Label("Please, specify installation settings"));
         layout.addComponent(content);
 
-        TextField txtClusterName = new TextField("Installation name: ");
+        TextField txtClusterName = new TextField("Flume installation name: ");
         txtClusterName.setRequired(true);
         txtClusterName.addValueChangeListener(new Property.ValueChangeListener() {
 
@@ -145,22 +145,6 @@ public class ConfigurationStep extends VerticalLayout {
 
         Collection<Integer> col = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-        ComboBox cmbNodesCount = new ComboBox("Number of Flume nodes", col);
-        cmbNodesCount.setImmediate(true);
-        cmbNodesCount.setNullSelectionAllowed(false);
-        cmbNodesCount.setRequired(true);
-        cmbNodesCount.setStyleName("default");
-        cmbNodesCount.setTextInputAllowed(false);
-        cmbNodesCount.setValue(config.getNodesCount());
-        cmbNodesCount.addValueChangeListener(new Property.ValueChangeListener() {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                String val = event.getProperty().getValue().toString();
-                config.setNodesCount(Integer.parseInt(val));
-            }
-        });
-
         final TextField txtHadoopClusterName = new TextField("Hadoop cluster name");
         txtHadoopClusterName.setRequired(true);
         txtHadoopClusterName.setMaxLength(20);
@@ -211,7 +195,6 @@ public class ConfigurationStep extends VerticalLayout {
             }
         });
 
-        content.addComponent(cmbNodesCount);
         content.addComponent(new Label("Hadoop settings"));
         content.addComponent(txtHadoopClusterName);
         content.addComponent(cmbSlaveNodes);
@@ -235,9 +218,7 @@ public class ConfigurationStep extends VerticalLayout {
                 wizard.next();
         } else if(config.getSetupType() == SetupType.WITH_HADOOP) {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            if(wizard.getConfig().getNodesCount() <= 0)
-                show("Invalid number of Flume nodes");
-            else if(hc.getClusterName() == null || hc.getClusterName().isEmpty())
+            if(hc.getClusterName() == null || hc.getClusterName().isEmpty())
                 show("Enter Hadoop cluster name");
             else if(hc.getCountOfSlaveNodes() <= 0)
                 show("Invalid number of Hadoop slave nodes");

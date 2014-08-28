@@ -12,7 +12,6 @@ public class FlumeConfig implements ConfigBase {
 
     private String clusterName = "";
     private SetupType setupType;
-    private int nodesCount;
     private String hadoopClusterName;
     private Set<Agent> nodes = new HashSet();
 
@@ -31,14 +30,6 @@ public class FlumeConfig implements ConfigBase {
 
     public void setSetupType(SetupType setupType) {
         this.setupType = setupType;
-    }
-
-    public int getNodesCount() {
-        return nodesCount;
-    }
-
-    public void setNodesCount(int nodesCount) {
-        this.nodesCount = nodesCount;
     }
 
     public String getHadoopClusterName() {

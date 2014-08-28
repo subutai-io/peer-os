@@ -35,7 +35,6 @@ public class VerificationStep extends VerticalLayout {
             }
         else if(config.getSetupType() == SetupType.WITH_HADOOP) {
             HadoopClusterConfig hc = wizard.getHadoopConfig();
-            cfgView.addStringCfg("Number of Flume nodes", config.getNodesCount() + "");
             cfgView.addStringCfg("Hadoop cluster name", hc.getClusterName());
             cfgView.addStringCfg("Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "");
             cfgView.addStringCfg("Replication factor", hc.getReplicationFactor() + "");
