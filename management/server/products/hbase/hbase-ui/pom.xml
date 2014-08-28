@@ -24,6 +24,10 @@
             <artifactId>mgmt-shared-protocol</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>subutai-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-server</artifactId>
         </dependency>
