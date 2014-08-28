@@ -23,6 +23,12 @@ function promote_usage {
 # (4) shutdown & '@template' snapshot all mounts, and apply "keep" holds
 
 function promote {
+  if [ "`is_system_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
   OPTIND=0
   if [ "$1" == "promote" ]; then
     shift
@@ -73,9 +79,20 @@ function promote {
  
   local lxc="$1"
 
+  if [ "`are_containers_locked_read $lxc`" == "true" ]
+  then
+     msg_error "Container(s) locked by a subutai process"
+     exit 1
+  fi
+
+  lock_container_read $lxc
+  if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
   # The master is already a template
   if [ "$lxc" == "master" ]; then
     msg_error "The master is already a template. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   fi
 
@@ -87,6 +104,8 @@ function promote {
   # check to make sure the container is NOT already a template
   if [ "`zfs_is_template $lxc`" == "true" ]; then
     msg_error "Container \"$lxc\" is already a template. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$lxc\" is NOT a template"
@@ -95,6 +114,8 @@ function promote {
   # check to make sure container is NOT registered as a template
   if [ "`is_registered $lxc`" == "true" ]; then
     msg_error "A template with name \"$lxc\" is registered. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: \"$lxc\" is NOT registered"
@@ -105,18 +126,22 @@ function promote {
   # check to make sure the parent is a template
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    unlock_container_read $lxc
+    if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
   fi
 
+  # TODO is this check really necessary while promoting a child container?? 
+  # User may have promoted the parent but may not have registered yet!
   # check to make sure the parent is registered
-  if [ "`is_registered $parent`" == "false" ]; then
-    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
-    exit 1
-  else
-    msg_info "    - check passed: parent \"$parent\" is registered"
-  fi
+  #if [ "`is_registered $parent`" == "false" ]; then
+  #  msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+  #  exit 1
+  #else
+  #  msg_info "    - check passed: parent \"$parent\" is registered"
+  #fi
 
   # if a newname is specified check to see such a container does not exist
   # make a copy of the container before converting it into a template
@@ -185,6 +210,10 @@ function promote {
   zfs snapshot lxc-data/$lxc_template-home@template
   zfs hold keep lxc-data/$lxc_template-home@template
   zfs set readonly=on lxc-data/$lxc_template-home
+
+  msg_ok "Successfully promoted $lxc_template"
+  unlock_container_read $lxc
+  if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
 
 

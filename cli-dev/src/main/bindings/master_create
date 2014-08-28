@@ -2,6 +2,15 @@
 
 
 function master_create {
+  if [ "`is_system_all_locked`" == "true" ]
+  then
+     msg_error "System locked by a subutai process"
+     exit 1
+  fi
+
+  lock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
+
   # Check for Master Existence
   # ---------------------------------------------------------------------------
 
@@ -47,9 +56,9 @@ function master_create {
   # Configuration for apt-proxy
   if [ -n "$SUBUTAI_APT_PROXY" ]; then
     echo "deb $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       > /etc/apt/sources.list
+       > /etc/apt/sources.list.d/subutai-repo.list
     echo "deb-src $SUBUTAI_APT_PROXY $SUBUTAI_OS_RELEASE_NAME  main restricted universe multiverse" \
-       >> /etc/apt/sources.list
+       >> /etc/apt/sources.list.d/subutai-repo.list
   fi
   lxc_wait_net master
   echo "deb $SUBUTAI_SITE_REPO $SUBUTAI_OS_RELEASE_NAME main" \
@@ -92,6 +101,9 @@ function master_create {
   addmount master opt lxc
   addmount master home lxc-data
   addmount master var lxc-data
+  
+  unlock_subutai_system
+  if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
 }
 
 function master_create_description {

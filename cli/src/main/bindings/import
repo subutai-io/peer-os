@@ -13,42 +13,77 @@ function import_usage {
 
 # Plan for importing a template
 # ----------------------------------------------------------------------------
-# (1) Install the debian package if subutai import not called during a debian package installation
-# (2) perform sanity checks first
+# (1) perform sanity checks first
 #     - a container with the same name MUST NOT already exist
 #     - the template name MUST be in the template registry
 #     - the template parent MUST be present and in the template registry
 #       if NOT the user will have to install the parent container first
+# (2) Install the debian package if subutai import not called during a debian package installation
 # (3) Setup the LXC container area under /var/lib/lxc/
 # (4) Receive delta images of all filesystems starting with the rootfs
 # (5) Mount the rootfs filesystem on /var/lib/lxc/$template/rootfs
 
 function import {
-  local container="$1"
+  if [ "`is_system_locked`" == "true" ]
+  then
+    msg_error "System locked by a subutai process"
+    exit 1
+  fi
 
+  local container="$1"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
+ 
+  # ----------------------------------------------------------------------------
+  # (1) perform sanity checks first
+  #     - a container with the same name MUST NOT already exist
+  #     - the template name MUST be in the template registry
+  #     - the template parent MUST be present and in the template registry
+  #       if NOT the user will have to install the parent container first
+  # ----------------------------------------------------------------------------
+  lxc_assert_no $container
+  zfs_assert_nods lxc/$container
+
+  if [ -f "$debian_file" ]; then
+    is_local="true"
+  else
+    is_local="false"
+  fi
+  
   if [ -z "$container"  ]; then
     msg_error "Expecting single parameter for the container to import"
     show_usage "`import_usage`"
   fi
 
   if [ "$container" = "master" ];then
-    subutai master_import
-    exit $?
+    msg_error "Please use subutai master_import command!"
+    exit 1
   fi
-  # ----------------------------------------------------------------------------
-  # (1) Install the debian package if subutai import not called during a debian package installation
-  # ----------------------------------------------------------------------------
-  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
-  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    msg_info "subutai import called from command line"
-    local debian_package_name=`get_debian_package_name $container`
-    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-    local package_name=`get_package_name $container`
 
-    if [ ! -f "$debian_file" ]; then
-      msg_error "Could not find template file \"$debian_file\". Aborting ..."
+  if [ $is_local == "true" ]; then
+    if [ "`are_md5sums_equal $container`" == true ];then
+      msg_info "    - check passed: local \"$container\" package is same with the registered package"
+    elif [ "`is_registered $container`" == true -a "`are_md5sums_equal $container`" == false  ]; then
+      msg_error "A template $container is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$container-*\" and import again"
       exit 1
     fi
+  else
+      # check to make sure container is registered as a template
+    if [ "`is_registered $container`" == "false" ]; then
+      msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+      exit 1
+    else
+      msg_info "    - check passed: \"$container\" is registered"
+    fi
+  fi
+
+ 
+  # ----------------------------------------------------------------------------
+  # (2) Install the debian package if subutai import not called during a debian package installation
+  # ----------------------------------------------------------------------------
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai import called from command line"
 
     cd $SUBUTAI_TMPDIR
     is_package_installed $package_name
@@ -56,36 +91,73 @@ function import {
       msg_error "Template $container seems already installed, please destroy first"
       exit 1
     fi
+    
+    if [ "`is_dpkg_locked`" == "true" ]
+    then
+      msg_error "$1 import FAILED! dpkg is locked by process!"
+      exit 1
+    fi
 
-    dpkg -i $debian_file
-    if [ $? -eq 0 ]; then
-      msg_ok "Debian package of $package_name is installed succesfully"
-      exit 0
+    if [ "$is_local" == "true" ]
+    then
+      if [ "`are_containers_locked_read $container`" == "true" ]
+      then
+        msg_error "Container(s) locked by a subutai process"
+        exit 1
+      fi
+     
+      lock_container_read $container
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+      dpkg -i $debian_file
+      if [ $? -eq 0 ]; then
+        msg_ok "Debian package of $package_name is installed succesfully from local"
+        unlock_container_read $container
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+        exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_container_read $container
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+        subutai destroy $container
+        apt-get --assume-yes --force-yes purge $package_name
+	exit 1
+      fi
+    elif [ "`is_registered $container`" == "true" ]
+    then
+      if [ "`are_containers_locked_read $container`" == "true" ]
+      then
+        msg_error "Container(s) locked by a subutai process"
+        exit 1
+      fi
+
+      lock_container_read $container
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+
+      apt-get --assume-yes --force-yes install $package_name
+      if [ $? -eq 0 ]; then
+       msg_ok "Debian package of $package_name is installed succesfully from repo"
+       unlock_container_read $container
+       if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+       exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_container_read $container
+        if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+	subutai destroy $container
+        apt-get --assume-yes --force-yes purge $package_name
+        exit 1
+      fi
     else
-      msg_error "Debian package of $package_name could not be installed, removing"
-      subutai destroy $container
+      msg_error "Package $package_name is not found!"
+      unlock_container_read $container
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
       exit 1
     fi
   else
     msg_info "subutai import called while installing template from the debian package"
   fi
-  # ----------------------------------------------------------------------------
-  # (2) perform sanity checks first
-  #     - a container with the same name MUST NOT already exist
-  #     - the template name MUST be in the template registry
-  #     - the template parent MUST be present and in the template registry
-  #       if NOT the user will have to install the parent container first
-  # ----------------------------------------------------------------------------
-  lxc_assert_no $container
-
-  # check to make sure container is registered as a template
-  if [ "`is_registered $container`" == "false" ]; then
-    msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
-    exit 1
-  else 
-    msg_info "    - check passed: \"$container\" is registered"
-  fi
-
+  
   debian_root=$SUBUTAI_TMPDIR/$container
   config=$debian_root/config
   parent=`cat $config | grep subutai.parent | awk '{print $3}'`
@@ -95,6 +167,9 @@ function import {
   # check to make sure the parent is a template
   if [ "`zfs_is_template $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT a template. Aborting ..."
+    apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $container
+    if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is a template"
@@ -103,6 +178,9 @@ function import {
   # check to make sure the parent is registered
   if [ "`is_registered $parent`" == "false" ]; then
     msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
+    apt-get --assume-yes --force-yes purge $package_name
+    unlock_container_read $container
+    if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
     exit 1
   else
     msg_info "    - check passed: parent \"$parent\" is registered"
@@ -115,7 +193,7 @@ function import {
   deltas=$debian_root/deltas
 
   mkdir -p $lxc_rootfs
-  echo lxc_rootfs = $lxc_rootfs
+  msg_info "lxc_rootfs = $lxc_rootfs"
   cp $config $lxc_home;
   cp $debian_root/fstab $lxc_home;
   cp $debian_root/packages $lxc_home;
@@ -126,11 +204,9 @@ function import {
   zfs recv lxc/$container-opt < $deltas/opt.delta
   zfs recv lxc-data/$container-var < $deltas/var.delta
   zfs recv lxc-data/$container-home < $deltas/home.delta
-
 }
 
 
 function import_description {
   echo import a template
 }
-
