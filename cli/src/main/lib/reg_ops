@@ -22,7 +22,33 @@ function is_registered {
     echo false
   fi
 } 
-    
+
+
+# accepts parameter "template-name"
+# returns true|false according to md5sum comparison
+# of registered template package with local template package
+function are_md5sums_equal {
+  local template=$1
+  local url=`build_rest_url $SUBUTAI_REST_GET_TEMPLATE_PATH`/$template
+
+  if [ "$TEST_MODE" == "true" ]; then
+    echo "true"
+  fi
+
+  if [ "`is_registered $template`" == "false" ]; then
+    echo "false"
+  fi
+  resp=`curl -s -XGET $url`
+  md5sum_of_remote_package=$(echo $resp | awk '{split($0,a,"md5sum"); print a[2]}' | cut -d '"' -f 3)
+  debian_file="$SUBUTAI_TMPDIR/"`get_debian_package_name $template`".deb"
+  md5sum_of_local_package=$(echo `md5sum $debian_file` | awk '{split($0,a," "); print a[1]}')
+  if [ "$md5sum_of_remote_package" == "$md5sum_of_local_package" ];then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 
 # returns registered templates
 # accepts parameter "parents" which include templates' parents
@@ -52,7 +78,7 @@ function send_n_register {
   local url=`build_rest_url $SUBUTAI_REST_REGISTER_PATH`
 
   if [ "$TEST_MODE" == "true" ]; then
-    msg_notice "${FUNCNAME[0]} called in TEST mode"
+    msg_info "${FUNCNAME[0]} called in TEST mode"
     return
   fi
 
