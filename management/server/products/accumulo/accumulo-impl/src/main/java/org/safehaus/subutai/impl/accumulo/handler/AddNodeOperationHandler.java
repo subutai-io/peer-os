@@ -2,6 +2,7 @@ package org.safehaus.subutai.impl.accumulo.handler;
 
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
@@ -12,7 +13,6 @@ import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.UUID;
 
@@ -72,7 +72,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 		}
 
 		//check installed subutai packages
-		Command checkInstalledCommand = Commands.getCheckInstalledCommand(Util.wrapAgentToSet(lxcAgent));
+		Command checkInstalledCommand = Commands.getCheckInstalledCommand(Sets.newHashSet(lxcAgent));
 		manager.getCommandRunner().runCommand(checkInstalledCommand);
 
 		if (!checkInstalledCommand.hasCompleted()) {
@@ -131,7 +131,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 		if (install) {
 			po.addLog(String.format("Installing %s on %s node...", Config.PRODUCT_KEY, lxcAgent.getHostname()));
 
-			Command installCommand = Commands.getInstallCommand(Util.wrapAgentToSet(lxcAgent));
+			Command installCommand = Commands.getInstallCommand(Sets.newHashSet(lxcAgent));
 			manager.getCommandRunner().runCommand(installCommand);
 
 			if (installCommand.hasSucceeded()) {
@@ -155,7 +155,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 			po.addLog("Node registration succeeded\nSetting master node...");
 
 			Command setMasterNodeCommand =
-					Commands.getAddMasterCommand(Util.wrapAgentToSet(lxcAgent), config.getMasterNode());
+					Commands.getAddMasterCommand(Sets.newHashSet(lxcAgent), config.getMasterNode());
 			manager.getCommandRunner().runCommand(setMasterNodeCommand);
 
 			if (setMasterNodeCommand.hasSucceeded()) {
@@ -163,7 +163,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 				po.addLog("Setting master node succeeded\nSetting GC node...");
 
 				Command setGcNodeCommand =
-						Commands.getAddGCCommand(Util.wrapAgentToSet(lxcAgent), config.getGcNode());
+						Commands.getAddGCCommand(Sets.newHashSet(lxcAgent), config.getGcNode());
 				manager.getCommandRunner().runCommand(setGcNodeCommand);
 
 				if (setGcNodeCommand.hasSucceeded()) {
@@ -171,7 +171,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 					po.addLog("Setting GC node succeeded\nSetting monitor node...");
 
 					Command setMonitorCommand =
-							Commands.getAddMonitorCommand(Util.wrapAgentToSet(lxcAgent), config.getMonitor());
+							Commands.getAddMonitorCommand(Sets.newHashSet(lxcAgent), config.getMonitor());
 					manager.getCommandRunner().runCommand(setMonitorCommand);
 
 					if (setMonitorCommand.hasSucceeded()) {
@@ -179,8 +179,8 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 						po.addLog("Setting monitor node succeeded\nSetting tracers/slaves...");
 
 						Command setTracersSlavesCommand = nodeType.isSlave() ? Commands.getAddTracersCommand(
-								Util.wrapAgentToSet(lxcAgent), config.getTracers()) :
-								Commands.getAddSlavesCommand(Util.wrapAgentToSet(lxcAgent),
+								Sets.newHashSet(lxcAgent), config.getTracers()) :
+								Commands.getAddSlavesCommand(Sets.newHashSet(lxcAgent),
 										config.getSlaves());
 
 						manager.getCommandRunner().runCommand(setTracersSlavesCommand);
@@ -190,7 +190,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 							po.addLog("Setting tracers/slaves succeeded\nSetting Zk cluster...");
 
 							Command setZkClusterCommand =
-									Commands.getBindZKClusterCommand(Util.wrapAgentToSet(lxcAgent),
+									Commands.getBindZKClusterCommand(Sets.newHashSet(lxcAgent),
 											zkConfig.getNodes());
 							manager.getCommandRunner().runCommand(setZkClusterCommand);
 
