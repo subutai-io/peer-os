@@ -105,6 +105,12 @@ function destroy {
   for child in $children_list 
   do
     subutai destroy -r -f $child
+    if [ $? != 0 ]
+    then
+      unlock_container_read $clone
+      if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
+      exit 1
+    fi
   done
   
   # (3) Remove the debian package if installed

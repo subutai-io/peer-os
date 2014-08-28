@@ -117,10 +117,10 @@ function import {
         exit 0
       else
         msg_error "Debian package of $package_name could not be installed, removing"
-        subutai destroy $container
-        apt-get --assume-yes --force-yes purge $package_name
         unlock_container_read $container
         if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
+        subutai destroy $container
+        apt-get --assume-yes --force-yes purge $package_name
 	exit 1
       fi
     elif [ "`is_registered $container`" == "true" ]
