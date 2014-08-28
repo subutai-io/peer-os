@@ -3,6 +3,7 @@ package org.safehaus.subutai.pet.ui;
 
 import java.io.File;
 
+import org.safehaus.subutai.pet.api.PetManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.shared.protocol.FileUtil;
 
@@ -16,6 +17,23 @@ public class PetUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "pet.png";
     public static final String MODULE_NAME = "Pet";
+    private PetManager petManager;
+
+
+    public PetManager getPetManager() {
+        return petManager;
+    }
+
+
+    public void setPetManager( final PetManager petManager ) {
+        this.petManager = petManager;
+    }
+
+
+    public void init() {}
+
+
+    public void destroy() {}
 
 
     @Override
@@ -32,7 +50,7 @@ public class PetUI implements PortalModule {
 
     @Override
     public File getImage() {
-        return FileUtil.getFile(MODULE_IMAGE, this);
+        return FileUtil.getFile( MODULE_IMAGE, this );
     }
 
 
