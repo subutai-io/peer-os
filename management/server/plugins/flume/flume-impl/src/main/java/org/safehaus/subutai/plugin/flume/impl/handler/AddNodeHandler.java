@@ -79,8 +79,9 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
         }
 
         if(!installed && config.getSetupType() == SetupType.OVER_HADOOP) {
+            po.addLog("Installing Flume...");
             cmd = manager.getCommandRunner().createCommand(
-                    new RequestBuilder(Commands.make(CommandType.INSTALL)),
+                    new RequestBuilder(Commands.make(CommandType.INSTALL)).withTimeout(180),
                     set);
             manager.getCommandRunner().runCommand(cmd);
 
