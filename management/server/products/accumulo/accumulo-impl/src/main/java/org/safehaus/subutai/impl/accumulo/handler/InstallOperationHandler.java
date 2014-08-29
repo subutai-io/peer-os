@@ -6,12 +6,12 @@ import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.common.CollectionUtil;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -21,217 +21,265 @@ import java.util.logging.Logger;
 /**
  * Created by dilshat on 5/6/14.
  */
-public class InstallOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
-	private final Config config;
-	private final ProductOperation po;
+public class InstallOperationHandler extends AbstractOperationHandler<AccumuloImpl>
+{
+    private final Config config;
+    private final ProductOperation po;
 
 
-	public InstallOperationHandler(AccumuloImpl manager, Config config) {
-		super(manager, config.getClusterName());
-		this.config = config;
-		po = manager.getTracker()
-				.createProductOperation(Config.PRODUCT_KEY, String.format("Installing %s", Config.PRODUCT_KEY));
-	}
+    public InstallOperationHandler( AccumuloImpl manager, Config config )
+    {
+        super( manager, config.getClusterName() );
+        this.config = config;
+        po = manager.getTracker()
+            .createProductOperation( Config.PRODUCT_KEY, String.format( "Installing %s", Config.PRODUCT_KEY ) );
+    }
 
 
-	@Override
-	public UUID getTrackerId() {
-		return po.getId();
-	}
+    @Override
+    public UUID getTrackerId()
+    {
+        return po.getId();
+    }
 
 
-	@Override
-	public void run() {
+    @Override
+    public void run()
+    {
 
-		Logger LOG = Logger.getLogger(InstallOperationHandler.class.getName());
+        Logger LOG = Logger.getLogger( InstallOperationHandler.class.getName() );
 
-		LOG.log(Level.WARNING, config.toString());
+        LOG.log( Level.WARNING, config.toString() );
 
-		if (config.getMasterNode() == null || config.getGcNode() == null || config.getMonitor() == null || Strings
-				.isNullOrEmpty(config.getClusterName()) || Util.isCollectionEmpty(config.getTracers()) || Util
-				.isCollectionEmpty(config.getSlaves())) {
-			po.addLogFailed("Malformed configuration\nInstallation aborted");
-			return;
-		}
+        if ( config.getMasterNode() == null || config.getGcNode() == null || config.getMonitor() == null || Strings
+            .isNullOrEmpty( config.getClusterName() ) || CollectionUtil.isCollectionEmpty( config.getTracers() )
+            || CollectionUtil
+            .isCollectionEmpty( config.getSlaves() ) )
+        {
+            po.addLogFailed( "Malformed configuration\nInstallation aborted" );
+            return;
+        }
 
-		if (config.getMasterNode().equals(config.getGcNode())) {
-			po.addLogFailed("Master and CG can not be the same node");
-			return;
-		}
+        if ( config.getMasterNode().equals( config.getGcNode() ) )
+        {
+            po.addLogFailed( "Master and CG can not be the same node" );
+            return;
+        }
 
-		if (manager.getCluster(config.getClusterName()) != null) {
-			po.addLogFailed(String.format("Cluster with name '%s' already exists\nInstallation aborted",
-					config.getClusterName()));
-			return;
-		}
+        if ( manager.getCluster( config.getClusterName() ) != null )
+        {
+            po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
+                config.getClusterName() ) );
+            return;
+        }
 
-		org.safehaus.subutai.api.hadoop.Config hadoopConfig =
-				manager.getHadoopManager().getCluster(config.getClusterName());
+        org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+            manager.getHadoopManager().getCluster( config.getClusterName() );
 
-		if (hadoopConfig == null) {
-			po.addLogFailed(String.format("Hadoop cluster with name '%s' not found\nInstallation aborted",
-					config.getClusterName()));
-			return;
-		}
+        if ( hadoopConfig == null )
+        {
+            po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found\nInstallation aborted",
+                config.getClusterName() ) );
+            return;
+        }
 
-		if (!hadoopConfig.getAllNodes().containsAll(config.getAllNodes())) {
-			po.addLogFailed(String.format("Not all supplied nodes belong to Hadoop cluster %s \nInstallation aborted",
-					config.getClusterName()));
-			return;
-		}
+        if ( !hadoopConfig.getAllNodes().containsAll( config.getAllNodes() ) )
+        {
+            po.addLogFailed( String.format( "Not all supplied nodes belong to Hadoop cluster %s \nInstallation aborted",
+                config.getClusterName() ) );
+            return;
+        }
 
-		org.safehaus.subutai.api.zookeeper.Config zkConfig =
-				manager.getZkManager().getCluster(config.getClusterName());
+        org.safehaus.subutai.api.zookeeper.Config zkConfig =
+            manager.getZkManager().getCluster( config.getClusterName() );
 
-		if (zkConfig == null) {
-			po.addLogFailed(String.format("Zookeeper cluster with name '%s' not found\nInstallation aborted",
-					config.getClusterName()));
-			return;
-		}
+        if ( zkConfig == null )
+        {
+            po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found\nInstallation aborted",
+                config.getClusterName() ) );
+            return;
+        }
 
-		if (!zkConfig.getNodes().containsAll(config.getAllNodes())) {
-			po.addLogFailed(
-					String.format("Not all supplied nodes belong to Zookeeper cluster %s \nInstallation aborted",
-							config.getClusterName()));
-			return;
-		}
+        if ( !zkConfig.getNodes().containsAll( config.getAllNodes() ) )
+        {
+            po.addLogFailed(
+                String.format( "Not all supplied nodes belong to Zookeeper cluster %s \nInstallation aborted",
+                    config.getClusterName() ) );
+            return;
+        }
 
+        po.addLog( "Checking prerequisites..." );
 
-		po.addLog("Checking prerequisites...");
+        //check installed ksks packages
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getAllNodes() );
+        manager.getCommandRunner().runCommand( checkInstalledCommand );
 
-		//check installed ksks packages
-		Command checkInstalledCommand = Commands.getCheckInstalledCommand(config.getAllNodes());
-		manager.getCommandRunner().runCommand(checkInstalledCommand);
+        if ( !checkInstalledCommand.hasCompleted() )
+        {
+            po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
+            return;
+        }
 
-		if (!checkInstalledCommand.hasCompleted()) {
-			po.addLogFailed("Failed to check presence of installed ksks packages\nInstallation aborted");
-			return;
-		}
+        for ( Agent node : config.getAllNodes() )
+        {
+            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
 
-		for (Agent node : config.getAllNodes()) {
-			AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
+            if ( result.getStdOut().contains( "ksks-accumulo" ) )
+            {
+                po.addLogFailed( String.format( "Node %s already has Accumulo installed. Installation aborted",
+                    node.getHostname() ) );
+                return;
+            }
+            else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
+            {
+                po.addLogFailed( String.format( "Node %s has no Hadoop installation. Installation aborted",
+                    node.getHostname() ) );
+                return;
+            }
+            else if ( !result.getStdOut().contains( "ksks-zookeeper" ) )
+            {
+                po.addLogFailed( String.format( "Node %s has no Zookeeper installation. Installation aborted",
+                    node.getHostname() ) );
+                return;
+            }
+        }
 
-			if (result.getStdOut().contains("ksks-accumulo")) {
-				po.addLogFailed(String.format("Node %s already has Accumulo installed. Installation aborted",
-						node.getHostname()));
-				return;
-			} else if (!result.getStdOut().contains("ksks-hadoop")) {
-				po.addLogFailed(String.format("Node %s has no Hadoop installation. Installation aborted",
-						node.getHostname()));
-				return;
-			} else if (!result.getStdOut().contains("ksks-zookeeper")) {
-				po.addLogFailed(String.format("Node %s has no Zookeeper installation. Installation aborted",
-						node.getHostname()));
-				return;
-			}
-		}
+        po.addLog( "Installing Accumulo..." );
 
-		po.addLog("Installing Accumulo...");
+        //install
+        Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
+        manager.getCommandRunner().runCommand( installCommand );
 
-		//install
-		Command installCommand = Commands.getInstallCommand(config.getAllNodes());
-		manager.getCommandRunner().runCommand(installCommand);
+        if ( installCommand.hasSucceeded() )
+        {
+            po.addLog( "Installation succeeded\nSetting master node..." );
 
-		if (installCommand.hasSucceeded()) {
-			po.addLog("Installation succeeded\nSetting master node...");
+            Command setMasterCommand = Commands.getAddMasterCommand( config.getAllNodes(), config.getMasterNode() );
+            manager.getCommandRunner().runCommand( setMasterCommand );
 
-			Command setMasterCommand = Commands.getAddMasterCommand(config.getAllNodes(), config.getMasterNode());
-			manager.getCommandRunner().runCommand(setMasterCommand);
+            if ( setMasterCommand.hasSucceeded() )
+            {
+                po.addLog( "Setting master node succeeded\nSetting GC node..." );
+                Command setGCNodeCommand = Commands.getAddGCCommand( config.getAllNodes(), config.getGcNode() );
+                manager.getCommandRunner().runCommand( setGCNodeCommand );
+                if ( setGCNodeCommand.hasSucceeded() )
+                {
+                    po.addLog( "Setting GC node succeeded\nSetting monitor node..." );
 
-			if (setMasterCommand.hasSucceeded()) {
-				po.addLog("Setting master node succeeded\nSetting GC node...");
-				Command setGCNodeCommand = Commands.getAddGCCommand(config.getAllNodes(), config.getGcNode());
-				manager.getCommandRunner().runCommand(setGCNodeCommand);
-				if (setGCNodeCommand.hasSucceeded()) {
-					po.addLog("Setting GC node succeeded\nSetting monitor node...");
+                    Command setMonitorCommand =
+                        Commands.getAddMonitorCommand( config.getAllNodes(), config.getMonitor() );
+                    manager.getCommandRunner().runCommand( setMonitorCommand );
 
-					Command setMonitorCommand =
-							Commands.getAddMonitorCommand(config.getAllNodes(), config.getMonitor());
-					manager.getCommandRunner().runCommand(setMonitorCommand);
+                    if ( setMonitorCommand.hasSucceeded() )
+                    {
+                        po.addLog( "Setting monitor node succeeded\nSetting tracers..." );
 
-					if (setMonitorCommand.hasSucceeded()) {
-						po.addLog("Setting monitor node succeeded\nSetting tracers...");
+                        Command setTracersCommand =
+                            Commands.getAddTracersCommand( config.getAllNodes(), config.getTracers() );
+                        manager.getCommandRunner().runCommand( setTracersCommand );
 
-						Command setTracersCommand =
-								Commands.getAddTracersCommand(config.getAllNodes(), config.getTracers());
-						manager.getCommandRunner().runCommand(setTracersCommand);
+                        if ( setTracersCommand.hasSucceeded() )
+                        {
+                            po.addLog( "Setting tracers succeeded\nSetting slaves..." );
 
-						if (setTracersCommand.hasSucceeded()) {
-							po.addLog("Setting tracers succeeded\nSetting slaves...");
+                            Command setSlavesCommand =
+                                Commands.getAddSlavesCommand( config.getAllNodes(), config.getSlaves() );
+                            manager.getCommandRunner().runCommand( setSlavesCommand );
 
-							Command setSlavesCommand =
-									Commands.getAddSlavesCommand(config.getAllNodes(), config.getSlaves());
-							manager.getCommandRunner().runCommand(setSlavesCommand);
+                            if ( setSlavesCommand.hasSucceeded() )
+                            {
+                                po.addLog( "Setting slaves succeeded\nSetting ZK cluster..." );
 
-							if (setSlavesCommand.hasSucceeded()) {
-								po.addLog("Setting slaves succeeded\nSetting ZK cluster...");
+                                Command setZkClusterCommand =
+                                    Commands.getBindZKClusterCommand( config.getAllNodes(), zkConfig.getNodes() );
+                                manager.getCommandRunner().runCommand( setZkClusterCommand );
 
-								Command setZkClusterCommand =
-										Commands.getBindZKClusterCommand(config.getAllNodes(), zkConfig.getNodes());
-								manager.getCommandRunner().runCommand(setZkClusterCommand);
+                                if ( setZkClusterCommand.hasSucceeded() )
+                                {
+                                    po.addLog( "Setting ZK cluster succeeded\nInitializing cluster with HDFS..." );
 
-								if (setZkClusterCommand.hasSucceeded()) {
-									po.addLog("Setting ZK cluster succeeded\nInitializing cluster with HDFS...");
+                                    Command initCommand =
+                                        Commands.getInitCommand( config.getInstanceName(), config.getPassword(),
+                                            config.getMasterNode() );
+                                    manager.getCommandRunner().runCommand( initCommand );
 
-									Command initCommand =
-											Commands.getInitCommand(config.getInstanceName(), config.getPassword(),
-													config.getMasterNode());
-									manager.getCommandRunner().runCommand(initCommand);
+                                    if ( initCommand.hasSucceeded() )
+                                    {
+                                        po.addLog( "Initialization succeeded\nStarting cluster..." );
 
-									if (initCommand.hasSucceeded()) {
-										po.addLog("Initialization succeeded\nStarting cluster...");
+                                        Command startClusterCommand =
+                                            Commands.getStartCommand( config.getMasterNode() );
+                                        manager.getCommandRunner().runCommand( startClusterCommand );
 
-										Command startClusterCommand =
-												Commands.getStartCommand(config.getMasterNode());
-										manager.getCommandRunner().runCommand(startClusterCommand);
+                                        //  temporarily turning off until exit code ir fixed:  if (
+                                        // startClusterCommand.hasSucceeded() ) {
+                                        if ( startClusterCommand.hasCompleted() )
+                                        {
+                                            po.addLog( "Cluster started successfully" );
+                                        }
+                                        else
+                                        {
+                                            po.addLog( String.format( "Starting cluster failed, %s, skipping...",
+                                                startClusterCommand.getAllErrors() ) );
+                                        }
+                                        po.addLog( "Updating db..." );
 
-										//  temporarily turning off until exit code ir fixed:  if (
-										// startClusterCommand.hasSucceeded() ) {
-										if (startClusterCommand.hasCompleted()) {
-											po.addLog("Cluster started successfully");
-										} else {
-											po.addLog(String.format("Starting cluster failed, %s, skipping...",
-													startClusterCommand.getAllErrors()));
-										}
-										po.addLog("Updating db...");
+                                        try
+                                        {
+                                            manager.getDbManager()
+                                                .saveInfo2( Config.PRODUCT_KEY, config.getClusterName(), config );
 
-										try {
-											manager.getDbManager()
-													.saveInfo2(Config.PRODUCT_KEY, config.getClusterName(), config);
-
-											po.addLogDone("Database information updated");
-										} catch (DBException e) {
-											po.addLogFailed(String.format("Failed to update database information, %s",
-													e.getMessage()));
-										}
-									} else {
-										po.addLogFailed(String.format("Initialization failed, %s",
-												initCommand.getAllErrors()));
-									}
-								} else {
-									po.addLogFailed(String.format("Setting ZK cluster failed, %s",
-											setZkClusterCommand.getAllErrors()));
-								}
-							} else {
-								po.addLogFailed(
-										String.format("Setting slaves failed, %s", setSlavesCommand.getAllErrors()));
-							}
-						} else {
-							po.addLogFailed(
-									String.format("Setting tracers failed, %s", setTracersCommand.getAllErrors()));
-						}
-					} else {
-						po.addLogFailed(
-								String.format("Setting monitor failed, %s", setMonitorCommand.getAllErrors()));
-					}
-				} else {
-					po.addLogFailed(String.format("Setting gc node failed, %s", setGCNodeCommand.getAllErrors()));
-				}
-			} else {
-				po.addLogFailed(String.format("Setting master node failed, %s", setMasterCommand.getAllErrors()));
-			}
-		} else {
-			po.addLogFailed(String.format("Installation failed, %s", installCommand.getAllErrors()));
-		}
-	}
+                                            po.addLogDone( "Database information updated" );
+                                        }
+                                        catch ( DBException e )
+                                        {
+                                            po.addLogFailed( String.format( "Failed to update database information, %s",
+                                                e.getMessage() ) );
+                                        }
+                                    }
+                                    else
+                                    {
+                                        po.addLogFailed( String.format( "Initialization failed, %s",
+                                            initCommand.getAllErrors() ) );
+                                    }
+                                }
+                                else
+                                {
+                                    po.addLogFailed( String.format( "Setting ZK cluster failed, %s",
+                                        setZkClusterCommand.getAllErrors() ) );
+                                }
+                            }
+                            else
+                            {
+                                po.addLogFailed(
+                                    String.format( "Setting slaves failed, %s", setSlavesCommand.getAllErrors() ) );
+                            }
+                        }
+                        else
+                        {
+                            po.addLogFailed(
+                                String.format( "Setting tracers failed, %s", setTracersCommand.getAllErrors() ) );
+                        }
+                    }
+                    else
+                    {
+                        po.addLogFailed(
+                            String.format( "Setting monitor failed, %s", setMonitorCommand.getAllErrors() ) );
+                    }
+                }
+                else
+                {
+                    po.addLogFailed( String.format( "Setting gc node failed, %s", setGCNodeCommand.getAllErrors() ) );
+                }
+            }
+            else
+            {
+                po.addLogFailed( String.format( "Setting master node failed, %s", setMasterCommand.getAllErrors() ) );
+            }
+        }
+        else
+        {
+            po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
+        }
+    }
 }
