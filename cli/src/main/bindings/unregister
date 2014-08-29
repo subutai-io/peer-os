@@ -15,6 +15,7 @@ function unregister_usage {
 # -----------------------------------------------------------------------------
 # (1) perform sanity checks first
 #     - master cannot be unregistered
+#     - template should not exist
 #     - template shoud have been registered
 #     - template should not have child templates registered
 #     - template should not be being used by other FAI machines
@@ -37,6 +38,9 @@ function unregister {
     msg_error "master template cannot be unregistered"
     exit 1
   fi
+
+  lxc_assert_no $template
+  zfs_assert_nods lxc/$template
 
   if [ "`are_containers_locked_write $template`" == "true" ]
   then
@@ -61,20 +65,6 @@ function unregister {
     exit 1
   else
     msg_info "    - check passed: \"$template\" is registered"
-  fi
-
-  parent=`zfs_get_parent $template`
-
-  # check to make sure the parent is registered if container itself is not master
-  if [ $template != "master" -a "`is_registered $parent`" == "false" ]; then
-    msg_error "Parent \"$parent\" is NOT registered. Aborting ..."
-    unlock_container_write $template
-    if [ $? != 0 ]; then msg_error "Template \"$template\" cannot be unlocked!"
-      exit 1 
-    fi
-    exit 1
-  elif [ $template != "master" ]; then
-    msg_info "    - check passed: parent \"$parent\" is registered"
   fi
 
   # check to make sure no child templates registered
