@@ -31,18 +31,8 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean clone(String hostName, String templateName, String cloneName) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        List<Template> parents = templateRegistry.getParentTemplates(templateName);
-        for(Template p : parents) {
-            boolean temp_exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
-            String pack_name = getPackageNameForTemplate(p.getTemplateName());
-            if(!temp_exists) {
-                boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack_name);
-                if(!b) {
-                    logger.error("Failed to install parent templates: " + p.getTemplateName());
-                    return false;
-                }
-            }
-        }
+        if(!prepareTemplates(a, templateName)) return false;
+
         return scriptExecutor.execute(a, ActionType.CLONE, templateName, cloneName, " &");
         // TODO: script does not return w/o redirecting outputs!!!
         // for now, script is run in background
@@ -51,18 +41,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
     @Override
     public boolean clone(String hostName, String templateName, Set<String> cloneNames) {
         Agent a = agentManager.getAgentByHostname(hostName);
-        List<Template> parents = templateRegistry.getParentTemplates(templateName);
-        for(Template p : parents) {
-            boolean temp_exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
-            String pack_name = getPackageNameForTemplate(p.getTemplateName());
-            if(!temp_exists) {
-                boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack_name);
-                if(!b) {
-                    logger.error("Failed to install parent templates: " + p.getTemplateName());
-                    return false;
-                }
-            }
-        }
+        if(!prepareTemplates(a, templateName)) return false;
 
         boolean result = true;
         for(String cloneName : cloneNames) {
@@ -146,6 +125,31 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         boolean b = scriptExecutor.execute(a, ActionType.EXPORT, templateName);
         if(b) return getExportedPackageFilePath(a, templateName);
         return null;
+    }
+
+    private boolean prepareTemplates(Agent a, String templateName) {
+        // check parents first
+        List<Template> parents = templateRegistry.getParentTemplates(templateName);
+        for(Template p : parents) {
+            boolean exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
+            if(!exists) {
+                String pack = getPackageNameForTemplate(p.getTemplateName());
+                boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack);
+                if(!b) {
+                    logger.error("Failed to install parent templates: " + p.getTemplateName());
+                    return false;
+                }
+            }
+        }
+        // check template itself
+        if(!scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, templateName)) {
+            String pack = getPackageNameForTemplate(templateName);
+            if(!scriptExecutor.execute(a, ActionType.INSTALL, pack)) {
+                logger.error("Failed to install template: " + templateName);
+                return false;
+            }
+        }
+        return true;
     }
 
     private String getPackageNameForTemplate(String templateName) {

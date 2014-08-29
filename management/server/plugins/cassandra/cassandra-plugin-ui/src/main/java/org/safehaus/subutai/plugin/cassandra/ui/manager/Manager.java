@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
 import com.vaadin.data.Property;
@@ -92,7 +92,7 @@ public class Manager {
 					String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host").getValue();
 					Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname(lxcHostname);
 					if (lxcAgent != null) {
-						TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent),
+						TerminalWindow terminal = new TerminalWindow(Sets.newHashSet(lxcAgent),
                                 CassandraUI.getExecutor(),
                                 CassandraUI.getCommandRunner(),
                                 CassandraUI.getAgentManager());

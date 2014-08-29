@@ -12,14 +12,14 @@
 
   <reference id="mahoutManager" availability="mandatory" interface="org.safehaus.subutai.api.mahout.Mahout" />
 
-  <bean id="restService" class="org.safehaus.subutai.mahout.services.RestService">
+  <bean id="mahoutRestServiceImpl" class="org.safehaus.subutai.mahout.services.RestService">
     <property name="agentManager" ref="agentManager" />
     <property name="mahoutManager" ref="mahoutManager" />
   </bean>
 
   <jaxrs:server address="/mahout" id="mahoutRestService">
     <jaxrs:serviceBeans>
-      <ref component-id="restService" />
+      <ref component-id="mahoutRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
