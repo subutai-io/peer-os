@@ -67,7 +67,7 @@ function demote {
     if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
     exit 1
   else
-    msg_info "Demoting template \"$temp\" with no children."
+    msg_info "    - Demoting template \"$temp\" with no children."
   fi
 
   # actual code to demote the template here
