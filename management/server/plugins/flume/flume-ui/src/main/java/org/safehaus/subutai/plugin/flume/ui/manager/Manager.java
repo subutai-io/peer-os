@@ -12,7 +12,6 @@ import org.safehaus.subutai.server.ui.component.*;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 public class Manager {
 
@@ -299,9 +298,10 @@ public class Manager {
             public void itemClick(ItemClickEvent event) {
                 if(event.isDoubleClick()) {
                     String lxcHostname = (String)table.getItem(event.getItemId()).getItemProperty("Host").getValue();
-                    Agent lxcAgent = FlumeUI.getAgentManager().getAgentByHostname(lxcHostname);
-                    if(lxcAgent != null) {
-                        TerminalWindow terminal = new TerminalWindow(Util.wrapAgentToSet(lxcAgent), FlumeUI.getExecutor(), FlumeUI.getCommandRunner(), FlumeUI.getAgentManager());
+                    Agent agent = FlumeUI.getAgentManager().getAgentByHostname(lxcHostname);
+                    if(agent != null) {
+                        Set<Agent> set = new HashSet<>(Arrays.asList(agent));
+                        TerminalWindow terminal = new TerminalWindow(set, FlumeUI.getExecutor(), FlumeUI.getCommandRunner(), FlumeUI.getAgentManager());
                         contentRoot.getUI().addWindow(terminal.getWindow());
                     } else
                         show("Agent is not connected");

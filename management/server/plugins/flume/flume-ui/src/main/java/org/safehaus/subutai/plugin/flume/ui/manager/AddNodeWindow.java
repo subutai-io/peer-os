@@ -6,11 +6,10 @@ import com.vaadin.ui.*;
 import java.util.Set;
 import java.util.UUID;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
+import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
-import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 
 class AddNodeWindow extends Window {
 
@@ -146,7 +145,7 @@ class AddNodeWindow extends Window {
 	}
 
 	private void setOutput(String output) {
-		if (!Util.isStringEmpty(output)) {
+        if(output != null) {
 			outputTxtArea.setValue(output);
 			outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
 		}
