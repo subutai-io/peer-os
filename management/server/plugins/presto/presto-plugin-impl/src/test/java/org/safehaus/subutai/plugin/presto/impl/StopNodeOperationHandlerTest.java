@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
@@ -49,31 +50,6 @@ public class StopNodeOperationHandlerTest {
         ProductOperation po = handler.getProductOperation();
         System.out.println( po.getLog() );
         Assert.assertTrue(po.getLog().contains("not connected"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
-
-    @Test
-    public void testNodeAlreadyBelongsToCluster(){
-        PrestoClusterConfig config = new PrestoClusterConfig();
-        final Agent tmp1 = CommonMockBuilder.createAgent();
-        tmp1.setHostname( "test-host" );
-        final Agent tmp2 = CommonMockBuilder.createAgent();
-        tmp1.setHostname( "test-host2" );
-
-        Set<Agent> workers = new HashSet<Agent>() {{
-            add(tmp1);
-            add(tmp2);
-        }};
-
-        config.setWorkers( workers );
-        config.setCoordinatorNode( tmp2 );
-
-        mock.setClusterConfig( config );
-        handler.run();
-
-        ProductOperation po = handler.getProductOperation();
-        System.out.println( po.getLog() );
-        Assert.assertTrue(po.getLog().contains("belong"));
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 }
