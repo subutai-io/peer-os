@@ -15,7 +15,8 @@ enum ActionType {
     LIST_CONTAINERS("list -c"),
     LIST_CONT_TEMP("list"),
     // gets generated debian package name for template. TODO: find a better way
-    GET_PACKAGE_NAME(". /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name", true);
+    GET_DEB_PACKAGE_NAME(". /usr/share/subutai-cli/subutai/lib/deb_ops && get_debian_package_name", true),
+    GET_PACKAGE_NAME(". /usr/share/subutai-cli/subutai/lib/deb_ops && get_package_name", true);
 
     private static final String PARENT_DIR = "/usr/bin/subutai ";
     private final String script;

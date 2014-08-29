@@ -127,13 +127,31 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         return null;
     }
 
+    @Override
+    public String getPackageName(String templateName) {
+        Set<Agent> phys = agentManager.getPhysicalAgents();
+        if(phys.isEmpty()) {
+            logger.error("No physical agents connected");
+            return null;
+        }
+        Agent phy = phys.iterator().next();
+        String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
+        Command cmd = commandRunner.createCommand(new RequestBuilder(s),
+                new HashSet<>(Arrays.asList(phy)));
+        commandRunner.runCommand(cmd);
+
+        if(cmd.hasSucceeded())
+            return cmd.getResults().get(phy.getUuid()).getStdOut();
+        return null;
+    }
+
     private boolean prepareTemplates(Agent a, String templateName) {
         // check parents first
         List<Template> parents = templateRegistry.getParentTemplates(templateName);
         for(Template p : parents) {
             boolean exists = scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, p.getTemplateName());
             if(!exists) {
-                String pack = getPackageNameForTemplate(p.getTemplateName());
+                String pack = getPackageName(p.getTemplateName());
                 boolean b = scriptExecutor.execute(a, ActionType.INSTALL, pack);
                 if(!b) {
                     logger.error("Failed to install parent templates: " + p.getTemplateName());
@@ -143,18 +161,13 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         }
         // check template itself
         if(!scriptExecutor.execute(a, ActionType.LIST_TEMPLATES, templateName)) {
-            String pack = getPackageNameForTemplate(templateName);
+            String pack = getPackageName(templateName);
             if(!scriptExecutor.execute(a, ActionType.INSTALL, pack)) {
                 logger.error("Failed to install template: " + templateName);
                 return false;
             }
         }
         return true;
-    }
-
-    private String getPackageNameForTemplate(String templateName) {
-        // TODO: call get_package_name function in physical server
-        return templateName + "-subutai-template";
     }
 
     private String getExportedPackageFilePath(Agent a, String templateName) {
@@ -164,7 +177,7 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         AgentResult res = cmd.getResults().get(a.getUuid());
         if(res.getExitCode() != null && res.getExitCode() == 0) {
             String dir = res.getStdOut();
-            String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
+            String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand(templateName);
             cmd = commandRunner.createCommand(new RequestBuilder(s), set);
             commandRunner.runCommand(cmd);
             if(cmd.hasSucceeded()) {
@@ -177,4 +190,5 @@ public class TemplateManagerImpl extends TemplateManagerBase {
         }
         return null;
     }
+
 }
