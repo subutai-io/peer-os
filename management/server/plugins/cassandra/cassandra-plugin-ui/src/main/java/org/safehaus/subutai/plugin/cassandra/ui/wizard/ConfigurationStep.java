@@ -5,9 +5,9 @@
  */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.shared.protocol.Util;
 
 import java.util.Arrays;
 
@@ -120,9 +120,9 @@ public class ConfigurationStep extends VerticalLayout {
 		next.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				if (Util.isStringEmpty(wizard.getConfig().getClusterName())) {
+				if (Strings.isNullOrEmpty(wizard.getConfig().getClusterName())) {
 					show("Please provide cluster name");
-				} else if (Util.isStringEmpty(wizard.getConfig().getDomainName())) {
+				} else if (Strings.isNullOrEmpty(wizard.getConfig().getDomainName())) {
 					show("Please provide domain name");
 				} else {
 					wizard.next();

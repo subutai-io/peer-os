@@ -2,59 +2,63 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.safehaus.subutai</groupId>
-    <artifactId>oozie-plugin-parent</artifactId>
-    <version>2.0.0</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>oozie-plugin-parent</artifactId>
+        <version>2.0.0</version>
+    </parent>
 
-  <artifactId>oozie-plugin-ui</artifactId>
-  <name>Subutai Oozie Plugin UI</name>
-  <description>Subutai Oozie Plugin UI</description>
-  <packaging>bundle</packaging>
+    <artifactId>oozie-plugin-ui</artifactId>
+    <name>Subutai Oozie Plugin UI</name>
+    <description>Subutai Oozie Plugin UI</description>
+    <packaging>bundle</packaging>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mgmt-shared-protocol</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>vaadin-custom</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.safehaus.subutai</groupId>
-      <artifactId>agent-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>oozie-plugin-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hadoop-api</artifactId>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mgmt-shared-protocol</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>subutai-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vaadin-custom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>agent-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>oozie-plugin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>tracker-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hadoop-api</artifactId>
+        </dependency>
+    </dependencies>
 
   <build>
     <plugins>
@@ -63,7 +67,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.ui.oozie</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.ui.plugin.oozie</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

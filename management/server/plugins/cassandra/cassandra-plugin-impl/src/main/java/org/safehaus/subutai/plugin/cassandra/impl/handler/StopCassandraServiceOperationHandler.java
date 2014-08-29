@@ -3,6 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 import java.util.UUID;
 
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
@@ -11,7 +12,6 @@ import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Util;
 
 
 /**
@@ -44,7 +44,7 @@ public class StopCassandraServiceOperationHandler extends AbstractOperationHandl
 
 
             public void run() {
-                Command stopServiceCommand = Commands.getStopCommand( Util.wrapAgentToSet( agent ) );
+                Command stopServiceCommand = Commands.getStopCommand(Sets.newHashSet(agent) );
                 manager.getCommandRunner().runCommand( stopServiceCommand );
                 if ( stopServiceCommand.hasSucceeded() ) {
                     AgentResult ar = stopServiceCommand.getResults().get( agent.getUuid() );
