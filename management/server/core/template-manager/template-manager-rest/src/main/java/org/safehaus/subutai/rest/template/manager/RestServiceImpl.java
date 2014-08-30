@@ -118,19 +118,12 @@ public class RestServiceImpl implements RestService {
                 type(MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
     }
 
-    private String mergeLines(List<String> lines) {
-        StringBuilder sb = new StringBuilder();
-        for(String s : lines) {
-            sb.append(s).append(System.lineSeparator());
-        }
-        return sb.toString();
-    }
-
     @Override
     public Response unregister(String templateName) {
 
         try {
             templateRegistry.unregisterTemplate(templateName);
+            logger.info("Template unregistered: {}", templateName);
         } catch(RegistryException ex) {
             logger.error("Failed to unregister template", ex);
             return Response.serverError().build();
@@ -140,6 +133,7 @@ public class RestServiceImpl implements RestService {
         Agent mgmt = agentManager.getAgentByHostname(managementHostName);
         try {
             aptRepoManager.removePackageByName(mgmt, pack_name);
+            logger.info("Package removed from repository: {}", pack_name);
         } catch(AptRepoException ex) {
             logger.error("Failed to remove from repo", ex);
             return Response.serverError().build();

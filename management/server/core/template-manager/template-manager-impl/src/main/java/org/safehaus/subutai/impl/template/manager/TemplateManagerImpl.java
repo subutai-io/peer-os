@@ -129,19 +129,26 @@ public class TemplateManagerImpl extends TemplateManagerBase {
 
     @Override
     public String getPackageName(String templateName) {
+
+        // TODO: replace this hard-coded implementation. code below not running
+        boolean temp = true;
+        if(temp) return templateName + "-subutai-template";
+
         Set<Agent> phys = agentManager.getPhysicalAgents();
         if(phys.isEmpty()) {
             logger.error("No physical agents connected");
             return null;
         }
-        Agent phy = phys.iterator().next();
+        // run on each physical server one by one until we get successful result
         String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
-        Command cmd = commandRunner.createCommand(new RequestBuilder(s),
-                new HashSet<>(Arrays.asList(phy)));
-        commandRunner.runCommand(cmd);
+        for(Agent phy : phys) {
+            Command cmd = commandRunner.createCommand(new RequestBuilder(s),
+                    new HashSet<>(Arrays.asList(phy)));
+            commandRunner.runCommand(cmd);
 
-        if(cmd.hasSucceeded())
-            return cmd.getResults().get(phy.getUuid()).getStdOut();
+            if(cmd.hasSucceeded())
+                return cmd.getResults().get(phy.getUuid()).getStdOut();
+        }
         return null;
     }
 
