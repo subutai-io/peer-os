@@ -1,11 +1,10 @@
 package org.safehaus.subutai.rest.template.manager;
 
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
+import java.io.InputStream;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 public interface RestService {
 
@@ -28,6 +27,10 @@ public interface RestService {
 	@GET
 	@Path ("export/{template}")
 	@Produces ({MediaType.APPLICATION_OCTET_STREAM})
-	public Response exportTemplate(@PathParam ("template") String templateName);
+    public Response exportTemplate(@PathParam("template") String templateName);
+
+    @GET
+    @Path("unregister/{template}")
+    public Response unregister(@PathParam("template") String templateName);
 
 }
