@@ -4,9 +4,11 @@ import java.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.JsonUtil;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.plugin.flume.api.SetupType;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
 
 public class RestService {
@@ -60,6 +62,7 @@ public class RestService {
     ) {
 
         FlumeConfig config = new FlumeConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName(clusterName);
 
         String[] arr = nodes.split("[,;]");
@@ -71,6 +74,39 @@ public class RestService {
         UUID uuid = flumeManager.installCluster(config);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
+    }
+
+    @GET
+    @Path("install/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String install(@PathParam("name") String name,
+            @PathParam("hadoopName") String hadoopName,
+            @PathParam("slaveNodesCount") String slaveNodesCount,
+            @PathParam("replFactor") String replFactor,
+            @PathParam("domainName") String domainName) {
+
+        FlumeConfig config = new FlumeConfig();
+        config.setClusterName(name);
+        config.setHadoopClusterName(hadoopName);
+        config.setSetupType(SetupType.WITH_HADOOP);
+
+        HadoopClusterConfig hc = new HadoopClusterConfig();
+        hc.setClusterName(hadoopName);
+        if(domainName != null) hc.setDomainName(domainName);
+        try {
+            int i = Integer.parseInt(slaveNodesCount);
+            hc.setCountOfSlaveNodes(i);
+        } catch(NumberFormatException ex) {
+        }
+        try {
+            int i = Integer.parseInt(replFactor);
+            hc.setReplicationFactor(i);
+        } catch(NumberFormatException ex) {
+        }
+
+        UUID trackId = flumeManager.installCluster(config, hc);
+
+        return JsonUtil.toJson(OPERATION_ID, trackId);
     }
 
     @GET
