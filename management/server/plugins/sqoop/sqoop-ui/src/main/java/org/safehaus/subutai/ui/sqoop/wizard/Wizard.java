@@ -5,66 +5,66 @@ import com.vaadin.ui.GridLayout;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
 public class Wizard {
-	private final GridLayout grid;
-	private int step = 1;
-	private SqoopConfig config = new SqoopConfig();
 
-	public Wizard() {
-		grid = new GridLayout(1, 20);
-		grid.setMargin(true);
-		grid.setSizeFull();
+    private final GridLayout grid;
+    private int step = 1;
+    private SqoopConfig config = new SqoopConfig();
 
-		putForm();
-	}
+    public Wizard() {
+        grid = new GridLayout(1, 20);
+        grid.setMargin(true);
+        grid.setSizeFull();
 
-	private void putForm() {
-		grid.removeComponent(0, 1);
-		Component component = null;
-		switch (step) {
-			case 1: {
-				component = new WelcomeStep(this);
-				break;
-			}
-			case 2: {
-				component = new NodeSelectionStep(this);
-				break;
-			}
-			case 3: {
-				component = new VerificationStep(this);
-				break;
-			}
-			default: {
-				break;
-			}
-		}
+        putForm();
+    }
 
-		if (component != null) {
-			grid.addComponent(component, 0, 1, 0, 19);
-		}
-	}
+    private void putForm() {
+        grid.removeComponent(0, 1);
+        Component component = null;
+        switch(step) {
+            case 1: {
+                component = new WelcomeStep(this);
+                break;
+            }
+            case 2: {
+                component = new NodeSelectionStep(this);
+                break;
+            }
+            case 3: {
+                component = new VerificationStep(this);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
 
-	public Component getContent() {
-		return grid;
-	}
+        if(component != null)
+            grid.addComponent(component, 0, 1, 0, 19);
+    }
 
-	protected void next() {
-		step++;
-		putForm();
-	}
+    public Component getContent() {
+        return grid;
+    }
 
-	protected void back() {
-		step--;
-		putForm();
-	}
+    protected void next() {
+        step++;
+        putForm();
+    }
 
-	protected void init() {
-		step = 1;
-		config = new SqoopConfig();
-		putForm();
-	}
+    protected void back() {
+        step--;
+        putForm();
+    }
 
-	public SqoopConfig getConfig() {
-		return config;
-	}
+    protected void init() {
+        step = 1;
+        config = new SqoopConfig();
+        putForm();
+    }
+
+    public SqoopConfig getConfig() {
+        return config;
+    }
 
 }

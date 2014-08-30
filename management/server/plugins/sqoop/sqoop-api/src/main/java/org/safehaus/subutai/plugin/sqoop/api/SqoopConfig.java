@@ -8,7 +8,7 @@ import org.safehaus.subutai.shared.protocol.ConfigBase;
 public class SqoopConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Sqoop2";
-    public static final String TEMPLATE_NAME = "sqoop";
+    public static final String TEMPLATE_NAME = "hadoopsqoop";
     private String clusterName;
     private int nodesCount;
     private Set<Agent> nodes = new HashSet();

@@ -8,41 +8,41 @@ import org.safehaus.subutai.ui.sqoop.SqoopUI;
 
 public class WelcomeStep extends Panel {
 
-	public WelcomeStep(final Wizard wizard) {
+    public WelcomeStep(final Wizard wizard) {
 
-		setSizeFull();
+        setSizeFull();
 
-		GridLayout grid = new GridLayout(10, 6);
-		grid.setSpacing(true);
-		grid.setMargin(true);
-		grid.setSizeFull();
+        GridLayout grid = new GridLayout(10, 6);
+        grid.setSpacing(true);
+        grid.setMargin(true);
+        grid.setSizeFull();
 
-		Label welcomeMsg = new Label("<center><h2>Welcome to Sqoop Installation Wizard!</h2>");
-		welcomeMsg.setContentMode(ContentMode.HTML);
-		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
+        Label welcomeMsg = new Label("<center><h2>Welcome to Sqoop Installation Wizard!</h2>");
+        welcomeMsg.setContentMode(ContentMode.HTML);
+        grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
-		Label logoImg = new Label();
-		logoImg.setIcon(new FileResource(FileUtil.getFile(SqoopUI.MODULE_IMAGE, this)));
-		logoImg.setContentMode(ContentMode.HTML);
-		logoImg.setHeight(150, Unit.PIXELS);
-		logoImg.setWidth(150, Unit.PIXELS);
-		grid.addComponent(logoImg, 1, 3, 2, 5);
+        Label logoImg = new Label();
+        logoImg.setIcon(new FileResource(FileUtil.getFile(SqoopUI.MODULE_IMAGE, this)));
+        logoImg.setContentMode(ContentMode.HTML);
+        logoImg.setHeight(150, Unit.PIXELS);
+        logoImg.setWidth(150, Unit.PIXELS);
+        grid.addComponent(logoImg, 1, 3, 2, 5);
 
-		Button next = new Button("Start");
-		next.addStyleName("default");
-		next.setWidth(100, Unit.PIXELS);
-		grid.addComponent(next, 6, 4, 6, 4);
-		grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
+        Button next = new Button("Start");
+        next.addStyleName("default");
+        next.setWidth(100, Unit.PIXELS);
+        grid.addComponent(next, 6, 4, 6, 4);
+        grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-		next.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent event) {
-				wizard.init();
-				wizard.next();
-			}
-		});
+        next.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                wizard.init();
+                wizard.next();
+            }
+        });
 
-		setContent(grid);
-	}
+        setContent(grid);
+    }
 
 }

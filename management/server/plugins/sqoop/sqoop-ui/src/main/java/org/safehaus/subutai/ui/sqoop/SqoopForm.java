@@ -11,37 +11,37 @@ import org.safehaus.subutai.ui.sqoop.wizard.Wizard;
 
 public class SqoopForm extends CustomComponent {
 
-	private final Wizard wizard;
-	private final Manager manager;
+    private final Wizard wizard;
+    private final Manager manager;
 
-	private final TabSheet tabSheet;
+    private final TabSheet tabSheet;
 
-	public SqoopForm() {
-		manager = new Manager();
-		wizard = new Wizard();
+    public SqoopForm() {
+        manager = new Manager();
+        wizard = new Wizard();
 
-		setSizeFull();
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSpacing(true);
-		verticalLayout.setSizeFull();
+        setSizeFull();
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing(true);
+        verticalLayout.setSizeFull();
 
-		tabSheet = new TabSheet();
-		tabSheet.setSizeFull();
-		tabSheet.addTab(wizard.getContent(), "Install");
-		tabSheet.addTab(manager.getContent(), "Manage");
+        tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
+        tabSheet.addTab(wizard.getContent(), "Install");
+        tabSheet.addTab(manager.getContent(), "Manage");
 
-		verticalLayout.addComponent(tabSheet);
-		setCompositionRoot(verticalLayout);
-		manager.refreshClustersInfo();
-	}
+        verticalLayout.addComponent(tabSheet);
+        setCompositionRoot(verticalLayout);
+        manager.refreshClustersInfo();
+    }
 
-	public void addTab(ImportExportBase component) {
-		TabSheet.Tab tab = tabSheet.addTab(component);
-		if (component instanceof ExportPanel)
-			tab.setCaption("Export");
-		else if (component instanceof ImportPanel)
-			tab.setCaption("Import");
-		tabSheet.setSelectedTab(component);
-	}
+    public void addTab(ImportExportBase component) {
+        TabSheet.Tab tab = tabSheet.addTab(component);
+        if(component instanceof ExportPanel)
+            tab.setCaption("Export");
+        else if(component instanceof ImportPanel)
+            tab.setCaption("Import");
+        tabSheet.setSelectedTab(component);
+    }
 
 }
