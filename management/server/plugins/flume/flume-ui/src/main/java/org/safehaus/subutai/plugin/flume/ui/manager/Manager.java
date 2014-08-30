@@ -7,7 +7,6 @@ import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.*;
 import org.safehaus.subutai.shared.operation.ProductOperationState;
 import org.safehaus.subutai.shared.operation.ProductOperationView;
@@ -53,23 +52,19 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if(config != null) {
-                    HadoopClusterConfig info = FlumeUI.getHadoopManager().getCluster(config.getHadoopClusterName());
-                    if(info != null) {
-                        Set<Agent> nodes = new HashSet<>(info.getAllNodes());
-                        nodes.removeAll(config.getNodes());
-                        if(!nodes.isEmpty()) {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
-                            contentRoot.getUI().addWindow(addNodeWindow);
-                            addNodeWindow.addCloseListener(new Window.CloseListener() {
-                                @Override
-                                public void windowClose(Window.CloseEvent closeEvent) {
-                                    refreshClustersInfo();
-                                }
-                            });
-                        } else
-                            show("All nodes in corresponding Hadoop cluster have Flume installed");
+                    Set<Agent> nodes = new HashSet<>(config.getHadoopNodes());
+                    nodes.removeAll(config.getNodes());
+                    if(!nodes.isEmpty()) {
+                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                        contentRoot.getUI().addWindow(addNodeWindow);
+                        addNodeWindow.addCloseListener(new Window.CloseListener() {
+                            @Override
+                            public void windowClose(Window.CloseEvent closeEvent) {
+                                refreshClustersInfo();
+                            }
+                        });
                     } else
-                        show("Hadoop cluster info not found");
+                        show("All nodes in corresponding Hadoop cluster have Flume installed");
                 } else
                     show("Please, select cluster");
             }

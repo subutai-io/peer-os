@@ -90,15 +90,14 @@ public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
     private boolean destroyNodes(FlumeConfig config) {
         ProductOperation po = productOperation;
-        for(Agent a : config.getNodes()) {
-            try {
-                manager.getContainerManager().cloneDestroy(a.getParentHostName(), a.getHostname());
-                po.addLog(String.format("Container %s destroyed", a.getHostname()));
-            } catch(LxcDestroyException ex) {
-                String m = "Failed to destroy container " + a.getHostname();
-                po.addLog(m);
-                manager.getLogger().error(m, ex);
-            }
+        po.addLog("Destroying container(s)...");
+        try {
+            manager.getContainerManager().clonesDestroy(config.getHadoopNodes());
+            po.addLog("Container(s) successfully destroyed");
+        } catch(LxcDestroyException ex) {
+            String m = "Failed to destroy container(s)";
+            po.addLog(m);
+            manager.getLogger().error(m, ex);
         }
         return true;
     }

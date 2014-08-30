@@ -4,11 +4,9 @@ import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
 import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -46,12 +44,7 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 
     boolean addNode(FlumeConfig config, Agent agent) {
         ProductOperation po = this.productOperation;
-        HadoopClusterConfig hc = manager.getHadoopManager().getCluster(config.getHadoopClusterName());
-        if(hc == null) {
-            po.addLog(String.format("Hadoop cluster '%s' not found", config.getHadoopClusterName()));
-            return false;
-        }
-        if(!hc.getAllNodes().contains(agent)) {
+        if(!config.getHadoopNodes().contains(agent)) {
             po.addLog("Node does not belong to Hadoop cluster");
             return false;
         }
@@ -73,12 +66,8 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             return false;
         }
         boolean installed = res.getStdOut().contains(Commands.PACKAGE_NAME);
-        if(!installed && config.getSetupType() == SetupType.WITH_HADOOP) {
-            po.addLog("Flume not installed on " + hostname);
-            return false;
-        }
 
-        if(!installed && config.getSetupType() == SetupType.OVER_HADOOP) {
+        if(!installed) {
             po.addLog("Installing Flume...");
             cmd = manager.getCommandRunner().createCommand(
                     new RequestBuilder(Commands.make(CommandType.INSTALL)).withTimeout(180),

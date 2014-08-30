@@ -36,8 +36,9 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
         if(environment.getNodes() == null || environment.getNodes().isEmpty())
             throw new ClusterSetupException("Environment has no nodes");
 
-        Set<Agent> flumeNodes = new HashSet<>();
+        Set<Agent> flumeNodes = new HashSet<>(), allNodes = new HashSet<>();
         for(Node n : environment.getNodes()) {
+            allNodes.add(n.getAgent());
             if(n.getTemplate().getProducts().contains(Commands.PACKAGE_NAME))
                 flumeNodes.add(n.getAgent());
         }
@@ -45,6 +46,7 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
             throw new ClusterSetupException("Environment has no nodes with Flume installed");
 
         config.setNodes(flumeNodes);
+        config.setHadoopNodes(allNodes);
 
         for(Agent a : config.getNodes()) {
             if(manager.agentManager.getAgentByHostname(a.getHostname()) == null)

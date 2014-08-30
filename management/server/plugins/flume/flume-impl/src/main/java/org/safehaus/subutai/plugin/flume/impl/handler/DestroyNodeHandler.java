@@ -3,9 +3,7 @@ package org.safehaus.subutai.plugin.flume.impl.handler;
 import java.util.*;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;
 import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
@@ -47,20 +45,7 @@ public class DestroyNodeHandler extends AbstractOperationHandler<FlumeImpl> {
             return;
         }
 
-        boolean ok = false;
-        if(config.getSetupType() == SetupType.OVER_HADOOP)
-            ok = uninstallFlume(agent);
-        else if(config.getSetupType() == SetupType.WITH_HADOOP)
-            try {
-                manager.getContainerManager().cloneDestroy(
-                        agent.getParentHostName(), agent.getHostname());
-                ok = true;
-            } catch(LxcDestroyException ex) {
-                String m = "Failed to destroy " + agent.getHostname();
-                po.addLog(m);
-                manager.getLogger().error(m, ex);
-            }
-        else po.addLog("Unsupported setup type: " + config.getSetupType());
+        boolean ok = uninstallFlume(agent);
 
         if(ok) {
             po.addLog("Updating db...");

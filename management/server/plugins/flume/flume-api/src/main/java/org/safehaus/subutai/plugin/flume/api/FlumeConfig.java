@@ -14,6 +14,7 @@ public class FlumeConfig implements ConfigBase {
     private SetupType setupType;
     private String hadoopClusterName;
     private Set<Agent> nodes = new HashSet();
+    private Set<Agent> hadoopNodes = new HashSet<>();
 
     @Override
     public String getClusterName() {
@@ -51,6 +52,14 @@ public class FlumeConfig implements ConfigBase {
 
     public void setNodes(Set<Agent> nodes) {
         this.nodes = nodes;
+    }
+
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
+    }
+
+    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+        this.hadoopNodes = hadoopNodes;
     }
 
     @Override
