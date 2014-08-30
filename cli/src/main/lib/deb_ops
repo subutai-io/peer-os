@@ -34,6 +34,19 @@
 #	NOTE: Debian package will be created under $SUBUTAI_TMPDIR directory
 #
 
+# Set TMPDIR variable to enfore dpkg-deb to use the specified directory while building the debian package for its temporary files
+export TMPDIR="/var"
+
+function is_dpkg_locked {
+  lsof /var/lib/dpkg/lock > /dev/null 2>&1
+  if [ $? == 0 ]
+  then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
 function deb_pkg {
   local lxc="$1"
   
@@ -173,13 +186,28 @@ function create_postinst_script {
   local postinst_file=$debian_dir/DEBIAN/postinst
   echo "#!/bin/bash"  >> $postinst_file
   echo ""  >> $postinst_file
+  echo "subutai_lib_base=/usr/share/subutai-cli/subutai/lib" >> $postinst_file
+  echo "subutai_conf_base=/etc/subutai" >> $postinst_file
+  echo "subutai_binding_base=/etc/subutai/bindings" >> $postinst_file
+  echo ". \$subutai_lib_base/funcs" >> $postinst_file
   echo "export APT_GET_INVOCATION=true" >> $postinst_file
+  
+  echo "# Check if lxc already exists" >> $postinst_file
+  echo "\`lxc_assert_no $lxc > /dev/null 2>&1\`" >> $postinst_file
+  echo "lxc_status=\$?" >> $postinst_file
+  echo "\`zfs_assert_nods \"lxc/$lxc\" > /dev/null 2>&1\`" >> $postinst_file
+  echo "dataset_status=\$?" >> $postinst_file
+  echo "if [ \$lxc_status -eq 0 ] && [ \$dataset_status -eq 0 ]; then" >> $postinst_file
   # Check if the template is master
   if [ $lxc != "master" ]; then
-    echo "subutai import $lxc" >> $postinst_file
+    echo "  subutai import $lxc" >> $postinst_file
   else
-    echo "subutai master_import"  >> $postinst_file
+    echo "  subutai master_import"  >> $postinst_file
   fi
+  echo "fi" >> $postinst_file
+  echo "if [ -d \"\$SUBUTAI_TMPDIR/$lxc\" ]; then" >> $postinst_file
+  echo "  rm -r \$SUBUTAI_TMPDIR/$lxc" >> $postinst_file
+  echo "fi" >> $postinst_file
   chmod 755 $postinst_file
 }
 
@@ -193,13 +221,13 @@ function create_prerm_script {
   local prerm_file=$debian_dir/DEBIAN/prerm
   echo "#!/bin/bash"  >> $prerm_file
   echo ""  >> $prerm_file
-  echo "export APT_GET_INVOCATION=true" >> $prerm_file
+  #echo "export APT_GET_INVOCATION=true" >> $prerm_file
   # Check if the template is master
-  if [ $lxc != "master" ]; then
-    echo "subutai destroy $lxc" >> $prerm_file
-  else
-    echo "subutai master_destroy" >> $prerm_file
-  fi
+  #if [ $lxc != "master" ]; then
+  #  echo "subutai destroy $lxc" >> $prerm_file
+  #else
+  #  echo "subutai master_destroy" >> $prerm_file
+  #fi
   chmod 755 $prerm_file
 }
 
@@ -236,5 +264,5 @@ function is_package_installed {
     msg_error "package name is not provided. Aborting ..."
     exit 1
   fi
-  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^i'
+  dpkg-query -Wf'${db:Status-abbrev}' $1 2>/dev/null | grep -q '^ii'
 }

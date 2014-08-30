@@ -5,6 +5,28 @@
 # --------------------------------------------------------------------------
 
 
+# returns the children of the provided container(arg $1)
+function zfs_get_children_list {
+  local parent="$1"
+  local snap=
+
+  # we got a dataset instead of a clone name
+  if [ -n "`echo $parent | egrep 'lxc.*/'`" ]; then
+    snap="$parent@template"
+  else
+    snap="lxc/$parent@template"
+  fi
+  local count=0
+  for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
+  do
+    children_list[$count]=`zfs_ctnr_from_ds $ds`
+    count=`expr $count + 1`
+  done
+
+  echo ${children_list[*]}
+}
+
+
 # prints out the children for a ds or container name (arg $1)
 # counts and prints out the children
 # returns the child count
@@ -22,7 +44,7 @@ function zfs_get_children {
   local count=0
   for ds in `zfs get origin | grep $snap | awk '{print $1}' | grep -v $snap`
   do
-    msg_notice "        -> \"`zfs_ctnr_from_ds $ds`\" is a child of $parent"
+    msg_info "        -> \"`zfs_ctnr_from_ds $ds`\" is a child of $parent"
     count=`expr $count + 1`
   done
 

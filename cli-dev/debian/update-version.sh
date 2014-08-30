@@ -62,7 +62,7 @@ function checkCommitsForPath {
     # Get list of files of this commit
     files=$(git diff-tree --no-commit-id --name-only -r $commit)
     # Check if there are changed files under the specified path
-    changedFiles=$(echo $files | grep ^$absPath/)
+    changedFiles=$(echo $files | grep $absPath/)
     if [ -n "$changedFiles" ]; then
       isChanged="true"
       break;

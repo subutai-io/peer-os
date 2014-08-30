@@ -4,45 +4,109 @@
 function master_import {
   # Check for Master Existence
   # ---------------------------------------------------------------------------
-
-  lxc_assert_no master
-  zfs_assert_nods "lxc/master"
+  
+  local container="master"
+  local debian_package_name=`get_debian_package_name $container`
+  local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
+  local package_name=`get_package_name $container`
+  
+  lxc_assert_no $container
+  zfs_assert_nods "lxc/$container"
 
   # Create the container
   # ---------------------------------------------------------------------------
 
-  local container="master"
-  debian_root=$SUBUTAI_TMPDIR/$container
-  config=$debian_root/config
-  fstab=$debian_root/fstab
-  deltas=$debian_root/deltas
-  
-  msg_info "APT_GET_INVOCATION: $APT_GET_INVOCATION"
-  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    msg_info "subutai master_import called from command line"
-    local debian_package_name=`get_debian_package_name $container`
-    local debian_file="$SUBUTAI_TMPDIR/$debian_package_name.deb"
-    local package_name=`get_package_name $container`
+  if [ -f "$debian_file" ]; then
+    is_local="true"
+  else
+    is_local="false"
+  fi
 
-    if [ ! -f "$debian_file" ]; then
-      msg_error "Could not find template file \"$debian_file\". Aborting ..."
+  if [ $is_local == "true" ]; then
+    if [ "`are_md5sums_equal $container`" == true ];then
+      msg_info "    - check passed: local \"$container\" package is same with the registered package"
+    elif [ "`is_registered $container`" == true -a "`are_md5sums_equal $container`" == false  ]; then
+      msg_error "A template $container is already registered and it is different from your local package. Try \"rm -rf $SUBUTAI_TMPDIR/$container-*\" and import again"
       exit 1
     fi
+  else
+      # check to make sure container is registered as a template
+    if [ "`is_registered $container`" == "false" ]; then
+      msg_error "A template with name \"$container\" is NOT registered. Aborting ..."
+      exit 1
+    else
+      msg_info "    - check passed: \"$container\" is registered"
+    fi
+  fi
+
+
+  # ----------------------------------------------------------------------------
+  # (2) Install the debian package if subutai import not called during a debian package installation
+  # ----------------------------------------------------------------------------
+
+  if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
+    msg_info "subutai master_import called from command line"
+    
+    if [ "`is_system_all_locked`" == "true" ]; then
+      msg_error "System locked by a subutai process"
+      exit 1
+    fi
+
+    lock_subutai_system
+    if [ $? != 0 ]; then msg_error "System cannot be locked!"; exit 1; fi
 
     pushd $SUBUTAI_TMPDIR > /dev/null
     is_package_installed $package_name
     if [ $? = 0  ]; then
       msg_error "Template $container seems already installed, please destroy first"
+      unlock_subutai_system
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
       exit 1
     fi
 
-    dpkg -i $debian_file
-    if [ $? -eq 0 ]; then
-      msg_ok "Debian package of $package_name is installed succesfully"
-      exit 0
+    if [ "`is_dpkg_locked`" == "true" ]; then
+      msg_error "$1 import FAILED! dpkg is locked by process!"
+      unlock_subutai_system
+      if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+      exit 1
+    fi
+
+    if [ "$is_local" == "true" ]
+    then
+      dpkg -i $debian_file
+      if [ $? -eq 0 ]; then
+        msg_ok "Debian package of $package_name is installed succesfully from local"
+        unlock_subutai_system
+        if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+        exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_subutai_system
+        if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+	subutai master_destroy
+        apt-get --assume-yes --force-yes purge $package_name
+        exit 1
+      fi
+    elif [ "`is_registered $container`" == "true" ]
+    then
+      apt-get --assume-yes --force-yes install $package_name
+      if [ $? -eq 0 ]; then
+        msg_ok "Debian package of $package_name is installed succesfully from repo"
+        unlock_subutai_system
+        if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+	exit 0
+      else
+        msg_error "Debian package of $package_name could not be installed, removing"
+        unlock_subutai_system
+        if [ $? != 0 ]; then msg_error "System cannot be unlocked!"; exit 1; fi
+	subutai destroy $container
+        apt-get --assume-yes --force-yes purge $package_name
+	exit 1
+      fi
     else
-      msg_error "Debian package of $package_name could not be installed, removing"
-      subutai master_destroy
+      msg_error "Package $package_name is not found!"
+      unlock_container_read $container
+      if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
       exit 1
     fi
     popd
@@ -50,7 +114,10 @@ function master_import {
     msg_info "subutai master_import called while installing master from the debian package"
   fi
 
-
+  debian_root=$SUBUTAI_TMPDIR/$container
+  config=$debian_root/config
+  fstab=$debian_root/fstab
+  deltas=$debian_root/deltas
   lxc_home=/var/lib/lxc/master
   lxc_rootfs=$lxc_home/rootfs
   mkdir -p $lxc_rootfs
@@ -63,7 +130,7 @@ function master_import {
   zfs set mountpoint=$lxc_rootfs lxc/master
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-    msg_ok "Imported $size delta for rootfs"
+    msg_info "Imported $size delta for rootfs"
   else
     msg_error "Delta import for rootfs failed"
   fi
@@ -72,7 +139,7 @@ function master_import {
   zfs hold keep lxc/master-opt@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-    msg_ok "Imported $size delta for opt"
+    msg_info "Imported $size delta for opt"
   else
     msg_error "Delta import for opt failed"
   fi
@@ -81,7 +148,7 @@ function master_import {
   zfs hold keep lxc-data/master-var@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-    msg_ok "Imported $size delta for var"
+    msg_info "Imported $size delta for var"
   else
     msg_error "Delta import for var failed"
   fi
@@ -90,13 +157,14 @@ function master_import {
   zfs hold keep lxc-data/master-home@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-    msg_ok "Imported $size delta for home"
+    msg_info "Imported $size delta for home"
   else
     msg_error "Delta generation for opt failed"
   fi
 
-  msg_ok "Master import from debian package is successful"
-  rm -rf $debian_root
+  if [ -d $debian_root ]; then
+    rm -rf $debian_root
+  fi
   exit 0
 }
 
