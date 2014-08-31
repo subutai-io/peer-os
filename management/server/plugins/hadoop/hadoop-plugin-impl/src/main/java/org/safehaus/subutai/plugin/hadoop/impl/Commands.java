@@ -15,7 +15,7 @@ public class Commands {
 	public static Command getInstallCommand(HadoopClusterConfig hadoopClusterConfig) {
 		return HadoopImpl.getCommandRunner().createCommand(
 				"Installing hadoop deb package",
-				new RequestBuilder("sleep 10;" +
+				new RequestBuilder("sleep 30;" +
 						"apt-get --force-yes --assume-yes install ksks-hadoop")
 						.withTimeout(180),
 				Sets.newHashSet(hadoopClusterConfig.getAllNodes())

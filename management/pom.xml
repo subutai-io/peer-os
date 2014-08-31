@@ -116,7 +116,6 @@
     <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
     <org.doomdark.version>1.1.2</org.doomdark.version>
     <org.jsoup.version>1.6.3</org.jsoup.version>
-    <!--<org.eclipse.jetty.orbit.version>2.5.0.v201103041518</org.eclipse.jetty.orbit.version>-->
     <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
     <org.mockito.version>1.9.5</org.mockito.version>
     <org.osgi.version>4.3.1</org.osgi.version>
