@@ -20,6 +20,10 @@ import java.util.Set;
 public class Commands extends CommandsSingleton
 {
 
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
+
     public static Command getInstallCommand( Set<Agent> agents )
     {
         return createCommand(

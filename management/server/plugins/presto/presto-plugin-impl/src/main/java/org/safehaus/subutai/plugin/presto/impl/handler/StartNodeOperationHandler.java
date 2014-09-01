@@ -41,6 +41,7 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<PrestoIm
     @Override
     public void run()
     {
+        productOperation = po;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

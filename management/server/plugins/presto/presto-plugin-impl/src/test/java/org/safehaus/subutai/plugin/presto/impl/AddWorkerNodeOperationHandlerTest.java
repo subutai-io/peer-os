@@ -42,28 +42,13 @@ public class AddWorkerNodeOperationHandlerTest {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName( "test-cluster" );
         config.setWorkers( new HashSet< Agent >( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
-        mock.setClusterConfig( config );
-
-        handler.run();
-
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
-
-    @Test
-    public void testWithExistingClusterWithConnectedAgents() {
-        PrestoClusterConfig config = new PrestoClusterConfig();
-        config.setClusterName( "test-cluster" );
-        config.setWorkers( new HashSet< Agent >( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setCoordinatorNode( CommonMockBuilder.createAgent() );
         mock.setClusterConfig( config );
 
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        System.out.println( po.getLog() );
-        Assert.assertTrue(po.getLog().toLowerCase().contains("test-host"));
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not connected"));
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 }

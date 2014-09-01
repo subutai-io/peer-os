@@ -42,6 +42,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
     @Override
     public void run()
     {
+        productOperation = po;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

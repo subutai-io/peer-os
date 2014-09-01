@@ -39,6 +39,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
     @Override
     public void run()
     {
+        productOperation = po;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {

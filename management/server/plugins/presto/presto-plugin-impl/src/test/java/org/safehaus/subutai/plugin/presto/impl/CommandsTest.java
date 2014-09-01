@@ -15,7 +15,7 @@ public class CommandsTest {
 
     @BeforeClass
     public static void setUp() {
-        commands = new Commands(new CommandRunnerMock());
+        commands = new Commands( new CommandRunnerMock() );
     }
 
 
@@ -23,10 +23,42 @@ public class CommandsTest {
     public void testInstallCommand() {
         Command command = commands.getInstallCommand( null );
 
+
         assertNotNull(command);
         assertEquals("apt-get --force-yes --assume-yes install ksks-presto", command.getDescription() );
     }
 
+    @Test
+    public void getStartCommand() {
+        Command command = commands.getStartCommand( null );
+
+        assertNotNull( command );
+        assertEquals( "service presto start", command.getDescription() );
+    }
+
+    @Test
+    public void getRestartCommand() {
+        Command command = commands.getRestartCommand( null );
+
+        assertNotNull( command );
+        assertEquals( "service presto restart", command.getDescription() );
+    }
+
+    @Test
+    public void getStatusCommand() {
+        Command command = commands.getStatusCommand( null );
+
+        assertNotNull( command );
+        assertEquals( "service presto status", command.getDescription() );
+    }
+
+    @Test
+    public void getStopCommand() {
+        Command command = commands.getStopCommand( null );
+
+        assertNotNull( command );
+        assertEquals( "service presto stop", command.getDescription() );
+    }
 
     @Test
     public void testUninstallCommand() {
