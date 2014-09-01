@@ -9,7 +9,7 @@ package org.safehaus.subutai.ui.mongodb.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.common.StringUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 
 import java.util.Arrays;
 

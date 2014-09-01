@@ -12,9 +12,9 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
+import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.UUID;
 
@@ -166,7 +166,7 @@ public class AgentManagerImplUT {
 
 		assertFalse(agentManager.getAgents().isEmpty());
 
-		when(response.getType()).thenReturn(ResponseType.AGENT_DISCONNECT);
+		when(response.getType()).thenReturn( ResponseType.AGENT_DISCONNECT);
 		//disconnecting agent
 		agentManager.onResponse(response);
 

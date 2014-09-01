@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;
 

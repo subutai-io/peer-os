@@ -14,7 +14,7 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.dis.manager.manage.BlueprintLoadForm;
 import org.safehaus.subutai.dis.manager.manage.BlueprintsForm;
 import org.safehaus.subutai.dis.manager.manage.EnvironmentsForm;
-import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.common.protocol.Disposable;
 
 
 /**

@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.plugin.flume.impl.handler.DestroyNodeHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.junit.*;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
-import org.safehaus.subutai.shared.operation.*;
+
 
 public class DestroyNodeHandlerTest {
 

@@ -7,8 +7,8 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.impl.zookeeper.Commands;
 import org.safehaus.subutai.impl.zookeeper.ZookeeperImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 
 public class StartStandalone extends AbstractOperationHandler<ZookeeperImpl> {
 

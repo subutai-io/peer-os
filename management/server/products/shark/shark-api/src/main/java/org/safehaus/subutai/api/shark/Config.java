@@ -5,8 +5,8 @@
  */
 package org.safehaus.subutai.api.shark;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.Set;
 

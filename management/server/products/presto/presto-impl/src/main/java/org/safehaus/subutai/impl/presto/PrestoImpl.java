@@ -13,7 +13,7 @@ import org.safehaus.subutai.api.presto.Config;
 import org.safehaus.subutai.api.presto.Presto;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.presto.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

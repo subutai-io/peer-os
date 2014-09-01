@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**

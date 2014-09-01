@@ -1,14 +1,16 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import java.util.Date;
 import java.util.UUID;
 
 
-public class ProductOperationMock implements ProductOperation {
+public class ProductOperationMock implements ProductOperation
+{
 	private final StringBuilder log = new StringBuilder();
 
 	private ProductOperationState state = ProductOperationState.RUNNING;

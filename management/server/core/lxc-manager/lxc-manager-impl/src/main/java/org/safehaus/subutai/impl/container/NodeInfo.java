@@ -1,6 +1,6 @@
 package org.safehaus.subutai.impl.container;
 
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.Set;
 import java.util.UUID;

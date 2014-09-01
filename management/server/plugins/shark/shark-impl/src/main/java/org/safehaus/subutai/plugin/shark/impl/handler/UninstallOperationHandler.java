@@ -2,19 +2,20 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.shark.api.Config;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
 /**
  * Created by dilshat on 5/7/14.
  */
-public class UninstallOperationHandler extends AbstractOperationHandler<SharkImpl> {
+public class UninstallOperationHandler extends AbstractOperationHandler<SharkImpl>
+{
 	private final ProductOperation po;
 
 	public UninstallOperationHandler(SharkImpl manager, String clusterName) {

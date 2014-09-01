@@ -8,7 +8,7 @@ import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.api.hive.Hive;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;

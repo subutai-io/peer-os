@@ -2,7 +2,7 @@ package org.safehaus.subutai.api.sqoop;
 
 import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
 import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
 

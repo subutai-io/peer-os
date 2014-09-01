@@ -2,12 +2,12 @@ package org.safehaus.subutai.ui.monitoring;
 
 
 import com.vaadin.ui.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.monitoring.component.AgentTree;
 import org.safehaus.subutai.ui.monitoring.util.UIUtil;
 
@@ -75,7 +75,7 @@ public class ModuleView extends CustomComponent {
 	private void addDateFields(AbsoluteLayout layout) {
 
 		Date endDate = new Date();
-		Date startDate = DateUtils.addHours(endDate, -1);
+		Date startDate = DateUtils.addHours( endDate, -1 );
 
 		startDateField = UIUtil.addDateField(layout, "From:", "left: 20px; top: 50px;", startDate);
 		endDateField = UIUtil.addDateField(layout, "To:", "left: 20px; top: 100px;", endDate);
@@ -143,7 +143,7 @@ public class ModuleView extends CustomComponent {
 
 		boolean success = true;
 
-		if (StringUtils.isEmpty(host)) {
+		if ( StringUtils.isEmpty( host )) {
 			Notification.show("Please select a node");
 			success = false;
 		} else if (metric == null) {

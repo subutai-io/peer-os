@@ -4,8 +4,8 @@ package org.safehaus.subutai.ui.monitoring;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.monitoring.Monitor;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 
 import java.io.File;
 
@@ -32,7 +32,7 @@ public class MonitoringModule implements PortalModule {
 
 	@Override
 	public File getImage() {
-		return FileUtil.getFile(MonitoringModule.MODULE_IMAGE, this);
+		return FileUtil.getFile( MonitoringModule.MODULE_IMAGE, this );
 	}
 
 

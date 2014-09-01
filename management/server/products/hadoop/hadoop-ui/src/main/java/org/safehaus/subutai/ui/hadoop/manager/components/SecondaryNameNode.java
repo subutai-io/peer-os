@@ -1,8 +1,8 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
 
 import java.util.UUID;

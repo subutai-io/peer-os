@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.strategy;
 
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.*;
 

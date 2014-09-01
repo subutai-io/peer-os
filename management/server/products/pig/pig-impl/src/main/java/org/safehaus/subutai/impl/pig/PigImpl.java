@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.pig.Pig;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.pig.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.pig.handler.InstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

@@ -6,10 +6,10 @@
 package org.safehaus.subutai.ui.zookeeper.manager;
 
 import org.safehaus.subutai.api.zookeeper.Config;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.ui.zookeeper.ZookeeperUI;
 
 import java.util.UUID;

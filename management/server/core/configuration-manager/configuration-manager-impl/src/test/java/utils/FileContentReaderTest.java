@@ -3,7 +3,7 @@ package utils;
 
 import org.junit.Test;
 import org.safehaus.subutai.configuration.manager.impl.utils.FileContentReader;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 
 /**

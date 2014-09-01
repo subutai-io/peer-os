@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.hadoop.operation;
 
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 
 import java.util.HashSet;
 import java.util.UUID;

@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class CommandsMock extends Commands {

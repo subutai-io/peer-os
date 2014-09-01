@@ -28,6 +28,7 @@
         <module>mahout</module>
         <module>cassandra</module>
         <module>oozie</module>
+        <module>plugin-common</module>
     </modules>
 
 </project>

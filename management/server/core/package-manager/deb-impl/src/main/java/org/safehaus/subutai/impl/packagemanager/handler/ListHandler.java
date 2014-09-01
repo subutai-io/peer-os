@@ -9,7 +9,7 @@ import org.safehaus.subutai.impl.packagemanager.info.DebPackageInfo;
 import org.safehaus.subutai.impl.packagemanager.info.PackageFlag;
 import org.safehaus.subutai.impl.packagemanager.info.PackageState;
 import org.safehaus.subutai.impl.packagemanager.info.SelectionState;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

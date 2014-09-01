@@ -6,17 +6,17 @@
 package org.safehaus.subutai.plugin.solr.api;
 
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
-
-public class SolrClusterConfig implements ConfigBase {
+public class SolrClusterConfig implements ConfigBase
+{
 
     public static final String PRODUCT_KEY = "Solr2";
     public static final String PRODUCT_NAME = "solr";
@@ -26,57 +26,67 @@ public class SolrClusterConfig implements ConfigBase {
     private Set<Agent> nodes = new HashSet<>();
 
 
-    public String getClusterName() {
+    public String getClusterName()
+    {
         return clusterName;
     }
 
 
-    public SolrClusterConfig setClusterName( String clusterName ) {
+    public SolrClusterConfig setClusterName( String clusterName )
+    {
         this.clusterName = clusterName;
         return this;
     }
 
 
-    public String getTemplateName() {
+    public String getTemplateName()
+    {
         return templateName;
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName( final String templateName )
+    {
         this.templateName = templateName;
     }
 
 
-    public void setNumberOfNodes( final int numberOfNodes ) {
-        this.numberOfNodes = numberOfNodes;
-    }
-
-
     @Override
-    public String getProductName() {
+    public String getProductName()
+    {
         return PRODUCT_KEY;
     }
 
 
-    public int getNumberOfNodes() {
+    public int getNumberOfNodes()
+    {
         return numberOfNodes;
     }
 
 
-    public Set<Agent> getNodes() {
+    public void setNumberOfNodes( final int numberOfNodes )
+    {
+        this.numberOfNodes = numberOfNodes;
+    }
+
+
+    public Set<Agent> getNodes()
+    {
         return nodes;
     }
 
 
-    public void setNodes( final Set<Agent> nodes ) {
+    public void setNodes( final Set<Agent> nodes )
+    {
         this.nodes = nodes;
     }
 
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "clusterName", clusterName )
-                                                                            .append( "numberOfNodes", numberOfNodes )
-                                                                            .append( "nodes", nodes ).toString();
+            .append( "numberOfNodes", numberOfNodes )
+            .append( "nodes", nodes ).toString();
     }
 }

@@ -5,8 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.MockBuilder;
 import org.safehaus.subutai.plugin.solr.impl.handler.mock.SolrImplMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
