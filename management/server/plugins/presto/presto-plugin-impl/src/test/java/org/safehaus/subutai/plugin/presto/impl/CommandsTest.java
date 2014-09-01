@@ -23,7 +23,6 @@ public class CommandsTest {
     public void testInstallCommand() {
         Command command = commands.getInstallCommand( null );
 
-
         assertNotNull(command);
         assertEquals("apt-get --force-yes --assume-yes install ksks-presto", command.getDescription() );
     }
