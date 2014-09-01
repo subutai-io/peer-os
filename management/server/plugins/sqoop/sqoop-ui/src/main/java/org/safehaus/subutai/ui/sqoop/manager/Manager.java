@@ -187,10 +187,12 @@ public class Manager {
                     alert.getOk().addClickListener(new Button.ClickListener() {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
-                            UUID trackID = SqoopUI.getManager().destroyNode(
+                            UUID trackId = SqoopUI.getManager().destroyNode(
                                     config.getClusterName(),
                                     agent.getHostname());
-                            ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, SqoopConfig.PRODUCT_KEY);
+                            ProgressWindow window = new ProgressWindow(
+                                    SqoopUI.getExecutor(), SqoopUI.getTracker(),
+                                    trackId, SqoopConfig.PRODUCT_KEY);
                             window.getWindow().addCloseListener(new Window.CloseListener() {
                                 @Override
                                 public void windowClose(Window.CloseEvent closeEvent) {

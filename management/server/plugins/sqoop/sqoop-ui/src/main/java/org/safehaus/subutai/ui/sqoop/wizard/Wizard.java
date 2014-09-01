@@ -2,6 +2,7 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 
 public class Wizard {
@@ -9,6 +10,7 @@ public class Wizard {
     private final GridLayout grid;
     private int step = 1;
     private SqoopConfig config = new SqoopConfig();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
     public Wizard() {
         grid = new GridLayout(1, 20);
@@ -60,11 +62,16 @@ public class Wizard {
     protected void init() {
         step = 1;
         config = new SqoopConfig();
+        hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 
     public SqoopConfig getConfig() {
         return config;
+    }
+
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
     }
 
 }

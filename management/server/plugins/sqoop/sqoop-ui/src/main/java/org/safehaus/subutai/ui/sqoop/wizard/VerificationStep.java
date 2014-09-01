@@ -3,6 +3,8 @@ package org.safehaus.subutai.ui.sqoop.wizard;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import java.util.UUID;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -23,10 +25,19 @@ public class VerificationStep extends Panel {
                 + "(you may change them by clicking on Back button)</strong><br/>");
         confirmationLbl.setContentMode(ContentMode.HTML);
 
+        final SqoopConfig config = wizard.getConfig();
+        final HadoopClusterConfig hc = wizard.getHadoopConfig();
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Installation name", wizard.getConfig().getClusterName());
-        for(Agent agent : wizard.getConfig().getNodes()) {
-            cfgView.addStringCfg("Node to install", agent.getHostname());
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            for(Agent agent : wizard.getConfig().getNodes()) {
+                cfgView.addStringCfg("Node(s) to install", agent.getHostname() + "");
+            }
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            cfgView.addStringCfg("Hadoop cluster name", hc.getClusterName());
+            cfgView.addStringCfg("Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "");
+            cfgView.addStringCfg("Replication factor", hc.getReplicationFactor() + "");
+            cfgView.addStringCfg("Domain name", hc.getDomainName());
         }
 
         Button install = new Button("Install");
@@ -36,8 +47,14 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
 
-                UUID trackID = SqoopUI.getManager().installCluster(wizard.getConfig());
-                ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(), SqoopUI.getTracker(), trackID, SqoopConfig.PRODUCT_KEY);
+                UUID trackId = null;
+                if(config.getSetupType() == SetupType.OVER_HADOOP)
+                    trackId = SqoopUI.getManager().installCluster(wizard.getConfig());
+                else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                    trackId = SqoopUI.getManager().installCluster(config, hc);
+
+                ProgressWindow window = new ProgressWindow(SqoopUI.getExecutor(),
+                        SqoopUI.getTracker(), trackId, SqoopConfig.PRODUCT_KEY);
                 window.getWindow().addCloseListener(new Window.CloseListener() {
                     @Override
                     public void windowClose(Window.CloseEvent closeEvent) {

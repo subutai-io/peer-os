@@ -28,21 +28,35 @@ public class WelcomeStep extends Panel {
         logoImg.setWidth(150, Unit.PIXELS);
         grid.addComponent(logoImg, 1, 3, 2, 5);
 
-        Button next = new Button("Start");
+        Button next = new Button("Start over-Hadoop installation");
         next.addStyleName("default");
-        next.setWidth(100, Unit.PIXELS);
+        next.addClickListener(new ClickListerner(wizard));
         grid.addComponent(next, 6, 4, 6, 4);
         grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-        next.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                wizard.init();
-                wizard.next();
-            }
-        });
+        Button next2 = new Button("Start with-Hadoop installation");
+        next2.addStyleName("default");
+        next2.addClickListener(new ClickListerner(wizard));
+        grid.addComponent(next, 7, 4, 7, 4);
+        grid.setComponentAlignment(next2, Alignment.BOTTOM_RIGHT);
 
         setContent(grid);
+    }
+
+    private class ClickListerner implements Button.ClickListener {
+
+        final Wizard wizard;
+
+        public ClickListerner(Wizard wizard) {
+            this.wizard = wizard;
+        }
+
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+            wizard.init();
+            wizard.next();
+        }
+
     }
 
 }
