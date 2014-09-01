@@ -13,9 +13,9 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerOperationHandler;
@@ -44,13 +44,9 @@ public class OozieImpl implements Oozie {
     private ContainerManager containerManager;
 
 
-    public OozieImpl( final AgentManager agentManager,
-                      final DbManager dbManager,
-                      final Tracker tracker,
-                      final CommandRunner commandRunner,
-                      final LxcManager lxcManager,
-                      final EnvironmentManager environmentManager,
-                      final ContainerManager containerManager ) {
+    public OozieImpl( final AgentManager agentManager, final DbManager dbManager, final Tracker tracker,
+                      final CommandRunner commandRunner, final LxcManager lxcManager,
+                      final EnvironmentManager environmentManager, final ContainerManager containerManager ) {
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;
@@ -232,13 +228,13 @@ public class OozieImpl implements Oozie {
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );
 
-        NodeGroup nodeGroup = new NodeGroup();
-        nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        NodeGroup oozieGroup = new NodeGroup();
+        oozieGroup.setTemplateName( config.getTemplateName() );
+        oozieGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
         int numberOfNodes = config.getClients().size() + 1; // +1 server
-        nodeGroup.setNumberOfNodes( numberOfNodes );
+        oozieGroup.setNumberOfNodes( numberOfNodes );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieGroup ) );
 
         return environmentBlueprint;
     }

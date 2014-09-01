@@ -4,9 +4,12 @@ package org.safehaus.subutai.plugin.oozie.impl;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.shared.protocol.ConfigBase;
+
+import com.google.common.base.Strings;
 
 
 /**
@@ -33,6 +36,19 @@ public class OozieSetupStrategy implements ClusterSetupStrategy {
 
     @Override
     public ConfigBase setup() throws ClusterSetupException {
+
+        if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
+                Strings.isNullOrEmpty( config.getDomainName() ) ||
+                Strings.isNullOrEmpty( config.getProductName() ) ||
+                Strings.isNullOrEmpty( config.getTemplateName() ) ) {
+            throw new ClusterSetupException( "Malformed cluster configuration" );
+        }
+
+        try {
+            new ClusterConfiguration( productOperation, oozieManager ).configureCluster( config );
+        } catch (ClusterConfigurationException e) {
+            throw new ClusterSetupException( e.getMessage() );
+        }
         return config;
     }
 }
