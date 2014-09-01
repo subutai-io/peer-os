@@ -9,9 +9,12 @@ public class SqoopConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Sqoop2";
     public static final String TEMPLATE_NAME = "hadoopsqoop";
+
     private String clusterName;
+    private SetupType setupType;
     private int nodesCount;
     private Set<Agent> nodes = new HashSet();
+    private Set<Agent> hadoopNodes = new HashSet<>();
 
     @Override
     public String getClusterName() {
@@ -20,6 +23,14 @@ public class SqoopConfig implements ConfigBase {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
     }
 
     public int getNodesCount() {
@@ -41,6 +52,14 @@ public class SqoopConfig implements ConfigBase {
 
     public void setNodes(Set<Agent> nodes) {
         this.nodes = nodes;
+    }
+
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
+    }
+
+    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+        this.hadoopNodes = hadoopNodes;
     }
 
     @Override
