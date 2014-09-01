@@ -16,6 +16,8 @@ public class Config implements ConfigBase {
 
 	private String clusterName = "";
 	private Set<Agent> nodes = new HashSet<>();
+    private SetupType setupType;
+    private String hadoopClusterName;
 
 
 	public String getClusterName() {
@@ -49,4 +51,25 @@ public class Config implements ConfigBase {
 	public String toString() {
 		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
 	}
+
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+
+    public void setSetupType( SetupType setupType ) {
+        this.setupType = setupType;
+    }
+
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+
+    public void setHadoopClusterName( String hadoopClusterName ) {
+        this.hadoopClusterName = hadoopClusterName;
+        this.clusterName = hadoopClusterName;
+    }
 }

@@ -2,7 +2,10 @@ package org.safehaus.subutai.plugin.pig.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Config;
+import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.pig.ui.PigUI;
@@ -24,19 +27,42 @@ public class VerificationStep extends Panel {
 				+ "(you may change them by clicking on Back button)</strong><br/>");
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
-		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Installation Name", wizard.getConfig().getClusterName());
-		for (Agent agent : wizard.getConfig().getNodes()) {
-			cfgView.addStringCfg("Nodes to install Pig to", agent.getHostname() + "");
-		}
+        // Display config values
+
+        final Config config = wizard.getConfig();
+        ConfigView cfgView = new ConfigView("Installation configuration");
+        cfgView.addStringCfg("Hadoop cluster name", config.getHadoopClusterName() );
+
+        if( config.getSetupType() == SetupType.OVER_HADOOP)
+            for(Agent agent : wizard.getConfig().getNodes()) {
+                cfgView.addStringCfg("Node to install", agent.getHostname() + "");
+            }
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            HadoopClusterConfig hc = wizard.getHadoopConfig();
+            cfgView.addStringCfg("Hadoop cluster name", hc.getClusterName());
+            cfgView.addStringCfg("Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "");
+            cfgView.addStringCfg("Replication factor", hc.getReplicationFactor() + "");
+            cfgView.addStringCfg("Domain name", hc.getDomainName());
+        }
+
+        // Install button
 
 		Button install = new Button("Install");
 		install.addStyleName("default");
 		install.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = PigUI.getPigManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(PigUI.getExecutor(), PigUI.getTracker(), trackID, Config.PRODUCT_KEY);
+
+                UUID trackId = null;
+
+                if(config.getSetupType() == SetupType.OVER_HADOOP) {
+                    trackId = PigUI.getPigManager().installCluster( config );
+                }
+                else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+//                    trackId = FlumeUI.getManager().installCluster( config, wizard.getHadoopConfig() );
+                }
+
+				ProgressWindow window = new ProgressWindow(PigUI.getExecutor(), PigUI.getTracker(), trackId, Config.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

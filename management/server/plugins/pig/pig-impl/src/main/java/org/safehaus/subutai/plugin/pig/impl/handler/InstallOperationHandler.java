@@ -30,7 +30,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
     @Override
     public void run()
     {
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) || CollectionUtil.isCollectionEmpty( config.getNodes() ) )
+        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil.isCollectionEmpty( config.getNodes() ) )
         {
             productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
@@ -65,6 +65,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
         productOperation.addLog( "Checking prerequisites..." );
 
         // Check installed packages
+
         Command checkInstalledCommand = manager.getCommands().getCheckInstalledCommand( config.getNodes() );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
@@ -86,13 +87,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
                         node.getHostname() ) );
                 it.remove();
             }
-//            else if ( !result.getStdOut().contains( org.safehaus.subutai.plugin.hadoop.api.Config.PRODUCT_PACKAGE ) )
-//            {
-//                productOperation.addLog(
-//                    String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-//                        node.getHostname() ) );
-//                it.remove();
-//            }
         }
 
         if ( config.getNodes().isEmpty() )
@@ -104,6 +98,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PigImpl>
         productOperation.addLog( "Updating db..." );
 
         // Save to db
+
         if ( manager.getDbManager().saveInfo( Config.PRODUCT_KEY, config.getClusterName(), config ) )
         {
             productOperation.addLog( "Cluster info saved to DB\nInstalling Pig..." );

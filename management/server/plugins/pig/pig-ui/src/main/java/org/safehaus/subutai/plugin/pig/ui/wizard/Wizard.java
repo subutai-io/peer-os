@@ -2,12 +2,16 @@ package org.safehaus.subutai.plugin.pig.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Config;
 
 public class Wizard {
+
 	private final GridLayout grid;
 	private int step = 1;
 	private Config config = new Config();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -68,4 +72,13 @@ public class Wizard {
 		return config;
 	}
 
+
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
+    }
+
+
+    public void setHadoopConfig( HadoopClusterConfig hadoopConfig ) {
+        this.hadoopConfig = hadoopConfig;
+    }
 }
