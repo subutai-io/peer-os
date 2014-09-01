@@ -13,12 +13,25 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
 
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.container.ContainerManager"/>
+
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
+
     <bean id="pig-impl" scope="singleton" class="org.safehaus.subutai.plugin.pig.impl.PigImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
         <argument ref="agentManager"/>
         <argument ref="dbManager"/>
         <argument ref="tracker"/>
+
+        <property name="environmentManager" ref="environmentManager"/>
+        <property name="containerManager" ref="containerManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
     <service ref="pig-impl" interface="org.safehaus.subutai.plugin.pig.api.Pig"/>

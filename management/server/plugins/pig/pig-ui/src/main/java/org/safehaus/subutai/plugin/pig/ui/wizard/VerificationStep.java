@@ -59,7 +59,7 @@ public class VerificationStep extends Panel {
                     trackId = PigUI.getPigManager().installCluster( config );
                 }
                 else if(config.getSetupType() == SetupType.WITH_HADOOP) {
-//                    trackId = FlumeUI.getManager().installCluster( config, wizard.getHadoopConfig() );
+                    trackId = PigUI.getPigManager().installCluster( config, wizard.getHadoopConfig() );
                 }
 
 				ProgressWindow window = new ProgressWindow(PigUI.getExecutor(), PigUI.getTracker(), trackId, Config.PRODUCT_KEY);

@@ -4,13 +4,22 @@ package org.safehaus.subutai.plugin.pig.impl;
 import com.google.common.base.Preconditions;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.plugin.pig.api.SetupType;
 import org.safehaus.subutai.plugin.pig.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.pig.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +35,10 @@ public class PigImpl implements Pig {
 	private DbManager dbManager;
 	private Tracker tracker;
 	private ExecutorService executor;
-
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
+    private Hadoop hadoopManager;
+    private PluginDAO pluginDao;
 
 	public PigImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
 		this.commands = new Commands(commandRunner);
@@ -34,8 +46,32 @@ public class PigImpl implements Pig {
 		this.agentManager = agentManager;
 		this.dbManager = dbManager;
 		this.tracker = tracker;
+        pluginDao = new PluginDAO(dbManager);
 	}
 
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+    public void setEnvironmentManager(EnvironmentManager environmentManager) {
+        this.environmentManager = environmentManager;
+    }
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+    public void setContainerManager(ContainerManager containerManager) {
+        this.containerManager = containerManager;
+    }
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager) {
+        this.hadoopManager = hadoopManager;
+    }
 
 	public void init() {
 		executor = Executors.newCachedThreadPool();
@@ -72,7 +108,12 @@ public class PigImpl implements Pig {
 	}
 
 
-	@Override
+    public PluginDAO getPluginDao() {
+        return pluginDao;
+    }
+
+
+    @Override
 	public UUID installCluster(Config config) {
 
 		Preconditions.checkNotNull(config, "Configuration is null");
@@ -82,6 +123,14 @@ public class PigImpl implements Pig {
 
 		return operationHandler.getTrackerId();
 	}
+
+    @Override
+    public UUID installCluster(Config config, HadoopClusterConfig hadoopConfig) {
+        InstallOperationHandler operationHandler = new InstallOperationHandler(this, config);
+        operationHandler.setHadoopConfig( hadoopConfig );
+        executor.execute(operationHandler);
+        return operationHandler.getTrackerId();
+    }
 
 
 	@Override
@@ -108,4 +157,18 @@ public class PigImpl implements Pig {
 
 		return operationHandler.getTrackerId();
 	}
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po ) {
+        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+            return new OverHadoopSetupStrategy( this, config, po );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy(this, config, po);
+            s.setEnvironment(env);
+            return s;
+        }
+        return null;
+    }
 }
