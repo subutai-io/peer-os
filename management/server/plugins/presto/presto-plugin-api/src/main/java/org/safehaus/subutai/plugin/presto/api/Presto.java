@@ -5,45 +5,58 @@
  */
 package org.safehaus.subutai.plugin.presto.api;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+
 
 /**
  * @author dilshat
  */
 public interface Presto extends ApiBase<PrestoClusterConfig> {
 
-	public UUID addWorkerNode(String clusterName, String lxcHostname);
+    public UUID addWorkerNode( String clusterName, String lxcHostname );
 
-	public UUID destroyWorkerNode(String clusterName, String lxcHostname);
+    public UUID destroyWorkerNode( String clusterName, String lxcHostname );
 
-	public UUID changeCoordinatorNode(String clusterName, String newMasterHostname);
+    public UUID changeCoordinatorNode( String clusterName, String newMasterHostname );
 
-	/**
-	 * Starts the specified node
-	 *
-	 * @param clusterName - name of cluster
-	 * @param lxcHostName - hostname of node
-	 * @return - UUID of operation to track
-	 */
-	public UUID startNode(String clusterName, String lxcHostName);
+    /**
+     * Starts the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     *
+     * @return - UUID of operation to track
+     */
+    public UUID startNode( String clusterName, String lxcHostName );
 
-	/**
-	 * Stops the specified node
-	 *
-	 * @param clusterName - name of cluster
-	 * @param lxcHostName - hostname of node
-	 * @return - UUID of operation to track
-	 */
-	public UUID stopNode(String clusterName, String lxcHostName);
+    /**
+     * Stops the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     *
+     * @return - UUID of operation to track
+     */
+    public UUID stopNode( String clusterName, String lxcHostName );
 
-	/**
-	 * Checks status of the specified node
-	 *
-	 * @param clusterName - name of cluster
-	 * @param lxcHostName - hostname of node
-	 * @return - UUID of operation to track
-	 */
-	public UUID checkNode(String clusterName, String lxcHostName);
+    /**
+     * Checks status of the specified node
+     *
+     * @param clusterName - name of cluster
+     * @param lxcHostName - hostname of node
+     *
+     * @return - UUID of operation to track
+     */
+    public UUID checkNode( String clusterName, String lxcHostName );
+
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, PrestoClusterConfig prestoClusterConfig );
+
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, PrestoClusterConfig prestoClusterConfig,
+                                                         Environment environment );
 }
