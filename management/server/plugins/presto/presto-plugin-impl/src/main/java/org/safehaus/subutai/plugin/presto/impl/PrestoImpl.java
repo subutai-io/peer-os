@@ -26,6 +26,7 @@ import org.safehaus.subutai.plugin.presto.impl.handler.ChangeCoordinatorNodeOper
 import org.safehaus.subutai.plugin.presto.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.DestroyWorkerNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.presto.impl.handler.PrestoDbSetupStrategy;
 import org.safehaus.subutai.plugin.presto.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.UninstallOperationHandler;
@@ -41,46 +42,46 @@ import com.google.common.base.Preconditions;
  */
 public class PrestoImpl implements Presto {
 
-    private CommandRunner commandRunner;
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ExecutorService executor;
-    private PluginDAO pluginDAO;
+    private static CommandRunner commandRunner;
+    private static AgentManager agentManager;
+    private static DbManager dbManager;
+    private static Tracker tracker;
+    private static ExecutorService executor;
+    private static PluginDAO pluginDAO;
 
 
     public PrestoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
+        PrestoImpl.commandRunner = commandRunner;
+        PrestoImpl.agentManager = agentManager;
+        PrestoImpl.dbManager = dbManager;
+        PrestoImpl.tracker = tracker;
         pluginDAO = new PluginDAO( dbManager );
 
         Commands.init( commandRunner );
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public static CommandRunner getCommandRunner() {
         return commandRunner;
     }
 
 
-    public AgentManager getAgentManager() {
+    public static AgentManager getAgentManager() {
         return agentManager;
     }
 
 
-    public DbManager getDbManager() {
+    public static DbManager getDbManager() {
         return dbManager;
     }
 
 
-    public Tracker getTracker() {
+    public static Tracker getTracker() {
         return tracker;
     }
 
 
-    public PluginDAO getPluginDAO() {
+    public static PluginDAO getPluginDAO() {
         return pluginDAO;
     }
 
@@ -204,7 +205,10 @@ public class PrestoImpl implements Presto {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final ProductOperation po,
                                                          final PrestoClusterConfig prestoClusterConfig ) {
-        return null;
+        Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation is null" );
+
+        return new PrestoDbSetupStrategy( po, this, prestoClusterConfig );
     }
 
 
