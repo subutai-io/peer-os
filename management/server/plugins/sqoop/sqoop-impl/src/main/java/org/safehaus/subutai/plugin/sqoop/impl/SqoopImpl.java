@@ -2,11 +2,15 @@ package org.safehaus.subutai.plugin.sqoop.impl;
 
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.plugin.sqoop.impl.handler.*;
 import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 public class SqoopImpl extends SqoopBase {
 
@@ -18,6 +22,11 @@ public class SqoopImpl extends SqoopBase {
         h.setConfig(config);
         executor.execute(h);
         return po.getId();
+    }
+
+    @Override
+    public UUID installCluster(SqoopConfig config, HadoopClusterConfig hadoopConfig) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -83,6 +92,18 @@ public class SqoopImpl extends SqoopBase {
         h.setSettings(settings);
         executor.execute(h);
         return po.getId();
+    }
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment env, SqoopConfig config, ProductOperation po) {
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            return new SetupStrategyOverHadoop(this, config, po);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop(this, config, po);
+            s.setEnvironment(env);
+            return s;
+        }
+        return null;
     }
 
 }

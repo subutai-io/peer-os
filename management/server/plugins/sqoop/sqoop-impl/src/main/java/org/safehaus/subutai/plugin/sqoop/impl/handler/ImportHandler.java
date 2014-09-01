@@ -31,6 +31,7 @@ public class ImportHandler extends AbstractHandler {
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
         if(agent == null) {
             po.addLogFailed("Node is not connected");
@@ -39,7 +40,7 @@ public class ImportHandler extends AbstractHandler {
 
         String s = CommandFactory.build(CommandType.IMPORT, settings);
         Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(s).withTimeout(60),
+                new RequestBuilder(s).withTimeout(600),
                 new HashSet<>(Arrays.asList(agent)));
 
         manager.getCommandRunner().runCommand(cmd);

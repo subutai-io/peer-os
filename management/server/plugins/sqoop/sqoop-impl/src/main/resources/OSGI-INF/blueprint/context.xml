@@ -11,6 +11,10 @@
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+    <reference id="containerManager" availability="mandatory"
+                   interface="org.safehaus.subutai.api.container.ContainerManager"/>
+    <reference id="environmentManager" availability="mandatory"
+                   interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
 
     <bean id="sqoop-impl" scope="singleton" class="org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl"
           init-method="init" destroy-method="destroy">
@@ -19,6 +23,8 @@
         <property name="tracker" ref="tracker"/>
         <property name="dbManager" ref="dbManager"/>
         <property name="hadoopManager" ref="hadoopManager"/>
+        <property name="containerManager" ref="containerManager"/>
+        <property name="environmentManager" ref="environmentManager"/>
     </bean>
 
     <service ref="sqoop-impl" interface="org.safehaus.subutai.plugin.sqoop.api.Sqoop"/>

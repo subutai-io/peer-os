@@ -20,6 +20,7 @@ public class CheckHandler extends AbstractHandler {
 
     @Override
     public void run() {
+        ProductOperation po = productOperation;
         SqoopConfig config = getClusterConfig();
         if(config == null) {
             po.addLogFailed("Sqoop installation not found: " + clusterName);
@@ -46,7 +47,8 @@ public class CheckHandler extends AbstractHandler {
                 po.addLogFailed("Sqoop not installed on " + hostname);
         else {
             po.addLog(res.getStdOut());
-            po.addLogFailed(res.getStdErr());
+            po.addLog(res.getStdErr());
+            po.addLogFailed("Failed to check Sqoop");
         }
 
     }

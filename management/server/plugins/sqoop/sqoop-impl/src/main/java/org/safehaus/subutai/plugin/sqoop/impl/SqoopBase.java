@@ -4,22 +4,33 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class SqoopBase implements Sqoop {
+
+    static final Logger logger = LoggerFactory.getLogger(SqoopImpl.class);
 
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
     protected Tracker tracker;
     protected DbManager dbManager;
+    protected PluginDAO pluginDao;
     protected Hadoop hadoopManager;
+    protected ContainerManager containerManager;
+    protected EnvironmentManager environmentManager;
 
     protected ExecutorService executor;
 
     public void init() {
+        pluginDao = new PluginDAO(dbManager);
         executor = Executors.newCachedThreadPool();
     }
 
@@ -59,6 +70,14 @@ public abstract class SqoopBase implements Sqoop {
         this.dbManager = dbManager;
     }
 
+    public PluginDAO getPluginDao() {
+        return pluginDao;
+    }
+
+    public void setPluginDao(PluginDAO pluginDao) {
+        this.pluginDao = pluginDao;
+    }
+
     public Hadoop getHadoopManager() {
         return hadoopManager;
     }
@@ -67,12 +86,32 @@ public abstract class SqoopBase implements Sqoop {
         this.hadoopManager = hadoopManager;
     }
 
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+    public void setContainerManager(ContainerManager containerManager) {
+        this.containerManager = containerManager;
+    }
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+    public void setEnvironmentManager(EnvironmentManager environmentManager) {
+        this.environmentManager = environmentManager;
+    }
+
     public ExecutorService getExecutor() {
         return executor;
     }
 
     public void setExecutor(ExecutorService executor) {
         this.executor = executor;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
 }

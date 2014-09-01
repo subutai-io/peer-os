@@ -1,23 +1,20 @@
 package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import java.util.Iterator;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
+import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 
-abstract class AbstractHandler implements Runnable {
-
-    final SqoopImpl manager;
-    final String clusterName;
-    final ProductOperation po;
+abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl> {
 
     String hostname;
 
     public AbstractHandler(SqoopImpl manager, String clusterName, ProductOperation po) {
-        this.manager = manager;
-        this.clusterName = clusterName;
-        this.po = po;
+        super(manager, clusterName);
+        this.productOperation = po;
     }
 
     public String getHostname() {
@@ -29,8 +26,12 @@ abstract class AbstractHandler implements Runnable {
     }
 
     SqoopConfig getClusterConfig() {
-        return manager.getDbManager().getInfo(SqoopConfig.PRODUCT_KEY, clusterName,
-                SqoopConfig.class);
+        try {
+            return manager.getPluginDao().getInfo(SqoopConfig.PRODUCT_KEY, clusterName,
+                    SqoopConfig.class);
+        } catch(DBException ex) {
+            return null;
+        }
     }
 
     /**
@@ -54,7 +55,7 @@ abstract class AbstractHandler implements Runnable {
                 it.remove();
                 m += " Omitting from clients list";
             }
-            po.addLog(m);
+            productOperation.addLog(m);
         }
         return connected;
     }

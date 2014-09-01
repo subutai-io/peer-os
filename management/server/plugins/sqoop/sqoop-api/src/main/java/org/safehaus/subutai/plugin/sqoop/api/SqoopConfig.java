@@ -14,6 +14,7 @@ public class SqoopConfig implements ConfigBase {
     private SetupType setupType;
     private int nodesCount;
     private Set<Agent> nodes = new HashSet();
+    private String hadoopClusterName;
     private Set<Agent> hadoopNodes = new HashSet<>();
 
     @Override
@@ -52,6 +53,14 @@ public class SqoopConfig implements ConfigBase {
 
     public void setNodes(Set<Agent> nodes) {
         this.nodes = nodes;
+    }
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
     }
 
     public Set<Agent> getHadoopNodes() {

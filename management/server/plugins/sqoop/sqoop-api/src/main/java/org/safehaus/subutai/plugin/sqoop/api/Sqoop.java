@@ -1,13 +1,19 @@
 package org.safehaus.subutai.plugin.sqoop.api;
 
 import java.util.UUID;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
+import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 public interface Sqoop extends ApiBase<SqoopConfig> {
 
     public UUID isInstalled(String clusterName, String hostname);
+
+    public UUID installCluster(SqoopConfig config, HadoopClusterConfig hadoopConfig);
 
     public UUID addNode(String clusterName, String hostname);
 
@@ -16,4 +22,7 @@ public interface Sqoop extends ApiBase<SqoopConfig> {
     public UUID exportData(ExportSetting settings);
 
     public UUID importData(ImportSetting settings);
+
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment env,
+            SqoopConfig config, ProductOperation po);
 }

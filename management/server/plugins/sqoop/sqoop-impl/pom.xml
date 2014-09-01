@@ -11,8 +11,8 @@
 
     <artifactId>sqoop-plugin-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>Subutai Sqoop</name>
-    <description>Subutai Sqoop</description>
+    <name>Subutai Sqoop Impl</name>
+    <description>Subutai Sqoop Impl</description>
 
     <dependencies>
         <dependency>
@@ -56,6 +56,16 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>environment-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>subutai-common</artifactId>
+            <version>2.0.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
