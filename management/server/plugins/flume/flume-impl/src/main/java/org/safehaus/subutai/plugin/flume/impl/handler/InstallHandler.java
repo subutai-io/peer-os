@@ -34,11 +34,9 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
     @Override
     public void run() {
         ProductOperation po = productOperation;
-        ClusterSetupStrategy s = null;
-        if(config.getSetupType() == SetupType.OVER_HADOOP)
-            s = manager.getClusterSetupStrategy(null, config, po);
+        Environment env = null;
 
-        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+        if(config.getSetupType() == SetupType.WITH_HADOOP) {
 
             if(hadoopConfig == null) {
                 po.addLogFailed("No Hadoop configuration specified");
@@ -46,15 +44,11 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
             }
 
             po.addLog("Preparing environment...");
-            // TODO: composite template name for Hadoop and Flume
-            String t = String.format("%s%s", hadoopConfig.getTemplateName(),
-                    FlumeConfig.TEMPLATE_NAME);
-            hadoopConfig.setTemplateName(t);
+            hadoopConfig.setTemplateName(FlumeConfig.TEMPLATE_NAME);
             try {
                 EnvironmentBlueprint eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
-                Environment env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
-                s = manager.getClusterSetupStrategy(env, config, po);
+                env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
             } catch(ClusterSetupException ex) {
                 po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
                 return;
@@ -65,6 +59,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
             po.addLog("Environment preparation completed");
         }
 
+        ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, po);
         try {
             if(s == null) throw new ClusterSetupException("No setup strategy");
 
