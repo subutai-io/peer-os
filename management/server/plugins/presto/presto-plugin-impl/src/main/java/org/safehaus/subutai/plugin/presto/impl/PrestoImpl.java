@@ -46,7 +46,7 @@ public class PrestoImpl implements Presto {
     private DbManager dbManager;
     private Tracker tracker;
     private ExecutorService executor;
-    private static PluginDAO pluginDAO;
+    private PluginDAO pluginDAO;
 
 
     public PrestoImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
@@ -77,6 +77,11 @@ public class PrestoImpl implements Presto {
 
     public Tracker getTracker() {
         return tracker;
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
     }
 
 
