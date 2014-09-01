@@ -37,7 +37,7 @@ class OverHadoopSetupStrategy extends FlumeSetupStrategy {
 
         if(!hc.getAllNodes().containsAll(config.getNodes()))
             throw new ClusterSetupException("Not all nodes belong to Hadoop cluster "
-                    + config.getClusterName());
+                    + config.getHadoopClusterName());
 
         po.addLog("Checking installed packages...");
         Command cmd = manager.getCommandRunner().createCommand(
