@@ -11,7 +11,7 @@ public class PetImpl implements PetManager {
 
     @Override
     public String getPetName() {
-        return "hello kitty!";
+        return "hello kitty beta!";
     }
 
 
