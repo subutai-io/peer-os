@@ -10,7 +10,7 @@
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 
 import com.vaadin.server.FileResource;

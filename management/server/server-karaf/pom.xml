@@ -631,7 +631,7 @@
 
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>mgmt-shared-protocol</artifactId>
+                  <artifactId>plugin-common</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 

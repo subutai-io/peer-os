@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.solr.rest;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 

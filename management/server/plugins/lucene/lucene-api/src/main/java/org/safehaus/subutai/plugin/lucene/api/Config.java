@@ -1,14 +1,16 @@
 package org.safehaus.subutai.plugin.lucene.api;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class Config implements ConfigBase {
+public class Config implements ConfigBase
+{
 
 	public static final String PRODUCT_KEY = "Lucene2";
     public static final String TEMPLATE_NAME = "hadooplucene";

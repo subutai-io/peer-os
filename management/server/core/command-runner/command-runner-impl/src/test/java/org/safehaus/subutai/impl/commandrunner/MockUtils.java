@@ -10,11 +10,11 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.RequestType;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.enums.ResponseType;
 
 import java.util.HashSet;
 import java.util.Set;

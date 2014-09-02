@@ -9,7 +9,7 @@ package org.safehaus.subutai.impl.commandrunner;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Response;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

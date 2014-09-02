@@ -6,7 +6,7 @@
 package org.safehaus.subutai.plugin.mongodb.rest;
 
 
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**

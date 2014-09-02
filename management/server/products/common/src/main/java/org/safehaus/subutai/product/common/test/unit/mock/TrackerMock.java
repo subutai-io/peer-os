@@ -2,8 +2,8 @@ package org.safehaus.subutai.product.common.test.unit.mock;
 
 
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 
 import java.util.Date;
 import java.util.List;

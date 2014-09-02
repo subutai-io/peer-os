@@ -10,7 +10,7 @@ import com.vaadin.ui.*;
 import org.safehaus.subutai.plugin.shark.api.Config;
 import org.safehaus.subutai.plugin.shark.ui.SharkUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 

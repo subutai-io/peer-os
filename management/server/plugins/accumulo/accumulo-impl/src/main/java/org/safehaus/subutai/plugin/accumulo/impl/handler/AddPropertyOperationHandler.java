@@ -1,17 +1,15 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
-import org.safehaus.subutai.plugin.accumulo.impl.Commands;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
+import org.safehaus.subutai.plugin.accumulo.impl.Commands;
+
+import java.util.UUID;
 
 
 /**

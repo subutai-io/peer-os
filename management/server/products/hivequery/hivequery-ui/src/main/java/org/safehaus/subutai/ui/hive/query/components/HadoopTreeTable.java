@@ -2,7 +2,7 @@ package org.safehaus.subutai.ui.hive.query.components;
 
 import com.vaadin.ui.TreeTable;
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.hive.query.HiveQueryUI;
 
 import java.util.List;

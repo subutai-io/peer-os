@@ -4,13 +4,13 @@ package org.safehaus.subutai.plugin.mahout.impl.handler;
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
 import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Iterator;
 import java.util.UUID;

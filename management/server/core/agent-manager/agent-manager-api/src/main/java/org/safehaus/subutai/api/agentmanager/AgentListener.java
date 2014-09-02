@@ -1,7 +1,7 @@
 package org.safehaus.subutai.api.agentmanager;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;
 

@@ -12,10 +12,10 @@ import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;
 import org.safehaus.subutai.impl.mongodb.common.CommandType;
 import org.safehaus.subutai.impl.mongodb.common.Commands;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.List;
 import java.util.Map;

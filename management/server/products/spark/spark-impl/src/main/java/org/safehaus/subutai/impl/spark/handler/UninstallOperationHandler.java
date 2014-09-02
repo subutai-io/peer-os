@@ -5,9 +5,9 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.spark.Config;
 import org.safehaus.subutai.impl.spark.Commands;
 import org.safehaus.subutai.impl.spark.SparkImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 

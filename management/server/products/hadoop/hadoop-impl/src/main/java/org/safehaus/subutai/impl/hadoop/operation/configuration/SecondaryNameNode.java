@@ -3,11 +3,11 @@ package org.safehaus.subutai.impl.hadoop.operation.configuration;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.Commands;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 

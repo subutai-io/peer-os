@@ -7,7 +7,7 @@ import com.vaadin.ui.VerticalLayout;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.dis.manager.EnvironmentManagerUI;
 import org.safehaus.subutai.dis.manager.window.BlueprintDetails;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import java.util.List;
 

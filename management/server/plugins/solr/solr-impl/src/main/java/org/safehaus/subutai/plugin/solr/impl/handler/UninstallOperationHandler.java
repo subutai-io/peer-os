@@ -5,7 +5,7 @@ import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 
 public class UninstallOperationHandler extends AbstractOperationHandler<SolrImpl> {

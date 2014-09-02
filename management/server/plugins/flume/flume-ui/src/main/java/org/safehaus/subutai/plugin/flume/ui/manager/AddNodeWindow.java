@@ -5,11 +5,12 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 class AddNodeWindow extends Window {
 

@@ -13,7 +13,7 @@ import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
 import org.safehaus.subutai.configuration.manager.api.TextInjector;
 import org.safehaus.subutai.configuration.manager.impl.loaders.*;
 import org.safehaus.subutai.configuration.manager.impl.utils.*;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 
 /**

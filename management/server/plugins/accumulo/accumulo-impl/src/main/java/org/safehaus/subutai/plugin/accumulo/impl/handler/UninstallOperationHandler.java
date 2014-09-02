@@ -4,8 +4,8 @@ package org.safehaus.subutai.plugin.accumulo.impl.handler;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.ClusterConfiguration;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 
 import java.util.UUID;
 

@@ -14,12 +14,7 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.impl.zookeeper.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 
 public class ZookeeperImpl implements Zookeeper {

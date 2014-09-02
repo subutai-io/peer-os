@@ -9,8 +9,8 @@ package org.safehaus.subutai.plugin.accumulo.api;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
 /**

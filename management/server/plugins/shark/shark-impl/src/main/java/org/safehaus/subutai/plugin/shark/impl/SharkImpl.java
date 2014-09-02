@@ -10,11 +10,11 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.shark.api.Config;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.impl.handler.*;
 import org.safehaus.subutai.plugin.spark.api.Spark;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

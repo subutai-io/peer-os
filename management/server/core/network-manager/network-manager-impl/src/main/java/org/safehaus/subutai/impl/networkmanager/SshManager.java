@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.networkmanager;
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.List;

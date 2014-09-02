@@ -7,9 +7,9 @@ package org.safehaus.subutai.api.communicationmanager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -13,10 +13,11 @@ import org.safehaus.subutai.plugin.accumulo.impl.ClusterConfiguration;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.settings.Common;
+
 
 import java.util.UUID;
 

@@ -8,7 +8,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
 import org.safehaus.subutai.api.aptrepositorymanager.PackageInfo;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.settings.Common;
 
 import java.util.List;
 

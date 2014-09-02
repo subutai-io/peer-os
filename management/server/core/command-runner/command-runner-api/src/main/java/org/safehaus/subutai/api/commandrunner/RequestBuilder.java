@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
-import org.safehaus.subutai.shared.protocol.enums.RequestType;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.protocol.Request;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**

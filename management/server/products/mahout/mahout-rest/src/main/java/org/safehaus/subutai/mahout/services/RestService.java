@@ -14,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.mahout.Config;
 import org.safehaus.subutai.api.mahout.Mahout;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class RestService {

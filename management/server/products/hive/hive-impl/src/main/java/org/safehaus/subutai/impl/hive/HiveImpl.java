@@ -1,9 +1,9 @@
 package org.safehaus.subutai.impl.hive;
 
 import org.safehaus.subutai.api.hive.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.hive.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.List;
 import java.util.Map;

@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 
 /**

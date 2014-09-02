@@ -6,7 +6,7 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 import com.google.gson.JsonObject;
 import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.StringWriter;

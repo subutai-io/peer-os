@@ -4,7 +4,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.shark.Config;
 import org.safehaus.subutai.api.shark.Shark;
 import org.safehaus.subutai.api.spark.Spark;
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

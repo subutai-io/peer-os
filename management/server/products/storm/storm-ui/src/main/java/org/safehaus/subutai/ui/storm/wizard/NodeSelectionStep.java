@@ -6,7 +6,7 @@ import com.vaadin.data.Property;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.storm.Config;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.storm.StormUI;
 
 import java.util.Arrays;

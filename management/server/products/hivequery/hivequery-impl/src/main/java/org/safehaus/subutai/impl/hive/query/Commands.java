@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.hive.query;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 public class Commands {
 

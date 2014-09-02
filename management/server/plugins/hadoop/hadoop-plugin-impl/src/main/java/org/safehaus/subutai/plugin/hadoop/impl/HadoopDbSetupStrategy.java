@@ -7,15 +7,15 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.common.InstallHadoopOperation;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 
 /**
@@ -66,7 +66,8 @@ public class HadoopDbSetupStrategy implements ClusterSetupStrategy {
 	}
 
 	@Override
-	public HadoopClusterConfig setup() throws ClusterSetupException {
+	public HadoopClusterConfig setup() throws ClusterSetupException
+    {
 
 		if (hadoopClusterConfig == null ||
 				Strings.isNullOrEmpty(hadoopClusterConfig.getClusterName()) ||
