@@ -6,7 +6,7 @@
 package org.safehaus.subutai.ui.hbase.wizard;
 
 
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.ui.hbase.HBaseUI;
 
 import com.vaadin.server.FileResource;

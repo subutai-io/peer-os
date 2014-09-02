@@ -6,13 +6,13 @@ import com.vaadin.event.Action;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.Window;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 import org.safehaus.subutai.plugin.hadoop.ui.manager.components.*;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import java.util.List;
 import java.util.UUID;

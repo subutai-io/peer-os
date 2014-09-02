@@ -7,7 +7,7 @@ package org.safehaus.subutai.impl.tracker;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import java.util.UUID;
 
@@ -50,7 +50,7 @@ public class ProductOperationImplUT {
 		ProductOperationImpl poi = new ProductOperationImpl(SOURCE, DESCRIPTION, mock(TrackerImpl.class));
 
 		assertEquals(DESCRIPTION, poi.getDescription());
-		assertEquals(ProductOperationState.RUNNING, poi.getState());
+		assertEquals( ProductOperationState.RUNNING, poi.getState());
 		assertNotNull(poi.createDate());
 		assertNotNull(poi.getId());
 	}

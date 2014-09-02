@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.strategy;
 
 import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.EnumSet;
 import java.util.Set;

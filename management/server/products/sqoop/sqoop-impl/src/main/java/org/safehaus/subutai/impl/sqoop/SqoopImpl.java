@@ -3,8 +3,8 @@ package org.safehaus.subutai.impl.sqoop;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.setting.ExportSetting;
 import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.handler.*;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 
 import java.util.List;
 import java.util.UUID;

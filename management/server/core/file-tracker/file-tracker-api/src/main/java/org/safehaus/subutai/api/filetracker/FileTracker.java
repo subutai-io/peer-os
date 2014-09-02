@@ -2,7 +2,7 @@ package org.safehaus.subutai.api.filetracker;
 
 
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 public interface FileTracker {
 

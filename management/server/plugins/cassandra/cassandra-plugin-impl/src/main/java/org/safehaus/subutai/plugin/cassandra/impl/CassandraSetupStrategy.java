@@ -1,18 +1,11 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -35,7 +28,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( config, "Cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
-        Preconditions.checkNotNull( cassandra, "Cassandra manager is null" );
+        Preconditions.checkNotNull( cassandra, "Mongo manager is null" );
         this.environment = environment;
         this.config = config;
         this.productOperation = po;

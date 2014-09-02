@@ -6,7 +6,7 @@ import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.UUID;

@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.accumulo.ui.common;
 
 import org.safehaus.subutai.plugin.accumulo.ui.AccumuloUI;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;
 import com.vaadin.data.Item;

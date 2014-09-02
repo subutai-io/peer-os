@@ -25,13 +25,13 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartCassandraServiceO
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopAllNodesOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopCassandraServiceOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

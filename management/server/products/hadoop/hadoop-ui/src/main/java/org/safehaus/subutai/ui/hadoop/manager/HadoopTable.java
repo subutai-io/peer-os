@@ -7,10 +7,10 @@ import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.Window;
 import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
 import org.safehaus.subutai.ui.hadoop.manager.components.*;
 

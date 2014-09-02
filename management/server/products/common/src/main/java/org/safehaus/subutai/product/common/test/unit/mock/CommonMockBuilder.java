@@ -2,7 +2,7 @@ package org.safehaus.subutai.product.common.test.unit.mock;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

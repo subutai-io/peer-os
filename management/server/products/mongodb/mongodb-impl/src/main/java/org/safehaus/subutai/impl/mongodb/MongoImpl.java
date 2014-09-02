@@ -16,7 +16,7 @@ import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.mongodb.common.Commands;
 import org.safehaus.subutai.impl.mongodb.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

@@ -5,7 +5,7 @@ import java.io.File;
 
 import org.safehaus.subutai.pet.api.PetManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 import com.vaadin.ui.Component;
 

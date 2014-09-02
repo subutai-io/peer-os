@@ -151,7 +151,14 @@ void KAResponse::serialize(string& output)
 	}
 	for(unsigned int index=0; index < this->getConfPoints().size(); index++)
 	{
-		root["response"]["confPoints"][index]=this->getConfPoints()[index];
+		if(this->getType() == "INOTIFY_LIST_RESPONSE")
+		{
+			root["response"]["configPoints"][index]=this->getConfPoints()[index];
+		}
+		else if(this->getType() == "INOTIFY_ACTION_RESPONSE")
+		{
+			root["response"]["configPoint"][index]=this->getConfPoints()[index];
+		}
 	}
 
 	output = writer.write(root);

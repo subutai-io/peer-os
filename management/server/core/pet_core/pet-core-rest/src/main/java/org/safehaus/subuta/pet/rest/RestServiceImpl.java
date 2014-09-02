@@ -1,7 +1,7 @@
 package org.safehaus.subuta.pet.rest;
 
 
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.pet.api.PetManager;
 
 

@@ -2,9 +2,9 @@ package org.safehaus.subutai.impl.communicationmanager;
 
 
 import org.safehaus.subutai.api.communicationmanager.CommandJson;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.enums.RequestType;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

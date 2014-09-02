@@ -2,10 +2,10 @@ package org.safehaus.subutai.plugin.pig.rest;
 
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -52,7 +52,7 @@ public class RestService {
 
 		UUID uuid = pigManager.installCluster(config);
 
-		return JsonUtil.toJson(OPERATION_ID, uuid);
+		return JsonUtil.toJson( OPERATION_ID, uuid );
 	}
 
 

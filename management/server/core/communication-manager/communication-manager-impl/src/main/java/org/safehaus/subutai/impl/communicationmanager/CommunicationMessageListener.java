@@ -14,8 +14,8 @@ import javax.jms.MessageListener;
 
 import org.safehaus.subutai.api.communicationmanager.CommandJson;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
+import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Response;
 
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.RemoveInfo;

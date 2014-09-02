@@ -4,7 +4,7 @@ package org.safehaus.subutai.rest.tracker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

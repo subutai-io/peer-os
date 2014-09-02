@@ -14,24 +14,21 @@ import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -49,8 +46,12 @@ public class HBaseImpl implements HBase {
     private ContainerManager containerManager;
 
 
-    public HBaseImpl( AgentManager agentManager, Hadoop hadoopManager, DbManager dbManager, Tracker tracker,
-                      CommandRunner commandRunner, EnvironmentManager environmentManager,
+    public HBaseImpl( AgentManager agentManager,
+                      Hadoop hadoopManager,
+                      DbManager dbManager,
+                      Tracker tracker,
+                      CommandRunner commandRunner,
+                      EnvironmentManager environmentManager,
                       ContainerManager containerManager ) {
         this.agentManager = agentManager;
         this.hadoopManager = hadoopManager;
@@ -196,6 +197,19 @@ public class HBaseImpl implements HBase {
 
 
     @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseConfig config,
+                                                         final ProductOperation po ) {
+        return new HBaseSetupStrategy( environment, config, po, this );
+    }
+
+
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HBaseConfig config ) {
+        return null;
+    }
+
+
+    @Override
     public HBaseConfig getCluster( String clusterName ) {
         return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
     }
@@ -258,31 +272,5 @@ public class HBaseImpl implements HBase {
         }
 
         return allNodes;
-    }
-
-
-    @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseConfig config,
-                                                         final ProductOperation po ) {
-        return new HBaseSetupStrategy( environment, config, po, this );
-    }
-
-
-    @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HBaseConfig config ) {
-        EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
-        environmentBlueprint.setLinkHosts( true );
-        environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
-        environmentBlueprint.setExchangeSshKeys( true );
-
-        NodeGroup nodeGroup = new NodeGroup();
-        nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
-        nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
-
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
-
-        return environmentBlueprint;
     }
 }

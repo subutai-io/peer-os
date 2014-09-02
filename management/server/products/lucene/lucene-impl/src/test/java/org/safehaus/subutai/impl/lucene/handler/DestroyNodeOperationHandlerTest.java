@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.impl.lucene.LuceneImpl;
 import org.safehaus.subutai.impl.lucene.handler.mock.LuceneImplMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

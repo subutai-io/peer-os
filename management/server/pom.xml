@@ -18,6 +18,7 @@
         <module>vaadin</module>
         <module>plugins</module>
         <module>products</module>
+        <module>subutai-common</module>
         <module>server-karaf</module>
     </modules>
 

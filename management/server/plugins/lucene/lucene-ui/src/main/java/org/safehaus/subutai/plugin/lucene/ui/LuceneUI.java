@@ -8,11 +8,11 @@ package org.safehaus.subutai.plugin.lucene.ui;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.lucene.api.*;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -87,7 +87,7 @@ public class LuceneUI implements PortalModule {
 
 	@Override
 	public File getImage() {
-		return FileUtil.getFile(LuceneUI.MODULE_IMAGE, this);
+		return FileUtil.getFile( LuceneUI.MODULE_IMAGE, this );
 	}
 
 

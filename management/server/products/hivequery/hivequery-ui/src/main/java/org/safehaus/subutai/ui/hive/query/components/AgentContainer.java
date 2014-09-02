@@ -2,7 +2,7 @@ package org.safehaus.subutai.ui.hive.query.components;
 
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 /**
  * Created by daralbaev on 06.05.14.
