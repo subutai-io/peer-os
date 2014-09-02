@@ -1,4 +1,4 @@
-package org.safehaus.subutai.sqoop.services;
+package org.safehaus.subutai.plugin.sqoop.rest;
 
 import java.util.ArrayList;
 import java.util.List;

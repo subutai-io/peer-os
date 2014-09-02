@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.wizard;
+package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;

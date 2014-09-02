@@ -1,13 +1,13 @@
-package org.safehaus.subutai.ui.sqoop;
+package org.safehaus.subutai.plugin.sqoop.ui;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.ui.sqoop.manager.ExportPanel;
-import org.safehaus.subutai.ui.sqoop.manager.ImportExportBase;
-import org.safehaus.subutai.ui.sqoop.manager.ImportPanel;
-import org.safehaus.subutai.ui.sqoop.manager.Manager;
-import org.safehaus.subutai.ui.sqoop.wizard.Wizard;
+import org.safehaus.subutai.plugin.sqoop.ui.manager.ExportPanel;
+import org.safehaus.subutai.plugin.sqoop.ui.manager.ImportExportBase;
+import org.safehaus.subutai.plugin.sqoop.ui.manager.ImportPanel;
+import org.safehaus.subutai.plugin.sqoop.ui.manager.Manager;
+import org.safehaus.subutai.plugin.sqoop.ui.wizard.Wizard;
 
 public class SqoopForm extends CustomComponent {
 

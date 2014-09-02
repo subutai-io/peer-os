@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.manager;
+package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
@@ -9,7 +9,7 @@ import java.util.*;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.component.*;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class Manager {
 

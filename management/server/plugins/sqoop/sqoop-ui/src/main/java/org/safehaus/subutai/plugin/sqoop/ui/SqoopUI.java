@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop;
+package org.safehaus.subutai.plugin.sqoop.ui;
 
 import com.vaadin.ui.Component;
 import java.io.File;

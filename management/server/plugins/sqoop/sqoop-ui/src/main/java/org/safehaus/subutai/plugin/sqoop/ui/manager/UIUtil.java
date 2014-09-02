@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.manager;
+package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
 import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.label.ContentMode;

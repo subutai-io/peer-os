@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.manager;
+package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class ImportPanel extends ImportExportBase {
 

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.wizard;
+package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -9,7 +9,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class NodeSelectionStep extends VerticalLayout {
 

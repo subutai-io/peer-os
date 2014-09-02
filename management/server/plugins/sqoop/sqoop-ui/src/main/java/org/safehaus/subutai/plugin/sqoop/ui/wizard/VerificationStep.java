@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.wizard;
+package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -8,7 +8,7 @@ import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class VerificationStep extends Panel {
 

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.manager;
+package org.safehaus.subutai.plugin.sqoop.ui.manager;
 
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.ui.sqoop.SqoopUI;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class ExportPanel extends ImportExportBase {
 

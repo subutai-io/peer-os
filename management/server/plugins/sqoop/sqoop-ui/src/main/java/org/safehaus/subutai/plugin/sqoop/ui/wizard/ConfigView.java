@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.sqoop.wizard;
+package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 import com.vaadin.data.Item;
 import com.vaadin.ui.TreeTable;
