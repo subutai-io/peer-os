@@ -11,11 +11,15 @@ import java.util.UUID;
 
 public interface Elasticsearch extends ApiBase<Config> {
 
-	UUID startAllNodes(String clusterName);
+	public UUID startAllNodes(String clusterName);
 
-	UUID checkAllNodes(String clusterName);
+	public UUID checkAllNodes(String clusterName);
 
-	UUID stopAllNodes(String clusterName);
+	public UUID stopAllNodes(String clusterName);
+
+    public UUID addNode(String clusterName, String lxcHostname);
+
+    public UUID destroyNode(String clusterName, String lxcHostname);
 
     ClusterSetupStrategy getClusterSetupStrategy( Environment environment, Config config, ProductOperation po );
 

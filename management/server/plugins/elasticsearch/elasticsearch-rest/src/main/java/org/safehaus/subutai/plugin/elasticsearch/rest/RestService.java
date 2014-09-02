@@ -125,4 +125,30 @@ public class RestService {
 
 		return JsonUtil.toJson(OPERATION_ID, uuid);
 	}
+
+
+    @GET
+   	@Path ("addNode")
+   	@Produces ( {MediaType.APPLICATION_JSON})
+   	public String addNode(
+   			@QueryParam ("clusterName") String clusterName,
+   			@QueryParam ("node") String node
+   	) {
+   		UUID uuid = elasticsearch.addNode(clusterName, node);
+
+   		return JsonUtil.toJson(OPERATION_ID, uuid);
+   	}
+
+
+    @GET
+   	@Path ("destroyNode")
+   	@Produces ( {MediaType.APPLICATION_JSON})
+   	public String destroyNode(
+   			@QueryParam ("clusterName") String clusterName,
+   			@QueryParam ("node") String node
+   	) {
+   		UUID uuid = elasticsearch.destroyNode(clusterName, node);
+
+   		return JsonUtil.toJson(OPERATION_ID, uuid);
+   	}
 }

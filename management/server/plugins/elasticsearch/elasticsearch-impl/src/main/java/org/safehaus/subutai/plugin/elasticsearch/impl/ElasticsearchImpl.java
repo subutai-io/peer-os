@@ -315,4 +315,28 @@ public class ElasticsearchImpl implements Elasticsearch {
 
         return new StandaloneSetupStrategy( environment, config, po, this );
     }
+
+
+    @Override
+    public UUID addNode(final String clusterName, final String lxcHostname) {
+
+         AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
+
+         executor.execute(operationHandler);
+
+         return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID destroyNode(final String clusterName, final String lxcHostname) {
+
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+
 }
