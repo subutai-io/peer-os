@@ -1656,7 +1656,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ElasticSearch -->
+      <!-- Elasticsearch -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-api</artifactId>
@@ -1675,6 +1675,28 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Elasticsearch Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

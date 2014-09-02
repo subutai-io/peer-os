@@ -30,6 +30,7 @@
         <module>oozie</module>
         <module>lucene</module>
         <module>pig</module>
+        <module>elasticsearch</module>
     </modules>
 
 </project>
