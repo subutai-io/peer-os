@@ -1175,7 +1175,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Hadoop 2-->
+                <!-- Hadoop-->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hadoop-plugin-api</artifactId>
