@@ -22,6 +22,13 @@ public class Commands extends CommandsSingleton {
 	}
 
 
+    public static Command getUninstallCommand( Set<Agent> agents ) {
+        return createCommand( "Uninstall Mahout",
+                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-elasticsearch" ).withTimeout( 60 ),
+                agents );
+    }
+
+
 	public static Command getConfigureCommand(Set<Agent> agents, String param) {
 		return createCommand(new RequestBuilder(String.format(" . /etc/profile && es-conf.sh %s ", param)), agents
 		);
@@ -41,4 +48,11 @@ public class Commands extends CommandsSingleton {
 	public static Command getStopCommand(Set<Agent> agents) {
 		return createCommand(new RequestBuilder("service elasticsearch stop"), agents);
 	}
+
+
+    public static Command getCheckInstalledCommand( Set<Agent> agents ) {
+        return createCommand( "Check installed ksks packages", new RequestBuilder( "dpkg -l | grep '^ii' | grep ksks" ),
+                agents );
+    }
+
 }
