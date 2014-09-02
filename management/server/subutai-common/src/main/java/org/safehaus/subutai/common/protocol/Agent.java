@@ -100,4 +100,7 @@ public class Agent implements Serializable, Comparable<Agent> {
 		return hostname;
 	}
 
+    public void setHostname( String hostname ) {
+        this.hostname = hostname;
+    }
 }

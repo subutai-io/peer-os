@@ -14,9 +14,7 @@ import org.safehaus.subutai.common.protocol.Response;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 	private final String newCoordinatorHostname;
@@ -35,6 +33,7 @@ public class ChangeCoordinatorNodeOperationHandler extends AbstractOperationHand
 
 	@Override
 	public void run() {
+        productOperation = po;
 		final PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));

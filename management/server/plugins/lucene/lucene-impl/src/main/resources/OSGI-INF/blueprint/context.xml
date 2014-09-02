@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+
+    <reference id="tracker" availability="mandatory"
+               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+
+    <reference id="dbManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
+
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.container.ContainerManager"/>
+
+    <bean id="lucene-impl" scope="singleton" class="org.safehaus.subutai.plugin.lucene.impl.LuceneImpl"
+          init-method="init" destroy-method="destroy">
+        <argument ref="commandRunner"/>
+        <argument ref="agentManager"/>
+        <argument ref="dbManager"/>
+        <argument ref="tracker"/>
+        <argument ref="hadoopManager"/>
+        <argument ref="environmentManager"/>
+        <argument ref="containerManager"/>
+    </bean>
+
+    <service ref="lucene-impl" interface="org.safehaus.subutai.plugin.lucene.api.Lucene"/>
+
+</blueprint>

@@ -29,6 +29,8 @@
         <module>cassandra</module>
         <module>oozie</module>
         <module>plugin-common</module>
+        <module>lucene</module>
+        <module>pig</module>
     </modules>
 
 </project>

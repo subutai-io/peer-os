@@ -12,10 +12,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
-
-/**
- * Created by dilshat on 5/7/14.
- */
 public class StopNodeOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;
@@ -42,6 +38,7 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<PrestoImp
     @Override
     public void run()
     {
+        productOperation = po;
         PrestoClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
