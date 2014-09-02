@@ -14,7 +14,7 @@ import com.vaadin.ui.themes.Runo;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.server.ui.component.AgentTree;
-import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.ui.lxcmanager.clone.Cloner;
 import org.safehaus.subutai.ui.lxcmanager.manage.Manager;
 

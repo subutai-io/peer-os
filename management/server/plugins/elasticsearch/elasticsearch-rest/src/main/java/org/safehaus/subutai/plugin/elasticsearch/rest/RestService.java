@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.elasticsearch.rest;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.plugin.elasticsearch.api.*;
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

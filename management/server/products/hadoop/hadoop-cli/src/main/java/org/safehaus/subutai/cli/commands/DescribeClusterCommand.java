@@ -5,7 +5,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**

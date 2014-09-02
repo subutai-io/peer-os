@@ -4,10 +4,10 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
 import org.safehaus.subutai.impl.hadoop.operation.common.AddNodeOperation;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Map;
 import java.util.Set;

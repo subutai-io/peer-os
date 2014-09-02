@@ -19,8 +19,8 @@
  *  @details   KAConnection class is designed for communication with MQTT ACtiveMQ broker.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.3
- *  @date      Jun 13, 2014
+ *  @version   1.0.4
+ *  @date      Sep 02, 2014
  */
 #ifndef KACONNECTION_H_
 #define KACONNECTION_H_
@@ -42,7 +42,6 @@ public:
 	virtual ~KAConnection();
 	bool openSession();
 	bool sendMessage(string);
-	bool sendInotifyMessage(string);
 	bool checkMessageStatus();
 	void resetMessageStatus();
 	void setMessage(string);
@@ -55,7 +54,6 @@ private:
 	const char* id;
 	const char* subscribedTopic;
 	const char* publishedTopic;
-	const char* InotifyTopic;
 	const char* broadcastTopic;
 	int	port;
 	int keepalive;

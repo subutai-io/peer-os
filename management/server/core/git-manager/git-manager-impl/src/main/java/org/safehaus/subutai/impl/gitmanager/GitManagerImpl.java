@@ -18,12 +18,12 @@ import org.safehaus.subutai.api.gitmanager.GitCommand;
 import org.safehaus.subutai.api.gitmanager.GitException;
 import org.safehaus.subutai.api.gitmanager.GitFileStatus;
 import org.safehaus.subutai.api.gitmanager.GitManager;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**

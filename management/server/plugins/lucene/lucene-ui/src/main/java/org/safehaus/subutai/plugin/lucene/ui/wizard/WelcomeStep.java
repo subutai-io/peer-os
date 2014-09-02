@@ -4,8 +4,8 @@ import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 import org.safehaus.subutai.plugin.lucene.ui.LuceneUI;
 
 public class WelcomeStep extends Panel {
@@ -24,7 +24,7 @@ public class WelcomeStep extends Panel {
 		grid.addComponent(welcomeMsg, 3, 1, 6, 2);
 
 		Label logoImg = new Label();
-		logoImg.setIcon(new FileResource(FileUtil.getFile(LuceneUI.MODULE_IMAGE, this)));
+		logoImg.setIcon(new FileResource( FileUtil.getFile( LuceneUI.MODULE_IMAGE, this )));
 		logoImg.setContentMode(ContentMode.HTML);
 		logoImg.setHeight(206, Unit.PIXELS);
 		logoImg.setWidth(100, Unit.PIXELS);

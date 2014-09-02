@@ -4,15 +4,15 @@ package org.safehaus.subutai.plugin.presto.impl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.AddWorkerNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,7 +40,7 @@ public class CheckNodeOperationHandlerTest {
     public void testWithUnconnectedAgents() {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName( "test-cluster" );
-        config.setWorkers( new HashSet< Agent >( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setWorkers( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setCoordinatorNode( CommonMockBuilder.createAgent() );
         mock.setClusterConfig( config );
 

@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.template.manager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;

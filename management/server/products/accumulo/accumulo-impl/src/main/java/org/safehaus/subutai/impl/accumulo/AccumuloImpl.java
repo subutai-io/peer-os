@@ -12,7 +12,7 @@ import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.impl.accumulo.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

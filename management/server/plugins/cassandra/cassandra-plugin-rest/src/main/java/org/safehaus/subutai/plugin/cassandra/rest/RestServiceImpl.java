@@ -7,8 +7,8 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**

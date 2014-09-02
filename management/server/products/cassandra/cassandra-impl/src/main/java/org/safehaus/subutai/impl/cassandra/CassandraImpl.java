@@ -17,10 +17,10 @@ import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.AgentUtil;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.util.AgentUtil;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 
 public class CassandraImpl implements Cassandra {
 

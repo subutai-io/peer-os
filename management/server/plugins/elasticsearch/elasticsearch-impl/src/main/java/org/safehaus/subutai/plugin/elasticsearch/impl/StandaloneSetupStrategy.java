@@ -7,13 +7,11 @@ import java.util.Set;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.common.exception.*;
+import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.settings.*;
+import org.safehaus.subutai.common.tracker.*;
 import org.safehaus.subutai.plugin.elasticsearch.api.Config;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

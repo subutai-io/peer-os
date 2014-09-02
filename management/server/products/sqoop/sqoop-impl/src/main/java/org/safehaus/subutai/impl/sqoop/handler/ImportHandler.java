@@ -4,11 +4,11 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.sqoop.setting.ImportSetting;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;
 import org.safehaus.subutai.impl.sqoop.CommandType;
 import org.safehaus.subutai.impl.sqoop.SqoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;

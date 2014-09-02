@@ -12,8 +12,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.api.communicationmanager.CommandJson;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 
 import javax.jms.*;
 import java.util.UUID;

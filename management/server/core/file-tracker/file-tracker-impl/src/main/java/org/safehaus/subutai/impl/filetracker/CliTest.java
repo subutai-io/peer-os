@@ -6,8 +6,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
 import org.safehaus.subutai.api.filetracker.FileTracker;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 
 
 /**

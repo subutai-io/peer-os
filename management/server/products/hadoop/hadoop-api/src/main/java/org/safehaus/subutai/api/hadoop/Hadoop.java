@@ -1,7 +1,7 @@
 package org.safehaus.subutai.api.hadoop;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
 

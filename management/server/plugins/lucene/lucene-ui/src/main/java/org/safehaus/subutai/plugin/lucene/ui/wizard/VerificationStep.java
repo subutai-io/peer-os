@@ -4,9 +4,9 @@ package org.safehaus.subutai.plugin.lucene.ui.wizard;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.lucene.api.*;
 import org.safehaus.subutai.plugin.lucene.ui.LuceneUI;
 

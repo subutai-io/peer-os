@@ -32,12 +32,12 @@ import org.safehaus.subutai.api.lxcmanager.LxcState;
 import org.safehaus.subutai.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
-import org.safehaus.subutai.common.StringUtil;
-import org.safehaus.subutai.common.UUIDUtil;
+import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
 import org.safehaus.subutai.impl.strategy.RoundRobinStrategy;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

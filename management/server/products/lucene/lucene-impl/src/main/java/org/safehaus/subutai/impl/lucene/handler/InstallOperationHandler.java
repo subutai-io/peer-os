@@ -6,11 +6,11 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lucene.Config;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.impl.lucene.Commands;
 import org.safehaus.subutai.impl.lucene.LuceneImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Iterator;
 

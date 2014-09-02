@@ -3,15 +3,15 @@ package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.plugin.lucene.api.SetupType;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl>

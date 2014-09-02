@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
 
 public class StartHandler extends AbstractOperationHandler<FlumeImpl> {
 

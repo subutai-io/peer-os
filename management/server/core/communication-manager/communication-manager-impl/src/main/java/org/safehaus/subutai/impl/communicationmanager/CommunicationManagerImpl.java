@@ -8,7 +8,7 @@ import org.apache.activemq.advisory.AdvisorySupport;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.shared.protocol.Request;
+import org.safehaus.subutai.common.protocol.Request;
 
 import javax.jms.*;
 import java.util.Collection;

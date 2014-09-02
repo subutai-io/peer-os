@@ -6,11 +6,11 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.pig.ui.PigUI;
 
 import java.util.List;

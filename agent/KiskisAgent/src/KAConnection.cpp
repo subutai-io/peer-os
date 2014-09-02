@@ -28,7 +28,6 @@ KAConnection::KAConnection(const char * id, const char * subscribedTopic, const 
 	this->subscribedTopic = subscribedTopic;
 	this->broadcastTopic = broadcastTopic;
 	this->publishedTopic = publishedTopic;
-	this->InotifyTopic = "INOTIFY_TOPIC";
 	this->reveivedMessage=false;
 	this->connectionStatus=false;
 	this->bufferSize = 10000;
@@ -110,16 +109,6 @@ bool KAConnection::sendMessage(string message)
 {
 	const  char * _message = message.c_str();
 	int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
-	return ( ret == MOSQ_ERR_SUCCESS );
-}
-
-/**
- *  \details   This method sends the given strings about inotify to MQTT Broker.
- */
-bool KAConnection::sendInotifyMessage(string message)
-{
-	const  char * _message = message.c_str();
-	int ret = publish(NULL,this->InotifyTopic,strlen(_message),_message,2,true);
 	return ( ret == MOSQ_ERR_SUCCESS );
 }
 

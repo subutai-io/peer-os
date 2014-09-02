@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.accumulo.Accumulo;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
 import org.safehaus.subutai.api.commandrunner.CommandStatus;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -3,11 +3,11 @@ package org.safehaus.subutai.impl.solr.handler;
 
 import org.junit.Test;
 import org.safehaus.subutai.api.solr.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.impl.solr.SolrImpl;
 import org.safehaus.subutai.impl.solr.handler.mock.MockBuilder;
 import org.safehaus.subutai.impl.solr.handler.mock.SolrImplMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

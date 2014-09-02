@@ -7,7 +7,7 @@ import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

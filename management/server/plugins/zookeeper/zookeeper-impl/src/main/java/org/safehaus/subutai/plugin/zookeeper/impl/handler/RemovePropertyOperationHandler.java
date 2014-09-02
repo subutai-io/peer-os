@@ -8,9 +8,9 @@ import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.impl.Commands;
 import org.safehaus.subutai.plugin.zookeeper.impl.ZookeeperImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;

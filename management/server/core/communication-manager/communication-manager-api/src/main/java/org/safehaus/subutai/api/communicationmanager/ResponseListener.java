@@ -1,7 +1,7 @@
 package org.safehaus.subutai.api.communicationmanager;
 
 
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Response;
 
 
 /**

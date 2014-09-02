@@ -12,8 +12,8 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;

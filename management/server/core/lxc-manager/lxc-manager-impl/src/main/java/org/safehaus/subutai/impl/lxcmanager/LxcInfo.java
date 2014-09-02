@@ -6,7 +6,7 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**

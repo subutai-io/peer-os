@@ -12,7 +12,7 @@ import org.safehaus.subutai.product.common.test.unit.mock.CommandMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 
 public class MockBuilder {

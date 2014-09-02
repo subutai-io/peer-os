@@ -12,7 +12,7 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.mongodb.api.Mongo;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;

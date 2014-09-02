@@ -2,7 +2,7 @@ package utils;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Iterator;

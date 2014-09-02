@@ -3,8 +3,8 @@ package org.safehaus.subutai.hadoop.services;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

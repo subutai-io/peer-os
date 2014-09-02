@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 
 /**

@@ -7,11 +7,11 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.elasticsearch.api.*;
+import org.safehaus.subutai.plugin.elasticsearch.api.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.elasticsearch.ui.ElasticsearchUI;
 
 import java.util.Iterator;

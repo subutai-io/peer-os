@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.impl.hive.handler.mock.HiveImplMock;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.HashSet;
 

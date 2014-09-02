@@ -4,14 +4,15 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.flume.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.flume.CommandType;
 import org.safehaus.subutai.impl.flume.Commands;
 import org.safehaus.subutai.impl.flume.FlumeImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
-public class UninstallHandler extends AbstractOperationHandler<FlumeImpl> {
+public class UninstallHandler extends AbstractOperationHandler<FlumeImpl>
+{
 
 	public UninstallHandler(FlumeImpl manager, String clusterName) {
 		super(manager, clusterName);

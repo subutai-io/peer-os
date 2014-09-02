@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.networkmanager;
 
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.List;
 

@@ -175,7 +175,7 @@ string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNu
 string KAResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
 {
 	clear();
-	this->setType("INOTIFY_RESPONSE");
+	this->setType("INOTIFY_ACTION_RESPONSE");
 	this->setUuid(uuid);
 	this->setconfigPoint(configPoint);
 	this->setDateTime(dateTime);
@@ -191,10 +191,9 @@ string KAResponsePack::createInotifyMessage(string uuid ,string configPoint,stri
 string KAResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
 {
 	clear();
-	this->setType("INOTIFY_SHOW_RESPONSE");
+	this->setType("INOTIFY_LIST_RESPONSE");
 	this->setUuid(uuid);
 	this->setConfPoints(configPoint);
-
 	this->serialize(sendout);
 	return sendout;
 }
