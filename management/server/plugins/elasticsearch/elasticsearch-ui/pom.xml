@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>template-manager-parent</artifactId>
+        <artifactId>elasticsearch-plugin-parent</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>template-manager-rest</artifactId>
-    <name>Subutai Template Manager Rest</name>
-    <description>Subutai Template Manager Rest</description>
+    <artifactId>elasticsearch-plugin-ui</artifactId>
+    <name>Subutai Elasticsearch UI</name>
+    <description>Subutai Elasticsearch UI</description>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -21,11 +21,25 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>subutai-common</artifactId>
+            <artifactId>elasticsearch-plugin-api</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>template-manager-api</artifactId>
+            <artifactId>tracker-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>vaadin-custom</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -33,30 +47,26 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>apt-repository-api</artifactId>
+            <artifactId>command-runner-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>template-registry-api</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--CXF-->
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>command-runner-api</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -67,13 +77,14 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.rest.template.manager</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.elasticsearch.ui</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
