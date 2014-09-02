@@ -82,7 +82,6 @@ function deb_pkg {
   propline="`cat $conf | grep subutai.template.package`"
 
   if [ -z "$propline" ]; then
-    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
     debian_file=$debian_dir".deb"
   else
     debian_file=`echo $propline | awk '{print $3}'`
