@@ -94,4 +94,13 @@ public interface TemplateManager {
      * @return
      */
     public String getPackageName(String templateName);
+
+    /**
+     * Gets a full Debian package name for a given template. Name does not have
+     * <tt>.deb</tt> extension.
+     *
+     * @param templateName the template name
+     * @return
+     */
+    public String getDebianPackageName(String templateName);
 }
