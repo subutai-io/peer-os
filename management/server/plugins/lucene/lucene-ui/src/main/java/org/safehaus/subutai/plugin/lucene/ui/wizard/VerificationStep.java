@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.lucene.ui.wizard;
 
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.lucene.ui.wizard.ConfigView;
-import org.safehaus.subutai.plugin.lucene.ui.wizard.Wizard;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.lucene.api.*;
@@ -18,9 +13,6 @@ import org.safehaus.subutai.plugin.lucene.ui.LuceneUI;
 import java.util.UUID;
 
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel {
 
 	public VerificationStep(final Wizard wizard) {
@@ -36,30 +28,48 @@ public class VerificationStep extends Panel {
 				+ "(you may change them by clicking on Back button)</strong><br/>");
 		confirmationLbl.setContentMode(ContentMode.HTML);
 
-		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Hadoop cluster Name", wizard.getConfig().getHadoopClusterName());
-		for (Agent agent : wizard.getConfig().getNodes()) {
-			cfgView.addStringCfg("Node to install", agent.getHostname() + "");
-		}
+        final Config config = wizard.getConfig();
 
-		Button install = new Button("Install");
-		install.addStyleName("default");
-		install.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = LuceneUI.getLuceneManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(LuceneUI.getExecutor(), LuceneUI.getTracker(), trackID,
-						Config.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						wizard.init();
-					}
-				});
-				getUI().addWindow(window.getWindow());
-			}
-		});
+        ConfigView cfgView = new ConfigView( "Installation configuration" );
+        cfgView.addStringCfg( "Installation Name", wizard.getConfig().getClusterName() );
+        cfgView.addStringCfg( "Hadoop cluster name", wizard.getConfig().getHadoopClusterName() );
+
+        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+            for ( Agent agent : wizard.getConfig().getNodes() ) {
+                cfgView.addStringCfg( "Node to install", agent.getHostname() + "" );
+            }
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            HadoopClusterConfig hc = wizard.getHadoopConfig();
+
+            cfgView.addStringCfg( "Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "" );
+            cfgView.addStringCfg( "Replication factor", hc.getReplicationFactor() + "" );
+            cfgView.addStringCfg( "Domain name", hc.getDomainName() );
+        }
+
+        Button install = new Button( "Install" );
+        install.addStyleName( "default" );
+        install.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                UUID trackId = null;
+                if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+                    trackId = LuceneUI.getLuceneManager().installCluster( config );
+                }
+                else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+//                    trackId = LuceneUI.getLuceneManager().installCluster( config, wizard.getHadoopConfig() );
+                }
+                ProgressWindow window = new ProgressWindow( LuceneUI.getExecutor(), LuceneUI.getTracker(), trackId,
+                        Config.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        wizard.init();
+                    }
+                } );
+                getUI().addWindow( window.getWindow() );
+            }
+        } );
 
 		Button back = new Button("Back");
 		back.addStyleName("default");

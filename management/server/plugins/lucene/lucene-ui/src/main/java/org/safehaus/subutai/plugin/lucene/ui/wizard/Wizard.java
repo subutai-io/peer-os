@@ -1,23 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.lucene.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.*;
 
 
-/**
- * @author dilshat
- */
 public class Wizard {
 
 	private final GridLayout grid;
 	private int step = 1;
 	private Config config = new Config();
+    private HadoopClusterConfig hadoopConfig = new HadoopClusterConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -26,6 +21,12 @@ public class Wizard {
 
 		putForm();
 	}
+
+
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
+    }
+
 
 	private void putForm() {
 		grid.removeComponent(0, 1);
