@@ -102,7 +102,8 @@ function export {
   # ----------------------------------------------------------------------------
 
   debian_package_name=`get_debian_package_name $container`
-  debian_root="$SUBUTAI_TMPDIR/$debian_package_name"
+  debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
   deltas="$debian_root/deltas"
   mkdir -p $deltas
   zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
@@ -122,8 +123,8 @@ function export {
   pkg=`deb_pkg $container`
   check_status "debian package $pkg generated" "$?"
   
-  # Remove debian root directory after debian package generation
-  rm -rf $debian_root
+  # Remove debian directory after debian package generation
+  rm -rf $debian_dir
   unlock_container_write $container
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }
