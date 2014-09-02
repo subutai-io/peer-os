@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.common.AgentUtil;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 
 /**

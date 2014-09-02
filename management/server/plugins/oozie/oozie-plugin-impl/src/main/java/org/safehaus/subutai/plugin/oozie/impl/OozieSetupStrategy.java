@@ -2,11 +2,12 @@ package org.safehaus.subutai.plugin.oozie.impl;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 
 import com.google.common.base.Strings;
 
