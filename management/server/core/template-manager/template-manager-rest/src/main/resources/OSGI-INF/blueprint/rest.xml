@@ -21,12 +21,15 @@
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
     <reference id="repoManager" availability="mandatory"
                interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
+    <reference id="commandRunner" availability="mandatory"
+               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
     <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.rest.template.manager.RestServiceImpl">
         <property name="templateManager" ref="templateManager"/>
         <property name="templateRegistry" ref="templateRegistry"/>
         <property name="aptRepoManager" ref="repoManager"/>
         <property name="agentManager" ref="agentManager"/>
+        <property name="commandRunner" ref="commandRunner"/>
     </bean>
 
     <jaxrs:server address="/template" id="templateManagerRestService">

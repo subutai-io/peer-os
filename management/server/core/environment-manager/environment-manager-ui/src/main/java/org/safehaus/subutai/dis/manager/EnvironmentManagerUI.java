@@ -4,7 +4,7 @@ package org.safehaus.subutai.dis.manager;
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;

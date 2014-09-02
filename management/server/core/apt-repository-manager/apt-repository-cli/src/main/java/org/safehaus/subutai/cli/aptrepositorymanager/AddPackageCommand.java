@@ -7,7 +7,7 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.settings.Common;
 
 
 @Command (scope = "apt", name = "add-package", description = "Add package to apt repository by path")
@@ -35,7 +35,7 @@ public class AddPackageCommand extends OsgiCommandSupport {
 
 		try {
 			aptRepositoryManager
-					.addPackageByPath(agentManager.getAgentByHostname(Common.MANAGEMENT_AGENT_HOSTNAME), packagePath,
+					.addPackageByPath(agentManager.getAgentByHostname( Common.MANAGEMENT_AGENT_HOSTNAME), packagePath,
 							false);
 		} catch (AptRepoException e) {
 			System.out.println(e);

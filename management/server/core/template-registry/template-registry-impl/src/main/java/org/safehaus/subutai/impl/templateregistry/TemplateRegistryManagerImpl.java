@@ -24,8 +24,8 @@ import org.safehaus.subutai.api.templateregistry.RegistryException;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
-import org.safehaus.subutai.common.StringUtil;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

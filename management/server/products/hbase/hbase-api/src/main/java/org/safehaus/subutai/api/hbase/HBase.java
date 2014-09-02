@@ -7,7 +7,7 @@ package org.safehaus.subutai.api.hbase;
 
 
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.List;
 import java.util.UUID;

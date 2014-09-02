@@ -1,7 +1,7 @@
 package org.safehaus.subutai.pet.ui;
 
 
-import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.common.protocol.Disposable;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;

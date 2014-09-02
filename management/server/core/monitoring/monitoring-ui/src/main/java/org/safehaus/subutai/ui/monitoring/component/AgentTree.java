@@ -12,9 +12,9 @@ import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
 import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Disposable;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.common.settings.Common;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -200,7 +200,7 @@ public final class AgentTree extends ConcurrentComponent
 
 				//add orphans to tree
 				if (!possibleOrphans.isEmpty()) {
-					Item parent = container.getItem(Common.UNKNOWN_LXC_PARENT_NAME);
+					Item parent = container.getItem( Common.UNKNOWN_LXC_PARENT_NAME);
 					if (parent == null) {
 						parent = container.addItem(Common.UNKNOWN_LXC_PARENT_NAME);
 					}

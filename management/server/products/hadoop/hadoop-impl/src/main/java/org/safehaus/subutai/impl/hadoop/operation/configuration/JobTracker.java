@@ -3,12 +3,12 @@ package org.safehaus.subutai.impl.hadoop.operation.configuration;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.Commands;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,7 +57,7 @@ public class JobTracker {
 						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
 							@Override
 							public void onComplete(NodeState state) {
-								if (NodeState.RUNNING.equals(state)) {
+								if ( NodeState.RUNNING.equals(state)) {
 									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 									isSuccessful.set(true);
 								}

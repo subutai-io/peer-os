@@ -4,7 +4,7 @@ package org.safehaus.subutai.cli.templateregistry;
 import java.nio.charset.Charset;
 
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;

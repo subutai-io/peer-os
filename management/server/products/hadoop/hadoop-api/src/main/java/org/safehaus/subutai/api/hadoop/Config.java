@@ -1,9 +1,9 @@
 package org.safehaus.subutai.api.hadoop;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.settings.Common;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class Config implements ConfigBase {
 	public static final String PRODUCT_KEY = "Hadoop";
-	public static final String PRODUCT_PACKAGE = (Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
+	public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
 	public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
 
 	private String clusterName, domainName;

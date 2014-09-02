@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>presto-plugin-cli</artifactId>
-    <name>:: Subutai Presto CLI</name>
+    <name>Subutai Presto CLI</name>
     <description>Subutai Presto CLI</description>
     <packaging>bundle</packaging>
 
@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
+            <artifactId>subutai-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

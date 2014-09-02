@@ -17,10 +17,10 @@ import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 
 
 public class HBaseImpl implements HBase {

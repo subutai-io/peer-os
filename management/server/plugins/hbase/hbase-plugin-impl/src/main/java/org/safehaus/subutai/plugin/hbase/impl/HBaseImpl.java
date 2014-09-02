@@ -14,6 +14,8 @@ import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
@@ -24,11 +26,9 @@ import org.safehaus.subutai.plugin.hbase.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Preconditions;
 

@@ -18,8 +18,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.shared.protocol.Parameters;
-import org.safehaus.subutai.shared.protocol.Setting;
+import org.safehaus.subutai.common.protocol.Parameters;
+import org.safehaus.subutai.common.protocol.Setting;
 
 public class MonitorView extends VerticalLayout implements View {
 

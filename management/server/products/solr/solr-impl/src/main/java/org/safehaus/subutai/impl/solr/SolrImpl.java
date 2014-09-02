@@ -8,8 +8,8 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.solr.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

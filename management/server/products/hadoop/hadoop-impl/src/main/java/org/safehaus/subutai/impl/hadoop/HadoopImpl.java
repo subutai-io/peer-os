@@ -12,7 +12,7 @@ import org.safehaus.subutai.impl.hadoop.operation.Adding;
 import org.safehaus.subutai.impl.hadoop.operation.Deletion;
 import org.safehaus.subutai.impl.hadoop.operation.Installation;
 import org.safehaus.subutai.impl.hadoop.operation.configuration.*;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.List;
 import java.util.UUID;

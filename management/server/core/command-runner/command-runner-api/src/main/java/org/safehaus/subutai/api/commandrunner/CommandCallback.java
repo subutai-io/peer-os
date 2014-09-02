@@ -6,7 +6,7 @@
 package org.safehaus.subutai.api.commandrunner;
 
 
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Response;
 
 
 /**

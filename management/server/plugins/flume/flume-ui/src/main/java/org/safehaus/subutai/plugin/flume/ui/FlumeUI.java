@@ -11,7 +11,7 @@ import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 public class FlumeUI implements PortalModule {
 

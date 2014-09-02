@@ -1,15 +1,10 @@
 package org.safehaus.subutai.api.templateregistry;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.annotations.Expose;
+import java.util.*;
 
 
 /**
@@ -102,7 +97,7 @@ public class Template {
 
 
     public boolean isInUseOnFAIs() {
-        return !faisUsingThisTemplate.isEmpty();
+        return faisUsingThisTemplate != null && !faisUsingThisTemplate.isEmpty();
     }
 
 

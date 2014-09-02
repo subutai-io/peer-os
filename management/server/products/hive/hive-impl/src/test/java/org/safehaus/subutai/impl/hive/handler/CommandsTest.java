@@ -7,7 +7,7 @@ import org.safehaus.subutai.impl.hive.CommandType;
 import org.safehaus.subutai.impl.hive.Commands;
 import org.safehaus.subutai.impl.hive.Product;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 public class CommandsTest {
 

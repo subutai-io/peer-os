@@ -7,8 +7,8 @@ package org.safehaus.subutai.ui.accumulo.manager;
 
 
 import org.safehaus.subutai.api.accumulo.Config;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.ui.accumulo.AccumuloUI;
 
 import java.util.UUID;

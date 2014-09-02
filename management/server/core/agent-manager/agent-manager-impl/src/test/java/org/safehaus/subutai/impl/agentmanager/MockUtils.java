@@ -6,8 +6,8 @@
 package org.safehaus.subutai.impl.agentmanager;
 
 
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.ResponseType;
+import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +29,7 @@ public class MockUtils {
 		when(response.getIps()).thenReturn(mock(List.class));
 		when(response.getHostname()).thenReturn("lxchostname");
 		when(response.getParentHostName()).thenReturn("hostname");
-		when(response.getType()).thenReturn(ResponseType.REGISTRATION_REQUEST);
+		when(response.getType()).thenReturn( ResponseType.REGISTRATION_REQUEST);
 
 		return response;
 	}

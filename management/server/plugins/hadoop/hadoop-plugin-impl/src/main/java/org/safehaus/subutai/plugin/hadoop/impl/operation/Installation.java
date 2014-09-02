@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.hadoop.impl.operation;
 
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopDbSetupStrategy;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
 
 import java.util.UUID;
 

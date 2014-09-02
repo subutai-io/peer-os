@@ -2,13 +2,13 @@ package org.safehaus.subutai.plugin.flume.api;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 public class FlumeConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Flume2";
-    public static final String TEMPLATE_NAME = "flume";
+    public static final String TEMPLATE_NAME = "hadoopflume";
 
     private String clusterName = "";
     private SetupType setupType;

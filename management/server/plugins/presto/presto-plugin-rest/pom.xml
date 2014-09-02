@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>presto-plugin-rest</artifactId>
-    <name>:: Subutai Presto REST</name>
+    <name>Subutai Presto REST</name>
     <description>Subutai Presto REST</description>
     <packaging>bundle</packaging>
 
@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
+            <artifactId>subutai-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

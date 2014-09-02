@@ -14,8 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.dbmanager.DbManagerImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

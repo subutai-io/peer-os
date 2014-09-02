@@ -14,11 +14,11 @@ import org.safehaus.subutai.api.agentmanager.AgentListener;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
 import org.safehaus.subutai.api.communicationmanager.ResponseListener;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
-import org.safehaus.subutai.shared.protocol.enums.RequestType;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.settings.Common;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -195,7 +195,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 			Preconditions.checkNotNull(communicationService, "Communication service is null");
 
 			agents = CacheBuilder.newBuilder().
-					expireAfterWrite(Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
+					expireAfterWrite( Common.AGENT_FRESHNESS_MIN, TimeUnit.MINUTES).
 					build();
 
 			communicationService.addListener(this);

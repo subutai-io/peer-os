@@ -2,8 +2,8 @@ package org.safehaus.subutai.product.common.test.unit.mock;
 
 
 import org.safehaus.subutai.api.commandrunner.*;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Request;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
 
 import java.util.Set;
 import java.util.UUID;

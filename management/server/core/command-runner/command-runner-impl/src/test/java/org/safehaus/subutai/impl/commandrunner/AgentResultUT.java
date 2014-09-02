@@ -7,7 +7,7 @@ package org.safehaus.subutai.impl.commandrunner;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.UUID;
 

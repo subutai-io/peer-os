@@ -1,144 +1,233 @@
 package org.safehaus.subutai.rest.template.manager;
 
+
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.RegistryException;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
 
-public class RestServiceImpl implements RestService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestServiceImpl.class);
+public class RestServiceImpl implements RestService
+{
+
+    private static final Logger logger = Logger.getLogger( RestServiceImpl.class.getName() );
     TemplateManager templateManager;
     TemplateRegistryManager templateRegistry;
     AptRepositoryManager aptRepoManager;
     AgentManager agentManager;
+    CommandRunner commandRunner;
     private String managementHostName = "management";
 
-    public void setTemplateManager(TemplateManager templateManager) {
+
+    public void setTemplateManager( TemplateManager templateManager )
+    {
         this.templateManager = templateManager;
     }
 
-    public void setTemplateRegistry(TemplateRegistryManager templateRegistry) {
+
+    public void setTemplateRegistry( TemplateRegistryManager templateRegistry )
+    {
         this.templateRegistry = templateRegistry;
     }
 
-    public void setAptRepoManager(AptRepositoryManager aptRepoManager) {
+
+    public void setAptRepoManager( AptRepositoryManager aptRepoManager )
+    {
         this.aptRepoManager = aptRepoManager;
     }
 
-    public void setAgentManager(AgentManager agentManager) {
+
+    public void setAgentManager( AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
+    public void setCommandRunner(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
+    }
+
     @Override
-    public String getManagementHostName() {
+    public String getManagementHostName()
+    {
         return managementHostName;
     }
 
+
     @Override
-    public void setManagementHostName(String managementHostName) {
+    public void setManagementHostName( String managementHostName )
+    {
         this.managementHostName = managementHostName;
     }
 
+
     @Override
-    public Response importTemplate(InputStream in, String configDir) {
+    public Response importTemplate( InputStream in, String configDir )
+    {
         Path path;
-        try {
-            path = Files.createTempFile("subutai-template-", ".deb");
-            try(OutputStream os = new FileOutputStream(path.toFile())) {
+        try
+        {
+            path = Files.createTempFile( "subutai-template-", ".deb" );
+            try (OutputStream os = new FileOutputStream( path.toFile() ))
+            {
                 int len;
                 byte[] buf = new byte[1024];
-                while((len = in.read(buf)) > 0) {
-                    os.write(buf, 0, len);
+                while ( ( len = in.read( buf ) ) > 0 )
+                {
+                    os.write( buf, 0, len );
                 }
                 os.flush();
             }
-            logger.info("Payload saved to " + path.toString());
-        } catch(IOException ex) {
+            logger.info( "Payload saved to " + path.toString() );
+        }
+        catch ( IOException ex )
+        {
             String m = "Failed to write payload data to file";
-            logger.error(m, ex);
+            logger.log( Level.SEVERE, m, ex );
             return Response.serverError().build();
         }
 
-        Agent mgmt = agentManager.getAgentByHostname(managementHostName);
-        try {
-            aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
+        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
+        try
+        {
+            Path configPath = Paths.get( configDir, "config" );
+            Path packagesPath = Paths.get( configDir, "packages" );
+            List<String> files = aptRepoManager.readFileContents( mgmt, path.toString(),
+                Arrays.asList( configPath.toString(), packagesPath.toString() ) );
 
-            Path configPath = Paths.get(configDir, "config");
-            Path packagesPath = Paths.get(configDir, "packages");
-            List<String> files = aptRepoManager.readFileContents(mgmt, path.toString(),
-                    Arrays.asList(configPath.toString(), packagesPath.toString()));
-
-            HashCode md5 = com.google.common.io.Files.hash(path.toFile(), Hashing.md5());
+            HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
             String md5sum = md5.toString();
 
+            String templateName = retrieveTemplateName(files.get(0));
+            String debPack = templateManager.getDebianPackageName(templateName);
+            path = movePath(path, debPack + ".deb");
+            if(path == null) throw new Exception("Failed to rename uploaded package");
+
+            aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
             templateRegistry.registerTemplate(files.get(0), files.get(1), md5sum);
-        } catch(AptRepoException ex) {
+
+        } catch(AptRepoException ex)        {
             String m = "Failed to process deb package";
-            logger.error(m, ex);
+            logger.log( Level.SEVERE, m, ex );
             return Response.serverError().build();
-        } catch(Exception ex) {
-            String m = "Import of package failed";
-            logger.error(m, ex);
-            return Response.serverError().build();
-        } finally {
-            // clean up
-            path.toFile().delete();
         }
-        logger.info("Template package successfully imported.");
+        catch ( Exception ex )
+        {
+            String m = "Import of package failed";
+            logger.log( Level.SEVERE, m, ex );
+            return Response.serverError().build();
+        }
+        finally
+        {
+            // clean up
+            if(path != null) path.toFile().delete();
+        }
+        logger.info( "Template package successfully imported." );
         return Response.ok().build();
     }
 
+
     @Override
-    public Response exportTemplate(String templateName) {
+    public Response exportTemplate( String templateName )
+    {
         // TODO: we need to be able to export in specified physical sever
         // currently this method calls export script on management server
-        String path = templateManager.exportTemplate(managementHostName, templateName);
-        if(path == null)
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        String path = templateManager.exportTemplate( managementHostName, templateName );
+        if ( path == null )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
 
-        String cd = "attachment; filename=\"" + Paths.get(path).getFileName() + "\"";
-        return Response.ok(new File(path)).
-                header("Content-Disposition", cd).
-                type(MediaType.APPLICATION_OCTET_STREAM_TYPE).build();
+        String cd = "attachment; filename=\"" + Paths.get( path ).getFileName() + "\"";
+        return Response.ok( new File( path ) ).
+            header( "Content-Disposition", cd ).
+            type( MediaType.APPLICATION_OCTET_STREAM_TYPE ).build();
     }
 
-    @Override
-    public Response unregister(String templateName) {
 
-        try {
-            templateRegistry.unregisterTemplate(templateName);
-            logger.info("Template unregistered: {}", templateName);
-        } catch(RegistryException ex) {
-            logger.error("Failed to unregister template", ex);
+    @Override
+    public Response unregister( String templateName )
+    {
+        try
+        {
+            templateRegistry.unregisterTemplate( templateName );
+            logger.info( String.format( "Template unregistered: %s", templateName ) );
+        }
+        catch ( RegistryException ex )
+        {
+            logger.log( Level.SEVERE, "Failed to unregister template", ex );
             return Response.serverError().build();
         }
 
-        String pack_name = templateManager.getPackageName(templateName);
-        Agent mgmt = agentManager.getAgentByHostname(managementHostName);
-        try {
-            aptRepoManager.removePackageByName(mgmt, pack_name);
-            logger.info("Package removed from repository: {}", pack_name);
-        } catch(AptRepoException ex) {
-            logger.error("Failed to remove from repo", ex);
+        String pack_name = templateManager.getPackageName( templateName );
+        Agent mgmt = agentManager.getAgentByHostname( managementHostName );
+        try
+        {
+            aptRepoManager.removePackageByName( mgmt, pack_name );
+            logger.info(String.format("Package removed from repository: %s", pack_name));
+
+            removeDebianPackage(templateName);
+        }
+        catch ( AptRepoException ex )
+        {
+            logger.log( Level.SEVERE, "Failed to remove from repo", ex );
             return Response.serverError().build();
         }
 
         return Response.ok().build();
+    }
+
+    private String retrieveTemplateName(String config) {
+        Properties prop = new Properties();
+        try {
+            prop.load(new StringReader(config));
+            return prop.getProperty("lxc.utsname");
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to retrieve template name from config: {}",
+                    ex.getMessage());
+        }
+        return null;
+    }
+
+    private Path movePath(Path path, String newName) {
+        Path new_path = Paths.get(path.getParent().toString(), newName);
+        try {
+            Files.move(path, new_path, StandardCopyOption.REPLACE_EXISTING);
+            return new_path;
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to move package file: {0}", ex.getMessage());
+        }
+        return null;
+    }
+
+    private void removeDebianPackage(String templateName) {
+        String deb_pack = templateManager.getDebianPackageName(templateName);
+        if(deb_pack == null) {
+            logger.log(Level.WARNING, "Can't get Debian package name for {0}", templateName);
+            return;
+        }
+        deb_pack += ".deb";
+
+        Path path = Paths.get(Common.APT_REPO_PATH,
+                Common.APT_REPO_AMD64_PACKAGES_SUBPATH, deb_pack);
+        try {
+            Files.delete(path);
+            logger.log(Level.INFO, "Removed package file {0}", path);
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to remove package file " + deb_pack, ex);
+        }
     }
 }

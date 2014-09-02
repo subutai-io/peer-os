@@ -6,8 +6,8 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
 
 import java.util.Collection;

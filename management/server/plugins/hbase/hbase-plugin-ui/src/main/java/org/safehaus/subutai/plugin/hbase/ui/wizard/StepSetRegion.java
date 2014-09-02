@@ -9,7 +9,7 @@ package org.safehaus.subutai.plugin.hbase.ui.wizard;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.Set;
