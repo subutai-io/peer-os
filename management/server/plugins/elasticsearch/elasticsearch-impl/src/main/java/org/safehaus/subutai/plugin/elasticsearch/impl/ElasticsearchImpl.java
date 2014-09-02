@@ -22,7 +22,6 @@ import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
