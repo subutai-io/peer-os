@@ -4,12 +4,12 @@ import java.util.Iterator;
 
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.pig.api.Config;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 import com.google.common.base.Strings;
 
@@ -21,9 +21,11 @@ class OverHadoopSetupStrategy extends PigSetupStrategy {
     }
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
-        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil.isCollectionEmpty( config.getNodes() ) )
+        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || CollectionUtil
+            .isCollectionEmpty( config.getNodes() ) )
         {
             throw new ClusterSetupException("Malformed configuration\nInstallation aborted");
         }
