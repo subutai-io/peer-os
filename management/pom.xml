@@ -1148,6 +1148,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Lucene Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Pig -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1172,6 +1199,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>pig-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Pig Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
