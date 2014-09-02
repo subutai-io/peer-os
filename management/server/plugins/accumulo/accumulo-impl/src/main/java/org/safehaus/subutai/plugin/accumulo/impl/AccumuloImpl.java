@@ -18,6 +18,7 @@ import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.api.SetupType;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.*;
+
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
@@ -34,8 +35,9 @@ import java.util.concurrent.Executors;
 public class AccumuloImpl implements Accumulo
 {
 
+    protected Commands commands;
     private CommandRunner commandRunner;
-    private AgentManager agentManager;
+    protected AgentManager agentManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
@@ -63,6 +65,7 @@ public class AccumuloImpl implements Accumulo
         this.zkManager = zkManager;
         this.environmentManager = environmentManager;
         this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
 
         Commands.init( commandRunner );
     }
@@ -121,6 +124,9 @@ public class AccumuloImpl implements Accumulo
         executor.shutdown();
     }
 
+    public Commands getCommands() {
+        return commands;
+    }
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig )
     {
@@ -181,7 +187,6 @@ public class AccumuloImpl implements Accumulo
     public AccumuloClusterConfig getCluster( String clusterName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-
         try
         {
             return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );

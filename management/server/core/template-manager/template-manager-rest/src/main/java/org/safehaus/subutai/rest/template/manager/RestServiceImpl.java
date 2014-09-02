@@ -3,24 +3,22 @@ package org.safehaus.subutai.rest.template.manager;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepoException;
 import org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.RegistryException;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.common.protocol.Agent;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.safehaus.subutai.common.settings.Common;
 
 
 public class RestServiceImpl implements RestService
@@ -31,6 +29,7 @@ public class RestServiceImpl implements RestService
     TemplateRegistryManager templateRegistry;
     AptRepositoryManager aptRepoManager;
     AgentManager agentManager;
+    CommandRunner commandRunner;
     private String managementHostName = "management";
 
 
@@ -57,6 +56,9 @@ public class RestServiceImpl implements RestService
         this.agentManager = agentManager;
     }
 
+    public void setCommandRunner(CommandRunner commandRunner) {
+        this.commandRunner = commandRunner;
+    }
 
     @Override
     public String getManagementHostName()
@@ -101,8 +103,6 @@ public class RestServiceImpl implements RestService
         Agent mgmt = agentManager.getAgentByHostname( managementHostName );
         try
         {
-            aptRepoManager.addPackageByPath( mgmt, path.toString(), false );
-
             Path configPath = Paths.get( configDir, "config" );
             Path packagesPath = Paths.get( configDir, "packages" );
             List<String> files = aptRepoManager.readFileContents( mgmt, path.toString(),
@@ -111,10 +111,15 @@ public class RestServiceImpl implements RestService
             HashCode md5 = com.google.common.io.Files.hash( path.toFile(), Hashing.md5() );
             String md5sum = md5.toString();
 
-            templateRegistry.registerTemplate( files.get( 0 ), files.get( 1 ), md5sum );
-        }
-        catch ( AptRepoException ex )
-        {
+            String templateName = retrieveTemplateName(files.get(0));
+            String debPack = templateManager.getDebianPackageName(templateName);
+            path = movePath(path, debPack + ".deb");
+            if(path == null) throw new Exception("Failed to rename uploaded package");
+
+            aptRepoManager.addPackageByPath(mgmt, path.toString(), false);
+            templateRegistry.registerTemplate(files.get(0), files.get(1), md5sum);
+
+        } catch(AptRepoException ex)        {
             String m = "Failed to process deb package";
             logger.log( Level.SEVERE, m, ex );
             return Response.serverError().build();
@@ -128,7 +133,7 @@ public class RestServiceImpl implements RestService
         finally
         {
             // clean up
-            path.toFile().delete();
+            if(path != null) path.toFile().delete();
         }
         logger.info( "Template package successfully imported." );
         return Response.ok().build();
@@ -156,7 +161,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response unregister( String templateName )
     {
-
         try
         {
             templateRegistry.unregisterTemplate( templateName );
@@ -173,7 +177,9 @@ public class RestServiceImpl implements RestService
         try
         {
             aptRepoManager.removePackageByName( mgmt, pack_name );
-            logger.info( String.format( "Package removed from repository: %s", pack_name ) );
+            logger.info(String.format("Package removed from repository: %s", pack_name));
+
+            removeDebianPackage(templateName);
         }
         catch ( AptRepoException ex )
         {
@@ -182,5 +188,46 @@ public class RestServiceImpl implements RestService
         }
 
         return Response.ok().build();
+    }
+
+    private String retrieveTemplateName(String config) {
+        Properties prop = new Properties();
+        try {
+            prop.load(new StringReader(config));
+            return prop.getProperty("lxc.utsname");
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to retrieve template name from config: {}",
+                    ex.getMessage());
+        }
+        return null;
+    }
+
+    private Path movePath(Path path, String newName) {
+        Path new_path = Paths.get(path.getParent().toString(), newName);
+        try {
+            Files.move(path, new_path, StandardCopyOption.REPLACE_EXISTING);
+            return new_path;
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to move package file: {0}", ex.getMessage());
+        }
+        return null;
+    }
+
+    private void removeDebianPackage(String templateName) {
+        String deb_pack = templateManager.getDebianPackageName(templateName);
+        if(deb_pack == null) {
+            logger.log(Level.WARNING, "Can't get Debian package name for {0}", templateName);
+            return;
+        }
+        deb_pack += ".deb";
+
+        Path path = Paths.get(Common.APT_REPO_PATH,
+                Common.APT_REPO_AMD64_PACKAGES_SUBPATH, deb_pack);
+        try {
+            Files.delete(path);
+            logger.log(Level.INFO, "Removed package file {0}", path);
+        } catch(IOException ex) {
+            logger.log(Level.SEVERE, "Failed to remove package file " + deb_pack, ex);
+        }
     }
 }

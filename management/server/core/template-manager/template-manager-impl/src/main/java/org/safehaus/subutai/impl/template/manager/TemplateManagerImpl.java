@@ -3,16 +3,16 @@ package org.safehaus.subutai.impl.template.manager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.common.protocol.Agent;
-
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 
 public class TemplateManagerImpl extends TemplateManagerBase
@@ -154,7 +154,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
                 boolean installed = scriptExecutor.execute( a, ActionType.IMPORT, p.getTemplateName() );
                 if ( !installed )
                 {
-                    logger.severe( "Failed to install parent templates: " + p.getTemplateName() );
+                    logger.log(Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName());
                     return false;
                 }
             }
@@ -180,13 +180,6 @@ public class TemplateManagerImpl extends TemplateManagerBase
     public String getPackageName( String templateName )
     {
 
-        // TODO: replace this hard-coded implementation. code below not running
-        boolean temp = true;
-        if ( temp )
-        {
-            return templateName + "-subutai-template";
-        }
-
         Set<Agent> phys = agentManager.getPhysicalAgents();
         if ( phys.isEmpty() )
         {
@@ -194,21 +187,40 @@ public class TemplateManagerImpl extends TemplateManagerBase
             return null;
         }
         // run on each physical server one by one until we get successful result
-        String s = ActionType.GET_PACKAGE_NAME.buildCommand( templateName );
-        for ( Agent phy : phys )
-        {
-            Command cmd = commandRunner.createCommand( new RequestBuilder( s ),
-                new HashSet<>( Arrays.asList( phy ) ) );
-            commandRunner.runCommand( cmd );
+        String s = ActionType.GET_PACKAGE_NAME.buildCommand(templateName);
+        s = ActionType.wrapInBash(s);
+        for(Agent phy : phys) {
 
-            if ( cmd.hasSucceeded() )
-            {
-                return cmd.getResults().get( phy.getUuid() ).getStdOut();
-            }
+            Command cmd = commandRunner.createCommand(new RequestBuilder(s),
+                    new HashSet<>(Arrays.asList(phy)));
+            commandRunner.runCommand(cmd);
+
+            if(cmd.hasSucceeded())
+                return cmd.getResults().get(phy.getUuid()).getStdOut().trim();
         }
         return null;
     }
 
+    @Override
+    public String getDebianPackageName(String templateName) {
+        Set<Agent> phys = agentManager.getPhysicalAgents();
+        if(phys.isEmpty()) {
+            logger.severe("No physical agents connected");
+            return null;
+        }
+        // run on each physical server one by one until we get successful result
+        String s = ActionType.GET_DEB_PACKAGE_NAME.buildCommand(templateName);
+        s = ActionType.wrapInBash(s);
+        for(Agent phy : phys) {
+            Command cmd = commandRunner.createCommand(new RequestBuilder(s),
+                    new HashSet<>(Arrays.asList(phy)));
+            commandRunner.runCommand(cmd);
+
+            if(cmd.hasSucceeded())
+                return cmd.getResults().get(phy.getUuid()).getStdOut().trim();
+        }
+        return null;
+    }
 
     private boolean prepareTemplates( Agent a, String templateName )
     {
@@ -223,7 +235,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
                 boolean b = scriptExecutor.execute( a, ActionType.INSTALL, pack );
                 if ( !b )
                 {
-                    logger.severe( "Failed to install parent templates: " + p.getTemplateName() );
+                    logger.log(Level.SEVERE, "Failed to install parent templates: {0}", p.getTemplateName());
                     return false;
                 }
             }
@@ -234,7 +246,7 @@ public class TemplateManagerImpl extends TemplateManagerBase
             String pack = getPackageName( templateName );
             if ( !scriptExecutor.execute( a, ActionType.INSTALL, pack ) )
             {
-                logger.severe( "Failed to install template: " + templateName );
+                logger.log(Level.SEVERE, "Failed to install template: {0}", templateName);
                 return false;
             }
         }
