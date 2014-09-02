@@ -256,11 +256,6 @@
       <artifactId>snappy-java</artifactId>
       <version>${org.xerial.snappy.version}</version>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-    <!--<artifactId>javax.servlet</artifactId>-->
-    <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>org.doomdark</groupId>
       <artifactId>com.springsource.org.doomdark.uuid</artifactId>
@@ -363,11 +358,6 @@
                   <artifactId>com.springsource.org.doomdark.uuid</artifactId>
                   <version>${org.doomdark.version}</version>
                 </artifactItem>
-                <!--<artifactItem>-->
-                <!--<groupId>org.eclipse.jetty.orbit</groupId>-->
-                <!--<artifactId>javax.servlet</artifactId>-->
-                <!--<version>${org.eclipse.jetty.orbit.version}</version>-->
-                <!--</artifactItem>-->
                 <artifactItem>
                   <groupId>org.elasticsearch</groupId>
                   <artifactId>elasticsearch</artifactId>
@@ -380,11 +370,6 @@
                   <artifactId>vaadin-themes</artifactId>
                   <version>${vaadin.version}</version>
                 </artifactItem>
-                <!--<artifactItem>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>vaadin-theme-compiler</artifactId>
-                    <version>${vaadin.version}</version>
-                </artifactItem>-->
                 <artifactItem>
                   <groupId>com.vaadin</groupId>
                   <artifactId>vaadin-shared</artifactId>
@@ -1539,27 +1524,27 @@
                 <!-- Presto -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>presto-api</artifactId>
+                  <artifactId>presto-plugin-api</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>presto-impl</artifactId>
+                  <artifactId>presto-plugin-impl</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>presto-ui</artifactId>
+                  <artifactId>presto-plugin-ui</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>presto-cli</artifactId>
+                  <artifactId>presto-plugin-cli</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>presto-rest</artifactId>
+                  <artifactId>presto-plugin-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
