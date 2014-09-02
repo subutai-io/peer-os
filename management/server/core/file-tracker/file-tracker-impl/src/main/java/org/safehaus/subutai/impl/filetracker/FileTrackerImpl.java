@@ -70,7 +70,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
         Command command = commandRunner.createCommand(
             new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_REQUEST )
+                .withType( RequestType.INOTIFY_CREATE_REQUEST )
                 .withConfPoints( configPoints ),
             Sets.newHashSet( agent )
         );
@@ -85,7 +85,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
         Command command = commandRunner.createCommand(
             new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_CANCEL_REQUEST )
+                .withType( RequestType.INOTIFY_REMOVE_REQUEST )
                 .withConfPoints( configPoints ),
             Sets.newHashSet( agent )
         );
@@ -100,7 +100,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
 
         Command command = commandRunner.createCommand(
             new RequestBuilder( "pwd" )
-                .withType( RequestType.INOTIFY_SHOW_REQUEST ),
+                .withType( RequestType.INOTIFY_LIST_REQUEST ),
             Sets.newHashSet( agent )
         );
 
@@ -113,7 +113,7 @@ public class FileTrackerImpl implements FileTracker, ResponseListener
     @Override
     public void onResponse( Response response )
     {
-        if ( response == null || response.getType() != ResponseType.INOTIFY_RESPONSE )
+        if ( response == null || response.getType() != ResponseType.INOTIFY_ACTION_RESPONSE )
         {
             return;
         }
