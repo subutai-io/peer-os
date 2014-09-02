@@ -1,19 +1,21 @@
 package org.safehaus.subutai.plugin.pig.api;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+import org.safehaus.subutai.common.settings.Common;
 
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class Config implements ConfigBase {
+public class Config implements ConfigBase
+{
 
     public static final String TEMPLATE_NAME = "hadooppig";
 	public static final String PRODUCT_KEY = "Pig2";
-	public static final String PRODUCT_PACKAGE = (Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
+	public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY).toLowerCase();
 
 	private String clusterName = "";
     private SetupType setupType;

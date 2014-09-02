@@ -4,10 +4,10 @@ package org.safehaus.subutai.plugin.pig.impl.handler;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.impl.PigImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<PigImpl>
