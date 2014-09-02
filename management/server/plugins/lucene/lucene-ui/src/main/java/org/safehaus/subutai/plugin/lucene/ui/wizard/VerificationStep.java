@@ -53,12 +53,14 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 UUID trackId = null;
+
                 if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
                     trackId = LuceneUI.getLuceneManager().installCluster( config );
                 }
                 else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
-//                    trackId = LuceneUI.getLuceneManager().installCluster( config, wizard.getHadoopConfig() );
+                    trackId = LuceneUI.getLuceneManager().installCluster( config, wizard.getHadoopConfig() );
                 }
+
                 ProgressWindow window = new ProgressWindow( LuceneUI.getExecutor(), LuceneUI.getTracker(), trackId,
                         Config.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
@@ -67,6 +69,7 @@ public class VerificationStep extends Panel {
                         wizard.init();
                     }
                 } );
+
                 getUI().addWindow( window.getWindow() );
             }
         } );

@@ -10,6 +10,7 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Config;
 import org.safehaus.subutai.plugin.lucene.api.Lucene;
 import org.safehaus.subutai.api.tracker.Tracker;
@@ -34,9 +35,9 @@ public class LuceneImpl implements Lucene {
 	private Tracker tracker;
 	private Hadoop hadoopManager;
 	private ExecutorService executor;
-    PluginDAO pluginDao;
-    EnvironmentManager environmentManager;
-    ContainerManager containerManager;
+    private PluginDAO pluginDao;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
 
 
 	public LuceneImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
@@ -83,7 +84,17 @@ public class LuceneImpl implements Lucene {
 	}
 
 
-	public void init() {
+    public PluginDAO getPluginDao() {
+        return pluginDao;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+
+    public void init() {
 		executor = Executors.newCachedThreadPool();
 	}
 
@@ -107,14 +118,29 @@ public class LuceneImpl implements Lucene {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy(Environment env, Config config, ProductOperation po) {
-        if(config.getSetupType() == SetupType.OVER_HADOOP)
-            return new OverHadoopSetupStrategy(this, config, po);
-        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
-//            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy(this, config, po);
-//            s.setEnvironment(env);
-//            return s;
+    public UUID installCluster(Config config, HadoopClusterConfig hadoopConfig) {
+
+        InstallOperationHandler operationHandler = new InstallOperationHandler(this, config);
+        operationHandler.setHadoopConfig( hadoopConfig );
+
+        executor.execute(operationHandler);
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment env, Config config, ProductOperation po ) {
+
+        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+            return new OverHadoopSetupStrategy( this, config, po );
         }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, config, po );
+            s.setEnvironment( env );
+            return s;
+        }
+
         return null;
     }
 
