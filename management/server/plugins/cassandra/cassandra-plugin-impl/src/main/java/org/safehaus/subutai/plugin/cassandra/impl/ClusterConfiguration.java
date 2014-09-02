@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
@@ -130,6 +131,14 @@ public class ClusterConfiguration {
         else {
             po.addLogFailed( String.format( "Installation failed, %s", setSeedsCommand.getAllErrors() ) );
             return;
+        }
+
+        try {
+            po.addLog( "Cassandra cluster data saved into database" );
+            cassandraManager.getPluginDAO().saveInfo( CassandraConfig.PRODUCT_KEY, config.getClusterName(), config );
+        }
+        catch ( DBException e ) {
+            e.printStackTrace();
         }
     }
 }

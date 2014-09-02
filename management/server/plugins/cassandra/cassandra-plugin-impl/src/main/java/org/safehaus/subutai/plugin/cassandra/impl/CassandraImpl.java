@@ -7,8 +7,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -17,6 +15,15 @@ import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckAllNodesOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckCassandraServiceStatusOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.InstallOperationHandler;
@@ -25,13 +32,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartCassandraServiceO
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopAllNodesOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopCassandraServiceOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.common.protocol.NodeGroup;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -48,6 +49,7 @@ public class CassandraImpl implements Cassandra {
     private AgentManager agentManager;
     private EnvironmentManager environmentManager;
     private ContainerManager containerManager;
+    private PluginDAO pluginDAO;
 
 
     public CassandraImpl( DbManager dbManager,
@@ -66,7 +68,18 @@ public class CassandraImpl implements Cassandra {
         this.agentManager = agentManager;
         this.environmentManager = environmentManager;
         this.containerManager = containerManager;
+        this.pluginDAO = new PluginDAO( dbManager );
         Commands.init( commandRunner );
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
     }
 
 

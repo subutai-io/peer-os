@@ -77,6 +77,8 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
         }
         config.setSeedNodes( seedNodes );
 
+
+
         try {
             new ClusterConfiguration( productOperation, cassandraManager ).configureCluster( config );
         }
