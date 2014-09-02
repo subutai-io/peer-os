@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.common.AgentUtil;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.common.UUIDUtil;
+import org.safehaus.subutai.common.util.AgentUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.server.ui.component.AgentTree;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.lxcmanager.LxcUI;
 
 import com.google.common.base.Strings;

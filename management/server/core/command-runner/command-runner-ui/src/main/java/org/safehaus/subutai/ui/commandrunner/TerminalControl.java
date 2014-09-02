@@ -8,7 +8,7 @@ import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.TextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.util.FileUtil;
 
 /**
  * Created by daralbaev on 7/9/14.

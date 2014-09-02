@@ -11,7 +11,7 @@ import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.elasticsearch.ElasticsearchUI;
 
 import java.util.Iterator;

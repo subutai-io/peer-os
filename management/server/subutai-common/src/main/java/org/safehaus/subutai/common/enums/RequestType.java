@@ -1,0 +1,13 @@
+package org.safehaus.subutai.common.enums;
+
+
+public enum RequestType {
+	EXECUTE_REQUEST,
+	HEARTBEAT_REQUEST,
+	TERMINATE_REQUEST,
+	REGISTRATION_REQUEST_DONE,
+	PS_REQUEST,
+	INOTIFY_REQUEST,
+	INOTIFY_SHOW_REQUEST,
+    RequestType, INOTIFY_CANCEL_REQUEST
+}

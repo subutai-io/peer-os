@@ -10,10 +10,9 @@
 
   <packaging>pom</packaging>
 
-  <modules>
-    <module>shared</module>
-    <module>server</module>
-  </modules>
+    <modules>
+        <module>server</module>
+    </modules>
 
   <description>Parent project for the Subutai Project Artifacts</description>
 

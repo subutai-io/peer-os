@@ -1,6 +1,6 @@
 package org.safehaus.subutai.api.lxcmanager;
 
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Collections;
 import java.util.HashMap;

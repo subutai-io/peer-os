@@ -5,8 +5,8 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.configuration.manager.api.TextInjector;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.FileUtil;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.FileUtil;
 
 
 /**

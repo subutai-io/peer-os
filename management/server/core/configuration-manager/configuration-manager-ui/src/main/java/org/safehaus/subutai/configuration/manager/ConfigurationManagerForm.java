@@ -12,7 +12,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.subutai.configuration.manager.api.ConfigManager;
 import org.safehaus.subutai.configuration.manager.manage.ConfigLoaderForm;
-import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.common.protocol.Disposable;
 
 
 /**

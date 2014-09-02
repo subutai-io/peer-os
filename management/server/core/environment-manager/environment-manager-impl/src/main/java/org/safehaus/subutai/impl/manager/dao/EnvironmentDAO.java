@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.manager.dao;
 
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import java.util.List;
 

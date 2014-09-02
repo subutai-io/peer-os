@@ -11,8 +11,8 @@ import org.junit.*;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.api.communicationmanager.CommunicationManager;
-import org.safehaus.subutai.shared.protocol.Request;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;

@@ -1,6 +1,6 @@
 package org.safehaus.subutai.api.flume;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
 

@@ -7,10 +7,10 @@ package org.safehaus.subutai.plugin.mongodb.api;
 
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ApiBase;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 
 import java.util.UUID;
 

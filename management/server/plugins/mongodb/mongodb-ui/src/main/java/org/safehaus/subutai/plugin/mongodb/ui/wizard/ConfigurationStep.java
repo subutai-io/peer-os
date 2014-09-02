@@ -8,7 +8,7 @@ package org.safehaus.subutai.plugin.mongodb.ui.wizard;
 
 import java.util.Arrays;
 
-import org.safehaus.subutai.common.StringUtil;
+import org.safehaus.subutai.common.util.StringUtil;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;

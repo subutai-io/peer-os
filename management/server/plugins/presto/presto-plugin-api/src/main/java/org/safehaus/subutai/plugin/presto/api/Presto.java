@@ -5,7 +5,7 @@
  */
 package org.safehaus.subutai.plugin.presto.api;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
 

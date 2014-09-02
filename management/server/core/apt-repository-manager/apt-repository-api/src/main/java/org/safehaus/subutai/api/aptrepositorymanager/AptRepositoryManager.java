@@ -6,7 +6,7 @@
 package org.safehaus.subutai.api.aptrepositorymanager;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.List;
 

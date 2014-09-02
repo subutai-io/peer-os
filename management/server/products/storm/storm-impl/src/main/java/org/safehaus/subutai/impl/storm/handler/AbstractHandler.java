@@ -3,14 +3,15 @@ package org.safehaus.subutai.impl.storm.handler;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.storm.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.storm.Commands;
 import org.safehaus.subutai.impl.storm.StormImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 
-abstract class AbstractHandler extends AbstractOperationHandler<StormImpl> {
+abstract class AbstractHandler extends AbstractOperationHandler<StormImpl>
+{
 
 	public AbstractHandler(StormImpl manager, String clusterName) {
 		super(manager, clusterName);

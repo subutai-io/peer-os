@@ -5,8 +5,8 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.hive.HiveUI;
 
 import java.util.*;

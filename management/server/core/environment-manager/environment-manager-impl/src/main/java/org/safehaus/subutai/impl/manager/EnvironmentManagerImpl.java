@@ -20,7 +20,7 @@ import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.impl.manager.builder.EnvironmentBuilder;
 import org.safehaus.subutai.impl.manager.dao.EnvironmentDAO;
 import org.safehaus.subutai.impl.manager.util.BlueprintParser;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Strings;
 

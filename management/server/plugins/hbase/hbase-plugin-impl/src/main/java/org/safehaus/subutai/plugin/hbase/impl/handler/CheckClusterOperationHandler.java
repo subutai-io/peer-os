@@ -5,18 +5,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class CheckClusterOperationHandler extends AbstractOperationHandler<HBaseImpl> {
+public class CheckClusterOperationHandler extends AbstractOperationHandler<HBaseImpl>
+{
 
     private ProductOperation po;
     private String clusterName;

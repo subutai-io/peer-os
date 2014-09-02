@@ -4,8 +4,8 @@ package org.safehaus.subutai.hive.services;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.api.hive.Hive;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
