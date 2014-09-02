@@ -5,8 +5,8 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class Commands extends CommandsSingleton {
 
 	public Command getInstallCommand(Set<Agent> agents) {
 		return createCommand(
-				new RequestBuilder(INSTALL).withTimeout(90).withStdOutRedirection(OutputRedirection.NO), agents);
+				new RequestBuilder(INSTALL).withTimeout(90).withStdOutRedirection( OutputRedirection.NO), agents);
 	}
 
 
