@@ -1,24 +1,20 @@
 package org.safehaus.subutai.plugin.lucene.impl.handler;
 
 
-import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.lucene.api.Config;
-import org.safehaus.subutai.plugin.lucene.impl.Commands;
 import org.safehaus.subutai.plugin.lucene.impl.LuceneImpl;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
-
-import java.util.Iterator;
+import org.safehaus.subutai.shared.operation.ProductOperation;
+import org.safehaus.subutai.shared.protocol.ClusterSetupException;
+import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl>
 {
     private final Config config;
-
+    private HadoopClusterConfig hadoopConfig;
 
     public InstallOperationHandler( LuceneImpl manager, Config config )
     {
@@ -28,116 +24,51 @@ public class InstallOperationHandler extends AbstractOperationHandler<LuceneImpl
             String.format( "Installing %s", Config.PRODUCT_KEY ) );
     }
 
+    public HadoopClusterConfig getHadoopConfig() {
+        return hadoopConfig;
+    }
+
+    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
+    }
 
     @Override
     public void run()
     {
-        if ( Strings.isNullOrEmpty( config.getHadoopClusterName() ) || Strings.isNullOrEmpty( config.getClusterName() )
-            || CollectionUtil.isCollectionEmpty( config.getNodes() ) )
-        {
-            productOperation.addLogFailed( "Malformed configuration. Not all parameters are given: "
-                + " hadoopClusterName, clusterName or nodes. \nInstallation aborted" );
-            return;
-        }
+        ProductOperation po = productOperation;
+       Environment env = null;
 
-        if ( manager.getCluster( clusterName ) != null )
-        {
-            productOperation.addLogFailed(
-                String.format( "Cluster with name '%s' already exists\nInstallation aborted", clusterName ) );
-            return;
-        }
+//       if(config.getSetupType() == SetupType.WITH_HADOOP) {
+//
+//           if(hadoopConfig == null) {
+//               po.addLogFailed("No Hadoop configuration specified");
+//               return;
+//           }
+//
+//           po.addLog("Preparing environment...");
+//           hadoopConfig.setTemplateName(FlumeConfig.TEMPLATE_NAME);
+//           try {
+//               EnvironmentBlueprint eb = manager.getHadoopManager()
+//                       .getDefaultEnvironmentBlueprint( hadoopConfig );
+//               env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
+//           } catch(ClusterSetupException ex) {
+//               po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
+//               return;
+//           } catch(EnvironmentBuildException ex) {
+//               po.addLogFailed("Failed to build environment: " + ex.getMessage());
+//               return;
+//           }
+//           po.addLog("Environment preparation completed");
+//       }
 
-        if ( manager.getHadoopManager().getCluster( config.getHadoopClusterName() ) == null )
-        {
-            productOperation.addLogFailed( String.format( "Hadoop cluster '%s' not found\nInstallation aborted",
-                config.getHadoopClusterName() ) );
-            return;
-        }
+       ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, po);
+       try {
+           if(s == null) throw new ClusterSetupException("No setup strategy");
 
-        // Check if node agent is connected
-        for ( Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); )
-        {
-            Agent node = it.next();
-            if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
-            {
-                productOperation.addLog(
-                    String.format( "Node %s is not connected. Omitting this node from installation",
-                        node.getHostname() ) );
-                it.remove();
-            }
-        }
-
-        if ( config.getNodes().isEmpty() )
-        {
-            productOperation.addLogFailed( "No nodes eligible for installation. Operation aborted" );
-            return;
-        }
-
-        productOperation.addLog( "Checking prerequisites..." );
-
-        // Check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( config.getNodes() );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
-
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
-            productOperation
-                .addLogFailed( "Failed to check presence of installed subutai packages\nInstallation aborted" );
-            return;
-        }
-
-        for ( Iterator<Agent> it = config.getNodes().iterator(); it.hasNext(); )
-        {
-            Agent node = it.next();
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-
-            if ( result.getStdOut().contains( "ksks-lucene" ) )
-            {
-                productOperation.addLog(
-                    String.format( "Node %s already has Lucene installed. Omitting this node from installation",
-                        node.getHostname() ) );
-                it.remove();
-            }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
-            {
-                productOperation.addLog(
-                    String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-                        node.getHostname() ) );
-                it.remove();
-            }
-        }
-
-        if ( config.getNodes().isEmpty() )
-        {
-            productOperation.addLogFailed( "No nodes eligible for installation. Operation aborted" );
-            return;
-        }
-
-        // Save to db
-        productOperation.addLog( "Installing Lucene..." );
-
-        Command installCommand = manager.getCommands().getInstallCommand( config.getNodes() );
-        manager.getCommandRunner().runCommand( installCommand );
-
-        if ( installCommand.hasSucceeded() )
-        {
-            productOperation.addLog( "Installation succeeded\nUpdating db..." );
-
-            try
-            {
-                manager.getDbManager().saveInfo2( Config.PRODUCT_KEY, clusterName, config );
-
-                productOperation.addLogDone( "Information updated in db" );
-            }
-            catch ( DBException e )
-            {
-                productOperation
-                    .addLogFailed( String.format( "Failed to update information in db, %s", e.getMessage() ) );
-            }
-        }
-        else
-        {
-            productOperation.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-        }
+           s.setup();
+           po.addLogDone("Done");
+       } catch(ClusterSetupException ex) {
+           po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
+       }
     }
 }

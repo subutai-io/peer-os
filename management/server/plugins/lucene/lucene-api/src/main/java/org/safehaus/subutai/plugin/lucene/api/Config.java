@@ -11,12 +11,13 @@ import java.util.Set;
 public class Config implements ConfigBase {
 
 	public static final String PRODUCT_KEY = "Lucene2";
+    public static final String TEMPLATE_NAME = "hadooplucene";
 
 	private String hadoopClusterName = "";
 	private String clusterName = "";
-
+    private SetupType setupType = SetupType.OVER_HADOOP;
 	private Set<Agent> nodes = new HashSet<>();
-
+    private Set<Agent> hadoopNodes = new HashSet<>();
 
 	@Override
 	public String getClusterName() {
@@ -57,4 +58,24 @@ public class Config implements ConfigBase {
 				", nodes=" + nodes +
 				'}';
 	}
+
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
+    }
+
+
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
+    }
+
+
+    public void setHadoopNodes( final Set<Agent> hadoopNodes ) {
+        this.hadoopNodes = hadoopNodes;
+    }
 }
