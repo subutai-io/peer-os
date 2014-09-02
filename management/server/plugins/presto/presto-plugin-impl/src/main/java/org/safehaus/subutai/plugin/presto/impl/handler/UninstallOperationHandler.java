@@ -11,9 +11,7 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
+
 public class UninstallOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 	private final ProductOperation po;
 
@@ -30,6 +28,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
 
 	@Override
 	public void run() {
+        productOperation = po;
 		PrestoClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
 			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
