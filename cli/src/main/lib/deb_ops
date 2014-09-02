@@ -74,17 +74,10 @@ function deb_pkg {
   create_preinst_script $lxc $debian_dir
   create_postinst_script $lxc $debian_dir
   create_prerm_script $lxc $debian_dir
-  
+ 
   # ----------------------------------------------------------------------------
-  # (4) create debian package
+  # (4) insert subutai.template.package info inside containers config file
   # ----------------------------------------------------------------------------
-  dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
-  check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
-
-  # ----------------------------------------------------------------------------
-  # (5) return path of newly generated debian package
-  # ----------------------------------------------------------------------------
-  
   conf="/var/lib/lxc/$lxc/config"
   propline="`cat $conf | grep subutai.template.package`"
 
@@ -94,6 +87,18 @@ function deb_pkg {
   else
     debian_file=`echo $propline | awk '{print $3}'`
   fi
+
+ 
+  # ----------------------------------------------------------------------------
+  # (5) create debian package
+  # ----------------------------------------------------------------------------
+  dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
+  check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
+
+  # ----------------------------------------------------------------------------
+  # (6) return path of newly generated debian package
+  # ----------------------------------------------------------------------------
+  
   echo $debian_file
 }
 
