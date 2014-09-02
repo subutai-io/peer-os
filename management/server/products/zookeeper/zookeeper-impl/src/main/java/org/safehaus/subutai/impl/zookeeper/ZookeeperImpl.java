@@ -9,7 +9,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.network.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;

@@ -10,22 +10,18 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.Response;
 
 import com.google.common.base.Preconditions;
 
-
-/**
- * Created by daralbaev on 01.09.14.
- */
 public class PrestoDbSetupStrategy implements ClusterSetupStrategy {
 
     private Environment environment;

@@ -1,76 +1,70 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
-import com.google.common.collect.Sets;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
 
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.common.collect.Sets;
 
 
 /**
  * Created by dilshat on 5/7/14.
  */
-public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<SparkImpl>
-{
+public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<SparkImpl> {
     private final ProductOperation po;
     private final String lxcHostname;
 
 
-    public AddSlaveNodeOperationHandler( SparkImpl manager, String clusterName, String lxcHostname )
-    {
+    public AddSlaveNodeOperationHandler( SparkImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
-            String.format( "Adding node %s to %s", lxcHostname, clusterName ) );
+        po = SparkImpl.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+                String.format( "Adding node %s to %s", lxcHostname, clusterName ) );
     }
 
 
     @Override
-    public UUID getTrackerId()
-    {
+    public UUID getTrackerId() {
         return po.getId();
     }
 
 
     @Override
-    public void run()
-    {
+    public void run() {
         SparkClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
-        {
+        if ( config == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null )
-        {
-            po.addLogFailed( String
-                .format( "Master node %s is not connected\nOperation aborted", config.getMasterNode().getHostname() ) );
+        if ( SparkImpl.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null ) {
+            po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
+                    config.getMasterNode().getHostname() ) );
             return;
         }
 
-        Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null )
-        {
+        Agent agent = SparkImpl.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( agent == null ) {
             po.addLogFailed( String.format( "New node %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         //check if node is in the cluster
-        if ( config.getSlaveNodes().contains( agent ) )
-        {
-            po.addLogFailed(
-                String.format( "Node %s already belongs to this cluster\nOperation aborted", agent.getHostname() ) );
+        if ( config.getSlaveNodes().contains( agent ) ) {
+            po.addLogFailed( String.format( "Node %s already belongs to this cluster\nOperation aborted",
+                    agent.getHostname() ) );
             return;
         }
 
@@ -80,23 +74,20 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         //check installed ksks packages
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
+        SparkImpl.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
+        if ( !checkInstalledCommand.hasCompleted() ) {
             po.addLogFailed( "Failed to check presence of installed ksks packages\nOperation aborted" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-spark" ) && install )
-        {
+        if ( result.getStdOut().contains( "ksks-spark" ) && install ) {
             po.addLogFailed( String.format( "Node %s already has Spark installed\nOperation aborted", lxcHostname ) );
             return;
         }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
-        {
+        else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation\nOperation aborted", lxcHostname ) );
             return;
         }
@@ -104,113 +95,91 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         config.getSlaveNodes().add( agent );
         po.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
-        {
+        try {
+            SparkImpl.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+
             po.addLog( "Cluster info updated in DB" );
             //install spark
 
-            if ( install )
-            {
+            if ( install ) {
                 po.addLog( "Installing Spark..." );
                 Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
-                manager.getCommandRunner().runCommand( installCommand );
+                SparkImpl.getCommandRunner().runCommand( installCommand );
 
-                if ( installCommand.hasSucceeded() )
-                {
+                if ( installCommand.hasSucceeded() ) {
                     po.addLog( "Installation succeeded" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
                     return;
                 }
             }
 
             po.addLog( "Setting master IP on slave..." );
-            Command setMasterIPCommand = Commands
-                .getSetMasterIPCommand( config.getMasterNode(), Sets.newHashSet( agent ) );
-            manager.getCommandRunner().runCommand( setMasterIPCommand );
+            Command setMasterIPCommand =
+                    Commands.getSetMasterIPCommand( config.getMasterNode(), Sets.newHashSet( agent ) );
+            SparkImpl.getCommandRunner().runCommand( setMasterIPCommand );
 
-            if ( setMasterIPCommand.hasSucceeded() )
-            {
+            if ( setMasterIPCommand.hasSucceeded() ) {
                 po.addLog( "Master IP successfully set\nRegistering slave with master..." );
 
                 Command addSlaveCommand = Commands.getAddSlaveCommand( agent, config.getMasterNode() );
-                manager.getCommandRunner().runCommand( addSlaveCommand );
+                SparkImpl.getCommandRunner().runCommand( addSlaveCommand );
 
-                if ( addSlaveCommand.hasSucceeded() )
-                {
+                if ( addSlaveCommand.hasSucceeded() ) {
                     po.addLog( "Registration succeeded\nRestarting master..." );
 
                     Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
                     final AtomicBoolean ok = new AtomicBoolean();
-                    manager.getCommandRunner().runCommand( restartMasterCommand, new CommandCallback()
-                    {
+                    SparkImpl.getCommandRunner().runCommand( restartMasterCommand, new CommandCallback() {
 
                         @Override
-                        public void onResponse( Response response, AgentResult agentResult, Command command )
-                        {
-                            if ( agentResult.getStdOut().contains( "starting" ) )
-                            {
+                        public void onResponse( Response response, AgentResult agentResult, Command command ) {
+                            if ( agentResult.getStdOut().contains( "starting" ) ) {
                                 ok.set( true );
                                 stop();
                             }
                         }
-
                     } );
 
-                    if ( ok.get() )
-                    {
+                    if ( ok.get() ) {
                         po.addLog( "Master restarted successfully\nStarting Spark on new node..." );
 
                         Command startSlaveCommand = Commands.getStartSlaveCommand( agent );
                         ok.set( false );
-                        manager.getCommandRunner().runCommand( startSlaveCommand, new CommandCallback()
-                        {
+                        SparkImpl.getCommandRunner().runCommand( startSlaveCommand, new CommandCallback() {
 
                             @Override
-                            public void onResponse( Response response, AgentResult agentResult, Command command )
-                            {
-                                if ( agentResult.getStdOut().contains( "starting" ) )
-                                {
+                            public void onResponse( Response response, AgentResult agentResult, Command command ) {
+                                if ( agentResult.getStdOut().contains( "starting" ) ) {
                                     ok.set( true );
                                     stop();
                                 }
                             }
-
                         } );
 
-                        if ( ok.get() )
-                        {
+                        if ( ok.get() ) {
                             po.addLogDone( "Spark started successfully\nDone" );
                         }
-                        else
-                        {
+                        else {
                             po.addLogFailed(
-                                String.format( "Failed to start Spark, %s", startSlaveCommand.getAllErrors() ) );
+                                    String.format( "Failed to start Spark, %s", startSlaveCommand.getAllErrors() ) );
                         }
-
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed(
-                            String.format( "Master restart failed, %s", restartMasterCommand.getAllErrors() ) );
+                                String.format( "Master restart failed, %s", restartMasterCommand.getAllErrors() ) );
                     }
-
                 }
-                else
-                {
+                else {
                     po.addLogFailed( String.format( "Registration failed, %s", addSlaveCommand.getAllErrors() ) );
                 }
             }
-            else
-            {
+            else {
                 po.addLogFailed( String.format( "Failed to set master IP, %s", setMasterIPCommand.getAllErrors() ) );
             }
-
         }
-        else
-        {
+        catch ( DBException e ) {
             po.addLogFailed( "Could not update cluster info in DB! Please see logs\nOperation aborted" );
         }
     }

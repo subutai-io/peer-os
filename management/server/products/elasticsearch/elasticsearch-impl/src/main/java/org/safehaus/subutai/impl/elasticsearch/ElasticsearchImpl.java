@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.network.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;

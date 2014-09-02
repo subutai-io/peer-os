@@ -12,7 +12,7 @@
     <reference id="containerManager" availability="mandatory"
                interface="org.safehaus.subutai.api.container.ContainerManager"/>
     <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
+               interface="org.safehaus.subutai.api.network.NetworkManager"/>
     <reference id="environmentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
 

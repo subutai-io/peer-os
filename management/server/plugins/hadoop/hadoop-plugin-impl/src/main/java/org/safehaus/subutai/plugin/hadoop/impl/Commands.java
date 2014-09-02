@@ -7,20 +7,17 @@ import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.Agent;
 
-/**
- * Created by daralbaev on 02.04.14.
- */
 public class Commands {
 
-	public static Command getInstallCommand(HadoopClusterConfig hadoopClusterConfig) {
-		return HadoopImpl.getCommandRunner().createCommand(
+	/*public static Command getInstallCommand(HadoopClusterConfig hadoopClusterConfig) {
+        return HadoopImpl.getCommandRunner().createCommand(
 				"Installing hadoop deb package",
 				new RequestBuilder("sleep 30;" +
 						"apt-get --force-yes --assume-yes install ksks-hadoop")
 						.withTimeout(180),
 				Sets.newHashSet(hadoopClusterConfig.getAllNodes())
 		);
-	}
+	}*/
 
 	public static Command getInstallCommand(Agent agent) {
 		return HadoopImpl.getCommandRunner().createCommand(

@@ -3,10 +3,10 @@
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
 
-    <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.impl.networkmanager.NetwokManagerImpl">
+    <bean id="networkManager" scope="singleton" class="org.safehaus.subutai.impl.network.NetwokManagerImpl">
         <property name="commandRunner" ref="commandRunner"/>
     </bean>
 
-    <service ref="networkManager" interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
+    <service ref="networkManager" interface="org.safehaus.subutai.api.network.NetworkManager"/>
 
 </blueprint>

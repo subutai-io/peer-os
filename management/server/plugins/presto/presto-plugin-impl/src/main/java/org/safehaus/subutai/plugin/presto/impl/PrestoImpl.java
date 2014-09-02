@@ -18,7 +18,10 @@ import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.AddWorkerNodeOperationHandler;
@@ -30,9 +33,6 @@ import org.safehaus.subutai.plugin.presto.impl.handler.PrestoDbSetupStrategy;
 import org.safehaus.subutai.plugin.presto.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 import com.google.common.base.Preconditions;
 
@@ -216,6 +216,7 @@ public class PrestoImpl implements Presto {
     public ClusterSetupStrategy getClusterSetupStrategy( final ProductOperation po,
                                                          final PrestoClusterConfig prestoClusterConfig,
                                                          final Environment environment ) {
-        return null;
+
+        return new PrestoDbSetupStrategy( environment, po, this, prestoClusterConfig );
     }
 }

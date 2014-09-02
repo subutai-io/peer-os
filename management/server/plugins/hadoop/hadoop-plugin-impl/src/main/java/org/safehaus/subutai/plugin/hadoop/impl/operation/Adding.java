@@ -16,19 +16,13 @@ import org.safehaus.subutai.common.protocol.Agent;
 import java.util.Set;
 import java.util.UUID;
 
-
-/**
- * Created by daralbaev on 08.04.14.
- */
 public class Adding {
-	private HadoopImpl parent;
-	private HadoopClusterConfig hadoopClusterConfig;
+    private HadoopClusterConfig hadoopClusterConfig;
 	private String clusterName;
 
 
-	public Adding(HadoopImpl parent, String clusterName) {
-		this.parent = parent;
-		this.clusterName = clusterName;
+	public Adding( String clusterName ) {
+        this.clusterName = clusterName;
 	}
 
 
@@ -41,7 +35,7 @@ public class Adding {
 			public void run() {
 
 				try {
-					hadoopClusterConfig = parent.getPluginDAO().getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName,
+					hadoopClusterConfig = HadoopImpl.getPluginDAO().getInfo(HadoopClusterConfig.PRODUCT_KEY, clusterName,
 							HadoopClusterConfig.class);
 				} catch (DBException e) {
 					po.addLogFailed(e.getMessage());
@@ -88,7 +82,7 @@ public class Adding {
 						hadoopClusterConfig.getDataNodes().add(agent);
 
 						try {
-							parent.getPluginDAO()
+							HadoopImpl.getPluginDAO()
 									.saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
 											hadoopClusterConfig);
 							po.addLog("Cluster info saved to DB");

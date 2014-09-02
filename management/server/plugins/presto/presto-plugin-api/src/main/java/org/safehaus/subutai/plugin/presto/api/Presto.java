@@ -9,9 +9,9 @@ package org.safehaus.subutai.plugin.presto.api;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ApiBase;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 
 
 /**

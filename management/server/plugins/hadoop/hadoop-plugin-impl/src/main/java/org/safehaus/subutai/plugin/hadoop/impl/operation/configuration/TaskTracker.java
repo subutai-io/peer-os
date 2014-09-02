@@ -1,177 +1,180 @@
 package org.safehaus.subutai.plugin.hadoop.impl.operation.configuration;
 
+
+import java.util.UUID;
+
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
-import org.safehaus.subutai.common.protocol.Agent;
 
-import java.util.UUID;
 
-/**
- * Created by daralbaev on 15.04.14.
- */
 public class TaskTracker {
-	private HadoopImpl parent;
-	private HadoopClusterConfig hadoopClusterConfig;
+    private HadoopClusterConfig hadoopClusterConfig;
 
-	public TaskTracker(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig) {
-		this.parent = parent;
-		this.hadoopClusterConfig = hadoopClusterConfig;
-	}
 
-	public UUID status(final Agent agent) {
+    public TaskTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        this.hadoopClusterConfig = hadoopClusterConfig;
+    }
 
-		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
-				String.format("Getting status of clusters %s TaskTracker", agent.getHostname()));
 
-		parent.getExecutor().execute(new Runnable() {
+    public UUID status( final Agent agent ) {
 
-			public void run() {
+        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+                String.format( "Getting status of clusters %s TaskTracker", agent.getHostname() ) );
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
-				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
-					return;
-				}
+        HadoopImpl.getExecutor().execute( new Runnable() {
 
-				Command command = Commands.getJobTrackerCommand(agent, "status");
-				HadoopImpl.getCommandRunner().runCommand(command);
+            public void run() {
 
-				NodeState nodeState = NodeState.UNKNOWN;
-				if (command.hasCompleted()) {
-					AgentResult result = command.getResults().get(agent.getUuid());
-					if (result.getStdOut() != null && result.getStdOut().contains("TaskTracker")) {
-						String[] array = result.getStdOut().split("\n");
+                final Agent node = HadoopImpl.getAgentManager().getAgentByHostname( agent.getHostname() );
+                if ( node == null ) {
+                    po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
+                            agent.getHostname() ) );
+                    return;
+                }
 
-						for (String status : array) {
-							if (status.contains("TaskTracker")) {
-								String temp = status.
-										replaceAll("TaskTracker is ", "");
-								if (temp.toLowerCase().contains("not")) {
-									nodeState = NodeState.STOPPED;
-								} else {
-									nodeState = NodeState.RUNNING;
-								}
-							}
-						}
-					}
-				}
+                Command command = Commands.getJobTrackerCommand( agent, "status" );
+                HadoopImpl.getCommandRunner().runCommand( command );
 
-				if (NodeState.UNKNOWN.equals(nodeState)) {
-					po.addLogFailed(String.format("Failed to check status of %s",
-							agent.getHostname()
-					));
-				} else {
-					po.addLogDone(String.format("DataNode of %s is %s",
-							agent.getHostname(),
-							nodeState
-					));
-				}
-			}
-		});
+                NodeState nodeState = NodeState.UNKNOWN;
+                if ( command.hasCompleted() ) {
+                    AgentResult result = command.getResults().get( agent.getUuid() );
+                    if ( result.getStdOut() != null && result.getStdOut().contains( "TaskTracker" ) ) {
+                        String[] array = result.getStdOut().split( "\n" );
 
-		return po.getId();
+                        for ( String status : array ) {
+                            if ( status.contains( "TaskTracker" ) ) {
+                                String temp = status.
+                                                            replaceAll( "TaskTracker is ", "" );
+                                if ( temp.toLowerCase().contains( "not" ) ) {
+                                    nodeState = NodeState.STOPPED;
+                                }
+                                else {
+                                    nodeState = NodeState.RUNNING;
+                                }
+                            }
+                        }
+                    }
+                }
 
-	}
+                if ( NodeState.UNKNOWN.equals( nodeState ) ) {
+                    po.addLogFailed( String.format( "Failed to check status of %s", agent.getHostname() ) );
+                }
+                else {
+                    po.addLogDone( String.format( "DataNode of %s is %s", agent.getHostname(), nodeState ) );
+                }
+            }
+        } );
 
-	public UUID block(final Agent agent) {
+        return po.getId();
+    }
 
-		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
-				String.format("Blocking TaskTracker of %s cluster", agent.getHostname()));
 
-		parent.getExecutor().execute(new Runnable() {
+    public UUID block( final Agent agent ) {
 
-			public void run() {
+        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+                String.format( "Blocking TaskTracker of %s cluster", agent.getHostname() ) );
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
-				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
-					return;
-				}
+        HadoopImpl.getExecutor().execute( new Runnable() {
 
-				Command command = Commands.getRemoveTaskTrackerCommand(hadoopClusterConfig, agent);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+            public void run() {
 
-				command = Commands.getIncludeTaskTrackerCommand(hadoopClusterConfig, agent);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+                final Agent node = HadoopImpl.getAgentManager().getAgentByHostname( agent.getHostname() );
+                if ( node == null ) {
+                    po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
+                            agent.getHostname() ) );
+                    return;
+                }
 
-				command = Commands.getRefreshJobTrackerCommand(hadoopClusterConfig);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+                Command command = Commands.getRemoveTaskTrackerCommand( hadoopClusterConfig, agent );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
 
-				hadoopClusterConfig.getBlockedAgents().add(agent);
-				if (parent.getDbManager().saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-						hadoopClusterConfig)) {
-					po.addLog("Cluster info saved to DB");
-				} else {
-					po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
-							"Blocking node aborted");
-				}
-			}
-		});
+                command = Commands.getIncludeTaskTrackerCommand( hadoopClusterConfig, agent );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
 
-		return po.getId();
+                command = Commands.getRefreshJobTrackerCommand( hadoopClusterConfig );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
 
-	}
+                hadoopClusterConfig.getBlockedAgents().add( agent );
+                try {
+                    HadoopImpl.getPluginDAO()
+                              .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                      hadoopClusterConfig );
+                    po.addLog( "Cluster info saved to DB" );
+                }
+                catch ( DBException e ) {
+                    po.addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Blocking node aborted" );
+                }
+            }
+        } );
 
-	private void logCommand(Command command, ProductOperation po) {
-		if (command.hasSucceeded()) {
-			po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
-		} else if (command.hasCompleted()) {
-			po.addLogFailed(String.format("Task's operation %s failed", command.getDescription()));
-		} else {
-			po.addLogFailed(String.format("Task's operation %s timeout", command.getDescription()));
-		}
-	}
+        return po.getId();
+    }
 
-	public UUID unblock(final Agent agent) {
 
-		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
-				String.format("Unblocking TaskTracker of %s cluster", agent.getHostname()));
+    private void logCommand( Command command, ProductOperation po ) {
+        if ( command.hasSucceeded() ) {
+            po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
+        }
+        else if ( command.hasCompleted() ) {
+            po.addLogFailed( String.format( "Task's operation %s failed", command.getDescription() ) );
+        }
+        else {
+            po.addLogFailed( String.format( "Task's operation %s timeout", command.getDescription() ) );
+        }
+    }
 
-		parent.getExecutor().execute(new Runnable() {
 
-			public void run() {
+    public UUID unblock( final Agent agent ) {
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(agent.getHostname());
-				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", agent.getHostname()));
-					return;
-				}
+        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+                String.format( "Unblocking TaskTracker of %s cluster", agent.getHostname() ) );
 
-				Command command = Commands.getSetTaskTrackerCommand(hadoopClusterConfig, agent);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+        HadoopImpl.getExecutor().execute( new Runnable() {
 
-				command = Commands.getExcludeTaskTrackerCommand(hadoopClusterConfig, agent);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+            public void run() {
 
-				command = Commands.getStartTaskTrackerCommand(agent);
-				HadoopImpl.getCommandRunner().runCommand(command);
-				logCommand(command, po);
+                final Agent node = HadoopImpl.getAgentManager().getAgentByHostname( agent.getHostname() );
+                if ( node == null ) {
+                    po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
+                            agent.getHostname() ) );
+                    return;
+                }
 
-				hadoopClusterConfig.getBlockedAgents().remove(agent);
-				if (parent.getDbManager().saveInfo(HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-						hadoopClusterConfig)) {
-					po.addLog("Cluster info saved to DB");
-				} else {
-					po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
-							"Blocking node aborted");
-				}
-			}
-		});
+                Command command = Commands.getSetTaskTrackerCommand( hadoopClusterConfig, agent );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
 
-		return po.getId();
+                command = Commands.getExcludeTaskTrackerCommand( hadoopClusterConfig, agent );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
 
-	}
+                command = Commands.getStartTaskTrackerCommand( agent );
+                HadoopImpl.getCommandRunner().runCommand( command );
+                logCommand( command, po );
+
+                hadoopClusterConfig.getBlockedAgents().remove( agent );
+                try {
+                    HadoopImpl.getPluginDAO()
+                              .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                      hadoopClusterConfig );
+                    po.addLog( "Cluster info saved to DB" );
+                }
+                catch ( DBException e ) {
+                    po.addLogFailed( "Could not save cluster info to DB! Please see logs\n" + "Blocking node aborted" );
+                }
+            }
+        } );
+
+        return po.getId();
+    }
 }

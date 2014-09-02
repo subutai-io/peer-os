@@ -8,9 +8,17 @@ import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.network.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
@@ -18,9 +26,6 @@ import org.safehaus.subutai.plugin.hadoop.impl.operation.Adding;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.Deletion;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.Installation;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.configuration.*;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.*;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -117,7 +122,7 @@ public class HadoopImpl implements Hadoop {
 
 	@Override
 	public UUID uninstallCluster(final String clusterName) {
-		return new Deletion(this).execute(clusterName);
+		return new Deletion().execute(clusterName);
 	}
 
 	@Override
@@ -140,82 +145,82 @@ public class HadoopImpl implements Hadoop {
 
 	@Override
 	public UUID startNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).start();
+		return new NameNode( hadoopClusterConfig).start();
 	}
 
 	@Override
 	public UUID stopNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).stop();
+		return new NameNode( hadoopClusterConfig).stop();
 	}
 
 	@Override
 	public UUID restartNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).restart();
+		return new NameNode( hadoopClusterConfig).restart();
 	}
 
 	@Override
 	public UUID statusNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new NameNode(this, hadoopClusterConfig).status();
+		return new NameNode( hadoopClusterConfig).status();
 	}
 
 	@Override
 	public UUID statusSecondaryNameNode(HadoopClusterConfig hadoopClusterConfig) {
-		return new SecondaryNameNode(this, hadoopClusterConfig).status();
+		return new SecondaryNameNode( hadoopClusterConfig).status();
 	}
 
 	@Override
 	public UUID statusDataNode(Agent agent) {
-		return new DataNode(this, null).status(agent);
+		return new DataNode( null).status(agent);
 	}
 
 	@Override
 	public UUID startJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).start();
+		return new JobTracker( hadoopClusterConfig).start();
 	}
 
 	@Override
 	public UUID stopJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).stop();
+		return new JobTracker( hadoopClusterConfig).stop();
 	}
 
 	@Override
 	public UUID restartJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).restart();
+		return new JobTracker( hadoopClusterConfig).restart();
 	}
 
 	@Override
 	public UUID statusJobTracker(HadoopClusterConfig hadoopClusterConfig) {
-		return new JobTracker(this, hadoopClusterConfig).status();
+		return new JobTracker( hadoopClusterConfig).status();
 	}
 
 	@Override
 	public UUID statusTaskTracker(Agent agent) {
-		return new TaskTracker(this, null).status(agent);
+		return new TaskTracker( null).status(agent);
 	}
 
 	@Override
 	public UUID addNode(String clusterName) {
-		return new Adding(this, clusterName).execute();
+		return new Adding( clusterName).execute();
 	}
 
 	@Override
 	public UUID blockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig).block(agent);
+		return new DataNode( hadoopClusterConfig).block(agent);
 	}
 
 	@Override
 	public UUID blockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig).block(agent);
+		return new TaskTracker( hadoopClusterConfig).block(agent);
 	}
 
 	@Override
 	public UUID unblockDataNode(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new DataNode(this, hadoopClusterConfig).unblock(agent);
+		return new DataNode( hadoopClusterConfig).unblock(agent);
 	}
 
 	@Override
 	public UUID unblockTaskTracker(HadoopClusterConfig hadoopClusterConfig, Agent agent) {
-		return new TaskTracker(this, hadoopClusterConfig).unblock(agent);
+		return new TaskTracker( hadoopClusterConfig).unblock(agent);
 	}
 
 	@Override
@@ -233,12 +238,13 @@ public class HadoopImpl implements Hadoop {
 
 
 	@Override
-	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config) throws ClusterSetupException {
+	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(final HadoopClusterConfig config) throws
+            ClusterSetupException {
 		EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
 		environmentBlueprint.setName(String.format("%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUID.randomUUID()));
 		environmentBlueprint.setLinkHosts(true);
 		environmentBlueprint.setExchangeSshKeys(true);
-		environmentBlueprint.setDomainName(Common.DEFAULT_DOMAIN_NAME);
+		environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME);
 		Set<NodeGroup> nodeGroups = new HashSet<>(INITIAL_CAPACITY);
 
 		//hadoop master nodes
@@ -246,7 +252,7 @@ public class HadoopImpl implements Hadoop {
 		mastersGroup.setName(NodeType.MASTER_NODE.name());
 		mastersGroup.setNumberOfNodes(HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY);
 		mastersGroup.setTemplateName(config.getTemplateName());
-		mastersGroup.setPlacementStrategy(PlacementStrategy.MORE_RAM);
+		mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM);
 		mastersGroup.setPhysicalNodes(convertAgent2Hostname());
 		nodeGroups.add(mastersGroup);
 

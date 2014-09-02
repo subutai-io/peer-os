@@ -21,7 +21,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
 	public CheckNodeOperationHandler(SparkImpl manager, String clusterName, String lxcHostname) {
 		super(manager, clusterName);
 		this.lxcHostname = lxcHostname;
-		po = manager.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
+		po = SparkImpl.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
 				String.format("Checking state of %s in %s", lxcHostname, clusterName));
 	}
 
@@ -38,7 +38,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
 			return;
 		}
 
-		Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
+		Agent node = SparkImpl.getAgentManager().getAgentByHostname(lxcHostname);
 		if (node == null) {
 			po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
 			return;
@@ -52,7 +52,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
 		po.addLog("Checking node...");
 
 		Command checkNodeCommand = Commands.getStatusAllCommand(node);
-		manager.getCommandRunner().runCommand(checkNodeCommand);
+		SparkImpl.getCommandRunner().runCommand(checkNodeCommand);
 
 		AgentResult res = checkNodeCommand.getResults().get(node.getUuid());
 		if (checkNodeCommand.hasSucceeded()) {

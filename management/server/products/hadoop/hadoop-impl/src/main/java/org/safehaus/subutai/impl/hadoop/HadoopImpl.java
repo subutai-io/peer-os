@@ -6,7 +6,7 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.network.NetworkManager;
 import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.impl.hadoop.operation.Adding;
 import org.safehaus.subutai.impl.hadoop.operation.Deletion;

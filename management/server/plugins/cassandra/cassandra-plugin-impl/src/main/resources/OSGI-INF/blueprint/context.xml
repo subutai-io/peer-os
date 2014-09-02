@@ -8,7 +8,7 @@
   <reference id="lxcManager" availability="mandatory"
              interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
   <reference id="networkManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.networkmanager.NetworkManager" />
+             interface="org.safehaus.subutai.api.network.NetworkManager" />
   <reference id="commandRunner" availability="mandatory"
              interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
   <reference id="agentManager" availability="mandatory"

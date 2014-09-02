@@ -11,24 +11,19 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
-/**
- * Created by daralbaev on 14.04.14.
- */
 public class JobTracker {
-	private HadoopImpl parent;
-	private HadoopClusterConfig hadoopClusterConfig;
+    private HadoopClusterConfig hadoopClusterConfig;
 
-	public JobTracker(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig) {
-		this.parent = parent;
-		this.hadoopClusterConfig = hadoopClusterConfig;
+	public JobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        this.hadoopClusterConfig = hadoopClusterConfig;
 	}
 
 	public UUID start() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
+				= HadoopImpl.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Starting cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
-		parent.getExecutor().execute(new Runnable() {
+		HadoopImpl.getExecutor().execute(new Runnable() {
 
 			public void run() {
 				if (hadoopClusterConfig == null) {
@@ -38,7 +33,7 @@ public class JobTracker {
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(
+				final Agent node = HadoopImpl.getAgentManager().getAgentByHostname(
 						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
@@ -65,10 +60,10 @@ public class JobTracker {
 	public UUID stop() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
+				= HadoopImpl.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Stopping cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
-		parent.getExecutor().execute(new Runnable() {
+		HadoopImpl.getExecutor().execute(new Runnable() {
 
 			public void run() {
 				if (hadoopClusterConfig == null) {
@@ -77,7 +72,7 @@ public class JobTracker {
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(
+				final Agent node = HadoopImpl.getAgentManager().getAgentByHostname(
 						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
@@ -103,10 +98,10 @@ public class JobTracker {
 
 	public UUID restart() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
+				= HadoopImpl.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Restarting cluster's %s JobTracker", hadoopClusterConfig.getClusterName()));
 
-		parent.getExecutor().execute(new Runnable() {
+		HadoopImpl.getExecutor().execute(new Runnable() {
 
 			public void run() {
 				if (hadoopClusterConfig == null) {
@@ -115,7 +110,7 @@ public class JobTracker {
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(
+				final Agent node = HadoopImpl.getAgentManager().getAgentByHostname(
 						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
@@ -142,10 +137,10 @@ public class JobTracker {
 	public UUID status() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
+				= HadoopImpl.getTracker().createProductOperation(HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Getting status of clusters %s JobTracker", hadoopClusterConfig.getClusterName()));
 
-		parent.getExecutor().execute(new Runnable() {
+		HadoopImpl.getExecutor().execute(new Runnable() {
 
 			public void run() {
 				if (hadoopClusterConfig == null) {
@@ -154,7 +149,7 @@ public class JobTracker {
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(
+				final Agent node = HadoopImpl.getAgentManager().getAgentByHostname(
 						hadoopClusterConfig.getJobTracker().getHostname());
 				if (node == null) {
 					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig

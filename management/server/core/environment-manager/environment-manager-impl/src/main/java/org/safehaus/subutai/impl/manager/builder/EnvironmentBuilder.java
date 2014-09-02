@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
+import org.safehaus.subutai.api.network.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.common.protocol.Agent;

@@ -4,21 +4,18 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
 
 import com.google.common.base.Strings;
 
 
-/**
- * Created by dilshat on 5/7/14.
- */
 public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl> {
     private final ProductOperation po;
     private final PrestoClusterConfig config;
@@ -28,7 +25,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
 
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+        po = PrestoImpl.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
                 String.format( "Installing %s", PrestoClusterConfig.PRODUCT_KEY ) );
     }
 
@@ -53,7 +50,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
             return;
         }
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getCoordinatorNode().getHostname() ) == null ) {
+        if ( PrestoImpl.getAgentManager().getAgentByHostname( config.getCoordinatorNode().getHostname() ) == null ) {
             po.addLogFailed( "Coordinator node is not connected\nInstallation aborted" );
             return;
         }
@@ -61,7 +58,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
         //check if node agent is connected
         for ( Iterator<Agent> it = config.getWorkers().iterator(); it.hasNext(); ) {
             Agent node = it.next();
-            if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null ) {
+            if ( PrestoImpl.getAgentManager().getAgentByHostname( node.getHostname() ) == null ) {
                 po.addLog( String.format( "Node %s is not connected. Omitting this node from installation",
                         node.getHostname() ) );
                 it.remove();

@@ -8,9 +8,6 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 import java.util.UUID;
 
-/**
- * Created by daralbaev on 08.04.14.
- */
 public class Installation {
 	private HadoopImpl parent;
 	private HadoopClusterConfig hadoopClusterConfig;

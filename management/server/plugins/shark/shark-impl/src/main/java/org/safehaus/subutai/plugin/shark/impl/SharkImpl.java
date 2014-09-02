@@ -5,7 +5,12 @@
  */
 package org.safehaus.subutai.plugin.shark.impl;
 
-import com.google.common.base.Preconditions;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.dbmanager.DbManager;
@@ -13,118 +18,135 @@ import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.shark.api.Config;
 import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.plugin.shark.impl.handler.*;
+import org.safehaus.subutai.plugin.shark.impl.handler.ActualizeMasterIpOperationHandler;
+import org.safehaus.subutai.plugin.shark.impl.handler.AddNodeOperationHandler;
+import org.safehaus.subutai.plugin.shark.impl.handler.DestroyNodeOperationHandler;
+import org.safehaus.subutai.plugin.shark.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.shark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+
 
 /**
  * @author dilshat
  */
 public class SharkImpl implements Shark {
 
-	private CommandRunner commandRunner;
-	private AgentManager agentManager;
-	private Spark sparkManager;
-	private DbManager dbManager;
-	private Tracker tracker;
-	private ExecutorService executor;
+    private CommandRunner commandRunner;
+    private AgentManager agentManager;
+    private Spark sparkManager;
+    private DbManager dbManager;
+    private Tracker tracker;
+    private ExecutorService executor;
 
-	public SharkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker, Spark sparkManager) {
-		this.commandRunner = commandRunner;
-		this.agentManager = agentManager;
-		this.dbManager = dbManager;
-		this.tracker = tracker;
-		this.sparkManager = sparkManager;
 
-		Commands.init(commandRunner);
-	}
+    public SharkImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker,
+                      Spark sparkManager ) {
+        this.commandRunner = commandRunner;
+        this.agentManager = agentManager;
+        this.dbManager = dbManager;
+        this.tracker = tracker;
+        this.sparkManager = sparkManager;
 
-	public CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+        Commands.init( commandRunner );
+    }
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public Spark getSparkManager() {
-		return sparkManager;
-	}
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
 
-	public DbManager getDbManager() {
-		return dbManager;
-	}
 
-	public Tracker getTracker() {
-		return tracker;
-	}
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
 
-	public void destroy() {
-		executor.shutdown();
-	}
+    public Spark getSparkManager() {
+        return sparkManager;
+    }
 
-	public UUID installCluster(final Config config) {
 
-		Preconditions.checkNotNull(config, "Configuration is null");
+    public DbManager getDbManager() {
+        return dbManager;
+    }
 
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-		executor.execute(operationHandler);
+    public Tracker getTracker() {
+        return tracker;
+    }
 
-		return operationHandler.getTrackerId();
-	}
 
-	public UUID uninstallCluster(final String clusterName) {
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
-		executor.execute(operationHandler);
+    public void destroy() {
+        executor.shutdown();
+    }
 
-		return operationHandler.getTrackerId();
-	}
 
-	public UUID destroyNode(final String clusterName, final String lxcHostname) {
+    public UUID installCluster( final Config config ) {
 
-		AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
+        Preconditions.checkNotNull( config, "Configuration is null" );
 
-		executor.execute(operationHandler);
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
 
-		return operationHandler.getTrackerId();
-	}
+        executor.execute( operationHandler );
 
-	public UUID addNode(final String clusterName, final String lxcHostname) {
+        return operationHandler.getTrackerId();
+    }
 
-		AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
 
-		executor.execute(operationHandler);
+    public UUID uninstallCluster( final String clusterName ) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
 
-	public List<Config> getClusters() {
-		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-	}
+        executor.execute( operationHandler );
 
-	@Override
-	public Config getCluster(String clusterName) {
-		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID actualizeMasterIP(final String clusterName) {
 
-		AbstractOperationHandler operationHandler = new ActualizeMasterIpOperationHandler(this, clusterName);
+    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
 
-		executor.execute(operationHandler);
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
 
-		return operationHandler.getTrackerId();
-	}
+        executor.execute( operationHandler );
 
+        return operationHandler.getTrackerId();
+    }
+
+
+    public UUID addNode( final String clusterName, final String lxcHostname ) {
+
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
+
+
+    public List<Config> getClusters() {
+        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
+    }
+
+
+    @Override
+    public Config getCluster( String clusterName ) {
+        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+    }
+
+
+    public UUID actualizeMasterIP( final String clusterName ) {
+
+        AbstractOperationHandler operationHandler = new ActualizeMasterIpOperationHandler( this, clusterName );
+
+        executor.execute( operationHandler );
+
+        return operationHandler.getTrackerId();
+    }
 }
