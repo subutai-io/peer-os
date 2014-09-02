@@ -25,7 +25,7 @@ public class PetForm extends CustomComponent implements Disposable {
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new Button("test beta"), "Environments" );
+        sheet.addTab( new Button("test beta new"), "Environments" );
         verticalLayout.addComponent( sheet );
 
 

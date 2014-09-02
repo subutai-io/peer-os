@@ -5,11 +5,16 @@
  */
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
-import com.vaadin.server.FileResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
+
+import com.vaadin.server.FileResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * @author dilshat
@@ -23,7 +28,7 @@ public class StepStart extends VerticalLayout {
 		gridLayout.setSizeFull();
 
 		Label welcomeMsg = new Label(
-				"<center><h2>Welcome to Cassandra Installation Wizard!</h2></center>"
+				"<center><h2>Welcome to Cassandra Installation Wizard.</h2></center>"
 		);
 		welcomeMsg.addStyleName("h2");
 		welcomeMsg.setContentMode(ContentMode.HTML);

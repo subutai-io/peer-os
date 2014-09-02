@@ -1,14 +1,16 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import java.util.UUID;
+
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
 
 /**
@@ -25,6 +27,12 @@ public class InstallOperationHandler extends AbstractOperationHandler<CassandraI
         this.config = config;
         po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
+    }
+
+
+    @Override
+    public UUID getTrackerId() {
+        return po.getId();
     }
 
 
