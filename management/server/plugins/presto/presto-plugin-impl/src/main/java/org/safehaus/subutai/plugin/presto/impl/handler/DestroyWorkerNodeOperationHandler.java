@@ -13,7 +13,6 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.UUID;
 
-
 public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;

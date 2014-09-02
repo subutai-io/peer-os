@@ -17,9 +17,9 @@ import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import java.util.Set;
 
 
+
 public class Commands extends CommandsSingleton
 {
-
     public Commands( CommandRunner commandRunner ) {
         init( commandRunner );
     }

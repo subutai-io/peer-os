@@ -38,7 +38,7 @@ public class DestroyWorkerNodeOperationHandlerTest {
     }
 
     @Test
-    public void testWithExistingCluster() {
+    public void testWithUnconnectedAgents() {
         mock.setClusterConfig( new PrestoClusterConfig() );
         handler.run();
 

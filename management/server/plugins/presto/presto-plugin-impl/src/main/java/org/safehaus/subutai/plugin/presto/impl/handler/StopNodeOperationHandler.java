@@ -1,7 +1,6 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 
-
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;

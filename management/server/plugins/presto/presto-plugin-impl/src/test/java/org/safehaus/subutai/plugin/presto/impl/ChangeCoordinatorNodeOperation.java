@@ -37,7 +37,7 @@ public class ChangeCoordinatorNodeOperation {
     }
 
     @Test
-    public void testWithExistingCluster() {
+    public void testWithUnconnectedAgents() {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName( "test-cluster" );
         config.setWorkers( new HashSet< Agent >( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
