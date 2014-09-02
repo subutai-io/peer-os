@@ -1,26 +1,23 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 
-import java.util.UUID;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.ClusterConfiguration;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import java.util.UUID;
 
 
 /**
  * Handles destroy node operation.
  */
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
-    private final ProductOperation po;
     private final String lxcHostname;
     private final NodeType nodeType;
 
@@ -32,14 +29,14 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
         Preconditions.checkNotNull( nodeType, "Node type is null" );
         this.lxcHostname = lxcHostname;
         this.nodeType = nodeType;
-        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying %s on %s", nodeType, lxcHostname ) );
     }
 
 
     @Override
     public UUID getTrackerId() {
-        return po.getId();
+        return productOperation.getId();
     }
 
 
@@ -47,34 +44,34 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
     public void run() {
         //check of node type is allowed for removal
         if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) ) {
-            po.addLogFailed( "Only tracer or slave node can be destroyed" );
+            productOperation.addLogFailed( "Only tracer or slave node can be destroyed" );
             return;
         }
 
         //check if cluster exists
         final AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         //check if node's agent is connected
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null ) {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
         //check if node belongs to cluster
         if ( !accumuloClusterConfig.getAllNodes().contains( agent ) ) {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
         //check if master node is connected
         if ( manager.getAgentManager().getAgentByHostname( accumuloClusterConfig.getMasterNode().getHostname() )
                 == null ) {
-            po.addLogFailed( String.format( "Master node %s is not connected",
+            productOperation.addLogFailed( String.format( "Master node %s is not connected",
                     accumuloClusterConfig.getMasterNode().getHostname() ) );
             return;
         }
@@ -82,24 +79,24 @@ public class DestroyNodeOperationHandler extends AbstractOperationHandler<Accumu
         //check if node is the last node of its role
         if ( nodeType == NodeType.TRACER ) {
             if ( accumuloClusterConfig.getTracers().size() == 1 ) {
-                po.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead" );
+                productOperation.addLogFailed( "This is the last tracer in the cluster, destroy cluster instead" );
                 return;
             }
         }
         else {
             if ( accumuloClusterConfig.getSlaves().size() == 1 ) {
-                po.addLogFailed( "This is the last slave in the cluster, destroy cluster instead" );
+                productOperation.addLogFailed( "This is the last slave in the cluster, destroy cluster instead" );
                 return;
             }
         }
 
         //remove node
         try {
-            new ClusterConfiguration( po, manager ).removeNode( accumuloClusterConfig, agent, nodeType );
-            po.addLogDone( "Node removed successfully" );
+            new ClusterConfiguration( productOperation, manager ).removeNode( accumuloClusterConfig, agent, nodeType );
+            productOperation.addLogDone( "Node removed successfully" );
         }
         catch ( ClusterConfigurationException e ) {
-            po.addLogFailed( String.format( "Node removal failed, %s", e.getMessage() ) );
+            productOperation.addLogFailed( String.format( "Node removal failed, %s", e.getMessage() ) );
         }
     }
 }

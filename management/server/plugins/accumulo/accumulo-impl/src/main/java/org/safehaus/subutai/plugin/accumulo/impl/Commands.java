@@ -9,6 +9,7 @@ package org.safehaus.subutai.plugin.accumulo.impl;
 import java.util.Set;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.shared.protocol.Agent;
@@ -17,10 +18,12 @@ import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
 import com.google.common.collect.Sets;
 
 
-/**
- * @author dilshat
- */
+
 public class Commands extends CommandsSingleton {
+
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(

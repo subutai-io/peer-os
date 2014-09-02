@@ -1,8 +1,9 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 
-import java.util.UUID;
-
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
@@ -13,21 +14,17 @@ import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
 import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.shared.protocol.ClusterConfigurationException;
 import org.safehaus.subutai.shared.protocol.settings.Common;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import java.util.UUID;
 
 
 /**
  * Handles add note operation
  */
 public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
-    private final ProductOperation po;
     private final String lxcHostname;
     private final NodeType nodeType;
 
@@ -38,46 +35,45 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         Preconditions.checkNotNull( nodeType, "Node type is null" );
         this.lxcHostname = lxcHostname;
         this.nodeType = nodeType;
-        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node %s of type %s to %s", lxcHostname, nodeType, clusterName ) );
     }
 
 
     @Override
     public UUID getTrackerId() {
-        return po.getId();
+        return productOperation.getId();
     }
 
 
     @Override
     public void run() {
-
         //check of node type is allowed for addition
         if ( !( nodeType == NodeType.TRACER || nodeType.isSlave() ) ) {
-            po.addLogFailed( "Only tracer or slave node can be added" );
+            productOperation.addLogFailed( "Only tracer or slave node can be added" );
             return;
         }
         //check if cluster exists
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         //check if node's agent is connected
         Agent lxcAgent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( lxcAgent == null ) {
-            po.addLogFailed( String.format( "Agent %s is not connected", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent %s is not connected", lxcHostname ) );
             return;
         }
 
         //check if node already belongs to specified role
         if ( nodeType == NodeType.TRACER && accumuloClusterConfig.getTracers().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Agent %s already belongs to tracers", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent %s already belongs to tracers", lxcHostname ) );
             return;
         }
         else if ( nodeType.isSlave() && accumuloClusterConfig.getSlaves().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Agent %s already belongs to slaves", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent %s already belongs to slaves", lxcHostname ) );
             return;
         }
 
@@ -86,7 +82,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
         if ( !checkInstalledCommand.hasCompleted() ) {
-            po.addLogFailed( "Failed to check presence of installed subutai packages" );
+            productOperation.addLogFailed( "Failed to check presence of installed subutai packages" );
             return;
         }
 
@@ -94,7 +90,7 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
         //check if node has Hadoop installed
         if ( !result.getStdOut().contains( Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME ) ) {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation", lxcAgent.getHostname() ) );
+            productOperation.addLogFailed( String.format( "Node %s has no Hadoop installation", lxcAgent.getHostname() ) );
             return;
         }
 
@@ -106,14 +102,14 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                 manager.getHadoopManager().getCluster( accumuloClusterConfig.getHadoopClusterName() );
 
         if ( hadoopConfig == null ) {
-            po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found",
+            productOperation.addLogFailed( String.format( "Hadoop cluster with name '%s' not found",
                     accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
         //check if node belongs to underlying Hadoop cluster
         if ( !hadoopConfig.getAllNodes().contains( lxcAgent ) ) {
-            po.addLogFailed( String.format( "Node '%s' does not belong to Hadoop cluster %s", lxcAgent.getHostname(),
+            productOperation.addLogFailed( String.format( "Node '%s' does not belong to Hadoop cluster %s", lxcAgent.getHostname(),
                     accumuloClusterConfig.getClusterName() ) );
             return;
         }
@@ -123,19 +119,19 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
                 manager.getZkManager().getCluster( accumuloClusterConfig.getZookeeperClusterName() );
 
         if ( zkConfig == null ) {
-            po.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found",
+            productOperation.addLogFailed( String.format( "Zookeeper cluster with name '%s' not found",
                     accumuloClusterConfig.getClusterName() ) );
             return;
         }
 
         //add node
         try {
-            new ClusterConfiguration( po, manager )
+            new ClusterConfiguration( productOperation, manager )
                     .addNode( accumuloClusterConfig, zkConfig, lxcAgent, nodeType, install );
-            po.addLogDone( "Node added successfully" );
+            productOperation.addLogDone( "Node added successfully" );
         }
         catch ( ClusterConfigurationException e ) {
-            po.addLogFailed( String.format( "Node addition failed, %s", e.getMessage() ) );
+            productOperation.addLogFailed( String.format( "Node addition failed, %s", e.getMessage() ) );
         }
     }
 }

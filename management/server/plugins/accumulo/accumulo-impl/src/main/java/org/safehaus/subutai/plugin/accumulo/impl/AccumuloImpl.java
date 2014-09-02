@@ -42,8 +42,9 @@ import com.google.common.base.Strings;
 
 public class AccumuloImpl implements Accumulo {
 
+    protected Commands commands;
     private CommandRunner commandRunner;
-    private AgentManager agentManager;
+    protected AgentManager agentManager;
     private Tracker tracker;
     private Hadoop hadoopManager;
     private Zookeeper zkManager;
@@ -70,6 +71,7 @@ public class AccumuloImpl implements Accumulo {
         this.zkManager = zkManager;
         this.environmentManager = environmentManager;
         this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
 
         Commands.init( commandRunner );
     }
@@ -119,6 +121,9 @@ public class AccumuloImpl implements Accumulo {
         executor.shutdown();
     }
 
+    public Commands getCommands() {
+        return commands;
+    }
 
     public UUID installCluster( final AccumuloClusterConfig accumuloClusterConfig ) {
         Preconditions.checkNotNull( accumuloClusterConfig, "Accumulo cluster configuration is null" );
@@ -174,7 +179,9 @@ public class AccumuloImpl implements Accumulo {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
 
         try {
-            return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
+            AccumuloClusterConfig config = pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
+            return config;
+//            return pluginDAO.getInfo( AccumuloClusterConfig.PRODUCT_KEY, clusterName, AccumuloClusterConfig.class );
         }
         catch ( DBException e ) {
             return null;
