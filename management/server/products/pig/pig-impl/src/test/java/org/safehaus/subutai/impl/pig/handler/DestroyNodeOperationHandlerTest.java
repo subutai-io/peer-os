@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.impl.pig.PigImpl;
 import org.safehaus.subutai.impl.pig.handler.mock.PigImplMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

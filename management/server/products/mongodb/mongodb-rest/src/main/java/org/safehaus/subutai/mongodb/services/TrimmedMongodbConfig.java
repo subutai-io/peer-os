@@ -6,7 +6,7 @@
 package org.safehaus.subutai.mongodb.services;
 
 
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.settings.Common;
 
 
 /**

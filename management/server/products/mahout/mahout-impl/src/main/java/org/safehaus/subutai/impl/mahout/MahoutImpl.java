@@ -16,7 +16,7 @@ import org.safehaus.subutai.impl.mahout.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.impl.mahout.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.mahout.handler.InstallOperationHandler;
 import org.safehaus.subutai.impl.mahout.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

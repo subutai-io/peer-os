@@ -5,9 +5,10 @@ import java.util.Set;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.*;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.*;
 
 class WithHadoopSetupStrategy extends FlumeSetupStrategy {
 
@@ -26,7 +27,8 @@ class WithHadoopSetupStrategy extends FlumeSetupStrategy {
     }
 
     @Override
-    public ConfigBase setup() throws ClusterSetupException {
+    public ConfigBase setup() throws ClusterSetupException
+    {
 
         checkConfig();
 

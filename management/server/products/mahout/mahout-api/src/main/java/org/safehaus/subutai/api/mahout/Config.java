@@ -1,7 +1,7 @@
 package org.safehaus.subutai.api.mahout;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;

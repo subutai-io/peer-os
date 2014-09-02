@@ -8,8 +8,8 @@ import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.impl.lucene.Commands;
 import org.safehaus.subutai.impl.lucene.LuceneImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 public class AddNodeOperationHandler extends AbstractOperationHandler<LuceneImpl>

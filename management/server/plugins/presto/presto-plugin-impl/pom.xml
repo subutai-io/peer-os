@@ -11,7 +11,7 @@
 
     <artifactId>presto-plugin-impl</artifactId>
     <packaging>bundle</packaging>
-    <name>:: Subutai Presto</name>
+    <name>Subutai Presto Impl</name>
     <description>Subutai Presto</description>
 
     <dependencies>
@@ -23,10 +23,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -55,6 +51,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>command-runner-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>product-common</artifactId>
         </dependency>
     </dependencies>
 

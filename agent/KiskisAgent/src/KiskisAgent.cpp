@@ -725,7 +725,7 @@ int main(int argc,char *argv[],char *envp[])
 							logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","Irrelevant Terminate Request"));
 						}
 					}
-					else if(command.getType()=="INOTIFY_REQUEST")
+					else if(command.getType()=="INOTIFY_CREATE_REQUEST")
 					{
 						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_REQUEST.."));
 						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
@@ -736,11 +736,11 @@ int main(int argc,char *argv[],char *envp[])
 						}
 						Watcher.stats();
 						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
-						connection->sendInotifyMessage(sendout);
+						connection->sendMessage(sendout);
 						Watcher.stats();
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}
-					else if(command.getType()=="INOTIFY_CANCEL_REQUEST")
+					else if(command.getType()=="INOTIFY_REMOVE_REQUEST")
 					{
 						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_CANCEL_REQUEST.."));
 						for(unsigned int i=0; i<command.getWatchArguments().size();i++)
@@ -751,16 +751,16 @@ int main(int argc,char *argv[],char *envp[])
 						}
 						Watcher.stats();
 						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
-						connection->sendInotifyMessage(sendout);
+						connection->sendMessage(sendout);
 						Watcher.stats();
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}
-					else if(command.getType()=="INOTIFY_SHOW_REQUEST")
+					else if(command.getType()=="INOTIFY_LIST_REQUEST")
 					{
 						logMain.writeLog(6,logMain.setLogData("<KiskisAgent>","executing INOTIFY_SHOW_REQUEST.."));
 						Watcher.stats();
 						sendout = response.createInotifyShowMessage(Uuid,response.getConfPoints());
-						connection->sendInotifyMessage(sendout);
+						connection->sendMessage(sendout);
 						Watcher.stats();
 						logMain.writeLog(7,logMain.setLogData("<KiskisAgent>","Sending Inotify Show Message: ",sendout));
 					}

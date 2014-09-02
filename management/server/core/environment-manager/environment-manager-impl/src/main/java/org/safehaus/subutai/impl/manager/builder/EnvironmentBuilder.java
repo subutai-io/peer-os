@@ -13,10 +13,10 @@ import org.safehaus.subutai.api.manager.helper.Node;
 import org.safehaus.subutai.api.networkmanager.NetworkManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.ArrayList;
 import java.util.HashSet;

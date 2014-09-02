@@ -8,8 +8,8 @@ package org.safehaus.subutai.impl.tracker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import java.util.Date;
 import java.util.UUID;
@@ -18,7 +18,8 @@ import java.util.UUID;
 /**
  * This is an implementaion of ProductOperation
  */
-public class ProductOperationImpl implements ProductOperation {
+public class ProductOperationImpl implements ProductOperation
+{
 
 	/**
 	 * product operation id

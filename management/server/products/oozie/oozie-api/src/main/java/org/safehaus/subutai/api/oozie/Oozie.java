@@ -7,7 +7,7 @@ package org.safehaus.subutai.api.oozie;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 /**
  * @author dilshat

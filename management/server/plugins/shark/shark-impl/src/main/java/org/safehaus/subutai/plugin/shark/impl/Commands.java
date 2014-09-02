@@ -8,8 +8,8 @@ package org.safehaus.subutai.plugin.shark.impl;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class Commands extends CommandsSingleton {
 	public static Command getInstallCommand(Set<Agent> agents) {
 		return createCommand(
 				new RequestBuilder("apt-get --force-yes --assume-yes install ksks-shark")
-						.withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+						.withTimeout(90).withStdOutRedirection( OutputRedirection.NO),
 				agents
 		);
 	}

@@ -6,7 +6,7 @@
 package org.safehaus.subutai.api.commandrunner;
 
 
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.base.Preconditions;
 

@@ -15,7 +15,7 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.manager.EnvironmentManager;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.PluginDAO;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;
@@ -30,11 +30,11 @@ import org.safehaus.subutai.plugin.zookeeper.impl.handler.RemovePropertyOperatio
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.zookeeper.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

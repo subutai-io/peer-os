@@ -13,7 +13,7 @@ import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
 import org.safehaus.subutai.impl.strategy.DefaultLxcPlacementStrategy;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

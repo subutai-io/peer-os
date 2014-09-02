@@ -3,7 +3,7 @@ package org.safehaus.subutai.impl.hadoop.operation.common;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.impl.hadoop.Commands;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.ArrayList;
 import java.util.List;

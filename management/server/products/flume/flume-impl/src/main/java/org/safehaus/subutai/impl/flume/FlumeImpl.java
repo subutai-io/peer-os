@@ -6,8 +6,8 @@ import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.api.flume.Flume;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.flume.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

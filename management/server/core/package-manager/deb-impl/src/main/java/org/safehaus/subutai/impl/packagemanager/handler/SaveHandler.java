@@ -5,7 +5,7 @@ import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.packagemanager.PackageInfo;
 import org.safehaus.subutai.impl.packagemanager.DebPackageManager;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,7 +18,7 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.api.templateregistry.TemplateTree;
-import org.safehaus.subutai.shared.protocol.Disposable;
+import org.safehaus.subutai.common.protocol.Disposable;
 
 import java.util.List;
 

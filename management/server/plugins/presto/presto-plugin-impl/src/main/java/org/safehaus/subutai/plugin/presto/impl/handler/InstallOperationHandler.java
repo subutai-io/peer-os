@@ -5,14 +5,14 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.common.CollectionUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.Response;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -20,9 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-/**
- * Created by dilshat on 5/7/14.
- */
 public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl>
 {
     private final ProductOperation po;
@@ -48,6 +45,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
     @Override
     public void run()
     {
+        productOperation = po;
         if ( Strings.isNullOrEmpty( config.getClusterName() ) || CollectionUtil.isCollectionEmpty( config.getWorkers() )
             || config.getCoordinatorNode() == null )
         {

@@ -4,11 +4,11 @@ import com.google.common.collect.Lists;
 import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
 import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,7 +32,8 @@ public class EnvironmentConfig {
 		this.environment = environment;
 	}
 
-	public HadoopClusterConfig init() throws EnvironmentBuildException, ClusterSetupException {
+	public HadoopClusterConfig init() throws EnvironmentBuildException, ClusterSetupException
+    {
 		if (environment == null && blueprint != null) {
 			environment = HadoopImpl.getEnvironmentManager().buildEnvironmentAndReturn(blueprint);
 		}
