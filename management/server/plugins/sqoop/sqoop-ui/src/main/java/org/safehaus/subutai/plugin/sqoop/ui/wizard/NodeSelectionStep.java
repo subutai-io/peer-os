@@ -8,8 +8,8 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
+import org.safehaus.subutai.shared.protocol.Agent;
 
 public class NodeSelectionStep extends VerticalLayout {
 
@@ -33,8 +33,8 @@ public class NodeSelectionStep extends VerticalLayout {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                String v = event.getProperty().getValue().toString().trim();
-                wizard.getConfig().setClusterName(v);
+                Object v = event.getProperty().getValue();
+                if(v != null) wizard.getConfig().setClusterName(v.toString().trim());
             }
         });
         txtClusterName.setValue(wizard.getConfig().getClusterName());

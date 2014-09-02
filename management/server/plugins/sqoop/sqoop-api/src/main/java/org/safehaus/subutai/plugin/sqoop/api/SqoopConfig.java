@@ -10,11 +10,11 @@ public class SqoopConfig implements ConfigBase {
     public static final String PRODUCT_KEY = "Sqoop2";
     public static final String TEMPLATE_NAME = "hadoopsqoop";
 
-    private String clusterName;
+    private String clusterName = "";
     private SetupType setupType;
     private int nodesCount;
     private Set<Agent> nodes = new HashSet();
-    private String hadoopClusterName;
+    private String hadoopClusterName = "";
     private Set<Agent> hadoopNodes = new HashSet<>();
 
     @Override
