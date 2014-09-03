@@ -1,75 +1,89 @@
 package org.safehaus.subutai.plugin.accumulo.rest;
 
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
-import org.safehaus.subutai.common.protocol.Agent;
+
+import java.util.*;
 
 
 /**
  * REST implementation of Accumulo API
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
     private Accumulo accumuloManager;
     private AgentManager agentManager;
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public void setAccumuloManager( final Accumulo accumuloManager ) {
+    public void setAccumuloManager( final Accumulo accumuloManager )
+    {
         this.accumuloManager = accumuloManager;
     }
 
 
     @Override
-    public String listClusters() {
-        return JsonUtil.toJson( accumuloManager.getClusters() );
+    public String listClusters()
+    {
+        List<AccumuloClusterConfig> configs = accumuloManager.getClusters();
+        List<String> clusterNames = new ArrayList<>();
+        for ( AccumuloClusterConfig config : configs )
+        {
+            clusterNames.add( config.getClusterName() );
+        }
+        return JsonUtil.toJson( clusterNames );
     }
 
 
     @Override
-    public String getCluster( final String source ) {
+    public String getCluster( final String source )
+    {
         return JsonUtil.toJson( accumuloManager.getCluster( source ) );
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
+    public String destroyCluster( final String clusterName )
+    {
         return wrapUUID( accumuloManager.uninstallCluster( clusterName ) );
     }
 
 
-    private String wrapUUID( UUID uuid ) {
+    private String wrapUUID( UUID uuid )
+    {
         return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
+    public String startCluster( final String clusterName )
+    {
         return wrapUUID( accumuloManager.startCluster( clusterName ) );
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
+    public String stopCluster( final String clusterName )
+    {
         return wrapUUID( accumuloManager.stopCluster( clusterName ) );
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public String createCluster( final String config )
+    {
         TrimmedAccumuloConfig trimmedAccumuloConfig = JsonUtil.fromJson( config, TrimmedAccumuloConfig.class );
         AccumuloClusterConfig expandedConfig = new AccumuloClusterConfig();
         expandedConfig.setClusterName( trimmedAccumuloConfig.getClusterName() );
@@ -81,10 +95,12 @@ public class RestServiceImpl implements RestService {
 
         Set<Agent> tracers = new HashSet<>();
         Set<Agent> slaves = new HashSet<>();
-        for ( String tracer : trimmedAccumuloConfig.getTracers() ) {
+        for ( String tracer : trimmedAccumuloConfig.getTracers() )
+        {
             tracers.add( agentManager.getAgentByHostname( tracer ) );
         }
-        for ( String slave : trimmedAccumuloConfig.getSlaves() ) {
+        for ( String slave : trimmedAccumuloConfig.getSlaves() )
+        {
             slaves.add( agentManager.getAgentByHostname( slave ) );
         }
 
@@ -96,7 +112,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
+    public String addNode( final String clustername, final String lxchostname, final String nodetype )
+    {
         NodeType accumuloNodeType = NodeType.valueOf( nodetype.toUpperCase() );
 
         return wrapUUID( accumuloManager.addNode( clustername, lxchostname, accumuloNodeType ) );
@@ -104,7 +121,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+    public String destroyNode( final String clustername, final String lxchostname, final String nodetype )
+    {
         NodeType accumuloNodeType = NodeType.valueOf( nodetype.toUpperCase() );
 
         return wrapUUID( accumuloManager.destroyNode( clustername, lxchostname, accumuloNodeType ) );
@@ -112,7 +130,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String checkNode( final String clusterName, final String lxchostname ) {
+    public String checkNode( final String clusterName, final String lxchostname )
+    {
         return wrapUUID( accumuloManager.checkNode( clusterName, lxchostname ) );
     }
 }
