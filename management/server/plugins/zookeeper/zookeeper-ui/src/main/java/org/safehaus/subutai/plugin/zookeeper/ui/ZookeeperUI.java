@@ -92,7 +92,7 @@ public class ZookeeperUI implements PortalModule {
 	}
 
 	public Component createComponent() {
-		return new Form();
+		return new ZookeeperForm();
 	}
 
 }
