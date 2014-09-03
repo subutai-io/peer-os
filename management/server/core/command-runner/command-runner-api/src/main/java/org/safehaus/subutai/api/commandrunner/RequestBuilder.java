@@ -243,8 +243,8 @@ public class RequestBuilder {
 
 
     /**
-     * Sets configuration points to track. This is actual for command with type INOTIFY_REQUEST or
-     * INOTIFY_CANCEL_REQUEST
+     * Sets configuration points to track. This is actual for command with type INOTIFY_CREATE_REQUEST or
+     * INOTIFY_REMOVE_REQUEST
      */
     public RequestBuilder withConfPoints( String confPoints[] ) {
 
