@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
 import org.safehaus.subutai.plugin.hive.impl.handler.*;
@@ -19,6 +20,14 @@ public class HiveImpl extends HiveBase {
     @Override
     public UUID installCluster(HiveConfig config) {
         AbstractOperationHandler h = new InstallHandler(this, config);
+        executor.execute(h);
+        return h.getTrackerId();
+    }
+
+    @Override
+    public UUID installCluster(HiveConfig config, HadoopClusterConfig hc) {
+        InstallHandler h = new InstallHandler(this, config);
+        h.setHadoopConfig(hc);
         executor.execute(h);
         return h.getTrackerId();
     }
