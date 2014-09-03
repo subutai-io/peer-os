@@ -8,7 +8,6 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopDbSetupStrategy;
@@ -18,15 +17,18 @@ import org.safehaus.subutai.plugin.hadoop.impl.operation.common.AddNodeOperation
 import com.google.common.base.Strings;
 
 
+/**
+ * Created by daralbaev on 08.04.14.
+ */
 public class Adding {
     private HadoopImpl parent;
     private HadoopClusterConfig hadoopClusterConfig;
     private String clusterName;
 
 
-    public Adding( final HadoopImpl parent, String clusterName ) {
-        this.clusterName = clusterName;
+    public Adding( HadoopImpl parent, String clusterName ) {
         this.parent = parent;
+        this.clusterName = clusterName;
     }
 
 
@@ -38,14 +40,8 @@ public class Adding {
             @Override
             public void run() {
 
-                try {
-                    hadoopClusterConfig = parent.getPluginDAO().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
-                            HadoopClusterConfig.class );
-                }
-                catch ( DBException e ) {
-                    po.addLogFailed( e.getMessage() );
-                }
-
+                hadoopClusterConfig = parent.getDbManager().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
+                        HadoopClusterConfig.class );
                 if ( hadoopClusterConfig == null ||
                         Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName() ) ||
                         Strings.isNullOrEmpty( hadoopClusterConfig.getDomainName() ) ) {
@@ -55,10 +51,11 @@ public class Adding {
 
                 try {
                     po.addLog( String.format( "Creating %d lxc container...", 1 ) );
-                    Set<Agent> cfgServers = parent.getContainerManager().clone( hadoopClusterConfig.getTemplateName(),
-                            HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY,
-                            parent.getAgentManager().getPhysicalAgents(),
-                            HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.SLAVE_NODE ) );
+                    Set<Agent> cfgServers = HadoopImpl.getContainerManager()
+                                                      .clone( hadoopClusterConfig.getTemplateName(), 3,
+                                                              HadoopImpl.getAgentManager().getPhysicalAgents(),
+                                                              HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType(
+                                                                      NodeType.SLAVE_NODE ) );
                     Agent agent = null;
 
                     for ( Agent a : cfgServers ) {
@@ -74,7 +71,7 @@ public class Adding {
                         AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
                         for ( Command command : addOperation.getCommandList() ) {
                             po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
-                            parent.getCommandRunner().runCommand( command );
+                            HadoopImpl.getCommandRunner().runCommand( command );
 
                             if ( command.hasSucceeded() ) {
                                 po.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
@@ -88,13 +85,12 @@ public class Adding {
                         hadoopClusterConfig.getTaskTrackers().add( agent );
                         hadoopClusterConfig.getDataNodes().add( agent );
 
-                        try {
-                            parent.getPluginDAO()
-                                  .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                          hadoopClusterConfig );
+                        if ( parent.getDbManager()
+                                   .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                           hadoopClusterConfig ) ) {
                             po.addLog( "Cluster info saved to DB" );
                         }
-                        catch ( DBException e ) {
+                        else {
                             po.addLogFailed( "Could not save cluster info to DB! Please see logs\n"
                                     + "Adding new node aborted" );
                         }
