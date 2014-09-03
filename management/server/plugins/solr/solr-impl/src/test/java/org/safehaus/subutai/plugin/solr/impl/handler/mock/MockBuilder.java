@@ -29,7 +29,7 @@ public class MockBuilder {
 
         DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
 
-        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
+        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig().setClusterName( "test-cluster" ) );
 
         return new UninstallOperationHandler( solrImpl, "test-cluster" );
     }
