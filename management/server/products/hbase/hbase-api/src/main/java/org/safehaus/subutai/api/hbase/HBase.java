@@ -6,7 +6,7 @@
 package org.safehaus.subutai.api.hbase;
 
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public interface HBase extends ApiBase<HBaseConfig>
 
     public List<HBaseConfig> getClusters();
 
-    List<Config> getHadoopClusters();
+    List<HadoopClusterConfig> getHadoopClusters();
 
-    Config getHadoopCluster( String clusterName );
+    HadoopClusterConfig getHadoopCluster( String clusterName );
 }

@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -116,8 +116,8 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
-    public UUID installCluster( final Config config ) {
-        return new Installation( this, config ).execute();
+    public UUID installCluster( final HadoopClusterConfig hadoopClusterConfig ) {
+        return new Installation( this, hadoopClusterConfig ).execute();
     }
 
 
@@ -128,44 +128,44 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
-    public List<Config> getClusters() {
-        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
+    public List<HadoopClusterConfig> getClusters() {
+        return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class );
     }
 
 
     @Override
-    public Config getCluster( String clusterName ) {
-        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+    public HadoopClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class );
     }
 
 
     @Override
-    public UUID startNameNode( Config config ) {
-        return new NameNode( this, config ).start();
+    public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).start();
     }
 
 
     @Override
-    public UUID stopNameNode( Config config ) {
-        return new NameNode( this, config ).stop();
+    public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).stop();
     }
 
 
     @Override
-    public UUID restartNameNode( Config config ) {
-        return new NameNode( this, config ).restart();
+    public UUID restartNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).restart();
     }
 
 
     @Override
-    public UUID statusNameNode( Config config ) {
-        return new NameNode( this, config ).status();
+    public UUID statusNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).status();
     }
 
 
     @Override
-    public UUID statusSecondaryNameNode( Config config ) {
-        return new SecondaryNameNode( this, config ).status();
+    public UUID statusSecondaryNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new SecondaryNameNode( this, hadoopClusterConfig ).status();
     }
 
 
@@ -176,26 +176,26 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
-    public UUID startJobTracker( Config config ) {
-        return new JobTracker( this, config ).start();
+    public UUID startJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).start();
     }
 
 
     @Override
-    public UUID stopJobTracker( Config config ) {
-        return new JobTracker( this, config ).stop();
+    public UUID stopJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).stop();
     }
 
 
     @Override
-    public UUID restartJobTracker( Config config ) {
-        return new JobTracker( this, config ).restart();
+    public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).restart();
     }
 
 
     @Override
-    public UUID statusJobTracker( Config config ) {
-        return new JobTracker( this, config ).status();
+    public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).status();
     }
 
 
@@ -212,25 +212,25 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
-    public UUID blockDataNode( Config config, Agent agent ) {
-        return new DataNode( this, config ).block( agent );
+    public UUID blockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new DataNode( this, hadoopClusterConfig ).block( agent );
     }
 
 
     @Override
-    public UUID blockTaskTracker( Config config, Agent agent ) {
-        return new TaskTracker( this, config ).block( agent );
+    public UUID blockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new TaskTracker( this, hadoopClusterConfig ).block( agent );
     }
 
 
     @Override
-    public UUID unblockDataNode( Config config, Agent agent ) {
-        return new DataNode( this, config ).unblock( agent );
+    public UUID unblockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new DataNode( this, hadoopClusterConfig ).unblock( agent );
     }
 
 
     @Override
-    public UUID unblockTaskTracker( Config config, Agent agent ) {
-        return new TaskTracker( this, config ).unblock( agent );
+    public UUID unblockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new TaskTracker( this, hadoopClusterConfig ).unblock( agent );
     }
 }

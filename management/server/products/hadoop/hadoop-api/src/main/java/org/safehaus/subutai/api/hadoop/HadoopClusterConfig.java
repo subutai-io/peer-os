@@ -14,10 +14,15 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * Created by daralbaev on 02.04.14.
  */
-public class Config implements ConfigBase {
+public class HadoopClusterConfig implements ConfigBase {
     public static final String PRODUCT_KEY = "Hadoop";
+    public static final int DEFAULT_HADOOP_MASTER_NODES_QUANTITY = 3;
+    public static final String PRODUCT_NAME = PRODUCT_KEY.toLowerCase();
+
     public static final String PRODUCT_PACKAGE = ( Common.PACKAGE_PREFIX + PRODUCT_KEY ).toLowerCase();
     public static final int NAME_NODE_PORT = 8020, JOB_TRACKER_PORT = 9000;
+
+    private String templateName = PRODUCT_NAME;
 
     private String clusterName, domainName;
     private Agent nameNode, jobTracker, secondaryNameNode;
@@ -26,7 +31,7 @@ public class Config implements ConfigBase {
     private Set<Agent> blockedAgents;
 
 
-    public Config() {
+    public HadoopClusterConfig() {
         domainName = Common.DEFAULT_DOMAIN_NAME;
         dataNodes = new ArrayList<>();
         taskTrackers = new ArrayList<>();
@@ -191,9 +196,9 @@ public class Config implements ConfigBase {
             return false;
         }
 
-        Config config = ( Config ) o;
+        HadoopClusterConfig hadoopClusterConfig = ( HadoopClusterConfig ) o;
 
-        if ( clusterName != null ? !clusterName.equals( config.clusterName ) : config.clusterName != null ) {
+        if ( clusterName != null ? !clusterName.equals( hadoopClusterConfig.clusterName ) : hadoopClusterConfig.clusterName != null ) {
             return false;
         }
 

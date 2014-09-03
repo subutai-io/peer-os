@@ -9,7 +9,7 @@ package org.safehaus.subutai.plugin.hbase.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -38,9 +38,9 @@ public interface HBase extends ApiBase<HBaseConfig> {
 
     public List<HBaseConfig> getClusters();
 
-    List<Config> getHadoopClusters();
+    List<HadoopClusterConfig> getHadoopClusters();
 
-    Config getHadoopCluster( String clusterName );
+    HadoopClusterConfig getHadoopCluster( String clusterName );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseConfig config,
                                                          ProductOperation po );

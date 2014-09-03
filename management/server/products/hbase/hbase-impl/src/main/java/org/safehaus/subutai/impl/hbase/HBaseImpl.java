@@ -12,7 +12,7 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
@@ -276,13 +276,13 @@ public class HBaseImpl implements HBase {
 
 
     @Override
-    public List<Config> getHadoopClusters() {
+    public List<HadoopClusterConfig> getHadoopClusters() {
         return hadoopManager.getClusters();
     }
 
 
     @Override
-    public Config getHadoopCluster( String clusterName ) {
+    public HadoopClusterConfig getHadoopCluster( String clusterName ) {
         return hadoopManager.getCluster( clusterName );
     }
 
