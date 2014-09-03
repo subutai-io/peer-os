@@ -2,7 +2,7 @@ package org.safehaus.subutai.impl.mongodb.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;
 import org.safehaus.subutai.impl.mongodb.common.Commands;

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.shark.rest;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -39,10 +39,10 @@ public class RestService {
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String listClusters() {
 
-		List<Config> configList = sharkManager.getClusters();
+		List<SharkClusterConfig > configList = sharkManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configList) {
+		for (SharkClusterConfig config : configList) {
 			clusterNames.add(config.getClusterName());
 		}
 
@@ -63,7 +63,7 @@ public class RestService {
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String installCluster(@PathParam ("clusterName") String clusterName) {
 		SparkClusterConfig sparkConfig = sparkManager.getCluster(clusterName);
-		Config sharkConfig = new Config();
+		SharkClusterConfig sharkConfig = new SharkClusterConfig();
 
 		sharkConfig.setClusterName(sparkConfig.getClusterName());
 		sharkConfig.setNodes(sparkConfig.getAllNodes());

@@ -1822,6 +1822,28 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Elasticsearch Plugin -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>elasticsearch-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Products Modules - END -->
 
               </artifactItems>

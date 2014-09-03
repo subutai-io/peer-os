@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.pig.rest;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.*;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -34,11 +34,11 @@ public class RestService {
 	}
 
 
-	@GET
-	@Path ("installCluster")
+	@POST
+	@Path ("installCluster/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String installCluster(
-			@QueryParam ("clusterName") String clusterName,
+			@PathParam ("clusterName") String clusterName,
 			@QueryParam ("nodes") String nodes
 	) {
 
@@ -73,10 +73,10 @@ public class RestService {
 
 
 	@GET
-	@Path ("getCluster")
+	@Path ("getCluster/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getCluster(
-			@QueryParam ("clusterName") String clusterName
+			@PathParam ("clusterName") String clusterName
 	) {
 		Config config = pigManager.getCluster(clusterName);
 
@@ -84,12 +84,12 @@ public class RestService {
 	}
 
 
-	@GET
-	@Path ("destroyNode")
+	@DELETE
+	@Path ("destroyNode/{clusterName}/{node}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getCluster(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("node") String node
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("node") String node
 	) {
 		UUID uuid = pigManager.destroyNode(clusterName, node);
 

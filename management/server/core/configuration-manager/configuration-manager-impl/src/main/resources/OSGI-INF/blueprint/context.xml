@@ -3,27 +3,27 @@
 
     <!--<bean id="configManager" scope="singleton"
           init-method="start"
-          class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
+          class="org.safehaus.subutai.core.configuration.impl.ConfigManagerImpl">
       <property name="bcontext" ref="blueprintBundleContext"></property>
     </bean>-->
-    <service ref="textInjector" interface="org.safehaus.subutai.configuration.manager.api.TextInjector"/>
-    <service ref="configManager" interface="org.safehaus.subutai.configuration.manager.api.ConfigManager"/>
-    <!--<service ref="agentManager" interface="org.safehaus.subutai.api.agentmanager.AgentManager" />-->
-    <!--<service ref="textInjector" interface="org.safehaus.subutai.configuration.manager.api.TextInjector" />-->
+    <service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector"/>
+    <service ref="configManager" interface="org.safehaus.subutai.core.configuration.api.ConfigManager"/>
+    <!--<service ref="agentManager" interface="org.safehaus.subutai.core.agent.api.AgentManager" />-->
+    <!--<service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector" />-->
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="configManager" scope="singleton"
-          class="org.safehaus.subutai.configuration.manager.impl.ConfigManagerImpl">
+          class="org.safehaus.subutai.core.configuration.impl.ConfigManagerImpl">
         <!--<property name="bcontext" ref="blueprintBundleContext"></property>-->
         <!--<property name="agentManager" ref="agentManager" />-->
         <property name="textInjector" ref="textInjector"/>
     </bean>
 
     <bean id="textInjector" scope="singleton"
-          class="org.safehaus.subutai.configuration.manager.impl.command.TextInjectorImpl">
+          class="org.safehaus.subutai.core.configuration.impl.command.TextInjectorImpl">
         <!--<property name="textInjector" ref="textInjector"></property>-->
         <property name="commandRunner" ref="commandRunner"/>
         <property name="agentManager" ref="agentManager"/>

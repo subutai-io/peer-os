@@ -7,20 +7,21 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 
 import java.util.Set;
 
-
-/**
- * @author dilshat
- */
 public class Commands extends CommandsSingleton
 {
+
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
 
     public static Command getInstallCommand( Set<Agent> agents )
     {

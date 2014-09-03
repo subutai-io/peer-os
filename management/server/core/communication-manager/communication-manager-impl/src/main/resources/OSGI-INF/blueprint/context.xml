@@ -18,7 +18,7 @@
     </cm:property-placeholder>
 
     <bean id="communicationService"
-          class="org.safehaus.subutai.impl.communicationmanager.CommunicationManagerImpl"
+          class="org.safehaus.subutai.core.communication.impl.CommunicationManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="amqUrl" value="${amqUrl}"/>
         <property name="amqServiceTopic" value="${amqServiceTopic}"/>
@@ -29,7 +29,7 @@
     </bean>
 
     <service ref="communicationService"
-             interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager">
+             interface="org.safehaus.subutai.core.communication.api.CommunicationManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>

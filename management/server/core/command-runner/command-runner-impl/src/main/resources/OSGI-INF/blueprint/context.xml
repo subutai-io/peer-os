@@ -3,17 +3,17 @@
         >
 
     <reference id="communicationManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.communicationmanager.CommunicationManager"/>
+               interface="org.safehaus.subutai.core.communication.api.CommunicationManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="module" scope="singleton"
-          class="org.safehaus.subutai.impl.commandrunner.CommandRunnerImpl"
+          class="org.safehaus.subutai.core.command.impl.CommandRunnerImpl"
           init-method="init" destroy-method="destroy" activation="eager">
         <argument ref="communicationManager"/>
         <argument ref="agentManager"/>
     </bean>
 
-    <service ref="module" interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+    <service ref="module" interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
 </blueprint>

@@ -32,6 +32,7 @@
         <module>plugin-common</module>
         <module>lucene</module>
         <module>pig</module>
+        <module>elasticsearch</module>
     </modules>
 
 </project>

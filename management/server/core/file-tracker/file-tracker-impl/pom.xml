@@ -68,7 +68,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.impl.filetracker</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.filetracker.impl</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

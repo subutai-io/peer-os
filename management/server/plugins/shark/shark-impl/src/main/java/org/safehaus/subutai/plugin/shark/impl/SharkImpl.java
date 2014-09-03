@@ -6,12 +6,12 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.shark.impl.handler.*;
 import org.safehaus.subutai.plugin.spark.api.Spark;
@@ -71,7 +71,7 @@ public class SharkImpl implements Shark {
 		executor.shutdown();
 	}
 
-	public UUID installCluster(final Config config) {
+	public UUID installCluster(final SharkClusterConfig config) {
 
 		Preconditions.checkNotNull(config, "Configuration is null");
 
@@ -109,13 +109,13 @@ public class SharkImpl implements Shark {
 		return operationHandler.getTrackerId();
 	}
 
-	public List<Config> getClusters() {
-		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+	public List<SharkClusterConfig > getClusters() {
+		return dbManager.getInfo( SharkClusterConfig.PRODUCT_KEY, SharkClusterConfig.class);
 	}
 
 	@Override
-	public Config getCluster(String clusterName) {
-		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+	public SharkClusterConfig getCluster(String clusterName) {
+		return dbManager.getInfo( SharkClusterConfig.PRODUCT_KEY, clusterName, SharkClusterConfig.class);
 	}
 
 	public UUID actualizeMasterIP(final String clusterName) {
