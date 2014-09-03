@@ -2,40 +2,40 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-server-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>mgmt-server-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mgmt-server-products-parent</artifactId>
-    <name>Subutai Products Parent</name>
-    <description>Subutai Products Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>mgmt-server-products-parent</artifactId>
+  <name>Subutai Products Parent</name>
+  <description>Subutai Products Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>accumulo</module>
-        <module>flume</module>
-        <module>hadoop</module>
-        <module>hive</module>
-        <module>hivequery</module>
-        <module>lucene</module>
-        <module>mongodb</module>
-        <module>pig</module>
-        <module>presto</module>
-        <module>shark</module>
-        <module>solr</module>
-        <module>spark</module>
-        <module>sqoop</module>
-        <module>storm</module>
-        <module>zookeeper</module>
-        <module>elasticsearch</module>
-        <module>cassandra</module>
-        <module>oozie</module>
-        <module>hbase</module>
-        <module>mahout</module>
-        <module>common</module>
-    </modules>
+  <modules>
+    <module>common</module>
+    <!--<module>accumulo</module>-->
+    <!--<module>flume</module>
+    <module>hadoop</module>
+    <module>hive</module>
+    <module>hivequery</module>
+    <module>lucene</module>
+    <module>mongodb</module>
+    <module>pig</module>
+    <module>presto</module>
+    <module>shark</module>
+    <module>solr</module>
+    <module>spark</module>
+    <module>sqoop</module>
+    <module>storm</module>
+    <module>zookeeper</module>
+    <module>elasticsearch</module>
+    <module>cassandra</module>
+    <module>oozie</module>
+    <module>hbase</module>
+    <module>mahout</module>-->
+  </modules>
 
 </project>

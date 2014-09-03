@@ -12,7 +12,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 
-import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
 import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;

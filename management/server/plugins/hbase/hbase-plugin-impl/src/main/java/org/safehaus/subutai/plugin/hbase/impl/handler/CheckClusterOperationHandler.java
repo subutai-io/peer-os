@@ -4,20 +4,19 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class CheckClusterOperationHandler extends AbstractOperationHandler<HBaseImpl>
-{
+public class CheckClusterOperationHandler extends AbstractOperationHandler<HBaseImpl> {
 
     private ProductOperation po;
     private String clusterName;
@@ -33,8 +32,8 @@ public class CheckClusterOperationHandler extends AbstractOperationHandler<HBase
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Checking cluster %s", clusterName ) );
+        /*final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
+                String.format( "Checking cluster %s", clusterName ) );*/
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
