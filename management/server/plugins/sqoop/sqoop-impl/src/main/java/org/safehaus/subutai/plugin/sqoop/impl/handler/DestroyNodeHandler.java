@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.common.PluginDAO;
@@ -51,6 +52,9 @@ public class DestroyNodeHandler extends AbstractHandler {
             try {
                 PluginDAO dao = manager.getPluginDao();
                 if(config.getNodes().isEmpty()) {
+
+                    destroyNodes(config);
+
                     dao.deleteInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName());
                     po.addLogDone("Installation info deleted");
                 } else {
@@ -68,6 +72,22 @@ public class DestroyNodeHandler extends AbstractHandler {
             po.addLogFailed("Failed to remove Sqoop from node");
         }
 
+    }
+
+    private void destroyNodes(SqoopConfig config) {
+        if(config.getHadoopNodes() == null || config.getHadoopNodes().isEmpty())
+            return;
+
+        productOperation.addLog("Destroying nodes...");
+        try {
+            manager.getContainerManager().clonesDestroy(config.getHadoopNodes());
+            manager.getLogger().info("Destroyed {} node(s)", config.getHadoopNodes().size());
+            productOperation.addLog("Nodes successfully destroyed");
+        } catch(LxcDestroyException ex) {
+            String m = "Failed to detroy node(s)";
+            productOperation.addLog(m + ": " + ex.getMessage());
+            manager.getLogger().error(m, ex);
+        }
     }
 
 }
