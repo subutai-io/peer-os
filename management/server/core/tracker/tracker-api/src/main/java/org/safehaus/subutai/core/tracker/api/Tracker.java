@@ -5,12 +5,13 @@
  */
 package org.safehaus.subutai.core.tracker.api;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 
 /**

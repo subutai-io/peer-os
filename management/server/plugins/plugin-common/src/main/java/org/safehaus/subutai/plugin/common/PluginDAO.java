@@ -4,6 +4,7 @@ package org.safehaus.subutai.plugin.common;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -32,7 +33,12 @@ public class PluginDAO
 
     public void saveInfo( String source, String key, Object info ) throws DBException
     {
-        dbManager.executeUpdate2( "insert into product_info(source,key,info) values (?,?,?)", source, key,
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( info, "Info is null" );
+
+        dbManager.executeUpdate2( "insert into product_info(source,key,info) values (?,?,?)", source.toLowerCase(),
+            key.toLowerCase(),
             gson.toJson( info ) );
     }
 
@@ -47,10 +53,14 @@ public class PluginDAO
      */
     public <T> List<T> getInfo( String source, Class<T> clazz ) throws DBException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
         List<T> list = new ArrayList<>();
         try
         {
-            ResultSet rs = dbManager.executeQuery2( "select info from product_info where source = ?", source );
+            ResultSet rs = dbManager
+                .executeQuery2( "select info from product_info where source = ?", source.toLowerCase() );
             if ( rs != null )
             {
                 for ( Row row : rs )
@@ -79,11 +89,16 @@ public class PluginDAO
      */
     public <T> T getInfo( String source, String key, Class<T> clazz ) throws DBException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
         try
         {
 
             ResultSet rs = dbManager
-                .executeQuery2( "select info from product_info where source = ? and key = ?", source, key );
+                .executeQuery2( "select info from product_info where source = ? and key = ?", source.toLowerCase(),
+                    key.toLowerCase() );
             if ( rs != null )
             {
                 Row row = rs.one();
@@ -111,6 +126,10 @@ public class PluginDAO
      */
     public void deleteInfo( String source, String key ) throws DBException
     {
-        dbManager.executeUpdate2( "delete from product_info where source = ? and key = ?", source, key );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+
+        dbManager.executeUpdate2( "delete from product_info where source = ? and key = ?", source.toLowerCase(),
+            key.toLowerCase() );
     }
 }
