@@ -26,7 +26,13 @@ public class SqoopImpl extends SqoopBase {
 
     @Override
     public UUID installCluster(SqoopConfig config, HadoopClusterConfig hadoopConfig) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ProductOperation po = tracker.createProductOperation(SqoopConfig.PRODUCT_KEY,
+                "Install Sqoop with Hadoop: " + config.getClusterName());
+        InstallHandler h = new InstallHandler(this, config.getClusterName(), po);
+        h.setConfig(config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     @Override

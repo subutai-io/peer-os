@@ -7,6 +7,7 @@ import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.api.dbmanager.DBException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
@@ -35,10 +36,6 @@ public class DestroyNodeHandler extends AbstractHandler {
             po.addLogFailed("Node does not belong to Sqoop installation group");
             return;
         }
-        if(config.getNodes().size() == 1) {
-            po.addLogFailed("This is the last node. Destroy cluster instead");
-            return;
-        }
 
         String s = CommandFactory.build(CommandType.PURGE, null);
         Command cmd = manager.getCommandRunner().createCommand(
@@ -52,11 +49,16 @@ public class DestroyNodeHandler extends AbstractHandler {
             config.getNodes().remove(agent);
 
             try {
-                manager.getPluginDao().saveInfo(SqoopConfig.PRODUCT_KEY,
-                        config.getClusterName(), config);
-                po.addLogDone("Installation info successfully updated");
+                PluginDAO dao = manager.getPluginDao();
+                if(config.getNodes().isEmpty()) {
+                    dao.deleteInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName());
+                    po.addLogDone("Installation info deleted");
+                } else {
+                    dao.saveInfo(SqoopConfig.PRODUCT_KEY, config.getClusterName(), config);
+                    po.addLogDone("Installation info updated");
+                }
             } catch(DBException ex) {
-                String m = "Failed to save installation info";
+                String m = "Failed to update installation info";
                 po.addLogFailed(m);
                 manager.getLogger().error(m, ex);
             }
