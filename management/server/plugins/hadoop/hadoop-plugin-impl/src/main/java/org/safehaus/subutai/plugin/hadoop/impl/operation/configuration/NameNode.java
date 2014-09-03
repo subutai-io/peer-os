@@ -15,19 +15,21 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
 public class NameNode {
+    private HadoopImpl parent;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public NameNode( HadoopClusterConfig hadoopClusterConfig ) {
+    public NameNode( final HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
         this.hadoopClusterConfig = hadoopClusterConfig;
+        this.parent = parent;
     }
 
 
     public UUID start() {
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Starting cluster's %s NameNode", hadoopClusterConfig.getClusterName() ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( hadoopClusterConfig == null ) {
@@ -36,8 +38,8 @@ public class NameNode {
                     return;
                 }
 
-                final Agent node = HadoopImpl.getAgentManager()
-                                             .getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
+                final Agent node =
+                        parent.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
                 if ( node == null ) {
                     po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
                             hadoopClusterConfig.getNameNode().getHostname() ) );
@@ -45,7 +47,7 @@ public class NameNode {
                 }
 
                 Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "start" );
-                HadoopImpl.getCommandRunner().runCommand( command );
+                parent.getCommandRunner().runCommand( command );
 
                 if ( command.hasSucceeded() ) {
                     po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
@@ -65,10 +67,10 @@ public class NameNode {
 
     public UUID stop() {
 
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping cluster's %s NameNode", hadoopClusterConfig.getClusterName() ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( hadoopClusterConfig == null ) {
@@ -77,8 +79,8 @@ public class NameNode {
                     return;
                 }
 
-                final Agent node = HadoopImpl.getAgentManager()
-                                             .getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
+                final Agent node =
+                        parent.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
                 if ( node == null ) {
                     po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
                             hadoopClusterConfig.getNameNode().getHostname() ) );
@@ -86,7 +88,7 @@ public class NameNode {
                 }
 
                 Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "stop" );
-                HadoopImpl.getCommandRunner().runCommand( command );
+                parent.getCommandRunner().runCommand( command );
 
                 if ( command.hasSucceeded() ) {
                     po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
@@ -105,10 +107,10 @@ public class NameNode {
 
 
     public UUID restart() {
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Restarting cluster's %s NameNode", hadoopClusterConfig.getClusterName() ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( hadoopClusterConfig == null ) {
@@ -117,8 +119,8 @@ public class NameNode {
                     return;
                 }
 
-                final Agent node = HadoopImpl.getAgentManager()
-                                             .getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
+                final Agent node =
+                        parent.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
                 if ( node == null ) {
                     po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
                             hadoopClusterConfig.getNameNode().getHostname() ) );
@@ -126,7 +128,7 @@ public class NameNode {
                 }
 
                 Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "restart" );
-                HadoopImpl.getCommandRunner().runCommand( command );
+                parent.getCommandRunner().runCommand( command );
 
                 if ( command.hasSucceeded() ) {
                     po.addLogDone( String.format( "Task's operation %s finished", command.getDescription() ) );
@@ -146,10 +148,10 @@ public class NameNode {
 
     public UUID status() {
 
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Getting status of clusters %s NameNode", hadoopClusterConfig.getClusterName() ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( hadoopClusterConfig == null ) {
@@ -158,8 +160,8 @@ public class NameNode {
                     return;
                 }
 
-                final Agent node = HadoopImpl.getAgentManager()
-                                             .getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
+                final Agent node =
+                        parent.getAgentManager().getAgentByHostname( hadoopClusterConfig.getNameNode().getHostname() );
                 if ( node == null ) {
                     po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
                             hadoopClusterConfig.getNameNode().getHostname() ) );
@@ -167,7 +169,7 @@ public class NameNode {
                 }
 
                 Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "status" );
-                HadoopImpl.getCommandRunner().runCommand( command );
+                parent.getCommandRunner().runCommand( command );
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if ( command.hasCompleted() ) {
@@ -180,8 +182,7 @@ public class NameNode {
                                 String temp = status.
                                                             replaceAll( Pattern.quote(
                                                                     "!(SecondaryNameNode is not running on this " +
-                                                                            "machine)"
-                                                                            + "" ), "" ).
+                                                                            "machine)" + "" ), "" ).
                                                             replaceAll( "NameNode is ", "" );
                                 if ( temp.toLowerCase().contains( "not" ) ) {
                                     nodeState = NodeState.STOPPED;

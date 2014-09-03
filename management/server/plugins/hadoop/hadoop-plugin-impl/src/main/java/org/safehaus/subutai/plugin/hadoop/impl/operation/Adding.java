@@ -19,27 +19,28 @@ import com.google.common.base.Strings;
 
 
 public class Adding {
+    private HadoopImpl parent;
     private HadoopClusterConfig hadoopClusterConfig;
     private String clusterName;
 
 
-    public Adding( String clusterName ) {
+    public Adding( final HadoopImpl parent, String clusterName ) {
         this.clusterName = clusterName;
+        this.parent = parent;
     }
 
 
     public UUID execute() {
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
-                "Adding node to Hadoop" );
+        final ProductOperation po =
+                parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY, "Adding node to Hadoop" );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
             @Override
             public void run() {
 
                 try {
-                    hadoopClusterConfig = HadoopImpl.getPluginDAO()
-                                                    .getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
-                                                            HadoopClusterConfig.class );
+                    hadoopClusterConfig = parent.getPluginDAO().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
+                            HadoopClusterConfig.class );
                 }
                 catch ( DBException e ) {
                     po.addLogFailed( e.getMessage() );
@@ -54,12 +55,10 @@ public class Adding {
 
                 try {
                     po.addLog( String.format( "Creating %d lxc container...", 1 ) );
-                    Set<Agent> cfgServers = HadoopImpl.getContainerManager()
-                                                      .clone( hadoopClusterConfig.getTemplateName(),
-                                                              HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY,
-                                                              HadoopImpl.getAgentManager().getPhysicalAgents(),
-                                                              HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType(
-                                                                      NodeType.SLAVE_NODE ) );
+                    Set<Agent> cfgServers = parent.getContainerManager().clone( hadoopClusterConfig.getTemplateName(),
+                            HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY,
+                            parent.getAgentManager().getPhysicalAgents(),
+                            HadoopDbSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.SLAVE_NODE ) );
                     Agent agent = null;
 
                     for ( Agent a : cfgServers ) {
@@ -67,15 +66,15 @@ public class Adding {
                     }
                     po.addLog( "Lxc containers created successfully\nConfiguring network..." );
 
-                    if ( HadoopImpl.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
-                            hadoopClusterConfig.getDomainName() ) && HadoopImpl.getNetworkManager().configSshOnAgents(
+                    if ( parent.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
+                            hadoopClusterConfig.getDomainName() ) && parent.getNetworkManager().configSshOnAgents(
                             hadoopClusterConfig.getAllNodes(), agent ) ) {
                         po.addLog( "Cluster network configured" );
 
                         AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
                         for ( Command command : addOperation.getCommandList() ) {
                             po.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
-                            HadoopImpl.getCommandRunner().runCommand( command );
+                            parent.getCommandRunner().runCommand( command );
 
                             if ( command.hasSucceeded() ) {
                                 po.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
@@ -90,9 +89,9 @@ public class Adding {
                         hadoopClusterConfig.getDataNodes().add( agent );
 
                         try {
-                            HadoopImpl.getPluginDAO()
-                                      .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                              hadoopClusterConfig );
+                            parent.getPluginDAO()
+                                  .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                          hadoopClusterConfig );
                             po.addLog( "Cluster info saved to DB" );
                         }
                         catch ( DBException e ) {

@@ -14,21 +14,23 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 
 public class SecondaryNameNode {
+    private HadoopImpl parent;
     private HadoopClusterConfig hadoopClusterConfig;
 
 
-    public SecondaryNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+    public SecondaryNameNode( final HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
         this.hadoopClusterConfig = hadoopClusterConfig;
+        this.parent = parent;
     }
 
 
     public UUID status() {
 
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Getting status of clusters %s Secondary NameNode",
                         hadoopClusterConfig.getClusterName() ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( hadoopClusterConfig == null ) {
@@ -37,7 +39,7 @@ public class SecondaryNameNode {
                     return;
                 }
 
-                final Agent node = HadoopImpl.getAgentManager().getAgentByHostname(
+                final Agent node = parent.getAgentManager().getAgentByHostname(
                         hadoopClusterConfig.getSecondaryNameNode().getHostname() );
                 if ( node == null ) {
                     po.addLogFailed( String.format( "Agent with hostname %s is not connected\nOperation aborted",
@@ -46,7 +48,7 @@ public class SecondaryNameNode {
                 }
 
                 Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getSecondaryNameNode(), "status" );
-                HadoopImpl.getCommandRunner().runCommand( command );
+                parent.getCommandRunner().runCommand( command );
 
                 NodeState nodeState = NodeState.UNKNOWN;
                 if ( command.hasCompleted() ) {

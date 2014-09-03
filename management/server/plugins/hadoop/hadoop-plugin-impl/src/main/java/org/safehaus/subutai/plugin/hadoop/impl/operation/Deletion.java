@@ -13,18 +13,17 @@ import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 public class Deletion {
 
-    public UUID execute( final String clusterName ) {
-        final ProductOperation po = HadoopImpl.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+    public UUID execute( final HadoopImpl parent, final String clusterName ) {
+        final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
 
-        HadoopImpl.getExecutor().execute( new Runnable() {
+        parent.getExecutor().execute( new Runnable() {
 
             public void run() {
                 HadoopClusterConfig hadoopClusterConfig;
                 try {
-                    hadoopClusterConfig = HadoopImpl.getPluginDAO()
-                                                    .getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
-                                                            HadoopClusterConfig.class );
+                    hadoopClusterConfig = parent.getPluginDAO().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName,
+                            HadoopClusterConfig.class );
                 }
                 catch ( DBException e ) {
                     po.addLogFailed(
@@ -34,8 +33,8 @@ public class Deletion {
 
                 po.addLog( "Updating db..." );
                 try {
-                    HadoopImpl.getPluginDAO()
-                              .deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
+                    parent.getPluginDAO()
+                          .deleteInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName() );
                     po.addLogDone( "Cluster info deleted from DB\nDone" );
                 }
                 catch ( DBException e ) {
@@ -46,7 +45,7 @@ public class Deletion {
 
                 try {
                     for ( Agent agent : hadoopClusterConfig.getAllNodes() ) {
-                        HadoopImpl.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
+                        parent.getContainerManager().cloneDestroy( agent.getParentHostName(), agent.getHostname() );
                     }
                     po.addLog( "Lxc containers successfully destroyed" );
                 }
