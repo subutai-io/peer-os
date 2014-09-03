@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * @author dilshat
  */
-public interface Shark extends ApiBase<Config> {
+public interface Shark extends ApiBase<SharkClusterConfig > {
 
 	public UUID addNode(String clusterName, String lxcHostname);
 
