@@ -24,6 +24,7 @@
         <module>solr</module>
         <module>spark</module>
         <module>shark</module>
+        <module>sqoop</module>
         <module>hbase</module>
         <module>mahout</module>
         <module>cassandra</module>

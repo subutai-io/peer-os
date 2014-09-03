@@ -1,6 +1,6 @@
 package org.safehaus.subutai.plugin.shark.rest;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;

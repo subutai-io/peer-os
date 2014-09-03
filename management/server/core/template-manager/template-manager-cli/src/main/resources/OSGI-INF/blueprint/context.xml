@@ -1,15 +1,15 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="templateManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
+               interface="org.safehaus.subutai.core.template.api.TemplateManager"/>
     <reference id="containerManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.container.ContainerManager"/>
+               interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/get-master-template-name">
-            <action class="org.safehaus.subutai.cli.template.manager.MasterTemplateName">
+            <action class="org.safehaus.subutai.core.template.cli.MasterTemplateName">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -17,7 +17,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/setup">
-            <action class="org.safehaus.subutai.cli.template.manager.CheckAndSetup">
+            <action class="org.safehaus.subutai.core.template.cli.CheckAndSetup">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -25,7 +25,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/clone">
-            <action class="org.safehaus.subutai.cli.template.manager.CloneTemplate">
+            <action class="org.safehaus.subutai.core.template.cli.CloneTemplate">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -33,7 +33,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/destroy">
-            <action class="org.safehaus.subutai.cli.template.manager.CloneDestroy">
+            <action class="org.safehaus.subutai.core.template.cli.CloneDestroy">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -41,7 +41,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/promote">
-            <action class="org.safehaus.subutai.cli.template.manager.PromoteClone">
+            <action class="org.safehaus.subutai.core.template.cli.PromoteClone">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -49,7 +49,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/import">
-            <action class="org.safehaus.subutai.cli.template.manager.ImportTemplate">
+            <action class="org.safehaus.subutai.core.template.cli.ImportTemplate">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -57,7 +57,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/export">
-            <action class="org.safehaus.subutai.cli.template.manager.ExportTemplate">
+            <action class="org.safehaus.subutai.core.template.cli.ExportTemplate">
                 <property name="templateManager" ref="templateManager"/>
             </action>
         </command>
@@ -65,7 +65,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="container/clone-many">
-            <action class="org.safehaus.subutai.cli.container.manager.CloneMany">
+            <action class="org.safehaus.subutai.core.template.cli.CloneMany">
                 <property name="templateManager" ref="templateManager"/>
                 <property name="containerManager" ref="containerManager"/>
                 <property name="agentManager" ref="agentManager"/>
@@ -75,7 +75,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="container/attach">
-            <action class="org.safehaus.subutai.cli.container.manager.AttachAndExecute">
+            <action class="org.safehaus.subutai.core.template.cli.AttachAndExecute">
                 <property name="containerManager" ref="containerManager"/>
                 <property name="agentManager" ref="agentManager"/>
             </action>

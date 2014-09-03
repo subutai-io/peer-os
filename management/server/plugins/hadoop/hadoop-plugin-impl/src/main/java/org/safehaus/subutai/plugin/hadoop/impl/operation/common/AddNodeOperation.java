@@ -1,6 +1,6 @@
 package org.safehaus.subutai.plugin.hadoop.impl.operation.common;
 
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 import org.safehaus.subutai.common.protocol.Agent;

@@ -6,12 +6,12 @@
 package org.safehaus.subutai.impl.mahout;
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.mahout.Config;
 import org.safehaus.subutai.api.mahout.Mahout;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.impl.mahout.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.impl.mahout.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.mahout.handler.InstallOperationHandler;

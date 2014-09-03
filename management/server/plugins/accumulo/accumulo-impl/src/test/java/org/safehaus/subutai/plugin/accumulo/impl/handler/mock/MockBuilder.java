@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler.mock;
 
 
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
