@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.impl.operation;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.HadoopDbSetupStrategy;
+import org.safehaus.subutai.plugin.hadoop.impl.HadoopSetupStrategy;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
 import java.util.UUID;
@@ -26,7 +26,7 @@ public class Installation {
 		parent.getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
-				HadoopDbSetupStrategy strategy = new HadoopDbSetupStrategy(po, parent, hadoopClusterConfig);
+				HadoopSetupStrategy strategy = new HadoopSetupStrategy(po, parent, hadoopClusterConfig);
 				try {
 					strategy.setup();
 				} catch (ClusterSetupException e) {
