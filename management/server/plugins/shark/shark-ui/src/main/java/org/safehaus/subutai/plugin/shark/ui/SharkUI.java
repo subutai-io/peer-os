@@ -9,7 +9,7 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.core.agentmanager.api.AgentManager;
 import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.server.ui.api.PortalModule;
@@ -79,11 +79,11 @@ public class SharkUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return SharkClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return SharkClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override
