@@ -6,10 +6,10 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import java.util.*;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
-import org.safehaus.subutai.server.ui.component.*;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
+import org.safehaus.subutai.server.ui.component.*;
 
 public class Manager {
 

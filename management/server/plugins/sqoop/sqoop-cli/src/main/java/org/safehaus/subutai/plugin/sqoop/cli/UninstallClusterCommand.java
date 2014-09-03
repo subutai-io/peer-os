@@ -5,10 +5,10 @@ import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 /**
  * Displays the last log entries
@@ -37,6 +37,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         this.sqoopManager = sqoopManager;
     }
 
+    @Override
     protected Object doExecute() {
         UUID uuid = sqoopManager.uninstallCluster(clusterName);
         int logSize = 0;

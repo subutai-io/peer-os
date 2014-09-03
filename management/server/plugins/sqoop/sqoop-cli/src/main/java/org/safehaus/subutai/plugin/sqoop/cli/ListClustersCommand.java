@@ -22,6 +22,7 @@ public class ListClustersCommand extends OsgiCommandSupport {
         this.sqoopManager = sqoopManager;
     }
 
+    @Override
     protected Object doExecute() {
         List<SqoopConfig> configList = sqoopManager.getClusters();
         if(!configList.isEmpty())

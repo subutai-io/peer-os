@@ -7,8 +7,8 @@ import com.vaadin.ui.HorizontalLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public class ExportPanel extends ImportExportBase {

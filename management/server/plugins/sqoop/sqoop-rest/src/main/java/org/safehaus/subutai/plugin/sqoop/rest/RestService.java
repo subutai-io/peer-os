@@ -8,16 +8,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.sqoop.api.DataSourceType;
 import org.safehaus.subutai.plugin.sqoop.api.Sqoop;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportParameter;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 public class RestService {
 

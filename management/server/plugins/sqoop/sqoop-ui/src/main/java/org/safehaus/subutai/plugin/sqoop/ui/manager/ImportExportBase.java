@@ -4,11 +4,11 @@ import com.vaadin.ui.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.CommonSetting;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.shared.protocol.Agent;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
 public abstract class ImportExportBase extends VerticalLayout {

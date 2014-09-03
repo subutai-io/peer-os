@@ -5,12 +5,12 @@ import java.util.HashSet;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 public class ImportHandler extends AbstractHandler {
 

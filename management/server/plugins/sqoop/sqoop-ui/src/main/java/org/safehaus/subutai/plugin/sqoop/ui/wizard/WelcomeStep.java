@@ -3,9 +3,9 @@ package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 import com.vaadin.server.FileResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
-import org.safehaus.subutai.shared.protocol.FileUtil;
 
 public class WelcomeStep extends Panel {
 

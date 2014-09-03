@@ -2,11 +2,11 @@ package org.safehaus.subutai.plugin.sqoop.impl.handler;
 
 import java.util.Iterator;
 import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.SqoopImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 abstract class AbstractHandler extends AbstractOperationHandler<SqoopImpl> {
 
