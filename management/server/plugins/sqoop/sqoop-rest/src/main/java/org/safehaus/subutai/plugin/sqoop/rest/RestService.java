@@ -88,13 +88,12 @@ public class RestService {
     @GET
     @Path("addNode")
     @Produces({MediaType.APPLICATION_JSON})
+    @Deprecated()
     public String addNode(
             @QueryParam("clusterName") String clusterName,
             @QueryParam("hostname") String hostname
     ) {
-        UUID uuid = sqoopManager.addNode(clusterName, hostname);
-
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        return JsonUtil.toJson(OPERATION_ID, null);
     }
 
     @GET

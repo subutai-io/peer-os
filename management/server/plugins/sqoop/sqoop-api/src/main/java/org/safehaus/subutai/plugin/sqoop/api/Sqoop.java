@@ -15,8 +15,6 @@ public interface Sqoop extends ApiBase<SqoopConfig> {
 
     public UUID installCluster(SqoopConfig config, HadoopClusterConfig hadoopConfig);
 
-    public UUID addNode(String clusterName, String hostname);
-
     public UUID destroyNode(String clusterName, String hostname);
 
     public UUID exportData(ExportSetting settings);

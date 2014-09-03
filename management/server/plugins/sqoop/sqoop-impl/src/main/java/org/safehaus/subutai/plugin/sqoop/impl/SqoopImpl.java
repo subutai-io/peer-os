@@ -61,16 +61,6 @@ public class SqoopImpl extends SqoopBase {
     }
 
     @Override
-    public UUID addNode(String clusterName, String hostname) {
-        ProductOperation po = tracker.createProductOperation(SqoopConfig.PRODUCT_KEY,
-                "Add new node " + hostname);
-        AddNodeHandler h = new AddNodeHandler(this, clusterName, po);
-        h.setHostname(hostname);
-        executor.execute(h);
-        return po.getId();
-    }
-
-    @Override
     public UUID destroyNode(String clusterName, String hostname) {
         ProductOperation po = tracker.createProductOperation(SqoopConfig.PRODUCT_KEY,
                 "Destroy node " + hostname);
