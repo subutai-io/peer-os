@@ -10,9 +10,11 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.core.db.api.DbManager"/>
     <reference id="containerManager" availability="mandatory"
-                   interface="org.safehaus.subutai.api.container.ContainerManager"/>
+               interface="org.safehaus.subutai.api.container.ContainerManager"/>
     <reference id="environmentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
 
     <bean id="hive-impl" scope="singleton" class="org.safehaus.subutai.plugin.hive.impl.HiveImpl"
           init-method="init" destroy-method="destroy">
@@ -22,6 +24,7 @@
         <property name="dbManager" ref="dbManager"/>
         <property name="containerManager" ref="containerManager"/>
         <property name="environmentManager" ref="environmentManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
     <service ref="hive-impl" interface="org.safehaus.subutai.plugin.hive.api.Hive"/>

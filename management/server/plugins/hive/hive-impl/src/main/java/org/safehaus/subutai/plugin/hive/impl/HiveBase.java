@@ -9,6 +9,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public abstract class HiveBase implements Hive {
     protected DbManager dbManager;
     protected ContainerManager containerManager;
     protected EnvironmentManager environmentManager;
+    protected Hadoop hadoopManager;
 
     protected PluginDAO pluginDao;
     protected ExecutorService executor;
@@ -86,6 +88,14 @@ public abstract class HiveBase implements Hive {
 
     public void setEnvironmentManager(EnvironmentManager environmentManager) {
         this.environmentManager = environmentManager;
+    }
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public void setHadoopManager(Hadoop hadoopManager) {
+        this.hadoopManager = hadoopManager;
     }
 
     public PluginDAO getPluginDao() {

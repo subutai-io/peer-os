@@ -1,169 +1,69 @@
 package org.safehaus.subutai.plugin.hive.impl.handler;
 
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.hive.impl.CommandType;
-import org.safehaus.subutai.plugin.hive.impl.Commands;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+import org.safehaus.subutai.plugin.hive.api.SetupType;
 import org.safehaus.subutai.plugin.hive.impl.HiveImpl;
-import org.safehaus.subutai.plugin.hive.impl.Product;
-import org.safehaus.subutai.common.protocol.Agent;
-
-import java.util.*;
 
 public class InstallHandler extends AbstractHandler {
 
-	private final HiveConfig config;
+    private final HiveConfig config;
+    private HadoopClusterConfig hadoopConfig;
 
-	public InstallHandler(HiveImpl manager, HiveConfig config) {
-		super(manager, config.getClusterName());
-		this.config = config;
-		this.productOperation = manager.getTracker().createProductOperation(
-				HiveConfig.PRODUCT_KEY,
-				"Installing cluster " + config.getClusterName());
-	}
+    public InstallHandler(HiveImpl manager, HiveConfig config) {
+        super(manager, config.getClusterName());
+        this.config = config;
+        this.productOperation = manager.getTracker().createProductOperation(
+                HiveConfig.PRODUCT_KEY,
+                "Installing cluster " + config.getClusterName());
+    }
 
-	@Override
-	public void run() {
-		ProductOperation po = productOperation;
-		if (manager.getCluster(clusterName) != null) {
-			po.addLogFailed(String.format("Cluster '%s' already exists",
-					clusterName));
-			return;
-		}
+    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
+    }
 
-		// check server node
-		if (!isNodeConnected(config.getServer().getHostname())) {
-			po.addLogFailed(String.format("Server node '%s' is not connected",
-					config.getServer().getHostname()));
-			return;
-		}
-		// check client nodes
-		if (checkClientNodes(config, true) == 0) {
-			po.addLogFailed("No nodes eligible for installation. Operation aborted");
-			return;
-		}
+    @Override
+    public void run() {
+        ProductOperation po = productOperation;
+        Environment env = null;
+        if(config.getSetupType() == SetupType.WITH_HADOOP) {
 
-		po.addLog("Check installed packages...");
-		// server packages
-		String s = Commands.make(CommandType.LIST, null);
-		Command cmd = manager.getCommandRunner().createCommand(
-				new RequestBuilder(s),
-				new HashSet<>(Arrays.asList(config.getServer())));
-		manager.getCommandRunner().runCommand(cmd);
+            if(hadoopConfig == null) {
+                po.addLogFailed("No Hadoop configuration specified");
+                return;
+            }
 
-		if (!cmd.hasCompleted()) {
-			po.addLogFailed("Failed to check installed packages for server node");
-			return;
-		}
-		AgentResult res = cmd.getResults().get(config.getServer().getUuid());
-		boolean skipHive = res.getStdOut().contains(Product.HIVE.getPackageName());
-		boolean skipDerby = res.getStdOut().contains(Product.DERBY.getPackageName());
+            po.addLog("Preparing environment...");
+            hadoopConfig.setTemplateName(HiveConfig.TEMPLATE_NAME);
+            try {
+                EnvironmentBlueprint eb = manager.getHadoopManager()
+                        .getDefaultEnvironmentBlueprint(hadoopConfig);
+                env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
+            } catch(ClusterSetupException ex) {
+                po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
+                return;
+            } catch(EnvironmentBuildException ex) {
+                po.addLogFailed("Failed to build environment: " + ex.getMessage());
+                return;
+            }
+            po.addLog("Environment preparation completed");
+        }
 
-		// check clients
-		s = Commands.make(CommandType.LIST, null);
-		cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
-				config.getClients());
-		manager.getCommandRunner().runCommand(cmd);
+        ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, po);
+        try {
+            if(s == null) throw new ClusterSetupException("No setup strategy");
 
-		if (!cmd.hasCompleted()) {
-			po.addLogFailed("Failed to check installed packages");
-			return;
-		}
-		Iterator<Agent> it = config.getClients().iterator();
-		while (it.hasNext()) {
-			Agent a = it.next();
-			res = cmd.getResults().get(a.getUuid());
-			if (res.getStdOut().contains(Product.HIVE.getPackageName())) {
-				po.addLog(String.format("Node '%s' has already Hive installed.\nOmitting from installation",
-						a.getHostname()));
-				it.remove();
-			}
-		}
-		if (config.getClients().isEmpty()) {
-			po.addLogFailed("No client nodes eligible for installation. Operation aborted");
-			return;
-		}
-
-		// save cluster info and install
-		po.addLog("Save cluster info");
-		if (manager.getDbManager().saveInfo(HiveConfig.PRODUCT_KEY, config.getClusterName(), config)) {
-			po.addLog("Cluster info saved");
-
-			po.addLog("Installing server...");
-			if (!skipHive) {
-				s = Commands.make(CommandType.INSTALL, Product.HIVE);
-				cmd = manager.getCommandRunner().createCommand(
-						new RequestBuilder(s).withTimeout(120),
-						new HashSet<>(Arrays.asList(config.getServer())));
-				manager.getCommandRunner().runCommand(cmd);
-				if (!cmd.hasSucceeded()) {
-					po.addLogFailed(cmd.getAllErrors());
-					return;
-				}
-			}
-			if (!skipDerby) {
-				s = Commands.make(CommandType.INSTALL, Product.DERBY);
-				cmd = manager.getCommandRunner().createCommand(
-						new RequestBuilder(s).withTimeout(120),
-						new HashSet<>(Arrays.asList(config.getServer())));
-				manager.getCommandRunner().runCommand(cmd);
-				if (!cmd.hasSucceeded()) {
-					po.addLogFailed(cmd.getAllErrors());
-					return;
-				}
-			}
-			// configure Hive server
-			s = Commands.configureHiveServer(config.getServer().getListIP().get(0));
-			cmd = manager.getCommandRunner().createCommand(new RequestBuilder(s),
-					new HashSet<>(Arrays.asList(config.getServer())));
-			manager.getCommandRunner().runCommand(cmd);
-			if (!cmd.hasSucceeded()) {
-				po.addLogFailed("Failed to configure Hive server");
-				return;
-			}
-			po.addLog("Server successfully installed");
-
-			po.addLog("Installing clients...");
-			s = Commands.make(CommandType.INSTALL, Product.HIVE);
-			cmd = manager.getCommandRunner().createCommand(
-					new RequestBuilder(s).withTimeout(120), config.getClients());
-			manager.getCommandRunner().runCommand(cmd);
-
-			if (cmd.hasCompleted()) {
-				List<Agent> readyClients = new ArrayList<>();
-				for (Agent a : config.getClients()) {
-					res = cmd.getResults().get(a.getUuid());
-					if (isZero(res.getExitCode())) {
-						readyClients.add(a);
-						po.addLog("Hive successfully installed on " + a.getHostname());
-					} else
-						po.addLog("Failed to install Hive on " + a.getHostname());
-				}
-				if (readyClients.size() > 0) {
-					s = Commands.configureClient(config.getServer());
-					cmd = manager.getCommandRunner().createCommand(
-							new RequestBuilder(s),
-							new HashSet<>(readyClients));
-					manager.getCommandRunner().runCommand(cmd);
-					for (Agent a : readyClients) {
-						res = cmd.getResults().get(a.getUuid());
-						if (isZero(res.getExitCode()))
-							po.addLog(String.format("Client node '%s' successfully configured",
-									a.getHostname()));
-						else
-							po.addLog(String.format("Failed to configure client node '%s': %s",
-									a.getHostname(), res.getStdErr()));
-					}
-					po.addLogDone("Done");
-				}
-			} else
-				po.addLogFailed("Failed to install client(s): "
-						+ cmd.getAllErrors());
-		} else
-			po.addLogFailed("Failed to save cluster info.\nInstallation aborted");
-	}
+            s.setup();
+            po.addLogDone("Done");
+        } catch(ClusterSetupException ex) {
+            po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
+        }
+    }
 
 }

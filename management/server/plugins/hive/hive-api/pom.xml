@@ -27,6 +27,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>agent-manager-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>environment-manager-api</artifactId>
+            <version>2.0.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>

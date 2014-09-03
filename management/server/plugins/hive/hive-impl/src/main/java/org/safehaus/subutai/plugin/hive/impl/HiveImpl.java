@@ -6,8 +6,12 @@ import java.util.Set;
 import java.util.UUID;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
+import org.safehaus.subutai.plugin.hive.api.SetupType;
 import org.safehaus.subutai.plugin.hive.impl.handler.*;
 
 public class HiveImpl extends HiveBase {
@@ -92,6 +96,18 @@ public class HiveImpl extends HiveBase {
     public Map<Agent, Boolean> isInstalled(Set<Agent> nodes) {
         CheckInstallHandler h = new CheckInstallHandler(this);
         return h.check(Product.HIVE, nodes);
+    }
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment env, HiveConfig config, ProductOperation po) {
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            return new SetupStrategyOverHadoop(this, config, po);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop(this, config, po);
+            s.setEnvironment(env);
+            return s;
+        }
+        return null;
     }
 
 }

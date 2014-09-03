@@ -11,11 +11,20 @@ public class HiveConfig implements ConfigBase {
     public static final String PRODUCT_KEY = "Hive2";
     public static final String TEMPLATE_NAME = "hadoophive";
 
+    private SetupType setupType;
     private String clusterName = "";
     private String hadoopClusterName = "";
     private Agent server;
     private Set<Agent> clients = new HashSet();
     private Set<Agent> hadoopNodes = new HashSet<>();
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
+    }
 
     @Override
     public String getClusterName() {
