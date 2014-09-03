@@ -1,19 +1,19 @@
-package org.safehaus.subutai.plugin.flume.ui.wizard;
+package org.safehaus.subutai.plugin.sqoop.ui.wizard;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import java.util.*;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
-import org.safehaus.subutai.plugin.flume.api.SetupType;
-import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.sqoop.api.SetupType;
+import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
+import org.safehaus.subutai.plugin.sqoop.ui.SqoopUI;
 
-public class ConfigurationStep extends VerticalLayout {
+public class NodeSelectionStep extends VerticalLayout {
 
-    public ConfigurationStep(final Wizard wizard) {
+    public NodeSelectionStep(final Wizard wizard) {
 
         setSizeFull();
 
@@ -27,14 +27,14 @@ public class ConfigurationStep extends VerticalLayout {
         layout.addComponent(new Label("Please, specify installation settings"));
         layout.addComponent(content);
 
-        TextField txtClusterName = new TextField("Flume installation name: ");
+        TextField txtClusterName = new TextField("Sqoop installation name: ");
         txtClusterName.setRequired(true);
         txtClusterName.addValueChangeListener(new Property.ValueChangeListener() {
 
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                String v = event.getProperty().getValue().toString().trim();
-                wizard.getConfig().setClusterName(v);
+                Object v = event.getProperty().getValue();
+                if(v != null) wizard.getConfig().setClusterName(v.toString().trim());
             }
         });
         txtClusterName.setValue(wizard.getConfig().getClusterName());
@@ -76,7 +76,7 @@ public class ConfigurationStep extends VerticalLayout {
 
     }
 
-    private void addOverHadoopControls(ComponentContainer parent, final FlumeConfig config) {
+    private void addOverHadoopControls(ComponentContainer parent, final SqoopConfig config) {
         final TwinColSelect select = new TwinColSelect("Nodes", new ArrayList<Agent>());
 
         ComboBox hadoopClusters = new ComboBox("Hadoop cluster");
@@ -98,7 +98,7 @@ public class ConfigurationStep extends VerticalLayout {
             }
         });
 
-        Hadoop hadoopManager = FlumeUI.getHadoopManager();
+        Hadoop hadoopManager = SqoopUI.getHadoopManager();
         List<HadoopClusterConfig> clusters = hadoopManager.getClusters();
         if(clusters != null)
             for(HadoopClusterConfig hadoopClusterInfo : clusters) {
@@ -140,7 +140,7 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
     private void addWithHadoopControls(ComponentContainer content,
-            final FlumeConfig config, final HadoopClusterConfig hadoopConfig) {
+            final SqoopConfig config, final HadoopClusterConfig hadoopConfig) {
 
         Collection<Integer> col = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
@@ -202,7 +202,7 @@ public class ConfigurationStep extends VerticalLayout {
     }
 
     private void nextButtonClickHandler(Wizard wizard) {
-        FlumeConfig config = wizard.getConfig();
+        SqoopConfig config = wizard.getConfig();
         if(config.getClusterName() == null || config.getClusterName().isEmpty()) {
             show("Enter installation name");
             return;

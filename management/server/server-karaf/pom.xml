@@ -1697,6 +1697,32 @@
                   <artifactId>sqoop-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>sqoop-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>sqoop-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>sqoop-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>sqoop-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>sqoop-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Storm -->
                 <artifactItem>
