@@ -94,7 +94,6 @@ public class NodeSelectionStep extends VerticalLayout {
                             new BeanItemContainer<>(Agent.class, hadoopInfo.getAllNodes())
                     );
                     config.setHadoopClusterName(hadoopInfo.getClusterName());
-                    config.getNodes().clear();
                 }
             }
         });
@@ -128,9 +127,9 @@ public class NodeSelectionStep extends VerticalLayout {
         select.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
+                config.getNodes().clear();
                 if(event.getProperty().getValue() != null) {
                     Collection agentList = (Collection)event.getProperty().getValue();
-                    config.getNodes().clear();
                     config.getNodes().addAll(agentList);
                 }
             }
