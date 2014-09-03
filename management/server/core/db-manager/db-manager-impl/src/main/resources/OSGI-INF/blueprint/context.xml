@@ -14,14 +14,14 @@
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <bean id="dbManager" class="org.safehaus.subutai.impl.dbmanager.DbManagerImpl"
+    <bean id="dbManager" class="org.safehaus.subutai.core.db.impl.DbManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton" activation="eager">
         <property name="cassandraHost" value="${cassandraHost}"/>
         <property name="cassandraPort" value="${cassandraPort}"/>
         <property name="cassandraKeyspace" value="${cassandraKeyspace}"/>
     </bean>
     <service ref="dbManager"
-             interface="org.safehaus.subutai.api.dbmanager.DbManager">
+             interface="org.safehaus.subutai.core.db.api.DbManager">
         <service-properties>
             <entry key="service.exported.interfaces" value="*"/>
         </service-properties>

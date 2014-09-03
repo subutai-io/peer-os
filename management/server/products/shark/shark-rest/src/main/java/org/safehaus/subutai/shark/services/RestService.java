@@ -1,6 +1,6 @@
 package org.safehaus.subutai.shark.services;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.shark.Config;
 import org.safehaus.subutai.api.shark.Shark;
 import org.safehaus.subutai.api.spark.Spark;

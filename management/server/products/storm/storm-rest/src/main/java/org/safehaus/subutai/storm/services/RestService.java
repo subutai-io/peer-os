@@ -1,7 +1,7 @@
 package org.safehaus.subutai.storm.services;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.api.storm.Storm;
 import org.safehaus.subutai.common.util.JsonUtil;

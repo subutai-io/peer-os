@@ -2,9 +2,9 @@ package org.safehaus.subutai.impl.solr.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.solr.SolrImpl;
