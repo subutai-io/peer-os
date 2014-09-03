@@ -54,7 +54,7 @@ public class RestService {
     }
 
     @GET
-    @Path("{clusterName}")
+    @Path("cluster/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getCluster(
             @PathParam("clusterName") String clusterName
@@ -65,7 +65,7 @@ public class RestService {
     }
 
     @POST
-    @Path("{clusterName}")
+    @Path("cluster/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String installCluster(
             @PathParam("clusterName") String clusterName,
@@ -89,7 +89,7 @@ public class RestService {
     }
 
     @POST
-    @Path("{clusterName}/nodes/{hostname}")
+    @Path("cluster/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
     @Deprecated()
     public String addNode(
@@ -100,7 +100,7 @@ public class RestService {
     }
 
     @DELETE
-    @Path("{clusterName}/nodes/{hostname}")
+    @Path("cluster/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
     public String destroyNode(
             @PathParam("clusterName") String clusterName,
