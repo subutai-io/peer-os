@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.hadoop;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.common.protocol.Agent;
 

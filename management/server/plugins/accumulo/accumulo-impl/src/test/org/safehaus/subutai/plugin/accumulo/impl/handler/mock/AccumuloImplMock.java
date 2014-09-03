@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler.mock;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;

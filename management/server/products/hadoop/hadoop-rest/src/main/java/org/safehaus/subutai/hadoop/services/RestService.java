@@ -1,6 +1,6 @@
 package org.safehaus.subutai.hadoop.services;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.common.util.JsonUtil;

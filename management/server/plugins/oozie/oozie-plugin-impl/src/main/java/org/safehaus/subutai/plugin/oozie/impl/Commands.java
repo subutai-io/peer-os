@@ -7,10 +7,10 @@ package org.safehaus.subutai.plugin.oozie.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandsSingleton;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 

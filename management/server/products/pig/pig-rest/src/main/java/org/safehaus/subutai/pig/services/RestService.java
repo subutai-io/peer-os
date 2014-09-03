@@ -1,7 +1,7 @@
 package org.safehaus.subutai.pig.services;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.api.pig.Pig;
 import org.safehaus.subutai.common.util.JsonUtil;

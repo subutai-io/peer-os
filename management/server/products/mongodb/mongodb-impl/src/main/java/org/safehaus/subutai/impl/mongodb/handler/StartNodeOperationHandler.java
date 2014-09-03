@@ -2,9 +2,9 @@ package org.safehaus.subutai.impl.mongodb.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandCallback;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;

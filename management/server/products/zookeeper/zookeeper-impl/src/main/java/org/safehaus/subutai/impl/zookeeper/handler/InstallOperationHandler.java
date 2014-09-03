@@ -3,12 +3,12 @@ package org.safehaus.subutai.impl.zookeeper.handler;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandCallback;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.impl.zookeeper.Commands;

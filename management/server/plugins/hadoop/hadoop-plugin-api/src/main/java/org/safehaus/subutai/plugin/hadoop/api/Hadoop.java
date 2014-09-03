@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.hadoop.api;
 
 
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;

@@ -1,13 +1,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="aptRepositoryManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
+               interface="org.safehaus.subutai.core.aptmanager.api.AptRepositoryManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="apt/list-packages">
-            <action class="org.safehaus.subutai.cli.aptrepositorymanager.ListPackagesCommand">
+            <action class="org.safehaus.subutai.core.aptmanager.cli.ListPackagesCommand">
                 <property name="aptRepositoryManager" ref="aptRepositoryManager"/>
                 <property name="agentManager" ref="agentManager"/>
             </action>
@@ -15,7 +15,7 @@
     </command-bundle>
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="apt/read-files">
-            <action class="org.safehaus.subutai.cli.aptrepositorymanager.ReadFilesCommand">
+            <action class="org.safehaus.subutai.core.aptmanager.cli.ReadFilesCommand">
                 <property name="aptRepositoryManager" ref="aptRepositoryManager"/>
                 <property name="agentManager" ref="agentManager"/>
             </action>
@@ -23,7 +23,7 @@
     </command-bundle>
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="apt/add-package">
-            <action class="org.safehaus.subutai.cli.aptrepositorymanager.AddPackageCommand">
+            <action class="org.safehaus.subutai.core.aptmanager.cli.AddPackageCommand">
                 <property name="aptRepositoryManager" ref="aptRepositoryManager"/>
                 <property name="agentManager" ref="agentManager"/>
             </action>
@@ -31,7 +31,7 @@
     </command-bundle>
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="apt/remove-package">
-            <action class="org.safehaus.subutai.cli.aptrepositorymanager.RemovePackageCommand">
+            <action class="org.safehaus.subutai.core.aptmanager.cli.RemovePackageCommand">
                 <property name="aptRepositoryManager" ref="aptRepositoryManager"/>
                 <property name="agentManager" ref="agentManager"/>
             </action>

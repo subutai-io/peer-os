@@ -1,14 +1,14 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.settings.Common;

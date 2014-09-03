@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
 
-    <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.impl.gitmanager.GitManagerImpl"
+    <bean id="gitmanager" scope="singleton" class="org.safehaus.subutai.core.git.impl.GitManagerImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="commandRunner"/>
     </bean>
 
-    <service ref="gitmanager" interface="org.safehaus.subutai.api.gitmanager.GitManager"/>
+    <service ref="gitmanager" interface="org.safehaus.subutai.core.git.api.GitManager"/>
 
 </blueprint>

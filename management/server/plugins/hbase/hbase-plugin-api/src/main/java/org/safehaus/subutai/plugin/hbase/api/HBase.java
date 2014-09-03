@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;

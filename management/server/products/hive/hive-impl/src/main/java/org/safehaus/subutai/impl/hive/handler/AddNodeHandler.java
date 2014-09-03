@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.hive.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hive.CommandType;

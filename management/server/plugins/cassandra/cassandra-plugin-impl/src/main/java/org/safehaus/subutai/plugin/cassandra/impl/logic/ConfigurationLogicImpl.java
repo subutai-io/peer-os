@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.cassandra.impl.logic;
 
 
 import org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic;
-import org.safehaus.subutai.configuration.manager.api.ConfigManager;
-import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.api.ConfigManager;
+import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
 
 import com.google.gson.JsonObject;
 

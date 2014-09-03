@@ -2,11 +2,11 @@ package org.safehaus.subutai.impl.mongodb.handler;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandCallback;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.NodeType;
 import org.safehaus.subutai.impl.mongodb.MongoImpl;

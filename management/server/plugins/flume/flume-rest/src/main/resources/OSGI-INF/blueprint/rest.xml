@@ -8,7 +8,7 @@
             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
   <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+             interface="org.safehaus.subutai.core.agentmanager.api.AgentManager" />
 
   <reference id="flumeManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.flume.api.Flume" />

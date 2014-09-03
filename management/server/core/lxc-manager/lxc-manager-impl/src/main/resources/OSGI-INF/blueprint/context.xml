@@ -2,19 +2,19 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
     <reference id="monitor" availability="mandatory"
-               interface="org.safehaus.subutai.api.monitoring.Monitor"/>
+               interface="org.safehaus.subutai.core.monitor.api.Monitor"/>
     <reference id="templateManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
+               interface="org.safehaus.subutai.core.template.api.TemplateManager"/>
     <reference id="templateRegistry" availability="mandatory"
-               interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
+               interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
+               interface="org.safehaus.subutai.core.db.api.DbManager"/>
 
-    <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.lxcmanager.LxcManagerImpl"
+    <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.core.container.impl.lxcmanager.LxcManagerImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="commandRunner"/>
@@ -22,7 +22,7 @@
     </bean>
 
     <bean id="containerManager" scope="singleton"
-          class="org.safehaus.subutai.impl.container.ContainerManagerImpl"
+          class="org.safehaus.subutai.core.container.impl.container.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
         <property name="lxcManager" ref="lxcmanager"/>
         <property name="agentManager" ref="agentManager"/>
@@ -32,7 +32,7 @@
         <property name="dbManager" ref="dbManager"/>
     </bean>
 
-    <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
-    <service ref="containerManager" interface="org.safehaus.subutai.api.container.ContainerManager"/>
+    <service ref="lxcmanager" interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager"/>
+    <service ref="containerManager" interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
 
 </blueprint>

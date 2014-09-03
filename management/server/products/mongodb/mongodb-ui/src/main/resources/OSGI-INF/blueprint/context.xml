@@ -4,11 +4,11 @@
     <reference id="mongoManager" availability="mandatory"
                interface="org.safehaus.subutai.api.mongodb.Mongo"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.mongodb.MongoUI"
           init-method="init" destroy-method="destroy">

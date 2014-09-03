@@ -1,10 +1,10 @@
 package org.safehaus.subutai.impl.hadoop.operation;
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.commandrunner.api.Command;
 import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
 import org.safehaus.subutai.impl.hadoop.operation.common.InstallHadoopOperation;

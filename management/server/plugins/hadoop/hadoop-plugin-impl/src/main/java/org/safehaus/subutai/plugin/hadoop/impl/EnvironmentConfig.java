@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.hadoop.impl;
 
 import com.google.common.collect.Lists;
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;

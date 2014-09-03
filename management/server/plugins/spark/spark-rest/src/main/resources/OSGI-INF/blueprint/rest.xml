@@ -15,7 +15,7 @@
     <reference id="sparkManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.spark.api.Spark"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
 
     <bean id="sparkRestService" class="org.safehaus.subutai.plugin.spark.rest.RestService">
         <property name="agentManager" ref="agentManager"/>

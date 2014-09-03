@@ -8,15 +8,15 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;

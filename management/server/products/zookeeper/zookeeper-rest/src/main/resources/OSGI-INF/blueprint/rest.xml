@@ -15,7 +15,7 @@
     <reference id="zookeeperManager" availability="mandatory"
                interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
 
     <bean id="zookeeperRestServiceImpl" class="org.safehaus.subutai.zookeeper.services.RestServiceImpl">
         <property name="zookeeperManager" ref="zookeeperManager"/>

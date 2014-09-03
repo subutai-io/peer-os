@@ -1,12 +1,12 @@
 package org.safehaus.subutai.plugin.flume.impl;
 
 import java.util.concurrent.ExecutorService;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.slf4j.Logger;

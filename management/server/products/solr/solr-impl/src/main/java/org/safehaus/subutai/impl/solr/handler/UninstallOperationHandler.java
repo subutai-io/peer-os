@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.solr.SolrImpl;

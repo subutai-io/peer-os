@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.flume.handler;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;

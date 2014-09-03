@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.lucene.impl.handler;
 /* TODO Rewrite tests
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.commandrunner.api.Command;
 import org.safehaus.subutai.impl.lucene.Commands;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 

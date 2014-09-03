@@ -3,9 +3,9 @@ package org.safehaus.subutai.impl.hbase;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandsSingleton;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 

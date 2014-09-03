@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import org.safehaus.subutai.api.accumulo.Accumulo;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;

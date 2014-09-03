@@ -10,12 +10,12 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.common.util.FileUtil;
 

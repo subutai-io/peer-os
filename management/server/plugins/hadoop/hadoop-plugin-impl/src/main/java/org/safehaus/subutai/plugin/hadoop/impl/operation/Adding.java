@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.hadoop.impl.operation;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;

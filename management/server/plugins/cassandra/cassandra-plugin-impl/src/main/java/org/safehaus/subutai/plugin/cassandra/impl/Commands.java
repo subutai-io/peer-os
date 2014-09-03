@@ -8,10 +8,10 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.AgentRequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandsSingleton;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.enums.OutputRedirection;

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.mahout.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
 import org.safehaus.subutai.api.mahout.Config;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.mahout.Commands;

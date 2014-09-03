@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.commandrunner.api.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;

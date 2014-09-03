@@ -2,9 +2,9 @@ package org.safehaus.subutai.impl.presto.handler;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandCallback;
 import org.safehaus.subutai.api.presto.Config;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.impl.presto.Commands;

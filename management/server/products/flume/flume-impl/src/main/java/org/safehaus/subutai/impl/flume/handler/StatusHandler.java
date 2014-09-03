@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.flume.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;

@@ -6,10 +6,10 @@
 package org.safehaus.subutai.ui.zookeeper;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
 import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.server.ui.api.PortalModule;

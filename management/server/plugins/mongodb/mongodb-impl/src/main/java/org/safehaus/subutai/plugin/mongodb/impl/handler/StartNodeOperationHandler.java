@@ -3,9 +3,9 @@ package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.core.commandrunner.api.AgentResult;
+import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.commandrunner.api.CommandCallback;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;

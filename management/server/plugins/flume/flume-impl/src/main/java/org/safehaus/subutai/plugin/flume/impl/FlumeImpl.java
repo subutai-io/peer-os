@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.flume.impl;
 
 import java.util.*;
 import java.util.concurrent.*;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.flume.api.*;
 import org.safehaus.subutai.plugin.flume.impl.handler.*;

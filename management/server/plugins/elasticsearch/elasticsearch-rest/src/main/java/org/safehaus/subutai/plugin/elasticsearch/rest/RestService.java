@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.elasticsearch.rest;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agentmanager.api.AgentManager;
 import org.safehaus.subutai.plugin.elasticsearch.api.*;
 import org.safehaus.subutai.common.util.JsonUtil;
 
