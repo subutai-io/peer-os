@@ -37,11 +37,11 @@ public class RestService {
 
 
 	@GET
-	@Path ("getClusters")
+	@Path ("clusters")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getClusters() {
 
-		List<Config> configs = hiveManager.getClusters();
+		List<Config> configs = hiveManager.Clusters;
 		ArrayList<String> clusterNames = new ArrayList();
 
 		for (Config config : configs) {
@@ -53,22 +53,22 @@ public class RestService {
 
 
 	@GET
-	@Path ("getCluster")
+	@Path ("cluster/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String getCluster(
-			@QueryParam ("clusterName") String clusterName
+			@PathParam ("clusterName") String clusterName
 	) {
-		Config config = hiveManager.getCluster(clusterName);
+		Config config = hiveManager.Cluster(clusterName);
 
 		return JsonUtil.GSON.toJson(config);
 	}
 
 
-	@GET
-	@Path ("installCluster")
+	@POST
+	@Path ("clusters/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String installCluster(
-			@QueryParam ("clusterName") String clusterName,
+			@PathParam ("clusterName") String clusterName,
 			@QueryParam ("hadoopClusterName") String hadoopClusterName,
 			@QueryParam ("server") String server,
 			@QueryParam ("clients") String clients
@@ -92,11 +92,11 @@ public class RestService {
 	}
 
 
-	@GET
-	@Path ("uninstallCluster")
+	@DELETE
+	@Path ("clusters/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String uninstallCluster(
-			@QueryParam ("clusterName") String clusterName
+			@PathParam ("clusterName") String clusterName
 	) {
 		UUID uuid = hiveManager.uninstallCluster(clusterName);
 
@@ -104,12 +104,12 @@ public class RestService {
 	}
 
 
-	@GET
-	@Path ("addNode")
+	@PUT
+	@Path ("clusters/{clusterName}/nodes/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String addNode(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("hostname") String hostname
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("hostname") String hostname
 	) {
 		UUID uuid = hiveManager.addNode(clusterName, hostname);
 
@@ -117,12 +117,12 @@ public class RestService {
 	}
 
 
-	@GET
-	@Path ("destroyNode")
+	@DELETE
+	@Path ("clusters/{clusterName}/nodes/{hostname}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String destroyNode(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("hostname") String hostname
+			@PathParam ("clusterName") String clusterName,
+			@PathParam ("hostname") String hostname
 	) {
 		UUID uuid = hiveManager.destroyNode(clusterName, hostname);
 
