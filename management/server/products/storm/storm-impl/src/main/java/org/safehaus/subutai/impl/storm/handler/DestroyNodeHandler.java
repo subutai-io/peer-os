@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.storm.handler;
 
-import org.safehaus.subutai.core.commandrunner.api.Command;
-import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.api.storm.Config;
 import org.safehaus.subutai.common.tracker.ProductOperation;

@@ -2,13 +2,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <bean id="aptRepositoryManager" scope="singleton"
-          class="org.safehaus.subutai.core.aptmanager.impl.AptRepositoryManagerImpl">
+          class="org.safehaus.subutai.core.apt.impl.AptRepositoryManagerImpl">
         <argument ref="commandRunner"/>
     </bean>
 
-    <service ref="aptRepositoryManager" interface="org.safehaus.subutai.core.aptmanager.api.AptRepositoryManager"/>
+    <service ref="aptRepositoryManager" interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager"/>
 
 </blueprint>

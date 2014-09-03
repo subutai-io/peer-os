@@ -7,8 +7,8 @@ package org.safehaus.subutai.plugin.hbase.ui;
 
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;

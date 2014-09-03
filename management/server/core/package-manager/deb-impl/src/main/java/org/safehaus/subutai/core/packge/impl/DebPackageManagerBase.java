@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.packge.impl;
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.packge.api.PackageManager;
 
 public abstract class DebPackageManagerBase implements PackageManager {

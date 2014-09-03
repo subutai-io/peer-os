@@ -3,7 +3,7 @@ package org.safehaus.subutai.mongodb.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.mongodb.Config;
 import org.safehaus.subutai.api.mongodb.Mongo;
 import org.safehaus.subutai.api.mongodb.NodeType;

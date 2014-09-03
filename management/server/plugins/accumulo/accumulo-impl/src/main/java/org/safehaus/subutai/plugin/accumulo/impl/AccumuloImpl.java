@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.accumulo.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;

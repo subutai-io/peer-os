@@ -4,10 +4,10 @@
                interface="org.safehaus.subutai.core.communication.api.CommunicationManager"/>
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="fileTracker" class="org.safehaus.subutai.core.filetracker.impl.FileTrackerImpl"
           init-method="init" destroy-method="destroy" scope="singleton">

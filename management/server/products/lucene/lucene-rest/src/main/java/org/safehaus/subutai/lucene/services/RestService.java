@@ -1,7 +1,7 @@
 package org.safehaus.subutai.lucene.services;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.api.lucene.Lucene;
 import org.safehaus.subutai.common.util.JsonUtil;

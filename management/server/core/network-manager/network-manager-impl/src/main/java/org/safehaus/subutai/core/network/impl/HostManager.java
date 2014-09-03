@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.network.impl;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.List;

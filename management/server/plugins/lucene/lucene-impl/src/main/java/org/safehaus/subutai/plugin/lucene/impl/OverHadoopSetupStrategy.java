@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.lucene.impl;
 
 import java.util.Iterator;
 
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;

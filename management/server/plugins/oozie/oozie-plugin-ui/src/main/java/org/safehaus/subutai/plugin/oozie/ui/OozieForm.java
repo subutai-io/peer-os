@@ -6,7 +6,7 @@
 package org.safehaus.subutai.plugin.oozie.ui;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.oozie.ui.manager.Manager;
 import org.safehaus.subutai.plugin.oozie.ui.wizard.Wizard;
 

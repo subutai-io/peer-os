@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.flume.rest;
 import java.util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.flume.api.Flume;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;

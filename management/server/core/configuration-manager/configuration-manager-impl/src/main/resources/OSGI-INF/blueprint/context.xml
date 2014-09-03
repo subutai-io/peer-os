@@ -8,12 +8,12 @@
     </bean>-->
     <service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector"/>
     <service ref="configManager" interface="org.safehaus.subutai.core.configuration.api.ConfigManager"/>
-    <!--<service ref="agentManager" interface="org.safehaus.subutai.core.agentmanager.api.AgentManager" />-->
+    <!--<service ref="agentManager" interface="org.safehaus.subutai.core.agent.api.AgentManager" />-->
     <!--<service ref="textInjector" interface="org.safehaus.subutai.core.configuration.api.TextInjector" />-->
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="configManager" scope="singleton"
           class="org.safehaus.subutai.core.configuration.impl.ConfigManagerImpl">

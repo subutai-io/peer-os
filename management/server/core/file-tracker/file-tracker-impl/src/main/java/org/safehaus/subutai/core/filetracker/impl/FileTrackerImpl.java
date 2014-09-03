@@ -2,9 +2,9 @@ package org.safehaus.subutai.core.filetracker.impl;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.commandrunner.api.Command;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
-import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.communication.api.ResponseListener;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;

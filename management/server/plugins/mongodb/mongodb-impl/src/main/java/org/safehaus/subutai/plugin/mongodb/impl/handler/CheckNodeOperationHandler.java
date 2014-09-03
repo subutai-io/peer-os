@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.mongodb.impl.handler;
 
 
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.impl.MongoImpl;
 import org.safehaus.subutai.plugin.mongodb.impl.common.Commands;

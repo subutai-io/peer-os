@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.hadoop.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;

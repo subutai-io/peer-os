@@ -6,10 +6,10 @@
 package org.safehaus.subutai.ui.cassandra;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.common.util.FileUtil;

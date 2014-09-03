@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.presto.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.presto.Config;
 import org.safehaus.subutai.impl.presto.Commands;
 import org.safehaus.subutai.impl.presto.PrestoImpl;

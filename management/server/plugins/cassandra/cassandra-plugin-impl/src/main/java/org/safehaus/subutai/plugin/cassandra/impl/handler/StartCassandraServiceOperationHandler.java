@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;

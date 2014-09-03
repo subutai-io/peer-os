@@ -15,7 +15,7 @@
     <reference id="solrManager" availability="mandatory"
                interface="org.safehaus.subutai.api.solr.Solr"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="solrRestServiceImpl" class="org.safehaus.subutai.solr.services.RestServiceImpl">
         <property name="solrManager" ref="solrManager"/>

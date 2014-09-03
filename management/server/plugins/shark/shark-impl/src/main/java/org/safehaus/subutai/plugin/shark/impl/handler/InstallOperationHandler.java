@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.shark.impl.handler;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;

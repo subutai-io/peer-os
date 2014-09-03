@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.lucene.handler;
 
 
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.impl.lucene.Commands;

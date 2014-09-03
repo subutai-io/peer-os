@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.hive.query;
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.hive.query.HiveQuery;
 import org.safehaus.subutai.core.tracker.api.Tracker;

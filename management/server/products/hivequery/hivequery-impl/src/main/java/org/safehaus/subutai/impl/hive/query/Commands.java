@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.hive.query;
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.commandrunner.api.Command;
-import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 
 public class Commands {

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.oozie.impl.handler;
 
 
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;

@@ -1,6 +1,6 @@
 package org.safehaus.subutai.core.network.impl;
 
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.common.protocol.Agent;
 

@@ -1,9 +1,9 @@
 package org.safehaus.subutai.impl.oozie;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.Command;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;

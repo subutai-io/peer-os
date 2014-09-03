@@ -5,7 +5,7 @@ import com.vaadin.data.Item;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcState;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;

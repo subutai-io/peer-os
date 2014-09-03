@@ -5,7 +5,7 @@
     <reference id="containerManager" availability="mandatory"
                interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="template/get-master-template-name">

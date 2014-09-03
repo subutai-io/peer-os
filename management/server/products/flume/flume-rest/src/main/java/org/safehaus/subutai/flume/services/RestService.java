@@ -1,7 +1,7 @@
 package org.safehaus.subutai.flume.services;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.flume.Config;
 import org.safehaus.subutai.api.flume.Flume;
 import org.safehaus.subutai.common.util.JsonUtil;

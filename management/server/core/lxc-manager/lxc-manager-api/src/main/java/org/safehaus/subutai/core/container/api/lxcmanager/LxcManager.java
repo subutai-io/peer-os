@@ -6,7 +6,7 @@
 package org.safehaus.subutai.core.container.api.lxcmanager;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.EnumMap;

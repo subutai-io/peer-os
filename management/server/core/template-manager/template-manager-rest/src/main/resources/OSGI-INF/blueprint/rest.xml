@@ -18,11 +18,11 @@
     <reference id="templateRegistry" availability="mandatory"
                interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="repoManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.aptmanager.api.AptRepositoryManager"/>
+               interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.core.template.rest.RestServiceImpl">
         <property name="templateManager" ref="templateManager"/>

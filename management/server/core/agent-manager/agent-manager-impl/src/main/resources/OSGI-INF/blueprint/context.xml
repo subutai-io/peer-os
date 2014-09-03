@@ -5,11 +5,11 @@
                interface="org.safehaus.subutai.core.communication.api.CommunicationManager"/>
 
     <bean id="agentManager"
-          class="org.safehaus.subutai.core.agentmanager.impl.AgentManagerImpl"
+          class="org.safehaus.subutai.core.agent.impl.AgentManagerImpl"
           init-method="init" destroy-method="destroy" scope="singleton">
         <property name="communicationService" ref="communicationService"/>
     </bean>
 
-    <service ref="agentManager" interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+    <service ref="agentManager" interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
 </blueprint>

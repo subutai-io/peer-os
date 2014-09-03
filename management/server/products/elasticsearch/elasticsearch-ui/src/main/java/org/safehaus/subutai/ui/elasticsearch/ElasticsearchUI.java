@@ -1,8 +1,8 @@
 package org.safehaus.subutai.ui.elasticsearch;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.api.elasticsearch.Config;
 import org.safehaus.subutai.api.elasticsearch.Elasticsearch;
 import org.safehaus.subutai.core.tracker.api.Tracker;

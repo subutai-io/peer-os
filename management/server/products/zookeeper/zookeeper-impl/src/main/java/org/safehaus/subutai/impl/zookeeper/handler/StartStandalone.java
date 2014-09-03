@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.zookeeper.handler;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.impl.zookeeper.Commands;
 import org.safehaus.subutai.impl.zookeeper.ZookeeperImpl;

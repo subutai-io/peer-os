@@ -2,7 +2,7 @@ package org.safehaus.subutai.core.monitor.ui;
 
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.server.ui.api.PortalModule;

@@ -5,7 +5,7 @@
 
     <reference id="dbManager" availability="mandatory" interface="org.safehaus.subutai.core.db.api.DbManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="containerManager" availability="mandatory"
                interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
     <reference id="templateRegistryManager" availability="mandatory"

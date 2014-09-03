@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.pig.handler;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.commandrunner.api.AgentResult;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.pig.Config;
 import org.safehaus.subutai.impl.pig.PigImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;

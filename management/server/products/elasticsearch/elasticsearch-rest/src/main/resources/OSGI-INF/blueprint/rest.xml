@@ -6,7 +6,7 @@
             http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <reference id="elasticsearch" availability="mandatory"
                interface="org.safehaus.subutai.api.elasticsearch.Elasticsearch"/>

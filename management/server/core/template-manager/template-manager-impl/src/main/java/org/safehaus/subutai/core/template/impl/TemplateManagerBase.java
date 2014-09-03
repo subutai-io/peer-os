@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.template.impl;
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.aptmanager.api.AptRepositoryManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.apt.api.AptRepositoryManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.template.api.TemplateManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 

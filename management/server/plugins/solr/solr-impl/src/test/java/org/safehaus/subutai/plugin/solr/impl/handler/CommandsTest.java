@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.solr.impl.handler;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.core.commandrunner.api.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 

@@ -2,8 +2,8 @@ package org.safehaus.subutai.impl.lucene;
 
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.lucene.Config;

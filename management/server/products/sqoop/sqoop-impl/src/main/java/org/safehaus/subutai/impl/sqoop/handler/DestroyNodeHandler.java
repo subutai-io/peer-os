@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.sqoop.handler;
 
-import org.safehaus.subutai.core.commandrunner.api.Command;
-import org.safehaus.subutai.core.commandrunner.api.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;

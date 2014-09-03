@@ -6,8 +6,8 @@
 package org.safehaus.subutai.ui.solr;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
-import org.safehaus.subutai.core.commandrunner.api.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 import org.safehaus.subutai.core.tracker.api.Tracker;

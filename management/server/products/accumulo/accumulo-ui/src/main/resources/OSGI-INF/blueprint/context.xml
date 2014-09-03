@@ -6,7 +6,7 @@
     <reference id="accumuloManager" availability="mandatory"
                interface="org.safehaus.subutai.api.accumulo.Accumulo"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.agentmanager.api.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
@@ -14,7 +14,7 @@
     <reference id="zookeeperManager" availability="mandatory"
                interface="org.safehaus.subutai.api.zookeeper.Zookeeper"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.core.commandrunner.api.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.accumulo.AccumuloUI"
           init-method="init" destroy-method="destroy">

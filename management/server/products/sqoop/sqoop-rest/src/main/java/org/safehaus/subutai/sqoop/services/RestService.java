@@ -2,7 +2,7 @@ package org.safehaus.subutai.sqoop.services;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.sqoop.Config;
 import org.safehaus.subutai.api.sqoop.DataSourceType;
 import org.safehaus.subutai.api.sqoop.Sqoop;

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentListener;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;

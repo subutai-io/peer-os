@@ -4,7 +4,7 @@ package org.safehaus.subutai.core.monitor.ui;
 import com.vaadin.ui.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.monitor.api.Metric;
 import org.safehaus.subutai.core.monitor.api.Monitor;
 import org.safehaus.subutai.common.protocol.Agent;

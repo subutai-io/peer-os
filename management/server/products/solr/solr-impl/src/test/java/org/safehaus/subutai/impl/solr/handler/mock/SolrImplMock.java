@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.solr.handler.mock;
 
 
-import org.safehaus.subutai.core.agentmanager.api.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.solr.Config;
