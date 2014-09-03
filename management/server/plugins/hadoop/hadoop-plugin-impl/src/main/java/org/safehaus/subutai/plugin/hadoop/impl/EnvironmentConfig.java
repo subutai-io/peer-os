@@ -8,6 +8,7 @@ import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
@@ -52,7 +53,7 @@ public class EnvironmentConfig {
 
         for ( Node node : environment.getNodes() ) {
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
-                if ( node.getTemplate().getProducts().contains( "ksks-" + config.getTemplateName() ) ) {
+                if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + config.getTemplateName() ) ) {
                     masterNodes.add( node.getAgent() );
                 }
             }
@@ -75,7 +76,7 @@ public class EnvironmentConfig {
 
         for ( Node node : environment.getNodes() ) {
             if ( NodeType.SLAVE_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
-                if ( node.getTemplate().getProducts().contains( "ksks-" + config.getTemplateName() ) ) {
+                if ( node.getTemplate().getProducts().contains( Common.PACKAGE_PREFIX + config.getTemplateName() ) ) {
                     slaveNodes.add( node.getAgent() );
                 }
             }

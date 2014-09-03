@@ -45,14 +45,14 @@ import com.google.common.base.Preconditions;
 public class HadoopImpl implements Hadoop {
     public static final int INITIAL_CAPACITY = 2;
 
-    private CommandRunner commandRunner;
+    private static CommandRunner commandRunner;
     private AgentManager agentManager;
     private Tracker tracker;
-    private ContainerManager containerManager;
+    private static ContainerManager containerManager;
     private NetworkManager networkManager;
     private ExecutorService executor;
-    private EnvironmentManager environmentManager;
-    private PluginDAO pluginDAO;
+    private static EnvironmentManager environmentManager;
+    private static PluginDAO pluginDAO;
 
 
     public HadoopImpl( AgentManager agentManager, Tracker tracker, CommandRunner commandRunner, DbManager dbManager,
@@ -68,11 +68,13 @@ public class HadoopImpl implements Hadoop {
 
         this.agentManager = agentManager;
         this.tracker = tracker;
-        this.commandRunner = commandRunner;
+        HadoopImpl.commandRunner = commandRunner;
         this.networkManager = networkManager;
-        this.containerManager = containerManager;
-        this.environmentManager = environmentManager;
-        this.pluginDAO = new PluginDAO( dbManager );
+        HadoopImpl.containerManager = containerManager;
+        HadoopImpl.environmentManager = environmentManager;
+        pluginDAO = new PluginDAO( dbManager );
+
+        Commands.init( commandRunner );
     }
 
 
@@ -87,7 +89,7 @@ public class HadoopImpl implements Hadoop {
     }
 
 
-    public CommandRunner getCommandRunner() {
+    public static CommandRunner getCommandRunner() {
         return commandRunner;
     }
 
@@ -97,7 +99,7 @@ public class HadoopImpl implements Hadoop {
     }
 
 
-    public ContainerManager getContainerManager() {
+    public static ContainerManager getContainerManager() {
         return containerManager;
     }
 
@@ -117,12 +119,12 @@ public class HadoopImpl implements Hadoop {
     }
 
 
-    public EnvironmentManager getEnvironmentManager() {
+    public static EnvironmentManager getEnvironmentManager() {
         return environmentManager;
     }
 
 
-    public PluginDAO getPluginDAO() {
+    public static PluginDAO getPluginDAO() {
         return pluginDAO;
     }
 
