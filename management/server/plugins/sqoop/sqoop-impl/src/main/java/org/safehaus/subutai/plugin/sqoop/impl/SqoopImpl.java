@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
@@ -42,12 +44,22 @@ public class SqoopImpl extends SqoopBase {
 
     @Override
     public List<SqoopConfig> getClusters() {
-        return dbManager.getInfo(SqoopConfig.PRODUCT_KEY, SqoopConfig.class);
+        try {
+            return pluginDao.getInfo(SqoopConfig.PRODUCT_KEY, SqoopConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get installation infos", ex);
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public SqoopConfig getCluster(String clusterName) {
-        return dbManager.getInfo(SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class);
+        try {
+            return pluginDao.getInfo(SqoopConfig.PRODUCT_KEY, clusterName, SqoopConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get installation info for ", clusterName, ex);
+        }
+        return null;
     }
 
     @Override
