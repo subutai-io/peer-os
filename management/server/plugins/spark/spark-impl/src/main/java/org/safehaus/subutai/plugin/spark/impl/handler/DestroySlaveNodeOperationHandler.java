@@ -5,24 +5,19 @@ import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-/**
- * Created by dilshat on 5/7/14.
- */
 public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<SparkImpl>
 {
-    private final ProductOperation po;
     private final String lxcHostname;
 
 
@@ -30,7 +25,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
             String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
     }
 
@@ -38,7 +33,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
     @Override
     public UUID getTrackerId()
     {
-        return po.getId();
+        return productOperation.getId();
     }
 
 
@@ -48,34 +43,34 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         final SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null )
         {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( agent == null )
         {
-            po.addLogFailed(
-                String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+            productOperation.addLogFailed(
+                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
         if ( config.getSlaveNodes().size() == 1 )
         {
-            po.addLogFailed(
-                "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+            productOperation.addLogFailed(
+                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
             return;
         }
 
         //check if node is in the cluster
         if ( !config.getSlaveNodes().contains( agent ) )
         {
-            po.addLogFailed(
-                String.format( "Node %s does not belong to this cluster\nOperation aborted", agent.getHostname() ) );
+            productOperation.addLogFailed(
+                    String.format( "Node %s does not belong to this cluster\nOperation aborted", agent.getHostname() ) );
             return;
         }
 
-        po.addLog( "Unregistering slave from master..." );
+        productOperation.addLog( "Unregistering slave from master..." );
 
         if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) != null )
         {
@@ -85,7 +80,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
             if ( clearSlavesCommand.hasSucceeded() )
             {
-                po.addLog( "Successfully unregistered slave from master\nRestarting master..." );
+                productOperation.addLog( "Successfully unregistered slave from master\nRestarting master..." );
 
                 Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
                 final AtomicBoolean ok = new AtomicBoolean();
@@ -106,30 +101,30 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
                 if ( ok.get() )
                 {
-                    po.addLog( "Master restarted successfully" );
+                    productOperation.addLog( "Master restarted successfully" );
                 }
                 else
                 {
-                    po.addLog( String
-                        .format( "Master restart failed, %s, skipping...", restartMasterCommand.getAllErrors() ) );
+                    productOperation.addLog( String
+                            .format( "Master restart failed, %s, skipping...", restartMasterCommand.getAllErrors() ) );
                 }
             }
             else
             {
-                po.addLog( String.format( "Failed to unregister slave from master: %s, skipping...",
-                    clearSlavesCommand.getAllErrors() ) );
+                productOperation.addLog( String.format( "Failed to unregister slave from master: %s, skipping...",
+                        clearSlavesCommand.getAllErrors() ) );
             }
         }
         else
         {
-            po.addLog( "Failed to unregister slave from master: Master is not connected, skipping..." );
+            productOperation.addLog( "Failed to unregister slave from master: Master is not connected, skipping..." );
         }
 
         boolean uninstall = !agent.equals( config.getMasterNode() );
 
         if ( uninstall )
         {
-            po.addLog( "Uninstalling Spark..." );
+            productOperation.addLog( "Uninstalling Spark..." );
 
             Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( uninstallCommand );
@@ -141,55 +136,55 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
                 {
                     if ( result.getStdOut().contains( "Package ksks-spark is not installed, so not removed" ) )
                     {
-                        po.addLog( String.format( "Spark is not installed, so not removed on node %s",
-                            agent.getHostname() ) );
+                        productOperation.addLog( String.format( "Spark is not installed, so not removed on node %s",
+                                agent.getHostname() ) );
                     }
                     else
                     {
-                        po.addLog( String.format( "Spark is removed from node %s",
-                            agent.getHostname() ) );
+                        productOperation.addLog( String.format( "Spark is removed from node %s",
+                                agent.getHostname() ) );
                     }
                 }
                 else
                 {
-                    po.addLog( String.format( "Error %s on node %s", result.getStdErr(),
-                        agent.getHostname() ) );
+                    productOperation.addLog( String.format( "Error %s on node %s", result.getStdErr(),
+                            agent.getHostname() ) );
                 }
 
             }
             else
             {
-                po.addLogFailed( String.format( "Uninstallation failed, %s", uninstallCommand.getAllErrors() ) );
+                productOperation.addLogFailed( String.format( "Uninstallation failed, %s", uninstallCommand.getAllErrors() ) );
                 return;
             }
         }
         else
         {
-            po.addLog( "Stopping slave..." );
+            productOperation.addLog( "Stopping slave..." );
 
             Command stopSlaveCommand = Commands.getStopSlaveCommand( agent );
             manager.getCommandRunner().runCommand( stopSlaveCommand );
 
             if ( stopSlaveCommand.hasSucceeded() )
             {
-                po.addLog( "Slave stopped successfully" );
+                productOperation.addLog( "Slave stopped successfully" );
             }
             else
             {
-                po.addLog( String.format( "Failed to stop slave, %s, skipping...", stopSlaveCommand.getAllErrors() ) );
+                productOperation.addLog( String.format( "Failed to stop slave, %s, skipping...", stopSlaveCommand.getAllErrors() ) );
             }
         }
 
         config.getSlaveNodes().remove( agent );
-        po.addLog( "Updating db..." );
+        productOperation.addLog( "Updating db..." );
 
         if ( manager.getDbManager().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
-            po.addLogDone( "Cluster info updated in DB\nDone" );
+            productOperation.addLogDone( "Cluster info updated in DB\nDone" );
         }
         else
         {
-            po.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
+            productOperation.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
         }
     }
 }
