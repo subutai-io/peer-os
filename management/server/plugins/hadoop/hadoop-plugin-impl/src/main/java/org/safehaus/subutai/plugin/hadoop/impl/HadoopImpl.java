@@ -65,12 +65,12 @@ public class HadoopImpl implements Hadoop {
         HadoopImpl.networkManager = networkManager;
         HadoopImpl.containerManager = containerManager;
         HadoopImpl.environmentManager = environmentManager;
-        pluginDAO = new PluginDAO( dbManager );
     }
 
 
     public static void init() {
         executor = Executors.newCachedThreadPool();
+        pluginDAO = new PluginDAO( dbManager );
     }
 
 
