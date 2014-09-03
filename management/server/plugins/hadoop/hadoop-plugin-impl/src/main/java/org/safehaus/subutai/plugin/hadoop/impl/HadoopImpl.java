@@ -39,13 +39,14 @@ import org.safehaus.subutai.plugin.hadoop.impl.operation.configuration.NameNode;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.configuration.SecondaryNameNode;
 import org.safehaus.subutai.plugin.hadoop.impl.operation.configuration.TaskTracker;
 
+import com.google.common.base.Preconditions;
+
 
 public class HadoopImpl implements Hadoop {
     public static final int INITIAL_CAPACITY = 2;
 
     private static CommandRunner commandRunner;
     private static AgentManager agentManager;
-    private DbManager dbManager;
     private static Tracker tracker;
     private static ContainerManager containerManager;
     private static NetworkManager networkManager;
@@ -58,14 +59,19 @@ public class HadoopImpl implements Hadoop {
                        NetworkManager networkManager, ContainerManager containerManager,
                        EnvironmentManager environmentManager ) {
 
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+        Preconditions.checkNotNull( containerManager, "Container manager is null" );
+        Preconditions.checkNotNull( environmentManager, "Environment manager is null" );
+
         HadoopImpl.agentManager = agentManager;
         HadoopImpl.tracker = tracker;
         HadoopImpl.commandRunner = commandRunner;
-
         HadoopImpl.networkManager = networkManager;
         HadoopImpl.containerManager = containerManager;
         HadoopImpl.environmentManager = environmentManager;
-        this.dbManager = dbManager;
         HadoopImpl.pluginDAO = new PluginDAO( dbManager );
     }
 
