@@ -45,7 +45,7 @@ public class HadoopImpl implements Hadoop {
 
     private static CommandRunner commandRunner;
     private static AgentManager agentManager;
-    private static DbManager dbManager;
+    private DbManager dbManager;
     private static Tracker tracker;
     private static ContainerManager containerManager;
     private static NetworkManager networkManager;
@@ -61,16 +61,17 @@ public class HadoopImpl implements Hadoop {
         HadoopImpl.agentManager = agentManager;
         HadoopImpl.tracker = tracker;
         HadoopImpl.commandRunner = commandRunner;
-        HadoopImpl.dbManager = dbManager;
+
         HadoopImpl.networkManager = networkManager;
         HadoopImpl.containerManager = containerManager;
         HadoopImpl.environmentManager = environmentManager;
+        this.dbManager = dbManager;
+        HadoopImpl.pluginDAO = new PluginDAO( dbManager );
     }
 
 
     public static void init() {
         executor = Executors.newCachedThreadPool();
-        pluginDAO = new PluginDAO( dbManager );
     }
 
 
@@ -82,11 +83,6 @@ public class HadoopImpl implements Hadoop {
 
     public static CommandRunner getCommandRunner() {
         return commandRunner;
-    }
-
-
-    public static DbManager getDbManager() {
-        return dbManager;
     }
 
 
