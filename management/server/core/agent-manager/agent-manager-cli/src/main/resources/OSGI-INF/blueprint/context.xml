@@ -2,11 +2,11 @@
         >
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-agent-by-hostname">
-            <action class="org.safehaus.subutai.cli.commands.GetAgentByHostnameCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetAgentByHostnameCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
@@ -14,7 +14,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-agent-by-uuid">
-            <action class="org.safehaus.subutai.cli.commands.GetAgentByUUIDCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetAgentByUUIDCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
@@ -22,7 +22,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-agents">
-            <action class="org.safehaus.subutai.cli.commands.GetAgentsCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetAgentsCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
@@ -30,7 +30,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-lxc-agents-by-parent-hostname">
-            <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsByParentHostnameCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetLxcAgentsByParentHostnameCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
@@ -38,7 +38,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-lxc-agents">
-            <action class="org.safehaus.subutai.cli.commands.GetLxcAgentsCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetLxcAgentsCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>
@@ -46,7 +46,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="agent/get-physical-agents">
-            <action class="org.safehaus.subutai.cli.commands.GetPhysicalAgentsCommand">
+            <action class="org.safehaus.subutai.core.agent.cli.GetPhysicalAgentsCommand">
                 <property name="agentManager" ref="agentManager"/>
             </action>
         </command>

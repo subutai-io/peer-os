@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.pig.ui;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.pig.api.Config;
 import org.safehaus.subutai.plugin.pig.api.Pig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;

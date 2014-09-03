@@ -99,7 +99,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.impl.dbmanager</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.db.impl</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

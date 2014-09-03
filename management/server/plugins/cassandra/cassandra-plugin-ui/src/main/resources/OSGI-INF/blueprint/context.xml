@@ -4,11 +4,11 @@
     <reference id="cassandraManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.ui.CassandraUI"
           init-method="init" destroy-method="destroy">

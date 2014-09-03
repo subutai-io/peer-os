@@ -1,13 +1,13 @@
 package org.safehaus.subutai.impl.oozie;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.protocol.Agent;

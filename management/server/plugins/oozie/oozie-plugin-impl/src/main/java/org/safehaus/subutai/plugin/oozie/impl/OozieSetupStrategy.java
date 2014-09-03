@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.exception.ClusterSetupException;

@@ -57,7 +57,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.templateregistry.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.registry.impl</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>

@@ -3,7 +3,7 @@ package org.safehaus.subutai.solr.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.solr.Config;
 import org.safehaus.subutai.api.solr.Solr;
 

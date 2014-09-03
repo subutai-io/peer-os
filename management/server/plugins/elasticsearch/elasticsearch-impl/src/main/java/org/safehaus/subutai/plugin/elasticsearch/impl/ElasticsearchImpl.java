@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -16,12 +16,10 @@ import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.elasticsearch.api.*;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.elasticsearch.impl.Commands;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;

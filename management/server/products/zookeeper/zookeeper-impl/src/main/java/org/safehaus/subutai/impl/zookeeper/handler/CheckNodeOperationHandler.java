@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.zookeeper.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.impl.zookeeper.Commands;
 import org.safehaus.subutai.impl.zookeeper.ZookeeperImpl;

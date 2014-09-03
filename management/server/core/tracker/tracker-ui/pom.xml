@@ -58,7 +58,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.ui.tracker</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.tracker.ui</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

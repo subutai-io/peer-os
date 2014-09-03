@@ -7,8 +7,8 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
 
 import java.util.ArrayList;
 import java.util.List;

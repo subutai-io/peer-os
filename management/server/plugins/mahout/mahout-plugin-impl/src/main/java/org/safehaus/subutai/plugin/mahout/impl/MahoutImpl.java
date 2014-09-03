@@ -11,13 +11,13 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallOperationHandler;
