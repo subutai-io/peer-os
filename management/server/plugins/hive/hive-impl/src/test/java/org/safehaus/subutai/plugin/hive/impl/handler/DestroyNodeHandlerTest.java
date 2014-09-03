@@ -1,13 +1,11 @@
 package org.safehaus.subutai.plugin.hive.impl.handler;
 
-import org.safehaus.subutai.plugin.hive.impl.handler.AbstractHandler;
-import org.safehaus.subutai.plugin.hive.impl.handler.DestroyNodeHandler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.handler.mock.HiveImplMock;
 
 public class DestroyNodeHandlerTest {
@@ -32,7 +30,7 @@ public class DestroyNodeHandlerTest {
 
 	@Test
 	public void testNotConnected() {
-		mock.setConfig(new HiveConfig());
+        mock.setConfig(new HiveConfig());
 		handler.run();
 
 		ProductOperation po = handler.getProductOperation();

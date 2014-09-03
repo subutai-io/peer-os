@@ -1,20 +1,18 @@
 package org.safehaus.subutai.plugin.hive.impl.handler;
 
-import org.safehaus.subutai.plugin.hive.impl.handler.AbstractHandler;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.handler.mock.HiveImplMock;
-import org.safehaus.subutai.common.protocol.Agent;
-
-import java.util.HashSet;
 
 public class AbstractHandlerTest {
 
 	private final AbstractHandler impl;
 	private final String serverHostname = "server-host";
-	private HiveConfig config;
+    private HiveConfig config;
 
 	public AbstractHandlerTest() {
 		impl = new AbstractHandlerMock(new HiveImplMock(), "test-cluster");
@@ -22,7 +20,7 @@ public class AbstractHandlerTest {
 
 	@Before
 	public void setUp() {
-		config = new HiveConfig();
+        config = new HiveConfig();
 		config.setClusterName("hive-cluster");
 
 		Agent a = HiveImplMock.createAgent(serverHostname);
