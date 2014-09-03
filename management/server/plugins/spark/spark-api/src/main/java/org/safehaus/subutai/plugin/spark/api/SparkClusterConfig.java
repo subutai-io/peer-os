@@ -52,7 +52,7 @@ public class SparkClusterConfig implements ConfigBase {
 	}
 
 	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<Agent>();
+		Set<Agent> allNodes = new HashSet<>();
 		if (slaves != null) {
 			allNodes.addAll(slaves);
 		}

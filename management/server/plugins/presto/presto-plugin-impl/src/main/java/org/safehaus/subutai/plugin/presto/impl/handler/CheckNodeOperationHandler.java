@@ -3,10 +3,10 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;

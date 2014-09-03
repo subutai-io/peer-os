@@ -57,7 +57,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.impl.network</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.network.impl</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>

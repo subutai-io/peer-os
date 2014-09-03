@@ -5,10 +5,10 @@
  */
 package org.safehaus.subutai.plugin.spark.api;
 
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 import java.util.UUID;
 

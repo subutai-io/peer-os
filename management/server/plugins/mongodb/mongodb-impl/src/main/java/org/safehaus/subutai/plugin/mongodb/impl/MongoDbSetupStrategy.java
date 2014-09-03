@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.mongodb.api.MongoClusterConfig;
 import org.safehaus.subutai.plugin.mongodb.api.NodeType;
 import org.safehaus.subutai.plugin.mongodb.impl.common.CommandType;

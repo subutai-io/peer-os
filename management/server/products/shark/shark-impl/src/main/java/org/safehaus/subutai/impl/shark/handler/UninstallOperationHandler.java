@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.shark.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.shark.Config;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;

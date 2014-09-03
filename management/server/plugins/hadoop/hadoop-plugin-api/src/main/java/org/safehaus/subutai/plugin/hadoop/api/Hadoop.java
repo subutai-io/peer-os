@@ -3,13 +3,13 @@ package org.safehaus.subutai.plugin.hadoop.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 public interface Hadoop extends ApiBase<HadoopClusterConfig> {

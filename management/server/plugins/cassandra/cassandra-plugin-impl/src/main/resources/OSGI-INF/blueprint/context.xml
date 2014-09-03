@@ -2,23 +2,23 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <reference id="tracker" availability="mandatory"
-             interface="org.safehaus.subutai.api.tracker.Tracker" />
+             interface="org.safehaus.subutai.core.tracker.api.Tracker" />
   <reference id="dbManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.dbmanager.DbManager" />
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
   <reference id="lxcManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.lxcmanager.LxcManager" />
+             interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager" />
   <reference id="networkManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.network.NetworkManager" />
+             interface="org.safehaus.subutai.core.network.api.NetworkManager" />
   <reference id="commandRunner" availability="mandatory"
-             interface="org.safehaus.subutai.api.commandrunner.CommandRunner" />
+             interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.agentmanager.AgentManager" />
+             interface="org.safehaus.subutai.core.agent.api.AgentManager" />
   <reference id="configManager" availability="mandatory"
-             interface="org.safehaus.subutai.configuration.manager.api.ConfigManager" />
+             interface="org.safehaus.subutai.core.configuration.api.ConfigManager" />
   <reference id="containerManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.container.ContainerManager" />
+             interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.manager.EnvironmentManager" />
+             interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
 
   <bean id="cassandra-impl" scope="singleton" class="org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl"
         init-method="init" destroy-method="destroy">

@@ -3,9 +3,9 @@ package org.safehaus.subutai.plugin.hadoop.cli;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.tracker.Tracker;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 

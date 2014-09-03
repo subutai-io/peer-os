@@ -3,10 +3,10 @@ package org.safehaus.subutai.plugin.hadoop.impl.operation;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 

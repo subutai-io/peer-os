@@ -2,8 +2,8 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;

@@ -2,16 +2,16 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
-    <bean id="packageManager" scope="singleton" class="org.safehaus.subutai.impl.packagemanager.DebPackageManager">
+    <bean id="packageManager" scope="singleton" class="org.safehaus.subutai.core.packge.impl.DebPackageManager">
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="location" value="/opt/subutai"/>
     </bean>
 
-    <service ref="packageManager" interface="org.safehaus.subutai.api.packagemanager.PackageManager"/>
+    <service ref="packageManager" interface="org.safehaus.subutai.core.packge.api.PackageManager"/>
 
 </blueprint>

@@ -15,7 +15,7 @@
     <reference id="mongodbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.mongodb.Mongo"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="mongodbRestServiceImpl" class="org.safehaus.subutai.mongodb.services.RestServiceImpl">
         <property name="mongodbManager" ref="mongodbManager"/>

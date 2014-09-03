@@ -4,12 +4,12 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import java.util.*;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.ui.FlumeUI;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.common.protocol.Agent;
 
 public class ConfigurationStep extends VerticalLayout {
 
@@ -94,7 +94,6 @@ public class ConfigurationStep extends VerticalLayout {
                             new BeanItemContainer<>(Agent.class, hadoopInfo.getAllNodes())
                     );
                     config.setHadoopClusterName(hadoopInfo.getClusterName());
-                    config.getNodes().clear();
                 }
             }
         });
@@ -128,9 +127,9 @@ public class ConfigurationStep extends VerticalLayout {
         select.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
+                config.getNodes().clear();
                 if(event.getProperty().getValue() != null) {
                     Collection agentList = (Collection)event.getProperty().getValue();
-                    config.getNodes().clear();
                     config.getNodes().addAll(agentList);
                 }
             }

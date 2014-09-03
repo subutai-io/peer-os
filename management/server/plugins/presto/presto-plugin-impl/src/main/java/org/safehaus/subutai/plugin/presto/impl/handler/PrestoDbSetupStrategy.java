@@ -5,22 +5,23 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 import com.google.common.base.Preconditions;
+
 
 public class PrestoDbSetupStrategy implements ClusterSetupStrategy {
 

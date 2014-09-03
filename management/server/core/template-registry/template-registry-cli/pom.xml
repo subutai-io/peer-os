@@ -69,7 +69,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.templateregistry.cli</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.registry.cli</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

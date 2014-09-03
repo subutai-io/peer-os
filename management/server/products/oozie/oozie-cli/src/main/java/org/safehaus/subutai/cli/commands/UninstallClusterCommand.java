@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;

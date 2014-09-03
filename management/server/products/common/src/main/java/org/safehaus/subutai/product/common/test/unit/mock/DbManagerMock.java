@@ -2,8 +2,8 @@ package org.safehaus.subutai.product.common.test.unit.mock;
 
 
 import com.datastax.driver.core.ResultSet;
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
 
 import java.util.List;
 

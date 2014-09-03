@@ -4,25 +4,18 @@ package org.safehaus.subutai.plugin.hadoop.impl.operation.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 
 
-/**
- * Created by daralbaev on 22.04.14.
- */
 public class AddNodeOperation {
-    private final HadoopClusterConfig hadoopClusterConfig;
     private List<Command> commandList;
-    private Agent agent;
 
 
     public AddNodeOperation( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
 
-        this.hadoopClusterConfig = hadoopClusterConfig;
-        this.agent = agent;
         commandList = new ArrayList<>();
 
         commandList.add( Commands.getInstallCommand( agent ) );

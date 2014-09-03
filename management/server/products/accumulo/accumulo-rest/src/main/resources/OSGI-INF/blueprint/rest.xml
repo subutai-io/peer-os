@@ -16,7 +16,7 @@
     <reference id="accumuloManager" availability="mandatory"
                interface="org.safehaus.subutai.api.accumulo.Accumulo"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="accumuloRestServiceImpl" class="org.safehaus.subutai.accumulo.services.RestServiceImpl">
         <property name="accumuloManager" ref="accumuloManager"/>
