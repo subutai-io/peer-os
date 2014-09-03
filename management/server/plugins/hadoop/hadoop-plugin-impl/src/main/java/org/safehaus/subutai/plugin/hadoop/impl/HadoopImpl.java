@@ -76,7 +76,7 @@ public class HadoopImpl implements Hadoop {
     }
 
 
-    public static void init() {
+    public void init() {
         executor = Executors.newCachedThreadPool();
     }
 
