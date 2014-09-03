@@ -1,6 +1,12 @@
 package org.safehaus.subutai.plugin.common;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
+
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.google.common.base.Preconditions;
@@ -8,11 +14,6 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

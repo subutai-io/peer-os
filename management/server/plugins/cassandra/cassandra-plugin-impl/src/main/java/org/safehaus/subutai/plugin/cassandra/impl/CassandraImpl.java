@@ -6,17 +6,24 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckAllNodesOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckCassandraServiceStatusOperationHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.InstallOperationHandler;
@@ -45,13 +52,8 @@ public class CassandraImpl implements Cassandra {
     private PluginDAO pluginDAO;
 
 
-    public CassandraImpl( DbManager dbManager,
-                          Tracker tracker,
-                          LxcManager lxcManager,
-                          NetworkManager networkManager,
-                          CommandRunner commandRunner,
-                          AgentManager agentManager,
-                          EnvironmentManager environmentManager,
+    public CassandraImpl( DbManager dbManager, Tracker tracker, LxcManager lxcManager, NetworkManager networkManager,
+                          CommandRunner commandRunner, AgentManager agentManager, EnvironmentManager environmentManager,
                           ContainerManager containerManager ) {
         this.dbManager = dbManager;
         this.tracker = tracker;
@@ -142,7 +144,7 @@ public class CassandraImpl implements Cassandra {
 
 
     public void init() {
-//        Commands.init( commandRunner );
+        //        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
