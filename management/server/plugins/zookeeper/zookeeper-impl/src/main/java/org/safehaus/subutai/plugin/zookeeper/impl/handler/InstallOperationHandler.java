@@ -3,8 +3,8 @@ package org.safehaus.subutai.plugin.zookeeper.impl.handler;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.zookeeper.api.SetupType;

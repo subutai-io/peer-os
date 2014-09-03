@@ -6,16 +6,16 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerOperationHandler;
@@ -44,9 +44,13 @@ public class OozieImpl implements Oozie {
     private ContainerManager containerManager;
 
 
-    public OozieImpl( final AgentManager agentManager, final DbManager dbManager, final Tracker tracker,
-                      final CommandRunner commandRunner, final LxcManager lxcManager,
-                      final EnvironmentManager environmentManager, final ContainerManager containerManager ) {
+    public OozieImpl( final AgentManager agentManager,
+                      final DbManager dbManager,
+                      final Tracker tracker,
+                      final CommandRunner commandRunner,
+                      final LxcManager lxcManager,
+                      final EnvironmentManager environmentManager,
+                      final ContainerManager containerManager ) {
         this.agentManager = agentManager;
         this.dbManager = dbManager;
         this.tracker = tracker;

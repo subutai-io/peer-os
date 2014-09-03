@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.hbase.impl;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 

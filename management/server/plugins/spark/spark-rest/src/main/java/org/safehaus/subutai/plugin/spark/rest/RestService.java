@@ -1,6 +1,6 @@
 package org.safehaus.subutai.plugin.spark.rest;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.impl.presto.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandCallback;
 import org.safehaus.subutai.api.presto.Config;
 import org.safehaus.subutai.impl.presto.Commands;
 import org.safehaus.subutai.impl.presto.PrestoImpl;

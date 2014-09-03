@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;

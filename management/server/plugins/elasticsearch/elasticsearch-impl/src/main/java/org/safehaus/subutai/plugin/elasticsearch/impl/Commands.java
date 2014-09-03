@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 

@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.hadoop.impl.operation;
 
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.HashMap;

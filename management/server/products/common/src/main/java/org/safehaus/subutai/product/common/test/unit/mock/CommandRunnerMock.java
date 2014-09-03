@@ -1,15 +1,16 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.api.commandrunner.*;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.core.command.api.*;
 
 import java.util.Set;
 import java.util.UUID;
 
 
-public class CommandRunnerMock implements CommandRunner {
+public class CommandRunnerMock implements CommandRunner
+{
 
 	@Override
 	public void runCommandAsync(Command command, CommandCallback commandCallback) {

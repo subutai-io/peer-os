@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.flume.api;
 
 import java.util.UUID;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.ApiBase;

@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.api.manager.exception.EnvironmentBuildException;
-import org.safehaus.subutai.api.manager.helper.Environment;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;

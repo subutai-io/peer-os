@@ -2,17 +2,17 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
     <reference id="tracker" availability="mandatory"
-               interface="org.safehaus.subutai.api.tracker.Tracker"/>
+               interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="dbManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
+               interface="org.safehaus.subutai.core.db.api.DbManager"/>
     <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
+               interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager"/>
     <reference id="networkManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.networkmanager.NetworkManager"/>
+               interface="org.safehaus.subutai.core.network.api.NetworkManager"/>
 
     <bean id="hadoop-impl" scope="singleton" class="org.safehaus.subutai.impl.hadoop.HadoopImpl"
           init-method="init" destroy-method="destroy">

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
@@ -29,7 +29,7 @@ public class MockBuilder {
 
         DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
 
-        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
+        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig().setClusterName( "test-cluster" ) );
 
         return new UninstallOperationHandler( solrImpl, "test-cluster" );
     }

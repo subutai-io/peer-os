@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.junit.Test;
-import org.safehaus.subutai.configuration.manager.api.ConfigTypeEnum;
-import org.safehaus.subutai.configuration.manager.impl.utils.ConfigBuilder;
+import org.safehaus.subutai.core.configuration.api.ConfigTypeEnum;
+import org.safehaus.subutai.core.configuration.impl.utils.ConfigBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

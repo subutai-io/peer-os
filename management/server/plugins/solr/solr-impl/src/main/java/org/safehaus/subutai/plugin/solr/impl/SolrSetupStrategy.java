@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.safehaus.subutai.api.dbmanager.DBException;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.api.manager.helper.Node;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.protocol.Agent;
