@@ -6,6 +6,7 @@
 package org.safehaus.subutai.plugin.shark.impl;
 
 import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
 import org.safehaus.subutai.common.enums.OutputRedirection;
@@ -17,6 +18,10 @@ import java.util.Set;
  * @author dilshat
  */
 public class Commands extends CommandsSingleton {
+
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
 
 	public static Command getInstallCommand(Set<Agent> agents) {
 		return createCommand(

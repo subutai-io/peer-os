@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.shark.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
 
 import java.util.List;
@@ -25,9 +25,9 @@ public class ListClustersCommand extends OsgiCommandSupport {
 	}
 
 	protected Object doExecute() {
-		List<Config> configList = sharkManager.getClusters();
+		List<SharkClusterConfig > configList = sharkManager.getClusters();
 		if (!configList.isEmpty())
-			for (Config config : configList) {
+			for (SharkClusterConfig config : configList) {
 				System.out.println(config.getClusterName());
 			}
 		else System.out.println("No Shark cluster");
