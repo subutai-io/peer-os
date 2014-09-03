@@ -74,8 +74,8 @@ public class Commands extends CommandsSingleton {
         int id = 0;
         for ( Agent agent : agents ) {
             requestBuilders.add( new AgentRequestBuilder( agent,
-                    String.format( "echo '%s' > %s && echo '%s' > %s", ++id, myIdFilePath, zooCfgFileContents,
-                            zooCfgFilePath ) ) );
+                    String.format( ". /etc/profile && zookeeper-setID.sh %s && echo '%s' > %s", ++id, zooCfgFileContents, zooCfgFilePath ) ) );
+
         }
 
         return createCommand( requestBuilders );
