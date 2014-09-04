@@ -1771,6 +1771,27 @@
                   <artifactId>storm-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>storm-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Zookeeper -->
                 <artifactItem>
