@@ -1243,6 +1243,32 @@
                   <artifactId>hive-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hive-plugin-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hive-plugin-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hive-plugin-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hive-plugin-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>hive-plugin-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
 
                 <!-- Hive Query -->
                 <artifactItem>
