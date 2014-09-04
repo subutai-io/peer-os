@@ -26,6 +26,17 @@ public class HBaseClusterConfig implements ConfigBase {
     private Set<String> region = new HashSet();
     private Set<String> quorum = new HashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
+    private SetupType setupType;
+
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
+    }
 
 
     public String getTemplateName() {
