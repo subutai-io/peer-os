@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 
 
-public class HBaseConfig implements ConfigBase {
+public class HBaseClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "HBase";
     public static final String PRODUCT_NAME = "HBase";
@@ -48,7 +48,7 @@ public class HBaseConfig implements ConfigBase {
     }
 
 
-    public HBaseConfig() {
+    public HBaseClusterConfig() {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 

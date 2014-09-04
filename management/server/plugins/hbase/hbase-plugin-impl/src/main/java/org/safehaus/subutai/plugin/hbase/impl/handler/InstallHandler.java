@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -20,13 +20,13 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private ProductOperation po;
-    private HBaseConfig config;
+    private HBaseClusterConfig config;
 
 
-    public InstallHandler( final HBaseImpl manager, final HBaseConfig config ) {
+    public InstallHandler( final HBaseImpl manager, final HBaseClusterConfig config ) {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -34,13 +34,13 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
     @Override
     public void run() {
         final ProductOperation po =
-                manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY, "Installing HBase" );
+                manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY, "Installing HBase" );
 
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
                 if ( manager.getDbManager()
-                            .getInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), HBaseConfig.class ) != null ) {
+                            .getInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), HBaseClusterConfig.class ) != null ) {
                     po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
                     return;
@@ -60,7 +60,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
                     return;
                 }
 
-                if ( manager.getDbManager().saveInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+                if ( manager.getDbManager().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
 
                     po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
 
@@ -177,7 +177,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
     }
 
 
-    private Set<Agent> getAllNodes( HBaseConfig config ) throws Exception {
+    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception {
         final Set<Agent> allNodes = new HashSet<>();
 
         if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null ) {

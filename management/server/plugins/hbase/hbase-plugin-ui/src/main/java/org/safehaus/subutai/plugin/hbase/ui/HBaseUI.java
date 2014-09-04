@@ -10,7 +10,7 @@ import com.vaadin.ui.Component;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.common.util.FileUtil;
@@ -83,11 +83,11 @@ public class HBaseUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return HBaseConfig.PRODUCT_KEY;
+		return HBaseClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return HBaseConfig.PRODUCT_KEY;
+		return HBaseClusterConfig.PRODUCT_KEY;
 	}
 
 

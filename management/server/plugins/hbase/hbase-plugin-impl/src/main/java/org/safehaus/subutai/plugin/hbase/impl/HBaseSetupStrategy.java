@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 
 /**
@@ -13,12 +13,12 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
  */
 public class HBaseSetupStrategy implements ClusterSetupStrategy {
 
-    HBaseConfig config;
+    HBaseClusterConfig config;
     private ProductOperation productOperation;
     private HBaseImpl hbase;
 
 
-    public HBaseSetupStrategy( final HBaseImpl hBase, final ProductOperation po, final HBaseConfig config ) {
+    public HBaseSetupStrategy( final HBaseImpl hBase, final ProductOperation po, final HBaseClusterConfig config ) {
         this.config = config;
         this.productOperation = po;
         this.hbase = hBase;

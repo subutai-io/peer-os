@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
@@ -151,7 +151,7 @@ public class HBaseImpl implements HBase {
     }
 
 
-    public UUID installCluster( final HBaseConfig config ) {
+    public UUID installCluster( final HBaseClusterConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
         executor.execute( operationHandler );
@@ -167,8 +167,8 @@ public class HBaseImpl implements HBase {
     }
 
 
-    public List<HBaseConfig> getClusters() {
-        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
+    public List<HBaseClusterConfig> getClusters() {
+        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
     }
 
 
@@ -185,21 +185,21 @@ public class HBaseImpl implements HBase {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseClusterConfig config,
                                                          final ProductOperation po ) {
         return new HBaseSetupStrategy( this, po, config );
     }
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HBaseConfig config ) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HBaseClusterConfig config ) {
         return null;
     }
 
 
     @Override
-    public HBaseConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+    public HBaseClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
     }
 
 
@@ -227,7 +227,7 @@ public class HBaseImpl implements HBase {
     }
 
 
-    private Set<Agent> getAllNodes( HBaseConfig config ) throws Exception {
+    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception {
         final Set<Agent> allNodes = new HashSet<>();
 
         if ( agentManager.getAgentByHostname( config.getMaster() ) == null ) {

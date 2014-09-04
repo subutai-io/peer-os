@@ -3,7 +3,8 @@ package org.safehaus.subutai.plugin.hbase.cli;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
@@ -41,7 +42,7 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
     protected Object doExecute() {
 
         UUID uuid = hbaseManager.uninstallCluster(clusterName);
-        tracker.printOperationLog(HBaseConfig.PRODUCT_KEY, uuid, 30000);
+        tracker.printOperationLog( HBaseClusterConfig.PRODUCT_KEY, uuid, 30000);
         return null;
 
     }

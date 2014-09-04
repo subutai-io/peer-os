@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 import com.google.common.base.Strings;
 
@@ -27,10 +27,10 @@ public class RestServiceImplOld {
 
     public String getClusters() {
 
-        List<HBaseConfig> configs = hbaseManager.getClusters();
+        List<HBaseClusterConfig> configs = hbaseManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
-        for ( HBaseConfig config : configs ) {
+        for ( HBaseClusterConfig config : configs ) {
             clusterNames.add( config.getClusterName() );
         }
 
@@ -39,7 +39,7 @@ public class RestServiceImplOld {
 
 
     public String getCluster(  String clusterName ) {
-        HBaseConfig config = hbaseManager.getCluster( clusterName );
+        HBaseClusterConfig config = hbaseManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
     }
@@ -82,7 +82,7 @@ public class RestServiceImplOld {
                                    String hadoopNameNode,
                                    String nodes,  String quorum,
                                    String region ) {
-        HBaseConfig config = new HBaseConfig();
+        HBaseClusterConfig config = new HBaseClusterConfig();
         config.setClusterName( clusterName );
         config.setMaster( master );
         config.setBackupMasters( backupMasters );

@@ -20,9 +20,9 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 /**
  * @author dilshat
  */
-public interface HBase extends ApiBase<HBaseConfig> {
+public interface HBase extends ApiBase<HBaseClusterConfig> {
 
-    public UUID installCluster( HBaseConfig config );
+    public UUID installCluster( HBaseClusterConfig config );
 
     UUID startCluster( String clusterName );
 
@@ -36,14 +36,14 @@ public interface HBase extends ApiBase<HBaseConfig> {
 
     UUID checkCluster( String clusterName );
 
-    public List<HBaseConfig> getClusters();
+    public List<HBaseClusterConfig> getClusters();
 
     List<Config> getHadoopClusters();
 
     Config getHadoopCluster( String clusterName );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
                                                          ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( HBaseConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
 }

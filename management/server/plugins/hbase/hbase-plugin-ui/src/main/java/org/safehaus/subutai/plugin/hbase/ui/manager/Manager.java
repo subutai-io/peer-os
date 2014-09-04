@@ -13,7 +13,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBaseType;
 import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -39,7 +40,7 @@ public class Manager
     private final Table regionTable;
     private final Table quorumTable;
     private final Table bmasterTable;
-    private HBaseConfig config;
+    private HBaseClusterConfig config;
 
 
     public Manager()
@@ -79,7 +80,7 @@ public class Manager
             public void valueChange( Property.ValueChangeEvent event )
             {
                 Object value = event.getProperty().getValue();
-                config = value != null ? ( HBaseConfig ) value : null;
+                config = value != null ? ( HBaseClusterConfig ) value : null;
                 refreshUI();
             }
         } );
@@ -110,7 +111,7 @@ public class Manager
                 {
                     UUID trackID = HBaseUI.getHbaseManager().startCluster( config.getClusterName() );
                     ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
-                        HBaseConfig.PRODUCT_KEY );
+                        HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -141,7 +142,7 @@ public class Manager
                 {
                     UUID trackID = HBaseUI.getHbaseManager().stopCluster( config.getClusterName() );
                     ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
-                        HBaseConfig.PRODUCT_KEY );
+                        HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -172,7 +173,7 @@ public class Manager
                 {
                     UUID trackID = HBaseUI.getHbaseManager().checkCluster( config.getClusterName() );
                     ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(), trackID,
-                        HBaseConfig.PRODUCT_KEY );
+                        HBaseClusterConfig.PRODUCT_KEY );
                     window.getWindow().addCloseListener( new Window.CloseListener()
                     {
                         @Override
@@ -211,7 +212,7 @@ public class Manager
                         {
                             UUID trackID = HBaseUI.getHbaseManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( HBaseUI.getExecutor(), HBaseUI.getTracker(),
-                                trackID, HBaseConfig.PRODUCT_KEY );
+                                trackID, HBaseClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -339,12 +340,12 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<HBaseConfig> clusters = HBaseUI.getHbaseManager().getClusters();
-        HBaseConfig clusterInfo = ( HBaseConfig ) clusterCombo.getValue();
+        List<HBaseClusterConfig> clusters = HBaseUI.getHbaseManager().getClusters();
+        HBaseClusterConfig clusterInfo = ( HBaseClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clusters != null && clusters.size() > 0 )
         {
-            for ( HBaseConfig info : clusters )
+            for ( HBaseClusterConfig info : clusters )
             {
                 clusterCombo.addItem( info );
                 clusterCombo.setItemCaption( info,
@@ -352,7 +353,7 @@ public class Manager
             }
             if ( clusterInfo != null )
             {
-                for ( HBaseConfig c : clusters )
+                for ( HBaseClusterConfig c : clusters )
                 {
                     if ( c.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {

@@ -2,7 +2,8 @@ package org.safehaus.subutai.plugin.hbase.cli;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 
 import java.util.List;
@@ -26,10 +27,10 @@ public class ListHBaseClustersCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
 
-        List<HBaseConfig> configs = hbaseManager.getClusters();
+        List<HBaseClusterConfig> configs = hbaseManager.getClusters();
         StringBuilder sb = new StringBuilder();
 
-        for (HBaseConfig config : configs) {
+        for (HBaseClusterConfig config : configs) {
             sb.append(config.getClusterName()).append("\n");
         }
 

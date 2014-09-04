@@ -7,7 +7,7 @@ import java.util.Set;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -26,20 +26,20 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     public CheckClusterHandler( final HBaseImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Checking %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
+        final ProductOperation po = manager.getTracker().createProductOperation( HBaseClusterConfig.PRODUCT_KEY,
                 String.format( "Checking cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                HBaseConfig config =
-                        manager.getDbManager().getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+                HBaseClusterConfig config =
+                        manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -78,7 +78,7 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
     }
 
 
-    private Set<Agent> getAllNodes( HBaseConfig config ) throws Exception {
+    private Set<Agent> getAllNodes( HBaseClusterConfig config ) throws Exception {
         final Set<Agent> allNodes = new HashSet<>();
 
         if ( manager.getAgentManager().getAgentByHostname( config.getMaster() ) == null ) {

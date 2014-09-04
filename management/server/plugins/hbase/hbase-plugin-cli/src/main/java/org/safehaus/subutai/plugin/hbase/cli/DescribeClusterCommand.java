@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.hbase.cli;
 
 
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -38,7 +38,7 @@ public class DescribeClusterCommand extends OsgiCommandSupport
 
     protected Object doExecute()
     {
-        HBaseConfig config = hbaseManager.getCluster( clusterName );
+        HBaseClusterConfig config = hbaseManager.getCluster( clusterName );
         if ( config != null )
         {
             StringBuilder sb = new StringBuilder();
