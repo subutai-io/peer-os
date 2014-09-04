@@ -24,6 +24,7 @@ public class HBaseConfig implements ConfigBase {
     private Set<String> region = new HashSet();
     private Set<String> quorum = new HashSet();
 
+
     public HBaseConfig() {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }

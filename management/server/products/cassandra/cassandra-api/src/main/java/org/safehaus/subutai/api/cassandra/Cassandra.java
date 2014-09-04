@@ -5,24 +5,26 @@
  */
 package org.safehaus.subutai.api.cassandra;
 
-import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.ApiBase;
+
 
 /**
  * @author dilshat
  */
 public interface Cassandra extends ApiBase<Config> {
 
-    UUID startAllNodes(String clusterName);
+    UUID startAllNodes( String clusterName );
 
-    UUID checkAllNodes(String clusterName);
+    UUID checkAllNodes( String clusterName );
 
-    UUID stopAllNodes(String clusterName);
+    UUID stopAllNodes( String clusterName );
 
-    UUID startCassandraService(String agentUUID);
+    UUID startCassandraService( String agentUUID );
 
-    UUID stopCassandraService(String agentUUID);
+    UUID stopCassandraService( String agentUUID );
 
-    UUID statusCassandraService(String agentUUID);
+    UUID statusCassandraService( String agentUUID );
 }

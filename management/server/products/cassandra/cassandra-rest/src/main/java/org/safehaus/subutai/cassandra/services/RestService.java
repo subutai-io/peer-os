@@ -13,14 +13,14 @@ public interface RestService {
 
     @GET
     @Path("install/{clusterName}/{domainName}/{numberOfNodes}/{numberOfSeeds}")
-    @Produces( MediaType.APPLICATION_JSON )
+    @Produces(MediaType.APPLICATION_JSON)
     public String install( @PathParam("clusterName") String clusterName, @PathParam("domainName") String domainName,
                            @PathParam("numberOfNodes") String numberOfNodes,
                            @PathParam("numberOfSeeds") String numberOfSeeds );
 
     @GET
     @Path("uninstall/{clusterName}")
-    @Produces( MediaType.APPLICATION_JSON )
+    @Produces(MediaType.APPLICATION_JSON)
     public String uninstall( @PathParam("clusterName") String clusterName );
 
     //    @POST
@@ -29,20 +29,20 @@ public interface RestService {
     //    public Response installFromJson( final String json );
 
     @GET
-    @Path( "startNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String startNode( @PathParam( "clusterName" ) String clusterName,
-                             @PathParam( "lxchostname" ) String lxchostname );
+    @Path("startNode/{clusterName}/{lxchostname}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String startNode( @PathParam("clusterName") String clusterName,
+                             @PathParam("lxchostname") String lxchostname );
 
     @GET
-    @Path( "stopNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String stopNode( @PathParam( "clusterName" ) String clusterName,
-                            @PathParam( "lxchostname" ) String lxchostname );
+    @Path("stopNode/{clusterName}/{lxchostname}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String stopNode( @PathParam("clusterName") String clusterName,
+                            @PathParam("lxchostname") String lxchostname );
 
     @GET
-    @Path( "checkNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String checkNode( @PathParam( "clusterName" ) String clusterName,
-                             @PathParam( "lxchostname" ) String lxchostname );
+    @Path("checkNode/{clusterName}/{lxchostname}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String checkNode( @PathParam("clusterName") String clusterName,
+                             @PathParam("lxchostname") String lxchostname );
 }

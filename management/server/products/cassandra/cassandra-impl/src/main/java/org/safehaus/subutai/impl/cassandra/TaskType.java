@@ -5,6 +5,7 @@
  */
 package org.safehaus.subutai.impl.cassandra;
 
+
 /**
  * @author dilshat
  */

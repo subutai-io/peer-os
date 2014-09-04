@@ -9,8 +9,8 @@ import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 
 /**
@@ -19,9 +19,9 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 public class RestServiceImpl implements RestService {
 
+    private static final String OPERATION_ID = "OPERATION_ID";
     private Oozie oozieManager;
     private Hadoop hadoopManager;
-    private static final String OPERATION_ID = "OPERATION_ID";
 
 
     public Hadoop getHadoopManager() {
