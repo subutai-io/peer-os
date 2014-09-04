@@ -45,16 +45,16 @@ public class StepStart extends Panel {
         logoImg.setWidth( 220, Unit.PIXELS );
         grid.addComponent( logoImg, 1, 3, 2, 5 );
 
-        Button startOverHadoopNZK = new Button( "Start over Hadoop installation" );
-        startOverHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startOverHadoopNZK, 7, 4, 7, 4 );
-        grid.setComponentAlignment( startOverHadoopNZK, Alignment.BOTTOM_RIGHT );
-        Button startWithHadoopNZK = new Button( "Start with Hadoop installation" );
-        startWithHadoopNZK.addStyleName( "default" );
-        grid.addComponent( startWithHadoopNZK, 8, 4, 8, 4 );
-        grid.setComponentAlignment( startWithHadoopNZK, Alignment.BOTTOM_RIGHT );
+        Button startOverHadoop = new Button( "Start over Hadoop installation" );
+        startOverHadoop.addStyleName( "default" );
+        grid.addComponent( startOverHadoop, 7, 4, 7, 4 );
+        grid.setComponentAlignment( startOverHadoop, Alignment.BOTTOM_RIGHT );
+        Button startWithHadoop = new Button( "Start with Hadoop installation" );
+        startWithHadoop.addStyleName( "default" );
+        grid.addComponent( startWithHadoop, 8, 4, 8, 4 );
+        grid.setComponentAlignment( startWithHadoop, Alignment.BOTTOM_RIGHT );
 
-        startOverHadoopNZK.addClickListener( new Button.ClickListener() {
+        startOverHadoop.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent event ) {
                 wizard.init();
@@ -62,7 +62,7 @@ public class StepStart extends Panel {
                 wizard.next();
             }
         } );
-        startWithHadoopNZK.addClickListener( new Button.ClickListener() {
+        startWithHadoop.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent event ) {
                 wizard.init();
