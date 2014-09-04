@@ -1,7 +1,9 @@
 package org.safehaus.subutai.plugin.storm.api;
 
 import java.util.UUID;
-import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 public interface Storm extends ApiBase<StormConfig> {
 
@@ -24,4 +26,9 @@ public interface Storm extends ApiBase<StormConfig> {
     public UUID addNode(String clusterName, String hostname);
 
     public UUID destroyNode(String clusterName, String hostname);
+
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint(StormConfig config);
+
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment environment,
+            StormConfig config, ProductOperation po);
 }

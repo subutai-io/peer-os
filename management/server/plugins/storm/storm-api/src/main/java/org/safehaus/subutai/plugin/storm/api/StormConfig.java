@@ -8,8 +8,9 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 
 public class StormConfig implements ConfigBase {
 
-    public static final String PRODUCT_NAME = "Storm";
-    public static final String TEMPLATE_NAME = "storm";
+    public static final String PRODUCT_NAME = "Storm2";
+    public static final String TEMPLATE_NAME_NIMBUS = "stormnimbus";
+    public static final String TEMPLATE_NAME_WORKER = "storm";
 
     private String clusterName;
     private int supervisorsCount;

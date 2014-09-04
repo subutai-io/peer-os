@@ -2,17 +2,19 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
-import org.safehaus.subutai.plugin.storm.impl.CommandType;
-import org.safehaus.subutai.plugin.storm.impl.Commands;
-import org.safehaus.subutai.plugin.storm.impl.StormImpl;
+import org.safehaus.subutai.plugin.storm.impl.*;
 
 public class InstallHandler extends AbstractHandler {
 
@@ -28,9 +30,32 @@ public class InstallHandler extends AbstractHandler {
 
     @Override
     public void run() {
-        doInstallation();
-        if(productOperation.getState() != ProductOperationState.SUCCEEDED)
-            destroyNodes();
+        Environment env = null;
+        EnvironmentBlueprint eb = manager.getDefaultEnvironmentBlueprint(config);
+        try {
+            productOperation.addLog("Building environment...");
+            env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
+            productOperation.addLog("Building environment completed");
+
+            productOperation.addLog("Installing cluster...");
+            ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, productOperation);
+            s.setup();
+            productOperation.addLog("Installing cluster completed");
+            productOperation.addLogDone(null);
+
+        } catch(EnvironmentBuildException ex) {
+            String m = "Failed to build environment";
+            productOperation.addLogFailed(m);
+            manager.getLogger().error(m, ex);
+        } catch(ClusterSetupException ex) {
+            String m = "Failed to setup cluster";
+            productOperation.addLog(ex.getMessage());
+            productOperation.addLogFailed(m);
+            manager.getLogger().error(m, ex);
+        } finally {
+            boolean b = productOperation.getState() != ProductOperationState.SUCCEEDED;
+            if(b) destroyNodes(env);
+        }
     }
 
     void doInstallation() {
@@ -153,21 +178,22 @@ public class InstallHandler extends AbstractHandler {
             po.addLogFailed("Failed to configure Storm cluster");
     }
 
-    void destroyNodes() {
-        ProductOperation po = productOperation;
+    void destroyNodes(Environment env) {
+
+        if(env == null || env.getNodes().isEmpty()) return;
+
+        Set<Agent> set = new HashSet<>(env.getNodes().size());
+        for(Node n : env.getNodes()) set.add(n.getAgent());
+        productOperation.addLog("Destroying node(s)...");
         try {
-            if(config.getSupervisors() != null && config.getSupervisors().size() > 0) {
-                po.addLog("Destroying supervisor nodes...");
-                manager.getLxcManager().destroyLxcs(config.getSupervisors());
-            }
-            if(config.getNimbus() != null && !config.isExternalZookeeper()) {
-                po.addLog("Destroying Nimbus node...");
-                HashSet<Agent> set = new HashSet<>(Arrays.asList(config.getNimbus()));
-                manager.getLxcManager().destroyLxcs(set);
-            }
+            manager.getContainerManager().clonesDestroy(set);
+            productOperation.addLog("Destroying node(s) completed");
         } catch(LxcDestroyException ex) {
-            po.addLog("Failed to destroy nodes: " + ex.getMessage());
+            String m = "Failed to destroy node(s)";
+            productOperation.addLog(m);
+            manager.getLogger().error(m, ex);
         }
+
     }
 
     private boolean prepareNodes(StormConfig config) throws LxcCreateException {

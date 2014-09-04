@@ -13,6 +13,10 @@
                interface="org.safehaus.subutai.plugin.zookeeper.api.Zookeeper"/>
     <reference id="lxcManager" availability="mandatory"
                interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
 
     <bean id="storm-impl" scope="singleton" class="org.safehaus.subutai.plugin.storm.impl.StormImpl"
           init-method="init" destroy-method="destroy">
@@ -22,6 +26,8 @@
         <property name="dbManager" ref="dbManager"/>
         <property name="zookeeperManager" ref="zookeeperManager"/>
         <property name="lxcManager" ref="lxcManager"/>
+        <property name="containerManager" ref="containerManager"/>
+        <property name="environmentManager" ref="environmentManager"/>
     </bean>
 
     <service ref="storm-impl" interface="org.safehaus.subutai.plugin.storm.api.Storm"/>

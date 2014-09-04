@@ -43,6 +43,10 @@
             <artifactId>subutai-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>environment-manager-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
