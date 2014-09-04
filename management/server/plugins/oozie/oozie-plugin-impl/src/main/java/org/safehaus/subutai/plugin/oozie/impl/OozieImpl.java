@@ -48,6 +48,15 @@ public class OozieImpl extends OozieBase {
     Hadoop hadoopManager;
 
 
+    public void init() {
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
+
+        Commands.init( commandRunner );
+        executor = Executors.newCachedThreadPool();
+    }
+
+
     public PluginDAO getPluginDAO() {
         return pluginDAO;
     }
@@ -153,15 +162,6 @@ public class OozieImpl extends OozieBase {
 
     public OozieImpl() {
 
-    }
-
-
-    public void init() {
-        this.pluginDAO = new PluginDAO( dbManager );
-        this.commands = new Commands( commandRunner );
-
-        Commands.init( commandRunner );
-        executor = Executors.newCachedThreadPool();
     }
 
 

@@ -22,6 +22,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
@@ -35,18 +36,30 @@ import com.google.common.base.Preconditions;
 
 public class HBaseImpl implements HBase {
 
-    private AgentManager agentManager;
-    private Hadoop hadoopManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ExecutorService executor;
-    private CommandRunner commandRunner;
-    private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
+    AgentManager agentManager;
+    Hadoop hadoopManager;
+    DbManager dbManager;
+    Tracker tracker;
+    ExecutorService executor;
+    CommandRunner commandRunner;
+    EnvironmentManager environmentManager;
+    ContainerManager containerManager;
+    PluginDAO pluginDAO;
+    Commands commands;
 
 
     public HBaseImpl() {
-        Commands.init( commandRunner );
+
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
     }
 
 
@@ -101,6 +114,9 @@ public class HBaseImpl implements HBase {
 
 
     public void init() {
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
+
         Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }

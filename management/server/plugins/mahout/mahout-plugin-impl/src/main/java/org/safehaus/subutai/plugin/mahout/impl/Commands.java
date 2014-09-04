@@ -5,18 +5,20 @@
  */
 package org.safehaus.subutai.plugin.mahout.impl;
 
+import java.util.Set;
+
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.enums.OutputRedirection;
-
-import java.util.Set;
 
 /**
  * @author dilshat
  */
 public class Commands extends CommandsSingleton {
+
+
 
 	public static Command getInstallCommand(Set<Agent> agents) {
 		return createCommand(
