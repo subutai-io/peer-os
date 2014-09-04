@@ -81,10 +81,11 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
             po.addLog( String.format( "Creating %d servers...", hadoopClusterConfig.getCountOfSlaveNodes()
                     + HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY ) );
 
-            if ( environment == null ) {
-                hadoopManager.getEnvironmentManager().buildEnvironmentAndReturn(
+            if ( this.environment == null ) {
+                environment = hadoopManager.getEnvironmentManager().buildEnvironmentAndReturn(
                         hadoopManager.getDefaultEnvironmentBlueprint( hadoopClusterConfig ) );
             }
+
             setMasterNodes();
             setSlaveNodes();
             po.addLog( "Lxc containers created successfully" );
@@ -152,7 +153,7 @@ public class HadoopSetupStrategy implements ClusterSetupStrategy {
     private void setMasterNodes() throws ClusterSetupException {
         Set<Agent> masterNodes = new HashSet<>();
 
-        for ( Node node : environment.getNodes() ) {
+        for ( Node node : this.environment.getNodes() ) {
             if ( NodeType.MASTER_NODE.name().equalsIgnoreCase( node.getNodeGroupName() ) ) {
                 if ( node.getTemplate().getProducts()
                          .contains( Common.PACKAGE_PREFIX + hadoopClusterConfig.getTemplateName() ) ) {
