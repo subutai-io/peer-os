@@ -27,26 +27,24 @@ import com.vaadin.ui.Component;
  */
 public class HBaseUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "hbase.png";
+    public static final String MODULE_IMAGE = "hbase.png";
 
-	private static HBase hbaseManager;
-	private static AgentManager agentManager;
+    private static HBase hbaseManager;
+    private static AgentManager agentManager;
     private static Hadoop hadoopManager;
-	private static Tracker tracker;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
+    private static Tracker tracker;
+    private static CommandRunner commandRunner;
+    private static ExecutorService executor;
 
-	public HBaseUI(
-			AgentManager agentManager,
-			Tracker tracker,
-			HBase hbaseManager,
-			CommandRunner commandRunner, Hadoop hadoopManager) {
-		HBaseUI.agentManager = agentManager;
-		HBaseUI.tracker = tracker;
-		HBaseUI.hbaseManager = hbaseManager;
-		HBaseUI.commandRunner = commandRunner;
+
+    public HBaseUI( AgentManager agentManager, Tracker tracker, HBase hbaseManager, CommandRunner commandRunner,
+                    Hadoop hadoopManager ) {
+        HBaseUI.agentManager = agentManager;
+        HBaseUI.tracker = tracker;
+        HBaseUI.hbaseManager = hbaseManager;
+        HBaseUI.commandRunner = commandRunner;
         HBaseUI.hadoopManager = hadoopManager;
-	}
+    }
 
 
     public static Hadoop getHadoopManager() {
@@ -60,58 +58,63 @@ public class HBaseUI implements PortalModule {
 
 
     public static Tracker getTracker() {
-		return tracker;
-	}
+        return tracker;
+    }
 
 
-	public static HBase getHbaseManager() {
-		return hbaseManager;
-	}
+    public static HBase getHbaseManager() {
+        return hbaseManager;
+    }
 
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    public static ExecutorService getExecutor() {
+        return executor;
+    }
 
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
-
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
-
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    public static AgentManager getAgentManager() {
+        return agentManager;
+    }
 
 
-	public void destroy() {
-		hbaseManager = null;
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+
+    public void destroy() {
+        hbaseManager = null;
         hadoopManager = null;
-		agentManager = null;
-		tracker = null;
-		commandRunner = null;
-		executor.shutdown();
-	}
-
-	@Override
-	public String getId() {
-		return HBaseClusterConfig.PRODUCT_KEY;
-	}
-
-	public String getName() {
-		return HBaseClusterConfig.PRODUCT_KEY;
-	}
+        agentManager = null;
+        tracker = null;
+        commandRunner = null;
+        executor.shutdown();
+    }
 
 
-	public Component createComponent() {
-		return new HBaseForm();
-	}
+    @Override
+    public String getId() {
+        return HBaseClusterConfig.PRODUCT_KEY;
+    }
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(HBaseUI.MODULE_IMAGE, this);
-	}
+
+    public String getName() {
+        return HBaseClusterConfig.PRODUCT_KEY;
+    }
+
+
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( HBaseUI.MODULE_IMAGE, this );
+    }
+
+
+    public Component createComponent() {
+        return new HBaseForm();
+    }
 }

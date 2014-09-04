@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.mahout.api;
 
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,33 +10,39 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 
 public class MahoutClusterConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Mahout";
-	public static final String PRODUCT_NAME = "Mahout";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Mahout";
+    public static final String PRODUCT_NAME = "Mahout";
     private String templateName = PRODUCT_NAME;
+    private String clusterName = "";
+    private SetupType setupType;
 
-	private Set<Agent> nodes = new HashSet();
+    private Set<Agent> nodes = new HashSet();
 
-	public String getClusterName() {
-		return clusterName;
-	}
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public void setClusterName( String clusterName ) {
+        this.clusterName = clusterName;
+    }
 
-	public void setNodes(Set<Agent> nodes) {
-		this.nodes = nodes;
-	}
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
+
+
+    public Set<Agent> getNodes() {
+        return nodes;
+    }
+
+
+    public void setNodes( Set<Agent> nodes ) {
+        this.nodes = nodes;
+    }
 
 
     public String getTemplateName() {
@@ -49,8 +56,17 @@ public class MahoutClusterConfig implements ConfigBase {
 
 
     @Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
-	}
+    public String toString() {
+        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
+    }
 
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+
+    public void setSetupType( final SetupType setupType ) {
+        this.setupType = setupType;
+    }
 }

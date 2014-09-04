@@ -33,15 +33,17 @@ public class ClusterConfiguration {
 
         po.addLog( "Configuring root hosts..." );
         Agent server = manager.getAgentManager().getAgentByHostname( config.getServer() );
-        HadoopClusterConfig hadoopClusterConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
-//        Set<Agent> hadoopNodes = new HashSet<Agent>();
-//        for ( String hadoopNode : config.ge) {
-//            Agent hadoopNodeAgent = manager.getAgentManager().getAgentByHostname( hadoopNode );
-//            hadoopNodes.add( hadoopNodeAgent );
-//        }
+        HadoopClusterConfig hadoopClusterConfig =
+                manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+        //        Set<Agent> hadoopNodes = new HashSet<Agent>();
+        //        for ( String hadoopNode : config.ge) {
+        //            Agent hadoopNodeAgent = manager.getAgentManager().getAgentByHostname( hadoopNode );
+        //            hadoopNodes.add( hadoopNodeAgent );
+        //        }
 
-        Command configureRootHostsCommand = Commands.getConfigureRootHostsCommand( Sets.newHashSet(hadoopClusterConfig.getAllNodes()),
-                AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
+        Command configureRootHostsCommand =
+                Commands.getConfigureRootHostsCommand( Sets.newHashSet( hadoopClusterConfig.getAllNodes() ),
+                        AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
         manager.getCommandRunner().runCommand( configureRootHostsCommand );
 
         if ( configureRootHostsCommand.hasSucceeded() ) {
@@ -53,7 +55,8 @@ public class ClusterConfiguration {
         }
 
         po.addLog( "Configuring root groups..." );
-        Command configureRootGroupsCommand = Commands.getConfigureRootGroupsCommand( Sets.newHashSet(hadoopClusterConfig.getAllNodes()) );
+        Command configureRootGroupsCommand =
+                Commands.getConfigureRootGroupsCommand( Sets.newHashSet( hadoopClusterConfig.getAllNodes() ) );
         manager.getCommandRunner().runCommand( configureRootGroupsCommand );
 
         if ( configureRootGroupsCommand.hasSucceeded() ) {

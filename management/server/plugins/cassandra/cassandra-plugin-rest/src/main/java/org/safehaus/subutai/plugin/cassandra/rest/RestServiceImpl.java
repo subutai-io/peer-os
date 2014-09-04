@@ -48,7 +48,8 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String createCluster( final String config ) {
-        TrimmedCassandraClusterConfig trimmedCassandraConfig = JsonUtil.fromJson( config, TrimmedCassandraClusterConfig.class );
+        TrimmedCassandraClusterConfig trimmedCassandraConfig =
+                JsonUtil.fromJson( config, TrimmedCassandraClusterConfig.class );
 
         CassandraClusterConfig cassandraConfig = new CassandraClusterConfig();
         cassandraConfig.setClusterName( trimmedCassandraConfig.getClusterName() );

@@ -23,9 +23,9 @@ public interface HBase extends ApiBase<HBaseClusterConfig> {
 
     public UUID installCluster( HBaseClusterConfig config );
 
-    UUID startCluster( String clusterName );
+    public List<HBaseClusterConfig> getClusters();
 
-    UUID stopCluster( String clusterName );
+    UUID startCluster( String clusterName );
 
     //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 
@@ -33,13 +33,13 @@ public interface HBase extends ApiBase<HBaseClusterConfig> {
 
     //    UUID stopNodes(String clusterName);
 
+    UUID stopCluster( String clusterName );
+
     UUID checkCluster( String clusterName );
 
-    public List<HBaseClusterConfig> getClusters();
+    //    List<HadoopClusterConfig> getHadoopClusters();
 
-//    List<HadoopClusterConfig> getHadoopClusters();
-
-//    HadoopClusterConfig getHadoopCluster( String clusterName );
+    //    HadoopClusterConfig getHadoopCluster( String clusterName );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
                                                          ProductOperation po );

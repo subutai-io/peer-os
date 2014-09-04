@@ -55,6 +55,11 @@ public class CassandraImpl extends CassandraBase {
     PluginDAO pluginDAO;
 
 
+    public CassandraImpl() {
+
+    }
+
+
     public DbManager getDbManager() {
         return dbManager;
     }
@@ -145,11 +150,6 @@ public class CassandraImpl extends CassandraBase {
     }
 
 
-    public CassandraImpl() {
-
-    }
-
-
     public PluginDAO getPluginDAO() {
         return pluginDAO;
     }
@@ -189,9 +189,34 @@ public class CassandraImpl extends CassandraBase {
     }
 
 
+    public List<CassandraClusterConfig> getClusters() {
+        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+    }
+
+
+    @Override
+    public CassandraClusterConfig getCluster( String clusterName ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+        try {
+            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return null;
+        }
+    }
+
+
     @Override
     public UUID startCluster( final String clusterName ) {
         AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkCluster( final String clusterName ) {
+        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
@@ -230,7 +255,30 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final CassandraClusterConfig config,
+    public UUID addNode( final String clusterName, final String lxchostname, final String nodetype ) {
+        // TODO
+        return null;
+    }
+
+
+    @Override
+    public UUID destroyNode( final String clusterName, final String lxchostname, final String nodetype ) {
+        // TODO
+        return null;
+    }
+
+
+    @Override
+    public UUID checkNode( final String clustername, final String lxchostname ) {
+        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final CassandraClusterConfig config,
                                                          final ProductOperation po ) {
         return new CassandraSetupStrategy( environment, config, po, this );
     }
@@ -251,52 +299,5 @@ public class CassandraImpl extends CassandraBase {
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
         return environmentBlueprint;
-    }
-
-
-    @Override
-    public UUID checkCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    public List<CassandraClusterConfig> getClusters() {
-        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-    }
-
-
-    @Override
-    public CassandraClusterConfig getCluster( String clusterName ) {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-        try {
-            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
-        }
-        catch ( DBException e ) {
-            return null;
-        }
-    }
-
-
-    @Override
-    public UUID addNode( final String clusterName, final String lxchostname, final String nodetype ) {
-        // TODO
-        return null;
-    }
-
-
-    @Override
-    public UUID destroyNode( final String clusterName, final String lxchostname, final String nodetype ) {
-        // TODO
-        return null;
-    }
-
-
-    @Override
-    public UUID checkNode( final String clustername, final String lxchostname ) {
-        AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
     }
 }

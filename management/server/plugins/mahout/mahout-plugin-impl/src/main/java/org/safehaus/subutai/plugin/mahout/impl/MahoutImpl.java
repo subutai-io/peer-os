@@ -145,8 +145,8 @@ public class MahoutImpl implements Mahout {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MahoutClusterConfig config,
-                                                         final ProductOperation po ) {
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final MahoutClusterConfig config, final ProductOperation po ) {
         return new MahoutSetupStrategy( this, po, config );
     }
 

@@ -1,12 +1,12 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
-import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
+import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
 /**
@@ -15,9 +15,10 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
-//    private CassandraConfig config;
+    //    private CassandraConfig config;
 
     private String clusterName;
+
 
     public StartClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
@@ -35,9 +36,9 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                CassandraClusterConfig
-                        config = manager.getDbManager().getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
-                        CassandraClusterConfig.class );
+                CassandraClusterConfig config = manager.getDbManager()
+                                                       .getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
+                                                               CassandraClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

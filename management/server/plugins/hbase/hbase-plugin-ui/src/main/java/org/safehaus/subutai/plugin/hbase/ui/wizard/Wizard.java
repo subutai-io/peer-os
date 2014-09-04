@@ -5,10 +5,11 @@
  */
 package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
-import com.vaadin.ui.Component;
-import com.vaadin.ui.VerticalLayout;
 
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+
+import com.vaadin.ui.Component;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
@@ -16,83 +17,90 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
  */
 public class Wizard {
 
-	private final VerticalLayout vlayout;
-	private int step = 1;
-	private HBaseClusterConfig config = new HBaseClusterConfig();
+    private final VerticalLayout vlayout;
+    private int step = 1;
+    private HBaseClusterConfig config = new HBaseClusterConfig();
 
-	public Wizard() {
-		vlayout = new VerticalLayout();
-		vlayout.setSizeFull();
-		vlayout.setMargin(true);
-		putForm();
-	}
 
-	public Component getContent() {
-		return vlayout;
-	}
+    public Wizard() {
+        vlayout = new VerticalLayout();
+        vlayout.setSizeFull();
+        vlayout.setMargin( true );
+        putForm();
+    }
 
-	public void next() {
-		step++;
-		putForm();
-	}
 
-	public void back() {
-		step--;
-		putForm();
-	}
+    private void putForm() {
+        vlayout.removeAllComponents();
+        switch ( step ) {
+            case 1: {
+                vlayout.addComponent( new StepStart( this ) );
+                break;
+            }
+            case 2: {
+                vlayout.addComponent( new ConfigurationStep( this ) );
+                break;
+            }
+            case 3: {
+                vlayout.addComponent( new StepSetMaster( this ) );
+                break;
+            }
+            case 4: {
+                vlayout.addComponent( new StepSetRegion( this ) );
+                break;
+            }
+            case 5: {
+                vlayout.addComponent( new StepSetQuorum( this ) );
+                break;
+            }
+            case 6: {
+                vlayout.addComponent( new StepSetBackupMasters( this ) );
+                break;
+            }
+            case 7: {
+                vlayout.addComponent( new VerificationStep( this ) );
+                break;
+            }
+            default: {
+                step = 1;
+                vlayout.addComponent( new StepStart( this ) );
+                break;
+            }
+        }
+    }
 
-	public void cancel() {
-		step = 1;
-		putForm();
-	}
 
-	public void init() {
-		step = 1;
-		config = new HBaseClusterConfig();
-		putForm();
-	}
+    public Component getContent() {
+        return vlayout;
+    }
 
-	public HBaseClusterConfig getConfig() {
-		return config;
-	}
 
-	private void putForm() {
-		vlayout.removeAllComponents();
-		switch (step) {
-			case 1: {
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-			case 2: {
-				vlayout.addComponent(new ConfigurationStep(this));
-				break;
-			}
-			case 3: {
-				vlayout.addComponent(new StepSetMaster(this));
-				break;
-			}
-			case 4: {
-				vlayout.addComponent(new StepSetRegion(this));
-				break;
-			}
-			case 5: {
-				vlayout.addComponent(new StepSetQuorum(this));
-				break;
-			}
-			case 6: {
-				vlayout.addComponent(new StepSetBackupMasters(this));
-				break;
-			}
-			case 7: {
-				vlayout.addComponent(new VerificationStep(this));
-				break;
-			}
-			default: {
-				step = 1;
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-		}
-	}
+    public void next() {
+        step++;
+        putForm();
+    }
 
+
+    public void back() {
+        step--;
+        putForm();
+    }
+
+
+    public void cancel() {
+        step = 1;
+        putForm();
+    }
+
+
+    public void init() {
+        step = 1;
+        config = new HBaseClusterConfig();
+        putForm();
+    }
+
+
+    public HBaseClusterConfig getConfig() {
+        return config;
+    }
 }

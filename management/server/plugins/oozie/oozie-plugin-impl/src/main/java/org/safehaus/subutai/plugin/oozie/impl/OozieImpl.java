@@ -46,6 +46,12 @@ public class OozieImpl extends OozieBase {
     EnvironmentManager environmentManager;
     ContainerManager containerManager;
     Hadoop hadoopManager;
+    ExecutorService executor;
+
+
+    public OozieImpl() {
+
+    }
 
 
     public void init() {
@@ -65,9 +71,6 @@ public class OozieImpl extends OozieBase {
     public void setPluginDAO( final PluginDAO pluginDAO ) {
         this.pluginDAO = pluginDAO;
     }
-
-
-    ExecutorService executor;
 
 
     public AgentManager getAgentManager() {
@@ -157,11 +160,6 @@ public class OozieImpl extends OozieBase {
 
     public void setExecutor( final ExecutorService executor ) {
         this.executor = executor;
-    }
-
-
-    public OozieImpl() {
-
     }
 
 

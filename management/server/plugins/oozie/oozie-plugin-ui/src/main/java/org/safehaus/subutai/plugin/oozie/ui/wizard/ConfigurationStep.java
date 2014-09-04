@@ -8,7 +8,6 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 import java.util.List;
 
-
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import com.google.common.base.Strings;
@@ -29,8 +28,8 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class ConfigurationStep extends Panel {
 
-    private TextField oozieClusterName;
     private final ComboBox hadoopClusters;
+    private TextField oozieClusterName;
     //    private final TwinColSelect select;
 
 
@@ -61,7 +60,8 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        HadoopClusterConfig info = wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info =
+                wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null ) {
             hadoopClusters.setValue( info );

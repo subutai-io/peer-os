@@ -4,20 +4,19 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
-{
+public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl> {
 
     private ProductOperation po;
     private String clusterName;
@@ -38,8 +37,8 @@ public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                HBaseClusterConfig config =
-                        manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
+                HBaseClusterConfig config = manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName,
+                        HBaseClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

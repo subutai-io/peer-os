@@ -13,14 +13,12 @@ import org.safehaus.subutai.core.command.api.RequestBuilder;
 
 public class Commands extends CommandsSingleton {
 
-    public Commands( CommandRunner commandRunner ) {
-        init( commandRunner );
-    }
-
-
     public static final String PACKAGE_NAME = "ksks-oozie-*";
     public static final String SERVER_PACKAGE_NAME = "ksks-oozie-server";
     public static final String CLIENT_PACKAGE_NAME = "ksks-oozie-client";
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
 
 
     public static String make( CommandType type ) {
@@ -92,8 +90,8 @@ public class Commands extends CommandsSingleton {
     public static Command getConfigureRootGroupsCommand( Set<Agent> agents ) {
 
         return createCommand( new RequestBuilder( String.format(
-                        ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
-                                + ".root.groups '\\*' " ) ), agents );
+                ". /etc/profile && $HADOOP_HOME/bin/hadoop-property.sh add core-site.xml hadoop.proxyuser"
+                        + ".root.groups '\\*' " ) ), agents );
     }
 
 

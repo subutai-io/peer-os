@@ -4,13 +4,13 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -38,8 +38,8 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl> {
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                OozieClusterConfig config =
-                        manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
+                OozieClusterConfig config = manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName,
+                        OozieClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

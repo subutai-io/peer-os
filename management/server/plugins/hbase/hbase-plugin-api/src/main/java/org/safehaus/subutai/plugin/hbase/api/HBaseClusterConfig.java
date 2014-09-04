@@ -14,12 +14,12 @@ public class HBaseClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "HBase";
     public static final String PRODUCT_NAME = "HBase";
+    private String templateName = PRODUCT_NAME;
     private int numberOfNodes = 4;
     private UUID uuid;
     private String master;
     private String backupMasters;
     private String clusterName = "";
-    private String templateName = PRODUCT_NAME;
     private String hadoopNameNode;
 
     private Set<String> nodes = new HashSet();
@@ -27,6 +27,16 @@ public class HBaseClusterConfig implements ConfigBase {
     private Set<String> quorum = new HashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
+
+
+    public HBaseClusterConfig() {
+        this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
+    }
+
+
+    public static String getProductKey() {
+        return PRODUCT_KEY;
+    }
 
 
     public SetupType getSetupType() {
@@ -56,16 +66,6 @@ public class HBaseClusterConfig implements ConfigBase {
 
     public void setDomainName( final String domainName ) {
         this.domainName = domainName;
-    }
-
-
-    public HBaseClusterConfig() {
-        this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
-    }
-
-
-    public static String getProductKey() {
-        return PRODUCT_KEY;
     }
 
 

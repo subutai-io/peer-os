@@ -16,8 +16,8 @@ public class OozieClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Oozie";
     public static final String PRODUCT_NAME_CLIENT = "hadoopOozieClient";
-    public static final String PRODUCT_NAME_SERVER = "hadoopOozieServer";
     private String templateNameClient = PRODUCT_NAME_CLIENT;
+    public static final String PRODUCT_NAME_SERVER = "hadoopOozieServer";
     private String templateNameServer = PRODUCT_NAME_SERVER;
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private String hadoopClusterName;

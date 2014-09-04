@@ -34,14 +34,12 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel
-{
+public class ConfigurationStep extends Panel {
 
     private final TwinColSelect select;
 
 
-    public ConfigurationStep( final Wizard wizard )
-    {
+    public ConfigurationStep( final Wizard wizard ) {
 
         setSizeFull();
 
@@ -60,50 +58,35 @@ public class ConfigurationStep extends Panel
 
         List<HadoopClusterConfig> clusters = MahoutUI.getHadoopManager().getClusters();
 
-        if ( clusters.size() > 0 )
-        {
-            for ( HadoopClusterConfig hadoopClusterInfo : clusters )
-            {
+        if ( clusters.size() > 0 ) {
+            for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
                 hadoopClusters.addItem( hadoopClusterInfo );
-                hadoopClusters.setItemCaption( hadoopClusterInfo,
-                    hadoopClusterInfo.getClusterName() );
+                hadoopClusters.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
         HadoopClusterConfig info = MahoutUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
-        if ( info != null )
-        {
+        if ( info != null ) {
             hadoopClusters.setValue( info );
         }
-        else if ( clusters.size() > 0 )
-        {
+        else if ( clusters.size() > 0 ) {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
 
-        if ( hadoopClusters.getValue() != null )
-        {
+        if ( hadoopClusters.getValue() != null ) {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
-            select.setContainerDataSource(
-                new BeanItemContainer<>(
-                    Agent.class, hadoopInfo.getAllNodes() )
-            );
+            select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
         }
 
-        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
-                    select.setContainerDataSource(
-                        new BeanItemContainer<>(
-                            Agent.class, hadoopInfo.getAllNodes() )
-                    );
+                    select.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
                     wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
                     wizard.getConfig().setNodes( new HashSet<Agent>() );
                 }
@@ -118,17 +101,13 @@ public class ConfigurationStep extends Panel
         select.setRightColumnCaption( "Selected Nodes" );
         select.setWidth( 100, Unit.PERCENTAGE );
         select.setRequired( true );
-        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
-        {
+        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
             select.setValue( wizard.getConfig().getNodes() );
         }
-        select.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        select.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     Set<Agent> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
                     wizard.getConfig().setNodes( agentList );
                 }
@@ -137,21 +116,16 @@ public class ConfigurationStep extends Panel
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
+        next.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
-                {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );
                 }
-                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
-                {
+                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
                     show( "Please, select target nodes" );
                 }
-                else
-                {
+                else {
                     wizard.next();
                 }
             }
@@ -159,11 +133,9 @@ public class ConfigurationStep extends Panel
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener()
-        {
+        back.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.back();
             }
         } );
@@ -182,13 +154,10 @@ public class ConfigurationStep extends Panel
         content.addComponent( buttons );
 
         setContent( layout );
-
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
-
 }

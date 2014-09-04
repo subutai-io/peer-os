@@ -48,7 +48,7 @@ public class Manager {
     private OozieUI oozieUI;
 
 
-    public Manager( final OozieUI oozieUI) {
+    public Manager( final OozieUI oozieUI ) {
         this.oozieUI = oozieUI;
 
         contentRoot = new GridLayout();
@@ -157,13 +157,15 @@ public class Manager {
     }
 
 
-    public Component getContent() {
-        return contentRoot;
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
+    private void refreshUI() {
+        if ( config != null ) {
+            populateServerTable( serverTable, config.getServer() );
+            populateClientsTable( clientsTable, config.getClients() );
+        }
+        else {
+            serverTable.removeAllItems();
+            clientsTable.removeAllItems();
+        }
     }
 
 
@@ -180,8 +182,8 @@ public class Manager {
         progressIcon.setVisible( false );
 
         final Object rowId = table.addItem( new Object[] {
-                        agentHostname, checkBtn, startBtn, stopBtn, progressIcon
-                }, null );
+                agentHostname, checkBtn, startBtn, stopBtn, progressIcon
+        }, null );
 
         checkBtn.addClickListener( new Button.ClickListener() {
             @Override
@@ -241,33 +243,6 @@ public class Manager {
     }
 
 
-    private void populateClientsTable( final Table table, Set<String> clientHostnames ) {
-
-        table.removeAllItems();
-
-        for ( final String agent : clientHostnames ) {
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setVisible( false );
-
-            final Object rowId = table.addItem( new Object[] {
-                            agent,
-                    }, null );
-        }
-    }
-
-
-    private void refreshUI() {
-        if ( config != null ) {
-            populateServerTable( serverTable, config.getServer() );
-            populateClientsTable( clientsTable, config.getClients() );
-        }
-        else {
-            serverTable.removeAllItems();
-            clientsTable.removeAllItems();
-        }
-    }
-
-
     public void refreshClustersInfo() {
         List<OozieClusterConfig> info = oozieUI.getOozieManager().getClusters();
         OozieClusterConfig clusterInfo = ( OozieClusterConfig ) clusterCombo.getValue();
@@ -288,6 +263,21 @@ public class Manager {
             else {
                 clusterCombo.setValue( info.iterator().next() );
             }
+        }
+    }
+
+
+    private void populateClientsTable( final Table table, Set<String> clientHostnames ) {
+
+        table.removeAllItems();
+
+        for ( final String agent : clientHostnames ) {
+            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            progressIcon.setVisible( false );
+
+            final Object rowId = table.addItem( new Object[] {
+                    agent,
+            }, null );
         }
     }
 
@@ -327,6 +317,11 @@ public class Manager {
     }
 
 
+    private void show( String notification ) {
+        Notification.show( notification );
+    }
+
+
     private Table createClientsTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
@@ -355,5 +350,10 @@ public class Manager {
             }
         } );
         return table;
+    }
+
+
+    public Component getContent() {
+        return contentRoot;
     }
 }

@@ -33,15 +33,13 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends VerticalLayout
-{
+public class ConfigurationStep extends VerticalLayout {
 
     private final ComboBox hadoopClusters;
     private final TwinColSelect select;
 
 
-    public ConfigurationStep( final Wizard wizard )
-    {
+    public ConfigurationStep( final Wizard wizard ) {
 
         setSizeFull();
 
@@ -58,10 +56,8 @@ public class ConfigurationStep extends VerticalLayout
         hadoopClusters.setNullSelectionAllowed( false );
 
         List<HadoopClusterConfig> clusters = HBaseUI.getHadoopManager().getClusters();
-        if ( clusters.size() > 0 )
-        {
-            for ( HadoopClusterConfig config : clusters )
-            {
+        if ( clusters.size() > 0 ) {
+            for ( HadoopClusterConfig config : clusters ) {
                 hadoopClusters.addItem( config );
                 hadoopClusters.setItemCaption( config, config.getClusterName() );
             }
@@ -69,40 +65,32 @@ public class ConfigurationStep extends VerticalLayout
 
         HadoopClusterConfig info = HBaseUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
-        if ( info != null )
-        {
+        if ( info != null ) {
             hadoopClusters.setValue( info );
         }
-        else if ( clusters.size() > 0 )
-        {
+        else if ( clusters.size() > 0 ) {
             hadoopClusters.setValue( clusters.iterator().next() );
         }
 
-        if ( hadoopClusters.getValue() != null )
-        {
+        if ( hadoopClusters.getValue() != null ) {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
             wizard.getConfig().setHadoopNameNode( hadoopInfo.getNameNode().getHostname() );
             Set<String> agentList = new HashSet<>();
-            for ( Agent agent : hadoopInfo.getAllNodes() )
-            {
+            for ( Agent agent : hadoopInfo.getAllNodes() ) {
                 agentList.add( agent.getHostname() );
             }
             select.setContainerDataSource( new BeanItemContainer<>( String.class, agentList ) );
         }
 
-        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        hadoopClusters.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
                     Set<String> agentList = new HashSet<>();
-                    for ( Agent agent : hadoopInfo.getAllNodes() )
-                    {
+                    for ( Agent agent : hadoopInfo.getAllNodes() ) {
                         agentList.add( agent.getHostname() );
                     }
                     select.setContainerDataSource( new BeanItemContainer<>( String.class, agentList ) );
@@ -122,21 +110,16 @@ public class ConfigurationStep extends VerticalLayout
         select.setRightColumnCaption( "Selected Nodes" );
         select.setWidth( 100, Unit.PERCENTAGE );
         select.setRequired( true );
-        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
-        {
+        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
             select.setValue( wizard.getConfig().getNodes() );
         }
-        select.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        select.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     Set<String> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
                     Set<String> hostnames = new HashSet<>();
-                    for ( String agent : agentList )
-                    {
+                    for ( String agent : agentList ) {
                         hostnames.add( agent );
                     }
 
@@ -147,29 +130,23 @@ public class ConfigurationStep extends VerticalLayout
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
+        next.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 Set<String> hostnames = new HashSet<>();
-                for ( String agent : ( Set<String> ) select.getValue() )
-                {
+                for ( String agent : ( Set<String> ) select.getValue() ) {
                     hostnames.add( agent );
                 }
 
                 wizard.getConfig().setNodes( hostnames );
 
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
-                {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );
                 }
-                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) )
-                {
+                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getNodes() ) ) {
                     show( "Please, select target nodes" );
                 }
-                else
-                {
+                else {
                     wizard.next();
                 }
             }
@@ -177,11 +154,9 @@ public class ConfigurationStep extends VerticalLayout
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener()
-        {
+        back.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.back();
             }
         } );
@@ -203,8 +178,7 @@ public class ConfigurationStep extends VerticalLayout
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
 }

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.oozie.api;
+package org.safehaus.subutai.plugin.mahout.api;
 
 
 public enum SetupType {

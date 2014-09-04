@@ -1,66 +1,60 @@
 package org.safehaus.subutai.plugin.mahout.impl.handler;
 
 
-import com.google.common.collect.Sets;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
 
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
 
 /**
  * Created by dilshat on 5/6/14.
  */
-public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
-{
+public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl> {
     private final ProductOperation po;
     private final String lxcHostname;
 
 
-    public AddNodeHandler( MahoutImpl manager, String clusterName, String lxcHostname )
-    {
+    public AddNodeHandler( MahoutImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
         po = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
-            String.format( "Adding node to %s", clusterName ) );
+                String.format( "Adding node to %s", clusterName ) );
     }
 
 
     @Override
-    public UUID getTrackerId()
-    {
+    public UUID getTrackerId() {
         return po.getId();
     }
 
 
     @Override
-    public void run()
-    {
+    public void run() {
         MahoutClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
-        {
+        if ( config == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
             return;
         }
 
         //check if node agent is connected
         Agent agent = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null )
-        {
+        if ( agent == null ) {
             po.addLogFailed( String.format( "Node %s is not connected\nOperation aborted", lxcHostname ) );
             return;
         }
 
-        if ( config.getNodes().contains( agent ) )
-        {
+        if ( config.getNodes().contains( agent ) ) {
             po.addLogFailed(
-                String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
+                    String.format( "Agent with hostname %s already belongs to cluster %s", lxcHostname, clusterName ) );
             return;
         }
 
@@ -70,22 +64,19 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
         manager.getCommandRunner().runCommand( checkInstalledCommand );
 
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
+        if ( !checkInstalledCommand.hasCompleted() ) {
             po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
             return;
         }
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-mahout" ) )
-        {
+        if ( result.getStdOut().contains( "ksks-mahout" ) ) {
             po.addLogFailed(
-                String.format( "Node %s already has Mahout installed\nInstallation aborted", lxcHostname ) );
+                    String.format( "Node %s already has Mahout installed\nInstallation aborted", lxcHostname ) );
             return;
         }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
-        {
+        else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
             po.addLogFailed( String.format( "Node %s has no Hadoop installation\nInstallation aborted", lxcHostname ) );
             return;
         }
@@ -93,26 +84,22 @@ public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
         config.getNodes().add( agent );
         po.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
-        {
+        if ( manager.getDbManager().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
             po.addLog( "Cluster info updated in DB\nInstalling Mahout..." );
             //install mahout
 
             Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
             manager.getCommandRunner().runCommand( installCommand );
 
-            if ( installCommand.hasSucceeded() )
-            {
+            if ( installCommand.hasSucceeded() ) {
                 po.addLogDone( "Installation succeeded\nDone" );
             }
-            else
-            {
+            else {
 
                 po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
             }
         }
-        else
-        {
+        else {
             po.addLogFailed( "Could not update cluster info in DB! Please see logs\nInstallation aborted" );
         }
     }

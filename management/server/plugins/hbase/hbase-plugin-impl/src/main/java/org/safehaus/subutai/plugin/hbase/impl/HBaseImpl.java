@@ -22,7 +22,6 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
@@ -68,13 +67,28 @@ public class HBaseImpl implements HBase {
     }
 
 
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
     public DbManager getDbManager() {
         return dbManager;
     }
 
 
+    public void setDbManager( DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
+
+
     public Tracker getTracker() {
         return tracker;
+    }
+
+
+    public void setTracker( Tracker tracker ) {
+        this.tracker = tracker;
     }
 
 
@@ -90,6 +104,11 @@ public class HBaseImpl implements HBase {
 
     public CommandRunner getCommandRunner() {
         return commandRunner;
+    }
+
+
+    public void setCommandRunner( CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
     }
 
 
@@ -137,26 +156,6 @@ public class HBaseImpl implements HBase {
     }
 
 
-    public void setDbManager( DbManager dbManager ) {
-        this.dbManager = dbManager;
-    }
-
-
-    public void setTracker( Tracker tracker ) {
-        this.tracker = tracker;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner ) {
-        this.commandRunner = commandRunner;
-    }
-
-
     public UUID installCluster( final HBaseClusterConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
@@ -165,16 +164,16 @@ public class HBaseImpl implements HBase {
     }
 
 
-    public UUID uninstallCluster( final String clusterName ) {
-        //        Preconditions.checkNotNull( config, "Configuration is null" );
-        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+    public List<HBaseClusterConfig> getClusters() {
+        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
     }
 
 
-    public List<HBaseClusterConfig> getClusters() {
-        return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, HBaseClusterConfig.class );
+    @Override
+    public UUID startCluster( final String clusterName ) {
+        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
     }
 
 
@@ -188,6 +187,22 @@ public class HBaseImpl implements HBase {
     public HadoopClusterConfig getHadoopCluster( String clusterName ) {
         return hadoopManager.getCluster( clusterName );
     }*/
+
+
+    @Override
+    public UUID stopCluster( final String clusterName ) {
+        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
+    @Override
+    public UUID checkCluster( final String clusterName ) {
+        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
 
 
     @Override
@@ -227,33 +242,17 @@ public class HBaseImpl implements HBase {
     }
 
 
+    public UUID uninstallCluster( final String clusterName ) {
+        //        Preconditions.checkNotNull( config, "Configuration is null" );
+        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
+        executor.execute( operationHandler );
+        return operationHandler.getTrackerId();
+    }
+
+
     @Override
     public HBaseClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
-    }
-
-
-    @Override
-    public UUID startCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID stopCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
-    }
-
-
-    @Override
-    public UUID checkCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
-        executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
     }
 
 

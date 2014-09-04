@@ -1,12 +1,12 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
-import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
 
 /**
@@ -24,9 +24,6 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
     }
-
-
-
 
 
     @Override

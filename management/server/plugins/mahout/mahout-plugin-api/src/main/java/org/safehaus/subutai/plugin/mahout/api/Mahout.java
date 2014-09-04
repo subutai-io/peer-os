@@ -30,7 +30,8 @@ public interface Mahout extends ApiBase<MahoutClusterConfig> {
 
     UUID startCluster( String clusterName );
 
-    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutClusterConfig config, ProductOperation po );
+    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutClusterConfig config,
+                                                  ProductOperation po );
 
     EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutClusterConfig config );
 }

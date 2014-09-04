@@ -3,16 +3,16 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 import java.util.UUID;
 
-import com.google.common.collect.Sets;
-
-import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -45,7 +45,7 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
 
             public void run() {
-                Command startServiceCommand = Commands.getStartCommand(Sets.newHashSet(agent) );
+                Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( agent ) );
                 manager.getCommandRunner().runCommand( startServiceCommand );
                 if ( startServiceCommand.hasSucceeded() ) {
                     AgentResult ar = startServiceCommand.getResults().get( agent.getUuid() );

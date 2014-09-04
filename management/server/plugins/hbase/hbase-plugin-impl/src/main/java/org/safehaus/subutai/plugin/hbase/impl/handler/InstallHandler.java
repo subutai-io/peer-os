@@ -4,20 +4,19 @@ package org.safehaus.subutai.plugin.hbase.impl.handler;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
-{
+public class InstallHandler extends AbstractOperationHandler<HBaseImpl> {
 
     private ProductOperation po;
     private HBaseClusterConfig config;
@@ -39,8 +38,8 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                if ( manager.getDbManager()
-                            .getInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), HBaseClusterConfig.class ) != null ) {
+                if ( manager.getDbManager().getInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(),
+                        HBaseClusterConfig.class ) != null ) {
                     po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
                             config.getClusterName() ) );
                     return;
@@ -60,7 +59,8 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
                     return;
                 }
 
-                if ( manager.getDbManager().saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
+                if ( manager.getDbManager()
+                            .saveInfo( HBaseClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) ) {
 
                     po.addLog( "Cluster info saved to DB\nInstalling HBase..." );
 

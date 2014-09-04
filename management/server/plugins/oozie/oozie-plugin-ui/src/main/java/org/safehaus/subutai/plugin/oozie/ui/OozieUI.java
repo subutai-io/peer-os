@@ -28,12 +28,16 @@ import com.vaadin.ui.Component;
 public class OozieUI implements PortalModule {
 
 
+    public static final String MODULE_IMAGE = "oozie.png";
     Oozie oozieManager;
     AgentManager agentManager;
     Tracker tracker;
     Hadoop hadoopManager;
     CommandRunner commandRunner;
     ExecutorService executor;
+
+
+    public OozieUI() {}
 
 
     public Oozie getOozieManager() {
@@ -84,12 +88,6 @@ public class OozieUI implements PortalModule {
     public void setCommandRunner( final CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
     }
-
-
-    public static final String MODULE_IMAGE = "oozie.png";
-
-
-    public OozieUI() {}
 
 
     public ExecutorService getExecutor() {

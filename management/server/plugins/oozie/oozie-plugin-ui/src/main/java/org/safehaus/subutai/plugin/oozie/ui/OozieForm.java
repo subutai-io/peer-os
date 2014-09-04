@@ -13,35 +13,34 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
+
 /**
  * @author dilshat
  */
 public class OozieForm extends CustomComponent {
 
-	private final Wizard wizard;
-	private final Manager manager;
-
-	public OozieForm(OozieUI oozieUI) {
+    private final Wizard wizard;
+    private final Manager manager;
 
 
-		setSizeFull();
-
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSpacing(true);
-		verticalLayout.setSizeFull();
-
-		TabSheet mongoSheet = new TabSheet();
-		mongoSheet.setSizeFull();
-		manager = new Manager(oozieUI);
-		wizard = new Wizard(oozieUI);
-		mongoSheet.addTab(wizard.getContent(), "Install");
-		mongoSheet.addTab(manager.getContent(), "Manage");
-		verticalLayout.addComponent(mongoSheet);
-
-		setCompositionRoot(verticalLayout);
-		manager.refreshClustersInfo();
-	}
+    public OozieForm( OozieUI oozieUI ) {
 
 
+        setSizeFull();
 
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing( true );
+        verticalLayout.setSizeFull();
+
+        TabSheet mongoSheet = new TabSheet();
+        mongoSheet.setSizeFull();
+        manager = new Manager( oozieUI );
+        wizard = new Wizard( oozieUI );
+        mongoSheet.addTab( wizard.getContent(), "Install" );
+        mongoSheet.addTab( manager.getContent(), "Manage" );
+        verticalLayout.addComponent( mongoSheet );
+
+        setCompositionRoot( verticalLayout );
+        manager.refreshClustersInfo();
+    }
 }
