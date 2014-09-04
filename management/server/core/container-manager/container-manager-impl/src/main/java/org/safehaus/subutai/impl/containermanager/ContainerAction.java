@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.container;
+package org.safehaus.subutai.impl.containermanager;
 
 
 /**

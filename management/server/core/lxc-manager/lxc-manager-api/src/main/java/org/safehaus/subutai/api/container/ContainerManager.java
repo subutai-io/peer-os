@@ -1,14 +1,13 @@
 package org.safehaus.subutai.api.container;
 
 
+import org.safehaus.subutai.api.containermanager.ContainerState;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -43,4 +42,24 @@ public interface ContainerManager {
 
 	public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
 			throws LxcCreateException;
-}
+
+    /**
+     * Returns number of lxc slots that each currently connected physical server can host. This method uses default lxc
+     * placement strategy for calculations
+     *
+     * @return map where key is a physical server and value is the number of lxc slots
+     */
+    public Map<Agent, Integer> getPhysicalServersWithLxcSlots();
+
+    /**
+     * Returns information about what lxc containers each physical servers has at present
+     *
+     * @return map where key is a hostname of physical server and value is a map where key is state of lxc and value is
+     * a list of lxc hostnames
+     */
+    public Map<String, EnumMap<ContainerState, List<String>>> getLxcOnPhysicalServers();
+
+    public boolean cloneLxcOnHost( Agent physicalAgent, String lxcHostname );
+
+
+    }

@@ -1,8 +1,9 @@
-package org.safehaus.subutai.impl.container;
+package org.safehaus.subutai.impl.containermanager;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.api.containermanager.IContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.api.template.manager.TemplateManager;

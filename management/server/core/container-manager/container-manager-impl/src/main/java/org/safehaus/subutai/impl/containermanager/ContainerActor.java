@@ -1,7 +1,8 @@
-package org.safehaus.subutai.impl.container;
+package org.safehaus.subutai.impl.containermanager;
 
 
-import org.safehaus.subutai.api.container.ContainerManager;
+import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.api.containermanager.IContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.Callable;
 
 
 /**
- * Handles parallel container creation/destruction
+ * Handles parallel containermanager creation/destruction
  */
 public class ContainerActor implements Callable<ContainerInfo> {
 	private final ContainerInfo containerInfo;

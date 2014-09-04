@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.api.container;
+package org.safehaus.subutai.api.containermanager;
 
 
 /**
- * Exception which can be thrown while destroying containers
+ * Exception which can be thrown while creating containers
  */
-public class ContainerDestroyException extends Exception {
+public class ContainerCreateException extends Exception {
 
-	public ContainerDestroyException(String message) {
+	public ContainerCreateException(String message) {
 		super(message);
 	}
 }

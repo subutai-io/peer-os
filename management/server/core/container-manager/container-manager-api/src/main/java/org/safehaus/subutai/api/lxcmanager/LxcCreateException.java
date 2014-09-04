@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.api.container;
+package org.safehaus.subutai.api.lxcmanager;
 
 
 /**
- * Exception which can be thrown while creating containers
+ * Exception which can be thrown while creating lxcs
  */
-public class ContainerCreateException extends Exception {
+public class LxcCreateException extends Exception {
 
-	public ContainerCreateException(String message) {
+	public LxcCreateException(String message) {
 		super(message);
 	}
 }

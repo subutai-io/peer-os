@@ -1,27 +1,27 @@
-package org.safehaus.subutai.impl.container;
+package org.safehaus.subutai.impl.containermanager;
 
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.*;
 import org.safehaus.subutai.api.templateregistry.Template;
-import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.impl.strategy.PlacementStrategyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContainerManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(ContainerManagerImpl.class);
 	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	// number sequences for template names used for new clone name generation
 	private ConcurrentMap<String, AtomicInteger> sequences;
@@ -116,7 +116,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 						String.format("Not all lxcs created. Use LXC module to cleanup %s", cloneNames));
 			}
 		} else {
-			throw new LxcCreateException("Empty container infos provided");
+			throw new LxcCreateException("Empty containermanager infos provided");
 		}
 
 
@@ -217,7 +217,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 	public void cloneDestroy(final String hostName, final String cloneName) throws LxcDestroyException {
 		boolean result = templateManager.cloneDestroy(hostName, cloneName);
 		if (!result) {
-			throw new LxcDestroyException(String.format("Error destroying container %s", cloneName));
+			throw new LxcDestroyException(String.format("Error destroying containermanager %s", cloneName));
 		}
 	}
 
