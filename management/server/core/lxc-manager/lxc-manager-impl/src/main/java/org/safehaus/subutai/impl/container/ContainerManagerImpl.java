@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.containermanager;
+package org.safehaus.subutai.impl.container;
 
 
 import com.google.gson.Gson;

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.impl.containermanager;
+package org.safehaus.subutai.impl.container;
 
 import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
