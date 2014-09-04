@@ -1,6 +1,5 @@
 package org.safehaus.subutai.api.containermanager;
 
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Collections;
@@ -26,26 +25,14 @@ public abstract class ContainerPlacementStrategy {
 		return null;
 	}
 
-	/**
-	 * This method calculates placement of lxcs on physical servers. Code should
-	 * check passed server metrics to figure out strategy for lxc placement This
-	 * is done by calling addPlacementInfo method.This method calculates on
-	 * which physical server to places lxc, the number of lxcs to place and
-	 * their type
-	 *
-	 * @param serverMetrics - map where key is a physical agent and value is a
-	 *                      metric
-	 */
-	public abstract void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws LxcCreateException;
-
 	public final void addPlacementInfo(Agent physicalNode, String nodeType, int numberOfLxcsToCreate)
-			throws LxcCreateException {
+			throws ContainerCreateException {
 		if (physicalNode == null)
-			throw new LxcCreateException("Physical node is null");
+			throw new ContainerCreateException("Physical node is null");
 		if (nodeType == null || nodeType.isEmpty())
-			throw new LxcCreateException("Node type is null or empty");
+			throw new ContainerCreateException("Node type is null or empty");
 		if (numberOfLxcsToCreate <= 0)
-			throw new LxcCreateException("Number of lxcs must be greater than 0");
+			throw new ContainerCreateException("Number of lxcs must be greater than 0");
 
 		Map<String, Integer> placementInfo = placementInfoMap.get(physicalNode);
 		if (placementInfo == null) {
@@ -55,6 +42,18 @@ public abstract class ContainerPlacementStrategy {
 
 		placementInfo.put(nodeType, numberOfLxcsToCreate);
 	}
+
+    /**
+     * This method calculates placement of lxcs on physical servers. Code should
+     * check passed server metrics to figure out strategy for lxc placement This
+     * is done by calling addPlacementInfo method.This method calculates on
+     * which physical server to places lxc, the number of lxcs to place and
+     * their type
+     *
+     * @param serverMetrics - map where key is a physical agent and value is a
+     *                      metric
+     */
+    public abstract void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) throws ContainerCreateException;
 
 	/**
 	 * Returns placement map

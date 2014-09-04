@@ -63,5 +63,4 @@ public abstract class ContainerManagerBase implements ContainerManager {
 	public void setDbManager(DbManager dbManager) {
 		this.dbManager = dbManager;
 	}
-
 }

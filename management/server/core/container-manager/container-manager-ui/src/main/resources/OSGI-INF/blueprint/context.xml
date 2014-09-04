@@ -5,13 +5,13 @@
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
-    <reference id="lxcManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.api.containermanager.ContainerManager"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.lxcmanager.LxcUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.ui.containermanager.ContainerUI"
           init-method="init" destroy-method="destroy">
         <property name="agentManager" ref="agentManager"/>
-        <property name="lxcManager" ref="lxcManager"/>
+        <property name="containerManager" ref="containerManager"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>

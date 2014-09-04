@@ -1,10 +1,10 @@
 package org.safehaus.subutai.impl.containermanager;
 
 
+
+import org.safehaus.subutai.api.containermanager.ContainerCreateException;
+import org.safehaus.subutai.api.containermanager.ContainerDestroyException;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
-import org.safehaus.subutai.api.containermanager.IContainerManager;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 
 import java.util.concurrent.Callable;
 
@@ -44,14 +44,14 @@ public class ContainerActor implements Callable<ContainerInfo> {
 				containerManager.clonesCreate(containerInfo.getPhysicalAgent().getHostname(), templateName,
 						containerInfo.getLxcHostnames());
 				containerInfo.setResult(true);
-			} catch (LxcCreateException ignore) {
+			} catch (ContainerCreateException ignore) {
 			}
 		} else {
 			try {
 				containerManager.clonesDestroy(containerInfo.getPhysicalAgent().getHostname(),
 						containerInfo.getLxcHostnames());
 				containerInfo.setResult(true);
-			} catch (LxcDestroyException ignore) {
+			} catch (ContainerDestroyException ignore) {
 
 			}
 		}

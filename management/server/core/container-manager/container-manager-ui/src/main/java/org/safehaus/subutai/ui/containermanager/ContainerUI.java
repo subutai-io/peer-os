@@ -1,10 +1,10 @@
-package org.safehaus.subutai.ui.lxcmanager;
+package org.safehaus.subutai.ui.containermanager;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
+import org.safehaus.subutai.api.containermanager.ContainerManager;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -13,10 +13,10 @@ import java.util.concurrent.Executors;
 public class ContainerUI implements PortalModule {
 
 	public static final String MODULE_IMAGE = "lxc.png";
-	public static final String MODULE_NAME = "LXC";
+	public static final String MODULE_NAME = "Container";
 	private static ExecutorService executor;
 	private AgentManager agentManager;
-	private LxcManager lxcManager;
+	private ContainerManager containerManager;
 
 
 	public static ExecutorService getExecutor() {
@@ -31,8 +31,8 @@ public class ContainerUI implements PortalModule {
 		this.agentManager = agentManager;
 	}
 
-	public void setLxcManager(LxcManager lxcManager) {
-		this.lxcManager = lxcManager;
+	public void setContainerManager(ContainerManager containerManager) {
+		this.containerManager = containerManager;
 	}
 
 
@@ -64,6 +64,6 @@ public class ContainerUI implements PortalModule {
 
 	@Override
 	public Component createComponent() {
-		return new LxcForm(agentManager, lxcManager);
+		return new ContainerForm(agentManager, containerManager);
 	}
 }

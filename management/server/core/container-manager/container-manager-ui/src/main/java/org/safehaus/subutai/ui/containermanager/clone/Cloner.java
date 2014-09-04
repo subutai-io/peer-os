@@ -1,38 +1,24 @@
-package org.safehaus.subutai.ui.lxcmanager.clone;
+package org.safehaus.subutai.ui.containermanager.clone;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.common.util.AgentUtil;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.server.ui.component.AgentTree;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.ui.lxcmanager.LxcUI;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Slider;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TreeTable;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
+import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.AgentUtil;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.safehaus.subutai.ui.containermanager.ContainerUI;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 public class Cloner extends VerticalLayout {
 
     private final AgentTree agentTree;
@@ -41,7 +27,7 @@ public class Cloner extends VerticalLayout {
     private final Slider slider;
     private final Label indicator;
     private final TreeTable lxcTable;
-    private final LxcManager lxcManager;
+    private final ContainerManager containerManager;
     private final String physicalHostLabel = "Physical Host";
     private final String statusLabel = "Status";
     private final String okIconSource = "img/ok.png";
@@ -52,83 +38,83 @@ public class Cloner extends VerticalLayout {
                     + "61}[0-9A-Za-z])?)*\\.?$";
 
 
-    public Cloner( final LxcManager lxcManager, AgentTree agentTree ) {
-        setSpacing( true );
-        setMargin( true );
+    public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
+        setSpacing(true);
+        setMargin(true);
 
         this.agentTree = agentTree;
 
-        this.lxcManager = lxcManager;
+        this.containerManager = containerManager;
 
         textFieldLxcName = new TextField();
         slider = new Slider();
-        slider.setMin( 1 );
-        slider.setMax( 20 );
-        slider.setWidth( 150, Unit.PIXELS );
-        slider.setImmediate( true );
-        cloneBtn = new Button( "Clone" );
-        cloneBtn.addStyleName( "default" );
-        cloneBtn.addClickListener( new Button.ClickListener() {
+        slider.setMin(1);
+        slider.setMax(20);
+        slider.setWidth(150, Unit.PIXELS);
+        slider.setImmediate(true);
+        cloneBtn = new Button("Clone");
+        cloneBtn.addStyleName("default");
+        cloneBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                startCloneTask();
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                //startCloneTask();
             }
-        } );
+        });
 
-        Button clearBtn = new Button( "Clear" );
-        clearBtn.addStyleName( "default" );
-        clearBtn.addClickListener( new Button.ClickListener() {
+        Button clearBtn = new Button("Clear");
+        clearBtn.addStyleName("default");
+        clearBtn.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
                 //clear completed
-                for ( Object rowId : lxcTable.getItemIds() ) {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null ) {
-                        Embedded statusIcon = ( Embedded ) ( row.getItemProperty( statusLabel ).getValue() );
-                        if ( statusIcon != null && (
-                                okIconSource.equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() )
+                for (Object rowId : lxcTable.getItemIds()) {
+                    Item row = lxcTable.getItem(rowId);
+                    if (row != null) {
+                        Embedded statusIcon = (Embedded) (row.getItemProperty(statusLabel).getValue());
+                        if (statusIcon != null && (
+                                okIconSource.equals(((ThemeResource) statusIcon.getSource()).getResourceId())
                                         || errorIconSource
-                                        .equals( ( ( ThemeResource ) statusIcon.getSource() ).getResourceId() ) ) ) {
-                            lxcTable.removeItem( rowId );
+                                        .equals(((ThemeResource) statusIcon.getSource()).getResourceId()))) {
+                            lxcTable.removeItem(rowId);
                         }
                     }
                 }
                 //clear empty parents
-                for ( Object rowId : lxcTable.getItemIds() ) {
-                    Item row = lxcTable.getItem( rowId );
-                    if ( row != null && row.getItemProperty( physicalHostLabel ).getValue() != null && (
-                            lxcTable.getChildren( rowId ) == null || lxcTable.getChildren( rowId ).isEmpty() ) ) {
-                        lxcTable.removeItem( rowId );
+                for (Object rowId : lxcTable.getItemIds()) {
+                    Item row = lxcTable.getItem(rowId);
+                    if (row != null && row.getItemProperty(physicalHostLabel).getValue() != null && (
+                            lxcTable.getChildren(rowId) == null || lxcTable.getChildren(rowId).isEmpty())) {
+                        lxcTable.removeItem(rowId);
                     }
                 }
             }
-        } );
+        });
 
         indicator = new Label();
-        indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
-        indicator.setContentMode( ContentMode.HTML );
-        indicator.setHeight( 11, Unit.PIXELS );
-        indicator.setWidth( 50, Unit.PIXELS );
-        indicator.setVisible( false );
+        indicator.setIcon(new ThemeResource("img/spinner.gif"));
+        indicator.setContentMode(ContentMode.HTML);
+        indicator.setHeight(11, Unit.PIXELS);
+        indicator.setWidth(50, Unit.PIXELS);
+        indicator.setVisible(false);
 
-        GridLayout topContent = new GridLayout( 7, 1 );
-        topContent.setSpacing( true );
+        GridLayout topContent = new GridLayout(7, 1);
+        topContent.setSpacing(true);
 
-        topContent.addComponent( new Label( "Product name" ) );
-        topContent.addComponent( textFieldLxcName );
-        topContent.addComponent( new Label( "Lxc count" ) );
-        topContent.addComponent( slider );
-        topContent.addComponent( cloneBtn );
-        topContent.addComponent( clearBtn );
-        topContent.addComponent( indicator );
-        topContent.setComponentAlignment( indicator, Alignment.MIDDLE_CENTER );
-        addComponent( topContent );
+        topContent.addComponent(new Label("Product name"));
+        topContent.addComponent(textFieldLxcName);
+        topContent.addComponent(new Label("Lxc count"));
+        topContent.addComponent(slider);
+        topContent.addComponent(cloneBtn);
+        topContent.addComponent(clearBtn);
+        topContent.addComponent(indicator);
+        topContent.setComponentAlignment(indicator, Alignment.MIDDLE_CENTER);
+        addComponent(topContent);
 
-        lxcTable = createLxcTable( "Lxc containers", 500 );
-        addComponent( lxcTable );
+        lxcTable = createLxcTable("Lxc containers", 500);
+        addComponent(lxcTable);
     }
 
-
+/*
     private void startCloneTask() {
         Set<Agent> physicalAgents = AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
         final String productName = textFieldLxcName.getValue().trim();
@@ -139,9 +125,9 @@ public class Cloner extends VerticalLayout {
         else if ( physicalAgents.isEmpty() ) {
             indicator.setVisible( true );
             final double count = ( Double ) slider.getValue();
-            LxcUI.getExecutor().execute( new Runnable() {
+            ContainerUI.getExecutor().execute( new Runnable() {
                 public void run() {
-                    Map<Agent, Integer> bestServers = lxcManager.getPhysicalServersWithLxcSlots();
+                    Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
                     if ( bestServers.isEmpty() ) {
                         show( "No servers available to accommodate new lxc containers" );
                         indicator.setVisible( false );
@@ -182,10 +168,10 @@ public class Cloner extends VerticalLayout {
                                 lxcHostNames.add( lxcHost.toString() );
 
                                 //start clone task
-                                LxcUI.getExecutor().execute( new Runnable() {
+                                ContainerUI.getExecutor().execute( new Runnable() {
                                     public void run() {
                                         boolean result =
-                                                lxcManager.cloneLxcOnHost( entry.getKey(), lxcHost.toString() );
+                                                containerManager.cloneLxcOnHost( entry.getKey(), lxcHost.toString() );
                                         Item row = lxcTable.getItem( lxcHost.toString() );
                                         if ( row != null ) {
                                             if ( result ) {
@@ -232,9 +218,9 @@ public class Cloner extends VerticalLayout {
             final AtomicInteger countProcessed = new AtomicInteger( ( int ) ( count * physicalAgents.size() ) );
             for ( final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet() ) {
                 for ( final String lxcHostname : agg.getValue() ) {
-                    LxcUI.getExecutor().execute( new Runnable() {
+                    ContainerUI.getExecutor().execute( new Runnable() {
                         public void run() {
-                            boolean result = lxcManager.cloneLxcOnHost( agg.getKey(), lxcHostname );
+                            boolean result = containerManager.cloneLxcOnHost( agg.getKey(), lxcHostname );
                             Item row = lxcTable.getItem( lxcHostname );
                             if ( row != null ) {
                                 if ( result ) {
@@ -255,43 +241,43 @@ public class Cloner extends VerticalLayout {
             }
         }
     }
+*/
 
-
-    private TreeTable createLxcTable( String caption, int size ) {
-        TreeTable table = new TreeTable( caption );
-        table.addContainerProperty( physicalHostLabel, String.class, null );
-        table.addContainerProperty( "Lxc Host", String.class, null );
-        table.addContainerProperty( statusLabel, Embedded.class, null );
-        table.setWidth( 100, Unit.PERCENTAGE );
-        table.setHeight( size, Unit.PIXELS );
-        table.setPageLength( 10 );
-        table.setSelectable( false );
-        table.setImmediate( true );
+    private TreeTable createLxcTable(String caption, int size) {
+        TreeTable table = new TreeTable(caption);
+        table.addContainerProperty(physicalHostLabel, String.class, null);
+        table.addContainerProperty("Lxc Host", String.class, null);
+        table.addContainerProperty(statusLabel, Embedded.class, null);
+        table.setWidth(100, Unit.PERCENTAGE);
+        table.setHeight(size, Unit.PIXELS);
+        table.setPageLength(10);
+        table.setSelectable(false);
+        table.setImmediate(true);
         return table;
     }
 
 
-    private void show( String msg ) {
-        Notification.show( msg );
+    private void show(String msg) {
+        Notification.show(msg);
     }
 
 
-    private void populateLxcTable( Map<Agent, List<String>> agents ) {
+    private void populateLxcTable(Map<Agent, List<String>> agents) {
 
-        for ( final Agent agent : agents.keySet() ) {
-            if ( lxcTable.getItem( agent.getHostname() ) == null ) {
-                lxcTable.addItem( new Object[] { agent.getHostname(), null, null }, agent.getHostname() );
+        for (final Agent agent : agents.keySet()) {
+            if (lxcTable.getItem(agent.getHostname()) == null) {
+                lxcTable.addItem(new Object[]{agent.getHostname(), null, null}, agent.getHostname());
             }
-            lxcTable.setCollapsed( agent.getHostname(), false );
-            for ( String lxc : agents.get( agent ) ) {
-                Embedded progressIcon = new Embedded( "", new ThemeResource( loadIconSource ) );
+            lxcTable.setCollapsed(agent.getHostname(), false);
+            for (String lxc : agents.get(agent)) {
+                Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
 
-                lxcTable.addItem( new Object[] {
-                                null, lxc, progressIcon
-                        }, lxc );
+                lxcTable.addItem(new Object[]{
+                        null, lxc, progressIcon
+                }, lxc);
 
-                lxcTable.setParent( lxc, agent.getHostname() );
-                lxcTable.setChildrenAllowed( lxc, false );
+                lxcTable.setParent(lxc, agent.getHostname());
+                lxcTable.setChildrenAllowed(lxc, false);
             }
         }
     }

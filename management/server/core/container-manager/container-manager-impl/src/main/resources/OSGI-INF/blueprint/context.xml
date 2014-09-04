@@ -22,9 +22,9 @@
     </bean>
 
     <bean id="containerManager" scope="singleton"
-          class="org.safehaus.subutai.impl.container.ContainerManagerImpl"
+          class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
-        <property name="lxcManager" ref="lxcmanager"/>
+        <property name="containerManager" ref="lxcmanager"/>
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="templateManager" ref="templateManager"/>
@@ -33,6 +33,6 @@
     </bean>
 
     <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
-    <service ref="containerManager" interface="org.safehaus.subutai.api.container.ContainerManager"/>
+    <service ref="containerManager" interface="org.safehaus.subutai.api.containermanager.IContainerManager"/>
 
 </blueprint>

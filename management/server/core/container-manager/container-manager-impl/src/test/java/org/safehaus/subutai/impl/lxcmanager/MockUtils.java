@@ -113,7 +113,7 @@ public class MockUtils {
 				+ "  py111-lxc-acda8863-c55d-11e3-acc9-af19ef907de1\n"
 				+ "  py111-lxc-acda8865-c55d-11e3-acc9-af19ef907de1\n"
 				+ "  py111-lxc-acdaaf77-c55d-11e3-acc9-af19ef907de1\n" + "\n" + "FROZEN\n" + "\n" + "STOPPED\n"
-				+ "  base-container\n" + "  py111-lxc-test1\n" + "  py111-lxc-test2";
+				+ "  base-containermanager\n" + "  py111-lxc-test1\n" + "  py111-lxc-test2";
 	}
 
 

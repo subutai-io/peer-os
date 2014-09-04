@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.lxcmanager.manage;
+package org.safehaus.subutai.ui.containermanager.manage;
 
 
 import com.vaadin.data.Item;
@@ -6,12 +6,11 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcState;
+import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.api.containermanager.ContainerState;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.ui.lxcmanager.LxcUI;
-import org.safehaus.subutai.ui.lxcmanager.common.Buttons;
+import org.safehaus.subutai.ui.containermanager.ContainerUI;
+import org.safehaus.subutai.ui.containermanager.common.Buttons;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -29,18 +28,18 @@ public class Manager extends VerticalLayout {
 	private final Button stopAllBtn;
 	private final Button destroyAllBtn;
 	private final TreeTable lxcTable;
-	private final LxcManager lxcManager;
+	private final ContainerManager containerManager;
 	private final AgentManager agentManager;
 	private volatile boolean isDestroyAllButtonClicked = false;
 
 
-	public Manager(AgentManager agentManager, LxcManager lxcManager) {
+	public Manager(AgentManager agentManager, ContainerManager containerManager) {
 
 		setSpacing(true);
 		setMargin(true);
 
 		this.agentManager = agentManager;
-		this.lxcManager = lxcManager;
+		this.containerManager = containerManager;
 
 		lxcTable = createTableTemplate("Lxc containers", 500);
 
@@ -152,11 +151,12 @@ public class Manager extends VerticalLayout {
 	public void getLxcInfo() {
 		lxcTable.setEnabled(false);
 		indicator.setVisible(true);
-		LxcUI.getExecutor().execute(new Runnable() {
+		ContainerUI.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				Map<String, EnumMap<LxcState, List<String>>> agentFamilies = lxcManager.getLxcOnPhysicalServers();
-				populateTable(agentFamilies);
+				Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
+//                agentFamilies = containerManager.getLxcOnPhysicalServers();
+//                populateTable(agentFamilies);
 				clearEmptyParents();
 				lxcTable.setEnabled(true);
 				indicator.setVisible(false);
@@ -165,10 +165,10 @@ public class Manager extends VerticalLayout {
 	}
 
 
-	private void populateTable(Map<String, EnumMap<LxcState, List<String>>> agentFamilies) {
+	private void populateTable(Map<String, EnumMap<ContainerState, List<String>>> agentFamilies) {
 		lxcTable.removeAllItems();
 
-		for (Map.Entry<String, EnumMap<LxcState, List<String>>> agentFamily : agentFamilies.entrySet()) {
+		for (Map.Entry<String, EnumMap<ContainerState, List<String>>> agentFamily : agentFamilies.entrySet()) {
 			final String parentHostname = agentFamily.getKey();
 			final Button startAllChildrenBtn = new Button(Buttons.START.getButtonLabel());
 			startAllChildrenBtn.addStyleName("default");
@@ -248,7 +248,7 @@ public class Manager extends VerticalLayout {
 				}
 			});
 
-			for (Map.Entry<LxcState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
+			for (Map.Entry<ContainerState, List<String>> lxcs : agentFamily.getValue().entrySet()) {
 
 				for (final String lxcHostname : lxcs.getValue()) {
 					final Button startBtn = new Button(Buttons.START.getButtonLabel());
@@ -261,9 +261,9 @@ public class Manager extends VerticalLayout {
 							new Embedded("", new ThemeResource("img/spinner.gif"));
 					progressIcon.setVisible(false);
 
-					if (lxcs.getKey() == LxcState.RUNNING) {
+					if (lxcs.getKey() == ContainerState.RUNNING) {
 						startBtn.setEnabled(false);
-					} else if (lxcs.getKey() == LxcState.STOPPED) {
+					} else if (lxcs.getKey() == ContainerState.STOPPED) {
 						stopBtn.setEnabled(false);
 					}
 					final Object rowId = lxcTable.addItem(new Object[] {
@@ -274,119 +274,119 @@ public class Manager extends VerticalLayout {
 					lxcTable.setParent(lxcHostname, parentHostname);
 					lxcTable.setChildrenAllowed(lxcHostname, false);
 
-					startBtn.addClickListener(new Button.ClickListener() {
-						@Override
-						public void buttonClick(Button.ClickEvent clickEvent) {
-							final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
-							if (physicalAgent != null) {
-								startBtn.setEnabled(false);
-								destroyBtn.setEnabled(false);
-								progressIcon.setVisible(true);
-								LxcUI.getExecutor().execute(new Runnable() {
-
-									public void run() {
-										boolean success = lxcManager.startLxcOnHost(physicalAgent, lxcHostname);
-										if (success) {
-											stopBtn.setEnabled(true);
-										} else {
-											startBtn.setEnabled(true);
-										}
-										destroyBtn.setEnabled(true);
-										progressIcon.setVisible(false);
-									}
-								});
-							}
-						}
-					});
-					stopBtn.addClickListener(new Button.ClickListener() {
-						@Override
-						public void buttonClick(Button.ClickEvent clickEvent) {
-							final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
-							if (physicalAgent != null) {
-								stopBtn.setEnabled(false);
-								destroyBtn.setEnabled(false);
-								progressIcon.setVisible(true);
-								LxcUI.getExecutor().execute(new Runnable() {
-
-									public void run() {
-										boolean success = lxcManager.stopLxcOnHost(physicalAgent, lxcHostname);
-										if (!success) {
-											stopBtn.setEnabled(true);
-										} else {
-											startBtn.setEnabled(true);
-										}
-										destroyBtn.setEnabled(true);
-										progressIcon.setVisible(false);
-									}
-								});
-							}
-						}
-					});
-					destroyBtn.addClickListener(new Button.ClickListener() {
-						@Override
-						public void buttonClick(Button.ClickEvent clickEvent) {
-							if (!isDestroyAllButtonClicked) {
-
-								ConfirmationDialog alert = new ConfirmationDialog(
-										"Do you want to destroy this lxc node?", "Yes", "No");
-								alert.getOk().addClickListener(new Button.ClickListener() {
-									@Override
-									public void buttonClick(Button.ClickEvent clickEvent) {
-										final Agent physicalAgent =
-												agentManager.getAgentByHostname(parentHostname);
-										if (physicalAgent != null) {
-											startBtn.setEnabled(false);
-											stopBtn.setEnabled(false);
-											destroyBtn.setEnabled(false);
-											progressIcon.setVisible(true);
-											LxcUI.getExecutor().execute(new Runnable() {
-
-												public void run() {
-													boolean success = lxcManager
-															.destroyLxcOnHost(physicalAgent, lxcHostname);
-													if (!success) {
-														stopBtn.setEnabled(true);
-														destroyBtn.setEnabled(true);
-														progressIcon.setVisible(false);
-													} else {
-														//remove row
-														lxcTable.removeItem(rowId);
-														clearEmptyParents();
-													}
-												}
-											});
-										}
-									}
-								});
-
-								getUI().addWindow(alert.getAlert());
-							} else {
-
-								final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
-								if (physicalAgent != null) {
-									startBtn.setEnabled(false);
-									stopBtn.setEnabled(false);
-									destroyBtn.setEnabled(false);
-									progressIcon.setVisible(true);
-									LxcUI.getExecutor().execute(new Runnable() {
-
-										public void run() {
-											boolean success = lxcManager.destroyLxcOnHost(physicalAgent, lxcHostname);
-											if (!success) {
-												stopBtn.setEnabled(true);
-												destroyBtn.setEnabled(true);
-												progressIcon.setVisible(false);
-											} else {
-												//remove row
-												lxcTable.removeItem(rowId);
-												clearEmptyParents();
-											}
-										}
-									});
-								}
-							}
-						}
-					});
+//					startBtn.addClickListener(new Button.ClickListener() {
+//						@Override
+//						public void buttonClick(Button.ClickEvent clickEvent) {
+//							final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
+//							if (physicalAgent != null) {
+//								startBtn.setEnabled(false);
+//								destroyBtn.setEnabled(false);
+//								progressIcon.setVisible(true);
+//								ContainerUI.getExecutor().execute(new Runnable() {
+//
+//									public void run() {
+//										boolean success = containerManager.startLxcOnHost(physicalAgent, lxcHostname);
+//										if (success) {
+//											stopBtn.setEnabled(true);
+//										} else {
+//											startBtn.setEnabled(true);
+//										}
+//										destroyBtn.setEnabled(true);
+//										progressIcon.setVisible(false);
+//									}
+//								});
+//							}
+//						}
+//					});
+//					stopBtn.addClickListener(new Button.ClickListener() {
+//						@Override
+//						public void buttonClick(Button.ClickEvent clickEvent) {
+//							final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
+//							if (physicalAgent != null) {
+//								stopBtn.setEnabled(false);
+//								destroyBtn.setEnabled(false);
+//								progressIcon.setVisible(true);
+//								ContainerUI.getExecutor().execute(new Runnable() {
+//
+//									public void run() {
+//										boolean success = containerManager.stopLxcOnHost(physicalAgent, lxcHostname);
+//										if (!success) {
+//											stopBtn.setEnabled(true);
+//										} else {
+//											startBtn.setEnabled(true);
+//										}
+//										destroyBtn.setEnabled(true);
+//										progressIcon.setVisible(false);
+//									}
+//								});
+//							}
+//						}
+//					});
+//					destroyBtn.addClickListener(new Button.ClickListener() {
+//						@Override
+//						public void buttonClick(Button.ClickEvent clickEvent) {
+//							if (!isDestroyAllButtonClicked) {
+//
+//								ConfirmationDialog alert = new ConfirmationDialog(
+//										"Do you want to destroy this lxc node?", "Yes", "No");
+//								alert.getOk().addClickListener(new Button.ClickListener() {
+//									@Override
+//									public void buttonClick(Button.ClickEvent clickEvent) {
+//										final Agent physicalAgent =
+//												agentManager.getAgentByHostname(parentHostname);
+//										if (physicalAgent != null) {
+//											startBtn.setEnabled(false);
+//											stopBtn.setEnabled(false);
+//											destroyBtn.setEnabled(false);
+//											progressIcon.setVisible(true);
+//											ContainerUI.getExecutor().execute(new Runnable() {
+//
+//												public void run() {
+//													boolean success = containerManager
+//															.destroyLxcOnHost(physicalAgent, lxcHostname);
+//													if (!success) {
+//														stopBtn.setEnabled(true);
+//														destroyBtn.setEnabled(true);
+//														progressIcon.setVisible(false);
+//													} else {
+//														//remove row
+//														lxcTable.removeItem(rowId);
+//														clearEmptyParents();
+//													}
+//												}
+//											});
+//										}
+//									}
+//								});
+//
+//								getUI().addWindow(alert.getAlert());
+//							} else {
+//
+//								final Agent physicalAgent = agentManager.getAgentByHostname(parentHostname);
+//								if (physicalAgent != null) {
+//									startBtn.setEnabled(false);
+//									stopBtn.setEnabled(false);
+//									destroyBtn.setEnabled(false);
+//									progressIcon.setVisible(true);
+//									ContainerUI.getExecutor().execute(new Runnable() {
+//
+//										public void run() {
+//											boolean success = containerManager.destroyLxcOnHost(physicalAgent, lxcHostname);
+//											if (!success) {
+//												stopBtn.setEnabled(true);
+//												destroyBtn.setEnabled(true);
+//												progressIcon.setVisible(false);
+//											} else {
+//												//remove row
+//												lxcTable.removeItem(rowId);
+//												clearEmptyParents();
+//											}
+//										}
+//									});
+//								}
+//							}
+//						}
+//					});
 				}
 			}
 		}
