@@ -7,7 +7,7 @@ import javax.ws.rs.core.MediaType;
 
 public interface RestService
 {
-    //view clusters
+    //list clusters
     @GET
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
