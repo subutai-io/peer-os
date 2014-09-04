@@ -1,4 +1,4 @@
-package org.safehaus.plugin.oozie.rest;
+package org.safehaus.plugin.hbase.rest;
 
 
 /**

@@ -110,6 +110,54 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
+    public String listClusters() {
+        return null;
+    }
+
+
+    @Override
+    public String getCluster( final String source ) {
+        return null;
+    }
+
+
+    @Override
+    public String createCluster( final String config ) {
+        return null;
+    }
+
+
+    @Override
+    public String destroyCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String startCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String stopCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
     public String checkNode( final String clusterName, final String lxchostname ) {
         CassandraConfig cassandraConfig = cassandraManager.getCluster( clusterName );
         if ( cassandraConfig != null ) {
