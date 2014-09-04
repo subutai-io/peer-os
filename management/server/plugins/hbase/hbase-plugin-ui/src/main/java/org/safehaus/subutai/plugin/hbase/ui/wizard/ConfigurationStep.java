@@ -6,16 +6,28 @@
 package org.safehaus.subutai.plugin.hbase.ui.wizard;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
+
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
-import org.safehaus.subutai.common.protocol.Agent;
-
-import java.util.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
@@ -45,17 +57,17 @@ public class ConfigurationStep extends VerticalLayout
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<Config> clusters = HBaseUI.getHbaseManager().getHadoopClusters();
+        List<HadoopClusterConfig> clusters = HBaseUI.getHbaseManager().getHadoopClusters();
         if ( clusters.size() > 0 )
         {
-            for ( Config Config : clusters )
+            for ( HadoopClusterConfig config : clusters )
             {
-                hadoopClusters.addItem( Config );
-                hadoopClusters.setItemCaption( Config, Config.getClusterName() );
+                hadoopClusters.addItem( config );
+                hadoopClusters.setItemCaption( config, config.getClusterName() );
             }
         }
 
-        Config info = HBaseUI.getHbaseManager().getHadoopCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = HBaseUI.getHbaseManager().getHadoopCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null )
         {
@@ -68,7 +80,7 @@ public class ConfigurationStep extends VerticalLayout
 
         if ( hadoopClusters.getValue() != null )
         {
-            Config hadoopInfo = ( Config ) hadoopClusters.getValue();
+            HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
             wizard.getConfig().setHadoopNameNode( hadoopInfo.getNameNode().getHostname() );
             Set<String> agentList = new HashSet<>();
@@ -86,7 +98,7 @@ public class ConfigurationStep extends VerticalLayout
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Config hadoopInfo = ( Config ) event.getProperty().getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
                     Set<String> agentList = new HashSet<>();
                     for ( Agent agent : hadoopInfo.getAllNodes() )

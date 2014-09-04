@@ -42,7 +42,7 @@ public class StepStart extends VerticalLayout {
 
         HorizontalLayout hl = new HorizontalLayout();
 
-        Button next = new Button( "Start" );
+        Button next = new Button( "Start over Hadoop Installation" );
         next.addStyleName( "default" );
         next.setWidth( 100, Unit.PIXELS );
         next.addClickListener( new Button.ClickListener() {
@@ -54,6 +54,19 @@ public class StepStart extends VerticalLayout {
         } );
 
         hl.addComponent( next );
+
+        Button withHadoop = new Button( "With Hadoop Installation" );
+        withHadoop.addStyleName( "default" );
+        withHadoop.setWidth( 100, Unit.PIXELS );
+        withHadoop.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                wizard.init();
+                wizard.next();
+            }
+        } );
+
+        hl.addComponent( withHadoop );
 
         gridLayout.addComponent( hl, 6, 4, 6, 4 );
         addComponent( gridLayout );

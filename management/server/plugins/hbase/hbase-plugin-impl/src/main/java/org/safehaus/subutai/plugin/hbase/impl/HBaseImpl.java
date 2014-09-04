@@ -8,8 +8,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -23,6 +21,8 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
@@ -179,13 +179,13 @@ public class HBaseImpl implements HBase {
 
 
     @Override
-    public List<Config> getHadoopClusters() {
+    public List<HadoopClusterConfig> getHadoopClusters() {
         return hadoopManager.getClusters();
     }
 
 
     @Override
-    public Config getHadoopCluster( String clusterName ) {
+    public HadoopClusterConfig getHadoopCluster( String clusterName ) {
         return hadoopManager.getCluster( clusterName );
     }
 

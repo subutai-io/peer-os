@@ -8,7 +8,7 @@
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
