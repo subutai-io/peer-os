@@ -24,6 +24,7 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.SetupType;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
@@ -208,7 +209,12 @@ public class HBaseImpl implements HBase {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final HBaseClusterConfig config,
                                                          final ProductOperation po ) {
-        return new HBaseSetupStrategy( this, po, config );
+        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+            return new OverHadoopSetupStrategy( this, po, config );
+        }
+        else {
+            return new WithHadoopSetupStrategy( environment, this, po, config );
+        }
     }
 
 

@@ -16,8 +16,9 @@ public class WithHadoopSetupStrategy extends HBaseSetupStrategy {
     private Environment environment;
 
 
-    public WithHadoopSetupStrategy( HBaseImpl manager, ProductOperation po, HBaseClusterConfig config ) {
+    public WithHadoopSetupStrategy( Environment environment, HBaseImpl manager, ProductOperation po, HBaseClusterConfig config ) {
         super( manager, po, config );
+        this.environment = environment;
     }
 
 

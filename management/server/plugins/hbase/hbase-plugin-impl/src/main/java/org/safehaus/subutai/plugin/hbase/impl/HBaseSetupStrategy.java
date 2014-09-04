@@ -14,14 +14,14 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 public class HBaseSetupStrategy implements ClusterSetupStrategy {
 
     HBaseClusterConfig config;
-    private ProductOperation productOperation;
-    private HBaseImpl hbase;
+    ProductOperation productOperation;
+    HBaseImpl manager;
 
 
-    public HBaseSetupStrategy( final HBaseImpl hBase, final ProductOperation po, final HBaseClusterConfig config ) {
+    public HBaseSetupStrategy( final HBaseImpl manager, final ProductOperation po, final HBaseClusterConfig config ) {
         this.config = config;
         this.productOperation = po;
-        this.hbase = hBase;
+        this.manager = manager;
     }
 
 
