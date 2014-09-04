@@ -1,0 +1,191 @@
+package org.safehaus.subutai.plugin.cassandra.rest;
+
+
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
+import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
+
+
+/**
+ * Created by bahadyr on 5/6/14.
+ */
+
+public class RestServiceImplOld implements RestServiceOld {
+
+    private Cassandra cassandraManager;
+    private static final String OPERATION_ID = "OPERATION_ID";
+
+
+    public void setCassandraManager( Cassandra cassandraManager ) {
+        this.cassandraManager = cassandraManager;
+    }
+
+
+    public Cassandra getCassandraManager() {
+        return cassandraManager;
+    }
+
+
+    public RestServiceImplOld() {
+    }
+
+
+    @Override
+    public String install( String clusterName, String domainName, String numberOfNodes, String numberOfSeeds ) {
+        CassandraConfig config = new CassandraConfig();
+        config.setClusterName( clusterName );
+        config.setDomainName( domainName );
+        config.setNumberOfNodes( Integer.parseInt( numberOfNodes ) );
+        config.setNumberOfSeeds( Integer.parseInt( numberOfSeeds ) );
+
+        UUID uuid = cassandraManager.installCluster( config );
+        return JsonUtil.toJson( OPERATION_ID, uuid.toString() );
+    }
+
+
+    @Override
+    public String uninstall( String clusterName ) {
+        UUID uuid = cassandraManager.uninstallCluster( clusterName );
+        return JsonUtil.toJson( OPERATION_ID, uuid.toString() );
+    }
+
+
+    @Override
+    public String startNode( final String clusterName, final String lxchostname ) {
+        CassandraConfig cassandraConfig = cassandraManager.getCluster( clusterName );
+        if ( cassandraConfig != null ) {
+            Agent agent = null;
+            for ( Agent node : cassandraConfig.getNodes() ) {
+
+                if ( node.getHostname().equalsIgnoreCase( lxchostname ) ) {
+                    agent = node;
+                    break;
+                }
+            }
+
+            if ( agent != null ) {
+                return JsonUtil.toJson( OPERATION_ID, cassandraManager
+                        .startCassandraService( cassandraConfig.getClusterName(), agent.getUuid().toString() ) );
+            }
+            else {
+                return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
+            }
+        }
+        else {
+            return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
+        }
+    }
+
+
+    @Override
+    public String stopNode( final String clusterName, final String lxchostname ) {
+        CassandraConfig cassandraConfig = cassandraManager.getCluster( clusterName );
+        if ( cassandraConfig != null ) {
+            Agent agent = null;
+            for ( Agent node : cassandraConfig.getNodes() ) {
+
+                if ( node.getHostname().equalsIgnoreCase( lxchostname ) ) {
+                    agent = node;
+                    break;
+                }
+            }
+
+            if ( agent != null ) {
+                return JsonUtil.toJson( OPERATION_ID, cassandraManager
+                        .stopCassandraService( cassandraConfig.getClusterName(), agent.getUuid().toString() ) );
+            }
+            else {
+                return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
+            }
+        }
+        else {
+            return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
+        }
+    }
+
+
+    @Override
+    public String listClusters() {
+        return null;
+    }
+
+
+    @Override
+    public String getCluster( final String source ) {
+        return null;
+    }
+
+
+    @Override
+    public String createCluster( final String config ) {
+        return null;
+    }
+
+
+    @Override
+    public String destroyCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String startCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String stopCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public String checkNode( final String clusterName, final String lxchostname ) {
+        CassandraConfig cassandraConfig = cassandraManager.getCluster( clusterName );
+        if ( cassandraConfig != null ) {
+            Agent agent = null;
+            for ( Agent node : cassandraConfig.getNodes() ) {
+
+                if ( node.getHostname().equalsIgnoreCase( lxchostname ) ) {
+                    agent = node;
+                    break;
+                }
+            }
+
+            if ( agent != null ) {
+                return JsonUtil.toJson( OPERATION_ID, cassandraManager
+                        .statusCassandraService( cassandraConfig.getClusterName(), agent.getUuid().toString() ) );
+            }
+            else {
+                return JsonUtil.toJson( "ERROR", String.format( "Agent %s not found", lxchostname ) );
+            }
+        }
+        else {
+            return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
+        }
+    }
+
+
+    public Response installFromJson( final String json ) {
+        String result = "Json saved : " + json;
+        return Response.status( 201 ).entity( result ).build();
+    }
+}
