@@ -5,7 +5,8 @@ set timeout 1500
 set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
-
+set jenkinsIP [lindex $argv 3]
+ 
 sleep 3
 spawn ssh "$user\@$ip"
 sleep 3
@@ -16,6 +17,18 @@ send "$password\r";
 #updating apt-get
 expect "# " { send "apt-get update\r"  }
 sleep 2
+#clear apt-get source list
+expect "# " { send "echo \" \" > /etc/apt/sources.list \r"}
+sleep 1
+#Adding management server apt-get links
+expect "# " { send "echo \"deb http://$jenkinsIP:9999/ubuntu trusty main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb-src http://$jenkinsIP:9999/ubuntu/ trusty main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb http://$jenkinsIP:9999/ubuntu trusty-updates main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
+expect "# " { send "echo \"deb-src http://$jenkinsIP:9999/ubuntu trusty-updates main restricted universe multiverse\" >> /etc/apt/sources.list \r"}
+sleep 1
 #installing openjre-7
 expect "# " { send "echo \"export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64\" >> /etc/profile\r" }
 sleep 2
@@ -33,7 +46,6 @@ sleep 3
 expect "# " { send "service cassandra start\r" }
 sleep 5
 #import cassandra keyspace
-
 expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh\r" }
 sleep 2
 expect "cqlsh> " { send "drop keyspace kiskis;\r" }
