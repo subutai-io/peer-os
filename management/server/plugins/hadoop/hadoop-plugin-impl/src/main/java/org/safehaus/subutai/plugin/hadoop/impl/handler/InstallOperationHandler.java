@@ -49,22 +49,6 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
             return;
         }
 
-        //check if node agent is connected
-        for ( Iterator<Agent> it = config.getAllNodes().iterator(); it.hasNext(); ) {
-            Agent node = it.next();
-            if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null ) {
-                productOperation.addLog(
-                        String.format( "Node %s is not connected. Omitting this node from installation",
-                                node.getHostname() ) );
-                it.remove();
-            }
-        }
-
-        if ( config.getAllSlaveNodes().isEmpty() ) {
-            productOperation.addLogFailed( "No nodes eligible for installation\nInstallation aborted" );
-            return;
-        }
-
         setup();
     }
 
