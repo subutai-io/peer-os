@@ -155,8 +155,8 @@ public class Manager {
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             progressIcon.setVisible( false );
             final Object rowId = table.addItem( new Object[] {
-                            agent.getHostname(), progressIcon
-                    }, null );
+                    agent.getHostname(), progressIcon
+            }, null );
         }
     }
 

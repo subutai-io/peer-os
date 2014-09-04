@@ -13,12 +13,12 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "cassandra", name = "describe-cluster", description = "Shows the details of the Cassandra cluster." )
+@Command(scope = "cassandra", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
 public class DescribeClusterCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
-    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false )
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
 
 

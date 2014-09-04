@@ -18,13 +18,13 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command( scope = "cassandra", name = "stop-cluster", description = "Command to stop Cassandra cluster" )
+@Command(scope = "cassandra", name = "stop-cluster", description = "Command to stop Cassandra cluster")
 public class StopAllNodesCommand extends OsgiCommandSupport {
 
     private static Cassandra cassandraManager;
     private static Tracker tracker;
-    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false )
+    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false)
     String clusterName = null;
 
 
