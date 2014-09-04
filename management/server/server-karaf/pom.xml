@@ -1383,33 +1383,6 @@
                 <!-- Zookeeper -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>zookeeper-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>zookeeper-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>zookeeper-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>zookeeper-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>zookeeper-rest</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
-                <!-- Zookeeper -->
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
                   <artifactId>zookeeper-plugin-api</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
@@ -1941,3 +1914,29 @@
     <!-- Products Modules - END -->
 
 
+    <!-- Zookeeper -->
+     <!--              <artifactItem>
+                     <groupId>org.safehaus.subutai</groupId>
+                     <artifactId>zookeeper-api</artifactId>
+                     <version>${project.version}</version>
+                   </artifactItem>
+                   <artifactItem>
+                     <groupId>org.safehaus.subutai</groupId>
+                     <artifactId>zookeeper-impl</artifactId>
+                     <version>${project.version}</version>
+                   </artifactItem>
+                   <artifactItem>
+                     <groupId>org.safehaus.subutai</groupId>
+                     <artifactId>zookeeper-ui</artifactId>
+                     <version>${project.version}</version>
+                   </artifactItem>
+                   <artifactItem>
+                     <groupId>org.safehaus.subutai</groupId>
+                     <artifactId>zookeeper-cli</artifactId>
+                     <version>${project.version}</version>
+                   </artifactItem>
+                   <artifactItem>
+                     <groupId>org.safehaus.subutai</groupId>
+                     <artifactId>zookeeper-rest</artifactId>
+                     <version>${project.version}</version>
+                   </artifactItem>-->
