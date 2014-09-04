@@ -18,16 +18,16 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 /**
  * @author dilshat
  */
-public interface Oozie extends ApiBase<OozieConfig> {
+public interface Oozie extends ApiBase<OozieClusterConfig> {
 
-    UUID startServer( OozieConfig config );
+    UUID startServer( OozieClusterConfig config );
 
-    UUID stopServer( OozieConfig config );
+    UUID stopServer( OozieClusterConfig config );
 
-    UUID checkServerStatus( OozieConfig config );
+    UUID checkServerStatus( OozieClusterConfig config );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, OozieConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, OozieClusterConfig config,
                                                          ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieClusterConfig config );
 }

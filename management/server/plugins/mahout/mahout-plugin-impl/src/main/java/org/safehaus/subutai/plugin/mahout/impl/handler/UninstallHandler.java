@@ -14,10 +14,10 @@ import java.util.UUID;
 /**
  * Created by dilshat on 5/6/14.
  */
-public class UninstallOperationHandler extends AbstractOperationHandler<MahoutImpl> {
+public class UninstallHandler extends AbstractOperationHandler<MahoutImpl> {
 	private final ProductOperation po;
 
-	public UninstallOperationHandler(MahoutImpl manager, String clusterName) {
+	public UninstallHandler( MahoutImpl manager, String clusterName ) {
 		super(manager, clusterName);
 		po = manager.getTracker().createProductOperation( MahoutConfig.PRODUCT_KEY,
 				String.format("Destroying cluster %s", clusterName));

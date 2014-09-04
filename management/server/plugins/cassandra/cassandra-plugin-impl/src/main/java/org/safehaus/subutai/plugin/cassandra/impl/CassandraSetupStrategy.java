@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -24,12 +24,12 @@ import com.google.common.base.Strings;
 public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
     private Environment environment;
-    private CassandraConfig config;
+    private CassandraClusterConfig config;
     private CassandraImpl cassandraManager;
     private ProductOperation productOperation;
 
 
-    public CassandraSetupStrategy( final Environment environment, final CassandraConfig config,
+    public CassandraSetupStrategy( final Environment environment, final CassandraClusterConfig config,
                                    final ProductOperation po, final CassandraImpl cassandra ) {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
@@ -44,7 +44,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public CassandraConfig setup() throws ClusterSetupException {
+    public CassandraClusterConfig setup() throws ClusterSetupException {
 
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getCommitLogDirectory() ) ||

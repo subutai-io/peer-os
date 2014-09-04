@@ -1,8 +1,17 @@
 package org.safehaus.plugin.oozie.rest;
 
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
+import org.safehaus.subutai.plugin.oozie.api.TrimmedOozieClusterConfig;
 
 
 /**
@@ -48,19 +57,46 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String createCluster( final String config ) {
-        return null;
+
+        TrimmedOozieClusterConfig tocc = JsonUtil.fromJson( config, TrimmedOozieClusterConfig.class );
+
+        HadoopClusterConfig hadoopConfig = hadoopManager.getCluster( tocc.getHadoopClusterName() );
+        if ( hadoopConfig == null ) {
+            return JsonUtil
+                    .toJson( "ERROR", String.format( "Hadoop cluster %s not found", tocc.getHadoopClusterName() ) );
+        }
+
+        OozieClusterConfig occ = new OozieClusterConfig();
+        occ.setClusterName( tocc.getClusterName() );
+        occ.setServer( tocc.getServerHostname() );
+        Set<String> clients = new HashSet<>();
+        //        Set<String> hadoopNodes = new HashSet<String>();
+        for ( Agent agent : hadoopConfig.getAllNodes() ) {
+            clients.add( agent.getHostname() );
+            //            hadoopNodes.add( agent.getHostname() );
+        }
+        clients.remove( tocc.getServerHostname() );
+        occ.setClients( clients );
+        //        config.setHadoopNodes( hadoopNodes );
+        occ.setHadoopClusterName( hadoopConfig.getClusterName() );
+
+        UUID uuid = this.oozieManager.installCluster( occ );
+        return JsonUtil.toJson( "OPERATION_ID", uuid.toString() );
     }
 
 
     @Override
     public String destroyCluster( final String clusterName ) {
-        return null;
+        UUID uuid = oozieManager.uninstallCluster( clusterName );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String startCluster( final String clusterName ) {
-        return null;
+        OozieClusterConfig occ = oozieManager.getCluster( clusterName );
+        UUID uuid = oozieManager.startServer( occ );
+        return wrapUUID( uuid );
     }
 
 
@@ -85,5 +121,10 @@ public class RestServiceImpl implements RestService {
     @Override
     public String checkNode( final String clustername, final String lxchostname ) {
         return null;
+    }
+
+
+    private String wrapUUID( UUID uuid ) {
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 }

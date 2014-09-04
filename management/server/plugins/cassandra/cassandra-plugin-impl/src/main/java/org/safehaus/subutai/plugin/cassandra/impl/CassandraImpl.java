@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckServiceHandler;
@@ -174,7 +174,7 @@ public class CassandraImpl extends CassandraBase {
     }
 
 
-    public UUID installCluster( final CassandraConfig config ) {
+    public UUID installCluster( final CassandraClusterConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallClusterHandler( this, config );
         executor.execute( operationHandler );
@@ -230,14 +230,14 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final CassandraConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final CassandraClusterConfig config,
                                                          final ProductOperation po ) {
         return new CassandraSetupStrategy( environment, config, po, this );
     }
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final CassandraConfig config ) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final CassandraClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
@@ -262,16 +262,16 @@ public class CassandraImpl extends CassandraBase {
     }
 
 
-    public List<CassandraConfig> getClusters() {
-        return dbManager.getInfo( CassandraConfig.PRODUCT_KEY, CassandraConfig.class );
+    public List<CassandraClusterConfig> getClusters() {
+        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
     }
 
 
     @Override
-    public CassandraConfig getCluster( String clusterName ) {
+    public CassandraClusterConfig getCluster( String clusterName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
         try {
-            return pluginDAO.getInfo( CassandraConfig.PRODUCT_KEY, clusterName, CassandraConfig.class );
+            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
         }
         catch ( DBException e ) {
             return null;

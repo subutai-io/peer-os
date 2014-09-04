@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.cassandra.cli;
 
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import org.apache.felix.gogo.commands.Argument;
@@ -29,7 +29,7 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
     String clusterName = null;
 
     protected Object doExecute() {
-        CassandraConfig config = cassandraManager.getCluster(clusterName);
+        CassandraClusterConfig config = cassandraManager.getCluster(clusterName);
         if (config != null) {
             StringBuilder sb = new StringBuilder();
             sb.append("Cluster name: ").append(config.getClusterName()).append("\n");

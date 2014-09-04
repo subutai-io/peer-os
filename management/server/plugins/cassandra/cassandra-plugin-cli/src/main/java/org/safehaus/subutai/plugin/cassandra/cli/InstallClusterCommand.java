@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import org.apache.felix.gogo.commands.Argument;
@@ -51,14 +51,14 @@ public class InstallClusterCommand extends OsgiCommandSupport {
     String numberOfSeeds = null;
 
     protected Object doExecute() throws IOException {
-        CassandraConfig config = new CassandraConfig();
+        CassandraClusterConfig config = new CassandraClusterConfig();
         config.setClusterName(clusterName);
         config.setDomainName(domainName);
         config.setNumberOfNodes(Integer.parseInt(numberOfNodes));
         config.setNumberOfSeeds(Integer.parseInt(numberOfSeeds));
 
         UUID uuid = cassandraManager.installCluster(config);
-        tracker.printOperationLog(CassandraConfig.PRODUCT_KEY, uuid, 30000);
+        tracker.printOperationLog( CassandraClusterConfig.PRODUCT_KEY, uuid, 30000);
         return null;
     }
 }

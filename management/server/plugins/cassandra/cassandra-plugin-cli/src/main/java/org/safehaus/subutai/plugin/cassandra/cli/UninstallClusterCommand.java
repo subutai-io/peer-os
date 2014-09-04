@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.cli;
 import java.util.UUID;
 
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import org.apache.felix.gogo.commands.Argument;
@@ -42,7 +42,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 
     protected Object doExecute() {
         UUID uuid = cassandraManager.uninstallCluster(clusterName);
-        tracker.printOperationLog(CassandraConfig.PRODUCT_KEY, uuid, 30000);
+        tracker.printOperationLog( CassandraClusterConfig.PRODUCT_KEY, uuid, 30000);
         return null;
     }
 }

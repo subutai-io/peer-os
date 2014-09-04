@@ -12,7 +12,7 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * @author dilshat
  */
-public class OozieConfig implements ConfigBase {
+public class OozieClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Oozie";
     public static final String PRODUCT_NAME_CLIENT = "hadoopOozieClient";
@@ -24,12 +24,11 @@ public class OozieConfig implements ConfigBase {
     private UUID uuid;
     private String server;
     private Set<String> clients;
-//    private Set<String> hadoopNodes;
     private String clusterName = "";
     private SetupType setupType;
 
 
-    public OozieConfig() {
+    public OozieClusterConfig() {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );
     }
 
@@ -144,7 +143,7 @@ public class OozieConfig implements ConfigBase {
                 ", uuid=" + uuid +
                 ", server='" + server + '\'' +
                 ", clients=" + clients +
-//                ", hadoopNodes=" + hadoopNodes +
+                //                ", hadoopNodes=" + hadoopNodes +
                 ", clusterName='" + clusterName + '\'' +
                 '}';
     }
@@ -157,5 +156,11 @@ public class OozieConfig implements ConfigBase {
 
     public void setTemplateNameClient( final String templateNameClient ) {
         this.templateNameClient = templateNameClient;
+    }
+
+
+    public Set<String> getAllOozieAgents() {
+        clients.add( server );
+        return clients;
     }
 }

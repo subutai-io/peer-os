@@ -1,7 +1,7 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
@@ -22,21 +22,22 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
     public StartClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        final ProductOperation po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting cluster %s", clusterName ) );
 
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                CassandraConfig config = manager.getDbManager().getInfo( CassandraConfig.PRODUCT_KEY, clusterName,
-                        CassandraConfig.class );
+                CassandraClusterConfig
+                        config = manager.getDbManager().getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
+                        CassandraClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

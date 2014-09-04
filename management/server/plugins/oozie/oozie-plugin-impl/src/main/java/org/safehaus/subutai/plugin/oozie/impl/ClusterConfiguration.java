@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 import com.google.common.collect.Sets;
 
@@ -29,7 +29,7 @@ public class ClusterConfiguration {
     }
 
 
-    public void configureCluster( OozieConfig config ) throws ClusterConfigurationException {
+    public void configureCluster( OozieClusterConfig config ) throws ClusterConfigurationException {
 
         po.addLog( "Configuring root hosts..." );
         Agent server = manager.getAgentManager().getAgentByHostname( config.getServer() );

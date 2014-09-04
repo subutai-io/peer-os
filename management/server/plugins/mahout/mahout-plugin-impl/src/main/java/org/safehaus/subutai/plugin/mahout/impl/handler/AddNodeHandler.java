@@ -17,13 +17,13 @@ import java.util.UUID;
 /**
  * Created by dilshat on 5/6/14.
  */
-public class AddNodeOperationHandler extends AbstractOperationHandler<MahoutImpl>
+public class AddNodeHandler extends AbstractOperationHandler<MahoutImpl>
 {
     private final ProductOperation po;
     private final String lxcHostname;
 
 
-    public AddNodeOperationHandler( MahoutImpl manager, String clusterName, String lxcHostname )
+    public AddNodeHandler( MahoutImpl manager, String clusterName, String lxcHostname )
     {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;

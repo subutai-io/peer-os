@@ -4,7 +4,8 @@ package org.safehaus.subutai.plugin.cassandra.impl.handler;
 import java.util.UUID;
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
@@ -30,14 +31,14 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
         super( manager, clusterName );
         this.agentUUID = agentUUID;
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        final ProductOperation po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting Cassandra service on %s", agentUUID ) );
         manager.getExecutor().execute( new Runnable() {
             Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );

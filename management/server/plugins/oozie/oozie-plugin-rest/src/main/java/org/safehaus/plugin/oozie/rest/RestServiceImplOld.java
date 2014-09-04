@@ -10,7 +10,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
 /**
@@ -51,7 +51,7 @@ public class RestServiceImplOld implements RestServiceOld {
             return JsonUtil.toJson( "ERROR", String.format( "Hadoop cluster %s not found", hadoopClusterName ) );
         }
 
-        OozieConfig config = new OozieConfig();
+        OozieClusterConfig config = new OozieClusterConfig();
         config.setClusterName( clusterName );
         config.setServer( serverHostname );
         Set<String> clients = new HashSet<>();
@@ -79,7 +79,7 @@ public class RestServiceImplOld implements RestServiceOld {
 
     @Override
     public String startCluster( final String clusterName ) {
-        OozieConfig config = oozieManager.getCluster( clusterName );
+        OozieClusterConfig config = oozieManager.getCluster( clusterName );
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }
@@ -90,7 +90,7 @@ public class RestServiceImplOld implements RestServiceOld {
 
     @Override
     public String stopCluster( final String clusterName ) {
-        OozieConfig config = oozieManager.getCluster( clusterName );
+        OozieClusterConfig config = oozieManager.getCluster( clusterName );
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }
@@ -101,7 +101,7 @@ public class RestServiceImplOld implements RestServiceOld {
 
     @Override
     public String checkCluster( final String clusterName ) {
-        OozieConfig config = oozieManager.getCluster( clusterName );
+        OozieClusterConfig config = oozieManager.getCluster( clusterName );
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }

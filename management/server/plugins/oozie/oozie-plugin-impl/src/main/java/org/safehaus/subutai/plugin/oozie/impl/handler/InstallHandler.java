@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 
@@ -20,14 +20,14 @@ import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 public class InstallHandler extends AbstractOperationHandler<OozieImpl> {
 
     private ProductOperation po;
-    private OozieConfig config;
+    private OozieClusterConfig config;
     private HadoopClusterConfig hadoopConfig;
 
 
-    public InstallHandler( final OozieImpl manager, final OozieConfig config ) {
+    public InstallHandler( final OozieImpl manager, final OozieClusterConfig config ) {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 
@@ -45,7 +45,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl> {
             }
 
             po.addLog( "Preparing environment..." );
-            hadoopConfig.setTemplateName( OozieConfig.PRODUCT_NAME_SERVER );
+            hadoopConfig.setTemplateName( OozieClusterConfig.PRODUCT_NAME_SERVER );
             try {
                 EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );

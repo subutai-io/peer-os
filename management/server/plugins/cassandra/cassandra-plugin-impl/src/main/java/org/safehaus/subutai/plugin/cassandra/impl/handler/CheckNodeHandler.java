@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
@@ -24,14 +24,14 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
         super( manager, clusterName );
         this.clusterName = clusterName;
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Checking cassandra on %s of %s cluster...", lxcHostname, clusterName ) );
     }
 
 
     @Override
     public void run() {
-        CassandraConfig cassandraConfig = manager.getCluster( clusterName );
+        CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
         if ( cassandraConfig == null ) {
             productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;

@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -45,7 +45,7 @@ public class Manager {
 	private GridLayout contentRoot;
 	private ComboBox clusterCombo;
 	private HorizontalLayout controlsContent;
-	private CassandraConfig config;
+	private CassandraClusterConfig config;
 
 
 	public Manager() {
@@ -120,7 +120,7 @@ public class Manager {
 		clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
 			@Override
 			public void valueChange(Property.ValueChangeEvent event) {
-				config = (CassandraConfig) event.getProperty().getValue();
+				config = (CassandraClusterConfig ) event.getProperty().getValue();
 				refreshUI();
 			}
 		});
@@ -150,7 +150,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = CassandraUI.getCassandraManager().checkCluster(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -172,7 +172,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = CassandraUI.getCassandraManager().startCluster(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -194,7 +194,7 @@ public class Manager {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = CassandraUI.getCassandraManager().stopCluster(config.getClusterName());
-				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {
@@ -224,7 +224,7 @@ public class Manager {
 							UUID trackID = CassandraUI.getCassandraManager()
 									.uninstallCluster(config.getClusterName());
 
-							ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
+							ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraClusterConfig.PRODUCT_KEY);
 							window.getWindow().addCloseListener(new Window.CloseListener() {
 								@Override
 								public void windowClose(Window.CloseEvent closeEvent) {
@@ -259,17 +259,17 @@ public class Manager {
 	}
 
 	public void refreshClustersInfo() {
-		List<CassandraConfig> info = CassandraUI.getCassandraManager().getClusters();
-        CassandraConfig clusterInfo = (CassandraConfig) clusterCombo.getValue();
+		List<CassandraClusterConfig> info = CassandraUI.getCassandraManager().getClusters();
+        CassandraClusterConfig clusterInfo = (CassandraClusterConfig ) clusterCombo.getValue();
 		clusterCombo.removeAllItems();
 		if (info != null && info.size() > 0) {
-			for (CassandraConfig mongoInfo : info) {
+			for (CassandraClusterConfig mongoInfo : info) {
 				clusterCombo.addItem(mongoInfo);
 				clusterCombo.setItemCaption(mongoInfo,
 						mongoInfo.getClusterName());
 			}
 			if (clusterInfo != null) {
-				for (CassandraConfig cassandraInfo : info) {
+				for (CassandraClusterConfig cassandraInfo : info) {
 					if (cassandraInfo.getClusterName().equals(clusterInfo.getClusterName())) {
 						clusterCombo.setValue(cassandraInfo);
 						return;

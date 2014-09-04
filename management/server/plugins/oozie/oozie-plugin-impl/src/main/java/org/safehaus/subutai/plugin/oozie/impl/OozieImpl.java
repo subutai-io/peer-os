@@ -23,7 +23,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.SetupType;
 import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
 import org.safehaus.subutai.plugin.oozie.impl.handler.InstallHandler;
@@ -173,7 +173,7 @@ public class OozieImpl extends OozieBase {
     }
 
 
-    public UUID installCluster( final OozieConfig config ) {
+    public UUID installCluster( final OozieClusterConfig config ) {
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -187,19 +187,19 @@ public class OozieImpl extends OozieBase {
     }
 
 
-    public List<OozieConfig> getClusters() {
-        return dbManager.getInfo( OozieConfig.PRODUCT_KEY, OozieConfig.class );
+    public List<OozieClusterConfig> getClusters() {
+        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, OozieClusterConfig.class );
     }
 
 
     @Override
-    public OozieConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
+    public OozieClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
     }
 
 
     @Override
-    public UUID startServer( final OozieConfig config ) {
+    public UUID startServer( final OozieClusterConfig config ) {
         AbstractOperationHandler operationHandler = new StartServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -207,7 +207,7 @@ public class OozieImpl extends OozieBase {
 
 
     @Override
-    public UUID stopServer( final OozieConfig config ) {
+    public UUID stopServer( final OozieClusterConfig config ) {
         AbstractOperationHandler operationHandler = new StopServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -215,7 +215,7 @@ public class OozieImpl extends OozieBase {
 
 
     @Override
-    public UUID checkServerStatus( final OozieConfig config ) {
+    public UUID checkServerStatus( final OozieClusterConfig config ) {
         AbstractOperationHandler operationHandler = new CheckServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
         return operationHandler.getTrackerId();
@@ -223,7 +223,7 @@ public class OozieImpl extends OozieBase {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final OozieConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final OozieClusterConfig config,
                                                          final ProductOperation po ) {
 
         if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
@@ -241,7 +241,7 @@ public class OozieImpl extends OozieBase {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final OozieConfig config ) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final OozieClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );

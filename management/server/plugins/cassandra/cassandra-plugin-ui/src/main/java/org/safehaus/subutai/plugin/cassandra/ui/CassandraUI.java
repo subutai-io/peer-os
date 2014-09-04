@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
@@ -72,11 +72,11 @@ public class CassandraUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return CassandraConfig.PRODUCT_KEY;
+		return CassandraClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return CassandraConfig.PRODUCT_KEY;
+		return CassandraClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

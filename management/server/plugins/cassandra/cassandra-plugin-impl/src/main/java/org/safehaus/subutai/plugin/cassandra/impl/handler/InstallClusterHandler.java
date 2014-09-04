@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 
 
@@ -19,13 +19,13 @@ import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 public class InstallClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
-    private CassandraConfig config;
+    private CassandraClusterConfig config;
 
 
-    public InstallClusterHandler( final CassandraImpl manager, final CassandraConfig config ) {
+    public InstallClusterHandler( final CassandraImpl manager, final CassandraClusterConfig config ) {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", config.getClusterName() ) );
     }
 

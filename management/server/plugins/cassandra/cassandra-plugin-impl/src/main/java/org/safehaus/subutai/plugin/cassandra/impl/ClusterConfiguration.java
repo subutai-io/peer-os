@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 
 /**
@@ -26,7 +26,7 @@ public class ClusterConfiguration {
     }
 
 
-    public void configureCluster( CassandraConfig config ) throws ClusterConfigurationException {
+    public void configureCluster( CassandraClusterConfig config ) throws ClusterConfigurationException {
 
         // setting cluster name
         po.addLog( "Setting cluster name " + config.getClusterName() );
@@ -135,7 +135,7 @@ public class ClusterConfiguration {
 
         try {
             po.addLog( "Cassandra cluster data saved into database" );
-            cassandraManager.getPluginDAO().saveInfo( CassandraConfig.PRODUCT_KEY, config.getClusterName(), config );
+            cassandraManager.getPluginDAO().saveInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
         }
         catch ( DBException e ) {
             e.printStackTrace();

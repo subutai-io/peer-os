@@ -13,7 +13,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 /**
  * @author dilshat
  */
-public interface Cassandra extends ApiBase<CassandraConfig> {
+public interface Cassandra extends ApiBase<CassandraClusterConfig> {
 
     UUID startCluster( String clusterName );
 
@@ -33,8 +33,8 @@ public interface Cassandra extends ApiBase<CassandraConfig> {
 
     UUID checkNode( String clustername, String lxchostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraClusterConfig config,
                                                          ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( CassandraConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( CassandraClusterConfig config );
 }

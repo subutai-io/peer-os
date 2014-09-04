@@ -10,7 +10,7 @@
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 
 import com.vaadin.ui.Component;
@@ -23,7 +23,7 @@ public class Wizard {
 
 	private final VerticalLayout vlayout;
 	private int step = 1;
-	private OozieConfig config = new OozieConfig();
+	private OozieClusterConfig config = new OozieClusterConfig();
     private OozieUI oozieUI;
 
 	public Wizard(OozieUI oozieUI) {
@@ -55,11 +55,11 @@ public class Wizard {
 
 	public void init() {
 		step = 1;
-		config = new OozieConfig();
+		config = new OozieClusterConfig();
 		putForm();
 	}
 
-	public OozieConfig getConfig() {
+	public OozieClusterConfig getConfig() {
 		return config;
 	}
 

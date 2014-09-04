@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.plugin.cassandra.api.TrimmedCassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
+import org.safehaus.subutai.plugin.cassandra.api.TrimmedCassandraClusterConfig;
 
 
 /**
@@ -31,9 +31,9 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listClusters() {
-        List<CassandraConfig> configs = cassandraManager.getClusters();
+        List<CassandraClusterConfig> configs = cassandraManager.getClusters();
         List<String> clusterNames = new ArrayList<>();
-        for ( CassandraConfig config : configs ) {
+        for ( CassandraClusterConfig config : configs ) {
             clusterNames.add( config.getClusterName() );
         }
         return JsonUtil.toJson( clusterNames );
@@ -48,9 +48,9 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String createCluster( final String config ) {
-        TrimmedCassandraConfig trimmedCassandraConfig = JsonUtil.fromJson( config, TrimmedCassandraConfig.class );
+        TrimmedCassandraClusterConfig trimmedCassandraConfig = JsonUtil.fromJson( config, TrimmedCassandraClusterConfig.class );
 
-        CassandraConfig cassandraConfig = new CassandraConfig();
+        CassandraClusterConfig cassandraConfig = new CassandraClusterConfig();
         cassandraConfig.setClusterName( trimmedCassandraConfig.getClusterName() );
         cassandraConfig.setDomainName( trimmedCassandraConfig.getDomainName() );
         cassandraConfig.setNumberOfNodes( trimmedCassandraConfig.getNumberOfNodes() );

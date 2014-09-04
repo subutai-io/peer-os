@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -113,12 +113,12 @@ public class OozieUI implements PortalModule {
 
     @Override
     public String getId() {
-        return OozieConfig.PRODUCT_KEY;
+        return OozieClusterConfig.PRODUCT_KEY;
     }
 
 
     public String getName() {
-        return OozieConfig.PRODUCT_KEY;
+        return OozieClusterConfig.PRODUCT_KEY;
     }
 
 

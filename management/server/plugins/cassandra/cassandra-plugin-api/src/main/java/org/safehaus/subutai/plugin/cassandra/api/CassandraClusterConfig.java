@@ -15,7 +15,7 @@ import org.safehaus.subutai.common.settings.Common;
 /**
  * @author dilshat
  */
-public class CassandraConfig implements ConfigBase {
+public class CassandraClusterConfig implements ConfigBase {
 
     public static final String PRODUCT_KEY = "Cassandra";
     public static final String PRODUCT_NAME = "Cassandra";

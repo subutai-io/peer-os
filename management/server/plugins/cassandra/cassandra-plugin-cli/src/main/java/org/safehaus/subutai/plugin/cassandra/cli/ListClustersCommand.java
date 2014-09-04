@@ -3,7 +3,7 @@ package org.safehaus.subutai.plugin.cassandra.cli;
 import java.util.List;
 
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import org.apache.felix.gogo.commands.Command;
@@ -36,11 +36,11 @@ public class ListClustersCommand extends OsgiCommandSupport {
     }
 
     protected Object doExecute() {
-        List<CassandraConfig> list = cassandraManager.getClusters();
+        List<CassandraClusterConfig> list = cassandraManager.getClusters();
         if (list.size() > 0) {
             StringBuilder sb = new StringBuilder();
 
-            for (CassandraConfig config : list) {
+            for (CassandraClusterConfig config : list) {
                 sb.append(config.getClusterName()).append("\n");
             }
             System.out.println(sb.toString());

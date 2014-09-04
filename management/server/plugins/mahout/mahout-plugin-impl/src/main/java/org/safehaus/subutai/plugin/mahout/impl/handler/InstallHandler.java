@@ -19,13 +19,13 @@ import java.util.UUID;
 /**
  * Created by dilshat on 5/6/14.
  */
-public class InstallOperationHandler extends AbstractOperationHandler<MahoutImpl>
+public class InstallHandler extends AbstractOperationHandler<MahoutImpl>
 {
     private final ProductOperation po;
     private final MahoutConfig config;
 
 
-    public InstallOperationHandler( MahoutImpl manager, MahoutConfig config )
+    public InstallHandler( MahoutImpl manager, MahoutConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;

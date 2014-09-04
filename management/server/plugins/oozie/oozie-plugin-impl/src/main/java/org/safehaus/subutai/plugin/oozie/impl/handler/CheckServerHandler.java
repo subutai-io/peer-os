@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -25,20 +25,20 @@ public class CheckServerHandler extends AbstractOperationHandler<OozieImpl> {
     public CheckServerHandler( final OozieImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Starting server on %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
+        final ProductOperation po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Checking status of cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                OozieConfig config =
-                        manager.getDbManager().getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
+                OozieClusterConfig config =
+                        manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
                             config.getClusterName() ) );

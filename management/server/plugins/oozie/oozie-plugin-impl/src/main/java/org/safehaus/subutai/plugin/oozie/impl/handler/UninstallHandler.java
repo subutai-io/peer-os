@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.impl.Commands;
 import org.safehaus.subutai.plugin.oozie.impl.OozieImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -26,20 +26,20 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl> {
     public UninstallHandler( final OozieImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Unistalling %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
+        final ProductOperation po = manager.getTracker().createProductOperation( OozieClusterConfig.PRODUCT_KEY,
                 String.format( "Destroying cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                OozieConfig config =
-                        manager.getDbManager().getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
+                OozieClusterConfig config =
+                        manager.getDbManager().getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
                 if ( config == null ) {
                     po.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
@@ -90,7 +90,7 @@ public class UninstallHandler extends AbstractOperationHandler<OozieImpl> {
                 }
 
                 po.addLog( "Updating db..." );
-                if ( manager.getDbManager().deleteInfo( OozieConfig.PRODUCT_KEY, config.getClusterName() ) ) {
+                if ( manager.getDbManager().deleteInfo( OozieClusterConfig.PRODUCT_KEY, config.getClusterName() ) ) {
                     po.addLogDone( "Cluster info deleted from DB\nDone" );
                 }
                 else {
