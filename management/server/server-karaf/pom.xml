@@ -781,6 +781,23 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                  <!-- Container Manager -->
+                  <artifactItem>
+                      <groupId>org.safehaus.subutai</groupId>
+                      <artifactId>container-manager-ui</artifactId>
+                      <version>${project.version}</version>
+                  </artifactItem>
+                  <artifactItem>
+                      <groupId>org.safehaus.subutai</groupId>
+                      <artifactId>container-manager-api</artifactId>
+                      <version>${project.version}</version>
+                  </artifactItem>
+                  <artifactItem>
+                      <groupId>org.safehaus.subutai</groupId>
+                      <artifactId>container-manager-impl</artifactId>
+                      <version>${project.version}</version>
+                  </artifactItem>
+
                 <!-- LXC Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -1136,7 +1153,7 @@
                   <artifactId>flume-rest</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-                
+
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>flume-plugin-api</artifactId>
@@ -1161,7 +1178,7 @@
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>flume-plugin-rest</artifactId>
                   <version>${project.version}</version>
-                </artifactItem>                
+                </artifactItem>
 
                 <!-- Hadoop -->
                 <artifactItem>
