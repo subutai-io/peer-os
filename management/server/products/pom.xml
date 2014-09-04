@@ -17,7 +17,7 @@
   <modules>
     <module>accumulo</module>
     <module>flume</module>
-    <module>hadoop</module>
+    <!--<module>hadoop</module>-->
     <module>hive</module>
     <module>hivequery</module>
     <module>lucene</module>

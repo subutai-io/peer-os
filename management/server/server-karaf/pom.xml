@@ -1164,7 +1164,7 @@
                 </artifactItem>
 
                 <!-- Hadoop -->
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hadoop-api</artifactId>
                   <version>${project.version}</version>
@@ -1188,7 +1188,7 @@
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hadoop-rest</artifactId>
                   <version>${project.version}</version>
-                </artifactItem>
+                </artifactItem>-->
 
                 <!-- Hadoop 2-->
                 <artifactItem>
