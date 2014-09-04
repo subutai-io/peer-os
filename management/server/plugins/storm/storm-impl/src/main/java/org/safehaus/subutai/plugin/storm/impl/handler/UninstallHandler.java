@@ -1,15 +1,16 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
-import org.safehaus.subutai.plugin.storm.impl.CommandType;
-import org.safehaus.subutai.plugin.storm.impl.StormImpl;
-import org.safehaus.subutai.plugin.storm.impl.Commands;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.impl.CommandType;
+import org.safehaus.subutai.plugin.storm.impl.Commands;
+import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 public class UninstallHandler extends AbstractHandler {
 
@@ -56,15 +57,20 @@ public class UninstallHandler extends AbstractHandler {
                     po.addLog(res.getStdErr());
                 }
             }
-            boolean b = manager.getDbManager().deleteInfo(StormConfig.PRODUCT_NAME, clusterName);
-            if(b) {
-                try {
-                    manager.getLxcManager().destroyLxcs(allNodes);
-                } catch(LxcDestroyException ex) {
-                    po.addLog("Failed to destroy nodes: " + ex.getMessage());
-                }
+            try {
+                po.addLog("Destroying container(s)...");
+                manager.getLxcManager().destroyLxcs(allNodes);
+                po.addLog("Container(s) destroyed");
+
+                manager.getPluginDao().deleteInfo(StormConfig.PRODUCT_NAME, clusterName);
                 po.addLogDone("Cluster info deleted");
-            } else po.addLogFailed("Failed to delete cluster info");
+            } catch(DBException ex) {
+                manager.getLogger().error("Failed to delete from db", ex);
+                po.addLogFailed("Failed to delete cluster info");
+            } catch(LxcDestroyException ex) {
+                po.addLog("Failed to destroy nodes: " + ex.getMessage());
+                manager.getLogger().error("Destroying container(s) failed", ex);
+            }
         } else {
             po.addLog(cmd.getAllErrors());
             po.addLogFailed("Failed to remove Storm on nodes");

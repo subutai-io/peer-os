@@ -1,8 +1,5 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
-import org.safehaus.subutai.plugin.storm.impl.CommandType;
-import org.safehaus.subutai.plugin.storm.impl.StormImpl;
-import org.safehaus.subutai.plugin.storm.impl.Commands;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -11,7 +8,11 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.impl.CommandType;
+import org.safehaus.subutai.plugin.storm.impl.Commands;
+import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 public class InstallHandler extends AbstractHandler {
 
@@ -136,13 +137,15 @@ public class InstallHandler extends AbstractHandler {
             }
         }
 
-        boolean saved = manager.getDbManager().saveInfo(StormConfig.PRODUCT_NAME,
-                clusterName, config);
-        if(!saved) {
-            po.addLogFailed("Failed to save cluster info");
-            return;
+        try {
+            manager.getPluginDao().saveInfo(StormConfig.PRODUCT_NAME,
+                    clusterName, config);
+            po.addLog("Cluster info successfully saved");
+        } catch(DBException ex) {
+            String m = "Failed to save cluster info";
+            po.addLogFailed(m);
+            manager.getLogger().error(m, ex);
         }
-        po.addLog("Cluster info successfully saved");
 
         if(configure(config))
             po.addLogDone("Storm cluster successfully configured");

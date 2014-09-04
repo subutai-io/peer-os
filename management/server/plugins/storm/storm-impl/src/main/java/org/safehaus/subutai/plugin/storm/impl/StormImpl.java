@@ -1,17 +1,11 @@
 package org.safehaus.subutai.plugin.storm.impl;
 
-import org.safehaus.subutai.plugin.storm.impl.handler.UninstallHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.InstallHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StopHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.AddNodeHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.RestartHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StartHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.StatusHandler;
-import org.safehaus.subutai.plugin.storm.impl.handler.DestroyNodeHandler;
 import java.util.List;
 import java.util.UUID;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.impl.handler.*;
 
 public class StormImpl extends StormBase {
 
@@ -31,12 +25,22 @@ public class StormImpl extends StormBase {
 
     @Override
     public List<StormConfig> getClusters() {
-        return dbManager.getInfo(StormConfig.PRODUCT_NAME, StormConfig.class);
+        try {
+            return pluginDao.getInfo(StormConfig.PRODUCT_NAME, StormConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get clusters info", ex);
+        }
+        return null;
     }
 
     @Override
     public StormConfig getCluster(String clusterName) {
-        return dbManager.getInfo(StormConfig.PRODUCT_NAME, clusterName, StormConfig.class);
+        try {
+            return pluginDao.getInfo(StormConfig.PRODUCT_NAME, clusterName, StormConfig.class);
+        } catch(DBException ex) {
+            logger.error("Failed to get cluster info", ex);
+        }
+        return null;
     }
 
     @Override

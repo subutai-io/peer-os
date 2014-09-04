@@ -7,10 +7,15 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class StormBase implements Storm {
+
+    static final Logger logger = LoggerFactory.getLogger(StormImpl.class);
 
     protected CommandRunner commandRunner;
     protected AgentManager agentManager;
@@ -19,10 +24,12 @@ public abstract class StormBase implements Storm {
     protected Zookeeper zookeeperManager;
     protected LxcManager lxcManager;
 
+    protected PluginDAO pluginDao;
     protected ExecutorService executor;
 
     public void init() {
         executor = Executors.newCachedThreadPool();
+        pluginDao = new PluginDAO(dbManager);
     }
 
     public void destroy() {
@@ -75,6 +82,18 @@ public abstract class StormBase implements Storm {
 
     public void setLxcManager(LxcManager lxcManager) {
         this.lxcManager = lxcManager;
+    }
+
+    public PluginDAO getPluginDao() {
+        return pluginDao;
+    }
+
+    public void setPluginDao(PluginDAO pluginDao) {
+        this.pluginDao = pluginDao;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
 }
