@@ -9,20 +9,20 @@ import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
 public abstract class ContainerManagerBase implements ContainerManager {
 
-	ContainerManager containerManager;
+//	ContainerManager containerManager;
 	AgentManager agentManager;
 	CommandRunner commandRunner;
 	TemplateManager templateManager;
 	TemplateRegistryManager templateRegistry;
 	DbManager dbManager;
 
-	public ContainerManager getContainerManager() {
-		return containerManager;
-	}
-
-	public void setContainerManager(ContainerManager containerManager) {
-		this.containerManager = containerManager;
-	}
+//	public ContainerManager getContainerManager() {
+//		return containerManager;
+//	}
+//
+//	public void setContainerManager(ContainerManager containerManager) {
+//		this.containerManager = containerManager;
+//	}
 
 	public AgentManager getAgentManager() {
 		return agentManager;

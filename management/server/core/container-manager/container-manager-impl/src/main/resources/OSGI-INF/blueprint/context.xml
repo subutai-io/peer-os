@@ -14,17 +14,21 @@
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
 
-    <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.lxcmanager.LxcManagerImpl"
+    <!--
+    <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="commandRunner"/>
         <argument ref="monitor"/>
     </bean>
+    -->
 
     <bean id="containerManager" scope="singleton"
           class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
+    <!--
         <property name="containerManager" ref="lxcmanager"/>
+    -->
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
         <property name="templateManager" ref="templateManager"/>
@@ -32,7 +36,9 @@
         <property name="dbManager" ref="dbManager"/>
     </bean>
 
+    <!--
     <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
-    <service ref="containerManager" interface="org.safehaus.subutai.api.containermanager.IContainerManager"/>
+    -->
+    <service ref="containerManager" interface="org.safehaus.subutai.api.containermanager.ContainerManager"/>
 
 </blueprint>

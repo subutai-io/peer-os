@@ -2,9 +2,6 @@ package org.safehaus.subutai.impl.containermanager.strategy;
 
 import org.safehaus.subutai.api.containermanager.ContainerPlacementStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
-import org.safehaus.subutai.impl.containermanager.strategy.BestServerStrategy;
-import org.safehaus.subutai.impl.containermanager.strategy.DefaultContainerPlacementStrategy;
-import org.safehaus.subutai.impl.containermanager.strategy.RoundRobinStrategy;
 
 import java.util.EnumSet;
 import java.util.Set;
