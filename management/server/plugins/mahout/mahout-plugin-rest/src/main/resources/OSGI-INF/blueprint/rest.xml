@@ -10,7 +10,7 @@
 
     <reference id="mahoutManager" availability="mandatory" interface="org.safehaus.subutai.plugin.mahout.api.Mahout"/>
 
-    <bean id="restService" class="org.safehaus.subutai.plugin.mahout.rest.RestServiceOld">
+    <bean id="restService" class="org.safehaus.subutai.plugin.mahout.rest.RestServiceImpl">
         <property name="agentManager" ref="agentManager"/>
         <property name="mahoutManager" ref="mahoutManager"/>
     </bean>

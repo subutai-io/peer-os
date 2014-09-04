@@ -1,10 +1,39 @@
 package org.safehaus.plugin.oozie.rest;
 
 
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.oozie.api.Oozie;
+
+
 /**
  * Created by bahadyr on 9/4/14.
  */
 public class RestServiceImpl implements RestService {
+
+    private Oozie oozieManager;
+    private Hadoop hadoopManager;
+
+
+    public Oozie getOozieManager() {
+        return oozieManager;
+    }
+
+
+    public void setOozieManager( final Oozie oozieManager ) {
+        this.oozieManager = oozieManager;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
     @Override
     public String listClusters() {
         return null;

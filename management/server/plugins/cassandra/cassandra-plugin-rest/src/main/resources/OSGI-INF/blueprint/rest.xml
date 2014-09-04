@@ -19,7 +19,7 @@
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.plugin.cassandra.rest.RestServiceImplOld">
+    <bean id="cassandraRestServiceImpl" class="org.safehaus.subutai.plugin.cassandra.rest.RestServiceImpl">
         <property name="cassandraManager" ref="cassandraManager"/>
     </bean>
 

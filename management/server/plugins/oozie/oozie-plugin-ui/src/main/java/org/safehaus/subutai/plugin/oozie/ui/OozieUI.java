@@ -11,6 +11,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
@@ -20,7 +25,66 @@ import com.vaadin.ui.Component;
 /**
  * @author dilshat
  */
-public class OozieUI extends OozieBase implements PortalModule {
+public class OozieUI implements PortalModule {
+
+
+    Oozie oozieManager;
+    AgentManager agentManager;
+    Tracker tracker;
+    Hadoop hadoopManager;
+    CommandRunner commandRunner;
+    ExecutorService executor;
+
+
+    public Oozie getOozieManager() {
+        return oozieManager;
+    }
+
+
+    public void setOozieManager( final Oozie oozieManager ) {
+        this.oozieManager = oozieManager;
+    }
+
+
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
 
     public static final String MODULE_IMAGE = "oozie.png";
 

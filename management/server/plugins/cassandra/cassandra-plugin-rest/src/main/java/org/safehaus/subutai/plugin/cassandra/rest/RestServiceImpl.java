@@ -19,6 +19,16 @@ public class RestServiceImpl implements RestService {
     private Cassandra cassandraManager;
 
 
+    public Cassandra getCassandraManager() {
+        return cassandraManager;
+    }
+
+
+    public void setCassandraManager( final Cassandra cassandraManager ) {
+        this.cassandraManager = cassandraManager;
+    }
+
+
     @Override
     public String listClusters() {
         List<CassandraConfig> configs = cassandraManager.getClusters();

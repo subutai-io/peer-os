@@ -10,7 +10,7 @@
 
   <reference id="hbaseManager" availability="mandatory" interface="org.safehaus.subutai.plugin.hbase.api.HBase" />
 
-  <bean id="restService" class="org.safehaus.plugin.hbase.rest.RestServiceImplOld">
+  <bean id="restService" class="org.safehaus.plugin.hbase.rest.RestServiceImpl">
     <property name="hbaseManager" ref="hbaseManager" />
   </bean>
 

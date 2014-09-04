@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.Path;
-
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
@@ -14,7 +12,7 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import com.google.common.base.Strings;
 
 
-@Path("hbase")
+//@Path("hbase")
 public class RestServiceImplOld {
 
     private static final String OPERATION_ID = "OPERATION_ID";

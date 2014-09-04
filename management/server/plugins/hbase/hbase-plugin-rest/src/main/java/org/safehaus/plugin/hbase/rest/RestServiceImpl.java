@@ -1,10 +1,27 @@
 package org.safehaus.plugin.hbase.rest;
 
 
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+
+
 /**
  * Created by bahadyr on 9/4/14.
  */
 public class RestServiceImpl implements RestService {
+
+    private HBase hbaseManager;
+
+
+    public HBase getHbaseManager() {
+        return hbaseManager;
+    }
+
+
+    public void setHbaseManager( final HBase hbaseManager ) {
+        this.hbaseManager = hbaseManager;
+    }
+
+
     @Override
     public String listClusters() {
         return null;

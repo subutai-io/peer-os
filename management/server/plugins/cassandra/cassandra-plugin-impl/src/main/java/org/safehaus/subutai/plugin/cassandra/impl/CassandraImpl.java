@@ -13,9 +13,16 @@ import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.CheckNodeHandler;
@@ -26,17 +33,55 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StartServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopClusterHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
+import org.safehaus.subutai.plugin.common.PluginDAO;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 
-public class CassandraImpl extends CassandraBase implements Cassandra {
+public class CassandraImpl extends CassandraBase {
+
+    Commands commands;
+    DbManager dbManager;
+    Tracker tracker;
+    LxcManager lxcManager;
+    ExecutorService executor;
+    NetworkManager networkManager;
+    CommandRunner commandRunner;
+    AgentManager agentManager;
+    EnvironmentManager environmentManager;
+    ContainerManager containerManager;
+    PluginDAO pluginDAO;
 
 
-    public CassandraImpl() {
+    public DbManager getDbManager() {
+        return dbManager;
+    }
 
+
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
+
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public LxcManager getLxcManager() {
+        return lxcManager;
+    }
+
+
+    public void setLxcManager( final LxcManager lxcManager ) {
+        this.lxcManager = lxcManager;
     }
 
 
@@ -50,7 +95,75 @@ public class CassandraImpl extends CassandraBase implements Cassandra {
     }
 
 
+    public NetworkManager getNetworkManager() {
+        return networkManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager ) {
+        this.networkManager = networkManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+        this.environmentManager = environmentManager;
+    }
+
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
+    }
+
+
+    public CassandraImpl() {
+
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
+    }
+
+
     public void init() {
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
+
         Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }

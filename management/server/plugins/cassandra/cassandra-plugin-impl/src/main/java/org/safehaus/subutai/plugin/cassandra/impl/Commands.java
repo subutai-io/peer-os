@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
 
@@ -26,10 +27,15 @@ import com.google.common.collect.Sets;
  */
 public class Commands extends CommandsSingleton {
 
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
+
+
     public static Command getInstallCommand( Set<Agent> agents ) {
 
         return createCommand( new RequestBuilder( "sleep 10; apt-get --force-yes --assume-yes install ksks-cassandra" )
-                        .withTimeout( 360 ).withStdOutRedirection( OutputRedirection.NO ), agents );
+                .withTimeout( 360 ).withStdOutRedirection( OutputRedirection.NO ), agents );
     }
 
 
