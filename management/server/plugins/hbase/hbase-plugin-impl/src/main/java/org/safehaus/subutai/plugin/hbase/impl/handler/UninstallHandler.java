@@ -20,7 +20,6 @@ public class UninstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private ProductOperation po;
-    //    private HBaseConfig config;
     private String clusterName;
 
 
