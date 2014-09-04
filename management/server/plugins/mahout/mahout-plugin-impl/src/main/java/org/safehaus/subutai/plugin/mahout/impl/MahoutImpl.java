@@ -20,9 +20,13 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
@@ -39,20 +43,70 @@ import com.google.common.collect.Sets;
  */
 public class MahoutImpl implements Mahout {
 
+    PluginDAO pluginDAO;
+    Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
     private ExecutorService executor;
+    private Hadoop hadoopManager;
 
 
-    public MahoutImpl( CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker ) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
+    public MahoutImpl() {
 
-        Commands.init( commandRunner );
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
+    }
+
+
+    public Commands getCommands() {
+        return commands;
+    }
+
+
+    public void setCommands( final Commands commands ) {
+        this.commands = commands;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
+    }
+
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+        this.environmentManager = environmentManager;
     }
 
 
@@ -61,8 +115,18 @@ public class MahoutImpl implements Mahout {
     }
 
 
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
     public AgentManager getAgentManager() {
         return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
     }
 
 
@@ -71,12 +135,35 @@ public class MahoutImpl implements Mahout {
     }
 
 
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
+
+
     public Tracker getTracker() {
         return tracker;
     }
 
 
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
     public void init() {
+        Commands.init( commandRunner );
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 

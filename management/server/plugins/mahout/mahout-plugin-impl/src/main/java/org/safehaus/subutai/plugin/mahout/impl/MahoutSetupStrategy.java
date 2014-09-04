@@ -15,15 +15,15 @@ public class MahoutSetupStrategy implements ClusterSetupStrategy {
 
 
     public MahoutClusterConfig config;
-    private ProductOperation productOperation;
-    private MahoutImpl mahout;
+    ProductOperation po;
+    MahoutImpl manager;
 
 
-    public MahoutSetupStrategy( MahoutImpl mahout, final ProductOperation po, final MahoutClusterConfig config ) {
+    public MahoutSetupStrategy( MahoutImpl manager, final ProductOperation po, final MahoutClusterConfig config ) {
 
         this.config = config;
-        this.productOperation = po;
-        this.mahout = mahout;
+        this.po = po;
+        this.manager = manager;
     }
 
 

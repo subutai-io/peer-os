@@ -38,7 +38,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl> {
     }
 
 
-    private void setupWithHadoop() {
+    private void setupOverHadoop() {
         try {
             //setup up Accumulo cluster
             ClusterSetupStrategy setupStrategy = manager.getClusterSetupStrategy( null, config, productOperation );
@@ -53,7 +53,7 @@ public class InstallHandler extends AbstractOperationHandler<HBaseImpl> {
     }
 
 
-    private void setupOverHadoop() {
+    private void setupWithHadoop() {
 
     }
 }
