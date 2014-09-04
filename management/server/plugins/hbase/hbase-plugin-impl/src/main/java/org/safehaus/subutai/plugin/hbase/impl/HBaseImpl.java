@@ -178,7 +178,7 @@ public class HBaseImpl implements HBase {
     }
 
 
-    @Override
+    /*@Override
     public List<HadoopClusterConfig> getHadoopClusters() {
         return hadoopManager.getClusters();
     }
@@ -187,7 +187,7 @@ public class HBaseImpl implements HBase {
     @Override
     public HadoopClusterConfig getHadoopCluster( String clusterName ) {
         return hadoopManager.getCluster( clusterName );
-    }
+    }*/
 
 
     @Override

@@ -23,11 +23,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hadoop-plugin-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>

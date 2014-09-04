@@ -6,18 +6,20 @@
 package org.safehaus.subutai.plugin.hbase.ui;
 
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
-
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
 
 
 /**
@@ -29,6 +31,7 @@ public class HBaseUI implements PortalModule {
 
 	private static HBase hbaseManager;
 	private static AgentManager agentManager;
+    private static Hadoop hadoopManager;
 	private static Tracker tracker;
 	private static CommandRunner commandRunner;
 	private static ExecutorService executor;
@@ -37,15 +40,26 @@ public class HBaseUI implements PortalModule {
 			AgentManager agentManager,
 			Tracker tracker,
 			HBase hbaseManager,
-			CommandRunner commandRunner) {
+			CommandRunner commandRunner, Hadoop hadoopManager) {
 		HBaseUI.agentManager = agentManager;
 		HBaseUI.tracker = tracker;
 		HBaseUI.hbaseManager = hbaseManager;
 		HBaseUI.commandRunner = commandRunner;
+        HBaseUI.hadoopManager = hadoopManager;
 	}
 
 
-	public static Tracker getTracker() {
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public static void setHadoopManager( final Hadoop hadoopManager ) {
+        HBaseUI.hadoopManager = hadoopManager;
+    }
+
+
+    public static Tracker getTracker() {
 		return tracker;
 	}
 
@@ -75,6 +89,7 @@ public class HBaseUI implements PortalModule {
 
 	public void destroy() {
 		hbaseManager = null;
+        hadoopManager = null;
 		agentManager = null;
 		tracker = null;
 		commandRunner = null;

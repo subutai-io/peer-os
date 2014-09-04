@@ -57,7 +57,7 @@ public class ConfigurationStep extends VerticalLayout
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = HBaseUI.getHbaseManager().getHadoopClusters();
+        List<HadoopClusterConfig> clusters = HBaseUI.getHadoopManager().getClusters();
         if ( clusters.size() > 0 )
         {
             for ( HadoopClusterConfig config : clusters )
@@ -67,7 +67,7 @@ public class ConfigurationStep extends VerticalLayout
             }
         }
 
-        HadoopClusterConfig info = HBaseUI.getHbaseManager().getHadoopCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = HBaseUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null )
         {

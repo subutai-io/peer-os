@@ -14,7 +14,6 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 
 /**
@@ -38,9 +37,9 @@ public interface HBase extends ApiBase<HBaseClusterConfig> {
 
     public List<HBaseClusterConfig> getClusters();
 
-    List<HadoopClusterConfig> getHadoopClusters();
+//    List<HadoopClusterConfig> getHadoopClusters();
 
-    HadoopClusterConfig getHadoopCluster( String clusterName );
+//    HadoopClusterConfig getHadoopCluster( String clusterName );
 
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
                                                          ProductOperation po );
