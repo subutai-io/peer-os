@@ -85,14 +85,20 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        HadoopClusterConfig info = PrestoUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
-
-        if ( info != null ) {
-            //restore cluster
-            hadoopClustersCombo.setValue( info );
+        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+            if ( clusters.size() > 0 ) {
+                hadoopClustersCombo.setValue( clusters.iterator().next() );
+            }
         }
-        else if ( clusters.size() > 0 ) {
-            hadoopClustersCombo.setValue( clusters.iterator().next() );
+        else {
+            HadoopClusterConfig info = PrestoUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+            if ( info != null ) {
+                //restore cluster
+                hadoopClustersCombo.setValue( info );
+            }
+            else if ( clusters.size() > 0 ) {
+                hadoopClustersCombo.setValue( clusters.iterator().next() );
+            }
         }
 
         //populate selection controls
