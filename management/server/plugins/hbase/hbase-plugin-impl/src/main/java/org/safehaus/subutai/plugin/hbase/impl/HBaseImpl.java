@@ -45,17 +45,7 @@ public class HBaseImpl implements HBase {
     private ContainerManager containerManager;
 
 
-    public HBaseImpl( AgentManager agentManager, Hadoop hadoopManager, DbManager dbManager, Tracker tracker,
-                      CommandRunner commandRunner, EnvironmentManager environmentManager,
-                      ContainerManager containerManager ) {
-        this.agentManager = agentManager;
-        this.hadoopManager = hadoopManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-        //        this.executor = executor;
-        this.commandRunner = commandRunner;
-        this.environmentManager = environmentManager;
-        this.containerManager = containerManager;
+    public HBaseImpl() {
         Commands.init( commandRunner );
     }
 
