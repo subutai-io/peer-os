@@ -1,40 +1,33 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
-import org.safehaus.subutai.common.exception.ClusterConfigurationException;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-
-import com.google.common.base.Strings;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class OozieSetupStrategy implements ClusterSetupStrategy {
+abstract class OozieSetupStrategy implements ClusterSetupStrategy {
 
 
-    private Environment environment;
-    private OozieConfig config;
-    private OozieImpl oozieManager;
-    private ProductOperation productOperation;
+    //    private Environment environment;
+    final OozieConfig config;
+    final OozieImpl oozieManager;
+    final ProductOperation po;
 
 
-    public OozieSetupStrategy( final Environment environment, final OozieConfig config, final ProductOperation po,
-                               final OozieImpl oozie ) {
+    public OozieSetupStrategy( OozieImpl oozie, ProductOperation po, OozieConfig config ) {
 
-        this.environment = environment;
-        this.config = config;
-        this.productOperation = po;
+        //        this.environment = environment;
         this.oozieManager = oozie;
+        this.po = po;
+        this.config = config;
     }
 
 
-    @Override
+    /*@Override
     public ConfigBase setup() throws ClusterSetupException {
 
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
@@ -50,5 +43,5 @@ public class OozieSetupStrategy implements ClusterSetupStrategy {
             throw new ClusterSetupException( e.getMessage() );
         }
         return config;
-    }
+    }*/
 }

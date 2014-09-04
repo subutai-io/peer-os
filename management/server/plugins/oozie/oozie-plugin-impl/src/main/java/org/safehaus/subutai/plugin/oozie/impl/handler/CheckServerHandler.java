@@ -16,13 +16,13 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StopServerOperationHandler extends AbstractOperationHandler<OozieImpl> {
+public class CheckServerHandler extends AbstractOperationHandler<OozieImpl> {
 
     private ProductOperation po;
     private String clusterName;
 
 
-    public StopServerOperationHandler( final OozieImpl manager, final String clusterName ) {
+    public CheckServerHandler( final OozieImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
@@ -33,7 +33,7 @@ public class StopServerOperationHandler extends AbstractOperationHandler<OozieIm
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
-                String.format( "Stopping cluster %s", clusterName ) );
+                String.format( "Checking status of cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
@@ -51,14 +51,16 @@ public class StopServerOperationHandler extends AbstractOperationHandler<OozieIm
                 }
                 Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
-                Command stopServiceCommand = Commands.getStopServerCommand( servers );
-                manager.getCommandRunner().runCommand( stopServiceCommand );
+                Command statusServiceCommand = Commands.getStatusServerCommand( servers );
+                manager.getCommandRunner().runCommand( statusServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() ) {
-                    po.addLogDone( "Stop succeeded" );
+                if ( statusServiceCommand.hasCompleted() ) {
+
+                    po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                 }
                 else {
-                    po.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+                    po.addLogFailed(
+                            String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }
         } );

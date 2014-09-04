@@ -57,6 +57,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hadoop-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -70,7 +75,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.impl.plugin.oozie</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.plugin.oozie.impl</Bundle-SymbolicName>
           </instructions>
         </configuration>
       </plugin>

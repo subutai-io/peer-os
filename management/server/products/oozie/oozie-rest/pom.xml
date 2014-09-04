@@ -101,7 +101,7 @@
           <manifestLocation>META-INF</manifestLocation>
           <unpackBundle>true</unpackBundle>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.rest.oozie</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.oozie.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

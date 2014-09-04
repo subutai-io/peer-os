@@ -1,16 +1,16 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.safehaus.subutai.common.exception.ClusterConfigurationException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -33,12 +33,14 @@ public class ClusterConfiguration {
 
         po.addLog( "Configuring root hosts..." );
         Agent server = manager.getAgentManager().getAgentByHostname( config.getServer() );
-        Set<Agent> hadoopNodes = new HashSet<Agent>();
-        for ( String hadoopNode : config.getHadoopNodes() ) {
-            Agent hadoopNodeAgent = manager.getAgentManager().getAgentByHostname( hadoopNode );
-            hadoopNodes.add( hadoopNodeAgent );
-        }
-        Command configureRootHostsCommand = Commands.getConfigureRootHostsCommand( hadoopNodes,
+        HadoopClusterConfig hadoopClusterConfig = manager.getHadoopManager().getCluster( config.getHadoopClusterName() );
+//        Set<Agent> hadoopNodes = new HashSet<Agent>();
+//        for ( String hadoopNode : config.ge) {
+//            Agent hadoopNodeAgent = manager.getAgentManager().getAgentByHostname( hadoopNode );
+//            hadoopNodes.add( hadoopNodeAgent );
+//        }
+
+        Command configureRootHostsCommand = Commands.getConfigureRootHostsCommand( Sets.newHashSet(hadoopClusterConfig.getAllNodes()),
                 AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
         manager.getCommandRunner().runCommand( configureRootHostsCommand );
 
@@ -51,7 +53,7 @@ public class ClusterConfiguration {
         }
 
         po.addLog( "Configuring root groups..." );
-        Command configureRootGroupsCommand = Commands.getConfigureRootGroupsCommand( hadoopNodes );
+        Command configureRootGroupsCommand = Commands.getConfigureRootGroupsCommand( Sets.newHashSet(hadoopClusterConfig.getAllNodes()) );
         manager.getCommandRunner().runCommand( configureRootGroupsCommand );
 
         if ( configureRootGroupsCommand.hasSucceeded() ) {

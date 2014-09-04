@@ -16,13 +16,13 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class CheckServerOperationHandler extends AbstractOperationHandler<OozieImpl> {
+public class StartServerHandler extends AbstractOperationHandler<OozieImpl> {
 
     private ProductOperation po;
     private String clusterName;
 
 
-    public CheckServerOperationHandler( final OozieImpl manager, final String clusterName ) {
+    public StartServerHandler( final OozieImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
@@ -33,7 +33,7 @@ public class CheckServerOperationHandler extends AbstractOperationHandler<OozieI
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,
-                String.format( "Checking status of cluster %s", clusterName ) );
+                String.format( "Starting cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
@@ -45,22 +45,32 @@ public class CheckServerOperationHandler extends AbstractOperationHandler<OozieI
                     return;
                 }
                 Agent serverAgent = manager.getAgentManager().getAgentByHostname( config.getServer() );
+
                 if ( serverAgent == null ) {
                     po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
                 Set<Agent> servers = new HashSet<Agent>();
                 servers.add( serverAgent );
-                Command statusServiceCommand = Commands.getStatusServerCommand( servers );
-                manager.getCommandRunner().runCommand( statusServiceCommand );
+                Command startServiceCommand = Commands.getStartServerCommand( servers );
+                manager.getCommandRunner().runCommand( startServiceCommand );
 
-                if ( statusServiceCommand.hasCompleted() ) {
+                if ( startServiceCommand.hasCompleted() ) {
+                    po.addLog( "Checking status..." );
 
-                    po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    Command checkCommand = Commands.getStatusServerCommand( servers );
+                    manager.getCommandRunner().runCommand( checkCommand );
+
+                    if ( checkCommand.hasCompleted() ) {
+
+                        po.addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
+                    }
+                    else {
+                        po.addLogFailed( String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
+                    }
                 }
                 else {
-                    po.addLogFailed(
-                            String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
         } );

@@ -8,17 +8,17 @@
     <reference id="tracker" availability="mandatory"
                interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="hadoopManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.hadoop.Hadoop"/>
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
     <reference id="commandRunner" availability="mandatory"
                interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.oozie.ui.OozieUI"
           init-method="init" destroy-method="destroy">
-        <argument ref="agentManager"/>
-        <argument ref="tracker"/>
-        <argument ref="hadoopManager"/>
-        <argument ref="oozieManager"/>
-        <argument ref="commandRunner"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="tracker" ref="tracker"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
+        <property name="oozieManager" ref="oozieManager"/>
+        <property name="commandRunner" ref="commandRunner"/>
     </bean>
 
     <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>

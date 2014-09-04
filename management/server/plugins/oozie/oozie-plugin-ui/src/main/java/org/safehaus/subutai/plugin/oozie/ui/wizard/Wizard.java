@@ -11,6 +11,7 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -23,8 +24,10 @@ public class Wizard {
 	private final VerticalLayout vlayout;
 	private int step = 1;
 	private OozieConfig config = new OozieConfig();
+    private OozieUI oozieUI;
 
-	public Wizard() {
+	public Wizard(OozieUI oozieUI) {
+        this.oozieUI = oozieUI;
 		vlayout = new VerticalLayout();
 		vlayout.setSizeFull();
 		vlayout.setMargin(true);
@@ -60,7 +63,18 @@ public class Wizard {
 		return config;
 	}
 
-	private void putForm() {
+
+    public OozieUI getOozieUI() {
+        return oozieUI;
+    }
+
+
+    public void setOozieUI( final OozieUI oozieUI ) {
+        this.oozieUI = oozieUI;
+    }
+
+
+    private void putForm() {
 		vlayout.removeAllComponents();
 		switch (step) {
 			case 1: {

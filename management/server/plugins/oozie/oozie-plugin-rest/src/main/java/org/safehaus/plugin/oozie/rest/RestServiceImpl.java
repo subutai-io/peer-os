@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -46,7 +46,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String installCluster( String clusterName, String serverHostname, String hadoopClusterName ) {
-        Config hadoopConfig = hadoopManager.getCluster( hadoopClusterName );
+        HadoopClusterConfig hadoopConfig = hadoopManager.getCluster( hadoopClusterName );
         if ( hadoopConfig == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Hadoop cluster %s not found", hadoopClusterName ) );
         }
@@ -55,14 +55,15 @@ public class RestServiceImpl implements RestService {
         config.setClusterName( clusterName );
         config.setServer( serverHostname );
         Set<String> clients = new HashSet<>();
-        Set<String> hadoopNodes = new HashSet<String>();
+//        Set<String> hadoopNodes = new HashSet<String>();
         for ( Agent agent : hadoopConfig.getAllNodes() ) {
             clients.add( agent.getHostname() );
-            hadoopNodes.add( agent.getHostname() );
+//            hadoopNodes.add( agent.getHostname() );
         }
         clients.remove( serverHostname );
         config.setClients( clients );
-        config.setHadoopNodes( hadoopNodes );
+//        config.setHadoopNodes( hadoopNodes );
+        config.setHadoopClusterName( hadoopConfig.getClusterName() );
 
         UUID uuid = this.oozieManager.installCluster( config );
         return JsonUtil.toJson( OPERATION_ID, uuid.toString() );

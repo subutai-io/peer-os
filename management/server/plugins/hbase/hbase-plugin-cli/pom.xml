@@ -82,7 +82,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.cli.plugin.hbase</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.hbase.cli</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

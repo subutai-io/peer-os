@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>hadoop-api</artifactId>
+      <artifactId>hadoop-plugin-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -101,7 +101,7 @@
           <manifestLocation>META-INF</manifestLocation>
           <unpackBundle>true</unpackBundle>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.rest.plugin.oozie</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.plugin.oozie.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
@@ -49,8 +48,9 @@ public class VerificationStep extends Panel {
 		install.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = OozieUI.getOozieManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(OozieUI.getExecutor(), OozieUI.getTracker(), trackID, OozieConfig.PRODUCT_KEY);
+				UUID trackID = wizard.getOozieUI().getOozieManager().installCluster(wizard.getConfig());
+				ProgressWindow window = new ProgressWindow(wizard.getOozieUI().getExecutor(),
+                        wizard.getOozieUI().getTracker(), trackID, OozieConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

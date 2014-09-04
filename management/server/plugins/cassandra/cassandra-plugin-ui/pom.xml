@@ -82,7 +82,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.ui.plugin.cassandra</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.plugin.cassandra.ui</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

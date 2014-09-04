@@ -21,17 +21,16 @@ import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterOperationHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterOperationHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterOperationHandler;
-import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallOperationHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.InstallHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterHandler;
+import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 
 
 public class HBaseImpl implements HBase {
@@ -159,7 +158,7 @@ public class HBaseImpl implements HBase {
     public UUID installCluster( final HBaseConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        AbstractOperationHandler operationHandler = new InstallHandler( this, config );
 
         executor.execute( operationHandler );
 
@@ -170,7 +169,7 @@ public class HBaseImpl implements HBase {
     public UUID uninstallCluster( final String clusterName ) {
         //        Preconditions.checkNotNull( config, "Configuration is null" );
 
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
 
         executor.execute( operationHandler );
 
@@ -217,7 +216,7 @@ public class HBaseImpl implements HBase {
 
     @Override
     public UUID startCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new StartClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
 
         executor.execute( operationHandler );
 
@@ -227,7 +226,7 @@ public class HBaseImpl implements HBase {
 
     @Override
     public UUID stopCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new StopClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new StopClusterHandler( this, clusterName );
 
         executor.execute( operationHandler );
 
@@ -237,7 +236,7 @@ public class HBaseImpl implements HBase {
 
     @Override
     public UUID checkCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new CheckClusterOperationHandler( this, clusterName );
+        AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
 
         executor.execute( operationHandler );
 

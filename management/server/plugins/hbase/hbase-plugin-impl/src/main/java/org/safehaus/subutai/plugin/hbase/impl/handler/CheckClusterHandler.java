@@ -16,27 +16,25 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class UninstallOperationHandler extends AbstractOperationHandler<HBaseImpl>
+public class CheckClusterHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private ProductOperation po;
-    //    private HBaseConfig config;
     private String clusterName;
 
 
-    public UninstallOperationHandler( final HBaseImpl manager, final String clusterName ) {
+    public CheckClusterHandler( final HBaseImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Setting up %s cluster...", clusterName ) );
+                String.format( "Checking %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-
+                String.format( "Checking cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
@@ -56,26 +54,24 @@ public class UninstallOperationHandler extends AbstractOperationHandler<HBaseImp
                     po.addLogFailed( e.getMessage() );
                     return;
                 }
-
-                po.addLog( "Uninstalling..." );
-
-                Command installCommand = Commands.getUninstallCommand( allNodes );
-                manager.getCommandRunner().runCommand( installCommand );
-
-                if ( installCommand.hasSucceeded() ) {
-                    po.addLog( "Uninstallation success.." );
-                }
-                else {
-                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
+                if ( allNodes == null || allNodes.isEmpty() ) {
+                    po.addLogFailed( "Nodes not connected" );
                     return;
                 }
 
-                po.addLog( "Updating db..." );
-                if ( manager.getDbManager().deleteInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
+                Command checkCommand = Commands.getStatusCommand( allNodes );
+                manager.getCommandRunner().runCommand( checkCommand );
+
+                if ( checkCommand.hasSucceeded() ) {
+                    StringBuilder status = new StringBuilder();
+                    for ( Agent agent : allNodes ) {
+                        status.append( agent.getHostname() ).append( ":\n" )
+                              .append( checkCommand.getResults().get( agent.getUuid() ).getStdOut() ).append( "\n\n" );
+                    }
+                    po.addLogDone( status.toString() );
                 }
                 else {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                    po.addLogFailed( String.format( "Check failed, %s", checkCommand.getAllErrors() ) );
                 }
             }
         } );

@@ -16,14 +16,14 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class UninstallOperationHandler extends AbstractOperationHandler<OozieImpl> {
+public class UninstallHandler extends AbstractOperationHandler<OozieImpl> {
 
     private ProductOperation po;
     //    private OozieConfig config;
     private String clusterName;
 
 
-    public UninstallOperationHandler( final OozieImpl manager, final String clusterName ) {
+    public UninstallHandler( final OozieImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( OozieConfig.PRODUCT_KEY,

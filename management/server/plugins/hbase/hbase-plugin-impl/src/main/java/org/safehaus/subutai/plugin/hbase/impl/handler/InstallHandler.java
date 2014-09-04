@@ -16,14 +16,14 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class InstallOperationHandler extends AbstractOperationHandler<HBaseImpl>
+public class InstallHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private ProductOperation po;
     private HBaseConfig config;
 
 
-    public InstallOperationHandler( final HBaseImpl manager, final HBaseConfig config ) {
+    public InstallHandler( final HBaseImpl manager, final HBaseConfig config ) {
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,

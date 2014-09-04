@@ -23,5 +23,5 @@
   <reference id="oozieManager" availability="mandatory"
              interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />
   <reference id="hadoopManager" availability="mandatory"
-             interface="org.safehaus.subutai.api.hadoop.Hadoop" />
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
 </blueprint>

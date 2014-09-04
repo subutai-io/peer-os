@@ -15,26 +15,25 @@ import com.google.common.collect.Sets;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StartClusterOperationHandler extends AbstractOperationHandler<HBaseImpl>
+public class StopClusterHandler extends AbstractOperationHandler<HBaseImpl>
 {
 
     private ProductOperation po;
-
     private String clusterName;
 
 
-    public StartClusterOperationHandler( final HBaseImpl manager, final String clusterName ) {
+    public StopClusterHandler( final HBaseImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Setting up %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Starting cluster %s", clusterName ) );
+                String.format( "Stopping cluster %s", clusterName ) );
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
@@ -52,14 +51,15 @@ public class StartClusterOperationHandler extends AbstractOperationHandler<HBase
                     return;
                 }
 
-                Command startCommand = Commands.getStartCommand( Sets.newHashSet( master ) );
-                manager.getCommandRunner().runCommand( startCommand );
 
-                if ( startCommand.hasSucceeded() ) {
-                    po.addLogDone( "Start success.." );
+                Command stopCommand = Commands.getStopCommand( Sets.newHashSet( master ) );
+                manager.getCommandRunner().runCommand( stopCommand );
+
+                if ( stopCommand.hasSucceeded() ) {
+                    po.addLogDone( "Stop success.." );
                 }
                 else {
-                    po.addLogFailed( String.format( "Start failed, %s", startCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Stop failed, %s", stopCommand.getAllErrors() ) );
                 }
             }
         } );
