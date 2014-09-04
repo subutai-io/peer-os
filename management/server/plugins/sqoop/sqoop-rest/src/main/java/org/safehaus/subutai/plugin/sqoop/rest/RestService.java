@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -36,7 +39,7 @@ public class RestService {
     }
 
     @GET
-    @Path("getClusters")
+    @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
     public String getClusters() {
 
@@ -51,21 +54,21 @@ public class RestService {
     }
 
     @GET
-    @Path("getCluster")
+    @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getCluster(
-            @QueryParam("clusterName") String clusterName
+            @PathParam("clusterName") String clusterName
     ) {
         SqoopConfig config = sqoopManager.getCluster(clusterName);
 
         return JsonUtil.GSON.toJson(config);
     }
 
-    @GET
-    @Path("installCluster")
+    @POST
+    @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String installCluster(
-            @QueryParam("clusterName") String clusterName,
+            @PathParam("clusterName") String clusterName,
             @QueryParam("nodes") String nodes
     ) {
 
@@ -85,30 +88,30 @@ public class RestService {
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
-    @Path("addNode")
+    @POST
+    @Path("clusters/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
     @Deprecated()
     public String addNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("hostname") String hostname
+            @PathParam("clusterName") String clusterName,
+            @PathParam("hostname") String hostname
     ) {
         return JsonUtil.toJson(OPERATION_ID, null);
     }
 
-    @GET
-    @Path("destroyNode")
+    @DELETE
+    @Path("clusters/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
     public String destroyNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("hostname") String hostname
+            @PathParam("clusterName") String clusterName,
+            @PathParam("hostname") String hostname
     ) {
         UUID uuid = sqoopManager.destroyNode(clusterName, hostname);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
+    @POST
     @Path("importData")
     @Produces({MediaType.APPLICATION_JSON})
     public String importData(
