@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.cassandra.impl.logic;
+package org.safehaus.subutai.plugin.cassandra.impl.configuration;
 
 
 import org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic;

@@ -34,7 +34,7 @@
   </bean>
 
   <bean id="cassandra-configuration-logic" scope="singleton"
-        class="org.safehaus.subutai.plugin.cassandra.impl.logic.ConfigurationLogicImpl">
+        class="org.safehaus.subutai.plugin.cassandra.impl.configuration.ConfigurationLogicImpl">
     <property name="configManager" ref="configManager" />
   </bean>
 
