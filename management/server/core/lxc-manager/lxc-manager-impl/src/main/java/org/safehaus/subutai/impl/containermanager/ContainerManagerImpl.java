@@ -244,8 +244,23 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 		}
 	}
 
+    @Override
+    public Map<Agent, Integer> getPhysicalServersWithLxcSlots() {
+        return null;
+    }
 
-	@Override
+    @Override
+    public Map<String, EnumMap<LxcState, List<String>>> getLxcOnPhysicalServers() {
+        return null;
+    }
+
+    @Override
+    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        return false;
+    }
+
+
+    @Override
 	public void clonesDestroyByHostname(final Set<String> cloneNames) throws LxcDestroyException {
 		if (cloneNames == null || cloneNames.isEmpty()) {
 			throw new LxcDestroyException("Clone names is empty or null");

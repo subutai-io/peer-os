@@ -1,8 +1,7 @@
 package org.safehaus.subutai.impl.containermanager;
 
 
-import org.safehaus.subutai.api.containermanager.ContainerManager;
-import org.safehaus.subutai.api.containermanager.IContainerManager;
+import org.safehaus.subutai.api.container.ContainerManager;
 import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.api.lxcmanager.LxcDestroyException;
 
