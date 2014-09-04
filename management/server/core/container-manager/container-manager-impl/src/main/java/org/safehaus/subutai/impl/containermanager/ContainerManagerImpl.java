@@ -9,9 +9,12 @@ import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.containermanager.*;
+import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
+import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.Template;
+import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -37,10 +40,13 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ExecutorService executor;
     private Monitor monitor;
 
-    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor) {
+    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager) {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.monitor = monitor;
+        this.templateManager = templateManager;
+        this.templateRegistry = templateRegistry;
+        this.dbManager = dbManager;
 
         Commands.init(commandRunner);
     }

@@ -26,11 +26,9 @@
     <bean id="containerManager" scope="singleton"
           class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
-    <!--
-        <property name="containerManager" ref="lxcmanager"/>
-    -->
         <property name="agentManager" ref="agentManager"/>
         <property name="commandRunner" ref="commandRunner"/>
+        <property name="monitor" ref="monitor"/>
         <property name="templateManager" ref="templateManager"/>
         <property name="templateRegistry" ref="templateRegistry"/>
         <property name="dbManager" ref="dbManager"/>
