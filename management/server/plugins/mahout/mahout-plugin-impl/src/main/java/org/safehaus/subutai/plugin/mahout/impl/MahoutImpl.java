@@ -127,6 +127,24 @@ public class MahoutImpl implements Mahout {
 
 
     @Override
+    public UUID checkNode( final String clustername, final String lxchostname ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID stopCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID startCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MahoutConfig config,
                                                          final ProductOperation po ) {
         return new MahoutSetupStrategy( this, po, config );

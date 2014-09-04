@@ -1,8 +1,15 @@
 package org.safehaus.subutai.plugin.mahout.rest;
 
 
+import java.util.List;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
+import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.TrimmedMahoutClusterConfig;
 
 
 /**
@@ -36,54 +43,79 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listClusters() {
-        return null;
+        List<MahoutConfig> clusters = mahoutManager.getClusters();
+        return JsonUtil.toJson( clusters );
     }
 
 
     @Override
     public String getCluster( final String source ) {
-        return null;
+        MahoutConfig mahoutConfig = mahoutManager.getCluster( source );
+        return JsonUtil.toJson( mahoutConfig );
     }
 
 
     @Override
     public String createCluster( final String config ) {
-        return null;
+        TrimmedMahoutClusterConfig tmcc = JsonUtil.fromJson( config, TrimmedMahoutClusterConfig.class );
+
+        MahoutConfig mahoutConfig = new MahoutConfig();
+        mahoutConfig.setClusterName( tmcc.getClusterName() );
+
+        for ( String node : tmcc.getNodes() ) {
+            Agent agent = agentManager.getAgentByHostname( node );
+            mahoutConfig.getNodes().add( agent );
+        }
+
+        UUID uuid = mahoutManager.installCluster( mahoutConfig );
+
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String destroyCluster( final String clusterName ) {
-        return null;
+        UUID uuid = mahoutManager.uninstallCluster( clusterName );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String startCluster( final String clusterName ) {
-        return null;
+        UUID uuid = mahoutManager.startCluster( clusterName );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String stopCluster( final String clusterName ) {
-        return null;
+        UUID uuid = mahoutManager.stopCluster( clusterName );
+        return wrapUUID( uuid );
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        return null;
+    public String addNode( final String clustername, final String lxchostname ) {
+        UUID uuid = mahoutManager.addNode( clustername, lxchostname );
+        return wrapUUID( uuid );
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        return null;
+    public String destroyNode( final String clustername, final String lxchostname ) {
+        UUID uuid = mahoutManager.destroyNode( clustername, lxchostname );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String checkNode( final String clustername, final String lxchostname ) {
-        return null;
+        UUID uuid = mahoutManager.checkNode( clustername, lxchostname );
+        return wrapUUID( uuid );
+    }
+
+
+    private String wrapUUID( UUID uuid ) {
+        return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 }

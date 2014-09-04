@@ -204,6 +204,30 @@ public class HBaseImpl implements HBase {
 
 
     @Override
+    public UUID checkNode( final String clustername, final String lxchostname ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID addNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID destroyCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
     public HBaseClusterConfig getCluster( String clusterName ) {
         return dbManager.getInfo( HBaseClusterConfig.PRODUCT_KEY, clusterName, HBaseClusterConfig.class );
     }

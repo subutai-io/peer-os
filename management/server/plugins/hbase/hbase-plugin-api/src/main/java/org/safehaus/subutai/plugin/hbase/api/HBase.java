@@ -46,4 +46,12 @@ public interface HBase extends ApiBase<HBaseClusterConfig> {
                                                          ProductOperation po );
 
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
+
+    UUID checkNode( String clustername, String lxchostname );
+
+    UUID destroyNode( String clustername, String lxchostname, String nodetype );
+
+    UUID addNode( String clustername, String lxchostname, String nodetype );
+
+    UUID destroyCluster( String clusterName );
 }
