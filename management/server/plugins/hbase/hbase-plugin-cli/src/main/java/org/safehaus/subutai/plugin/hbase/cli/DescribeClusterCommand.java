@@ -15,8 +15,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "hbase", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
 public class DescribeClusterCommand extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private HBase hbaseManager;
 
