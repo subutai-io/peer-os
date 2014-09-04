@@ -20,6 +20,7 @@
         <module>accumulo</module>
         <module>hadoop</module>
         <module>flume</module>
+        <module>hive</module>
         <module>presto</module>
         <module>solr</module>
         <module>spark</module>
