@@ -25,52 +25,7 @@ import com.vaadin.ui.Panel;
 public class StepStart extends Panel {
 
     public StepStart( final Wizard wizard ) {
-        /*setSizeFull();
-        GridLayout gridLayout = new GridLayout( 10, 6 );
-        gridLayout.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to HBase Installation Wizard!</h2><br/>"
-                + "Please click Start button to continue</center>" );
-        welcomeMsg.setContentMode( ContentMode.HTML );
-        gridLayout.addComponent( welcomeMsg, 3, 1, 6, 2 );
-
-        Label logoImg = new Label();
-        logoImg.setIcon( new FileResource( FileUtil.getFile( HBaseUI.MODULE_IMAGE, this ) ) );
-        logoImg.setContentMode( ContentMode.HTML );
-        logoImg.setHeight( 150, Unit.PIXELS );
-        logoImg.setWidth( 220, Unit.PIXELS );
-        gridLayout.addComponent( logoImg, 1, 3, 2, 5 );
-
-        HorizontalLayout hl = new HorizontalLayout();
-
-        Button overHadoop = new Button( "Start over Hadoop Installation" );
-        overHadoop.addStyleName( "default" );
-        overHadoop.setWidth( 100, Unit.PIXELS );
-        overHadoop.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                wizard.init();
-                wizard.next();
-            }
-        } );
-
-        hl.addComponent( overHadoop );
-
-        Button withHadoop = new Button( "With Hadoop Installation" );
-        withHadoop.addStyleName( "default" );
-        withHadoop.setWidth( 100, Unit.PIXELS );
-        withHadoop.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                wizard.init();
-                wizard.next();
-            }
-        } );
-
-        hl.addComponent( withHadoop );
-
-        gridLayout.addComponent( hl, 6, 4, 6, 4 );
-        addComponent( gridLayout );*/
         setSizeFull();
 
         GridLayout grid = new GridLayout( 10, 6 );
