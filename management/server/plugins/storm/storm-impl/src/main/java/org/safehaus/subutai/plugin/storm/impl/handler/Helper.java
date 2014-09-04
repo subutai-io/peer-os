@@ -1,15 +1,11 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
 
 class Helper {
@@ -18,18 +14,6 @@ class Helper {
 
     public Helper(StormImpl manager) {
         this.manager = manager;
-    }
-
-    Agent createContainer() throws LxcCreateException {
-        Set<Agent> s = createContainers(1);
-        return s.size() > 0 ? s.iterator().next() : null;
-    }
-
-    Set<Agent> createContainers(int count) throws LxcCreateException {
-        Map<Agent, Set<Agent>> lxcs = manager.getLxcManager().createLxcs(count);
-        Set<Agent> res = new HashSet<>();
-        for(Set<Agent> s : lxcs.values()) res.addAll(s);
-        return res;
     }
 
     boolean installZookeeper(Agent agent) {

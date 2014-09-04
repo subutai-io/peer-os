@@ -100,7 +100,7 @@ public class RestService {
             @QueryParam("clusterName") String clusterName,
             @QueryParam("hostname") String hostname
     ) {
-        UUID uuid = stormManager.addNode(clusterName, hostname);
+        UUID uuid = stormManager.addNode(clusterName);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }

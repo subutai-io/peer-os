@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -40,40 +41,36 @@ public class UninstallHandler extends AbstractHandler {
             return;
         }
 
-        Set<Agent> allNodes = new HashSet<>(config.getSupervisors());
-        allNodes.add(config.getNimbus());
-        Command cmd = manager.getCommandRunner().createCommand(
-                new RequestBuilder(Commands.make(CommandType.PURGE)),
-                allNodes);
-        manager.getCommandRunner().runCommand(cmd);
+        Set<Agent> nodes = new HashSet<>(config.getSupervisors());
 
-        if(cmd.hasCompleted()) {
-            for(Agent a : allNodes) {
-                AgentResult res = cmd.getResults().get(a.getUuid());
-                if(isZero(res.getExitCode()))
-                    po.addLog("Storm successfully removed from " + a.getHostname());
-                else {
-                    po.addLog(res.getStdOut());
-                    po.addLog(res.getStdErr());
-                }
-            }
-            try {
-                po.addLog("Destroying container(s)...");
-                manager.getLxcManager().destroyLxcs(allNodes);
-                po.addLog("Container(s) destroyed");
+        if(config.isExternalZookeeper()) {
+            po.addLog("Removing Storm from external Zookeeper node...");
+            Command cmd = manager.getCommandRunner().createCommand(
+                    new RequestBuilder(Commands.make(CommandType.PURGE)),
+                    new HashSet<>(Arrays.asList(config.getNimbus())));
+            manager.getCommandRunner().runCommand(cmd);
+            if(cmd.hasSucceeded())
+                po.addLog("Storm successfully removed from nimbus node");
+            else
+                po.addLog("Failed to remove Storm from nimbus node");
+        } else
+            nodes.add(config.getNimbus());
 
-                manager.getPluginDao().deleteInfo(StormConfig.PRODUCT_NAME, clusterName);
-                po.addLogDone("Cluster info deleted");
-            } catch(DBException ex) {
-                manager.getLogger().error("Failed to delete from db", ex);
-                po.addLogFailed("Failed to delete cluster info");
-            } catch(LxcDestroyException ex) {
-                po.addLog("Failed to destroy nodes: " + ex.getMessage());
-                manager.getLogger().error("Destroying container(s) failed", ex);
-            }
-        } else {
-            po.addLog(cmd.getAllErrors());
-            po.addLogFailed("Failed to remove Storm on nodes");
+        try {
+            po.addLog("Destroying container(s)...");
+            manager.getContainerManager().clonesDestroy(nodes);
+            po.addLog("Container(s) destroyed");
+
+            manager.getPluginDao().deleteInfo(StormConfig.PRODUCT_NAME, clusterName);
+            po.addLogDone("Cluster info deleted");
+        } catch(DBException ex) {
+            String m = "Failed to delete cluster info";
+            manager.getLogger().error(m, ex);
+            po.addLogFailed(m);
+        } catch(LxcDestroyException ex) {
+            String m = "Failed to destroy node(s)";
+            po.addLog(m + ex.getMessage());
+            manager.getLogger().error(m, ex);
         }
 
     }

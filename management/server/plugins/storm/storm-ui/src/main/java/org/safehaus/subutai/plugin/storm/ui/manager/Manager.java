@@ -102,7 +102,7 @@ public class Manager {
                     return;
                 }
 
-                UUID trackId = StormUI.getManager().addNode(config.getClusterName(), null);
+                UUID trackId = StormUI.getManager().addNode(config.getClusterName());
                 ProgressWindow pw = new ProgressWindow(StormUI.getExecutor(),
                         StormUI.getTracker(), trackId, StormConfig.PRODUCT_NAME);
                 pw.getWindow().addCloseListener(new Window.CloseListener() {

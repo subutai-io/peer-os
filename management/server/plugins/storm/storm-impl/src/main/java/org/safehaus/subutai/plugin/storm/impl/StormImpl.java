@@ -75,8 +75,8 @@ public class StormImpl extends StormBase {
     }
 
     @Override
-    public UUID addNode(String clusterName, String hostname) {
-        AbstractOperationHandler h = new AddNodeHandler(this, clusterName, hostname);
+    public UUID addNode(String clusterName) {
+        AbstractOperationHandler h = new AddNodeHandler(this, clusterName);
         executor.execute(h);
         return h.getTrackerId();
     }
