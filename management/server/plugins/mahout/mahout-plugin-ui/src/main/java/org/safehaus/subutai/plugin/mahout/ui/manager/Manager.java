@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -43,7 +43,7 @@ public class Manager
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private MahoutConfig config;
+    private MahoutClusterConfig config;
 
 
     public Manager()
@@ -75,7 +75,7 @@ public class Manager
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config = ( MahoutConfig ) event.getProperty().getValue();
+                config = ( MahoutClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -114,7 +114,7 @@ public class Manager
                         {
                             UUID trackID = MahoutUI.getMahoutManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( MahoutUI.getExecutor(), MahoutUI.getTracker(),
-                                trackID, MahoutConfig.PRODUCT_KEY );
+                                trackID, MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -243,12 +243,12 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<MahoutConfig> clustersInfo = MahoutUI.getMahoutManager().getClusters();
-        MahoutConfig clusterInfo = ( MahoutConfig ) clusterCombo.getValue();
+        List<MahoutClusterConfig> clustersInfo = MahoutUI.getMahoutManager().getClusters();
+        MahoutClusterConfig clusterInfo = ( MahoutClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && clustersInfo.size() > 0 )
         {
-            for ( MahoutConfig mongoClusterInfo : clustersInfo )
+            for ( MahoutClusterConfig mongoClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo,
@@ -256,7 +256,7 @@ public class Manager
             }
             if ( clusterInfo != null )
             {
-                for ( MahoutConfig mongoClusterInfo : clustersInfo )
+                for ( MahoutClusterConfig mongoClusterInfo : clustersInfo )
                 {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
@@ -311,7 +311,7 @@ public class Manager
                             UUID trackID = MahoutUI.getMahoutManager()
                                 .destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( MahoutUI.getExecutor(), MahoutUI.getTracker(),
-                                trackID, MahoutConfig.PRODUCT_KEY );
+                                trackID, MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override

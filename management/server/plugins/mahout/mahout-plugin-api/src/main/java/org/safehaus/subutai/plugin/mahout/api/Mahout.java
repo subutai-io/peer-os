@@ -18,7 +18,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 /**
  * @author dilshat
  */
-public interface Mahout extends ApiBase<MahoutConfig> {
+public interface Mahout extends ApiBase<MahoutClusterConfig> {
 
     UUID addNode( String clusterName, String lxcHostname );
 
@@ -30,7 +30,7 @@ public interface Mahout extends ApiBase<MahoutConfig> {
 
     UUID startCluster( String clusterName );
 
-    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutConfig config, ProductOperation po );
+    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutClusterConfig config, ProductOperation po );
 
-    EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutConfig config );
+    EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutClusterConfig config );
 }

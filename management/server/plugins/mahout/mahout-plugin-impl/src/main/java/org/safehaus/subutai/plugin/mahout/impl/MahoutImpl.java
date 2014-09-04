@@ -24,7 +24,7 @@ import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
 import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
@@ -86,7 +86,7 @@ public class MahoutImpl implements Mahout {
     }
 
 
-    public UUID installCluster( final MahoutConfig config ) {
+    public UUID installCluster( final MahoutClusterConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
         AbstractOperationHandler operationHandler = new InstallHandler( this, config );
         executor.execute( operationHandler );
@@ -101,14 +101,14 @@ public class MahoutImpl implements Mahout {
     }
 
 
-    public List<MahoutConfig> getClusters() {
-        return dbManager.getInfo( MahoutConfig.PRODUCT_KEY, MahoutConfig.class );
+    public List<MahoutClusterConfig> getClusters() {
+        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, MahoutClusterConfig.class );
     }
 
 
     @Override
-    public MahoutConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( MahoutConfig.PRODUCT_KEY, clusterName, MahoutConfig.class );
+    public MahoutClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, clusterName, MahoutClusterConfig.class );
     }
 
 
@@ -145,14 +145,14 @@ public class MahoutImpl implements Mahout {
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MahoutConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MahoutClusterConfig config,
                                                          final ProductOperation po ) {
         return new MahoutSetupStrategy( this, po, config );
     }
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final MahoutConfig config ) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final MahoutClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );

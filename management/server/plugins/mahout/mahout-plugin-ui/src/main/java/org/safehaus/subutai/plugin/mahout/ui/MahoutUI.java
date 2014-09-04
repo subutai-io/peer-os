@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -81,11 +81,11 @@ public class MahoutUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return MahoutConfig.PRODUCT_KEY;
+		return MahoutClusterConfig.PRODUCT_KEY;
 	}
 
 	public String getName() {
-		return MahoutConfig.PRODUCT_KEY;
+		return MahoutClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

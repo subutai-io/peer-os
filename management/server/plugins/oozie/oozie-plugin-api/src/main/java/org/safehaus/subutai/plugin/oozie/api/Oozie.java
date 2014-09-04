@@ -30,4 +30,8 @@ public interface Oozie extends ApiBase<OozieClusterConfig> {
                                                          ProductOperation po );
 
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieClusterConfig config );
+
+    UUID addNode( String clustername, String lxchostname, String nodetype );
+
+    UUID destroyNode( String clustername, String lxchostname, String nodetype );
 }

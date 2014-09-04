@@ -102,25 +102,31 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String stopCluster( final String clusterName ) {
-        return null;
+        OozieClusterConfig occ = oozieManager.getCluster( clusterName );
+        UUID uuid = oozieManager.stopServer( occ );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        return null;
+        UUID uuid = oozieManager.addNode( clustername, lxchostname, nodetype );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        return null;
+        UUID uuid = oozieManager.destroyNode( clustername, lxchostname, nodetype );
+        return wrapUUID( uuid );
     }
 
 
     @Override
     public String checkNode( final String clustername, final String lxchostname ) {
-        return null;
+        OozieClusterConfig occ = oozieManager.getCluster( clustername );
+        UUID uuid = oozieManager.checkServerStatus( occ );
+        return wrapUUID( uuid );
     }
 
 

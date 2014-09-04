@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
-public class MahoutConfig implements ConfigBase {
+public class MahoutClusterConfig implements ConfigBase {
 
 	public static final String PRODUCT_KEY = "Mahout";
 	public static final String PRODUCT_NAME = "Mahout";

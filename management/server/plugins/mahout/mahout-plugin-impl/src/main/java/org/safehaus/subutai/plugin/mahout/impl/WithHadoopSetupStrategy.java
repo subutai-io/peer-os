@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 
 
 /**
@@ -16,7 +16,7 @@ public class WithHadoopSetupStrategy extends MahoutSetupStrategy {
     private Environment environment;
 
 
-    public WithHadoopSetupStrategy( MahoutImpl manager, ProductOperation po, MahoutConfig config ) {
+    public WithHadoopSetupStrategy( MahoutImpl manager, ProductOperation po, MahoutClusterConfig config ) {
         super( manager, po, config );
     }
 

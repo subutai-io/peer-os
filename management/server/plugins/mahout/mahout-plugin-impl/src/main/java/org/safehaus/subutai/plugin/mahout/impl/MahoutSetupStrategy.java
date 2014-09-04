@@ -5,7 +5,7 @@ import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 
 
 /**
@@ -14,12 +14,12 @@ import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
 public class MahoutSetupStrategy implements ClusterSetupStrategy {
 
 
-    public MahoutConfig config;
+    public MahoutClusterConfig config;
     private ProductOperation productOperation;
     private MahoutImpl mahout;
 
 
-    public MahoutSetupStrategy( MahoutImpl mahout, final ProductOperation po, final MahoutConfig config ) {
+    public MahoutSetupStrategy( MahoutImpl mahout, final ProductOperation po, final MahoutClusterConfig config ) {
 
         this.config = config;
         this.productOperation = po;

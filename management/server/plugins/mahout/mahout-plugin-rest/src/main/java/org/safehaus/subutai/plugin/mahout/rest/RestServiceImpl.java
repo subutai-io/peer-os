@@ -8,7 +8,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.TrimmedMahoutClusterConfig;
 
 
@@ -43,14 +43,14 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listClusters() {
-        List<MahoutConfig> clusters = mahoutManager.getClusters();
+        List<MahoutClusterConfig> clusters = mahoutManager.getClusters();
         return JsonUtil.toJson( clusters );
     }
 
 
     @Override
     public String getCluster( final String source ) {
-        MahoutConfig mahoutConfig = mahoutManager.getCluster( source );
+        MahoutClusterConfig mahoutConfig = mahoutManager.getCluster( source );
         return JsonUtil.toJson( mahoutConfig );
     }
 
@@ -59,7 +59,7 @@ public class RestServiceImpl implements RestService {
     public String createCluster( final String config ) {
         TrimmedMahoutClusterConfig tmcc = JsonUtil.fromJson( config, TrimmedMahoutClusterConfig.class );
 
-        MahoutConfig mahoutConfig = new MahoutConfig();
+        MahoutClusterConfig mahoutConfig = new MahoutClusterConfig();
         mahoutConfig.setClusterName( tmcc.getClusterName() );
 
         for ( String node : tmcc.getNodes() ) {

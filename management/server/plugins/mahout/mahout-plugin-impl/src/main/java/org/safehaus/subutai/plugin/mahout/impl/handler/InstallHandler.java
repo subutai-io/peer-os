@@ -5,7 +5,7 @@ import com.google.common.base.Strings;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.impl.Commands;
 import org.safehaus.subutai.plugin.mahout.impl.MahoutImpl;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
@@ -22,15 +22,15 @@ import java.util.UUID;
 public class InstallHandler extends AbstractOperationHandler<MahoutImpl>
 {
     private final ProductOperation po;
-    private final MahoutConfig config;
+    private final MahoutClusterConfig config;
 
 
-    public InstallHandler( MahoutImpl manager, MahoutConfig config )
+    public InstallHandler( MahoutImpl manager, MahoutClusterConfig config )
     {
         super( manager, config.getClusterName() );
         this.config = config;
-        po = manager.getTracker().createProductOperation( MahoutConfig.PRODUCT_KEY,
-            String.format( "Installing %s", MahoutConfig.PRODUCT_KEY ) );
+        po = manager.getTracker().createProductOperation( MahoutClusterConfig.PRODUCT_KEY,
+            String.format( "Installing %s", MahoutClusterConfig.PRODUCT_KEY ) );
     }
 
 
@@ -114,7 +114,7 @@ public class InstallHandler extends AbstractOperationHandler<MahoutImpl>
         }
         po.addLog( "Updating db..." );
         //save to db
-        if ( manager.getDbManager().saveInfo( MahoutConfig.PRODUCT_KEY, config.getClusterName(), config ) )
+        if ( manager.getDbManager().saveInfo( MahoutClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
         {
             po.addLog( "Cluster info saved to DB\nInstalling Mahout..." );
 

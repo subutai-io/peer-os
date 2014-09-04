@@ -264,4 +264,16 @@ public class OozieImpl extends OozieBase {
 
         return environmentBlueprint;
     }
+
+
+    @Override
+    public UUID addNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
 }
