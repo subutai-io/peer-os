@@ -6,22 +6,28 @@
 package org.safehaus.subutai.core.db.impl;
 
 
-import com.datastax.driver.core.*;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.common.settings.Common;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
+
+import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -178,7 +184,7 @@ public class DbManagerImpl implements DbManager
             }
             return session.execute( boundStatement );
         }
-        catch ( Throwable ex )
+        catch ( RuntimeException ex )
         {
             throw new DBException( ex.getMessage() );
         }
@@ -214,7 +220,7 @@ public class DbManagerImpl implements DbManager
             }
             session.execute( boundStatement );
         }
-        catch ( Throwable ex )
+        catch ( RuntimeException ex )
         {
             throw new DBException( ex.getMessage() );
         }
