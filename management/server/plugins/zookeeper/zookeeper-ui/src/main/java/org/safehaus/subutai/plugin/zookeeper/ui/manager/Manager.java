@@ -41,10 +41,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 
-
-/**
- * @author dilshat
- */
 public class Manager {
 
     private final GridLayout contentRoot;
@@ -81,11 +77,12 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( ZookeeperClusterConfig ) event.getProperty().getValue();
                 refreshUI();
+                checkAll();
             }
         } );
         controlsContent.addComponent( clusterCombo );
 
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        Button refreshClustersBtn = new Button( "Refresh Clusters" );
         refreshClustersBtn.addStyleName( "default" );
         refreshClustersBtn.addClickListener( new Button.ClickListener() {
 
@@ -96,7 +93,7 @@ public class Manager {
         } );
         controlsContent.addComponent( refreshClustersBtn );
 
-        Button checkAllBtn = new Button( "Check all" );
+        Button checkAllBtn = new Button( "Check All" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener() {
 
@@ -107,7 +104,7 @@ public class Manager {
         } );
         controlsContent.addComponent( checkAllBtn );
 
-        Button startAllBtn = new Button( "Start all" );
+        Button startAllBtn = new Button( "Start All" );
         startAllBtn.addStyleName( "default" );
         startAllBtn.addClickListener( new Button.ClickListener() {
 
@@ -118,7 +115,7 @@ public class Manager {
         } );
         controlsContent.addComponent( startAllBtn );
 
-        Button stopAllBtn = new Button( "Stop all" );
+        Button stopAllBtn = new Button( "Stop All" );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener() {
 
@@ -129,7 +126,7 @@ public class Manager {
         } );
         controlsContent.addComponent( stopAllBtn );
 
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        Button destroyClusterBtn = new Button( "Destroy Cluster" );
         destroyClusterBtn.addStyleName( "default" );
         destroyClusterBtn.addClickListener( new Button.ClickListener() {
 
@@ -328,6 +325,7 @@ public class Manager {
     private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "IP", Label.class, null );
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Start", Button.class, null );
         table.addContainerProperty( "Stop", Button.class, null );
@@ -438,6 +436,8 @@ public class Manager {
         table.removeAllItems();
 
         for ( final Agent agent : agents ) {
+            final Label ip = new Label( agent.getListIP().toString() );
+            ip.addStyleName( "default" );
             final Button checkBtn = new Button( "Check" );
             checkBtn.addStyleName( "default" );
             final Button startBtn = new Button( "Start" );
@@ -452,7 +452,7 @@ public class Manager {
             progressIcon.setVisible( false );
 
             table.addItem( new Object[] {
-                    agent.getHostname(), checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
+                    agent.getHostname(), ip, checkBtn, startBtn, stopBtn, destroyBtn, progressIcon
             }, null );
 
             checkBtn.addClickListener( new Button.ClickListener() {
@@ -572,5 +572,12 @@ public class Manager {
 
     public Component getContent() {
         return contentRoot;
+    }
+
+    /**
+     * Checks all nodes status on all tables.
+     */
+    public void checkAll(){
+        checkNodesStatus( nodesTable );
     }
 }
