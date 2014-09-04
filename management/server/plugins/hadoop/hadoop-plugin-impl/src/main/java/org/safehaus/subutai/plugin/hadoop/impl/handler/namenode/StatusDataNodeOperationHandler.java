@@ -7,8 +7,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class StatusDataNodeOperationHandler extends AbstractOperationHandler<HadoopImpl> {

@@ -9,8 +9,8 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
+import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
 
 
 public class StatusNameNodeOperationHandler extends AbstractOperationHandler<HadoopImpl> {
@@ -72,7 +72,7 @@ public class StatusNameNodeOperationHandler extends AbstractOperationHandler<Had
                     statusCommand.getAllErrors() ) );
         }
         else {
-            productOperation.addLogDone( String.format( "Node %s is %s", node.getHostname(), nodeState ) );
+            productOperation.addLogDone( String.format( "NameNode %s is %s", node.getHostname(), nodeState ) );
         }
     }
 }
