@@ -781,7 +781,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                  <!-- Container Manager -->
+                  <!-- Container Manager  -->
                   <artifactItem>
                       <groupId>org.safehaus.subutai</groupId>
                       <artifactId>container-manager-ui</artifactId>
