@@ -1,9 +1,5 @@
 package org.safehaus.subutai.plugin.storm.impl.handler;
 
-import org.safehaus.subutai.plugin.storm.impl.CommandType;
-import org.safehaus.subutai.plugin.storm.impl.StormImpl;
-import org.safehaus.subutai.plugin.storm.impl.Commands;
-import org.safehaus.subutai.plugin.storm.impl.StormService;
 import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -11,6 +7,10 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
+import org.safehaus.subutai.plugin.storm.impl.CommandType;
+import org.safehaus.subutai.plugin.storm.impl.Commands;
+import org.safehaus.subutai.plugin.storm.impl.StormImpl;
+import org.safehaus.subutai.plugin.storm.impl.StormService;
 
 public class StartHandler extends AbstractHandler {
 
@@ -49,7 +49,7 @@ public class StartHandler extends AbstractHandler {
         for(StormService service : services) {
             if(service == StormService.NIMBUS) {
                 Helper h = new Helper(manager);
-                if(!h.startZookeeper(agent)) {
+                if(!h.startZookeeper(config.getZookeeperClusterName(), hostname)) {
                     po.addLog("Failed to start Zookeeper on Nimbus");
                     result = false;
                     break;

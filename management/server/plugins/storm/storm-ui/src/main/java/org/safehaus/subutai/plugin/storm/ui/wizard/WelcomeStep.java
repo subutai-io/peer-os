@@ -30,30 +30,34 @@ public class WelcomeStep extends Panel {
 
         Button next = new Button("Start (embedded Zookeeper)");
         next.addStyleName("default");
+        next.addClickListener(new NextClickHandler(wizard, false));
         grid.addComponent(next, 6, 4, 6, 4);
         grid.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
 
-        next.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                wizard.init(false);
-                wizard.next();
-            }
-        });
-
         Button nextExt = new Button("Start (external Zookeeper)");
         nextExt.addStyleName("default");
-        nextExt.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                wizard.init(true);
-                wizard.next();
-            }
-        });
+        nextExt.addClickListener(new NextClickHandler(wizard, true));
         grid.addComponent(nextExt, 7, 4, 7, 4);
         grid.setComponentAlignment(nextExt, Alignment.BOTTOM_RIGHT);
 
         setContent(grid);
     }
 
+    private class NextClickHandler implements Button.ClickListener {
+
+        final Wizard wizard;
+        final boolean withExtZookeeper;
+
+        public NextClickHandler(Wizard wizard, boolean withExtZookeeper) {
+            this.wizard = wizard;
+            this.withExtZookeeper = withExtZookeeper;
+        }
+
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+            wizard.init(withExtZookeeper);
+            wizard.next();
+        }
+
+    }
 }

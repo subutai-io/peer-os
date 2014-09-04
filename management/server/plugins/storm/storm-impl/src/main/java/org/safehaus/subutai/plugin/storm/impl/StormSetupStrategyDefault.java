@@ -71,15 +71,19 @@ public class StormSetupStrategyDefault implements ClusterSetupStrategy {
 
             if(!zk.getNodes().contains(config.getNimbus()))
                 throw new ClusterSetupException(
-                        "Specified nimbus node is not part of Zookeeper cluster");
-        }
+                        "Specified nimbus node is not part of Zookeeper cluster "
+                        + config.getZookeeperClusterName());
+        } else
+            // find out nimbus node in environment
+            for(Node n : environment.getNodes()) {
+                if(n.getNodeGroupName().equals(StormService.NIMBUS.toString()))
+                    config.setNimbus(n.getAgent());
+            }
 
+        // collect worker nodes in environment
         for(Node n : environment.getNodes()) {
             if(n.getNodeGroupName().equals(StormService.SUPERVISOR.toString()))
                 config.getSupervisors().add(n.getAgent());
-            else if(!config.isExternalZookeeper())
-                if(n.getNodeGroupName().equals(StormService.NIMBUS.toString()))
-                    config.setNimbus(n.getAgent());
         }
         if(config.getNimbus() == null)
             throw new ClusterSetupException("Environment has no Nimbus node");

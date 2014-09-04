@@ -3,7 +3,6 @@ package org.safehaus.subutai.plugin.storm.impl.handler;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
@@ -16,22 +15,10 @@ class Helper {
         this.manager = manager;
     }
 
-    boolean installZookeeper(Agent agent) {
-//        UUID id = manager.getZookeeperManager().install(agent.getHostname());
-//        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
-//        return watchOperation(src, id, 2, TimeUnit.MINUTES);
-
-        // TODO:
-        return false;
-    }
-
-    boolean startZookeeper(Agent agent) {
-//        UUID id = manager.getZookeeperManager().start(agent.getHostname());
-//        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
-//        return watchOperation(src, id, 1, TimeUnit.MINUTES);
-
-        // TODO:
-        return false;
+    boolean startZookeeper(String clusterName, String hostname) {
+        UUID id = manager.getZookeeperManager().startNode(clusterName, hostname);
+        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
+        return watchOperation(src, id, 1, TimeUnit.MINUTES);
     }
 
     private boolean watchOperation(String source, UUID id, long timeout, TimeUnit unit) {
