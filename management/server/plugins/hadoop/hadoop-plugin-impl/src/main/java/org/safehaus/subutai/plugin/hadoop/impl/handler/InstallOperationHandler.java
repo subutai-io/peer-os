@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 
@@ -38,10 +37,8 @@ public class InstallOperationHandler extends AbstractOperationHandler<HadoopImpl
     @Override
     public void run() {
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
-                CollectionUtil.isCollectionEmpty( config.getAllSlaveNodes() ) ||
-                config.getNameNode() == null ||
-                config.getSecondaryNameNode() == null ||
-                config.getJobTracker() == null ) {
+                config.getCountOfSlaveNodes() == null ||
+                config.getCountOfSlaveNodes() <= 0 ) {
             productOperation.addLogFailed( "Malformed configuration\nInstallation aborted" );
             return;
         }
