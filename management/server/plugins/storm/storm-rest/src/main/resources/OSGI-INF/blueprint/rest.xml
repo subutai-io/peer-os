@@ -8,14 +8,14 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
-    <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.api.storm.Storm"/>
+    <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.plugin.storm.api.Storm"/>
 
-    <bean id="restService" class="org.safehaus.subutai.storm.services.RestService">
+    <bean id="restService" class="org.safehaus.subutai.storm.plugin.rest.RestService">
         <property name="agentManager" ref="agentManager"/>
         <property name="stormManager" ref="stormManager"/>
     </bean>
 
-    <jaxrs:server address="/storm" id="stormRestService">
+    <jaxrs:server address="/storm2" id="stormRestService">
         <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>

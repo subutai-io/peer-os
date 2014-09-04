@@ -19,13 +19,13 @@ public class StormConfig implements ConfigBase {
     private Set<Agent> supervisors = new HashSet(); // worker nodes
 
     @Override
-    public String getClusterName() {
-        return clusterName;
+    public String getProductName() {
+        return PRODUCT_NAME;
     }
 
     @Override
-    public String getProductName() {
-        return PRODUCT_NAME;
+    public String getClusterName() {
+        return clusterName;
     }
 
     public void setClusterName(String clusterName) {
