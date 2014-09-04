@@ -52,7 +52,7 @@ public class StopServiceCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws IOException {
 
-        UUID uuid = cassandraManager.stopCassandraService( clusterName, agentUUID );
+        UUID uuid = cassandraManager.stopService( clusterName, agentUUID );
         tracker.printOperationLog( CassandraConfig.PRODUCT_KEY, uuid, 30000 );
 
         return null;

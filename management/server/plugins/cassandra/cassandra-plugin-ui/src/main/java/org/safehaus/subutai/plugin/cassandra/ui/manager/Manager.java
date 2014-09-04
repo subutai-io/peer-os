@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
+import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
 
+import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
@@ -149,7 +149,7 @@ public class Manager {
 		checkAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().checkAllNodes(config.getClusterName());
+				UUID trackID = CassandraUI.getCassandraManager().checkCluster(config.getClusterName());
 				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
@@ -171,7 +171,7 @@ public class Manager {
 		startAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().startAllNodes(config.getClusterName());
+				UUID trackID = CassandraUI.getCassandraManager().startCluster(config.getClusterName());
 				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
@@ -193,7 +193,7 @@ public class Manager {
 		stopAllBtn.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = CassandraUI.getCassandraManager().stopAllNodes(config.getClusterName());
+				UUID trackID = CassandraUI.getCassandraManager().stopCluster(config.getClusterName());
 				ProgressWindow window = new ProgressWindow(CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID, CassandraConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override

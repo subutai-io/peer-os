@@ -17,7 +17,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StartCassandraServiceOperationHandler extends AbstractOperationHandler<CassandraImpl> {
+public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
     //    private CassandraConfig config;
@@ -26,7 +26,7 @@ public class StartCassandraServiceOperationHandler extends AbstractOperationHand
     private String clusterName;
 
 
-    public StartCassandraServiceOperationHandler( final CassandraImpl manager, final String clusterName, final String agentUUID) {
+    public CheckServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
         super( manager, clusterName );
         this.agentUUID = agentUUID;
         this.clusterName = clusterName;
@@ -38,24 +38,27 @@ public class StartCassandraServiceOperationHandler extends AbstractOperationHand
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
-                String.format( "Starting Cassandra service on %s", agentUUID ) );
+                String.format( "Checking status of Cassandra service on %s", agentUUID ) );
         manager.getExecutor().execute( new Runnable() {
             Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
 
 
             public void run() {
-                Command startServiceCommand = Commands.getStartCommand(Sets.newHashSet(agent) );
-                manager.getCommandRunner().runCommand( startServiceCommand );
-                if ( startServiceCommand.hasSucceeded() ) {
-                    AgentResult ar = startServiceCommand.getResults().get( agent.getUuid() );
-                    if ( ar.getStdOut().contains( "starting Cassandra ..." ) || ar.getStdOut().contains(
-                            "is already running..." ) ) {
-                        po.addLog( ar.getStdOut() );
-                        po.addLogDone( "Start succeeded" );
+                Command statusServiceCommand = Commands.getStatusCommand(Sets.newHashSet(agent) );
+                manager.getCommandRunner().runCommand( statusServiceCommand );
+                if ( statusServiceCommand.hasSucceeded() ) {
+                    AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
+                    if ( ar.getStdOut().contains( "is running" ) ) {
+                        po.addLogDone( "Cassandra is running" );
+                    }
+                    else {
+                        po.addLogFailed( "Cassandra is not running" );
                     }
                 }
                 else {
-                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+                    po.addLogFailed( "Cassandra is not running" );
+                    //                    po.addLogFailed(String.format("Status check failed, %s",
+                    // statusServiceCommand.getAllErrors()));
                 }
             }
         } );

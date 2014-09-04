@@ -52,7 +52,7 @@ public class StatusServiceCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws IOException {
 
-        UUID uuid = cassandraManager.statusCassandraService( clusterName, agentUUID );
+        UUID uuid = cassandraManager.statusService( clusterName, agentUUID );
         tracker.printOperationLog( CassandraConfig.PRODUCT_KEY, uuid, 30000 );
 
         return null;

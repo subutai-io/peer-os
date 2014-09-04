@@ -12,25 +12,25 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StartAllNodesOperationHandler extends AbstractOperationHandler<CassandraImpl> {
+public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
-//    private CassandraConfig config;
-
+    //    private CassandraConfig config;
     private String clusterName;
 
-    public StartAllNodesOperationHandler( final CassandraImpl manager, final String clusterName ) {
+
+    public StopClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
-                String.format( "Starting %s cluster...", clusterName ) );
+                String.format( "Setting up %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
         final ProductOperation po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
-                String.format( "Starting cluster %s", clusterName ) );
+                String.format( "Stopping cluster %s", clusterName ) );
 
         manager.getExecutor().execute( new Runnable() {
 
@@ -42,14 +42,15 @@ public class StartAllNodesOperationHandler extends AbstractOperationHandler<Cass
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
-                Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
-                manager.getCommandRunner().runCommand( startServiceCommand );
 
-                if ( startServiceCommand.hasSucceeded() ) {
-                    po.addLogDone( "Start succeeded" );
+                Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
+                manager.getCommandRunner().runCommand( stopServiceCommand );
+
+                if ( stopServiceCommand.hasSucceeded() ) {
+                    po.addLogDone( "Stop succeeded" );
                 }
                 else {
-                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+                    po.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
             }
         } );

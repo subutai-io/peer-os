@@ -46,7 +46,7 @@ public class CheckAllNodesCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws IOException {
 
-        UUID uuid = cassandraManager.checkAllNodes(clusterName);
+        UUID uuid = cassandraManager.checkCluster(clusterName);
         int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(CassandraConfig.PRODUCT_KEY, uuid);

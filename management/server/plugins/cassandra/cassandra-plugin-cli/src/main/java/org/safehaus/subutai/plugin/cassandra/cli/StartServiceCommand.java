@@ -52,7 +52,7 @@ public class StartServiceCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws IOException {
 
-        UUID uuid = cassandraManager.startCassandraService( clusterName, agentUUID );
+        UUID uuid = cassandraManager.startService( clusterName, agentUUID );
         tracker.printOperationLog( CassandraConfig.PRODUCT_KEY, uuid, 30000 );
 
         return null;

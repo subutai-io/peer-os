@@ -16,13 +16,13 @@ import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class InstallOperationHandler extends AbstractOperationHandler<CassandraImpl> {
+public class InstallClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
     private CassandraConfig config;
 
 
-    public InstallOperationHandler( final CassandraImpl manager, final CassandraConfig config ) {
+    public InstallClusterHandler( final CassandraImpl manager, final CassandraConfig config ) {
         super( manager, config.getClusterName() );
         this.config = config;
         po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,

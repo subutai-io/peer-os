@@ -46,7 +46,7 @@ public class StartAllNodesCommand extends OsgiCommandSupport {
 
     protected Object doExecute() throws IOException {
 
-        UUID uuid = cassandraManager.startAllNodes(clusterName);
+        UUID uuid = cassandraManager.startCluster(clusterName);
         int logSize = 0;
         while (!Thread.interrupted()) {
             ProductOperationView po = tracker.getProductOperation(CassandraConfig.PRODUCT_KEY, uuid);

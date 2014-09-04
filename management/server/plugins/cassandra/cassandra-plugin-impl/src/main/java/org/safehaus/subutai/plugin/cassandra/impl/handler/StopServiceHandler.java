@@ -17,7 +17,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StopCassandraServiceOperationHandler extends AbstractOperationHandler<CassandraImpl> {
+public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
     //    private CassandraConfig config;
@@ -26,7 +26,7 @@ public class StopCassandraServiceOperationHandler extends AbstractOperationHandl
     private String clusterName;
 
 
-    public StopCassandraServiceOperationHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
+    public StopServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
         super( manager, clusterName );
         this.agentUUID = agentUUID;
         this.clusterName = clusterName;

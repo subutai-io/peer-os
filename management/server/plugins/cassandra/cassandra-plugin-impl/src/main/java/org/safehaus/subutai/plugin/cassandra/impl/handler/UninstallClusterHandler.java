@@ -12,13 +12,13 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class UninstallOperationHandler extends AbstractOperationHandler<CassandraImpl> {
+public class UninstallClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
     private ProductOperation po;
     private String clusterName;
 
 
-    public UninstallOperationHandler( final CassandraImpl manager, final String clusterName) {
+    public UninstallClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( CassandraConfig.PRODUCT_KEY,
