@@ -1,19 +1,20 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.registry.api.RegistryException;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.common.settings.Common;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
@@ -55,7 +56,7 @@ public class RestServiceImpl implements RestService {
 
             return Response.status( Response.Status.OK ).build();
         }
-        catch ( Throwable e ) {
+        catch ( IOException | RegistryException | RuntimeException e ) {
             return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
@@ -69,7 +70,7 @@ public class RestServiceImpl implements RestService {
 
             return Response.status( Response.Status.OK ).build();
         }
-        catch ( Throwable e ) {
+        catch ( RegistryException | RuntimeException e ) {
             return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
         }
     }
