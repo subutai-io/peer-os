@@ -28,7 +28,7 @@ public class RestService {
     }
 
     @GET
-    @Path("getClusters")
+    @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
     public String getClusters() {
 
@@ -43,21 +43,21 @@ public class RestService {
     }
 
     @GET
-    @Path("getCluster")
+    @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String getCluster(
-            @QueryParam("clusterName") String clusterName
+            @PathParam("clusterName") String clusterName
     ) {
         FlumeConfig config = flumeManager.getCluster(clusterName);
 
         return JsonUtil.GSON.toJson(config);
     }
 
-    @GET
-    @Path("installCluster")
+    @POST
+    @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String installCluster(
-            @QueryParam("clusterName") String clusterName,
+            @PathParam("clusterName") String clusterName,
             @QueryParam("nodes") String nodes
     ) {
 
@@ -76,7 +76,7 @@ public class RestService {
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
+    @POST
     @Path("install/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String install(@PathParam("name") String name,
@@ -109,59 +109,59 @@ public class RestService {
         return JsonUtil.toJson(OPERATION_ID, trackId);
     }
 
-    @GET
-    @Path("uninstallCluster")
+    @DELETE
+    @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
     public String uninstallCluster(
-            @QueryParam("clusterName") String clusterName
+            @PathParam("clusterName") String clusterName
     ) {
         UUID uuid = flumeManager.uninstallCluster(clusterName);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
-    @Path("addNode")
+    @POST
+    @Path("clusters/{clusterName}/nodes/{node}")
     @Produces({MediaType.APPLICATION_JSON})
     public String addNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("node") String node
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
     ) {
         UUID uuid = flumeManager.addNode(clusterName, node);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
-    @Path("destroyNode")
+    @DELETE
+    @Path("clusters/{clusterName}/nodes/{node}")
     @Produces({MediaType.APPLICATION_JSON})
     public String destroyNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("node") String node
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
     ) {
         UUID uuid = flumeManager.destroyNode(clusterName, node);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
-    @Path("startNode")
+    @PUT
+    @Path("clusters/{clusterName}/nodes/{node}/start")
     @Produces({MediaType.APPLICATION_JSON})
     public String startNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("node") String node
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
     ) {
         UUID uuid = flumeManager.startNode(clusterName, node);
 
         return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
-    @GET
-    @Path("stopNode")
+    @PUT
+    @Path("clusters/{clusterName}/nodes/{node}/stop")
     @Produces({MediaType.APPLICATION_JSON})
     public String stopNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("node") String node
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
     ) {
         UUID uuid = flumeManager.stopNode(clusterName, node);
 
@@ -169,11 +169,11 @@ public class RestService {
     }
 
     @GET
-    @Path("checkNode")
+    @Path("clusters/{clusterName}/nodes/{node}/check")
     @Produces({MediaType.APPLICATION_JSON})
     public String checkNode(
-            @QueryParam("clusterName") String clusterName,
-            @QueryParam("node") String node
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
     ) {
         UUID uuid = flumeManager.checkNode(clusterName, node);
 
