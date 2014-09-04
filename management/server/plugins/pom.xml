@@ -21,6 +21,7 @@
         <module>hadoop</module>
         <module>flume</module>
         <module>hive</module>
+        <module>storm</module>
         <module>presto</module>
         <module>solr</module>
         <module>spark</module>
