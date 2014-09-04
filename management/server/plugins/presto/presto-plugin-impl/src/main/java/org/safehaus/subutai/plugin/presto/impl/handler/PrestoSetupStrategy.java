@@ -23,7 +23,7 @@ import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 import com.google.common.base.Preconditions;
 
 
-public class PrestoDbSetupStrategy implements ClusterSetupStrategy {
+public class PrestoSetupStrategy implements ClusterSetupStrategy {
 
     private Environment environment;
     private ProductOperation po;
@@ -31,8 +31,8 @@ public class PrestoDbSetupStrategy implements ClusterSetupStrategy {
     private PrestoClusterConfig prestoClusterConfig;
 
 
-    public PrestoDbSetupStrategy( final ProductOperation po, final Presto prestoManager,
-                                  final PrestoClusterConfig prestoClusterConfig ) {
+    public PrestoSetupStrategy( final ProductOperation po, final Presto prestoManager,
+                                final PrestoClusterConfig prestoClusterConfig ) {
 
         Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -44,8 +44,8 @@ public class PrestoDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public PrestoDbSetupStrategy( final Environment environment, final ProductOperation po,
-                                  final PrestoImpl prestoManager, final PrestoClusterConfig prestoClusterConfig ) {
+    public PrestoSetupStrategy( final Environment environment, final ProductOperation po,
+                                final PrestoImpl prestoManager, final PrestoClusterConfig prestoClusterConfig ) {
         Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
         Preconditions.checkNotNull( environment, "Environment is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );

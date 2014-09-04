@@ -15,9 +15,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>common</module>
-    <!--<module>accumulo</module>-->
-    <!--<module>flume</module>
+    <module>accumulo</module>
+    <module>flume</module>
     <module>hadoop</module>
     <module>hive</module>
     <module>hivequery</module>
@@ -35,7 +34,7 @@
     <module>cassandra</module>
     <module>oozie</module>
     <module>hbase</module>
-    <module>mahout</module>-->
+    <module>mahout</module>
   </modules>
 
 </project>

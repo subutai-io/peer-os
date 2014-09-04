@@ -29,7 +29,7 @@ import org.safehaus.subutai.plugin.presto.impl.handler.ChangeCoordinatorNodeOper
 import org.safehaus.subutai.plugin.presto.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.DestroyWorkerNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.presto.impl.handler.PrestoDbSetupStrategy;
+import org.safehaus.subutai.plugin.presto.impl.handler.PrestoSetupStrategy;
 import org.safehaus.subutai.plugin.presto.impl.handler.StartNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.StopNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.handler.UninstallOperationHandler;
@@ -208,7 +208,7 @@ public class PrestoImpl implements Presto {
         Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation is null" );
 
-        return new PrestoDbSetupStrategy( po, this, prestoClusterConfig );
+        return new PrestoSetupStrategy( po, this, prestoClusterConfig );
     }
 
 
@@ -217,6 +217,6 @@ public class PrestoImpl implements Presto {
                                                          final PrestoClusterConfig prestoClusterConfig,
                                                          final Environment environment ) {
 
-        return new PrestoDbSetupStrategy( environment, po, this, prestoClusterConfig );
+        return new PrestoSetupStrategy( environment, po, this, prestoClusterConfig );
     }
 }
