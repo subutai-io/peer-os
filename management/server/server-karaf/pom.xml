@@ -1410,27 +1410,6 @@
                 <!-- Storm -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>storm-api</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>storm-impl</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>storm-ui</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>storm-rest</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
                   <artifactId>storm-plugin-api</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
