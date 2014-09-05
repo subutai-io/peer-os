@@ -9,6 +9,7 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
 import org.safehaus.subutai.plugin.storm.ui.StormUI;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 public class NodeSelectionStep extends Panel {
 
@@ -59,8 +60,8 @@ public class NodeSelectionStep extends Panel {
                     }
                 }
             });
-            List<org.safehaus.subutai.api.zookeeper.Config> zk_list = StormUI.getZookeeper().getClusters();
-            for(org.safehaus.subutai.api.zookeeper.Config zkc : zk_list) {
+            List<ZookeeperClusterConfig> zk_list = StormUI.getZookeeper().getClusters();
+            for(ZookeeperClusterConfig zkc : zk_list) {
                 zkClustersCombo.addItem(zkc);
                 zkClustersCombo.setItemCaption(zkc, zkc.getClusterName());
                 if(zkc.getClusterName().equals(wizard.getConfig().getZookeeperClusterName()))

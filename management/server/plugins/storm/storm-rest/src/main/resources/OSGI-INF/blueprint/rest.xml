@@ -10,7 +10,7 @@
 
     <reference id="stormManager" availability="mandatory" interface="org.safehaus.subutai.plugin.storm.api.Storm"/>
 
-    <bean id="restService" class="org.safehaus.subutai.storm.plugin.rest.RestService">
+    <bean id="restService" class="org.safehaus.subutai.plugin.storm.rest.RestService">
         <property name="agentManager" ref="agentManager"/>
         <property name="stormManager" ref="stormManager"/>
     </bean>

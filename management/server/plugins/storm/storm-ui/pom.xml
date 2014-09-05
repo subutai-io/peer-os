@@ -53,8 +53,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>zookeeper-api</artifactId>
-            <version>${project.version}</version>
+            <artifactId>zookeeper-plugin-api</artifactId>
         </dependency>
     </dependencies>
 
