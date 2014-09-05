@@ -166,7 +166,7 @@ public class Cloner extends VerticalLayout {
                                     lxcHost.append(lxcHostNames.size() + 1);
                                     lxcHost.append("-");
                                 }
-                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString());
+                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
                                 lxcHostNames.add(lxcHost.toString());
 
                                 //start clone task
@@ -204,7 +204,7 @@ public class Cloner extends VerticalLayout {
                 for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder();
                     lxcHost.append(productName).append(i).append("-");
-                    lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString());
+                    lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
                     lxcHostNames.add(lxcHost.toString());
                 }
                 agentFamilies.put(physAgent, lxcHostNames);
