@@ -21,6 +21,9 @@ public interface ContainerManager {
     public void clone(final String hostName, final String templateName, final String cloneName)
             throws ContainerCreateException;
 
+    public void destroy(final String hostName, final String cloneName)
+            throws ContainerDestroyException;
+
     /**
      * Returns information about what lxc containers each physical servers has at present
      *
@@ -36,4 +39,23 @@ public interface ContainerManager {
      * @return map where key is a physical server and value is the number of lxc slots
      */
     public Map<Agent, Integer> getPhysicalServersWithLxcSlots();
+
+    /**
+     * Starts lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     *
+     * @return true if all went ok, false otherwise
+     */
+    public boolean startLxcOnHost( Agent physicalAgent, String lxcHostname );
+    /**
+     * Stops lxc on a given physical server
+     *
+     * @param physicalAgent - physical server
+     * @param lxcHostname - hostname of lxc
+     *
+     * @return true if all went ok, false otherwise
+     */
+    public boolean stopLxcOnHost( Agent physicalAgent, String lxcHostname );
 }

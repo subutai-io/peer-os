@@ -220,6 +220,7 @@ public class Cloner extends VerticalLayout {
                             Item row = lxcTable.getItem(lxcHostname);
                             try {
                                 containerManager.clone(agg.getKey().getHostname(), "master", lxcHostname);
+
                                 if (row != null)
                                     row.getItemProperty("Status")
                                             .setValue(new Embedded("", new ThemeResource(okIconSource)));
