@@ -37,7 +37,8 @@ fi
 
 BRIDGE="br0"
 sed -i 's/lxcbr0/'"$BRIDGE"'/g' $LXCSOURCE/$pattern/config
-JenkinsIP=ifconfig br0 | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}'
+
+cp $BASE/repo/sources.list $LXCSOURCE/$pattern/rootfs/etc/apt/
 
 #Copying logstash&jmxtrans deb files.
 cp $BASE/repo/ksks-cassandra-mgmt-1.0.8-amd64.deb $LXCSOURCE/$pattern/rootfs/root/
@@ -53,7 +54,7 @@ ssh-keygen -f "/root/.ssh/known_hosts" -R $containerIP
 cd $BASE
 passwd=$(cat password.dat)
 /$BASE/presettings.exp.new $containerIP ubuntu ubuntu $passwd
-/$BASE/postsettings.exp.new $containerIP root $passwd $jenkinsIP
+/$BASE/postsettings.exp.new $containerIP root $passwd
 
 #removing cassandra-mgmt and kiskis.sql
 rm $LXCSOURCE/$pattern/rootfs/root/ksks-cassandra-mgmt-1.0.8-amd64.deb
