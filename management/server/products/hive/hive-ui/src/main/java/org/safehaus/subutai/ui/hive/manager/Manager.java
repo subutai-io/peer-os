@@ -7,6 +7,8 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hive.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -115,7 +117,7 @@ public class Manager
                     return;
                 }
 
-                org.safehaus.subutai.api.hadoop.Config hci = HiveUI.getHadoopManager().getCluster(
+                HadoopClusterConfig hci = HiveUI.getHadoopManager().getCluster(
                     config.getHadoopClusterName() );
                 if ( hci == null )
                 {

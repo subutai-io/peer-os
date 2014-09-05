@@ -7,8 +7,8 @@ import javax.ws.rs.core.Response;
 
 import org.safehaus.subutai.api.cassandra.Cassandra;
 import org.safehaus.subutai.api.cassandra.Config;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 
 /**
@@ -17,12 +17,11 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 public class RestServiceImpl implements RestService {
 
-    private Cassandra cassandraManager;
     private static final String OPERATION_ID = "OPERATION_ID";
+    private Cassandra cassandraManager;
 
 
-    public void setCassandraManager( Cassandra cassandraManager ) {
-        this.cassandraManager = cassandraManager;
+    public RestServiceImpl() {
     }
 
 
@@ -31,7 +30,8 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    public RestServiceImpl() {
+    public void setCassandraManager( Cassandra cassandraManager ) {
+        this.cassandraManager = cassandraManager;
     }
 
 

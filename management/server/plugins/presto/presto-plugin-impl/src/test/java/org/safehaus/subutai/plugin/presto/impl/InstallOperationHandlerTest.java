@@ -49,7 +49,7 @@ public class InstallOperationHandlerTest {
     public void testWithExistingCluster() {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName( "test-cluster" );
-        config.setWorkers( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setWorkers( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setCoordinatorNode( CommonMockBuilder.createAgent() );
 
         mock.setClusterConfig( config );

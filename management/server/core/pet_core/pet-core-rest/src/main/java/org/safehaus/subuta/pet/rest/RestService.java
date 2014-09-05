@@ -2,6 +2,7 @@ package org.safehaus.subuta.pet.rest;
 
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -14,4 +15,11 @@ public interface RestService {
     @Path( "welcome/{name}" )
     @Produces( MediaType.APPLICATION_JSON )
     public String welcome( @PathParam( "name" ) String name );
+
+    @POST
+    @Path( "somePost" )
+    @Produces(MediaType.APPLICATION_JSON)
+    public void somePost();
+
+
 }

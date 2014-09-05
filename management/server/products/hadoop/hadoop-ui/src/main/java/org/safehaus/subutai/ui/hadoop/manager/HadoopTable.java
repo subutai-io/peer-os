@@ -6,7 +6,7 @@ import com.vaadin.event.Action;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -99,7 +99,7 @@ public class HadoopTable extends TreeTable {
 					indicator.setVisible(true);
 
 					UUID trackID = HadoopUI.getHadoopManager().addNode((String) row.getItemProperty(CLUSTER_NAME_PROPERTY).getValue());
-					ProgressWindow window = new ProgressWindow(HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID, Config.PRODUCT_KEY);
+					ProgressWindow window = new ProgressWindow(HadoopUI.getExecutor(), HadoopUI.getTracker(), trackID, HadoopClusterConfig.PRODUCT_KEY);
 					window.getWindow().addCloseListener(new Window.CloseListener() {
 						@Override
 						public void windowClose(Window.CloseEvent closeEvent) {
@@ -162,8 +162,8 @@ public class HadoopTable extends TreeTable {
 		);
 		setCollapsed(parentId, false);
 
-		List<Config> list = HadoopUI.getHadoopManager().getClusters();
-		for (Config cluster : list) {
+		List<HadoopClusterConfig> list = HadoopUI.getHadoopManager().getClusters();
+		for (HadoopClusterConfig cluster : list) {
 			NameNode nameNode = new NameNode(cluster);
 			JobTracker jobTracker = new JobTracker(cluster);
 			SecondaryNameNode secondaryNameNode = new SecondaryNameNode(cluster);

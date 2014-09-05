@@ -16,13 +16,13 @@ public class ConfigurationLogicImpl implements ConfigurationLogic {
     private ConfigManager configManager;
 
 
-    public void setConfigManager( final ConfigManager configManager ) {
-        this.configManager = configManager;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
 
-    public ConfigManager getConfigManager() {
-        return configManager;
+    public void setConfigManager( final ConfigManager configManager ) {
+        this.configManager = configManager;
     }
 
 

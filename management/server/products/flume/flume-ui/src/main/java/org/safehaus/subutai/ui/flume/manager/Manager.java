@@ -7,6 +7,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.flume.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
@@ -200,7 +201,7 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    org.safehaus.subutai.api.hadoop.Config info = FlumeUI.getHadoopManager()
+                    HadoopClusterConfig info = FlumeUI.getHadoopManager()
                         .getCluster( config.getClusterName() );
                     if ( info != null )
                     {

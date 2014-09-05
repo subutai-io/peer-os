@@ -15,16 +15,19 @@
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
   <reference id="lxcManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.lxcmanager.LxcManager" />
+  <reference id="hadoopManager" availability="mandatory"
+             interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop" />
 
   <bean id="oozie-impl" scope="singleton" class="org.safehaus.subutai.plugin.oozie.impl.OozieImpl"
         init-method="init" destroy-method="destroy">
-    <argument ref="agentManager" />
-    <argument ref="dbManager" />
-    <argument ref="tracker" />
-    <argument ref="commandRunner" />
-    <argument ref="lxcManager" />
-    <argument ref="containerManager" />
-    <argument ref="environmentManager" />
+    <property name="agentManager" ref="agentManager" />
+    <property name="dbManager" ref="dbManager" />
+    <property name="tracker" ref="tracker" />
+    <property name="commandRunner" ref="commandRunner" />
+    <property name="lxcManager" ref="lxcManager" />
+    <property name="containerManager" ref="containerManager" />
+    <property name="environmentManager" ref="environmentManager" />
+    <property name="hadoopManager" ref="hadoopManager" />
   </bean>
 
   <service ref="oozie-impl" interface="org.safehaus.subutai.plugin.oozie.api.Oozie" />

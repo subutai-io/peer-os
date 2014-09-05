@@ -8,19 +8,19 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.hadoop.Config;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.hbase.HBase;
 import org.safehaus.subutai.api.hbase.HBaseConfig;
-import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 
 
 public class HBaseImpl implements HBase {
@@ -219,80 +219,6 @@ public class HBaseImpl implements HBase {
     }
 
 
-    public UUID uninstallCluster( final String clusterName ) {
-        final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Destroying cluster %s", clusterName ) );
-
-        executor.execute( new Runnable() {
-
-            public void run() {
-                HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
-                if ( config == null ) {
-                    po.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-
-                Set<Agent> allNodes;
-                try {
-                    allNodes = getAllNodes( config );
-                }
-                catch ( Exception e ) {
-                    po.addLogFailed( e.getMessage() );
-                    return;
-                }
-
-                po.addLog( "Uninstalling..." );
-
-                Command installCommand = Commands.getUninstallCommand( allNodes );
-                commandRunner.runCommand( installCommand );
-
-                if ( installCommand.hasSucceeded() ) {
-                    po.addLog( "Uninstallation success.." );
-                }
-                else {
-                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
-                    return;
-                }
-
-                po.addLog( "Updating db..." );
-                if ( dbManager.deleteInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName() ) ) {
-                    po.addLogDone( "Cluster info deleted from DB\nDone" );
-                }
-                else {
-                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
-                }
-            }
-        } );
-
-        return po.getId();
-    }
-
-
-    public List<HBaseConfig> getClusters() {
-
-        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
-    }
-
-
-    @Override
-    public List<Config> getHadoopClusters() {
-        return hadoopManager.getClusters();
-    }
-
-
-    @Override
-    public Config getHadoopCluster( String clusterName ) {
-        return hadoopManager.getCluster( clusterName );
-    }
-
-
-    @Override
-    public HBaseConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
-    }
-
-
     @Override
     public UUID startCluster( final String clusterName ) {
         final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
@@ -414,6 +340,24 @@ public class HBaseImpl implements HBase {
     }
 
 
+    public List<HBaseConfig> getClusters() {
+
+        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, HBaseConfig.class );
+    }
+
+
+    @Override
+    public List<Config> getHadoopClusters() {
+        return hadoopManager.getClusters();
+    }
+
+
+    @Override
+    public Config getHadoopCluster( String clusterName ) {
+        return hadoopManager.getCluster( clusterName );
+    }
+
+
     private Set<Agent> getAllNodes( HBaseConfig config ) throws Exception {
         final Set<Agent> allNodes = new HashSet<>();
 
@@ -441,5 +385,61 @@ public class HBaseImpl implements HBase {
         }
 
         return allNodes;
+    }
+
+
+    public UUID uninstallCluster( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( HBaseConfig.PRODUCT_KEY,
+                String.format( "Destroying cluster %s", clusterName ) );
+
+        executor.execute( new Runnable() {
+
+            public void run() {
+                HBaseConfig config = dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
+                if ( config == null ) {
+                    po.addLogFailed(
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                    return;
+                }
+
+                Set<Agent> allNodes;
+                try {
+                    allNodes = getAllNodes( config );
+                }
+                catch ( Exception e ) {
+                    po.addLogFailed( e.getMessage() );
+                    return;
+                }
+
+                po.addLog( "Uninstalling..." );
+
+                Command installCommand = Commands.getUninstallCommand( allNodes );
+                commandRunner.runCommand( installCommand );
+
+                if ( installCommand.hasSucceeded() ) {
+                    po.addLog( "Uninstallation success.." );
+                }
+                else {
+                    po.addLogFailed( String.format( "Uninstallation failed, %s", installCommand.getAllErrors() ) );
+                    return;
+                }
+
+                po.addLog( "Updating db..." );
+                if ( dbManager.deleteInfo( HBaseConfig.PRODUCT_KEY, config.getClusterName() ) ) {
+                    po.addLogDone( "Cluster info deleted from DB\nDone" );
+                }
+                else {
+                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
+                }
+            }
+        } );
+
+        return po.getId();
+    }
+
+
+    @Override
+    public HBaseConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( HBaseConfig.PRODUCT_KEY, clusterName, HBaseConfig.class );
     }
 }

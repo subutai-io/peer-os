@@ -8,24 +8,30 @@ package org.safehaus.subutai.plugin.mahout.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
  * @author dilshat
  */
-public interface Mahout extends ApiBase<MahoutConfig> {
+public interface Mahout extends ApiBase<MahoutClusterConfig> {
 
-    public UUID addNode( String clusterName, String lxcHostname );
+    UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID destroyNode( String clusterName, String lxcHostname );
+    UUID destroyNode( String clusterName, String lxcHostname );
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutConfig config,
-                                                         ProductOperation po );
+    UUID checkNode( String clustername, String lxchostname );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutConfig config );
+    UUID stopCluster( String clusterName );
+
+    UUID startCluster( String clusterName );
+
+    ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutClusterConfig config,
+                                                  ProductOperation po );
+
+    EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutClusterConfig config );
 }
