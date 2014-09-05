@@ -15,7 +15,6 @@ import java.util.Set;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
@@ -56,7 +55,7 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = MahoutUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = wizard.getMahoutUI().getHadoopManager().getClusters();
 
         if ( clusters.size() > 0 ) {
             for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
@@ -65,7 +64,7 @@ public class ConfigurationStep extends Panel {
             }
         }
 
-        HadoopClusterConfig info = MahoutUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = wizard.getMahoutUI().getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null ) {
             hadoopClusters.setValue( info );

@@ -34,12 +34,14 @@ public class AddNodeWindow extends Window {
     private final String clusterName;
 
     private final ArrayList<String> selectedNodes = new ArrayList<>();
+    private MahoutUI mahoutUI;
 
 
-    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes ) {
+    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes, MahoutUI mahoutUi ) {
+
 
         super( "Add New Node" );
-
+        this.mahoutUI = mahoutUi;
         clusterName = config.getClusterName();
 
         setModal( true );
@@ -136,13 +138,13 @@ public class AddNodeWindow extends Window {
 
         showProgress();
 
-        final UUID trackID = MahoutUI.getMahoutManager().addNode( clusterName, hostname );
+        final UUID trackID = mahoutUI.getMahoutManager().addNode( clusterName, hostname );
 
-        MahoutUI.getExecutor().execute( new Runnable() {
+        mahoutUI.getExecutor().execute( new Runnable() {
             public void run() {
                 while ( true ) {
                     ProductOperationView po =
-                            MahoutUI.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
+                            mahoutUI.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
                     if ( po != null ) {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                         if ( po.getState() != ProductOperationState.RUNNING ) {

@@ -39,14 +39,15 @@ import com.vaadin.ui.Window;
  */
 public class Manager {
 
-    private final GridLayout contentRoot;
-    private final ComboBox clusterCombo;
-    private final Table nodesTable;
+    private MahoutUI mahoutUI;
+    private GridLayout contentRoot;
+    private ComboBox clusterCombo;
+    private Table nodesTable;
     private MahoutClusterConfig config;
 
 
-    public Manager() {
-
+    public Manager( final MahoutUI mahoutUi ) {
+        this.mahoutUI = mahoutUi;
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
         contentRoot.setMargin( true );
@@ -101,9 +102,9 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = MahoutUI.getMahoutManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = mahoutUI.getMahoutManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID,
+                                    new ProgressWindow( mahoutUI.getExecutor(), mahoutUI.getTracker(), trackID,
                                             MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -132,12 +133,12 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config != null ) {
                     HadoopClusterConfig hadoopConfig =
-                            MahoutUI.getHadoopManager().getCluster( config.getClusterName() );
+                            mahoutUI.getHadoopManager().getCluster( config.getClusterName() );
                     if ( hadoopConfig != null ) {
                         Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() ) {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes );
+                            AddNodeWindow addNodeWindow = new AddNodeWindow( config, nodes, mahoutUI);
                             contentRoot.getUI().addWindow( addNodeWindow );
                             addNodeWindow.addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -182,11 +183,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = MahoutUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = mahoutUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), MahoutUI.getExecutor(),
-                                        MahoutUI.getCommandRunner(), MahoutUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), mahoutUI.getExecutor(),
+                                        mahoutUI.getCommandRunner(), mahoutUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -222,8 +223,8 @@ public class Manager {
             final Button destroyBtn = new Button( "Destroy" );
             destroyBtn.addStyleName( "default" );
             table.addItem( new Object[] {
-                            agent.getHostname(), destroyBtn
-                    }, null );
+                    agent.getHostname(), destroyBtn
+            }, null );
 
             destroyBtn.addClickListener( new Button.ClickListener() {
                 @Override
@@ -233,10 +234,10 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = MahoutUI.getMahoutManager()
+                            UUID trackID = mahoutUI.getMahoutManager()
                                                    .destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window =
-                                    new ProgressWindow( MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID,
+                                    new ProgressWindow( mahoutUI.getExecutor(), mahoutUI.getTracker(), trackID,
                                             MahoutClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
@@ -256,7 +257,7 @@ public class Manager {
 
 
     public void refreshClustersInfo() {
-        List<MahoutClusterConfig> clustersInfo = MahoutUI.getMahoutManager().getClusters();
+        List<MahoutClusterConfig> clustersInfo = mahoutUI.getMahoutManager().getClusters();
         MahoutClusterConfig clusterInfo = ( MahoutClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && clustersInfo.size() > 0 ) {

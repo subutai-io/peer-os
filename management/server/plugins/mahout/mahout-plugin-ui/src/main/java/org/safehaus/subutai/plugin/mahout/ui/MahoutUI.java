@@ -29,51 +29,75 @@ public class MahoutUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "mahout.png";
 
-    private static Mahout mahoutManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Hadoop hadoopManager;
-    private static CommandRunner commandRunner;
-    private static ExecutorService executor;
+    private Mahout mahoutManager;
+    private AgentManager agentManager;
+    private Tracker tracker;
+    private Hadoop hadoopManager;
+    private CommandRunner commandRunner;
+    private ExecutorService executor;
 
 
-    public MahoutUI( AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Mahout mahoutManager,
-                     CommandRunner commandRunner ) {
-        MahoutUI.agentManager = agentManager;
-        MahoutUI.tracker = tracker;
-        MahoutUI.hadoopManager = hadoopManager;
-        MahoutUI.mahoutManager = mahoutManager;
-        MahoutUI.commandRunner = commandRunner;
+    public MahoutUI() {
     }
 
 
-    public static Tracker getTracker() {
-        return tracker;
-    }
-
-
-    public static Mahout getMahoutManager() {
+    public Mahout getMahoutManager() {
         return mahoutManager;
     }
 
 
-    public static Hadoop getHadoopManager() {
-        return hadoopManager;
+    public void setMahoutManager( final Mahout mahoutManager ) {
+        this.mahoutManager = mahoutManager;
     }
 
 
-    public static ExecutorService getExecutor() {
-        return executor;
-    }
-
-
-    public static AgentManager getAgentManager() {
+    public AgentManager getAgentManager() {
         return agentManager;
     }
 
 
-    public static CommandRunner getCommandRunner() {
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
         return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
     }
 
 
@@ -109,6 +133,6 @@ public class MahoutUI implements PortalModule {
 
 
     public Component createComponent() {
-        return new MahoutForm();
+        return new MahoutForm(this);
     }
 }

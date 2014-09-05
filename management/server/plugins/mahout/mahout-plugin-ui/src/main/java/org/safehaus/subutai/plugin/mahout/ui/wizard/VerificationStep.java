@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
-import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -51,8 +50,8 @@ public class VerificationStep extends Panel {
         install.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = MahoutUI.getMahoutManager().installCluster( wizard.getConfig() );
-                ProgressWindow window = new ProgressWindow( MahoutUI.getExecutor(), MahoutUI.getTracker(), trackID,
+                UUID trackID = wizard.getMahoutUI().getMahoutManager().installCluster( wizard.getConfig() );
+                ProgressWindow window = new ProgressWindow( wizard.getMahoutUI().getExecutor(), wizard.getMahoutUI().getTracker(), trackID,
                         MahoutClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
