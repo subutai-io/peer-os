@@ -761,12 +761,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     @Override
     public void clone(String hostName, String templateName, String cloneName) throws ContainerCreateException {
-        Set<String> clones = new HashSet<String>();
-        clones.add(cloneName);
-        if (!templateManager.clone(hostName, templateName, clones)) {
+        if (!templateManager.clone(hostName, templateName, cloneName)) {
             throw new ContainerCreateException(
-                    String.format("Not all containers from %s : %s are created.", hostName,
-                            clones));
+                    String.format("Couldn't create container %s : %s.", hostName,
+                            cloneName));
         }
     }
 }
