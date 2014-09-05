@@ -37,6 +37,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
 
     @Override
     public void run() {
+        productOperation = po;
         SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );

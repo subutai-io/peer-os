@@ -45,6 +45,7 @@ public class ChangeMasterNodeOperationHandler extends AbstractOperationHandler<S
 
     @Override
     public void run() {
+        productOperation = po;
         final SparkClusterConfig config = manager.getCluster( clusterName );
         if ( config == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

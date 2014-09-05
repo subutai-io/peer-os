@@ -37,6 +37,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
 
     @Override
     public void run() {
+        productOperation = po;
         if ( Strings.isNullOrEmpty( config.getClusterName() ) || CollectionUtil
                 .isCollectionEmpty( config.getSlaveNodes() ) || config.getMasterNode() == null ) {
             po.addLogFailed( "Malformed configuration\nInstallation aborted" );
