@@ -767,9 +767,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             throw new ContainerCreateException(
                     String.format("Couldn't create container %s : %s.", hostName,
                             cloneName));
-        }
-        else {
-            long thresholdTime = System.currentTimeMillis() + Common.LXC_AGENT_WAIT_TIMEOUT_SEC*1000;
+        } else {
+            long thresholdTime = System.currentTimeMillis() + Common.LXC_AGENT_WAIT_TIMEOUT_SEC * 1000;
             Agent agent = agentManager.getAgentByHostname(cloneName);
             while (agent == null && thresholdTime > System.currentTimeMillis()) {
                 try {
@@ -789,31 +788,29 @@ public class ContainerManagerImpl extends ContainerManagerBase {
      * Starts lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
-     *
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
-    public boolean startLxcOnHost( Agent physicalAgent, String lxcHostname ) {
-        if ( physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname) ) {
-            Command startLxcCommand = Commands.getLxcStartCommand( physicalAgent, lxcHostname );
-            commandRunner.runCommand( startLxcCommand );
+    public boolean startLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
+            Command startLxcCommand = Commands.getLxcStartCommand(physicalAgent, lxcHostname);
+            commandRunner.runCommand(startLxcCommand);
             try {
-                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
+                Thread.sleep(WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS);
+            } catch (InterruptedException ignore) {
             }
-            catch ( InterruptedException ignore ) {
-            }
-            Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
-            commandRunner.runCommand( lxcInfoCommand );
+            Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
+            commandRunner.runCommand(lxcInfoCommand);
 
             ContainerState state = ContainerState.UNKNOWN;
-            if ( lxcInfoCommand.hasCompleted() ) {
+            if (lxcInfoCommand.hasCompleted()) {
                 AgentResult result = lxcInfoCommand.getResults().entrySet().iterator().next().getValue();
-                if ( result.getStdOut().contains( "RUNNING" ) ) {
+                if (result.getStdOut().contains("RUNNING")) {
                     state = ContainerState.RUNNING;
                 }
             }
 
-            return ContainerState.RUNNING.equals( state );
+            return ContainerState.RUNNING.equals(state);
         }
         return false;
     }
@@ -823,38 +820,39 @@ public class ContainerManagerImpl extends ContainerManagerBase {
      * Stops lxc on a given physical server
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname of lxc
-     *
+     * @param lxcHostname   - hostname of lxc
      * @return true if all went ok, false otherwise
      */
-    public boolean stopLxcOnHost( Agent physicalAgent, String lxcHostname ) {
-        if ( physicalAgent != null && !Strings.isNullOrEmpty( lxcHostname ) ) {
-            Command stopLxcCommand = Commands.getLxcStopCommand( physicalAgent, lxcHostname );
-            commandRunner.runCommand( stopLxcCommand );
-            try {
-                Thread.sleep( WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS );
-            }
-            catch ( InterruptedException ignore ) {
-            }
-            Command lxcInfoCommand = Commands.getLxcInfoCommand( physicalAgent, lxcHostname );
-            commandRunner.runCommand( lxcInfoCommand );
+    public boolean stopLxcOnHost(Agent physicalAgent, String lxcHostname) {
+        if (physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname)) {
+            Command stopLxcCommand = Commands.getLxcStopCommand(physicalAgent, lxcHostname);
+            commandRunner.runCommand(stopLxcCommand);
 
+            long thresholdTime = System.currentTimeMillis() + WAIT_BEFORE_CHECK_STATUS_TIMEOUT_MS;
             ContainerState state = ContainerState.UNKNOWN;
-            if ( lxcInfoCommand.hasCompleted() ) {
-                AgentResult result = lxcInfoCommand.getResults().entrySet().iterator().next().getValue();
-                if ( result.getStdOut().contains( "STOPPED" ) ) {
-                    state = ContainerState.STOPPED;
+            do {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ignore) {
                 }
-            }
+                Command lxcInfoCommand = Commands.getLxcInfoCommand(physicalAgent, lxcHostname);
+                commandRunner.runCommand(lxcInfoCommand);
+                if (lxcInfoCommand.hasCompleted()) {
+                    AgentResult result = lxcInfoCommand.getResults().entrySet().iterator().next().getValue();
+                    if (result.getStdOut().contains("STOPPED")) {
+                        state = ContainerState.STOPPED;
+                    }
+                }
+            } while (thresholdTime > System.currentTimeMillis() && ContainerState.UNKNOWN.equals(state));
 
-            return ContainerState.STOPPED.equals( state );
+            return ContainerState.STOPPED.equals(state);
         }
         return false;
     }
 
     @Override
     public void destroy(String hostName, String cloneName) throws ContainerDestroyException {
-        if(!templateManager.cloneDestroy(hostName, cloneName))
+        if (!templateManager.cloneDestroy(hostName, cloneName))
             throw new ContainerDestroyException(String.format("Could not destroy container %s : %s.", hostName, cloneName));
     }
 }
