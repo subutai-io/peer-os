@@ -37,7 +37,7 @@ public class ContainerUI implements PortalModule {
 
 
 	public void init() {
-		executor = Executors.newCachedThreadPool();
+		executor = Executors.newFixedThreadPool(1);
 	}
 
 

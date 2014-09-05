@@ -155,8 +155,8 @@ public class Manager extends VerticalLayout {
 
 			public void run() {
 				Map<String, EnumMap<ContainerState, List<String>>> agentFamilies;
-//                agentFamilies = containerManager.getLxcOnPhysicalServers();
-//                populateTable(agentFamilies);
+                agentFamilies = containerManager.getContainersOnPhysicalServers();
+                populateTable(agentFamilies);
 				clearEmptyParents();
 				lxcTable.setEnabled(true);
 				indicator.setVisible(false);

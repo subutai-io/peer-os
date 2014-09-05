@@ -452,7 +452,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             return null;
     }
 
-    	@Override
+    @Override
     public void clonesDestroy(final String hostName, final Set<String> cloneNames) throws ContainerDestroyException {
         boolean result = templateManager.cloneDestroy(hostName, cloneNames);
         if (!result) {
@@ -463,19 +463,19 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     }
 
-	@Override
-	public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
-			throws ContainerCreateException {
-		boolean result = templateManager.clone(hostName, templateName, cloneNames);
-		if (!result) {
-			throw new ContainerCreateException(
-					String.format("Not all containers from %s : %s are created. Use LXC module to cleanup", hostName,
-							cloneNames));
-		}
-	}
+    @Override
+    public void clonesCreate(final String hostName, final String templateName, final Set<String> cloneNames)
+            throws ContainerCreateException {
+        boolean result = templateManager.clone(hostName, templateName, cloneNames);
+        if (!result) {
+            throw new ContainerCreateException(
+                    String.format("Not all containers from %s : %s are created. Use LXC module to cleanup", hostName,
+                            cloneNames));
+        }
+    }
 
 
-//    @Override
+    //    @Override
     public void clonesDestroyByHostname(final Set<String> cloneNames) throws ContainerDestroyException {
         if (cloneNames == null || cloneNames.isEmpty()) {
             throw new ContainerDestroyException("Clone names is empty or null");
@@ -492,33 +492,33 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             }
         }
 
-		clonesDestroy(lxcAgents);
+        clonesDestroy(lxcAgents);
     }
 
-	public void clonesDestroy(Set<Agent> lxcAgents) throws ContainerDestroyException {
-		if (lxcAgents == null || lxcAgents.isEmpty()) {
-			throw new ContainerDestroyException("LxcAgents is null or empty");
-		}
+    public void clonesDestroy(Set<Agent> lxcAgents) throws ContainerDestroyException {
+        if (lxcAgents == null || lxcAgents.isEmpty()) {
+            throw new ContainerDestroyException("LxcAgents is null or empty");
+        }
 
-		Map<Agent, Set<Agent>> families = new HashMap<>();
-		for (Agent lxcAgent : lxcAgents) {
-			if (lxcAgent != null) {
-				Agent parentAgent = agentManager.getAgentByHostname(lxcAgent.getParentHostName());
-				if (parentAgent == null) {
-					throw new ContainerDestroyException(
-							String.format("Physical parent of %s is not connected", lxcAgent.getHostname()));
-				}
-				Set<Agent> lxcChildren = families.get(parentAgent);
-				if (lxcChildren == null) {
-					lxcChildren = new HashSet<>();
-					families.put(parentAgent, lxcChildren);
-				}
-				lxcChildren.add(lxcAgent);
-			}
-		}
+        Map<Agent, Set<Agent>> families = new HashMap<>();
+        for (Agent lxcAgent : lxcAgents) {
+            if (lxcAgent != null) {
+                Agent parentAgent = agentManager.getAgentByHostname(lxcAgent.getParentHostName());
+                if (parentAgent == null) {
+                    throw new ContainerDestroyException(
+                            String.format("Physical parent of %s is not connected", lxcAgent.getHostname()));
+                }
+                Set<Agent> lxcChildren = families.get(parentAgent);
+                if (lxcChildren == null) {
+                    lxcChildren = new HashSet<>();
+                    families.put(parentAgent, lxcChildren);
+                }
+                lxcChildren.add(lxcAgent);
+            }
+        }
 
-		cloneDestroy(families);
-	}
+        cloneDestroy(families);
+    }
 
 
     private void cloneDestroy(Map<Agent, Set<Agent>> agentFamilies) throws ContainerDestroyException {
@@ -667,21 +667,21 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         final Map<Agent, Integer> bestServers = new HashMap<>();
         Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
 
-        ContainerPlacementStrategy placementStrategy = new DefaultContainerPlacementStrategy( 1 );
-        Map<Agent, Integer> serversSlots = placementStrategy.calculateSlots( metrics );
+        ContainerPlacementStrategy placementStrategy = new DefaultContainerPlacementStrategy(1);
+        Map<Agent, Integer> serversSlots = placementStrategy.calculateSlots(metrics);
         // set all values to some equal amount so that RR strategy works from UI
         // TODO: remove this! This is for showing round-robin from UI
         int max = Integer.MIN_VALUE;
-        for ( Integer i : serversSlots.values() ) {
-            if ( i > max ) {
+        for (Integer i : serversSlots.values()) {
+            if (i > max) {
                 max = i;
             }
         }
         max = 10;
 
-        if ( !serversSlots.isEmpty() ) {
-            for ( Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet() ) {
-                bestServers.put( serverSlots.getKey(), max );
+        if (!serversSlots.isEmpty()) {
+            for (Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet()) {
+                bestServers.put(serverSlots.getKey(), max);
             }
         }
 
@@ -693,11 +693,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
      * Clones lxc on a given physical server and set its hostname
      *
      * @param physicalAgent - physical server
-     * @param lxcHostname - hostname to set for a new lxc
-     *
+     * @param lxcHostname   - hostname to set for a new lxc
      * @return true if all went ok, false otherwise
      */
-    public boolean cloneLxcOnHost( Agent physicalAgent, String lxcHostname ) {
+    public boolean cloneLxcOnHost(Agent physicalAgent, String lxcHostname) {
 //        if ( physicalAgent != null && !Strings.isNullOrEmpty(lxcHostname) ) {
 //            Command cloneLxcCommand = Commands.getCloneCommand(physicalAgent, lxcHostname);
 //            commandRunner.runCommand( cloneLxcCommand );
@@ -706,4 +705,68 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         return false;
     }
 
+    /**
+     * Returns information about what lxc containers each physical servers has at present
+     *
+     * @return map where key is a hostname of physical server and value is a map where key is state of lxc and value is
+     * a list of lxc hostnames
+     */
+    public Map<String, EnumMap<ContainerState, List<String>>> getContainersOnPhysicalServers() {
+        final Map<String, EnumMap<ContainerState, List<String>>> agentFamilies = new HashMap<>();
+        Set<Agent> pAgents = agentManager.getPhysicalAgents();
+        for (Iterator<Agent> it = pAgents.iterator(); it.hasNext(); ) {
+            Agent agent = it.next();
+            if (!agent.getHostname().matches("^py.*")) {
+                it.remove();
+            }
+        }
+        if (!pAgents.isEmpty()) {
+
+            Command getLxcListCommand = Commands.getLxcListCommand(pAgents);
+            commandRunner.runCommand(getLxcListCommand);
+
+            if (getLxcListCommand.hasCompleted()) {
+                for (AgentResult result : getLxcListCommand.getResults().values()) {
+                    Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
+
+                    String parentHostname =
+                            agent == null ? String.format("Offline[%s]", result.getAgentUUID()) : agent.getHostname();
+                    EnumMap<ContainerState, List<String>> lxcs = new EnumMap<>(ContainerState.class);
+                    String[] lxcStrs = result.getStdOut().split("\\n");
+
+                    for (int i = 2; i < lxcStrs.length; i++) {
+                        String[] lxcProperties = lxcStrs[i].split("\\s+");
+                        if (lxcProperties.length > 1) {
+                            String lxcHostname = lxcProperties[0];
+                            if (!(Common.BASE_CONTAINER_NAME.equalsIgnoreCase(lxcHostname)
+                                    || Common.MASTER_TEMPLATE_NAME.equalsIgnoreCase(lxcHostname))) {
+                                String lxcStatus = lxcProperties[1];
+
+                                ContainerState state = ContainerState.parseState(lxcStatus);
+
+                                if (lxcs.get(state) == null) {
+                                    lxcs.put(state, new ArrayList<String>());
+                                }
+                                lxcs.get(state).add(lxcHostname);
+                            }
+                        }
+                    }
+                    agentFamilies.put(parentHostname, lxcs);
+                }
+            }
+        }
+
+        return agentFamilies;
+    }
+
+    @Override
+    public void clone(String hostName, String templateName, String cloneName) throws ContainerCreateException {
+        Set<String> clones = new HashSet<String>();
+        clones.add(cloneName);
+        if (!templateManager.clone(hostName, templateName, clones)) {
+            throw new ContainerCreateException(
+                    String.format("Not all containers from %s : %s are created.", hostName,
+                            clones));
+        }
+    }
 }

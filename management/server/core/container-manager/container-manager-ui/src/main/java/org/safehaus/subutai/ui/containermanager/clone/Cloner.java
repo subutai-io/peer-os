@@ -6,6 +6,7 @@ import com.vaadin.data.Item;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.api.containermanager.ContainerCreateException;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.AgentUtil;
@@ -57,7 +58,7 @@ public class Cloner extends VerticalLayout {
         cloneBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                //startCloneTask();
+                startCloneTask();
             }
         });
 
@@ -114,134 +115,133 @@ public class Cloner extends VerticalLayout {
         addComponent(lxcTable);
     }
 
-/*
     private void startCloneTask() {
-        Set<Agent> physicalAgents = AgentUtil.filterPhysicalAgents( agentTree.getSelectedAgents() );
+        Set<Agent> physicalAgents = AgentUtil.filterPhysicalAgents(agentTree.getSelectedAgents());
         final String productName = textFieldLxcName.getValue().trim();
 
-        if ( !Strings.isNullOrEmpty( productName ) && !productName.matches( hostValidatorRegex ) ) {
-            show( "Please, use only letters, digits, dots and hyphens in product name" );
+        if (!Strings.isNullOrEmpty(productName) && !productName.matches(hostValidatorRegex)) {
+            show("Please, use only letters, digits, dots and hyphens in product name");
+            return;
         }
-        else if ( physicalAgents.isEmpty() ) {
-            indicator.setVisible( true );
-            final double count = ( Double ) slider.getValue();
-            ContainerUI.getExecutor().execute( new Runnable() {
+        if (physicalAgents.isEmpty()) {
+            show("There are no physical hosts.");
+            return;
+        }
+
+        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
+
+        if (physicalAgents.isEmpty()) {
+            indicator.setVisible(true);
+            final double count = (Double) slider.getValue();
+            ContainerUI.getExecutor().execute(new Runnable() {
                 public void run() {
                     Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
-                    if ( bestServers.isEmpty() ) {
-                        show( "No servers available to accommodate new lxc containers" );
-                        indicator.setVisible( false );
-                    }
-                    else {
+                    if (bestServers.isEmpty()) {
+                        show("No servers available to accommodate new lxc containers");
+                        indicator.setVisible(false);
+                    } else {
                         int numOfLxcSlots = 0;
-                        for ( Map.Entry<Agent, Integer> srv : bestServers.entrySet() ) {
+                        for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
                             numOfLxcSlots += srv.getValue();
                         }
 
-                        if ( numOfLxcSlots < count ) {
-                            show( String.format( "Only %s lxc containers can be created", numOfLxcSlots ) );
-                            indicator.setVisible( false );
-                        }
-                        else {
+                        if (numOfLxcSlots < count) {
+                            show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
+                            indicator.setVisible(false);
+                        } else {
 
                             Map<Agent, List<String>> agentFamilies = new HashMap<>();
-                            int numOfLxcsToClone = ( int ) count;
-                            final AtomicInteger countProcessed = new AtomicInteger( numOfLxcsToClone );
+                            int numOfLxcsToClone = (int) count;
+                            final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
 
-                            for ( int i = 1; i <= numOfLxcsToClone; i++ ) {
+                            for (int i = 1; i <= numOfLxcsToClone; i++) {
                                 Map<Agent, Integer> sortedBestServers =
-                                        CollectionUtil.sortMapByValueDesc( bestServers );
+                                        CollectionUtil.sortMapByValueDesc(bestServers);
                                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                                bestServers.put( entry.getKey(), entry.getValue() - 1 );
-                                List<String> lxcHostNames = agentFamilies.get( entry.getKey() );
-                                if ( lxcHostNames == null ) {
+                                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                                List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+                                if (lxcHostNames == null) {
                                     lxcHostNames = new ArrayList<>();
-                                    agentFamilies.put( entry.getKey(), lxcHostNames );
+                                    agentFamilies.put(entry.getKey(), lxcHostNames);
                                 }
                                 final StringBuilder lxcHost = new StringBuilder();
-                                if ( !Strings.isNullOrEmpty( productName ) ) {
-                                    lxcHost.append( productName );
-                                    lxcHost.append( lxcHostNames.size() + 1 );
-                                    lxcHost.append( "-" );
+                                if (!Strings.isNullOrEmpty(productName)) {
+                                    lxcHost.append(productName);
+                                    lxcHost.append(lxcHostNames.size() + 1);
+                                    lxcHost.append("-");
                                 }
-                                lxcHost.append( UUIDUtil.generateTimeBasedUUID().toString() );
-                                lxcHostNames.add( lxcHost.toString() );
+                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString());
+                                lxcHostNames.add(lxcHost.toString());
 
                                 //start clone task
-                                ContainerUI.getExecutor().execute( new Runnable() {
+                                ContainerUI.getExecutor().execute(new Runnable() {
                                     public void run() {
-                                        boolean result =
-                                                containerManager.cloneLxcOnHost( entry.getKey(), lxcHost.toString() );
-                                        Item row = lxcTable.getItem( lxcHost.toString() );
-                                        if ( row != null ) {
-                                            if ( result ) {
-                                                row.getItemProperty( "Status" )
-                                                   .setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
-                                            }
-                                            else {
-                                                row.getItemProperty( "Status" ).setValue(
-                                                        new Embedded( "", new ThemeResource( errorIconSource ) ) );
-                                            }
+                                        Item row = lxcTable.getItem(lxcHost.toString());
+                                        try {
+                                            containerManager.clone(entry.getKey().toString(), "master", lxcHost.toString());
+                                            if (row != null)
+                                                row.getItemProperty("Status")
+                                                        .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                                        } catch (ContainerCreateException ce) {
+                                            if (row != null)
+                                                row.getItemProperty("Status")
+                                                        .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                                         }
-                                        if ( countProcessed.decrementAndGet() == 0 ) {
-                                            indicator.setVisible( false );
+
+                                        if (countProcessed.decrementAndGet() == 0) {
+                                            indicator.setVisible(false);
                                         }
                                     }
-                                } );
+                                });
                             }
 
-                            populateLxcTable( agentFamilies );
+                            populateLxcTable(agentFamilies);
                         }
                     }
                 }
-            } );
-        }
-        else {
-
+            });
+        } else { // physical hosts not selected
             Map<Agent, List<String>> agentFamilies = new HashMap<>();
-            double count = ( Double ) slider.getValue();
-            for ( Agent physAgent : physicalAgents ) {
+            double count = (Double) slider.getValue();
+            for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<>();
-                for ( int i = 1; i <= count; i++ ) {
+                for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder();
-                    if ( !Strings.isNullOrEmpty( productName ) ) {
-                        lxcHost.append( productName ).append( i ).append( "-" );
-                    }
-                    lxcHost.append( UUIDUtil.generateTimeBasedUUID().toString() );
-                    lxcHostNames.add( lxcHost.toString() );
+                    lxcHost.append(productName).append(i).append("-");
+                    lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString());
+                    lxcHostNames.add(lxcHost.toString());
                 }
-                agentFamilies.put( physAgent, lxcHostNames );
+                agentFamilies.put(physAgent, lxcHostNames);
             }
 
-            populateLxcTable( agentFamilies );
-            indicator.setVisible( true );
-            final AtomicInteger countProcessed = new AtomicInteger( ( int ) ( count * physicalAgents.size() ) );
-            for ( final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet() ) {
-                for ( final String lxcHostname : agg.getValue() ) {
-                    ContainerUI.getExecutor().execute( new Runnable() {
+            populateLxcTable(agentFamilies);
+            indicator.setVisible(true);
+            final AtomicInteger countProcessed = new AtomicInteger((int) (count * physicalAgents.size()));
+            for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+                for (final String lxcHostname : agg.getValue()) {
+                    ContainerUI.getExecutor().execute(new Runnable() {
                         public void run() {
-                            boolean result = containerManager.cloneLxcOnHost( agg.getKey(), lxcHostname );
-                            Item row = lxcTable.getItem( lxcHostname );
-                            if ( row != null ) {
-                                if ( result ) {
-                                    row.getItemProperty( "Status" )
-                                       .setValue( new Embedded( "", new ThemeResource( okIconSource ) ) );
-                                }
-                                else {
-                                    row.getItemProperty( "Status" )
-                                       .setValue( new Embedded( "", new ThemeResource( errorIconSource ) ) );
-                                }
+                            Item row = lxcTable.getItem(lxcHostname);
+                            try {
+                                containerManager.clone(agg.getKey().toString(), "master", lxcHostname);
+                                if (row != null)
+                                    row.getItemProperty("Status")
+                                            .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                            } catch (ContainerCreateException ce) {
+                                if (row != null)
+                                    row.getItemProperty("Status")
+                                            .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                             }
-                            if ( countProcessed.decrementAndGet() == 0 ) {
-                                indicator.setVisible( false );
+
+                            if (countProcessed.decrementAndGet() == 0) {
+                                indicator.setVisible(false);
                             }
                         }
-                    } );
+                    });
                 }
             }
         }
     }
-*/
 
     private TreeTable createLxcTable(String caption, int size) {
         TreeTable table = new TreeTable(caption);
