@@ -123,10 +123,6 @@ public class Cloner extends VerticalLayout {
             show("Please, use only letters, digits, dots and hyphens in product name");
             return;
         }
-        if (physicalAgents.isEmpty()) {
-            show("There are no physical hosts.");
-            return;
-        }
 
         show(String.format("Selected physical servers count: %d", physicalAgents.size()));
 
@@ -178,7 +174,7 @@ public class Cloner extends VerticalLayout {
                                     public void run() {
                                         Item row = lxcTable.getItem(lxcHost.toString());
                                         try {
-                                            containerManager.clone(entry.getKey().toString(), "master", lxcHost.toString());
+                                            containerManager.clone(entry.getKey().getHostname(), "master", lxcHost.toString());
                                             if (row != null)
                                                 row.getItemProperty("Status")
                                                         .setValue(new Embedded("", new ThemeResource(okIconSource)));
@@ -223,7 +219,7 @@ public class Cloner extends VerticalLayout {
                         public void run() {
                             Item row = lxcTable.getItem(lxcHostname);
                             try {
-                                containerManager.clone(agg.getKey().toString(), "master", lxcHostname);
+                                containerManager.clone(agg.getKey().getHostname(), "master", lxcHostname);
                                 if (row != null)
                                     row.getItemProperty("Status")
                                             .setValue(new Embedded("", new ThemeResource(okIconSource)));
