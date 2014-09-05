@@ -771,7 +771,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         else {
             long thresholdTime = System.currentTimeMillis() + Common.LXC_AGENT_WAIT_TIMEOUT_SEC*1000;
             Agent agent = agentManager.getAgentByHostname(cloneName);
-            while (agent == null && thresholdTime <= System.currentTimeMillis()) {
+            while (agent == null && thresholdTime > System.currentTimeMillis()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignore) {
