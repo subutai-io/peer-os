@@ -10,91 +10,123 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.oozie.api.Oozie;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class OozieUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "oozie.png";
 
-	private static Oozie oozieManager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static Hadoop hadoopManager;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
+    public static final String MODULE_IMAGE = "oozie.png";
+    Oozie oozieManager;
+    AgentManager agentManager;
+    Tracker tracker;
+    Hadoop hadoopManager;
+    CommandRunner commandRunner;
+    ExecutorService executor;
 
-	public OozieUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Oozie oozieManager, CommandRunner commandRunner) {
-		OozieUI.agentManager = agentManager;
-		OozieUI.tracker = tracker;
-		OozieUI.hadoopManager = hadoopManager;
-		OozieUI.oozieManager = oozieManager;
-		OozieUI.commandRunner = commandRunner;
-	}
 
-	public static Oozie getOozieManager() {
-		return oozieManager;
-	}
+    public OozieUI() {}
 
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
+    public Oozie getOozieManager() {
+        return oozieManager;
+    }
 
-	public static Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+    public void setOozieManager( final Oozie oozieManager ) {
+        this.oozieManager = oozieManager;
+    }
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
 
-	public void destroy() {
-		oozieManager = null;
-		agentManager = null;
-		tracker = null;
-		hadoopManager = null;
-		executor.shutdown();
-	}
 
-	@Override
-	public String getId() {
-		return OozieConfig.PRODUCT_KEY;
-	}
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
 
-	public String getName() {
-		return OozieConfig.PRODUCT_KEY;
-	}
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(OozieUI.MODULE_IMAGE, this);
-	}
+    public Tracker getTracker() {
+        return tracker;
+    }
 
-	public Component createComponent() {
-		return new OozieForm();
-	}
 
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+
+    public void destroy() {
+        oozieManager = null;
+        agentManager = null;
+        tracker = null;
+        hadoopManager = null;
+        executor.shutdown();
+    }
+
+
+    @Override
+    public String getId() {
+        return OozieClusterConfig.PRODUCT_KEY;
+    }
+
+
+    public String getName() {
+        return OozieClusterConfig.PRODUCT_KEY;
+    }
+
+
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( OozieUI.MODULE_IMAGE, this );
+    }
+
+
+    public Component createComponent() {
+        return new OozieForm( this );
+    }
 }

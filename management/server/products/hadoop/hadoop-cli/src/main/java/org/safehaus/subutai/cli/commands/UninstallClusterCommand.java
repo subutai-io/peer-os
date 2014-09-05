@@ -3,7 +3,7 @@ package org.safehaus.subutai.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
@@ -43,7 +43,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 		UUID uuid = hadoopManager.uninstallCluster(clusterName);
 		int logSize = 0;
 		while (!Thread.interrupted()) {
-			ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+			ProductOperationView po = tracker.getProductOperation( HadoopClusterConfig.PRODUCT_KEY, uuid);
 			if (po != null) {
 				if (logSize != po.getLog().length()) {
 					System.out.print(po.getLog().substring(logSize, po.getLog().length()));

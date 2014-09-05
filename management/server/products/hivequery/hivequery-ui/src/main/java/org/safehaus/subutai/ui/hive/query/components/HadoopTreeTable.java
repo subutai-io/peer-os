@@ -1,7 +1,7 @@
 package org.safehaus.subutai.ui.hive.query.components;
 
 import com.vaadin.ui.TreeTable;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.hive.query.HiveQueryUI;
 
@@ -40,8 +40,8 @@ public class HadoopTreeTable extends TreeTable {
 		);
 		setCollapsed(parentId, false);
 
-		List<Config> list = HiveQueryUI.getManager().getHadoopClusters();
-		for (Config cluster : list) {
+		List<HadoopClusterConfig> list = HiveQueryUI.getManager().getHadoopClusters();
+		for (HadoopClusterConfig cluster : list) {
 
 			Object rowId = addItem(new Object[] {
 							new AgentContainer(cluster.getNameNode(),

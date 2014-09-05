@@ -5,17 +5,18 @@
  */
 package org.safehaus.subutai.api.mahout;
 
-import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.ApiBase;
+
 
 /**
  * @author dilshat
  */
 public interface Mahout extends ApiBase<Config> {
 
-    public UUID addNode(String clusterName, String lxcHostname);
+    public UUID addNode( String clusterName, String lxcHostname );
 
-    public UUID destroyNode(String clusterName, String lxcHostname);
-
+    public UUID destroyNode( String clusterName, String lxcHostname );
 }

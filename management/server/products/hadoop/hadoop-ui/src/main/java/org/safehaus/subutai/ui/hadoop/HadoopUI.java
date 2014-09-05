@@ -2,7 +2,7 @@ package org.safehaus.subutai.ui.hadoop;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.server.ui.api.PortalModule;
@@ -69,12 +69,12 @@ public class HadoopUI implements PortalModule {
 
 	@Override
 	public String getId() {
-		return Config.PRODUCT_KEY;
+		return HadoopClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override
 	public String getName() {
-		return Config.PRODUCT_KEY;
+		return HadoopClusterConfig.PRODUCT_KEY;
 	}
 
 	@Override

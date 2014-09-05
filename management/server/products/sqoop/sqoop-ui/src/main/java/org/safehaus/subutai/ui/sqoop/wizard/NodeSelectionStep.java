@@ -5,7 +5,7 @@ import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.sqoop.SqoopUI;
@@ -46,7 +46,7 @@ public class NodeSelectionStep extends Panel
                 select.setValue( null );
                 if ( e.getProperty().getValue() != null )
                 {
-                    Config hadoopInfo = ( Config ) e.getProperty().getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) e.getProperty().getValue();
                     select.setContainerDataSource( new BeanItemContainer<>(
                             Agent.class, hadoopInfo.getAllNodes() )
                     );
@@ -61,10 +61,10 @@ public class NodeSelectionStep extends Panel
             }
         } );
 
-        List<Config> clusters = SqoopUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = SqoopUI.getHadoopManager().getClusters();
         if ( clusters.size() > 0 )
         {
-            for ( Config hci : clusters )
+            for ( HadoopClusterConfig hci : clusters )
             {
                 hadoopClusters.addItem( hci );
                 hadoopClusters.setItemCaption( hci, hci.getClusterName() );
@@ -73,7 +73,7 @@ public class NodeSelectionStep extends Panel
         // select cluster if config has cluster name set
         if ( wizard.getConfig().getClusterName() != null )
         {
-            Config info = SqoopUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+            HadoopClusterConfig info = SqoopUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
             if ( info != null )
             {
                 hadoopClusters.setValue( info );

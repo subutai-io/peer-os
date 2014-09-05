@@ -9,7 +9,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.ChangeCoordinatorNodeOperationHandler;
-import org.safehaus.subutai.plugin.presto.impl.handler.CheckNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 

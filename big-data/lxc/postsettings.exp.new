@@ -51,7 +51,7 @@ sleep 1
 #Editing collectd conf file using collectd-conf.sh
 expect "# " { send "./collectd-conf.sh\r" }
 sleep 1
-expect "# " { send "sed -i -e 's/^/#/' /etc/apt/sources.list \r" }
+expect "# " { send "echo \"\" > /etc/apt/sources.list \r"}
 sleep 1
 #Adding management server apt-get links
 expect "# " { send "echo \"deb http://gw.intra.lan:9999/ubuntu trusty main restricted universe multiverse\" >> /etc/apt/sources.list \r"}

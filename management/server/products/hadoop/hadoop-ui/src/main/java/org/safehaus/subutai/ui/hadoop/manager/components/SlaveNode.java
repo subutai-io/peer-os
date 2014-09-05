@@ -1,6 +1,6 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
@@ -16,7 +16,7 @@ public class SlaveNode extends ClusterNode {
 	private Agent agent;
 	private boolean isDataNode;
 
-	public SlaveNode(Config cluster, Agent agent, boolean isDataNode) {
+	public SlaveNode(HadoopClusterConfig cluster, Agent agent, boolean isDataNode) {
 		super(cluster);
 		this.agent = agent;
 		this.isDataNode = isDataNode;

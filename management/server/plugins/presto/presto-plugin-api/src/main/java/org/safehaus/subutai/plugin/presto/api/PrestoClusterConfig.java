@@ -5,67 +5,78 @@
  */
 package org.safehaus.subutai.plugin.presto.api;
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
+
 
 /**
  * @author dilshat
  */
 public class PrestoClusterConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Presto2";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Presto";
+    private String clusterName = "";
 
-	private Agent coordinatorNode;
-	private Set<Agent> workers;
+    private Agent coordinatorNode;
+    private Set<Agent> workers;
 
-	public Agent getCoordinatorNode() {
-		return coordinatorNode;
-	}
 
-	public void setCoordinatorNode(Agent coordinatorNode) {
-		this.coordinatorNode = coordinatorNode;
-	}
+    public Agent getCoordinatorNode() {
+        return coordinatorNode;
+    }
 
-	public String getClusterName() {
-		return clusterName;
-	}
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public void setCoordinatorNode( Agent coordinatorNode ) {
+        this.coordinatorNode = coordinatorNode;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
 
-	public Set<Agent> getWorkers() {
-		return workers;
-	}
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	public void setWorkers(Set<Agent> workers) {
-		this.workers = workers;
-	}
 
-	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<Agent>();
-		if (workers != null) {
-			allNodes.addAll(workers);
-		}
-		if (coordinatorNode != null) {
-			allNodes.add(coordinatorNode);
-		}
+    public void setClusterName( String clusterName ) {
+        this.clusterName = clusterName;
+    }
 
-		return allNodes;
-	}
 
-	@Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers=" + workers + '}';
-	}
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
 
+
+    public Set<Agent> getWorkers() {
+        return workers;
+    }
+
+
+    public void setWorkers( Set<Agent> workers ) {
+        this.workers = workers;
+    }
+
+
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<Agent>();
+        if ( workers != null ) {
+            allNodes.addAll( workers );
+        }
+        if ( coordinatorNode != null ) {
+            allNodes.add( coordinatorNode );
+        }
+
+        return allNodes;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers="
+                + workers + '}';
+    }
 }

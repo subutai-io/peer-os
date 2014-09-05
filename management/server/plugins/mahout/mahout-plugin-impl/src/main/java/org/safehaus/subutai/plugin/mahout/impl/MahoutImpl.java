@@ -11,24 +11,28 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.core.tracker.api.Tracker;
-import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeOperationHandler;
-import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeOperationHandler;
-import org.safehaus.subutai.plugin.mahout.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.mahout.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.plugin.mahout.impl.handler.AddNodeHandler;
+import org.safehaus.subutai.plugin.mahout.impl.handler.DestroyNodeHandler;
+import org.safehaus.subutai.plugin.mahout.impl.handler.InstallHandler;
+import org.safehaus.subutai.plugin.mahout.impl.handler.UninstallHandler;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -39,23 +43,70 @@ import com.google.common.collect.Sets;
  */
 public class MahoutImpl implements Mahout {
 
+    PluginDAO pluginDAO;
+    Commands commands;
     private CommandRunner commandRunner;
     private AgentManager agentManager;
     private DbManager dbManager;
     private Tracker tracker;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
     private ExecutorService executor;
+    private Hadoop hadoopManager;
 
 
-    public MahoutImpl( CommandRunner commandRunner,
-                       AgentManager agentManager,
-                       DbManager dbManager,
-                       Tracker tracker ) {
-        this.commandRunner = commandRunner;
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
+    public MahoutImpl() {
 
-        Commands.init( commandRunner );
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
+    }
+
+
+    public Commands getCommands() {
+        return commands;
+    }
+
+
+    public void setCommands( final Commands commands ) {
+        this.commands = commands;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
+    }
+
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
+    }
+
+
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
+
+
+    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+        this.environmentManager = environmentManager;
     }
 
 
@@ -64,8 +115,18 @@ public class MahoutImpl implements Mahout {
     }
 
 
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
     public AgentManager getAgentManager() {
         return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
     }
 
 
@@ -74,12 +135,35 @@ public class MahoutImpl implements Mahout {
     }
 
 
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
+
+
     public Tracker getTracker() {
         return tracker;
     }
 
 
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
     public void init() {
+        Commands.init( commandRunner );
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -89,68 +173,73 @@ public class MahoutImpl implements Mahout {
     }
 
 
-    public UUID installCluster( final MahoutConfig config ) {
-
+    public UUID installCluster( final MahoutClusterConfig config ) {
         Preconditions.checkNotNull( config, "Configuration is null" );
-
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-
+        AbstractOperationHandler operationHandler = new InstallHandler( this, config );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     public UUID uninstallCluster( final String clusterName ) {
-
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
+        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
-    public List<MahoutConfig> getClusters() {
-        return dbManager.getInfo( MahoutConfig.PRODUCT_KEY, MahoutConfig.class );
+    public List<MahoutClusterConfig> getClusters() {
+        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, MahoutClusterConfig.class );
     }
 
 
     @Override
-    public MahoutConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( MahoutConfig.PRODUCT_KEY, clusterName, MahoutConfig.class );
+    public MahoutClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( MahoutClusterConfig.PRODUCT_KEY, clusterName, MahoutClusterConfig.class );
     }
 
 
     public UUID addNode( final String clusterName, final String lxcHostname ) {
-
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
-
+        AbstractOperationHandler operationHandler = new AddNodeHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     public UUID destroyNode( final String clusterName, final String lxcHostname ) {
-
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
-
+        AbstractOperationHandler operationHandler = new DestroyNodeHandler( this, clusterName, lxcHostname );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final MahoutConfig config,
-                                                         final ProductOperation po ) {
-        return new MahoutSetupStrategy( environment, config, po, this );
+    public UUID checkNode( final String clustername, final String lxchostname ) {
+        return null;
     }
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final MahoutConfig config ) {
+    public UUID stopCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID startCluster( final String clusterName ) {
+        return null;
+    }
+
+
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment,
+                                                         final MahoutClusterConfig config, final ProductOperation po ) {
+        return new MahoutSetupStrategy( this, po, config );
+    }
+
+
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final MahoutClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
