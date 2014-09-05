@@ -1,13 +1,14 @@
 package org.safehaus.subutai.plugin.hbase.api;
 
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 import org.doomdark.uuid.UUIDGenerator;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
+
+import com.google.common.collect.Sets;
 
 
 public class HBaseClusterConfig implements ConfigBase {
@@ -22,9 +23,9 @@ public class HBaseClusterConfig implements ConfigBase {
     private String clusterName = "";
     private String hadoopNameNode;
 
-    private Set<String> nodes = new HashSet();
-    private Set<String> region = new HashSet();
-    private Set<String> quorum = new HashSet();
+    private Set<String> nodes = Sets.newHashSet();
+    private Set<String> region = Sets.newHashSet();
+    private Set<String> quorum = Sets.newHashSet();
     private String domainName = Common.DEFAULT_DOMAIN_NAME;
     private SetupType setupType;
 

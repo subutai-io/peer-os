@@ -1,6 +1,8 @@
 package org.safehaus.subutai.impl.hive.query;
 
 import com.google.common.base.Strings;
+
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.hive.query.Config;
@@ -68,10 +70,10 @@ public class HiveQueryImpl extends HiveQueryBase {
 	}
 
 	@Override
-	public List<org.safehaus.subutai.api.hadoop.Config> getHadoopClusters() {
+	public List<HadoopClusterConfig> getHadoopClusters() {
 		return dbManager.getInfo(
-				org.safehaus.subutai.api.hadoop.Config.PRODUCT_KEY,
-				org.safehaus.subutai.api.hadoop.Config.class);
+				HadoopClusterConfig.PRODUCT_KEY,
+				HadoopClusterConfig.class);
 	}
 
 

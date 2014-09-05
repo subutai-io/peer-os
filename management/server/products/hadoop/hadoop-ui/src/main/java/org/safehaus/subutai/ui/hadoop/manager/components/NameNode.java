@@ -1,7 +1,7 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
 import com.vaadin.event.MouseEvents;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
@@ -13,7 +13,7 @@ import java.util.UUID;
  */
 public class NameNode extends ClusterNode {
 
-	public NameNode(final Config cluster) {
+	public NameNode(final HadoopClusterConfig cluster) {
 		super(cluster);
 		setHostname(cluster.getNameNode().getHostname());
 

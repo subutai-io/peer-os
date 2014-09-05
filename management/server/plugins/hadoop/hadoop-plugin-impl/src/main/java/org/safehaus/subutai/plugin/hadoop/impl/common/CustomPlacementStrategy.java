@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.hadoop.impl.operation;
+package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;

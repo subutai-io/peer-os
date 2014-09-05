@@ -2,7 +2,7 @@ package org.safehaus.subutai.ui.hadoop.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 
 /**
  * Created by daralbaev on 09.04.14.
@@ -10,7 +10,7 @@ import org.safehaus.subutai.api.hadoop.Config;
 public class Wizard {
 	private final VerticalLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
 
 	public Wizard() {
 		grid = new VerticalLayout();
@@ -62,11 +62,11 @@ public class Wizard {
 
 	protected void init() {
 		step = 1;
-		config = new Config();
+		hadoopClusterConfig = new HadoopClusterConfig();
 		putForm();
 	}
 
-	public Config getConfig() {
-		return config;
+	public HadoopClusterConfig getConfig() {
+		return hadoopClusterConfig;
 	}
 }

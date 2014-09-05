@@ -1,87 +1,92 @@
 package org.safehaus.subutai.plugin.hadoop.ui.manager.components;
 
-import com.vaadin.event.MouseEvents;
-import org.safehaus.subutai.common.enums.NodeState;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
-import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import java.util.UUID;
+
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
+
+import com.vaadin.event.MouseEvents;
+
 
 /**
  * Created by daralbaev on 12.04.14.
  */
 public class NameNode extends ClusterNode {
 
-	public NameNode(final HadoopClusterConfig cluster) {
-		super(cluster);
-		setHostname(cluster.getNameNode().getHostname());
+    public NameNode( final HadoopClusterConfig cluster ) {
+        super( cluster );
+        setHostname( cluster.getNameNode().getHostname() );
 
-		startButton.addClickListener(new MouseEvents.ClickListener() {
-			@Override
-			public void click(MouseEvents.ClickEvent clickEvent) {
-				setLoading(true);
-				getStatus(HadoopUI.getHadoopManager().startNameNode(cluster));
-			}
-		});
+        startButton.addClickListener( new MouseEvents.ClickListener() {
+            @Override
+            public void click( MouseEvents.ClickEvent clickEvent ) {
+                setLoading( true );
+                getStatus( HadoopUI.getHadoopManager().startNameNode( cluster ) );
+            }
+        } );
 
-		stopButton.addClickListener(new MouseEvents.ClickListener() {
-			@Override
-			public void click(MouseEvents.ClickEvent clickEvent) {
-				setLoading(true);
-				getStatus(HadoopUI.getHadoopManager().stopNameNode(cluster));
-			}
-		});
+        stopButton.addClickListener( new MouseEvents.ClickListener() {
+            @Override
+            public void click( MouseEvents.ClickEvent clickEvent ) {
+                setLoading( true );
+                getStatus( HadoopUI.getHadoopManager().stopNameNode( cluster ) );
+            }
+        } );
 
-		restartButton.addClickListener(new MouseEvents.ClickListener() {
-			@Override
-			public void click(MouseEvents.ClickEvent clickEvent) {
-				setLoading(true);
-				getStatus(HadoopUI.getHadoopManager().restartNameNode(cluster));
-			}
-		});
+        restartButton.addClickListener( new MouseEvents.ClickListener() {
+            @Override
+            public void click( MouseEvents.ClickEvent clickEvent ) {
+                setLoading( true );
+                getStatus( HadoopUI.getHadoopManager().restartNameNode( cluster ) );
+            }
+        } );
 
-		getStatus(null);
-	}
+        getStatus( null );
+    }
 
-	@Override
-	protected void getStatus(UUID trackID) {
-		setLoading(true);
-		for (ClusterNode slaveNode : slaveNodes) {
-			slaveNode.setLoading(true);
-		}
 
-		HadoopUI.getExecutor().execute(new CheckTask(cluster, new CompleteEvent() {
+    @Override
+    protected void getStatus( UUID trackID ) {
+        setLoading( true );
+        for ( ClusterNode slaveNode : slaveNodes ) {
+            slaveNode.setLoading( true );
+        }
 
-			public void onComplete(NodeState state) {
-				synchronized (progressButton) {
-					boolean isRunning = false;
-					if (state == NodeState.RUNNING) {
-						isRunning = true;
-					} else if (state == NodeState.STOPPED) {
-						isRunning = false;
-					}
+        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
 
-					startButton.setEnabled(!isRunning);
-					restartButton.setEnabled(isRunning);
-					stopButton.setEnabled(isRunning);
+            public void onComplete( NodeState state ) {
+                synchronized ( progressButton ) {
+                    boolean isRunning = false;
+                    if ( state == NodeState.RUNNING ) {
+                        isRunning = true;
+                    }
+                    else if ( state == NodeState.STOPPED ) {
+                        isRunning = false;
+                    }
 
-					for (ClusterNode slaveNode : slaveNodes) {
-						slaveNode.getStatus(null);
-					}
+                    startButton.setEnabled( !isRunning );
+                    restartButton.setEnabled( isRunning );
+                    stopButton.setEnabled( isRunning );
 
-					setLoading(false);
-				}
-			}
-		}, trackID, cluster.getNameNode()));
+                    for ( ClusterNode slaveNode : slaveNodes ) {
+                        slaveNode.getStatus( null );
+                    }
 
-	}
+                    setLoading( false );
+                }
+            }
+        }, trackID, cluster.getNameNode() ) );
+    }
 
-	@Override
-	protected void setLoading(boolean isLoading) {
-		startButton.setVisible(!isLoading);
-		stopButton.setVisible(!isLoading);
-		restartButton.setVisible(!isLoading);
-		progressButton.setVisible(isLoading);
-	}
+
+    @Override
+    protected void setLoading( boolean isLoading ) {
+        startButton.setVisible( !isLoading );
+        stopButton.setVisible( !isLoading );
+        restartButton.setVisible( !isLoading );
+        progressButton.setVisible( isLoading );
+    }
 }

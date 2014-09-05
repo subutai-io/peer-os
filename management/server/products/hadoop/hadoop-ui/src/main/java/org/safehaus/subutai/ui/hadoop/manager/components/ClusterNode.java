@@ -6,7 +6,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +19,12 @@ public class ClusterNode extends HorizontalLayout {
 
 	public static final int ICON_SIZE = 18;
 
-	protected Config cluster;
+	protected HadoopClusterConfig cluster;
 	protected Embedded progressButton, startButton, stopButton, restartButton;
 	protected List<ClusterNode> slaveNodes;
 	protected Label hostname;
 
-	public ClusterNode(Config cluster) {
+	public ClusterNode(HadoopClusterConfig cluster) {
 		this.cluster = cluster;
 		slaveNodes = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class ClusterNode extends HorizontalLayout {
 
 	}
 
-	public Config getCluster() {
+	public HadoopClusterConfig getCluster() {
 		return cluster;
 	}
 }

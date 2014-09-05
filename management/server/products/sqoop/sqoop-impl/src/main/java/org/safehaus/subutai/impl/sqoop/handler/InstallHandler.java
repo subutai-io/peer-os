@@ -1,5 +1,6 @@
 package org.safehaus.subutai.impl.sqoop.handler;
 
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
@@ -42,7 +43,7 @@ public class InstallHandler extends AbstractHandler {
 			return;
 		}
 
-		org.safehaus.subutai.api.hadoop.Config hc
+		HadoopClusterConfig hc
 				= manager.getHadoopManager().getCluster(clusterName);
 		if (hc == null) {
 			po.addLogFailed(String.format("Hadoop cluster %s does not exist", clusterName));
