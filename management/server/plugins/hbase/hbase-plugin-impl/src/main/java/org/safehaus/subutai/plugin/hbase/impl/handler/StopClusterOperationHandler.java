@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.hbase.impl.handler;
 
 
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.Commands;
 import org.safehaus.subutai.plugin.hbase.impl.HBaseImpl;
-import org.safehaus.subutai.common.protocol.Agent;
 
 import com.google.common.collect.Sets;
 
@@ -15,8 +15,7 @@ import com.google.common.collect.Sets;
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class StopClusterOperationHandler extends AbstractOperationHandler<HBaseImpl>
-{
+public class StopClusterOperationHandler extends AbstractOperationHandler<HBaseImpl> {
 
     private ProductOperation po;
     private String clusterName;
@@ -26,14 +25,14 @@ public class StopClusterOperationHandler extends AbstractOperationHandler<HBaseI
         super( manager, clusterName );
         this.clusterName = clusterName;
         po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Setting up %s cluster...", clusterName ) );
+                String.format( "Stopping %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
-                String.format( "Stopping cluster %s", clusterName ) );
+       /* final ProductOperation po = manager.getTracker().createProductOperation( HBaseConfig.PRODUCT_KEY,
+                String.format( "Stopping cluster %s", clusterName ) );*/
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {

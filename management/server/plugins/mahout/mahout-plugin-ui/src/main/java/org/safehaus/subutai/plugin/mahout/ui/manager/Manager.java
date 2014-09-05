@@ -11,6 +11,8 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
+
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
 import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -137,11 +139,11 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig = MahoutUI.getHadoopManager()
+                    HadoopClusterConfig hadoopHadoopClusterConfig = MahoutUI.getHadoopManager()
                         .getCluster( config.getClusterName() );
-                    if ( hadoopConfig != null )
+                    if ( hadoopHadoopClusterConfig != null )
                     {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        Set<Agent> nodes = new HashSet<>( hadoopHadoopClusterConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {

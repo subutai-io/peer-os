@@ -80,7 +80,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.rest.plugin.cassandra</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.plugin.cassandra.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

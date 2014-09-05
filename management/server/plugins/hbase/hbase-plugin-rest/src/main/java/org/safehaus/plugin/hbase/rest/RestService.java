@@ -1,32 +1,32 @@
 package org.safehaus.plugin.hbase.rest;
 
 
-import com.google.common.base.Strings;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+
+import com.google.common.base.Strings;
 
 
 @Path("hbase")
-public class RestService
-{
+public class RestService {
 
     private static final String OPERATION_ID = "OPERATION_ID";
 
     private HBase hbaseManager;
 
 
-    public void setHbaseManager( HBase hbaseManager )
-    {
+    public void setHbaseManager( HBase hbaseManager ) {
         this.hbaseManager = hbaseManager;
     }
 
@@ -34,14 +34,12 @@ public class RestService
     @GET
     @Path("getClusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getClusters()
-    {
+    public String getClusters() {
 
         List<HBaseConfig> configs = hbaseManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
 
-        for ( HBaseConfig config : configs )
-        {
+        for ( HBaseConfig config : configs ) {
             clusterNames.add( config.getClusterName() );
         }
 
@@ -52,8 +50,7 @@ public class RestService
     @GET
     @Path("getCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getCluster( @QueryParam("clusterName") String clusterName )
-    {
+    public String getCluster( @QueryParam("clusterName") String clusterName ) {
         HBaseConfig config = hbaseManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
@@ -63,8 +60,7 @@ public class RestService
     @GET
     @Path("startCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String startCluster( @QueryParam("clusterName") String clusterName )
-    {
+    public String startCluster( @QueryParam("clusterName") String clusterName ) {
 
         UUID uuid = hbaseManager.startCluster( clusterName );
 
@@ -75,8 +71,7 @@ public class RestService
     @GET
     @Path("stopCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String stopCluster( @QueryParam("clusterName") String clusterName )
-    {
+    public String stopCluster( @QueryParam("clusterName") String clusterName ) {
 
         UUID uuid = hbaseManager.stopCluster( clusterName );
 
@@ -87,8 +82,7 @@ public class RestService
     @GET
     @Path("checkCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String checkCluster( @QueryParam("clusterName") String clusterName )
-    {
+    public String checkCluster( @QueryParam("clusterName") String clusterName ) {
 
         UUID uuid = hbaseManager.checkCluster( clusterName );
 
@@ -99,8 +93,7 @@ public class RestService
     @GET
     @Path("uninstallCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String uninstallCluster( @QueryParam("clusterName") String clusterName )
-    {
+    public String uninstallCluster( @QueryParam("clusterName") String clusterName ) {
 
         UUID uuid = hbaseManager.uninstallCluster( clusterName );
 
@@ -111,16 +104,11 @@ public class RestService
     @GET
     @Path("installCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String installCluster(
-        @QueryParam("clusterName") String clusterName,
-        @QueryParam("master") String master,
-        @QueryParam("backupMasters") String backupMasters,
-        @QueryParam("hadoopNameNode") String hadoopNameNode,
-        @QueryParam("nodes") String nodes,
-        @QueryParam("quorum") String quorum,
-        @QueryParam("region") String region
-    )
-    {
+    public String installCluster( @QueryParam("clusterName") String clusterName, @QueryParam("master") String master,
+                                  @QueryParam("backupMasters") String backupMasters,
+                                  @QueryParam("hadoopNameNode") String hadoopNameNode,
+                                  @QueryParam("nodes") String nodes, @QueryParam("quorum") String quorum,
+                                  @QueryParam("region") String region ) {
         HBaseConfig config = new HBaseConfig();
         config.setClusterName( clusterName );
         config.setMaster( master );
@@ -129,26 +117,20 @@ public class RestService
 
         // BUG: Getting the params as list doesn't work. For example "List<String> nodes". To fix this we get a param
         // as plain string and use splitting.
-        if ( !Strings.isNullOrEmpty( nodes ) )
-        {
-            for ( String node : nodes.split( "," ) )
-            {
+        if ( !Strings.isNullOrEmpty( nodes ) ) {
+            for ( String node : nodes.split( "," ) ) {
                 config.getNodes().add( node );
             }
         }
 
-        if ( !Strings.isNullOrEmpty( quorum ) )
-        {
-            for ( String node : quorum.split( "," ) )
-            {
+        if ( !Strings.isNullOrEmpty( quorum ) ) {
+            for ( String node : quorum.split( "," ) ) {
                 config.getQuorum().add( node );
             }
         }
 
-        if ( !Strings.isNullOrEmpty( region ) )
-        {
-            for ( String node : region.split( "," ) )
-            {
+        if ( !Strings.isNullOrEmpty( region ) ) {
+            for ( String node : region.split( "," ) ) {
                 config.getRegion().add( node );
             }
         }
@@ -157,5 +139,4 @@ public class RestService
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
     }
-
 }

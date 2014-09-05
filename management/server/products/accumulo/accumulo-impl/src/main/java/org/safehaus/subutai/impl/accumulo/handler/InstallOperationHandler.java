@@ -3,6 +3,7 @@ package org.safehaus.subutai.impl.accumulo.handler;
 
 import com.google.common.base.Strings;
 import org.safehaus.subutai.api.accumulo.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -73,17 +74,17 @@ public class InstallOperationHandler extends AbstractOperationHandler<AccumuloIm
             return;
         }
 
-        org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+        HadoopClusterConfig hadoopHadoopClusterConfig =
             manager.getHadoopManager().getCluster( config.getClusterName() );
 
-        if ( hadoopConfig == null )
+        if ( hadoopHadoopClusterConfig == null )
         {
             po.addLogFailed( String.format( "Hadoop cluster with name '%s' not found\nInstallation aborted",
                 config.getClusterName() ) );
             return;
         }
 
-        if ( !hadoopConfig.getAllNodes().containsAll( config.getAllNodes() ) )
+        if ( !hadoopHadoopClusterConfig.getAllNodes().containsAll( config.getAllNodes() ) )
         {
             po.addLogFailed( String.format( "Not all supplied nodes belong to Hadoop cluster %s \nInstallation aborted",
                 config.getClusterName() ) );

@@ -1,5 +1,6 @@
 package org.safehaus.subutai.api.hive.query;
 
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface HiveQuery extends ApiBase<Config> {
 
 	public List<Config> load();
 
-	public List<org.safehaus.subutai.api.hadoop.Config> getHadoopClusters();
+	public List<HadoopClusterConfig> getHadoopClusters();
 }

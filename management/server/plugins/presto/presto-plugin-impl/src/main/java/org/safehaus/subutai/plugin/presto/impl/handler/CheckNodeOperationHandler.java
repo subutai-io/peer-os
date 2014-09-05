@@ -1,61 +1,54 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 
-import com.google.common.collect.Sets;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.Agent;
 
-import java.util.UUID;
+import com.google.common.collect.Sets;
 
 
-public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoImpl>
-{
+public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
     private final ProductOperation po;
     private final String lxcHostname;
 
 
-    public CheckNodeOperationHandler( PrestoImpl manager, String clusterName, String lxcHostname )
-    {
+    public CheckNodeOperationHandler( PrestoImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
-            String.format( "Checking state of %s in %s", lxcHostname, clusterName ) );
-
+        po = PrestoImpl.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
+                String.format( "Checking state of %s in %s", lxcHostname, clusterName ) );
     }
 
 
     @Override
-    public UUID getTrackerId()
-    {
+    public UUID getTrackerId() {
         return po.getId();
     }
 
 
     @Override
-    public void run()
-    {
+    public void run() {
         productOperation = po;
         PrestoClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null )
-        {
+        if ( config == null ) {
             po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
-        Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( node == null )
-        {
+        Agent node = PrestoImpl.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( node == null ) {
             po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 
-        if ( !config.getAllNodes().contains( node ) )
-        {
+        if ( !config.getAllNodes().contains( node ) ) {
             po.addLogFailed( String.format( "Node %s does not belong to this cluster", lxcHostname ) );
             return;
         }
@@ -63,14 +56,12 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
         po.addLog( "Checking node..." );
 
         Command checkNodeCommand = Commands.getStatusCommand( Sets.newHashSet( node ) );
-        manager.getCommandRunner().runCommand( checkNodeCommand );
+        PrestoImpl.getCommandRunner().runCommand( checkNodeCommand );
 
-        if ( checkNodeCommand.hasCompleted() )
-        {
+        if ( checkNodeCommand.hasCompleted() ) {
             po.addLogDone( String.format( "%s", checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
-        else
-        {
+        else {
             po.addLogFailed( String.format( "Faied to check status, %s", checkNodeCommand.getAllErrors() ) );
         }
     }

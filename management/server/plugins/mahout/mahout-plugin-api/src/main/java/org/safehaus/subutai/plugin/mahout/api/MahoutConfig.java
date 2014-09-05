@@ -1,41 +1,48 @@
 package org.safehaus.subutai.plugin.mahout.api;
 
-import java.util.HashSet;
+
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 
+import com.google.common.collect.Sets;
+
 
 public class MahoutConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Mahout";
-	public static final String PRODUCT_NAME = "Mahout";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Mahout";
+    public static final String PRODUCT_NAME = "Mahout";
+    private String clusterName = "";
     private String templateName = PRODUCT_NAME;
 
-	private Set<Agent> nodes = new HashSet();
+    private Set<Agent> nodes = Sets.newHashSet();
 
-	public String getClusterName() {
-		return clusterName;
-	}
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
 
-	public Set<Agent> getNodes() {
-		return nodes;
-	}
+    public void setClusterName( String clusterName ) {
+        this.clusterName = clusterName;
+    }
 
-	public void setNodes(Set<Agent> nodes) {
-		this.nodes = nodes;
-	}
+
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
+
+
+    public Set<Agent> getNodes() {
+        return nodes;
+    }
+
+
+    public void setNodes( Set<Agent> nodes ) {
+        this.nodes = nodes;
+    }
 
 
     public String getTemplateName() {
@@ -49,8 +56,7 @@ public class MahoutConfig implements ConfigBase {
 
 
     @Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
-	}
-
+    public String toString() {
+        return "Config{" + "clusterName=" + clusterName + ", nodes=" + nodes + '}';
+    }
 }

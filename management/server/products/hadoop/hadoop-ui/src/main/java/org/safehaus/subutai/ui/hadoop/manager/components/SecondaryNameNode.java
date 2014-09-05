@@ -1,6 +1,6 @@
 package org.safehaus.subutai.ui.hadoop.manager.components;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.ui.hadoop.HadoopUI;
@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 public class SecondaryNameNode extends ClusterNode {
 
-	public SecondaryNameNode(Config cluster) {
+	public SecondaryNameNode(HadoopClusterConfig cluster) {
 		super(cluster);
 		setHostname(cluster.getSecondaryNameNode().getHostname());
 

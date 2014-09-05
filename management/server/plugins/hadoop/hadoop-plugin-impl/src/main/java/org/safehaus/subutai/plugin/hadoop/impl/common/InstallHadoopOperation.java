@@ -1,8 +1,7 @@
-package org.safehaus.subutai.plugin.hadoop.impl.operation.common;
+package org.safehaus.subutai.plugin.hadoop.impl.common;
 
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.hadoop.impl.Commands;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -201,13 +202,13 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( config != null ) {
 
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+                    HadoopClusterConfig hadoopHadoopClusterConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
                     org.safehaus.subutai.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
-                    if ( hadoopConfig != null ) {
+                    if ( hadoopHadoopClusterConfig != null ) {
                         if ( zkConfig != null ) {
-                            Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                            Set<Agent> availableNodes = new HashSet<>( hadoopHadoopClusterConfig.getAllNodes() );
                             availableNodes.retainAll( zkConfig.getNodes() );
                             availableNodes.removeAll( config.getTracers() );
                             if ( availableNodes.isEmpty() ) {
@@ -248,13 +249,13 @@ public class Manager {
             public void buttonClick( Button.ClickEvent event ) {
                 if ( config != null ) {
 
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+                    HadoopClusterConfig hadoopHadoopClusterConfig =
                             AccumuloUI.getHadoopManager().getCluster( config.getClusterName() );
                     org.safehaus.subutai.api.zookeeper.Config zkConfig =
                             AccumuloUI.getZookeeperManager().getCluster( config.getClusterName() );
-                    if ( hadoopConfig != null ) {
+                    if ( hadoopHadoopClusterConfig != null ) {
                         if ( zkConfig != null ) {
-                            Set<Agent> availableNodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                            Set<Agent> availableNodes = new HashSet<>( hadoopHadoopClusterConfig.getAllNodes() );
                             availableNodes.retainAll( zkConfig.getNodes() );
                             availableNodes.removeAll( config.getSlaves() );
                             if ( availableNodes.isEmpty() ) {

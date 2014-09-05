@@ -8,27 +8,27 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
 import org.safehaus.subutai.plugin.hbase.impl.handler.CheckClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StartClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.StopClusterOperationHandler;
 import org.safehaus.subutai.plugin.hbase.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 
 import com.google.common.base.Preconditions;
 
@@ -45,12 +45,8 @@ public class HBaseImpl implements HBase {
     private ContainerManager containerManager;
 
 
-    public HBaseImpl( AgentManager agentManager,
-                      Hadoop hadoopManager,
-                      DbManager dbManager,
-                      Tracker tracker,
-                      CommandRunner commandRunner,
-                      EnvironmentManager environmentManager,
+    public HBaseImpl( AgentManager agentManager, Hadoop hadoopManager, DbManager dbManager, Tracker tracker,
+                      CommandRunner commandRunner, EnvironmentManager environmentManager,
                       ContainerManager containerManager ) {
         this.agentManager = agentManager;
         this.hadoopManager = hadoopManager;
@@ -184,13 +180,13 @@ public class HBaseImpl implements HBase {
 
 
     @Override
-    public List<Config> getHadoopClusters() {
+    public List<HadoopClusterConfig> getHadoopClusters() {
         return hadoopManager.getClusters();
     }
 
 
     @Override
-    public Config getHadoopCluster( String clusterName ) {
+    public HadoopClusterConfig getHadoopCluster( String clusterName ) {
         return hadoopManager.getCluster( clusterName );
     }
 
