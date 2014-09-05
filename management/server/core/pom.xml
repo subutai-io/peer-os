@@ -33,5 +33,6 @@
         <module>file-tracker</module>
         <module>config-point-tracker</module>
         <module>pet_core</module>
+        <module>peer-manager</module>
     </modules>
 </project>
