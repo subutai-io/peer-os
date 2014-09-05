@@ -164,7 +164,7 @@ public class Cloner extends VerticalLayout {
                                 if (!Strings.isNullOrEmpty(productName)) {
                                     lxcHost.append(productName);
                                     lxcHost.append(lxcHostNames.size() + 1);
-                                    lxcHost.append("-");
+                                    lxcHost.append("_");
                                 }
                                 lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
                                 lxcHostNames.add(lxcHost.toString());
@@ -203,7 +203,7 @@ public class Cloner extends VerticalLayout {
                 List<String> lxcHostNames = new ArrayList<>();
                 for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder();
-                    lxcHost.append(productName).append(i).append("-");
+                    lxcHost.append(productName).append(i).append("_");
                     lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
                     lxcHostNames.add(lxcHost.toString());
                 }
