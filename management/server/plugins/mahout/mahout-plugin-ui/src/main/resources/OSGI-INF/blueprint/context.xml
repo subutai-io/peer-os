@@ -14,11 +14,11 @@
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.plugin.mahout.ui.MahoutUI"
         init-method="init" destroy-method="destroy">
-    <argument ref="agentManager" />
-    <argument ref="tracker" />
-    <argument ref="hadoopManager" />
-    <argument ref="mahoutManager" />
-    <argument ref="commandRunner" />
+    <property name="agentManager" ref="agentManager" />
+    <property name="tracker" ref="tracker" />
+    <property name="hadoopManager" ref="hadoopManager" />
+    <property name="mahoutManager" ref="mahoutManager" />
+    <property name="commandRunner" ref="commandRunner" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

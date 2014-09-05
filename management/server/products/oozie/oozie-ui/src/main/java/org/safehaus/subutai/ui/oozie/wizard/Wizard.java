@@ -15,76 +15,84 @@ import org.safehaus.subutai.api.oozie.OozieConfig;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
+
 /**
  * @author dilshat
  */
 public class Wizard {
 
-	private final VerticalLayout vlayout;
-	private int step = 1;
-	private OozieConfig config = new OozieConfig();
+    private final VerticalLayout vlayout;
+    private int step = 1;
+    private OozieConfig config = new OozieConfig();
 
-	public Wizard() {
-		vlayout = new VerticalLayout();
-		vlayout.setSizeFull();
-		vlayout.setMargin(true);
-		putForm();
-	}
 
-	public Component getContent() {
-		return vlayout;
-	}
+    public Wizard() {
+        vlayout = new VerticalLayout();
+        vlayout.setSizeFull();
+        vlayout.setMargin( true );
+        putForm();
+    }
 
-	public void next() {
-		step++;
-		putForm();
-	}
 
-	public void back() {
-		step--;
-		putForm();
-	}
+    private void putForm() {
+        vlayout.removeAllComponents();
+        switch ( step ) {
+            case 1: {
+                vlayout.addComponent( new StepStart( this ) );
+                break;
+            }
+            case 2: {
+                vlayout.addComponent( new ConfigurationStep( this ) );
+                break;
+            }
+            case 3: {
+                vlayout.addComponent( new StepSetConfig( this ) );
+                break;
+            }
+            case 4: {
+                vlayout.addComponent( new VerificationStep( this ) );
+                break;
+            }
+            default: {
+                step = 1;
+                vlayout.addComponent( new StepStart( this ) );
+                break;
+            }
+        }
+    }
 
-	public void cancel() {
-		step = 1;
-		putForm();
-	}
 
-	public void init() {
-		step = 1;
-		config = new OozieConfig();
-		putForm();
-	}
+    public Component getContent() {
+        return vlayout;
+    }
 
-	public OozieConfig getConfig() {
-		return config;
-	}
 
-	private void putForm() {
-		vlayout.removeAllComponents();
-		switch (step) {
-			case 1: {
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-			case 2: {
-				vlayout.addComponent(new ConfigurationStep(this));
-				break;
-			}
-			case 3: {
-				vlayout.addComponent(new StepSetConfig(this));
-				break;
-			}
-			case 4: {
-				vlayout.addComponent(new VerificationStep(this));
-				break;
-			}
-			default: {
-				step = 1;
-				vlayout.addComponent(new StepStart(this));
-				break;
-			}
-		}
-	}
+    public void next() {
+        step++;
+        putForm();
+    }
 
+
+    public void back() {
+        step--;
+        putForm();
+    }
+
+
+    public void cancel() {
+        step = 1;
+        putForm();
+    }
+
+
+    public void init() {
+        step = 1;
+        config = new OozieConfig();
+        putForm();
+    }
+
+
+    public OozieConfig getConfig() {
+        return config;
+    }
 }

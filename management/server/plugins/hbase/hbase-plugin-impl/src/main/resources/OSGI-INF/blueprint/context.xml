@@ -18,13 +18,13 @@
 
   <bean id="hbase-impl" scope="singleton" class="org.safehaus.subutai.plugin.hbase.impl.HBaseImpl"
         init-method="init" destroy-method="destroy">
-    <argument ref="agentManager" />
-    <argument ref="hadoopManager" />
-    <argument ref="dbManager" />
-    <argument ref="tracker" />
-    <argument ref="commandRunner" />
-    <argument ref="containerManager" />
-    <argument ref="environmentManager" />
+    <property name="agentManager" ref="agentManager" />
+    <property name="hadoopManager" ref="hadoopManager" />
+    <property name="dbManager" ref="dbManager" />
+    <property name="tracker" ref="tracker" />
+    <property name="commandRunner" ref="commandRunner" />
+    <property name="containerManager" ref="containerManager" />
+    <property name="environmentManager" ref="environmentManager" />
   </bean>
 
   <service ref="hbase-impl" interface="org.safehaus.subutai.plugin.hbase.api.HBase" />

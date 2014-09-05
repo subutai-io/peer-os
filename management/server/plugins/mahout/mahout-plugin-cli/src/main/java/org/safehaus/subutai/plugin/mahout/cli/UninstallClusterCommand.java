@@ -7,7 +7,7 @@ import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -17,11 +17,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Displays the last log entries
  */
-@Command(scope = "mahout", name = "uninstall-cluster", description = "Command to uninstall Mahout cluster")
+@Command( scope = "mahout", name = "uninstall-cluster", description = "Command to uninstall Mahout cluster" )
 public class UninstallClusterCommand extends OsgiCommandSupport {
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
     String clusterName = null;
     private Mahout mahoutManager;
     private Tracker tracker;
@@ -51,7 +51,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
         UUID uuid = mahoutManager.uninstallCluster( clusterName );
         int logSize = 0;
         while ( !Thread.interrupted() ) {
-            ProductOperationView po = tracker.getProductOperation( MahoutConfig.PRODUCT_KEY, uuid );
+            ProductOperationView po = tracker.getProductOperation( MahoutClusterConfig.PRODUCT_KEY, uuid );
             if ( po != null ) {
                 if ( logSize != po.getLog().length() ) {
                     System.out.print( po.getLog().substring( logSize, po.getLog().length() ) );

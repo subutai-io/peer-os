@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.hbase.cli;
 
 
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -15,6 +15,9 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "hbase", name = "describe-cluster", description = "Shows the details of the Cassandra cluster.")
 public class DescribeClusterCommand extends OsgiCommandSupport {
 
+    @Argument( index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
+            multiValued = false )
+    String clusterName = null;
     private HBase hbaseManager;
 
 
@@ -28,13 +31,8 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
     }
 
 
-    @Argument(index = 0, name = "clusterName", description = "The name of the cluster.", required = true,
-            multiValued = false)
-    String clusterName = null;
-
-
     protected Object doExecute() {
-        HBaseConfig config = hbaseManager.getCluster( clusterName );
+        HBaseClusterConfig config = hbaseManager.getCluster( clusterName );
         if ( config != null ) {
             StringBuilder sb = new StringBuilder();
             sb.append( "Cluster name: " ).append( config.getClusterName() ).append( "\n" );

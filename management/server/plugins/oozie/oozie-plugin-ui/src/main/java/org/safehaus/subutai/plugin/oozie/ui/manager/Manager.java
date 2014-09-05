@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -44,10 +44,12 @@ public class Manager {
     private final ComboBox clusterCombo;
     private final Table serverTable;
     private final Table clientsTable;
-    private OozieConfig config;
+    private OozieClusterConfig config;
+    private OozieUI oozieUI;
 
 
-    public Manager() {
+    public Manager( final OozieUI oozieUI ) {
+        this.oozieUI = oozieUI;
 
         contentRoot = new GridLayout();
         contentRoot.setSpacing( true );
@@ -74,7 +76,7 @@ public class Manager {
         clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
-                config = ( OozieConfig ) event.getProperty().getValue();
+                config = ( OozieClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -115,10 +117,10 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID = OozieUI.getOozieManager().uninstallCluster( config.getClusterName() );
+                            UUID trackID = oozieUI.getOozieManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window =
-                                    new ProgressWindow( OozieUI.getExecutor(), OozieUI.getTracker(), trackID,
-                                            OozieConfig.PRODUCT_KEY );
+                                    new ProgressWindow( oozieUI.getExecutor(), oozieUI.getTracker(), trackID,
+                                            OozieClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener() {
                                 @Override
                                 public void windowClose( Window.CloseEvent closeEvent ) {
@@ -155,13 +157,15 @@ public class Manager {
     }
 
 
-    public Component getContent() {
-        return contentRoot;
-    }
-
-
-    private void show( String notification ) {
-        Notification.show( notification );
+    private void refreshUI() {
+        if ( config != null ) {
+            populateServerTable( serverTable, config.getServer() );
+            populateClientsTable( clientsTable, config.getClients() );
+        }
+        else {
+            serverTable.removeAllItems();
+            clientsTable.removeAllItems();
+        }
     }
 
 
@@ -178,17 +182,17 @@ public class Manager {
         progressIcon.setVisible( false );
 
         final Object rowId = table.addItem( new Object[] {
-                        agentHostname, checkBtn, startBtn, stopBtn, progressIcon
-                }, null );
+                agentHostname, checkBtn, startBtn, stopBtn, progressIcon
+        }, null );
 
         checkBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 progressIcon.setVisible( true );
 
-                UUID trackID = OozieUI.getOozieManager().checkServerStatus( config );
-                ProgressWindow window = new ProgressWindow( OozieUI.getExecutor(), OozieUI.getTracker(), trackID,
-                        OozieConfig.PRODUCT_KEY );
+                UUID trackID = oozieUI.getOozieManager().checkServerStatus( config );
+                ProgressWindow window = new ProgressWindow( oozieUI.getExecutor(), oozieUI.getTracker(), trackID,
+                        OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -206,9 +210,9 @@ public class Manager {
                 startBtn.setEnabled( false );
                 stopBtn.setEnabled( false );
 
-                UUID trackID = OozieUI.getOozieManager().startServer( config );
-                ProgressWindow window = new ProgressWindow( OozieUI.getExecutor(), OozieUI.getTracker(), trackID,
-                        OozieConfig.PRODUCT_KEY );
+                UUID trackID = oozieUI.getOozieManager().startServer( config );
+                ProgressWindow window = new ProgressWindow( oozieUI.getExecutor(), oozieUI.getTracker(), trackID,
+                        OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -224,9 +228,9 @@ public class Manager {
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 progressIcon.setVisible( true );
 
-                UUID trackID = OozieUI.getOozieManager().stopServer( config );
-                ProgressWindow window = new ProgressWindow( OozieUI.getExecutor(), OozieUI.getTracker(), trackID,
-                        OozieConfig.PRODUCT_KEY );
+                UUID trackID = oozieUI.getOozieManager().stopServer( config );
+                ProgressWindow window = new ProgressWindow( oozieUI.getExecutor(), oozieUI.getTracker(), trackID,
+                        OozieClusterConfig.PRODUCT_KEY );
                 window.getWindow().addCloseListener( new Window.CloseListener() {
                     @Override
                     public void windowClose( Window.CloseEvent closeEvent ) {
@@ -239,44 +243,17 @@ public class Manager {
     }
 
 
-    private void populateClientsTable( final Table table, Set<String> clientHostnames ) {
-
-        table.removeAllItems();
-
-        for ( final String agent : clientHostnames ) {
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setVisible( false );
-
-            final Object rowId = table.addItem( new Object[] {
-                            agent,
-                    }, null );
-        }
-    }
-
-
-    private void refreshUI() {
-        if ( config != null ) {
-            populateServerTable( serverTable, config.getServer() );
-            populateClientsTable( clientsTable, config.getClients() );
-        }
-        else {
-            serverTable.removeAllItems();
-            clientsTable.removeAllItems();
-        }
-    }
-
-
     public void refreshClustersInfo() {
-        List<OozieConfig> info = OozieUI.getOozieManager().getClusters();
-        OozieConfig clusterInfo = ( OozieConfig ) clusterCombo.getValue();
+        List<OozieClusterConfig> info = oozieUI.getOozieManager().getClusters();
+        OozieClusterConfig clusterInfo = ( OozieClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( info != null && info.size() > 0 ) {
-            for ( OozieConfig oozieConfig : info ) {
+            for ( OozieClusterConfig oozieConfig : info ) {
                 clusterCombo.addItem( oozieConfig );
                 clusterCombo.setItemCaption( oozieConfig, oozieConfig.getClusterName() );
             }
             if ( clusterInfo != null ) {
-                for ( OozieConfig oozieInfo : info ) {
+                for ( OozieClusterConfig oozieInfo : info ) {
                     if ( oozieInfo.getClusterName().equals( clusterInfo.getClusterName() ) ) {
                         clusterCombo.setValue( oozieInfo );
                         return;
@@ -286,6 +263,21 @@ public class Manager {
             else {
                 clusterCombo.setValue( info.iterator().next() );
             }
+        }
+    }
+
+
+    private void populateClientsTable( final Table table, Set<String> clientHostnames ) {
+
+        table.removeAllItems();
+
+        for ( final String agent : clientHostnames ) {
+            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            progressIcon.setVisible( false );
+
+            final Object rowId = table.addItem( new Object[] {
+                    agent,
+            }, null );
         }
     }
 
@@ -308,11 +300,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = oozieUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), OozieUI.getExecutor(),
-                                        OozieUI.getCommandRunner(), OozieUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), oozieUI.getExecutor(),
+                                        oozieUI.getCommandRunner(), oozieUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -322,6 +314,11 @@ public class Manager {
             }
         } );
         return table;
+    }
+
+
+    private void show( String notification ) {
+        Notification.show( notification );
     }
 
 
@@ -339,11 +336,11 @@ public class Manager {
                 if ( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
-                    Agent lxcAgent = OozieUI.getAgentManager().getAgentByHostname( lxcHostname );
+                    Agent lxcAgent = oozieUI.getAgentManager().getAgentByHostname( lxcHostname );
                     if ( lxcAgent != null ) {
                         TerminalWindow terminal =
-                                new TerminalWindow( Sets.newHashSet( lxcAgent ), OozieUI.getExecutor(),
-                                        OozieUI.getCommandRunner(), OozieUI.getAgentManager() );
+                                new TerminalWindow( Sets.newHashSet( lxcAgent ), oozieUI.getExecutor(),
+                                        oozieUI.getCommandRunner(), oozieUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
                     }
                     else {
@@ -353,5 +350,10 @@ public class Manager {
             }
         } );
         return table;
+    }
+
+
+    public Component getContent() {
+        return contentRoot;
     }
 }

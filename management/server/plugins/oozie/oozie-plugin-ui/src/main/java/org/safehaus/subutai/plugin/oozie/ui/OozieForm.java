@@ -19,8 +19,13 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class OozieForm extends CustomComponent {
 
+    private final Wizard wizard;
+    private final Manager manager;
 
-    public OozieForm() {
+
+    public OozieForm( OozieUI oozieUI ) {
+
+
         setSizeFull();
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -29,8 +34,8 @@ public class OozieForm extends CustomComponent {
 
         TabSheet mongoSheet = new TabSheet();
         mongoSheet.setSizeFull();
-        final Manager manager = new Manager();
-        final Wizard wizard = new Wizard();
+        manager = new Manager( oozieUI );
+        wizard = new Wizard( oozieUI );
         mongoSheet.addTab( wizard.getContent(), "Install" );
         mongoSheet.addTab( manager.getContent(), "Manage" );
         verticalLayout.addComponent( mongoSheet );

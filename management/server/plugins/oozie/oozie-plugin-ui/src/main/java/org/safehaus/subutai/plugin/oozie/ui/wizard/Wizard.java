@@ -10,7 +10,8 @@
 package org.safehaus.subutai.plugin.oozie.ui.wizard;
 
 
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
+import org.safehaus.subutai.plugin.oozie.ui.OozieUI;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -23,49 +24,16 @@ public class Wizard {
 
     private final VerticalLayout vlayout;
     private int step = 1;
-    private OozieConfig config = new OozieConfig();
+    private OozieClusterConfig config = new OozieClusterConfig();
+    private OozieUI oozieUI;
 
 
-    public Wizard() {
+    public Wizard( OozieUI oozieUI ) {
+        this.oozieUI = oozieUI;
         vlayout = new VerticalLayout();
         vlayout.setSizeFull();
         vlayout.setMargin( true );
         putForm();
-    }
-
-
-    public Component getContent() {
-        return vlayout;
-    }
-
-
-    public void next() {
-        step++;
-        putForm();
-    }
-
-
-    public void back() {
-        step--;
-        putForm();
-    }
-
-
-    public void cancel() {
-        step = 1;
-        putForm();
-    }
-
-
-    public void init() {
-        step = 1;
-        config = new OozieConfig();
-        putForm();
-    }
-
-
-    public OozieConfig getConfig() {
-        return config;
     }
 
 
@@ -94,5 +62,50 @@ public class Wizard {
                 break;
             }
         }
+    }
+
+
+    public Component getContent() {
+        return vlayout;
+    }
+
+
+    public void next() {
+        step++;
+        putForm();
+    }
+
+
+    public void back() {
+        step--;
+        putForm();
+    }
+
+
+    public void cancel() {
+        step = 1;
+        putForm();
+    }
+
+
+    public void init() {
+        step = 1;
+        config = new OozieClusterConfig();
+        putForm();
+    }
+
+
+    public OozieClusterConfig getConfig() {
+        return config;
+    }
+
+
+    public OozieUI getOozieUI() {
+        return oozieUI;
+    }
+
+
+    public void setOozieUI( final OozieUI oozieUI ) {
+        this.oozieUI = oozieUI;
     }
 }

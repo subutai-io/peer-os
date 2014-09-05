@@ -11,11 +11,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.mahout.Config;
 import org.safehaus.subutai.api.mahout.Mahout;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 
 
 public class RestService {
@@ -37,8 +37,8 @@ public class RestService {
 
 
     @GET
-    @Path( "getClusters" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path("getClusters")
+    @Produces({ MediaType.APPLICATION_JSON })
     public String getClusters() {
 
         List<Config> configs = mahoutManager.getClusters();
@@ -53,11 +53,9 @@ public class RestService {
 
 
     @GET
-    @Path( "getCluster" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String getCluster(
-            @QueryParam( "clusterName" ) String clusterName
-    ) {
+    @Path("getCluster")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String getCluster( @QueryParam("clusterName") String clusterName ) {
         Config config = mahoutManager.getCluster( clusterName );
 
         return JsonUtil.GSON.toJson( config );
@@ -65,12 +63,9 @@ public class RestService {
 
 
     @GET
-    @Path( "installCluster" )
+    @Path("installCluster")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String installCluster(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "nodes" ) String nodes
-    ) {
+    public String installCluster( @QueryParam("clusterName") String clusterName, @QueryParam("nodes") String nodes ) {
         Config config = new Config();
         config.setClusterName( clusterName );
 
@@ -86,11 +81,9 @@ public class RestService {
 
 
     @GET
-    @Path( "uninstallCluster" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String uninstallCluster(
-            @QueryParam( "clusterName" ) String clusterName
-    ) {
+    @Path("uninstallCluster")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String uninstallCluster( @QueryParam("clusterName") String clusterName ) {
         UUID uuid = mahoutManager.uninstallCluster( clusterName );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -98,12 +91,9 @@ public class RestService {
 
 
     @GET
-    @Path( "addNode" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String addNode(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "node" ) String node
-    ) {
+    @Path("addNode")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String addNode( @QueryParam("clusterName") String clusterName, @QueryParam("node") String node ) {
         UUID uuid = mahoutManager.addNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );
@@ -111,12 +101,9 @@ public class RestService {
 
 
     @GET
-    @Path( "destroyNode" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public String destroyNode(
-            @QueryParam( "clusterName" ) String clusterName,
-            @QueryParam( "node" ) String node
-    ) {
+    @Path("destroyNode")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String destroyNode( @QueryParam("clusterName") String clusterName, @QueryParam("node") String node ) {
         UUID uuid = mahoutManager.destroyNode( clusterName, node );
 
         return JsonUtil.toJson( OPERATION_ID, uuid );

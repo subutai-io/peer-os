@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.plugin.hbase.api.HBaseConfig;
+import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
@@ -18,6 +18,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 @Command(scope = "hbase", name = "uninstall-cluster", description = "Command to uninstall HBase cluster")
 public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
 
+    @Argument( index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster" )
+    String clusterName;
     private HBase hbaseManager;
     private Tracker tracker;
 
@@ -42,14 +44,10 @@ public class UninstallHBaseClusterCommand extends OsgiCommandSupport {
     }
 
 
-    @Argument(index = 0, name = "clusterName", required = true, multiValued = false, description = "Delete cluster")
-    String clusterName;
-
-
     protected Object doExecute() {
 
         UUID uuid = hbaseManager.uninstallCluster( clusterName );
-        tracker.printOperationLog( HBaseConfig.PRODUCT_KEY, uuid, 30000 );
+        tracker.printOperationLog( HBaseClusterConfig.PRODUCT_KEY, uuid, 30000 );
         return null;
     }
 }

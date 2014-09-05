@@ -13,7 +13,9 @@ package org.safehaus.subutai.plugin.oozie.ui.wizard;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.util.BeanItemContainer;
@@ -69,9 +71,12 @@ public class StepSetConfig extends Panel {
         cbServers.setTextInputAllowed( false );
         cbServers.setRequired( true );
         cbServers.setNullSelectionAllowed( false );
-        for ( String agent : wizard.getConfig().getHadoopNodes() ) {
-            cbServers.addItem( agent );
-            cbServers.setItemCaption( agent, agent );
+
+        HadoopClusterConfig hcc =
+                wizard.getOozieUI().getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+        for ( Agent agent : hcc.getAllNodes() ) {
+            cbServers.addItem( agent.getHostname() );
+            cbServers.setItemCaption( agent.getHostname(), agent.getHostname() );
         }
 
         vl.addComponent( cbServers );
@@ -81,7 +86,7 @@ public class StepSetConfig extends Panel {
         }
 
         final TwinColSelect selectClients = new TwinColSelect( "", new ArrayList<String>() );
-        //		selectClients.setItemCaptionPropertyId("hostname");
+        selectClients.setItemCaptionPropertyId( "hostname" );
         selectClients.setRows( 7 );
         selectClients.setNullSelectionAllowed( true );
         selectClients.setMultiSelect( true );
@@ -90,8 +95,7 @@ public class StepSetConfig extends Panel {
         selectClients.setRightColumnCaption( "Client nodes" );
         selectClients.setWidth( 100, Unit.PERCENTAGE );
         selectClients.setRequired( true );
-        selectClients
-                .setContainerDataSource( new BeanItemContainer<>( String.class, wizard.getConfig().getHadoopNodes() ) );
+        selectClients.setContainerDataSource( new BeanItemContainer<>( Agent.class, hcc.getAllNodes() ) );
 
         if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getClients() ) ) {
             selectClients.setValue( wizard.getConfig().getClients() );

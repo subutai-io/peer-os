@@ -2,13 +2,14 @@ package org.safehaus.subutai.plugin.mahout.ui.manager;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.ui.MahoutUI;
 
 import com.google.common.base.Strings;
@@ -33,12 +34,14 @@ public class AddNodeWindow extends Window {
     private final String clusterName;
 
     private final ArrayList<String> selectedNodes = new ArrayList<>();
+    private MahoutUI mahoutUI;
 
 
-    public AddNodeWindow( final MahoutConfig config, Set<Agent> nodes ) {
+    public AddNodeWindow( final MahoutClusterConfig config, Set<Agent> nodes, MahoutUI mahoutUi ) {
+
 
         super( "Add New Node" );
-
+        this.mahoutUI = mahoutUi;
         clusterName = config.getClusterName();
 
         setModal( true );
@@ -122,7 +125,8 @@ public class AddNodeWindow extends Window {
 
         selectedNodes.clear();
 
-        for ( Object id : nodesList.getItemIds() ) {
+        for ( Iterator i = nodesList.getItemIds().iterator(); i.hasNext(); ) {
+            Object id = i.next();
             if ( nodesList.isSelected( id ) ) {
                 selectedNodes.add( ( String ) id );
             }
@@ -134,13 +138,13 @@ public class AddNodeWindow extends Window {
 
         showProgress();
 
-        final UUID trackID = MahoutUI.getMahoutManager().addNode( clusterName, hostname );
+        final UUID trackID = mahoutUI.getMahoutManager().addNode( clusterName, hostname );
 
-        MahoutUI.getExecutor().execute( new Runnable() {
+        mahoutUI.getExecutor().execute( new Runnable() {
             public void run() {
                 while ( true ) {
                     ProductOperationView po =
-                            MahoutUI.getTracker().getProductOperation( MahoutConfig.PRODUCT_KEY, trackID );
+                            mahoutUI.getTracker().getProductOperation( MahoutClusterConfig.PRODUCT_KEY, trackID );
                     if ( po != null ) {
                         setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                         if ( po.getState() != ProductOperationState.RUNNING ) {
@@ -203,7 +207,7 @@ public class AddNodeWindow extends Window {
     private void setOutput( String output ) {
         if ( !Strings.isNullOrEmpty( output ) ) {
             outputTxtArea.setValue( output );
-            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().toString().length() - 1 );
         }
     }
 }

@@ -18,7 +18,6 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hbase.ui.HBaseUI;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
@@ -36,6 +35,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class ConfigurationStep extends VerticalLayout {
 
+    private final ComboBox hadoopClusters;
     private final TwinColSelect select;
 
 
@@ -49,21 +49,21 @@ public class ConfigurationStep extends VerticalLayout {
         content.setMargin( true );
 
         select = new TwinColSelect( "Nodes", new ArrayList<String>() );
-        final ComboBox hadoopClusters = new ComboBox( "Hadoop cluster" );
+        hadoopClusters = new ComboBox( "Hadoop cluster" );
         hadoopClusters.setImmediate( true );
         hadoopClusters.setTextInputAllowed( false );
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<HadoopClusterConfig> clusters = HBaseUI.getHbaseManager().getHadoopClusters();
+        List<HadoopClusterConfig> clusters = HBaseUI.getHadoopManager().getClusters();
         if ( clusters.size() > 0 ) {
-            for ( HadoopClusterConfig HadoopClusterConfig : clusters ) {
-                hadoopClusters.addItem( HadoopClusterConfig );
-                hadoopClusters.setItemCaption( HadoopClusterConfig, HadoopClusterConfig.getClusterName() );
+            for ( HadoopClusterConfig config : clusters ) {
+                hadoopClusters.addItem( config );
+                hadoopClusters.setItemCaption( config, config.getClusterName() );
             }
         }
 
-        HadoopClusterConfig info = HBaseUI.getHbaseManager().getHadoopCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = HBaseUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null ) {
             hadoopClusters.setValue( info );
@@ -117,8 +117,8 @@ public class ConfigurationStep extends VerticalLayout {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    Set<String> agentList = Sets.newHashSet( ( Collection ) event.getProperty().getValue() );
-                    Set<String> hostnames = Sets.newHashSet();
+                    Set<String> agentList = new HashSet( ( Collection ) event.getProperty().getValue() );
+                    Set<String> hostnames = new HashSet<>();
                     for ( String agent : agentList ) {
                         hostnames.add( agent );
                     }

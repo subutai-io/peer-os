@@ -6,24 +6,23 @@
 package org.safehaus.subutai.api.hbase;
 
 
-import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
-import org.safehaus.subutai.common.protocol.ApiBase;
-
 import java.util.List;
 import java.util.UUID;
+
+import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 
 /**
  * @author dilshat
  */
-public interface HBase extends ApiBase<HBaseConfig>
-{
+public interface HBase extends ApiBase<HBaseConfig> {
 
     public UUID installCluster( HBaseConfig config );
 
-    UUID startCluster( String clusterName );
+    public List<HBaseConfig> getClusters();
 
-    UUID stopCluster( String clusterName );
+    UUID startCluster( String clusterName );
 
     //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 
@@ -31,11 +30,11 @@ public interface HBase extends ApiBase<HBaseConfig>
 
     //    UUID stopNodes(String clusterName);
 
+    UUID stopCluster( String clusterName );
+
     UUID checkCluster( String clusterName );
 
-    public List<HBaseConfig> getClusters();
+    List<Config> getHadoopClusters();
 
-    List<HadoopClusterConfig> getHadoopClusters();
-
-    HadoopClusterConfig getHadoopCluster( String clusterName );
+    Config getHadoopCluster( String clusterName );
 }

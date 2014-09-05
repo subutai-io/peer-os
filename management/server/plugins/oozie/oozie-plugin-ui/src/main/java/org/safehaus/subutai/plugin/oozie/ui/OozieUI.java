@@ -16,7 +16,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
@@ -27,52 +27,70 @@ import com.vaadin.ui.Component;
  */
 public class OozieUI implements PortalModule {
 
+
     public static final String MODULE_IMAGE = "oozie.png";
-
-    private static Oozie oozieManager;
-    private static AgentManager agentManager;
-    private static Tracker tracker;
-    private static Hadoop hadoopManager;
-    private static CommandRunner commandRunner;
-    private static ExecutorService executor;
-
-
-    public OozieUI( AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Oozie oozieManager,
-                    CommandRunner commandRunner ) {
-        OozieUI.agentManager = agentManager;
-        OozieUI.tracker = tracker;
-        OozieUI.hadoopManager = hadoopManager;
-        OozieUI.oozieManager = oozieManager;
-        OozieUI.commandRunner = commandRunner;
-    }
+    Oozie oozieManager;
+    AgentManager agentManager;
+    Tracker tracker;
+    Hadoop hadoopManager;
+    CommandRunner commandRunner;
+    ExecutorService executor;
 
 
-    public static Oozie getOozieManager() {
+    public OozieUI() {}
+
+
+    public Oozie getOozieManager() {
         return oozieManager;
     }
 
 
-    public static AgentManager getAgentManager() {
+    public void setOozieManager( final Oozie oozieManager ) {
+        this.oozieManager = oozieManager;
+    }
+
+
+    public AgentManager getAgentManager() {
         return agentManager;
     }
 
 
-    public static Tracker getTracker() {
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public Tracker getTracker() {
         return tracker;
     }
 
 
-    public static Hadoop getHadoopManager() {
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
         return hadoopManager;
     }
 
 
-    public static CommandRunner getCommandRunner() {
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
         return commandRunner;
     }
 
 
-    public static ExecutorService getExecutor() {
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public ExecutorService getExecutor() {
         return executor;
     }
 
@@ -93,12 +111,12 @@ public class OozieUI implements PortalModule {
 
     @Override
     public String getId() {
-        return OozieConfig.PRODUCT_KEY;
+        return OozieClusterConfig.PRODUCT_KEY;
     }
 
 
     public String getName() {
-        return OozieConfig.PRODUCT_KEY;
+        return OozieClusterConfig.PRODUCT_KEY;
     }
 
 
@@ -109,6 +127,6 @@ public class OozieUI implements PortalModule {
 
 
     public Component createComponent() {
-        return new OozieForm();
+        return new OozieForm( this );
     }
 }
