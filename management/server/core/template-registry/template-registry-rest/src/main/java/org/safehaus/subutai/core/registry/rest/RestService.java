@@ -31,7 +31,7 @@ public interface RestService {
     public Response unregisterTemplate( @PathParam("templateName") String templateName );
 
     @GET
-    @Path("templates/{templateName}/{lxcArch}")
+    @Path("templates/{templateName}/arch/{lxcArch}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getTemplate( @PathParam("templateName") String templateName, @PathParam("lxcArch") String lxcArch );
 
@@ -41,7 +41,7 @@ public interface RestService {
     public String getParentTemplate( @PathParam("childTemplateName") String childTemplateName );
 
     @GET
-    @Path("templates/{childTemplateName}/{lxcArch}/parent")
+    @Path("templates/{childTemplateName}/arch/{lxcArch}/parent")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getParentTemplate( @PathParam("childTemplateName") String childTemplateName,
                                      @PathParam("lxcArch") String lxcArch );
@@ -52,7 +52,7 @@ public interface RestService {
     public String getParentTemplates( @PathParam("childTemplateName") String childTemplateName );
 
     @GET
-    @Path("templates/{childTemplateName}/{lxcArch}/parents")
+    @Path("templates/{childTemplateName}/arch/{lxcArch}/parents")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getParentTemplates( @PathParam("childTemplateName") String childTemplateName,
                                       @PathParam("lxcArch") String lxcArch );
@@ -63,7 +63,7 @@ public interface RestService {
     public String getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName );
 
     @GET
-    @Path("templates/{parentTemplateName}/{lxcArch}/children")
+    @Path("templates/{parentTemplateName}/arch/{lxcArch}/children")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName,
                                      @PathParam("lxcArch") String lxcArch );
@@ -92,7 +92,7 @@ public interface RestService {
 
 
     @GET
-    @Path("templates/{lxcArch}")
+    @Path("templates/arch/{lxcArch}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String listTemplates( @PathParam("lxcArch") String lxcArch );
 
@@ -103,7 +103,7 @@ public interface RestService {
     public String listTemplatesPlain();
 
     @GET
-    @Path("templates/{lxcArch}/plain-list")
+    @Path("templates/arch/{lxcArch}/plain-list")
     @Produces({ MediaType.TEXT_PLAIN })
     public String listTemplatesPlain( @PathParam("lxcArch") String lxcArch );
 }
