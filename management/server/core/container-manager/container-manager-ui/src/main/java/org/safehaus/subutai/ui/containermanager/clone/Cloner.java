@@ -173,6 +173,9 @@ public class Cloner extends VerticalLayout {
                                 ContainerUI.getExecutor().execute(new Runnable() {
                                     public void run() {
                                         Item row = lxcTable.getItem(lxcHost.toString());
+                                        row.getItemProperty("Status")
+                                                .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+
                                         try {
                                             containerManager.clone(entry.getKey().getHostname(), "master", lxcHost.toString());
                                             if (row != null)
@@ -218,6 +221,8 @@ public class Cloner extends VerticalLayout {
                     ContainerUI.getExecutor().execute(new Runnable() {
                         public void run() {
                             Item row = lxcTable.getItem(lxcHostname);
+                            row.getItemProperty("Status")
+                                    .setValue(new Embedded("", new ThemeResource(loadIconSource)));
                             try {
                                 containerManager.clone(agg.getKey().getHostname(), "master", lxcHostname);
 
@@ -270,7 +275,7 @@ public class Cloner extends VerticalLayout {
                 Embedded progressIcon = new Embedded("", new ThemeResource(loadIconSource));
 
                 lxcTable.addItem(new Object[]{
-                        null, lxc, progressIcon
+                        null, lxc, null /*progressIcon*/
                 }, lxc);
 
                 lxcTable.setParent(lxc, agent.getHostname());
