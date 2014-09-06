@@ -23,6 +23,7 @@ public class AddNodeWindow extends Window {
         setModal(true);
 
         setWidth(600, Unit.PIXELS);
+        setHeight(400, Unit.PIXELS);
 
         GridLayout content = new GridLayout(1, 3);
         content.setSizeFull();
@@ -88,8 +89,8 @@ public class AddNodeWindow extends Window {
         });
 
         outputTxtArea = new TextArea("Operation output");
-        outputTxtArea.setRows(13);
-        outputTxtArea.setColumns(43);
+        outputTxtArea.setRows(10);
+        outputTxtArea.setColumns(30);
         outputTxtArea.setImmediate(true);
         outputTxtArea.setWordwrap(true);
 

@@ -16,6 +16,7 @@ import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
@@ -141,31 +142,37 @@ public class Manager {
         addNodeBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                if(config != null) {
-                    String hn = config.getHadoopClusterName();
-                    if(hn == null || hn.isEmpty()) {
-                        show("Undefined Hadoop cluster name");
-                        return;
-                    }
+                if(config == null) show("Please, select cluster");
+
+                String hn = config.getHadoopClusterName();
+                if(hn == null || hn.isEmpty()) {
+                    show("Undefined Hadoop cluster name");
+                    return;
+                }
+                Set<Agent> nodes = null;
+                if(config.getSetupType() == SetupType.OVER_HADOOP) {
                     HadoopClusterConfig info = PrestoUI.getHadoopManager().getCluster(hn);
-                    if(info != null) {
-                        Set<Agent> nodes = new HashSet<>(info.getAllNodes());
-                        nodes.removeAll(config.getAllNodes());
-                        if(!nodes.isEmpty()) {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
-                            contentRoot.getUI().addWindow(addNodeWindow);
-                            addNodeWindow.addCloseListener(new Window.CloseListener() {
-                                @Override
-                                public void windowClose(Window.CloseEvent closeEvent) {
-                                    refreshClustersInfo();
-                                }
-                            });
-                        } else
-                            show("All nodes in corresponding Hadoop cluster have Presto installed");
-                    } else
+                    if(info != null)
+                        nodes = new HashSet<>(info.getAllNodes());
+                    else
                         show("Hadoop cluster info not found");
-                } else
-                    show("Please, select cluster");
+                } else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                    nodes = new HashSet<>(config.getHadoopNodes());
+
+                if(nodes != null) {
+                    nodes.removeAll(config.getAllNodes());
+                    if(!nodes.isEmpty()) {
+                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                        contentRoot.getUI().addWindow(addNodeWindow);
+                        addNodeWindow.addCloseListener(new Window.CloseListener() {
+                            @Override
+                            public void windowClose(Window.CloseEvent closeEvent) {
+                                refreshClustersInfo();
+                            }
+                        });
+                    } else
+                        show("All nodes in corresponding Hadoop cluster have Presto installed");
+                }
             }
         });
 

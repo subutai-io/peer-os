@@ -37,7 +37,7 @@ public class WelcomeStep extends Panel {
 
         Button next2 = new Button("Start with-Hadoop installation");
         next2.addStyleName("default");
-        next2.addClickListener(new NextClickHandler(wizard, SetupType.OVER_HADOOP));
+        next2.addClickListener(new NextClickHandler(wizard, SetupType.WITH_HADOOP));
         grid.addComponent(next2, 7, 4, 7, 4);
         grid.setComponentAlignment(next2, Alignment.BOTTOM_RIGHT);
 

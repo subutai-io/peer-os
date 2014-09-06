@@ -233,9 +233,13 @@ public class ConfigurationStep extends Panel {
             }
         };
         workersSelect.addValueChangeListener(workersSelectChangeListener);
+
+        parent.addComponent(hadoopClustersCombo);
+        parent.addComponent(coordinatorNodeCombo);
+        parent.addComponent(workersSelect);
     }
 
-    private void addWithHadoopComponents(GridLayout content, final PrestoClusterConfig config, final HadoopClusterConfig hadoopConfig) {
+    private void addWithHadoopComponents(ComponentContainer parent, final PrestoClusterConfig config, final HadoopClusterConfig hadoopConfig) {
 
         Collection<Integer> col = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
@@ -289,15 +293,20 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        content.addComponent(new Label("Hadoop settings"));
-        content.addComponent(txtHadoopClusterName);
-        content.addComponent(cmbSlaveNodes);
-        content.addComponent(cmbReplFactor);
-        content.addComponent(txtHadoopDomain);
+        parent.addComponent(new Label("Hadoop settings"));
+        parent.addComponent(txtHadoopClusterName);
+        parent.addComponent(cmbSlaveNodes);
+        parent.addComponent(cmbReplFactor);
+        parent.addComponent(txtHadoopDomain);
     }
 
     private void nextClickHandler(Wizard wizard) {
         PrestoClusterConfig config = wizard.getConfig();
+        if(config.getClusterName() == null || config.getClusterName().isEmpty()) {
+            show("Enter cluster name");
+            return;
+        }
+
         if(config.getSetupType() == SetupType.OVER_HADOOP)
             if(Strings.isNullOrEmpty(config.getHadoopClusterName()))
                 show("Please, select Hadoop cluster");

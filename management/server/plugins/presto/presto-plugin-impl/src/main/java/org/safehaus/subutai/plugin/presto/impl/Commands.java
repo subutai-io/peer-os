@@ -21,7 +21,7 @@ public class Commands extends CommandsSingleton {
         RequestBuilder rb = new RequestBuilder(
                 "apt-get --force-yes --assume-yes install " + PACKAGE_NAME);
         return createCommand(
-                rb.withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+                rb.withTimeout(600).withStdOutRedirection(OutputRedirection.NO),
                 agents);
     }
 

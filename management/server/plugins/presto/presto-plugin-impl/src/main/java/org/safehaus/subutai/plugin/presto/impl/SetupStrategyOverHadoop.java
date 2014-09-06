@@ -78,7 +78,7 @@ public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetup
                     config.getClusterName(),
                     config);
 
-            po.addLog("Cluster info saved to DB\nInstalling Presto...");
+            po.addLog("Cluster info saved to DB");
 
         } catch(DBException e) {
             throw new ClusterSetupException(

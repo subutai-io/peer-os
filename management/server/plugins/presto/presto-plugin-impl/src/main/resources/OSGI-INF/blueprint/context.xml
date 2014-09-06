@@ -18,13 +18,13 @@
 
     <bean id="presto-impl" scope="singleton" class="org.safehaus.subutai.plugin.presto.impl.PrestoImpl"
           init-method="init" destroy-method="destroy">
-        <argument ref="commandRunner"/>
-        <argument ref="agentManager"/>
-        <argument ref="dbManager"/>
-        <argument ref="tracker"/>
-        <argument ref="environmentManager"/>
-        <argument ref="hadoopManager"/>
-        <argument ref="containerManager"/>
+        <property name="commandRunner" ref="commandRunner"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="tracker" ref="tracker"/>
+        <property name="dbManager" ref="dbManager"/>
+        <property name="containerManager" ref="containerManager"/>
+        <property name="environmentManager" ref="environmentManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
     </bean>
 
     <service ref="presto-impl" interface="org.safehaus.subutai.plugin.presto.api.Presto"/>

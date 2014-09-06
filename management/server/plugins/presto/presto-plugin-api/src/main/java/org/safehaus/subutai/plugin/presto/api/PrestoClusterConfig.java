@@ -17,7 +17,7 @@ public class PrestoClusterConfig implements ConfigBase {
     private Set<Agent> workers = new HashSet<>();
     private Agent coordinatorNode;
     // with-Hadoop params
-    private int workerNodesCount;
+    private Set<Agent> hadoopNodes = new HashSet<>();
 
     @Override
     public String getProductName() {
@@ -65,12 +65,12 @@ public class PrestoClusterConfig implements ConfigBase {
         this.coordinatorNode = coordinatorNode;
     }
 
-    public int getWorkerNodesCount() {
-        return workerNodesCount;
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
     }
 
-    public void setWorkerNodesCount(int workerNodesCount) {
-        this.workerNodesCount = workerNodesCount;
+    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+        this.hadoopNodes = hadoopNodes;
     }
 
     public Set<Agent> getAllNodes() {
