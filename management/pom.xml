@@ -63,7 +63,7 @@
         <!-- global properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Runtime -->
-        <karaf.version>2.3.3</karaf.version>
+        <karaf.version>2.3.6</karaf.version>
         <!-- OSGI -->
         <org.osgi.version>4.3.1</org.osgi.version>
         <!-- servlet -->
