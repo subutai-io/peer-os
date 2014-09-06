@@ -125,53 +125,41 @@ public class Cloner extends VerticalLayout {
             return;
         }
 
-        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
-        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
-
-        if (physicalAgents.isEmpty()) {
-            indicator.setVisible(true);
+//        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
+        Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        if (physicalAgents.isEmpty()) { // process cloning by selected strategy
             final double count = (Double) slider.getValue();
-            ContainerUI.getExecutor().execute(new Runnable() {
-                public void run() {
-                    Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
-                    if (bestServers.isEmpty()) {
-                        show("No servers available to accommodate new lxc containers");
-                        indicator.setVisible(false);
-                    } else {
-                        int numOfLxcSlots = 0;
-                        for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
-                            numOfLxcSlots += srv.getValue();
-                        }
+            Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
+            if (bestServers.isEmpty()) {
+                show("No servers available to accommodate new lxc containers");
+                return;
+            }
+            int numOfLxcSlots = 0;
+            for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+                numOfLxcSlots += srv.getValue();
+            }
 
-                        if (numOfLxcSlots < count) {
-                            show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
-                            indicator.setVisible(false);
-                        } else {
-
+            if (numOfLxcSlots < count) {
+                show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
+                return;
+            }
 //                            Map<Agent, List<String>> agentFamilies = new HashMap<>();
-                            int numOfLxcsToClone = (int) count;
-                            final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
+            int numOfLxcsToClone = (int) count;
+//                            final AtomicInteger countProcessed = new AtomicInteger(numOfLxcsToClone);
 
-                            for (int i = 1; i <= numOfLxcsToClone; i++) {
-                                Map<Agent, Integer> sortedBestServers =
-                                        CollectionUtil.sortMapByValueDesc(bestServers);
-                                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                                bestServers.put(entry.getKey(), entry.getValue() - 1);
-                                List<String> lxcHostNames = agentFamilies.get(entry.getKey());
-                                if (lxcHostNames == null) {
-                                    lxcHostNames = new ArrayList<>();
-                                    agentFamilies.put(entry.getKey(), lxcHostNames);
-                                }
-                                final StringBuilder lxcHost = new StringBuilder();
-                                if (!Strings.isNullOrEmpty(productName)) {
-                                    lxcHost.append(productName);
-                                    lxcHost.append(lxcHostNames.size() + 1);
-                                    lxcHost.append("_");
-                                }
-                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_'));
-                                lxcHostNames.add(lxcHost.toString());
+            for (int i = 1; i <= numOfLxcsToClone; i++) {
+                Map<Agent, Integer> sortedBestServers =
+                        CollectionUtil.sortMapByValueDesc(bestServers);
+                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                List<String> lxcHostNames = agentFamilies.get(entry.getKey());
+                if (lxcHostNames == null) {
+                    lxcHostNames = new ArrayList<>();
+                    agentFamilies.put(entry.getKey(), lxcHostNames);
+                }
+                lxcHostNames.add(String.format("%s%d_%s", productName, lxcHostNames.size() + 1, UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_')));
 
-                                //start clone task
+                //start clone task
 //                                ContainerUI.getExecutor().execute(new Runnable() {
 //                                    public void run() {
 //                                        Item row = lxcTable.getItem(lxcHost.toString());
@@ -194,13 +182,9 @@ public class Cloner extends VerticalLayout {
 //                                        }
 //                                    }
 //                                });
-                            }
+            }
 //                            populateLxcTable(agentFamilies);
-                        }
-                    }
-                }
-            });
-        } else { // physical hosts not selected
+        } else { // process cloning in selected hosts
             double count = (Double) slider.getValue();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<>();
@@ -214,8 +198,8 @@ public class Cloner extends VerticalLayout {
             }
         }
 
-        populateLxcTable(agentFamilies);
         indicator.setVisible(true);
+        populateLxcTable(agentFamilies);
         CompletionService completionService = ContainerUI.getCompletionService();
         for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
             completionService.submit(new Callable<Boolean>() {
