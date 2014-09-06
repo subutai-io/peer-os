@@ -11,11 +11,11 @@ import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
 public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
 
-    private final String lxcHostname;
+    private final String hostname;
 
     public CheckNodeOperationHandler(PrestoImpl manager, String clusterName, String lxcHostname) {
         super(manager, clusterName);
-        this.lxcHostname = lxcHostname;
+        this.hostname = lxcHostname;
         productOperation = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
                 String.format("Checking state of %s in %s", lxcHostname, clusterName));
     }
@@ -29,14 +29,14 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<PrestoIm
             return;
         }
 
-        Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
+        Agent node = manager.getAgentManager().getAgentByHostname(hostname);
         if(node == null) {
-            po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
+            po.addLogFailed(String.format("Agent with hostname %s is not connected", hostname));
             return;
         }
 
         if(!config.getAllNodes().contains(node)) {
-            po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
+            po.addLogFailed(String.format("Node %s does not belong to this cluster", hostname));
             return;
         }
 

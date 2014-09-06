@@ -1,24 +1,21 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
 import com.google.common.base.Preconditions;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
-public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
+public class SetupHelper {
 
     final ProductOperation po;
     final PrestoImpl manager;
     final PrestoClusterConfig config;
 
-    public PrestoSetupStrategy(ProductOperation po, PrestoImpl manager, PrestoClusterConfig config) {
+    public SetupHelper(ProductOperation po, PrestoImpl manager, PrestoClusterConfig config) {
 
         Preconditions.checkNotNull(config, "Presto cluster config is null");
         Preconditions.checkNotNull(po, "Product operation tracker is null");
@@ -41,10 +38,10 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
         }
     }
 
-    void configureCoordinator() throws ClusterSetupException {
+    public void configureAsCoordinator(Agent agent) throws ClusterSetupException {
         po.addLog("Configuring coordinator...");
 
-        Command cmd = Commands.getSetCoordinatorCommand(config.getCoordinatorNode());
+        Command cmd = Commands.getSetCoordinatorCommand(agent);
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded())
@@ -54,11 +51,10 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
                     + cmd.getAllErrors());
     }
 
-    void configureWorkers() throws ClusterSetupException {
-        po.addLog("Configuring workers...");
+    public void configureAsWorker(Set<Agent> set, Agent coordinator) throws ClusterSetupException {
+        po.addLog("Configuring worker(s)...");
 
-        Command cmd = Commands.getSetWorkerCommand(config.getCoordinatorNode(),
-                config.getWorkers());
+        Command cmd = Commands.getSetWorkerCommand(coordinator, set);
         manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded())
@@ -68,22 +64,22 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
                     + cmd.getAllErrors());
     }
 
-    void startNodes() throws ClusterSetupException {
+    public void startNodes(final Set<Agent> set) throws ClusterSetupException {
         po.addLog("Starting Presto node(s)...");
 
-        Command cmd = Commands.getStartCommand(config.getAllNodes());
+        Command cmd = Commands.getStartCommand(set);
         final AtomicInteger okCount = new AtomicInteger();
         manager.getCommandRunner().runCommand(cmd, new CommandCallback() {
 
             @Override
             public void onResponse(Response response, AgentResult agentResult, Command command) {
                 if(agentResult.getStdOut().toLowerCase().contains("started"))
-                    if(okCount.incrementAndGet() == config.getAllNodes().size())
+                    if(okCount.incrementAndGet() == set.size())
                         stop();
             }
         });
 
-        if(okCount.get() == config.getAllNodes().size())
+        if(okCount.get() == set.size())
             po.addLogDone("Presto node(s) started successfully\nDone");
         else
             throw new ClusterSetupException(

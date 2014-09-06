@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
@@ -12,7 +13,7 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
-public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
+public class SetupStrategyOverHadoop extends SetupHelper implements ClusterSetupStrategy {
 
     private Set<Agent> skipInstallation = new HashSet<>();
 
@@ -94,9 +95,9 @@ public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
         if(installCommand.hasSucceeded()) {
             po.addLog("Installation succeeded");
 
-            configureCoordinator();
-            configureWorkers();
-            startNodes();
+            configureAsCoordinator(config.getCoordinatorNode());
+            configureAsWorker(config.getWorkers(), config.getCoordinatorNode());
+            startNodes(config.getAllNodes());
 
         } else throw new ClusterSetupException("Installation failed: "
                     + installCommand.getAllErrors());

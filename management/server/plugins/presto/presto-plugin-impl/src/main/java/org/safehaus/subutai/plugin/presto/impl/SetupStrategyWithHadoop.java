@@ -7,7 +7,7 @@ import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
-public class SetupStrategyWithHadoop extends PrestoSetupStrategy {
+public class SetupStrategyWithHadoop extends SetupHelper implements ClusterSetupStrategy {
 
     private Environment environment;
 
@@ -49,9 +49,9 @@ public class SetupStrategyWithHadoop extends PrestoSetupStrategy {
                     config.getWorkers().size(), config.getWorkerNodesCount()));
 
         checkConnected();
-        configureCoordinator();
-        configureWorkers();
-        startNodes();
+        configureAsCoordinator(config.getCoordinatorNode());
+        configureAsWorker(config.getWorkers(), config.getCoordinatorNode());
+        startNodes(config.getAllNodes());
 
         return config;
     }
