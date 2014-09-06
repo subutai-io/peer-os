@@ -16,10 +16,7 @@ import org.safehaus.subutai.server.ui.component.AgentTree;
 import org.safehaus.subutai.ui.containermanager.ContainerUI;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -238,7 +235,9 @@ public class Cloner extends VerticalLayout {
                     resultCumulator = false;
                 }
             }
-            if (!resultCumulator)
+            if (resultCumulator)
+                show("Cloning containers finished successfully.");
+            else
                 show("Not all containers successfully created.");
 
             indicator.setVisible(false);
@@ -257,26 +256,31 @@ public class Cloner extends VerticalLayout {
     private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
         final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
 
-        for (final String lxcHostname : cloneNames) {
-            ContainerUI.getExecutor().execute(new Runnable() {
-                public void run() {
-                    Item row = lxcTable.getItem(lxcHostname);
-                    row.getItemProperty("Status")
-                            .setValue(new Embedded("", new ThemeResource(loadIconSource)));
-                    try {
-                        containerManager.clone(hostName, templateName, lxcHostname);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            for (final String lxcHostname : cloneNames) {
+                executor.execute(new Runnable() {
+                    public void run() {
+                        Item row = lxcTable.getItem(lxcHostname);
+                        row.getItemProperty("Status")
+                                .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+                        try {
+                            containerManager.clone(hostName, templateName, lxcHostname);
 
-                        if (row != null)
-                            row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(okIconSource)));
-                        countProcessed.decrementAndGet();
-                    } catch (ContainerCreateException ce) {
-                        if (row != null)
-                            row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                            if (row != null)
+                                row.getItemProperty("Status")
+                                        .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                            countProcessed.decrementAndGet();
+                        } catch (ContainerCreateException ce) {
+                            if (row != null)
+                                row.getItemProperty("Status")
+                                        .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                        }
                     }
-                }
-            });
+                });
+            }
+        } finally {
+            executor.shutdown();
         }
         return countProcessed.intValue() == 0;
     }
