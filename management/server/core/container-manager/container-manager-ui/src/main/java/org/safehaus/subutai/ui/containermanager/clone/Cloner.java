@@ -173,18 +173,15 @@ public class Cloner extends VerticalLayout {
         indicator.setVisible(true);
         populateLxcTable(agentFamilies);
         countProcessed = new AtomicInteger((int) (count));
-        CompletionService completionService = ContainerUI.getCompletionService();
+//        CompletionService completionService = ContainerUI.getCompletionService();
         for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-            completionService.submit(new Callable<Boolean>() {
+            ContainerUI.getAgentExecutor().execute(new Runnable() {
                 @Override
-                public Boolean call() {
-                    return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
+                public void run() {
+                    executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
                 }
             });
         }
-
-
-
     }
 
 
