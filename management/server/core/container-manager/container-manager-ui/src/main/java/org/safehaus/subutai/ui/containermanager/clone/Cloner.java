@@ -38,8 +38,7 @@ public class Cloner extends VerticalLayout {
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
-    private AtomicInteger countProcessed=null;
-
+    private AtomicInteger countProcessed = null;
 
 
     public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
@@ -184,54 +183,39 @@ public class Cloner extends VerticalLayout {
         }
     }
 
-
-    /**
-     * Executes cloning action for agent.
-     *
-     * @param hostName
-     * @param templateName
-     * @param cloneNames
-     * @return
-     */
-    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
+    private void executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        try {
-            for (final String lxcHostname : cloneNames) {
-                executor.execute(new Runnable() {
-                    public void run() {
-                        Item row = lxcTable.getItem(lxcHostname);
+
+        for (final String lxcHostname : cloneNames) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    Item row = lxcTable.getItem(lxcHostname);
+                    if (row != null)
+                        row.getItemProperty("Status")
+                                .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+                    try {
+                        containerManager.clone(hostName, templateName, lxcHostname);
+
                         if (row != null)
                             row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(loadIconSource)));
-                        try {
-                            containerManager.clone(hostName, templateName, lxcHostname);
+                                    .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                    } catch (ContainerCreateException ce) {
+                        if (row != null)
+                            row.getItemProperty("Status")
+                                    .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                    }
 
-                            if (row != null)
-                                row.getItemProperty("Status")
-                                        .setValue(new Embedded("", new ThemeResource(okIconSource)));
-                            countProcessed.decrementAndGet();
-                        } catch (ContainerCreateException ce) {
-                            if (row != null)
-                                row.getItemProperty("Status")
-                                        .setValue(new Embedded("", new ThemeResource(errorIconSource)));
-                        }
-
-                        if (countProcessed.decrementAndGet() == 0) {
-                            show("Cloning containers finished successfully.");
-                            indicator.setVisible(false);
+                    if (countProcessed.decrementAndGet() == 0) {
+                        show("Cloning containers finished successfully.");
+                        indicator.setVisible(false);
 //                            else
 //                            show("Not all containers successfully created.");
-                        }
-
                     }
-                });
-            }
-        } finally {
-            System.out.println("Shutting down executor..."+ executor.toString());
-            executor.shutdown();
+
+                }
+            });
         }
-        return countProcessed.intValue() == 0;
     }
 
     private TreeTable createLxcTable(String caption, int size) {
