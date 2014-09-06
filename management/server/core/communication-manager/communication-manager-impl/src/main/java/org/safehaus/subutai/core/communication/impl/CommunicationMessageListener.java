@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.communication.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,7 @@ class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
 
-    private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
+    private final Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
 
     /**

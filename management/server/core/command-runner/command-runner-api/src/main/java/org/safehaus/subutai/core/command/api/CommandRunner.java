@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.command.api;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
 
 
 /**
@@ -62,6 +63,9 @@ public interface CommandRunner {
      * @return - command
      */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents );
+
+
+    public Command createCommandInternal( Set<Request> requests );
 
     /**
      * Creates command based on supplied RequestBuilder and target agents on which to run the command.

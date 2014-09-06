@@ -24,11 +24,11 @@ import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -174,7 +174,9 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     @Override
     public void addListener( AgentListener listener ) {
         try {
-            listeners.add( listener );
+            if ( !listeners.contains( listener ) ) {
+                listeners.add( listener );
+            }
         }
         catch ( Exception ex ) {
             LOG.log( Level.SEVERE, "Error in addListener", ex );

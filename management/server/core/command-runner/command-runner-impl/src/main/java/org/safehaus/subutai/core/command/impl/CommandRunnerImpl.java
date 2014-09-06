@@ -217,6 +217,12 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
     }
 
 
+    @Override
+    public Command createCommandInternal( final Set<Request> requests ) {
+        return new CommandImpl( requests );
+    }
+
+
     /**
      * Creates command using supplied request for the supplied set of agents
      *

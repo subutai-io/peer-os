@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
@@ -32,9 +33,9 @@ public interface CommandDispatcher {
      *
      * Caller will always be a remote peer Subutai supplying responses to requests previously sent to it.
      *
-     * @param response - response to some request
+     * @param responses - responses to process
      */
-    public void processResponse( String response );
+    public void processResponse( Set<Response> responses );
 
     /**
      * This method is called via REST only by remote peer Subutai.
@@ -43,5 +44,5 @@ public interface CommandDispatcher {
      *
      * @param requests - requests to execute
      */
-    public void executeRequests( Set<Request> requests );
+    public void executeRequests( UUID initiatorId, Set<Request> requests );
 }

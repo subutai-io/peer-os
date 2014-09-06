@@ -20,6 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.AgentResult;
@@ -100,7 +101,7 @@ public class CommandImpl implements Command {
     public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
 
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
-        Preconditions.checkArgument( agents != null && !agents.isEmpty(), "Agents are null or empty" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
 
         this.description = description;
         this.commandUUID = UUIDUtil.generateTimeBasedUUID();
@@ -119,6 +120,24 @@ public class CommandImpl implements Command {
     }
 
 
+    public CommandImpl( Set<Request> requests ) {
+
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Request are null or empty" );
+
+        this.description = "REMOTE";
+        this.requestsCount = requests.size();
+        this.commandUUID = requests.iterator().next().getTaskUuid();
+        int timeout = 0;
+        for ( Request request : requests ) {
+            if ( request.getTimeout() > timeout ) {
+                timeout = request.getTimeout();
+            }
+            this.localRequests.add( request );
+        }
+        this.timeout = timeout;
+    }
+
+
     /**
      * Constructor which initializes request based on supplied request builders. Each agent will receive own custom
      * request produced by corresponding AgentRequestBuilder
@@ -127,7 +146,7 @@ public class CommandImpl implements Command {
      * @param requestBuilders - request builder used to produce request
      */
     public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders ) {
-        Preconditions.checkArgument( requestBuilders != null && !requestBuilders.isEmpty(),
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
 
         this.description = description;
