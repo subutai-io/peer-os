@@ -1,12 +1,17 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.core.command.api.*;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.BatchRequest;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 
 
 public class CommandRunnerMock implements CommandRunner
@@ -43,7 +48,13 @@ public class CommandRunnerMock implements CommandRunner
 	}
 
 
-	@Override
+    @Override
+    public Command createCommandInternal( final Set<BatchRequest> batchRequests ) {
+        return null;
+    }
+
+
+    @Override
 	public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 		return null;
 	}

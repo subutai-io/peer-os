@@ -6,13 +6,13 @@
 package org.safehaus.subutai.core.communication.impl;
 
 
-import org.safehaus.subutai.core.communication.api.ResponseListener;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
-
-import java.util.UUID;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
 /**

@@ -13,6 +13,7 @@ import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -36,6 +37,7 @@ public class CommandRunnerImplUT {
 	private final boolean allTests = true;
 	private AgentManager agentManager;
 	private CommunicationManager communicationManager;
+	private CommandDispatcher dispatcher;
 	private CommandRunnerImpl commandRunner;
 
 
@@ -55,7 +57,8 @@ public class CommandRunnerImplUT {
 	public void beforeMethod() {
 		communicationManager = mock(CommunicationManager.class);
 		agentManager = mock(AgentManager.class);
-		commandRunner = new CommandRunnerImpl(communicationManager, agentManager);
+        dispatcher = mock(CommandDispatcher.class);
+		commandRunner = new CommandRunnerImpl(communicationManager, agentManager, dispatcher);
 		commandRunner.init();
 	}
 

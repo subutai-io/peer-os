@@ -1,19 +1,20 @@
 package org.safehaus.subutai.core.filetracker.impl;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.communication.api.ResponseListener;
-import org.safehaus.subutai.core.filetracker.api.FileTracker;
+import java.util.HashSet;
+
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.filetracker.api.FileTracker;
 
-import java.util.HashSet;
+import com.google.common.collect.Sets;
 
 
 public class FileTrackerImpl implements FileTracker, ResponseListener
