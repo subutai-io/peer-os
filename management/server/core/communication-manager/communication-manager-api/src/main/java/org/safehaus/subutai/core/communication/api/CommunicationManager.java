@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.communication.api;
 
 
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
 /**
