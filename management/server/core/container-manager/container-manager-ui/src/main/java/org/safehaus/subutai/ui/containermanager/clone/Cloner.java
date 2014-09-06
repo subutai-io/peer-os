@@ -126,7 +126,7 @@ public class Cloner extends VerticalLayout {
         }
 
 //        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
-        Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
             final double count = (Double) slider.getValue();
             Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
@@ -167,36 +167,66 @@ public class Cloner extends VerticalLayout {
             }
         }
 
-        indicator.setVisible(true);
+
         populateLxcTable(agentFamilies);
-        CompletionService completionService = ContainerUI.getCompletionService();
-        for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-            completionService.submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
+        ContainerUI.getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                indicator.setVisible(true);
+                CompletionService completionService = ContainerUI.getCompletionService();
+                for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+                    completionService.submit(new Callable<Boolean>() {
+                        @Override
+                        public Boolean call() {
+                            return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
+                        }
+                    });
                 }
-            });
-        }
 
-        boolean resultCumulator = true;
-        for (int i = 0; i < agentFamilies.size(); i++) {
-            try {
-                Future<Boolean> future = completionService.take();
-                resultCumulator &= future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                resultCumulator = false;
+                boolean resultCumulator = true;
+                for (int i = 0; i < agentFamilies.size(); i++) {
+                    try {
+                        Future<Boolean> future = completionService.take();
+                        resultCumulator &= future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        resultCumulator = false;
+                    }
+                }
+                if (resultCumulator)
+                    show("Cloning containers finished successfully.");
+                else
+                    show("Not all containers successfully created.");
+
+                indicator.setVisible(false);
             }
-        }
-        if (resultCumulator)
-            show("Cloning containers finished successfully.");
-        else
-            show("Not all containers successfully created.");
+        });
 
-        indicator.setVisible(false);
 
     }
 
+    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
+
+        int countProcessed = cloneNames.size();
+        for (final String lxcHostname : cloneNames) {
+            Item row = lxcTable.getItem(lxcHostname);
+            if (row != null)
+                row.getItemProperty("Status")
+                        .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+            try {
+                containerManager.clone(hostName, templateName, lxcHostname);
+
+                if (row != null)
+                    row.getItemProperty("Status")
+                            .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                countProcessed--;
+            } catch (ContainerCreateException ce) {
+                if (row != null)
+                    row.getItemProperty("Status")
+                            .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+            }
+        }
+        return countProcessed == 0;
+    }
 
     /**
      * Executes cloning action for agent.
@@ -206,16 +236,14 @@ public class Cloner extends VerticalLayout {
      * @param cloneNames
      * @return
      */
-    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
+    private boolean executeAgentInThread(final String hostName, final String templateName, List<String> cloneNames) {
 
         final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        CompletionService completionService = new ExecutorCompletionService(executor);
         try {
             for (final String lxcHostname : cloneNames) {
-                completionService.submit(new Callable() {
-                    public Boolean call() {
-                        boolean result = true;
+                executor.execute(new Runnable() {
+                    public void run() {
                         Item row = lxcTable.getItem(lxcHostname);
                         if (row != null)
                             row.getItemProperty("Status")
@@ -228,24 +256,15 @@ public class Cloner extends VerticalLayout {
                                         .setValue(new Embedded("", new ThemeResource(okIconSource)));
                             countProcessed.decrementAndGet();
                         } catch (ContainerCreateException ce) {
-                            result = false;
                             if (row != null)
                                 row.getItemProperty("Status")
                                         .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                         }
-                        return result;
                     }
                 });
             }
-
-            for (final String lxcHostname : cloneNames) {
-                try {
-                    completionService.take();
-                } catch (InterruptedException e) {
-                }
-            }
-
         } finally {
+            System.out.println("Shutting down executor..." + executor.toString());
             executor.shutdown();
         }
         return countProcessed.intValue() == 0;
