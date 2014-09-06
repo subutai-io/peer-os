@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.storm.impl.StormImpl;
+import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
 
 class Helper {
 
@@ -17,7 +18,7 @@ class Helper {
 
     boolean startZookeeper(String clusterName, String hostname) {
         UUID id = manager.getZookeeperManager().startNode(clusterName, hostname);
-        String src = org.safehaus.subutai.api.zookeeper.Config.PRODUCT_KEY;
+        String src = ZookeeperClusterConfig.PRODUCT_KEY;
         return watchOperation(src, id, 1, TimeUnit.MINUTES);
     }
 

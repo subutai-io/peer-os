@@ -740,6 +740,28 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Command Dispatcher -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>command-dispatcher-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>command-dispatcher-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>command-dispatcher-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>command-dispatcher-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Agent Manager -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>

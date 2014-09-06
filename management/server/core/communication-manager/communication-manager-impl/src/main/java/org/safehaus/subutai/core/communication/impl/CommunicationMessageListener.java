@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.communication.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 
 import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.safehaus.subutai.core.communication.api.ResponseListener;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 
@@ -28,7 +29,7 @@ class CommunicationMessageListener implements MessageListener {
 
     private static final Logger LOG = Logger.getLogger( CommunicationMessageListener.class.getName() );
 
-    private final ConcurrentLinkedQueue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
+    private final Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
 
 
     /**
