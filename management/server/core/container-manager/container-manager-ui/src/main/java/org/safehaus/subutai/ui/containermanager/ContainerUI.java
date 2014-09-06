@@ -49,7 +49,7 @@ public class ContainerUI implements PortalModule {
 
 
 	public void init() {
-		executor = Executors.newFixedThreadPool(1);
+		executor = Executors.newFixedThreadPool(3);
         agentExecutor = Executors.newCachedThreadPool();
         completionService = new ExecutorCompletionService(agentExecutor);
 	}
