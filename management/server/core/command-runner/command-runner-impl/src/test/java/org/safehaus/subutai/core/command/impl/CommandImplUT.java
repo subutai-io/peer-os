@@ -71,7 +71,7 @@ public class CommandImplUT {
 	@Test
 	public void shouldReturnSameNumberOfRequestAsAgents() {
 
-		assertEquals(1, command.getRequests().size());
+		assertEquals(1, command.getLocalRequests().size());
 	}
 
 

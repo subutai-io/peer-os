@@ -13,7 +13,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 
 import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.safehaus.subutai.core.communication.api.ResponseListener;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
 

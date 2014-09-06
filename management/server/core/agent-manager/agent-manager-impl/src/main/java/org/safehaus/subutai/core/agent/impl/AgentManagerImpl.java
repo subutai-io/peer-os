@@ -28,7 +28,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.communication.api.ResponseListener;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

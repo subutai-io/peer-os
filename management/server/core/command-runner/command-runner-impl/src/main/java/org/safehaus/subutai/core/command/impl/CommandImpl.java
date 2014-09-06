@@ -17,15 +17,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandStatus;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.common.util.UUIDUtil;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.protocol.Response;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -42,8 +42,10 @@ public class CommandImpl implements Command {
     private final int requestsCount;
     //uuid of command
     private final UUID commandUUID;
-    //set of requests to send to agents produced from supplied request builders
-    private final Set<Request> requests = new HashSet<>();
+    //subset of requests to send to local agents
+    private final Set<Request> localRequests = new HashSet<>();
+    //subset of requests to send to remote agents
+    private final Map<UUID, Request> remoteRequests = new HashMap<>();
     //command timeout
     private final int timeout;
     //semaphore used to wait until command completes or times out
@@ -82,7 +84,8 @@ public class CommandImpl implements Command {
         this.requestsCount = requestsCount;
         this.timeout = requestBuilder.getTimeout();
 
-        requests.add( requestBuilder.build( commandUUID, commandUUID ) );
+        Request request = requestBuilder.build( commandUUID, commandUUID );
+        localRequests.add( request );
     }
 
 
@@ -105,7 +108,13 @@ public class CommandImpl implements Command {
         this.timeout = requestBuilder.getTimeout();
 
         for ( Agent agent : agents ) {
-            requests.add( requestBuilder.build( agent.getUuid(), commandUUID ) );
+            Request request = requestBuilder.build( agent.getUuid(), commandUUID );
+            if ( agent.isLocal() ) {
+                localRequests.add( request );
+            }
+            else {
+                remoteRequests.put( agent.getOwnerId(), request );
+            }
         }
     }
 
@@ -127,9 +136,15 @@ public class CommandImpl implements Command {
 
         int maxTimeout = 0;
         for ( AgentRequestBuilder requestBuilder : requestBuilders ) {
-            requests.add( requestBuilder.build( requestBuilder.getAgent().getUuid(), commandUUID ) );
+            Request request = requestBuilder.build( requestBuilder.getAgent().getUuid(), commandUUID );
             if ( requestBuilder.getTimeout() > maxTimeout ) {
                 maxTimeout = requestBuilder.getTimeout();
+            }
+            if ( requestBuilder.getAgent().isLocal() ) {
+                localRequests.add( request );
+            }
+            else {
+                remoteRequests.put( requestBuilder.getAgent().getOwnerId(), request );
             }
         }
 
@@ -375,12 +390,22 @@ public class CommandImpl implements Command {
 
 
     /**
-     * Returns all request of this command
+     * Returns all local requests of this command
      *
-     * @return - requests of command
+     * @return - local requests of command
      */
-    public Set<Request> getRequests() {
-        return Collections.unmodifiableSet( requests );
+    public Set<Request> getLocalRequests() {
+        return Collections.unmodifiableSet( localRequests );
+    }
+
+
+    /**
+     * Returns all remote requests of this command
+     *
+     * @return - remote requests of command
+     */
+    public Map<UUID, Request> getRemoteRequests() {
+        return Collections.unmodifiableMap( remoteRequests );
     }
 
 
@@ -400,7 +425,8 @@ public class CommandImpl implements Command {
                 "results=" + results +
                 ", requestsCount=" + requestsCount +
                 ", commandUUID=" + commandUUID +
-                ", requests=" + requests +
+                ", localRequests=" + localRequests +
+                ", remoteRequests=" + remoteRequests +
                 ", timeout=" + timeout +
                 ", completionSemaphore=" + completionSemaphore +
                 ", updateLock=" + updateLock +

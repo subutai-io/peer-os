@@ -131,4 +131,15 @@ public class Agent implements Serializable, Comparable<Agent> {
     public void setHostname( String hostname ) {
         this.hostname = hostname;
     }
+
+
+    public boolean isLocal() {
+        //TODO remove this after agent supplies host id and owner id
+        //temporary workaround until agent correctly supplies hostId and ownerId
+        if ( hostId == null || ownerId == null ) {
+            return true;
+        }
+
+        return hostId.compareTo( ownerId ) == 0;
+    }
 }

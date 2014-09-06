@@ -1,7 +1,4 @@
-package org.safehaus.subutai.core.communication.api;
-
-
-import org.safehaus.subutai.common.protocol.Response;
+package org.safehaus.subutai.common.protocol;
 
 
 /**

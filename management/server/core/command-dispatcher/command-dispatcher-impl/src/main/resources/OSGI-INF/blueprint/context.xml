@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+  <!--<reference id="commandDispatcher" availability="mandatory"-->
+  <!--interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />-->
 
+  <bean id="module" scope="singleton"
+        class="org.safehaus.subutai.core.dispatcher.impl.CommandDispatcherImpl"
+        init-method="init" destroy-method="destroy" activation="eager">
+    <!--<argument ref="communicationManager"/>-->
+    <!--<argument ref="agentManager"/>-->
+  </bean>
+
+  <service ref="module" interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />
 
 </blueprint>

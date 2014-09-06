@@ -14,6 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.Command;
@@ -22,17 +27,13 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandStatus;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.core.communication.api.ResponseListener;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import com.google.common.base.Preconditions;
 
 
 /**
- * This class is implementation of CommandRunner interface. Runs commands on agents and routes received responses to
+ * This class is an implementation of CommandRunner interface. Runs commands on agents and routes received responses to
  * corresponding callbacks.
  */
 public class CommandRunnerImpl implements CommandRunner, ResponseListener {
@@ -41,15 +42,20 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 
     private final CommunicationManager communicationManager;
     private final AgentManager agentManager;
+    private final CommandDispatcher dispatcher;
     //cache of command executors where key is command UUID and value is CommandExecutor
     private ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
-    public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager ) {
+    public CommandRunnerImpl( CommunicationManager communicationManager, AgentManager agentManager,
+                              CommandDispatcher dispatcher ) {
         Preconditions.checkNotNull( communicationManager, "Communication Manager is null" );
+        Preconditions.checkNotNull( agentManager, "Agent Manager is null" );
+        Preconditions.checkNotNull( dispatcher, "Command Dispatcher is null" );
 
         this.communicationManager = communicationManager;
         this.agentManager = agentManager;
+        this.dispatcher = dispatcher;
     }
 
 
@@ -58,6 +64,7 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
      */
     public void init() {
         communicationManager.addListener( this );
+        dispatcher.addListener( this );
         commandExecutors = new ExpiringCache<>();
     }
 
@@ -67,13 +74,14 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
      */
     public void destroy() {
         communicationManager.removeListener( this );
+        dispatcher.removeListener( this );
         Map<UUID, CacheEntry<CommandExecutor>> entries = commandExecutors.getEntries();
         //shutdown all executors which are still there
         for ( Map.Entry<UUID, CacheEntry<CommandExecutor>> entry : entries.entrySet() ) {
             try {
                 entry.getValue().getValue().getExecutor().shutdown();
             }
-            catch ( Exception e ) {
+            catch ( Exception ignore ) {
             }
         }
         commandExecutors.dispose();
@@ -164,8 +172,9 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
         final CommandImpl commandImpl = ( CommandImpl ) command;
         Preconditions.checkArgument( commandExecutors.get( commandImpl.getCommandUUID() ) == null,
                 "" + "This command has been already queued for execution" );
-        Preconditions.checkArgument( commandImpl.getRequests() != null && !commandImpl.getRequests().isEmpty(),
-                "Requests are null or empty" );
+        Preconditions.checkArgument(
+                !commandImpl.getLocalRequests().isEmpty() || !commandImpl.getRemoteRequests().values().isEmpty(),
+                "Requests are empty" );
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         CommandExecutor commandExecutor = new CommandExecutor( commandImpl, executor, commandCallback );
@@ -179,11 +188,18 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
             commandImpl.setCommandStatus( CommandStatus.RUNNING );
             //execute command
             if ( commandImpl.isBroadcastCommand() ) {
-                communicationManager.sendBroadcastRequest( commandImpl.getRequests().iterator().next() );
+                communicationManager.sendBroadcastRequest( commandImpl.getLocalRequests().iterator().next() );
             }
             else {
-                for ( Request request : commandImpl.getRequests() ) {
-                    communicationManager.sendRequest( request );
+                //send local requests
+                if ( !commandImpl.getLocalRequests().isEmpty() ) {
+                    for ( Request request : commandImpl.getLocalRequests() ) {
+                        communicationManager.sendRequest( request );
+                    }
+                }
+                //send remote requests
+                if ( !commandImpl.getRemoteRequests().isEmpty() ) {
+                    dispatcher.sendRequests( commandImpl.getRemoteRequests() );
                 }
             }
         }
