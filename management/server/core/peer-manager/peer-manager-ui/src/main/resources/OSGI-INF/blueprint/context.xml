@@ -4,7 +4,7 @@
     <reference id="petManager" availability="mandatory"
                interface="org.safehaus.subutai.pet.api.PetManager"/>
 
-    <bean id="module" scope="singleton" class="org.safehaus.subutai.pet.ui.PetUI"
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.pet.ui.PeerUI"
           init-method="init" destroy-method="destroy">
         <property name="petManager" ref="petManager"/>
     </bean>

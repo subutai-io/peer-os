@@ -13,7 +13,7 @@ import com.vaadin.ui.Component;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PetUI implements PortalModule {
+public class PeerUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "peer.png";
     public static final String MODULE_NAME = "Peer";
@@ -56,6 +56,6 @@ public class PetUI implements PortalModule {
 
     @Override
     public Component createComponent() {
-        return new PetForm();
+        return new PeerForm();
     }
 }

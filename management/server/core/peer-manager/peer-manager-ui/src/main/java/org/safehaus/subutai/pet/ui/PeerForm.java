@@ -13,9 +13,9 @@ import com.vaadin.ui.themes.Runo;
 /**
  * Created by bahadyr on 8/28/14.
  */
-public class PetForm extends CustomComponent implements Disposable {
+public class PeerForm extends CustomComponent implements Disposable {
 
-    public PetForm() {
+    public PeerForm() {
         setHeight( 100, UNITS_PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
