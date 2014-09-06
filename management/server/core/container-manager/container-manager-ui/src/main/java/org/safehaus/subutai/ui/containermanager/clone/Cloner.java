@@ -38,7 +38,6 @@ public class Cloner extends VerticalLayout {
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
-    private AtomicInteger countProcessed = null;
 
 
     public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
@@ -126,12 +125,10 @@ public class Cloner extends VerticalLayout {
             return;
         }
 
-        final double count = (Double) slider.getValue();
-
 //        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
         Map<Agent, List<String>> agentFamilies = new HashMap<>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
-
+            final double count = (Double) slider.getValue();
             Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
@@ -151,7 +148,8 @@ public class Cloner extends VerticalLayout {
                 Map<Agent, Integer> sortedBestServers =
                         CollectionUtil.sortMapByValueDesc(bestServers);
                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                entry.setValue(entry.getValue() - 1);
+//                bestServers.put(entry.getKey(), entry.getValue() - 1);
                 List<String> lxcHostNames = agentFamilies.get(entry.getKey());
                 if (lxcHostNames == null) {
                     lxcHostNames = new ArrayList<>();
@@ -160,6 +158,7 @@ public class Cloner extends VerticalLayout {
                 lxcHostNames.add(String.format("%s%d_%s", productName, lxcHostNames.size() + 1, UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_')));
             }
         } else { // process cloning in selected hosts
+            double count = (Double) slider.getValue();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<>();
                 for (int i = 1; i <= count; i++) {
@@ -169,24 +168,51 @@ public class Cloner extends VerticalLayout {
             }
         }
 
-        indicator.setVisible(true);
+//        indicator.setVisible(true);
         populateLxcTable(agentFamilies);
-        countProcessed = new AtomicInteger((int) (agentFamilies.size()));
-//        CompletionService completionService = ContainerUI.getCompletionService();
+//        final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
+
+        CompletionService completionService = ContainerUI.getCompletionService();
         for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-            ContainerUI.getAgentExecutor().execute(new Runnable() {
+            completionService.submit(new Callable<Boolean>() {
                 @Override
-                public void run() {
+                public Boolean call() {
                     executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
+                    return true;
                 }
             });
         }
+//
+//        boolean resultCumulator = true;
+//        for (int i = 0; i < agentFamilies.size(); i++) {
+//            try {
+//                Future<Boolean> future = completionService.take();
+//                resultCumulator &= future.get();
+//            } catch (InterruptedException | ExecutionException e) {
+//                resultCumulator = false;
+//            }
+//        }
+//        if (resultCumulator)
+//            show("Cloning containers finished successfully.");
+//        else
+//            show("Not all containers successfully created.");
+//
+//        indicator.setVisible(false);
+
     }
 
+
+    /**
+     * Executes cloning action for agent.
+     *
+     * @param hostName
+     * @param templateName
+     * @param cloneNames
+     * @return
+     */
     private void executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
-
         for (final String lxcHostname : cloneNames) {
             executor.execute(new Runnable() {
                 public void run() {
@@ -200,19 +226,13 @@ public class Cloner extends VerticalLayout {
                         if (row != null)
                             row.getItemProperty("Status")
                                     .setValue(new Embedded("", new ThemeResource(okIconSource)));
+
                     } catch (ContainerCreateException ce) {
                         if (row != null)
                             row.getItemProperty("Status")
                                     .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                     }
-
-                    if (countProcessed.decrementAndGet() == 0) {
-                        show("Cloning containers finished successfully.");
-                        indicator.setVisible(false);
-//                            else
-//                            show("Not all containers successfully created.");
-                    }
-
+//                    countProcessed.decrementAndGet();
                 }
             });
         }
