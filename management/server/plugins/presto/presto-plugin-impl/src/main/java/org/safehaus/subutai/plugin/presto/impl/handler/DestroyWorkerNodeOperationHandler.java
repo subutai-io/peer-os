@@ -1,8 +1,8 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 
+import com.google.common.collect.Sets;
 import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -12,8 +12,6 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
@@ -72,7 +70,7 @@ public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<
         if ( uninstallCommand.hasCompleted() ) {
             AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
             if ( result.getExitCode() != null && result.getExitCode() == 0 ) {
-                if ( result.getStdOut().contains( "Package ksks-presto is not installed, so not removed" ) ) {
+                if(result.getStdOut().contains("Presto is not installed, so not removed"))
                     po.addLog( String.format( "Presto is not installed, so not removed on node %s",
                             agent.getHostname() ) );
                 }

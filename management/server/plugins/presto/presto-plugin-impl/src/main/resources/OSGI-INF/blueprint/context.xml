@@ -9,6 +9,10 @@
                interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.core.db.api.DbManager"/>
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
 
     <bean id="presto-impl" scope="singleton" class="org.safehaus.subutai.plugin.presto.impl.PrestoImpl"
           init-method="init" destroy-method="destroy">
@@ -16,6 +20,8 @@
         <argument ref="agentManager"/>
         <argument ref="dbManager"/>
         <argument ref="tracker"/>
+        <argument ref="environmentManager"/>
+        <argument ref="hadoopManager"/>
     </bean>
 
     <service ref="presto-impl" interface="org.safehaus.subutai.plugin.presto.api.Presto"/>

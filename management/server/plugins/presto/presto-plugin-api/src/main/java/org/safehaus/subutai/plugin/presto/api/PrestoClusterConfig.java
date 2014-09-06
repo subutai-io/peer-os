@@ -11,17 +11,17 @@ public class PrestoClusterConfig implements ConfigBase {
     public static final String TEMAPLTE_NAME = "presto";
 
     private String clusterName = "";
-    private String hadoopClusterName = ""; // only for over-Hadoop setup
     private SetupType setupType;
-    private Agent coordinatorNode;
+    // over-Hadoop params
+    private String hadoopClusterName = "";
     private Set<Agent> workers = new HashSet<>();
+    private Agent coordinatorNode;
+    // with-Hadoop params
+    private int workerNodesCount;
 
-    public Agent getCoordinatorNode() {
-        return coordinatorNode;
-    }
-
-    public void setCoordinatorNode(Agent coordinatorNode) {
-        this.coordinatorNode = coordinatorNode;
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
     }
 
     @Override
@@ -33,25 +33,20 @@ public class PrestoClusterConfig implements ConfigBase {
         this.clusterName = clusterName;
     }
 
-    public String getHadoopClusterName() {
-        return hadoopClusterName;
-    }
-
-    public void setHadoopClusterName(String hadoopClusterName) {
-        this.hadoopClusterName = hadoopClusterName;
-    }
-
-    @Override
-    public String getProductName() {
-        return PRODUCT_KEY;
-    }
-
     public SetupType getSetupType() {
         return setupType;
     }
 
     public void setSetupType(SetupType setupType) {
         this.setupType = setupType;
+    }
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
     }
 
     public Set<Agent> getWorkers() {
@@ -62,11 +57,26 @@ public class PrestoClusterConfig implements ConfigBase {
         this.workers = workers;
     }
 
+    public Agent getCoordinatorNode() {
+        return coordinatorNode;
+    }
+
+    public void setCoordinatorNode(Agent coordinatorNode) {
+        this.coordinatorNode = coordinatorNode;
+    }
+
+    public int getWorkerNodesCount() {
+        return workerNodesCount;
+    }
+
+    public void setWorkerNodesCount(int workerNodesCount) {
+        this.workerNodesCount = workerNodesCount;
+    }
+
     public Set<Agent> getAllNodes() {
         Set<Agent> allNodes = new HashSet<>();
         if(workers != null) allNodes.addAll(workers);
         if(coordinatorNode != null) allNodes.add(coordinatorNode);
-
         return allNodes;
     }
 

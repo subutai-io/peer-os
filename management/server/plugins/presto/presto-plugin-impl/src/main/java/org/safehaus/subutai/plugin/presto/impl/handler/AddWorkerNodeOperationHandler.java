@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 
+import com.google.common.collect.Sets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
@@ -15,8 +15,6 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-
-import com.google.common.collect.Sets;
 
 
 public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
@@ -79,7 +77,7 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-presto" ) ) {
+        if(result.getStdOut().contains(Commands.PACKAGE_NAME)) {
             po.addLogFailed( String.format( "Node %s already has Presto installed\nOperation aborted", lxcHostname ) );
             return;
         }

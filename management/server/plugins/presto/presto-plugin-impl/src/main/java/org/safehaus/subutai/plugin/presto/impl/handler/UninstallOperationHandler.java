@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.presto.impl.handler;
 
 
 import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -56,7 +55,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<PrestoIm
             for ( AgentResult result : uninstallCommand.getResults().values() ) {
                 Agent agent = PrestoImpl.getAgentManager().getAgentByUUID( result.getAgentUUID() );
                 if ( result.getExitCode() != null && result.getExitCode() == 0 ) {
-                    if ( result.getStdOut().contains( "Package ksks-presto is not installed, so not removed" ) ) {
+                    if(result.getStdOut().contains("Presto is not installed, so not removed"))
                         po.addLog( String.format( "Presto is not installed, so not removed on node %s",
                                 agent == null ? result.getAgentUUID() : agent.getHostname() ) );
                     }

@@ -13,9 +13,11 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.*;
@@ -26,14 +28,20 @@ public class PrestoImpl implements Presto {
     private static AgentManager agentManager;
     private static DbManager dbManager;
     private static Tracker tracker;
+    private static Hadoop hadoopManager;
+    private static EnvironmentManager environmentManager;
     private static ExecutorService executor;
     private static PluginDAO pluginDAO;
 
-    public PrestoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
+    public PrestoImpl(CommandRunner commandRunner, AgentManager agentManager,
+            DbManager dbManager, Tracker tracker,
+            Hadoop hadoopManager, EnvironmentManager envManager) {
         PrestoImpl.commandRunner = commandRunner;
         PrestoImpl.agentManager = agentManager;
         PrestoImpl.dbManager = dbManager;
         PrestoImpl.tracker = tracker;
+        PrestoImpl.hadoopManager = hadoopManager;
+        PrestoImpl.environmentManager = envManager;
         pluginDAO = new PluginDAO(dbManager);
 
         Commands.init(commandRunner);
@@ -53,6 +61,14 @@ public class PrestoImpl implements Presto {
 
     public static Tracker getTracker() {
         return tracker;
+    }
+
+    public static Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+    public static EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
     }
 
     public static PluginDAO getPluginDAO() {
@@ -173,10 +189,8 @@ public class PrestoImpl implements Presto {
     @Override
     public ClusterSetupStrategy getClusterSetupStrategy(final ProductOperation po,
             final PrestoClusterConfig prestoClusterConfig) {
-        Preconditions.checkNotNull(prestoClusterConfig, "Presto cluster config is null");
-        Preconditions.checkNotNull(po, "Product operation is null");
 
-        return new PrestoSetupStrategy(po, this, prestoClusterConfig);
+        return new SetupStrategyOverHadoop(po, this, prestoClusterConfig);
     }
 
     @Override
@@ -184,6 +198,8 @@ public class PrestoImpl implements Presto {
             final PrestoClusterConfig prestoClusterConfig,
             final Environment environment) {
 
-        return new PrestoSetupStrategy(environment, po, this, prestoClusterConfig);
+        SetupStrategyWithHadoop s = new SetupStrategyWithHadoop(po, this, prestoClusterConfig);
+        s.setEnvironment(environment);
+        return s;
     }
 }

@@ -1,10 +1,7 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
-
-import java.util.Iterator;
-import java.util.Set;
+import com.google.common.base.Preconditions;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -13,168 +10,85 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandCallback;
-import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.impl.Commands;
-import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
-import com.google.common.base.Preconditions;
+public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
 
+    final ProductOperation po;
+    final Presto manager;
+    final PrestoClusterConfig config;
 
-public class PrestoSetupStrategy implements ClusterSetupStrategy {
+    public PrestoSetupStrategy(ProductOperation po, Presto manager, PrestoClusterConfig config) {
 
-    private Environment environment;
-    private ProductOperation po;
-    private Presto prestoManager;
-    private PrestoClusterConfig prestoClusterConfig;
-
-
-    public PrestoSetupStrategy( final ProductOperation po, final Presto prestoManager,
-                                final PrestoClusterConfig prestoClusterConfig ) {
-
-        Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
-        Preconditions.checkNotNull( po, "Product operation tracker is null" );
-        Preconditions.checkNotNull( prestoManager, "Presto manager is null" );
+        Preconditions.checkNotNull(config, "Presto cluster config is null");
+        Preconditions.checkNotNull(po, "Product operation tracker is null");
+        Preconditions.checkNotNull(manager, "Presto manager is null");
 
         this.po = po;
-        this.prestoManager = prestoManager;
-        this.prestoClusterConfig = prestoClusterConfig;
+        this.manager = manager;
+        this.config = config;
     }
 
+    void checkConnected() throws ClusterSetupException {
 
-    public PrestoSetupStrategy( final Environment environment, final ProductOperation po,
-                                final PrestoImpl prestoManager, final PrestoClusterConfig prestoClusterConfig ) {
-        Preconditions.checkNotNull( prestoClusterConfig, "Presto cluster config is null" );
-        Preconditions.checkNotNull( environment, "Environment is null" );
-        Preconditions.checkNotNull( po, "Product operation tracker is null" );
-        Preconditions.checkNotNull( prestoManager, "Presto manager is null" );
+        String hostname = config.getCoordinatorNode().getHostname();
+        if(PrestoImpl.getAgentManager().getAgentByHostname(hostname) == null)
+            throw new ClusterSetupException("Coordinator node is not connected");
 
-        this.environment = environment;
-        this.po = po;
-        this.prestoManager = prestoManager;
-        this.prestoClusterConfig = prestoClusterConfig;
+        for(Agent a : config.getWorkers()) {
+            if(PrestoImpl.getAgentManager().getAgentByHostname(a.getHostname()) == null)
+                throw new ClusterSetupException("Not all worker nodes are connected");
+        }
     }
 
+    void configureCoordinator() throws ClusterSetupException {
+        po.addLog("Configuring coordinator...");
 
-    @Override
-    public PrestoClusterConfig setup() throws ClusterSetupException {
-        check();
-        install();
+        Command cmd = Commands.getSetCoordinatorCommand(config.getCoordinatorNode());
+        PrestoImpl.getCommandRunner().runCommand(cmd);
 
-        return prestoClusterConfig;
+        if(cmd.hasSucceeded())
+            po.addLog("Coordinator configured successfully");
+        else
+            throw new ClusterSetupException("Failed to configure coordinator: "
+                    + cmd.getAllErrors());
     }
 
+    void configureWorkers() throws ClusterSetupException {
+        po.addLog("Configuring workers...");
 
-    private void check() throws ClusterSetupException {
-        po.addLog( "Checking prerequisites..." );
-        //check installed ksks packages
-        Set<Agent> allNodes = prestoClusterConfig.getAllNodes();
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( allNodes );
-        PrestoImpl.getCommandRunner().runCommand( checkInstalledCommand );
+        Command cmd = Commands.getSetWorkerCommand(config.getCoordinatorNode(),
+                config.getWorkers());
+        PrestoImpl.getCommandRunner().runCommand(cmd);
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
+        if(cmd.hasSucceeded())
+            po.addLog("Workers configured successfully");
+        else
+            throw new ClusterSetupException("Failed to configure workers: "
+                    + cmd.getAllErrors());
+    }
+
+    void startNodes() throws ClusterSetupException {
+        po.addLog("Starting Presto node(s)...");
+
+        Command cmd = Commands.getStartCommand(config.getAllNodes());
+        final AtomicInteger okCount = new AtomicInteger();
+        PrestoImpl.getCommandRunner().runCommand(cmd, new CommandCallback() {
+
+            @Override
+            public void onResponse(Response response, AgentResult agentResult, Command command) {
+                if(agentResult.getStdOut().toLowerCase().contains("started"))
+                    if(okCount.incrementAndGet() == config.getAllNodes().size())
+                        stop();
+            }
+        });
+
+        if(okCount.get() == config.getAllNodes().size())
+            po.addLogDone("Presto node(s) started successfully\nDone");
+        else
             throw new ClusterSetupException(
-                    "Failed to check presence of installed ksks packages\nInstallation aborted" );
-        }
-
-        for ( Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
-            Agent node = it.next();
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-            if ( result.getStdOut().contains( "ksks-presto" ) ) {
-                po.addLog( String.format( "Node %s already has Presto installed. Omitting this node from installation",
-                        node.getHostname() ) );
-                prestoClusterConfig.getWorkers().remove( node );
-                it.remove();
-            }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
-                po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-                        node.getHostname() ) );
-                prestoClusterConfig.getWorkers().remove( node );
-                it.remove();
-            }
-        }
-
-        if ( prestoClusterConfig.getWorkers().isEmpty() ) {
-            throw new ClusterSetupException( "No nodes eligible for installation\nInstallation aborted" );
-        }
-        if ( !allNodes.contains( prestoClusterConfig.getCoordinatorNode() ) ) {
-            throw new ClusterSetupException( "Coordinator node was omitted\nInstallation aborted" );
-        }
-    }
-
-
-    private void install() throws ClusterSetupException {
-        po.addLog( "Updating db..." );
-        //save to db
-        try {
-            PrestoImpl.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, prestoClusterConfig.getClusterName(),
-                    prestoClusterConfig );
-
-            po.addLog( "Cluster info saved to DB\nInstalling Presto..." );
-            //install presto
-
-            Command installCommand = Commands.getInstallCommand( prestoClusterConfig.getAllNodes() );
-            PrestoImpl.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() ) {
-                po.addLog( "Installation succeeded\nConfiguring coordinator..." );
-
-                Command configureCoordinatorCommand =
-                        Commands.getSetCoordinatorCommand( prestoClusterConfig.getCoordinatorNode() );
-                PrestoImpl.getCommandRunner().runCommand( configureCoordinatorCommand );
-
-                if ( configureCoordinatorCommand.hasSucceeded() ) {
-                    po.addLog( "Coordinator configured successfully\nConfiguring workers..." );
-
-                    Command configureWorkersCommand =
-                            Commands.getSetWorkerCommand( prestoClusterConfig.getCoordinatorNode(),
-                                    prestoClusterConfig.getWorkers() );
-                    PrestoImpl.getCommandRunner().runCommand( configureWorkersCommand );
-
-                    if ( configureWorkersCommand.hasSucceeded() ) {
-                        po.addLog( "Workers configured successfully\nStarting Presto..." );
-
-                        Command startNodesCommand = Commands.getStartCommand( prestoClusterConfig.getAllNodes() );
-                        final AtomicInteger okCount = new AtomicInteger();
-                        PrestoImpl.getCommandRunner().runCommand( startNodesCommand, new CommandCallback() {
-
-                            @Override
-                            public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                                if ( agentResult.getStdOut().contains( "Started" )
-                                        && okCount.incrementAndGet() == prestoClusterConfig.getAllNodes().size() ) {
-                                    stop();
-                                }
-                            }
-                        } );
-
-                        if ( okCount.get() == prestoClusterConfig.getAllNodes().size() ) {
-                            po.addLogDone( "Presto started successfully\nDone" );
-                        }
-                        else {
-                            throw new ClusterSetupException(
-                                    String.format( "Failed to start Presto, %s", startNodesCommand.getAllErrors() ) );
-                        }
-                    }
-                    else {
-                        throw new ClusterSetupException( String.format( "Failed to configure workers, %s",
-                                configureWorkersCommand.getAllErrors() ) );
-                    }
-                }
-                else {
-                    throw new ClusterSetupException( String.format( "Failed to configure coordinator, %s",
-                            configureCoordinatorCommand.getAllErrors() ) );
-                }
-            }
-            else {
-                throw new ClusterSetupException(
-                        String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-            }
-        }
-        catch ( DBException e ) {
-            throw new ClusterSetupException(
-                    "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
-        }
+                    String.format("Failed to start Presto node(s): %s",
+                            cmd.getAllErrors()));
     }
 }
