@@ -1,6 +1,8 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
 import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.*;
@@ -25,7 +27,8 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         this.hostname = hostname;
         productOperation = manager.getTracker().createProductOperation(
                 PrestoClusterConfig.PRODUCT_KEY,
-                String.format("Adding node %s to %s", hostname, clusterName));
+                String.format("Adding node %s to %s",
+                        (hostname != null ? hostname : ""), clusterName));
     }
 
     @Override
@@ -44,11 +47,19 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         }
 
         try {
+            Agent agent;
             if(config.getSetupType() == SetupType.OVER_HADOOP)
-                setupHost(config);
+                agent = setupHost(config);
             else if(config.getSetupType() == SetupType.WITH_HADOOP)
-                addHost(config);
+                agent = addHost(config);
             else throw new ClusterSetupException("No setup type");
+
+            config.getWorkers().add(agent);
+
+            po.addLog("Saving cluster info...");
+            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
+                    clusterName, config);
+            po.addLog("Saved cluster info");
 
             po.addLogDone(null);
 
@@ -58,10 +69,13 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         } catch(LxcCreateException ex) {
             po.addLog(ex.getMessage());
             po.addLogFailed("Add worker node failed");
+        } catch(DBException ex) {
+            po.addLog(ex.getMessage());
+            po.addLogFailed("Failed to save cluster info");
         }
     }
 
-    void setupHost(PrestoClusterConfig config) throws ClusterSetupException {
+    Agent setupHost(PrestoClusterConfig config) throws ClusterSetupException {
         ProductOperation po = productOperation;
 
         Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
@@ -90,17 +104,6 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
         } else if(!result.getStdOut().contains(hadoopPack))
             throw new ClusterSetupException("Node has no Hadoop installation");
 
-        config.getWorkers().add(agent);
-        po.addLog("Updating db...");
-        //save to db
-        try {
-            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
-                    config.getClusterName(), config);
-            po.addLog("Cluster info updated in DB");
-        } catch(DBException e) {
-            throw new ClusterSetupException("Could not update cluster info in DB: " + e.getMessage());
-        }
-
         //install presto
         if(!skipInstall) {
             po.addLog("Installing Presto...");
@@ -113,22 +116,28 @@ public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<Pres
                 throw new ClusterSetupException("Installation failed: " + installCommand.getAllErrors());
         }
 
+        Set<Agent> set = new HashSet<>(Arrays.asList(agent));
         SetupHelper sh = new SetupHelper(po, manager, config);
-        sh.configureAsWorker(Sets.newHashSet(agent), config.getCoordinatorNode());
-        sh.startNodes(Sets.newHashSet(agent));
+        sh.configureAsWorker(set, config.getCoordinatorNode());
+        sh.startNodes(set);
 
+        return agent;
     }
 
-    private void addHost(PrestoClusterConfig config)
+    private Agent addHost(PrestoClusterConfig config)
             throws LxcCreateException, ClusterSetupException {
 
         Set<Agent> set = manager.getContainerManager().clone(
                 PrestoClusterConfig.TEMAPLTE_NAME, 1, null);
         if(set.isEmpty())
             throw new ClusterSetupException("Failed to create container");
+        if(set.size() != 1)
+            throw new ClusterSetupException("Inconsistent state: cloned more than one container");
 
-        Agent agent = set.iterator().next();
         SetupHelper sh = new SetupHelper(productOperation, manager, config);
-        sh.configureAsWorker(Sets.newHashSet(agent), config.getCoordinatorNode());
+        sh.configureAsWorker(set, config.getCoordinatorNode());
+        sh.startNodes(set);
+
+        return set.iterator().next();
     }
 }

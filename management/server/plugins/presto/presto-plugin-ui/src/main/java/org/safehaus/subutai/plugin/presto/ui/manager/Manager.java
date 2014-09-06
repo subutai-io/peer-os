@@ -149,29 +149,40 @@ public class Manager {
                     show("Undefined Hadoop cluster name");
                     return;
                 }
-                Set<Agent> nodes = null;
                 if(config.getSetupType() == SetupType.OVER_HADOOP) {
                     HadoopClusterConfig info = PrestoUI.getHadoopManager().getCluster(hn);
-                    if(info != null)
-                        nodes = new HashSet<>(info.getAllNodes());
-                    else
-                        show("Hadoop cluster info not found");
-                } else if(config.getSetupType() == SetupType.WITH_HADOOP)
-                    nodes = new HashSet<>(config.getHadoopNodes());
-
-                if(nodes != null) {
-                    nodes.removeAll(config.getAllNodes());
-                    if(!nodes.isEmpty()) {
-                        AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
-                        contentRoot.getUI().addWindow(addNodeWindow);
-                        addNodeWindow.addCloseListener(new Window.CloseListener() {
-                            @Override
-                            public void windowClose(Window.CloseEvent closeEvent) {
-                                refreshClustersInfo();
-                            }
-                        });
+                    if(info != null) {
+                        HashSet<Agent> nodes = new HashSet<>(info.getAllNodes());
+                        nodes.removeAll(config.getAllNodes());
+                        if(!nodes.isEmpty()) {
+                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
+                            contentRoot.getUI().addWindow(addNodeWindow);
+                            addNodeWindow.addCloseListener(new Window.CloseListener() {
+                                @Override
+                                public void windowClose(Window.CloseEvent closeEvent) {
+                                    refreshClustersInfo();
+                                }
+                            });
+                        } else
+                            show("All nodes in corresponding Hadoop cluster have Presto installed");
                     } else
-                        show("All nodes in corresponding Hadoop cluster have Presto installed");
+                        show("Hadoop cluster info not found");
+                } else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+                    ConfirmationDialog d = new ConfirmationDialog(
+                            "Add node to cluster", "OK", "Cancel");
+                    d.getOk().addClickListener(new Button.ClickListener() {
+
+                        @Override
+                        public void buttonClick(Button.ClickEvent event) {
+                            UUID trackId = PrestoUI.getPrestoManager().addWorkerNode(
+                                    config.getClusterName(), null);
+                            ProgressWindow w = new ProgressWindow(PrestoUI.getExecutor(),
+                                    PrestoUI.getTracker(), trackId, PrestoClusterConfig.PRODUCT_KEY);
+                            contentRoot.getUI().addWindow(w.getWindow());
+                        }
+                    });
+                    contentRoot.getUI().addWindow(d.getAlert());
+
                 }
             }
         });
