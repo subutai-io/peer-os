@@ -38,6 +38,8 @@ public class Cloner extends VerticalLayout {
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
+    private AtomicInteger countProcessed=null;
+
 
 
     public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
@@ -125,10 +127,12 @@ public class Cloner extends VerticalLayout {
             return;
         }
 
+        final double count = (Double) slider.getValue();
+
 //        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
-        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        Map<Agent, List<String>> agentFamilies = new HashMap<>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
-            final double count = (Double) slider.getValue();
+
             Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
@@ -157,7 +161,6 @@ public class Cloner extends VerticalLayout {
                 lxcHostNames.add(String.format("%s%d_%s", productName, lxcHostNames.size() + 1, UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_')));
             }
         } else { // process cloning in selected hosts
-            double count = (Double) slider.getValue();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<>();
                 for (int i = 1; i <= count; i++) {
@@ -167,66 +170,23 @@ public class Cloner extends VerticalLayout {
             }
         }
 
-
+        indicator.setVisible(true);
         populateLxcTable(agentFamilies);
-        ContainerUI.getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                indicator.setVisible(true);
-                CompletionService completionService = ContainerUI.getCompletionService();
-                for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-                    completionService.submit(new Callable<Boolean>() {
-                        @Override
-                        public Boolean call() {
-                            return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
-                        }
-                    });
+        countProcessed = new AtomicInteger((int) (count));
+        CompletionService completionService = ContainerUI.getCompletionService();
+        for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+            completionService.submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() {
+                    return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
                 }
-
-                boolean resultCumulator = true;
-                for (int i = 0; i < agentFamilies.size(); i++) {
-                    try {
-                        Future<Boolean> future = completionService.take();
-                        resultCumulator &= future.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        resultCumulator = false;
-                    }
-                }
-                if (resultCumulator)
-                    show("Cloning containers finished successfully.");
-                else
-                    show("Not all containers successfully created.");
-
-                indicator.setVisible(false);
-            }
-        });
-
-
-    }
-
-    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
-
-        int countProcessed = cloneNames.size();
-        for (final String lxcHostname : cloneNames) {
-            Item row = lxcTable.getItem(lxcHostname);
-            if (row != null)
-                row.getItemProperty("Status")
-                        .setValue(new Embedded("", new ThemeResource(loadIconSource)));
-            try {
-                containerManager.clone(hostName, templateName, lxcHostname);
-
-                if (row != null)
-                    row.getItemProperty("Status")
-                            .setValue(new Embedded("", new ThemeResource(okIconSource)));
-                countProcessed--;
-            } catch (ContainerCreateException ce) {
-                if (row != null)
-                    row.getItemProperty("Status")
-                            .setValue(new Embedded("", new ThemeResource(errorIconSource)));
-            }
+            });
         }
-        return countProcessed == 0;
+
+
+
     }
+
 
     /**
      * Executes cloning action for agent.
@@ -236,9 +196,8 @@ public class Cloner extends VerticalLayout {
      * @param cloneNames
      * @return
      */
-    private boolean executeAgentInThread(final String hostName, final String templateName, List<String> cloneNames) {
+    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
 
-        final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
         ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
             for (final String lxcHostname : cloneNames) {
@@ -260,11 +219,18 @@ public class Cloner extends VerticalLayout {
                                 row.getItemProperty("Status")
                                         .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                         }
+
+                        if (countProcessed.decrementAndGet() == 0) {
+                            show("Cloning containers finished successfully.");
+//                            else
+//                            show("Not all containers successfully created.");
+                        }
+                        indicator.setVisible(false);
                     }
                 });
             }
         } finally {
-            System.out.println("Shutting down executor..." + executor.toString());
+            System.out.println("Shutting down executor..."+ executor.toString());
             executor.shutdown();
         }
         return countProcessed.intValue() == 0;
