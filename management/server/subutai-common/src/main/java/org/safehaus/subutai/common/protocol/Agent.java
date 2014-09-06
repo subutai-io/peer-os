@@ -31,6 +31,9 @@ public class Agent implements Serializable, Comparable<Agent> {
                   boolean isLXC, String transportId, UUID hostId, UUID ownerId ) {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
+        //TODO uncomment checks when agent supplies host id and owner id
+        //        Preconditions.checkNotNull( hostId, "Host id is null" );
+        //        Preconditions.checkNotNull( ownerId, "Owner id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
