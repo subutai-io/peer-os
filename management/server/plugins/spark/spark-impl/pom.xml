@@ -11,8 +11,8 @@
 
   <artifactId>spark-plugin-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Spark</name>
-  <description>Subutai Spark</description>
+  <name>Subutai Spark Impl</name>
+  <description>Subutai Spark Impl</description>
 
   <dependencies>
     <dependency>

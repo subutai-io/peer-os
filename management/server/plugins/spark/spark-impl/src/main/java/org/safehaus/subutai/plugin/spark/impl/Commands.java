@@ -1,21 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.spark.impl;
 
 
+import com.google.common.collect.Sets;
 import java.util.Set;
-
 import org.safehaus.subutai.common.enums.OutputRedirection;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
 import org.safehaus.subutai.core.command.api.RequestBuilder;
-
-import com.google.common.collect.Sets;
 
 
 public class Commands extends CommandsSingleton {
@@ -27,8 +20,7 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "sleep 20; apt-get --force-yes --assume-yes install ksks-spark" ).withTimeout( 90 )
-                                                                                                     .withStdOutRedirection(
+                new RequestBuilder("sleep 20; apt-get --force-yes --assume-yes install ksks-spark").withTimeout(600)                                                                                                     .withStdOutRedirection(
                                                                                                              OutputRedirection.NO ),
                 agents );
     }

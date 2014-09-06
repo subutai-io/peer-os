@@ -1,10 +1,10 @@
-package org.safehaus.subutai.plugin.spark.impl.handler;
+package org.safehaus.subutai.plugin.spark.impl;
 
 
+import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -19,16 +19,9 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
-import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
-
-import com.google.common.base.Preconditions;
 
 
-/**
- * Created by talas on 9/2/14.
- */
-public class SparkDbSetupStrategy implements ClusterSetupStrategy {
+public class SetupStrategyOverHadoop implements ClusterSetupStrategy {
 
     private Environment environment;
     private ProductOperation po;
@@ -36,7 +29,7 @@ public class SparkDbSetupStrategy implements ClusterSetupStrategy {
     private SparkClusterConfig sparkClusterConfig;
 
 
-    public SparkDbSetupStrategy( final ProductOperation po, final Spark sparkManager,
+    public SetupStrategyOverHadoop( final ProductOperation po, final Spark sparkManager,
                                  final SparkClusterConfig sparkClusterConfig ) {
         Preconditions.checkNotNull( sparkClusterConfig, "Spark cluster config is null" );
         Preconditions.checkNotNull( po, "Product operation tracker is null" );
@@ -48,7 +41,7 @@ public class SparkDbSetupStrategy implements ClusterSetupStrategy {
     }
 
 
-    public SparkDbSetupStrategy( Environment environment, ProductOperation po, Spark sparkManager,
+    public SetupStrategyOverHadoop( Environment environment, ProductOperation po, Spark sparkManager,
                                  SparkClusterConfig sparkClusterConfig ) {
         this.environment = environment;
         this.po = po;

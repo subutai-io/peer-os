@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
+import com.google.common.base.Strings;
 import java.util.Iterator;
 import java.util.UUID;
-
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -12,8 +12,6 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
-
-import com.google.common.base.Strings;
 
 
 public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl> {
@@ -75,7 +73,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
 
     private void setupSpark() {
         try {
-            ClusterSetupStrategy sparkClusterStrategy = manager.getClusterSetupStrategy( po, config );
+            ClusterSetupStrategy sparkClusterStrategy = manager.getClusterSetupStrategy(po, config, null);
             sparkClusterStrategy.setup();
             po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }

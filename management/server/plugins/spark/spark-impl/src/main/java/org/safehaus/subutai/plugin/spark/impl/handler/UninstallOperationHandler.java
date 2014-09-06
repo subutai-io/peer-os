@@ -2,7 +2,6 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
 import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -76,10 +75,9 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
             po.addLog( "Updating db..." );
             try {
                 SparkImpl.getPluginDAO().deleteInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName() );
-                po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
-            }
-            catch ( DBException ex ) {
-                po.addLogDone( "Cluster info deleted from DB\nDone" );
+                po.addLogDone("Cluster info deleted from DB\nDone");
+            } catch(DBException ex) {
+                po.addLogFailed("Error while deleting cluster info from DB: " + ex.getMessage());
             }
         }
         else {
