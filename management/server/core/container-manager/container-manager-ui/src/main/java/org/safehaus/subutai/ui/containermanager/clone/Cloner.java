@@ -222,10 +222,11 @@ public class Cloner extends VerticalLayout {
 
                         if (countProcessed.decrementAndGet() == 0) {
                             show("Cloning containers finished successfully.");
+                            indicator.setVisible(false);
 //                            else
 //                            show("Not all containers successfully created.");
                         }
-                        indicator.setVisible(false);
+
                     }
                 });
             }
