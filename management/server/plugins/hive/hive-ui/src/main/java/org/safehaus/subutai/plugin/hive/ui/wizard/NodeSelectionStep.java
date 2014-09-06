@@ -105,9 +105,12 @@ public class NodeSelectionStep extends Panel {
                 hadoopClusters.setItemCaption(hci, hci.getClusterName());
             }
 
-        HadoopClusterConfig info = HiveUI.getHadoopManager().getCluster(config.getHadoopClusterName());
-        if(info != null)
-            hadoopClusters.setValue(info);
+        String hn = config.getHadoopClusterName();
+        if(hn != null && !hn.isEmpty()) {
+            HadoopClusterConfig info = HiveUI.getHadoopManager().getCluster(hn);
+            if(info != null)
+                hadoopClusters.setValue(info);
+        }
 
         parent.addComponent(hadoopClusters);
         parent.addComponent(cmbServerNode);

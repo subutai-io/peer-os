@@ -14,26 +14,27 @@
   <description>Subutai Plugins Parent</description>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>mongodb</module>
-    <module>zookeeper</module>
-    <module>accumulo</module>
-    <module>hadoop</module>
-    <module>flume</module>
-    <module>hive</module>
-    <module>presto</module>
-    <module>solr</module>
-    <module>spark</module>
-    <module>shark</module>
-    <module>sqoop</module>
-    <module>hbase</module>
-    <module>mahout</module>
-    <module>cassandra</module>
-    <module>oozie</module>
-    <module>plugin-common</module>
-    <module>lucene</module>
-    <module>pig</module>
-    <module>elasticsearch</module>
-  </modules>
+    <modules>
+        <module>mongodb</module>
+        <module>zookeeper</module>
+        <module>accumulo</module>
+        <module>hadoop</module>
+        <module>flume</module>
+        <module>hive</module>
+        <module>storm</module>
+        <module>presto</module>
+        <module>solr</module>
+        <module>spark</module>
+        <module>shark</module>
+        <module>sqoop</module>
+        <module>hbase</module>
+        <module>mahout</module>
+        <module>cassandra</module>
+        <module>oozie</module>
+        <module>plugin-common</module>
+        <module>lucene</module>
+        <module>pig</module>
+        <module>elasticsearch</module>
+    </modules>
 
 </project>
