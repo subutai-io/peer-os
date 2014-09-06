@@ -16,6 +16,10 @@ import org.safehaus.subutai.server.ui.component.AgentTree;
 import org.safehaus.subutai.ui.containermanager.ContainerUI;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -166,7 +170,7 @@ public class Cloner extends VerticalLayout {
                                     lxcHost.append(lxcHostNames.size() + 1);
                                     lxcHost.append("_");
                                 }
-                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
+                                lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_'));
                                 lxcHostNames.add(lxcHost.toString());
 
                                 //start clone task
@@ -207,7 +211,7 @@ public class Cloner extends VerticalLayout {
                 for (int i = 1; i <= count; i++) {
                     StringBuilder lxcHost = new StringBuilder();
                     lxcHost.append(productName).append(i).append("_");
-                    lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-','_'));
+                    lxcHost.append(UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_'));
                     lxcHostNames.add(lxcHost.toString());
                 }
                 agentFamilies.put(physAgent, lxcHostNames);
@@ -215,34 +219,66 @@ public class Cloner extends VerticalLayout {
 
             populateLxcTable(agentFamilies);
             indicator.setVisible(true);
-            final AtomicInteger countProcessed = new AtomicInteger((int) (count * physicalAgents.size()));
+            CompletionService completionService = ContainerUI.getCompletionService();
             for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-                for (final String lxcHostname : agg.getValue()) {
-                    ContainerUI.getExecutor().execute(new Runnable() {
-                        public void run() {
-                            Item row = lxcTable.getItem(lxcHostname);
-                            row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(loadIconSource)));
-                            try {
-                                containerManager.clone(agg.getKey().getHostname(), "master", lxcHostname);
+                completionService.submit(new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() {
+                        return executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
+                    }
+                });
+            }
 
-                                if (row != null)
-                                    row.getItemProperty("Status")
-                                            .setValue(new Embedded("", new ThemeResource(okIconSource)));
-                            } catch (ContainerCreateException ce) {
-                                if (row != null)
-                                    row.getItemProperty("Status")
-                                            .setValue(new Embedded("", new ThemeResource(errorIconSource)));
-                            }
-
-                            if (countProcessed.decrementAndGet() == 0) {
-                                indicator.setVisible(false);
-                            }
-                        }
-                    });
+            boolean resultCumulator = true;
+            for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+                try {
+                    Future<Boolean> future = completionService.take();
+                    resultCumulator &= future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    resultCumulator = false;
                 }
             }
+            if (!resultCumulator)
+                show("Not all containers successfully created.");
+
+            indicator.setVisible(false);
         }
+    }
+
+
+    /**
+     * Executes cloning action for agent.
+     *
+     * @param hostName
+     * @param templateName
+     * @param cloneNames
+     * @return
+     */
+    private boolean executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
+        final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
+
+        for (final String lxcHostname : cloneNames) {
+            ContainerUI.getExecutor().execute(new Runnable() {
+                public void run() {
+                    Item row = lxcTable.getItem(lxcHostname);
+                    row.getItemProperty("Status")
+                            .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+                    try {
+                        containerManager.clone(hostName, templateName, lxcHostname);
+
+                        if (row != null)
+                            row.getItemProperty("Status")
+                                    .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                        countProcessed.decrementAndGet();
+                    } catch (ContainerCreateException ce) {
+                        if (row != null)
+                            row.getItemProperty("Status")
+                                    .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                    }
+                }
+            });
+        }
+        return countProcessed.intValue() == 0;
     }
 
     private TreeTable createLxcTable(String caption, int size) {
