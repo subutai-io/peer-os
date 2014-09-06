@@ -1,103 +1,103 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
-
-import java.util.UUID;
-
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
 
-import com.google.common.collect.Sets;
-
-
 public class DestroyWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
-    private final ProductOperation po;
-    private final String lxcHostname;
 
+    private final String hostname;
 
-    public DestroyWorkerNodeOperationHandler( PrestoImpl manager, String clusterName, String lxcHostname ) {
-        super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
-        po = PrestoImpl.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
-                String.format( "Destroying %s in %s", lxcHostname, clusterName ) );
+    public DestroyWorkerNodeOperationHandler(PrestoImpl manager, String clusterName, String lxcHostname) {
+        super(manager, clusterName);
+        this.hostname = lxcHostname;
+        productOperation = manager.getTracker().createProductOperation(PrestoClusterConfig.PRODUCT_KEY,
+                String.format("Destroying %s in %s", lxcHostname, clusterName));
     }
-
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
 
     @Override
     public void run() {
-        productOperation = po;
-        PrestoClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+        ProductOperation po = productOperation;
+        PrestoClusterConfig config = manager.getCluster(clusterName);
+        if(config == null) {
+            po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
         }
 
-        Agent agent = PrestoImpl.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null ) {
+        Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
+        if(agent == null) {
             po.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected\nOperation aborted", lxcHostname ) );
+                    String.format("Agent with hostname %s is not connected\nOperation aborted", hostname));
             return;
         }
 
-        if ( config.getWorkers().size() == 1 ) {
+        if(config.getWorkers().size() == 1) {
             po.addLogFailed(
-                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted" );
+                    "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted");
             return;
         }
 
         //check if node is in the cluster
-        if ( !config.getWorkers().contains( agent ) ) {
-            po.addLogFailed( String.format( "Node %s does not belong to this cluster\nOperation aborted",
-                    agent.getHostname() ) );
+        if(!config.getWorkers().contains(agent)) {
+            po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted",
+                    agent.getHostname()));
             return;
         }
 
-        po.addLog( "Uninstalling Presto..." );
+        boolean ok = false;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            ok = uninstall(agent);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+            ok = destroyNode(agent);
+        else
+            po.addLog("Undefined setup type");
 
-        Command uninstallCommand = Commands.getUninstallCommand( Sets.newHashSet( agent ) );
-        PrestoImpl.getCommandRunner().runCommand( uninstallCommand );
+        if(ok) {
+            config.getWorkers().remove(agent);
+            po.addLog("Updating db...");
 
-        if ( uninstallCommand.hasCompleted() ) {
-            AgentResult result = uninstallCommand.getResults().get( agent.getUuid() );
-            if ( result.getExitCode() != null && result.getExitCode() == 0 ) {
-                if ( result.getStdOut().contains( "Package ksks-presto is not installed, so not removed" ) ) {
-                    po.addLog( String.format( "Presto is not installed, so not removed on node %s",
-                            agent.getHostname() ) );
-                }
-                else {
-                    po.addLog( String.format( "Presto is removed from node %s", agent.getHostname() ) );
-                }
+            try {
+                manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config);
+                po.addLogDone("Cluster info updated in DB\nDone");
+            } catch(DBException e) {
+                po.addLogFailed("Failed to update cluster info in DB");
             }
-            else {
-                po.addLog( String.format( "Error %s on node %s", result.getStdErr(), agent.getHostname() ) );
-            }
-        }
-        else {
-            po.addLogFailed( String.format( "Uninstallation failed, %s", uninstallCommand.getAllErrors() ) );
-            return;
-        }
+        } else
+            po.addLogFailed("Failed to destroy node");
+    }
 
-        config.getWorkers().remove( agent );
-        po.addLog( "Updating db..." );
+    private boolean uninstall(Agent agent) {
+        ProductOperation po = productOperation;
+        po.addLog("Uninstalling Presto...");
 
+        Command cmd = Commands.getUninstallCommand(Sets.newHashSet(agent));
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(cmd.hasSucceeded()) {
+            po.addLog("Presto removed from " + agent.getHostname());
+            return true;
+        } else {
+            po.addLog("Uninstallation failed: " + cmd.getAllErrors());
+            return false;
+        }
+    }
+
+    private boolean destroyNode(Agent agent) {
         try {
-            PrestoImpl.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
-            po.addLogDone( "Cluster info updated in DB\nDone" );
-        }
-        catch ( DBException e ) {
-            po.addLogFailed( "Error while updating cluster info in DB. Check logs.\nFailed" );
+            manager.getContainerManager().cloneDestroy(agent.getParentHostName(),
+                    agent.getHostname());
+            return true;
+        } catch(LxcDestroyException ex) {
+            productOperation.addLog("Failed to destroy node: " + ex.getMessage());
+            return false;
         }
     }
 }

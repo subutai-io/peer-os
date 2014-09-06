@@ -1,29 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.presto.api;
 
-
 import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
-
-/**
- * @author dilshat
- */
 public interface Presto extends ApiBase<PrestoClusterConfig> {
 
-    public UUID addWorkerNode( String clusterName, String lxcHostname );
+    public UUID installCluster(PrestoClusterConfig config, HadoopClusterConfig hadoopConfig);
 
-    public UUID destroyWorkerNode( String clusterName, String lxcHostname );
+    public UUID addWorkerNode(String clusterName, String lxcHostname);
 
-    public UUID changeCoordinatorNode( String clusterName, String newMasterHostname );
+    public UUID destroyWorkerNode(String clusterName, String lxcHostname);
+
+    public UUID changeCoordinatorNode(String clusterName, String newMasterHostname);
 
     /**
      * Starts the specified node
@@ -33,7 +25,7 @@ public interface Presto extends ApiBase<PrestoClusterConfig> {
      *
      * @return - UUID of operation to track
      */
-    public UUID startNode( String clusterName, String lxcHostName );
+    public UUID startNode(String clusterName, String lxcHostName);
 
     /**
      * Stops the specified node
@@ -43,7 +35,7 @@ public interface Presto extends ApiBase<PrestoClusterConfig> {
      *
      * @return - UUID of operation to track
      */
-    public UUID stopNode( String clusterName, String lxcHostName );
+    public UUID stopNode(String clusterName, String lxcHostName);
 
     /**
      * Checks status of the specified node
@@ -53,10 +45,8 @@ public interface Presto extends ApiBase<PrestoClusterConfig> {
      *
      * @return - UUID of operation to track
      */
-    public UUID checkNode( String clusterName, String lxcHostName );
+    public UUID checkNode(String clusterName, String lxcHostName);
 
-    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, PrestoClusterConfig prestoClusterConfig );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, PrestoClusterConfig prestoClusterConfig,
-                                                         Environment environment );
+    public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
+            PrestoClusterConfig config, Environment environment);
 }

@@ -1,149 +1,143 @@
 package org.safehaus.subutai.plugin.presto.impl.handler;
 
-
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
+import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.command.api.*;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.Commands;
 import org.safehaus.subutai.plugin.presto.impl.PrestoImpl;
-
-import com.google.common.collect.Sets;
-
+import org.safehaus.subutai.plugin.presto.impl.SetupHelper;
 
 public class AddWorkerNodeOperationHandler extends AbstractOperationHandler<PrestoImpl> {
-    private final ProductOperation po;
-    private final String lxcHostname;
 
+    private final String hostname;
 
-    public AddWorkerNodeOperationHandler( PrestoImpl manager, String clusterName, String lxcHostname ) {
-        super( manager, clusterName );
-        this.lxcHostname = lxcHostname;
-        po = PrestoImpl.getTracker().createProductOperation( PrestoClusterConfig.PRODUCT_KEY,
-                String.format( "Adding node %s to %s", lxcHostname, clusterName ) );
+    public AddWorkerNodeOperationHandler(PrestoImpl manager, String clusterName, String hostname) {
+        super(manager, clusterName);
+        this.hostname = hostname;
+        productOperation = manager.getTracker().createProductOperation(
+                PrestoClusterConfig.PRODUCT_KEY,
+                String.format("Adding node %s to %s",
+                        (hostname != null ? hostname : ""), clusterName));
     }
-
-
-    @Override
-    public UUID getTrackerId() {
-        return po.getId();
-    }
-
 
     @Override
     public void run() {
-        productOperation = po;
-        PrestoClusterConfig config = manager.getCluster( clusterName );
-        if ( config == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+        ProductOperation po = productOperation;
+        PrestoClusterConfig config = manager.getCluster(clusterName);
+        if(config == null) {
+            po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;
         }
 
-        if ( PrestoImpl.getAgentManager().getAgentByHostname( config.getCoordinatorNode().getHostname() ) == null ) {
-            po.addLogFailed( String.format( "Coordinator node %s is not connected\nOperation aborted",
-                    config.getCoordinatorNode().getHostname() ) );
+        if(manager.getAgentManager().getAgentByHostname(config.getCoordinatorNode().getHostname()) == null) {
+            po.addLogFailed(String.format("Coordinator node %s is not connected",
+                    config.getCoordinatorNode().getHostname()));
             return;
         }
 
-        Agent agent = PrestoImpl.getAgentManager().getAgentByHostname( lxcHostname );
-        if ( agent == null ) {
-            po.addLogFailed( String.format( "New node %s is not connected\nOperation aborted", lxcHostname ) );
-            return;
+        try {
+            Agent agent;
+            if(config.getSetupType() == SetupType.OVER_HADOOP)
+                agent = setupHost(config);
+            else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                agent = addHost(config);
+            else throw new ClusterSetupException("No setup type");
+
+            config.getWorkers().add(agent);
+
+            po.addLog("Saving cluster info...");
+            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
+                    clusterName, config);
+            po.addLog("Saved cluster info");
+
+            po.addLogDone(null);
+
+        } catch(ClusterSetupException ex) {
+            po.addLog(ex.getMessage());
+            po.addLogFailed("Add worker node failed");
+        } catch(LxcCreateException ex) {
+            po.addLog(ex.getMessage());
+            po.addLogFailed("Add worker node failed");
+        } catch(DBException ex) {
+            po.addLog(ex.getMessage());
+            po.addLogFailed("Failed to save cluster info");
         }
+    }
+
+    Agent setupHost(PrestoClusterConfig config) throws ClusterSetupException {
+        ProductOperation po = productOperation;
+
+        Agent agent = manager.getAgentManager().getAgentByHostname(hostname);
+        if(agent == null)
+            throw new ClusterSetupException("New node is not connected");
 
         //check if node is in the cluster
-        if ( config.getWorkers().contains( agent ) ) {
-            po.addLogFailed( String.format( "Node %s already belongs to this cluster\nOperation aborted",
-                    agent.getHostname() ) );
-            return;
-        }
+        if(config.getWorkers().contains(agent))
+            throw new ClusterSetupException("Node already belongs to cluster" + clusterName);
 
-        po.addLog( "Checking prerequisites..." );
+        po.addLog("Checking prerequisites...");
 
         //check installed ksks packages
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
-        PrestoImpl.getCommandRunner().runCommand( checkInstalledCommand );
+        Command checkInstalledCommand = Commands.getCheckInstalledCommand(Sets.newHashSet(agent));
+        manager.getCommandRunner().runCommand(checkInstalledCommand);
 
-        if ( !checkInstalledCommand.hasCompleted() ) {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nOperation aborted" );
-            return;
+        if(!checkInstalledCommand.hasCompleted())
+            throw new ClusterSetupException("Failed to check installed packages");
+
+        AgentResult result = checkInstalledCommand.getResults().get(agent.getUuid());
+        boolean skipInstall = false;
+        String hadoopPack = Common.PACKAGE_PREFIX + HadoopClusterConfig.PRODUCT_NAME;
+        if(result.getStdOut().contains(Commands.PACKAGE_NAME)) {
+            skipInstall = true;
+            po.addLog("Node already has Presto installed");
+        } else if(!result.getStdOut().contains(hadoopPack))
+            throw new ClusterSetupException("Node has no Hadoop installation");
+
+        //install presto
+        if(!skipInstall) {
+            po.addLog("Installing Presto...");
+            Command installCommand = Commands.getInstallCommand(Sets.newHashSet(agent));
+            manager.getCommandRunner().runCommand(installCommand);
+
+            if(installCommand.hasSucceeded())
+                po.addLog("Installation succeeded");
+            else
+                throw new ClusterSetupException("Installation failed: " + installCommand.getAllErrors());
         }
 
-        AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
+        Set<Agent> set = new HashSet<>(Arrays.asList(agent));
+        SetupHelper sh = new SetupHelper(po, manager, config);
+        sh.configureAsWorker(set, config.getCoordinatorNode());
+        sh.startNodes(set);
 
-        if ( result.getStdOut().contains( "ksks-presto" ) ) {
-            po.addLogFailed( String.format( "Node %s already has Presto installed\nOperation aborted", lxcHostname ) );
-            return;
-        }
-        else if ( !result.getStdOut().contains( "ksks-hadoop" ) ) {
-            po.addLogFailed( String.format( "Node %s has no Hadoop installation\nOperation aborted", lxcHostname ) );
-            return;
-        }
+        return agent;
+    }
 
-        config.getWorkers().add( agent );
-        po.addLog( "Updating db..." );
-        //save to db
-        try {
-            PrestoImpl.getPluginDAO().saveInfo( PrestoClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+    private Agent addHost(PrestoClusterConfig config)
+            throws LxcCreateException, ClusterSetupException {
 
-            po.addLog( "Cluster info updated in DB" );
-            //install presto
+        Set<Agent> set = manager.getContainerManager().clone(
+                PrestoClusterConfig.TEMAPLTE_NAME, 1, null);
+        if(set.isEmpty())
+            throw new ClusterSetupException("Failed to create container");
+        if(set.size() != 1)
+            throw new ClusterSetupException("Inconsistent state: cloned more than one container");
 
-            po.addLog( "Installing Presto..." );
-            Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
-            PrestoImpl.getCommandRunner().runCommand( installCommand );
+        SetupHelper sh = new SetupHelper(productOperation, manager, config);
+        sh.configureAsWorker(set, config.getCoordinatorNode());
+        sh.startNodes(set);
 
-            if ( installCommand.hasSucceeded() ) {
-                po.addLog( "Installation succeeded" );
-            }
-            else {
-                po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-                return;
-            }
-
-            po.addLog( "Configuring worker..." );
-            Command configureWorkerCommand =
-                    Commands.getSetWorkerCommand( config.getCoordinatorNode(), Sets.newHashSet( agent ) );
-            PrestoImpl.getCommandRunner().runCommand( configureWorkerCommand );
-
-            if ( configureWorkerCommand.hasSucceeded() ) {
-                po.addLog( "Worker configured successfully\nStarting Presto on new node..." );
-
-                Command startCommand = Commands.getStartCommand( Sets.newHashSet( agent ) );
-                final AtomicBoolean ok = new AtomicBoolean();
-                PrestoImpl.getCommandRunner().runCommand( startCommand, new CommandCallback() {
-
-                    @Override
-                    public void onResponse( Response response, AgentResult agentResult, Command command ) {
-                        if ( agentResult.getStdOut().contains( "Started" ) ) {
-                            ok.set( true );
-                            stop();
-                        }
-                    }
-                } );
-
-                if ( ok.get() ) {
-                    po.addLogDone( "Presto started successfully\nDone" );
-                }
-                else {
-                    po.addLogFailed( String.format( "Failed to start Presto, %s", startCommand.getAllErrors() ) );
-                }
-            }
-            else {
-                po.addLogFailed(
-                        String.format( "Failed to configure worker, %s", configureWorkerCommand.getAllErrors() ) );
-            }
-        }
-        catch ( DBException e ) {
-            po.addLogFailed( "Could not update cluster info in DB! Please see logs\nOperation aborted" );
-        }
+        return set.iterator().next();
     }
 }
