@@ -15,14 +15,14 @@
 
     <jaxrs:server address="/peer" id="petRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="petRestServiceImpl"/>
+            <ref component-id="peerRestServiceImpl"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="petRestServiceImpl" class="org.safehaus.subuta.pet.rest.RestServiceImpl">
-        <property name="petManager" ref="petManager"/>
+    <bean id="peerRestServiceImpl" class="org.safehaus.subuta.pet.rest.RestServiceImpl">
+        <property name="peerManager" ref="peerManager"/>
     </bean>
 
-    <reference id="petManager" availability="mandatory"
-               interface="org.safehaus.subutai.pet.api.PetManager"/>
+    <reference id="peerManager" availability="mandatory"
+               interface="org.safehaus.subutai.pet.api.PeerManager"/>
 </blueprint>

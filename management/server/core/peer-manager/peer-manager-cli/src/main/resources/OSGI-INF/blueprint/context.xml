@@ -8,6 +8,6 @@
     </command>
   </command-bundle>
 
-  <reference id="petManager" availability="mandatory" interface="org.safehaus.subutai.pet.api.PetManager" />
+  <reference id="petManager" availability="mandatory" interface="org.safehaus.subutai.pet.api.PeerManager" />
 
 </blueprint>

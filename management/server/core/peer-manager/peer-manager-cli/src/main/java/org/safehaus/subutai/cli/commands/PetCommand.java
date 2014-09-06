@@ -1,7 +1,7 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import org.safehaus.subutai.pet.api.PetManager;
+import org.safehaus.subutai.pet.api.PeerManager;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -10,25 +10,25 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command( scope = "pet", name = "get-command" )
+@Command( scope = "peer", name = "get-host-id" )
 public class PetCommand extends OsgiCommandSupport {
 
-    private PetManager petManager;
+    private PeerManager peerManager;
 
 
-    public PetManager getPetManager() {
-        return petManager;
+    public PeerManager getPeerManager() {
+        return peerManager;
     }
 
 
-    public void setPetManager( final PetManager petManager ) {
-        this.petManager = petManager;
+    public void setPeerManager( final PeerManager peerManager ) {
+        this.peerManager = peerManager;
     }
 
 
     @Override
     protected Object doExecute() throws Exception {
-        System.out.println(petManager.getPetName());
+        System.out.println( peerManager.getHostId() );
         return null;
     }
 }

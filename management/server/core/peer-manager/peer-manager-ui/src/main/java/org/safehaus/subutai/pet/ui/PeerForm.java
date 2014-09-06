@@ -2,8 +2,8 @@ package org.safehaus.subutai.pet.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
+import org.safehaus.subutai.pet.ui.forms.PeerRegisterForm;
 
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
@@ -25,7 +25,7 @@ public class PeerForm extends CustomComponent implements Disposable {
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        sheet.addTab( new Button("test beta new"), "Environments" );
+        sheet.addTab( new PeerRegisterForm(), "Registration" );
         verticalLayout.addComponent( sheet );
 
 

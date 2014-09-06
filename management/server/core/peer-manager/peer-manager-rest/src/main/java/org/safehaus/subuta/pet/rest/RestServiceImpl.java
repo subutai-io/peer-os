@@ -2,7 +2,8 @@ package org.safehaus.subuta.pet.rest;
 
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.pet.api.PetManager;
+import org.safehaus.subutai.pet.api.Peer;
+import org.safehaus.subutai.pet.api.PeerManager;
 
 
 /**
@@ -11,17 +12,17 @@ import org.safehaus.subutai.pet.api.PetManager;
 
 public class RestServiceImpl implements RestService {
 
-    private PetManager petManager;
+    private PeerManager peerManager;
     private static final String MSG_RESPONSE = "MSG_RESPONSE";
 
 
-    public PetManager getPetManager() {
-        return petManager;
+    public PeerManager getPeerManager() {
+        return peerManager;
     }
 
 
-    public void setPetManager( final PetManager petManager ) {
-        this.petManager = petManager;
+    public void setPeerManager( final PeerManager peerManager ) {
+        this.peerManager = peerManager;
     }
 
 
@@ -30,15 +31,8 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String welcome( String name ) {
-
-        String hello = petManager.helloPet( name );
-        return JsonUtil.toJson( MSG_RESPONSE, hello );
-    }
-
-
-    @Override
-    public void somePost() {
-
+    public String registerPeer( final String config ) {
+        Peer peer = JsonUtil.fromJson( config, Peer.class );
+        return peerManager.registerPeer(peer);
     }
 }

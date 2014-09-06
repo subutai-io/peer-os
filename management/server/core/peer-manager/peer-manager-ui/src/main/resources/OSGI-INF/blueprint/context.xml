@@ -2,7 +2,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <reference id="petManager" availability="mandatory"
-               interface="org.safehaus.subutai.pet.api.PetManager"/>
+               interface="org.safehaus.subutai.pet.api.PeerManager"/>
 
     <bean id="module" scope="singleton" class="org.safehaus.subutai.pet.ui.PeerUI"
           init-method="init" destroy-method="destroy">

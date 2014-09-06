@@ -3,7 +3,7 @@ package org.safehaus.subutai.pet.ui;
 
 import java.io.File;
 
-import org.safehaus.subutai.pet.api.PetManager;
+import org.safehaus.subutai.pet.api.PeerManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.common.util.FileUtil;
 
@@ -17,15 +17,15 @@ public class PeerUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "peer.png";
     public static final String MODULE_NAME = "Peer";
-    private PetManager petManager;
+    private PeerManager petManager;
 
 
-    public PetManager getPetManager() {
+    public PeerManager getPetManager() {
         return petManager;
     }
 
 
-    public void setPetManager( final PetManager petManager ) {
+    public void setPetManager( final PeerManager petManager ) {
         this.petManager = petManager;
     }
 
