@@ -191,15 +191,15 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
                 communicationManager.sendBroadcastRequest( commandImpl.getLocalRequests().iterator().next() );
             }
             else {
+                //send remote requests
+                if ( !commandImpl.getRemoteRequests().isEmpty() ) {
+                    dispatcher.sendRequests( commandImpl.getRemoteRequests() );
+                }
                 //send local requests
                 if ( !commandImpl.getLocalRequests().isEmpty() ) {
                     for ( Request request : commandImpl.getLocalRequests() ) {
                         communicationManager.sendRequest( request );
                     }
-                }
-                //send remote requests
-                if ( !commandImpl.getRemoteRequests().isEmpty() ) {
-                    dispatcher.sendRequests( commandImpl.getRemoteRequests() );
                 }
             }
         }
