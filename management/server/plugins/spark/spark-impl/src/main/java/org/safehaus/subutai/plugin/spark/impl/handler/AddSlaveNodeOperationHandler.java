@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 
+import com.google.common.collect.Sets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
@@ -15,8 +15,6 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -30,7 +28,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
     public AddSlaveNodeOperationHandler( SparkImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         this.lxcHostname = lxcHostname;
-        po = SparkImpl.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
+        po = manager.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
                 String.format( "Adding node %s to %s", lxcHostname, clusterName ) );
     }
 
@@ -50,13 +48,13 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
             return;
         }
 
-        if ( SparkImpl.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null ) {
+        if(manager.getAgentManager().getAgentByHostname(config.getMasterNode().getHostname()) == null) {
             po.addLogFailed( String.format( "Master node %s is not connected\nOperation aborted",
                     config.getMasterNode().getHostname() ) );
             return;
         }
 
-        Agent agent = SparkImpl.getAgentManager().getAgentByHostname( lxcHostname );
+        Agent agent = manager.getAgentManager().getAgentByHostname(lxcHostname);
         if ( agent == null ) {
             po.addLogFailed( String.format( "New node %s is not connected\nOperation aborted", lxcHostname ) );
             return;
@@ -75,7 +73,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         //check installed ksks packages
         Command checkInstalledCommand = Commands.getCheckInstalledCommand( Sets.newHashSet( agent ) );
-        SparkImpl.getCommandRunner().runCommand( checkInstalledCommand );
+        manager.getCommandRunner().runCommand(checkInstalledCommand);
 
         if ( !checkInstalledCommand.hasCompleted() ) {
             po.addLogFailed( "Failed to check presence of installed ksks packages\nOperation aborted" );
@@ -84,7 +82,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
         AgentResult result = checkInstalledCommand.getResults().get( agent.getUuid() );
 
-        if ( result.getStdOut().contains( "ksks-spark" ) && install ) {
+        if(result.getStdOut().contains(Commands.PACKAGE_NAME) && install) {
             po.addLogFailed( String.format( "Node %s already has Spark installed\nOperation aborted", lxcHostname ) );
             return;
         }
@@ -97,7 +95,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
         po.addLog( "Updating db..." );
         //save to db
         try {
-            SparkImpl.getPluginDAO().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config );
+            manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config);
 
             po.addLog( "Cluster info updated in DB" );
             //install spark
@@ -105,7 +103,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
             if ( install ) {
                 po.addLog( "Installing Spark..." );
                 Command installCommand = Commands.getInstallCommand( Sets.newHashSet( agent ) );
-                SparkImpl.getCommandRunner().runCommand( installCommand );
+                manager.getCommandRunner().runCommand(installCommand);
 
                 if ( installCommand.hasSucceeded() ) {
                     po.addLog( "Installation succeeded" );
@@ -119,20 +117,20 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
             po.addLog( "Setting master IP on slave..." );
             Command setMasterIPCommand =
                     Commands.getSetMasterIPCommand( config.getMasterNode(), Sets.newHashSet( agent ) );
-            SparkImpl.getCommandRunner().runCommand( setMasterIPCommand );
+            manager.getCommandRunner().runCommand(setMasterIPCommand);
 
             if ( setMasterIPCommand.hasSucceeded() ) {
                 po.addLog( "Master IP successfully set\nRegistering slave with master..." );
 
                 Command addSlaveCommand = Commands.getAddSlaveCommand( agent, config.getMasterNode() );
-                SparkImpl.getCommandRunner().runCommand( addSlaveCommand );
+                manager.getCommandRunner().runCommand(addSlaveCommand);
 
                 if ( addSlaveCommand.hasSucceeded() ) {
                     po.addLog( "Registration succeeded\nRestarting master..." );
 
                     Command restartMasterCommand = Commands.getRestartMasterCommand( config.getMasterNode() );
                     final AtomicBoolean ok = new AtomicBoolean();
-                    SparkImpl.getCommandRunner().runCommand( restartMasterCommand, new CommandCallback() {
+                    manager.getCommandRunner().runCommand(restartMasterCommand, new CommandCallback() {
 
                         @Override
                         public void onResponse( Response response, AgentResult agentResult, Command command ) {
@@ -148,7 +146,7 @@ public class AddSlaveNodeOperationHandler extends AbstractOperationHandler<Spark
 
                         Command startSlaveCommand = Commands.getStartSlaveCommand( agent );
                         ok.set( false );
-                        SparkImpl.getCommandRunner().runCommand( startSlaveCommand, new CommandCallback() {
+                        manager.getCommandRunner().runCommand(startSlaveCommand, new CommandCallback() {
 
                             @Override
                             public void onResponse( Response response, AgentResult agentResult, Command command ) {

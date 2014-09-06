@@ -13,6 +13,8 @@ import org.safehaus.subutai.core.command.api.RequestBuilder;
 
 public class Commands extends CommandsSingleton {
 
+    public static final String PACKAGE_NAME = "ksks-spark";
+
     public Commands( CommandRunner commandRunner ) {
         init( commandRunner );
     }
@@ -20,15 +22,14 @@ public class Commands extends CommandsSingleton {
 
     public static Command getInstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder("sleep 20; apt-get --force-yes --assume-yes install ksks-spark").withTimeout(600)                                                                                                     .withStdOutRedirection(
-                                                                                                             OutputRedirection.NO ),
+                new RequestBuilder("sleep 20; apt-get --force-yes --assume-yes install " + PACKAGE_NAME).withTimeout(600).withStdOutRedirection(                                                                                                             OutputRedirection.NO ),
                 agents );
     }
 
 
     public static Command getUninstallCommand( Set<Agent> agents ) {
         return createCommand(
-                new RequestBuilder( "apt-get --force-yes --assume-yes purge ksks-spark" ).withTimeout( 60 ), agents );
+                new RequestBuilder("apt-get --force-yes --assume-yes purge " + PACKAGE_NAME).withTimeout(60), agents);
     }
 
 
