@@ -11,6 +11,8 @@ public class PrestoClusterConfig implements ConfigBase {
     public static final String TEMAPLTE_NAME = "presto";
 
     private String clusterName = "";
+    private String hadoopClusterName = ""; // only for over-Hadoop setup
+    private SetupType setupType;
     private Agent coordinatorNode;
     private Set<Agent> workers = new HashSet<>();
 
@@ -31,9 +33,25 @@ public class PrestoClusterConfig implements ConfigBase {
         this.clusterName = clusterName;
     }
 
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
+
     @Override
     public String getProductName() {
         return PRODUCT_KEY;
+    }
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
     }
 
     public Set<Agent> getWorkers() {

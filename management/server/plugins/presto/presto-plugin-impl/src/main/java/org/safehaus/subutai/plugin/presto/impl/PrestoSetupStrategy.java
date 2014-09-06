@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.presto.impl.handler;
+package org.safehaus.subutai.plugin.presto.impl;
 
 
 import java.util.Iterator;
