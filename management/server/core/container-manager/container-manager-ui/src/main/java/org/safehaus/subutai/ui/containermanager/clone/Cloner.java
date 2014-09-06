@@ -148,8 +148,7 @@ public class Cloner extends VerticalLayout {
                 Map<Agent, Integer> sortedBestServers =
                         CollectionUtil.sortMapByValueDesc(bestServers);
                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                entry.setValue(entry.getValue() - 1);
-//                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                bestServers.put(entry.getKey(), entry.getValue() - 1);
                 List<String> lxcHostNames = agentFamilies.get(entry.getKey());
                 if (lxcHostNames == null) {
                     lxcHostNames = new ArrayList<>();
@@ -211,10 +210,12 @@ public class Cloner extends VerticalLayout {
 
         final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
         ExecutorService executor = Executors.newFixedThreadPool(1);
+        CompletionService completionService = new ExecutorCompletionService(executor);
         try {
             for (final String lxcHostname : cloneNames) {
-                executor.execute(new Runnable() {
-                    public void run() {
+                completionService.submit(new Callable() {
+                    public Boolean call() {
+                        boolean result = true;
                         Item row = lxcTable.getItem(lxcHostname);
                         if (row != null)
                             row.getItemProperty("Status")
@@ -227,13 +228,23 @@ public class Cloner extends VerticalLayout {
                                         .setValue(new Embedded("", new ThemeResource(okIconSource)));
                             countProcessed.decrementAndGet();
                         } catch (ContainerCreateException ce) {
+                            result = false;
                             if (row != null)
                                 row.getItemProperty("Status")
                                         .setValue(new Embedded("", new ThemeResource(errorIconSource)));
                         }
+                        return result;
                     }
                 });
             }
+
+            for (final String lxcHostname : cloneNames) {
+                try {
+                    completionService.take();
+                } catch (InterruptedException e) {
+                }
+            }
+
         } finally {
             executor.shutdown();
         }
