@@ -10,14 +10,13 @@ import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
 
     private Set<Agent> skipInstallation = new HashSet<>();
 
-    public SetupStrategyOverHadoop(ProductOperation po, Presto manager,
+    public SetupStrategyOverHadoop(ProductOperation po, PrestoImpl manager,
             PrestoClusterConfig config) {
         super(po, manager, config);
     }
@@ -45,7 +44,7 @@ public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
         //check installed packages
         Set<Agent> allNodes = config.getAllNodes();
         Command checkInstalledCommand = Commands.getCheckInstalledCommand(allNodes);
-        PrestoImpl.getCommandRunner().runCommand(checkInstalledCommand);
+        manager.getCommandRunner().runCommand(checkInstalledCommand);
 
         if(!checkInstalledCommand.hasCompleted())
             throw new ClusterSetupException(
@@ -74,7 +73,7 @@ public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
         po.addLog("Updating db...");
         //save to db
         try {
-            PrestoImpl.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
+            manager.getPluginDAO().saveInfo(PrestoClusterConfig.PRODUCT_KEY,
                     config.getClusterName(),
                     config);
 
@@ -90,7 +89,7 @@ public class SetupStrategyOverHadoop extends PrestoSetupStrategy {
         Set<Agent> installationSet = new HashSet<>(config.getAllNodes());
         installationSet.removeAll(skipInstallation);
         Command installCommand = Commands.getInstallCommand(installationSet);
-        PrestoImpl.getCommandRunner().runCommand(installCommand);
+        manager.getCommandRunner().runCommand(installCommand);
 
         if(installCommand.hasSucceeded()) {
             po.addLog("Installation succeeded");

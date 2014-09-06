@@ -10,16 +10,15 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandCallback;
-import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
 
     final ProductOperation po;
-    final Presto manager;
+    final PrestoImpl manager;
     final PrestoClusterConfig config;
 
-    public PrestoSetupStrategy(ProductOperation po, Presto manager, PrestoClusterConfig config) {
+    public PrestoSetupStrategy(ProductOperation po, PrestoImpl manager, PrestoClusterConfig config) {
 
         Preconditions.checkNotNull(config, "Presto cluster config is null");
         Preconditions.checkNotNull(po, "Product operation tracker is null");
@@ -33,11 +32,11 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
     void checkConnected() throws ClusterSetupException {
 
         String hostname = config.getCoordinatorNode().getHostname();
-        if(PrestoImpl.getAgentManager().getAgentByHostname(hostname) == null)
+        if(manager.getAgentManager().getAgentByHostname(hostname) == null)
             throw new ClusterSetupException("Coordinator node is not connected");
 
         for(Agent a : config.getWorkers()) {
-            if(PrestoImpl.getAgentManager().getAgentByHostname(a.getHostname()) == null)
+            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException("Not all worker nodes are connected");
         }
     }
@@ -46,7 +45,7 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
         po.addLog("Configuring coordinator...");
 
         Command cmd = Commands.getSetCoordinatorCommand(config.getCoordinatorNode());
-        PrestoImpl.getCommandRunner().runCommand(cmd);
+        manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded())
             po.addLog("Coordinator configured successfully");
@@ -60,7 +59,7 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
 
         Command cmd = Commands.getSetWorkerCommand(config.getCoordinatorNode(),
                 config.getWorkers());
-        PrestoImpl.getCommandRunner().runCommand(cmd);
+        manager.getCommandRunner().runCommand(cmd);
 
         if(cmd.hasSucceeded())
             po.addLog("Workers configured successfully");
@@ -74,7 +73,7 @@ public abstract class PrestoSetupStrategy implements ClusterSetupStrategy {
 
         Command cmd = Commands.getStartCommand(config.getAllNodes());
         final AtomicInteger okCount = new AtomicInteger();
-        PrestoImpl.getCommandRunner().runCommand(cmd, new CommandCallback() {
+        manager.getCommandRunner().runCommand(cmd, new CommandCallback() {
 
             @Override
             public void onResponse(Response response, AgentResult agentResult, Command command) {

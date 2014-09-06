@@ -13,6 +13,8 @@
                interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
     <reference id="hadoopManager" availability="mandatory"
                interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
 
     <bean id="presto-impl" scope="singleton" class="org.safehaus.subutai.plugin.presto.impl.PrestoImpl"
           init-method="init" destroy-method="destroy">
@@ -22,6 +24,7 @@
         <argument ref="tracker"/>
         <argument ref="environmentManager"/>
         <argument ref="hadoopManager"/>
+        <argument ref="containerManager"/>
     </bean>
 
     <service ref="presto-impl" interface="org.safehaus.subutai.plugin.presto.api.Presto"/>

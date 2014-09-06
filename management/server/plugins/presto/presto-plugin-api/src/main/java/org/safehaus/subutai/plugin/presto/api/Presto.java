@@ -45,8 +45,5 @@ public interface Presto extends ApiBase<PrestoClusterConfig> {
     public UUID checkNode(String clusterName, String lxcHostName);
 
     public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
-            PrestoClusterConfig config);
-
-    public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po,
             PrestoClusterConfig config, Environment environment);
 }

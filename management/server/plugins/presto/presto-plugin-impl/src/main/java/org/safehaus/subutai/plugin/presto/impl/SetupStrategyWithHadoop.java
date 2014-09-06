@@ -5,14 +5,13 @@ import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.core.environment.api.helper.Node;
-import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 
 public class SetupStrategyWithHadoop extends PrestoSetupStrategy {
 
     private Environment environment;
 
-    public SetupStrategyWithHadoop(ProductOperation po, Presto manager, PrestoClusterConfig config) {
+    public SetupStrategyWithHadoop(ProductOperation po, PrestoImpl manager, PrestoClusterConfig config) {
         super(po, manager, config);
     }
 
