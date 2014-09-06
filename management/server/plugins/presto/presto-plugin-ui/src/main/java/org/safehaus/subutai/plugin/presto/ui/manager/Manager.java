@@ -144,12 +144,12 @@ public class Manager {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if(config == null) show("Please, select cluster");
 
-                String hn = config.getHadoopClusterName();
-                if(hn == null || hn.isEmpty()) {
-                    show("Undefined Hadoop cluster name");
-                    return;
-                }
                 if(config.getSetupType() == SetupType.OVER_HADOOP) {
+                    String hn = config.getHadoopClusterName();
+                    if(hn == null || hn.isEmpty()) {
+                        show("Undefined Hadoop cluster name");
+                        return;
+                    }
                     HadoopClusterConfig info = PrestoUI.getHadoopManager().getCluster(hn);
                     if(info != null) {
                         HashSet<Agent> nodes = new HashSet<>(info.getAllNodes());
