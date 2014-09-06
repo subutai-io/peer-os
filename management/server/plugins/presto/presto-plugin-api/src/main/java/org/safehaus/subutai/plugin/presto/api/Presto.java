@@ -5,8 +5,11 @@ import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 public interface Presto extends ApiBase<PrestoClusterConfig> {
+
+    public UUID installCluster(PrestoClusterConfig config, HadoopClusterConfig hadoopConfig);
 
     public UUID addWorkerNode(String clusterName, String lxcHostname);
 

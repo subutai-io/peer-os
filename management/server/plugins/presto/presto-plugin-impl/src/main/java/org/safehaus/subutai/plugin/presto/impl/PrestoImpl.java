@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.Presto;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.SetupType;
@@ -29,6 +30,14 @@ public class PrestoImpl extends PrestoBase implements Presto {
         executor.execute(operationHandler);
 
         return operationHandler.getTrackerId();
+    }
+
+    @Override
+    public UUID installCluster(PrestoClusterConfig config, HadoopClusterConfig hadoopConfig) {
+        InstallOperationHandler h = new InstallOperationHandler(this, config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     @Override
