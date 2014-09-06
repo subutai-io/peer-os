@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
@@ -31,7 +31,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     @Override
-    public void sendRequests( final Map<UUID, Request> requests ) {
+    public void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         //use PeerManager to figure out IP of target peer by UUID
         //send requests in batch to each peer
@@ -69,7 +69,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     @Override
-    public void executeRequests( final UUID initiatorId, final Set<Request> requests ) {
+    public void executeRequests( final UUID initiatorId, final Set<BatchRequest> requests ) {
         //execute requests using Command Runner
         //upon response in callback, cache response to persistent queue (key => initiator id)
         //some background thread should iterate this queue and attempt to send responses back to initiator

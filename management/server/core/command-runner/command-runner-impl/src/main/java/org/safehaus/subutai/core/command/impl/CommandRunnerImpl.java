@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
@@ -218,8 +219,8 @@ public class CommandRunnerImpl implements CommandRunner, ResponseListener {
 
 
     @Override
-    public Command createCommandInternal( final Set<Request> requests ) {
-        return new CommandImpl( requests );
+    public Command createCommandInternal( final Set<BatchRequest> batchRequests ) {
+        return new CommandImpl( batchRequests );
     }
 
 

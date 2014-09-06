@@ -18,6 +18,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.CollectionUtil;
@@ -46,7 +47,7 @@ public class CommandImpl implements Command {
     //subset of requests to send to local agents
     private final Set<Request> localRequests = new HashSet<>();
     //subset of requests to send to remote agents
-    private final Map<UUID, Request> remoteRequests = new HashMap<>();
+    private final Map<UUID, Set<BatchRequest>> remoteRequests = new HashMap<>();
     //command timeout
     private final int timeout;
     //semaphore used to wait until command completes or times out
@@ -114,27 +115,41 @@ public class CommandImpl implements Command {
                 localRequests.add( request );
             }
             else {
-                remoteRequests.put( agent.getOwnerId(), request );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                if ( batchRequests == null ) {
+                    batchRequests = new HashSet<>();
+                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                    batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
+                }
+                else {
+                    batchRequests.iterator().next().addTargetUUID( agent.getUuid() );
+                }
             }
         }
     }
 
 
-    public CommandImpl( Set<Request> requests ) {
+    public CommandImpl( Set<BatchRequest> batchRequests ) {
 
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Request are null or empty" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
+                "Batch Requests are null or empty" );
 
         this.description = "REMOTE";
-        this.requestsCount = requests.size();
-        this.commandUUID = requests.iterator().next().getTaskUuid();
+        Set<Request> requests = new HashSet<>();
+        for ( BatchRequest batchRequest : batchRequests ) {
+            requests.addAll( batchRequest.getRequests() );
+        }
         int timeout = 0;
         for ( Request request : requests ) {
             if ( request.getTimeout() > timeout ) {
                 timeout = request.getTimeout();
             }
-            this.localRequests.add( request );
         }
+        this.requestsCount = requests.size();
         this.timeout = timeout;
+        //take any taskUUID since all requests in the batch must belong to the same command
+        this.commandUUID = requests.iterator().next().getTaskUuid();
+        this.localRequests.addAll( requests );
     }
 
 
@@ -155,15 +170,21 @@ public class CommandImpl implements Command {
 
         int maxTimeout = 0;
         for ( AgentRequestBuilder requestBuilder : requestBuilders ) {
-            Request request = requestBuilder.build( requestBuilder.getAgent().getUuid(), commandUUID );
+            Agent agent = requestBuilder.getAgent();
+            Request request = requestBuilder.build( agent.getUuid(), commandUUID );
             if ( requestBuilder.getTimeout() > maxTimeout ) {
                 maxTimeout = requestBuilder.getTimeout();
             }
-            if ( requestBuilder.getAgent().isLocal() ) {
+            if ( agent.isLocal() ) {
                 localRequests.add( request );
             }
             else {
-                remoteRequests.put( requestBuilder.getAgent().getOwnerId(), request );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                if ( batchRequests == null ) {
+                    batchRequests = new HashSet<>();
+                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                }
+                batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
             }
         }
 
@@ -423,7 +444,7 @@ public class CommandImpl implements Command {
      *
      * @return - remote requests of command
      */
-    public Map<UUID, Request> getRemoteRequests() {
+    public Map<UUID, Set<BatchRequest>> getRemoteRequests() {
         return Collections.unmodifiableMap( remoteRequests );
     }
 

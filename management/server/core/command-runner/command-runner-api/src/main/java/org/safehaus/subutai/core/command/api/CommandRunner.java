@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.command.api;
 import java.util.Set;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 
 
 /**
@@ -65,7 +65,7 @@ public interface CommandRunner {
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents );
 
 
-    public Command createCommandInternal( Set<Request> requests );
+    public Command createCommandInternal( Set<BatchRequest> batchRequests );
 
     /**
      * Creates command based on supplied RequestBuilder and target agents on which to run the command.

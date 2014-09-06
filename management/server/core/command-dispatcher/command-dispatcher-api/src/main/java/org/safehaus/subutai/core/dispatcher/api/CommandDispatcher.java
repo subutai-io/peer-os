@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 
@@ -22,7 +22,7 @@ public interface CommandDispatcher {
      *
      * @param requests - requests to send
      */
-    public void sendRequests( Map<UUID, Request> requests );
+    public void sendRequests( Map<UUID, Set<BatchRequest>> requests );
 
     public void addListener( ResponseListener listener );
 
@@ -44,5 +44,5 @@ public interface CommandDispatcher {
      *
      * @param requests - requests to execute
      */
-    public void executeRequests( UUID initiatorId, Set<Request> requests );
+    public void executeRequests( UUID initiatorId, Set<BatchRequest> requests );
 }

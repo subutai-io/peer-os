@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
 import org.safehaus.subutai.core.command.api.Command;
@@ -48,7 +49,7 @@ public class CommandRunnerMock implements CommandRunner
 
 
     @Override
-    public Command createCommandInternal( final Set<Request> requests ) {
+    public Command createCommandInternal( final Set<BatchRequest> batchRequests ) {
         return null;
     }
 
