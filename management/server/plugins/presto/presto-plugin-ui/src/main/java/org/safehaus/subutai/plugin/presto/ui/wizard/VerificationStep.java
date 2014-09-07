@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.presto.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -15,9 +10,6 @@ import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel {
 
     public VerificationStep(final Wizard wizard) {
