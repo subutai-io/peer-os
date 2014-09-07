@@ -9,6 +9,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
@@ -26,6 +27,14 @@ public class SparkImpl extends SparkBase implements Spark {
         executor.execute(operationHandler);
 
         return operationHandler.getTrackerId();
+    }
+
+    @Override
+    public UUID installCluster(SparkClusterConfig config, HadoopClusterConfig hadoopConfig) {
+        InstallOperationHandler h = new InstallOperationHandler(this, config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
     }
 
     @Override
@@ -138,4 +147,5 @@ public class SparkImpl extends SparkBase implements Spark {
 
         return null;
     }
+
 }

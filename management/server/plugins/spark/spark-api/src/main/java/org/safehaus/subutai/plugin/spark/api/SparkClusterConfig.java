@@ -11,6 +11,7 @@ public class SparkClusterConfig implements ConfigBase {
     public static final String TEMPLATE_NAME = "spark";
 
     private String clusterName = "";
+    private String hadoopClusterName = "";
     private SetupType setupType;
     private Agent masterNode;
     private Set<Agent> slaves = new HashSet<>();
@@ -30,6 +31,14 @@ public class SparkClusterConfig implements ConfigBase {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
+
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
     }
 
     public SetupType getSetupType() {
