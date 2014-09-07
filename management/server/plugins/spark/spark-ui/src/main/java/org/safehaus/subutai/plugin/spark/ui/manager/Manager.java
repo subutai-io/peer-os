@@ -216,10 +216,9 @@ public class Manager {
         SparkClusterConfig clusterInfo = (SparkClusterConfig)clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if(clustersInfo != null && clustersInfo.size() > 0) {
-            for(SparkClusterConfig mongoClusterInfo : clustersInfo) {
-                clusterCombo.addItem(mongoClusterInfo);
-                clusterCombo.setItemCaption(mongoClusterInfo,
-                        mongoClusterInfo.getClusterName());
+            for(SparkClusterConfig ci : clustersInfo) {
+                clusterCombo.addItem(ci);
+                clusterCombo.setItemCaption(ci, ci.getClusterName());
             }
             if(clusterInfo != null) {
                 for(SparkClusterConfig mongoClusterInfo : clustersInfo) {
