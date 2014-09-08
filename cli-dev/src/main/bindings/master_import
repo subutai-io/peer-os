@@ -45,7 +45,7 @@ function master_import {
   # ----------------------------------------------------------------------------
 
   if [ -z "$APT_GET_INVOCATION" -o "$APT_GET_INVOCATION" != "true" ]; then
-    msg_info "subutai master_import called from command line"
+    msg_info "    - subutai master_import called from command line"
     
     if [ "`is_system_all_locked`" == "true" ]; then
       msg_error "System locked by a subutai process"
@@ -111,7 +111,7 @@ function master_import {
     fi
     popd
   else
-    msg_info "subutai master_import called while installing master from the debian package"
+    msg_info "    - subutai master_import called while installing master from the debian package"
   fi
 
   debian_root=$SUBUTAI_TMPDIR/$container
@@ -130,7 +130,7 @@ function master_import {
   zfs set mountpoint=$lxc_rootfs lxc/master
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/rootfs.delta | awk '{print $5}'`
-    msg_info "Imported $size delta for rootfs"
+    msg_info "    - Imported $size delta for rootfs"
   else
     msg_error "Delta import for rootfs failed"
   fi
@@ -139,7 +139,7 @@ function master_import {
   zfs hold keep lxc/master-opt@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/opt.delta | awk '{print $5}'`
-    msg_info "Imported $size delta for opt"
+    msg_info "    - Imported $size delta for opt"
   else
     msg_error "Delta import for opt failed"
   fi
@@ -148,7 +148,7 @@ function master_import {
   zfs hold keep lxc-data/master-var@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/var.delta | awk '{print $5}'`
-    msg_info "Imported $size delta for var"
+    msg_info "    - Imported $size delta for var"
   else
     msg_error "Delta import for var failed"
   fi
@@ -157,7 +157,7 @@ function master_import {
   zfs hold keep lxc-data/master-home@template
   if [ $? -eq 0 ]; then
     size=`ls -lh $deltas/home.delta | awk '{print $5}'`
-    msg_info "Imported $size delta for home"
+    msg_info "    - Imported $size delta for home"
   else
     msg_error "Delta generation for opt failed"
   fi
