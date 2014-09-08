@@ -125,6 +125,8 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
         //some background thread should iterate this queue and attempt to send responses back to owner
+        //if ok -> delete responses from db, if responses contain final delete request too
+        //otherwise insert request with new attempts number and delete request wil old attempts number (order matters!)
     }
 
 
