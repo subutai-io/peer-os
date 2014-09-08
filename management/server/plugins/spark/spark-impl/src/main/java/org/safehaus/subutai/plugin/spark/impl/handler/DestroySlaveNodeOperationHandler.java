@@ -2,16 +2,10 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import com.google.common.collect.Sets;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
-import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.db.api.DBException;
-import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -51,8 +45,8 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
         //check if node is in the cluster
         if(!config.getSlaveNodes().contains(agent)) {
-            po.addLogFailed(String.format("Node %s does not belong to this cluster\nOperation aborted",
-                    agent.getHostname()));
+            po.addLogFailed(
+                    String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
             return;
         }
 
@@ -77,13 +71,14 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
                             stop();
                         }
                     }
+
                 });
 
                 if(ok.get())
                     po.addLog("Master restarted successfully");
                 else
-                    po.addLog(String.format("Master restart failed, %s, skipping...",
-                            restartMasterCommand.getAllErrors()));
+                    po.addLog(String
+                            .format("Master restart failed, %s, skipping...", restartMasterCommand.getAllErrors()));
             } else
                 po.addLog(String.format("Failed to unregister slave from master: %s, skipping...",
                         clearSlavesCommand.getAllErrors()));
@@ -93,35 +88,28 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         boolean uninstall = !agent.equals(config.getMasterNode());
 
         if(uninstall) {
+            po.addLog("Uninstalling Spark...");
 
-            if(config.getSetupType() == SetupType.OVER_HADOOP) {
-                po.addLog("Uninstalling Spark...");
+            Command uninstallCommand = Commands.getUninstallCommand(Sets.newHashSet(agent));
+            manager.getCommandRunner().runCommand(uninstallCommand);
 
-                Command uninstallCommand = Commands.getUninstallCommand(Sets.newHashSet(agent));
-                manager.getCommandRunner().runCommand(uninstallCommand);
-
-                if(uninstallCommand.hasCompleted()) {
-                    AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
-                    if(result.getExitCode() != null && result.getExitCode() == 0)
-                        if(result.getStdOut().contains("Spark is not installed, so not removed"))
-                            po.addLog(String.format("Spark is not installed, so not removed on node %s",
-                                    agent.getHostname()));
-                        else
-                            po.addLog(String.format("Spark is removed from node %s", agent.getHostname()));
+            if(uninstallCommand.hasCompleted()) {
+                AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
+                if(result.getExitCode() != null && result.getExitCode() == 0)
+                    if(result.getStdOut().contains("Package ksks-spark is not installed, so not removed"))
+                        po.addLog(String.format("Spark is not installed, so not removed on node %s",
+                                agent.getHostname()));
                     else
-                        po.addLog(String.format("Error %s on node %s", result.getStdErr(), agent.getHostname()));
-                } else {
-                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
-                    return;
-                }
-            } else if(config.getSetupType() == SetupType.WITH_HADOOP)
-                try {
-                    manager.getContainerManager().cloneDestroy(
-                            agent.getParentHostName(), agent.getHostname());
-                } catch(LxcDestroyException ex) {
-                    po.addLog("Failed to destroy container: " + ex.getMessage());
-                }
+                        po.addLog(String.format("Spark is removed from node %s",
+                                agent.getHostname()));
+                else
+                    po.addLog(String.format("Error %s on node %s", result.getStdErr(),
+                            agent.getHostname()));
 
+            } else {
+                po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
+                return;
+            }
         } else {
             po.addLog("Stopping slave...");
 
@@ -140,7 +128,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         try {
             manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config);
             po.addLogDone("Cluster info updated in DB\nDone");
-        } catch(DBException e) {
+        } catch(DBException ex) {
             po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
         }
     }
