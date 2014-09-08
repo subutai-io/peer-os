@@ -11,13 +11,13 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.ui.SharkUI;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +34,7 @@ public class Manager
     private final GridLayout contentRoot;
     private final ComboBox clusterCombo;
     private final Table nodesTable;
-    private Config config;
+    private SharkClusterConfig config;
 
 
     public Manager()
@@ -66,7 +66,7 @@ public class Manager
             @Override
             public void valueChange( Property.ValueChangeEvent event )
             {
-                config = ( Config ) event.getProperty().getValue();
+                config = ( SharkClusterConfig ) event.getProperty().getValue();
                 refreshUI();
             }
         } );
@@ -105,7 +105,7 @@ public class Manager
                         {
                             UUID trackID = SharkUI.getSharkManager().uninstallCluster( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( SharkUI.getExecutor(), SharkUI.getTracker(),
-                                trackID, Config.PRODUCT_KEY );
+                                trackID, SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -195,7 +195,7 @@ public class Manager
                         {
                             UUID trackID = SharkUI.getSharkManager().actualizeMasterIP( config.getClusterName() );
                             ProgressWindow window = new ProgressWindow( SharkUI.getExecutor(), SharkUI.getTracker(),
-                                trackID, Config.PRODUCT_KEY );
+                                trackID, SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override
@@ -275,13 +275,13 @@ public class Manager
 
     public void refreshClustersInfo()
     {
-        List<Config> clustersInfo = SharkUI.getSharkManager().getClusters();
+        List<SharkClusterConfig > clustersInfo = SharkUI.getSharkManager().getClusters();
 
-        Config clusterInfo = ( Config ) clusterCombo.getValue();
+        SharkClusterConfig clusterInfo = ( SharkClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( clustersInfo != null && clustersInfo.size() > 0 )
         {
-            for ( Config mongoClusterInfo : clustersInfo )
+            for ( SharkClusterConfig mongoClusterInfo : clustersInfo )
             {
                 clusterCombo.addItem( mongoClusterInfo );
                 clusterCombo.setItemCaption( mongoClusterInfo,
@@ -289,7 +289,7 @@ public class Manager
             }
             if ( clusterInfo != null )
             {
-                for ( Config mongoClusterInfo : clustersInfo )
+                for ( SharkClusterConfig mongoClusterInfo : clustersInfo )
                 {
                     if ( mongoClusterInfo.getClusterName().equals( clusterInfo.getClusterName() ) )
                     {
@@ -345,7 +345,7 @@ public class Manager
                             UUID trackID = SharkUI.getSharkManager()
                                 .destroyNode( config.getClusterName(), agent.getHostname() );
                             ProgressWindow window = new ProgressWindow( SharkUI.getExecutor(), SharkUI.getTracker(),
-                                trackID, Config.PRODUCT_KEY );
+                                trackID, SharkClusterConfig.PRODUCT_KEY );
                             window.getWindow().addCloseListener( new Window.CloseListener()
                             {
                                 @Override

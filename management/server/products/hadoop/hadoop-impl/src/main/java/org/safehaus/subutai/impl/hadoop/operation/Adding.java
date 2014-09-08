@@ -1,13 +1,13 @@
 package org.safehaus.subutai.impl.hadoop.operation;
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
 import org.safehaus.subutai.impl.hadoop.operation.common.AddNodeOperation;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class Adding {
 	private HadoopImpl parent;
-	private Config config;
+	private HadoopClusterConfig hadoopClusterConfig;
 	private String clusterName;
 
 	public Adding(HadoopImpl parent, String clusterName) {
@@ -28,16 +28,16 @@ public class Adding {
 
 
 	public UUID execute() {
-		final ProductOperation po = parent.getTracker().createProductOperation(Config.PRODUCT_KEY, "Adding node to Hadoop");
+		final ProductOperation po = parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY, "Adding node to Hadoop");
 
 		parent.getExecutor().execute(new Runnable() {
 			@Override
 			public void run() {
 
-				config = parent.getDbManager().getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-				if (config == null ||
-						Strings.isNullOrEmpty(config.getClusterName()) ||
-						Strings.isNullOrEmpty(config.getDomainName())) {
+				hadoopClusterConfig = parent.getDbManager().getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class);
+				if ( hadoopClusterConfig == null ||
+						Strings.isNullOrEmpty( hadoopClusterConfig.getClusterName()) ||
+						Strings.isNullOrEmpty( hadoopClusterConfig.getDomainName())) {
 					po.addLogFailed("Malformed configuration\nHadoop adding new node aborted");
 					return;
 				}
@@ -54,11 +54,13 @@ public class Adding {
 					}
 					po.addLog("Lxc containers created successfully\nConfiguring network...");
 
-					if (parent.getNetworkManager().configHostsOnAgents(config.getAllNodes(), agent, config.getDomainName()) &&
-							parent.getNetworkManager().configSshOnAgents(config.getAllNodes(), agent)) {
+					if (parent.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
+                            hadoopClusterConfig
+                            .getDomainName()) &&
+							parent.getNetworkManager().configSshOnAgents( hadoopClusterConfig.getAllNodes(), agent)) {
 						po.addLog("Cluster network configured");
 
-						AddNodeOperation addOperation = new AddNodeOperation(config, agent);
+						AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent);
 						for (Command command : addOperation.getCommandList()) {
 							po.addLog((String.format("%s started...", command.getDescription())));
 							HadoopImpl.getCommandRunner().runCommand(command);
@@ -70,10 +72,11 @@ public class Adding {
 							}
 						}
 
-						config.getTaskTrackers().add(agent);
-						config.getDataNodes().add(agent);
+						hadoopClusterConfig.getTaskTrackers().add(agent);
+						hadoopClusterConfig.getDataNodes().add(agent);
 
-						if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+						if (parent.getDbManager().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                hadoopClusterConfig )) {
 							po.addLog("Cluster info saved to DB");
 						} else {
 							po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +

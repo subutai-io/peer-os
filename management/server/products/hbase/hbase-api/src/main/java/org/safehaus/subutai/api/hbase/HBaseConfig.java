@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.doomdark.uuid.UUIDGenerator;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 
 public class HBaseConfig implements ConfigBase {
@@ -23,6 +23,7 @@ public class HBaseConfig implements ConfigBase {
     private Set<String> nodes = new HashSet();
     private Set<String> region = new HashSet();
     private Set<String> quorum = new HashSet();
+
 
     public HBaseConfig() {
         this.uuid = UUID.fromString( UUIDGenerator.getInstance().generateTimeBasedUUID().toString() );

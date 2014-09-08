@@ -6,24 +6,30 @@
 package org.safehaus.subutai.ui.hbase.wizard;
 
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.common.CollectionUtil;
-
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.util.CollectionUtil;
+
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
  * @author dilshat
  */
-public class StepSetQuorum extends VerticalLayout
-{
+public class StepSetQuorum extends VerticalLayout {
 
-    public StepSetQuorum( final Wizard wizard )
-    {
+    public StepSetQuorum( final Wizard wizard ) {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setSizeFull();
         verticalLayout.setHeight( 100, Unit.PERCENTAGE );
@@ -64,18 +70,14 @@ public class StepSetQuorum extends VerticalLayout
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
+        next.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.getConfig().setQuorum( ( Set<String> ) select.getValue() );
-                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getQuorum() ) )
-                {
+                if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getQuorum() ) ) {
                     show( "Please add quorum servers" );
                 }
-                else
-                {
+                else {
                     wizard.next();
                 }
             }
@@ -83,11 +85,9 @@ public class StepSetQuorum extends VerticalLayout
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener()
-        {
+        back.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.back();
             }
         } );
@@ -105,9 +105,7 @@ public class StepSetQuorum extends VerticalLayout
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
-
 }

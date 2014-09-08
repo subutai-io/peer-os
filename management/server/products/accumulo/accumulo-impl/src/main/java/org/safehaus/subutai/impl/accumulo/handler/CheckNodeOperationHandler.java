@@ -2,12 +2,12 @@ package org.safehaus.subutai.impl.accumulo.handler;
 
 
 import org.safehaus.subutai.api.accumulo.Config;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 

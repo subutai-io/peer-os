@@ -1,10 +1,10 @@
 package org.safehaus.subutai.hadoop.services;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,11 +36,11 @@ public class RestService {
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String listClusters() {
 
-		List<Config> configList = hadoopManager.getClusters();
+		List<HadoopClusterConfig> hadoopClusterConfigList = hadoopManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configList) {
-			clusterNames.add(config.getClusterName());
+		for (HadoopClusterConfig hadoopClusterConfig : hadoopClusterConfigList ) {
+			clusterNames.add( hadoopClusterConfig.getClusterName());
 		}
 
 		return JsonUtil.GSON.toJson(clusterNames);
@@ -64,12 +64,12 @@ public class RestService {
 			@PathParam ("numberOfReplicas") int numberOfReplicas
 	) {
 
-		Config config = new Config();
-		config.setClusterName(clusterName);
-		config.setCountOfSlaveNodes(numberOfSlaveNodes);
-		config.setReplicationFactor(numberOfReplicas);
+		HadoopClusterConfig hadoopClusterConfig = new HadoopClusterConfig();
+		hadoopClusterConfig.setClusterName(clusterName);
+		hadoopClusterConfig.setCountOfSlaveNodes(numberOfSlaveNodes);
+		hadoopClusterConfig.setReplicationFactor(numberOfReplicas);
 
-		UUID uuid = hadoopManager.installCluster(config);
+		UUID uuid = hadoopManager.installCluster( hadoopClusterConfig );
 
 		return JsonUtil.toJson(OPERATION_ID, uuid);
 	}
@@ -90,40 +90,40 @@ public class RestService {
 	@Path ("start_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String startNameNode(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.startNameNode(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.startNameNode( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("stop_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String stopNameNode(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.stopNameNode(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.stopNameNode( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("restart_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String restartNameNode(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.restartNameNode(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.restartNameNode( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("status_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusNameNode(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusNameNode(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusNameNode( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("status_secondary_name_node/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusSecondaryNameNode(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusSecondaryNameNode(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusSecondaryNameNode( hadoopClusterConfig ));
 	}
 
 	@GET
@@ -138,32 +138,32 @@ public class RestService {
 	@Path ("start_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String startJobTracker(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.startJobTracker(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.startJobTracker( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("stop_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String stopJobTracker(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.stopJobTracker(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.stopJobTracker( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("restart_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String restartJobTracker(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.restartJobTracker(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.restartJobTracker( hadoopClusterConfig ));
 	}
 
 	@GET
 	@Path ("status_job_tracker/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
 	public String statusJobTracker(@PathParam ("clusterName") String clusterName) {
-		Config config = hadoopManager.getCluster(clusterName);
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusJobTracker(config));
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.statusJobTracker( hadoopClusterConfig ));
 	}
 
 	@GET
@@ -187,10 +187,10 @@ public class RestService {
 	public String blockDataNode(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("hostname") String hostname) {
-		Config config = hadoopManager.getCluster(clusterName);
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
 		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.blockDataNode(config, agent));
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.blockDataNode( hadoopClusterConfig, agent));
 	}
 
 	@GET
@@ -199,10 +199,10 @@ public class RestService {
 	public String blockTaskTracker(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("hostname") String hostname) {
-		Config config = hadoopManager.getCluster(clusterName);
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
 		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.blockTaskTracker(config, agent));
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.blockTaskTracker( hadoopClusterConfig, agent));
 	}
 
 	@GET
@@ -211,10 +211,10 @@ public class RestService {
 	public String unblockDataNode(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("hostname") String hostname) {
-		Config config = hadoopManager.getCluster(clusterName);
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
 		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.unblockDataNode(config, agent));
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.unblockDataNode( hadoopClusterConfig, agent));
 	}
 
 	@GET
@@ -223,9 +223,9 @@ public class RestService {
 	public String unblockTaskTracker(
 			@PathParam ("clusterName") String clusterName,
 			@PathParam ("hostname") String hostname) {
-		Config config = hadoopManager.getCluster(clusterName);
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
 		Agent agent = agentManager.getAgentByHostname(hostname);
 
-		return JsonUtil.toJson(OPERATION_ID, hadoopManager.unblockTaskTracker(config, agent));
+		return JsonUtil.toJson(OPERATION_ID, hadoopManager.unblockTaskTracker( hadoopClusterConfig, agent));
 	}
 }

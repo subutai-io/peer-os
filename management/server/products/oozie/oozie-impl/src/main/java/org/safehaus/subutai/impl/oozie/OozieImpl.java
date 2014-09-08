@@ -1,18 +1,6 @@
 package org.safehaus.subutai.impl.oozie;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.oozie.Oozie;
-import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.AgentUtil;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.settings.Common;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,9 +8,20 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.api.oozie.Oozie;
+import org.safehaus.subutai.api.oozie.OozieConfig;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.util.AgentUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
-public class OozieImpl implements Oozie
-{
+
+public class OozieImpl implements Oozie {
 
     public AgentManager agentManager;
     private DbManager dbManager;
@@ -31,70 +30,57 @@ public class OozieImpl implements Oozie
     private CommandRunner commandRunner;
 
 
-    public void init()
-    {
+    public void init() {
         Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
 
-    public void destroy()
-    {
+    public void destroy() {
         executor.shutdown();
     }
 
 
-    public void setDbManager( DbManager dbManager )
-    {
+    public void setDbManager( DbManager dbManager ) {
         this.dbManager = dbManager;
     }
 
 
-    public void setTracker( Tracker tracker )
-    {
+    public void setTracker( Tracker tracker ) {
         this.tracker = tracker;
     }
 
 
-    public void setAgentManager( AgentManager agentManager )
-    {
+    public void setAgentManager( AgentManager agentManager ) {
         this.agentManager = agentManager;
     }
 
 
-    public void setCommandRunner( CommandRunner commandRunner )
-    {
+    public void setCommandRunner( CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
     }
 
 
-    public UUID installCluster( final OozieConfig config )
-    {
+    public UUID installCluster( final OozieConfig config ) {
         final ProductOperation po = tracker.createProductOperation( OozieConfig.PRODUCT_KEY, "Installing Oozie" );
 
-        executor.execute( new Runnable()
-        {
+        executor.execute( new Runnable() {
 
-            public void run()
-            {
-                if ( dbManager.getInfo( config.PRODUCT_KEY, config.getClusterName(), OozieConfig.class ) != null )
-                {
+            public void run() {
+                if ( dbManager.getInfo( config.PRODUCT_KEY, config.getClusterName(), OozieConfig.class ) != null ) {
                     po.addLogFailed( String.format( "Cluster with name '%s' already exists\nInstallation aborted",
-                        config.getClusterName() ) );
+                            config.getClusterName() ) );
                     return;
                 }
 
-                for ( String node : config.getHadoopNodes() )
-                {
-                    if ( agentManager.getAgentByHostname( node ) == null )
-                    {
+                for ( String node : config.getHadoopNodes() ) {
+                    if ( agentManager.getAgentByHostname( node ) == null ) {
                         po.addLogFailed( String.format( "Node %s not connected\nAborted", node ) );
                         return;
                     }
                 }
 
-                if ( dbManager.saveInfo( config.PRODUCT_KEY, config.getClusterName(), config ) )
-                {
+                if ( dbManager.saveInfo( config.PRODUCT_KEY, config.getClusterName(), config ) ) {
                     po.addLog( "Cluster info saved to DB" );
 
                     //                    Set<Agent> allNodes = new HashSet<Agent>();
@@ -109,59 +95,51 @@ public class OozieImpl implements Oozie
                     Command installServerCommand = Commands.getInstallServerCommand( servers );
                     commandRunner.runCommand( installServerCommand );
 
-                    if ( installServerCommand.hasSucceeded() )
-                    {
+                    if ( installServerCommand.hasSucceeded() ) {
                         po.addLog( "Install server successful." );
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed(
-                            String.format( "Installation failed, %s", installServerCommand.getAllErrors() ) );
+                                String.format( "Installation failed, %s", installServerCommand.getAllErrors() ) );
                         return;
                     }
 
                     // Installing Oozie client
                     po.addLog( "Installing Oozie clients..." );
                     Set<Agent> clientAgents = new HashSet<Agent>();
-                    for ( String clientAgent : config.getClients() )
-                    {
+                    for ( String clientAgent : config.getClients() ) {
                         Agent client = agentManager.getAgentByHostname( clientAgent );
                         clientAgents.add( client );
                     }
                     Command installClientsCommand = Commands.getInstallClientCommand( clientAgents );
                     commandRunner.runCommand( installClientsCommand );
 
-                    if ( installClientsCommand.hasSucceeded() )
-                    {
+                    if ( installClientsCommand.hasSucceeded() ) {
                         po.addLog( "Install clients successful." );
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed(
-                            String.format( "Installation failed, %s", installClientsCommand.getAllErrors() ) );
+                                String.format( "Installation failed, %s", installClientsCommand.getAllErrors() ) );
                         return;
                     }
 
                     po.addLog( "Configuring root hosts..." );
                     Agent server = agentManager.getAgentByHostname( config.getServer() );
                     Set<Agent> hadoopNodes = new HashSet<Agent>();
-                    for ( String hadoopNode : config.getHadoopNodes() )
-                    {
+                    for ( String hadoopNode : config.getHadoopNodes() ) {
                         Agent hadoopNodeAgent = agentManager.getAgentByHostname( hadoopNode );
                         hadoopNodes.add( hadoopNodeAgent );
                     }
                     Command configureRootHostsCommand = Commands.getConfigureRootHostsCommand( hadoopNodes,
-                        AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
+                            AgentUtil.getAgentIpByMask( server, Common.IP_MASK ) );
                     commandRunner.runCommand( configureRootHostsCommand );
 
-                    if ( configureRootHostsCommand.hasSucceeded() )
-                    {
+                    if ( configureRootHostsCommand.hasSucceeded() ) {
                         po.addLog( "Configuring root hosts successful." );
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed(
-                            String.format( "Configuration failed, %s", configureRootHostsCommand.getAllErrors() ) );
+                                String.format( "Configuration failed, %s", configureRootHostsCommand.getAllErrors() ) );
                         return;
                     }
 
@@ -169,20 +147,17 @@ public class OozieImpl implements Oozie
                     Command configureRootGroupsCommand = Commands.getConfigureRootGroupsCommand( hadoopNodes );
                     commandRunner.runCommand( configureRootGroupsCommand );
 
-                    if ( configureRootGroupsCommand.hasSucceeded() )
-                    {
+                    if ( configureRootGroupsCommand.hasSucceeded() ) {
                         po.addLog( "Configuring root groups successful." );
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed(
-                            String.format( "Configuring failed, %s", configureRootGroupsCommand.getAllErrors() ) );
+                                String.format( "Configuring failed, %s", configureRootGroupsCommand.getAllErrors() ) );
                         return;
                     }
                     po.addLogDone( "Oozie installation succeeded" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
                 }
             }
@@ -192,30 +167,24 @@ public class OozieImpl implements Oozie
     }
 
 
-    public UUID uninstallCluster( final String clusterName )
-    {
+    public UUID uninstallCluster( final String clusterName ) {
         final ProductOperation po = tracker.createProductOperation( OozieConfig.PRODUCT_KEY,
-            String.format( "Destroying cluster %s", clusterName ) );
-        executor.execute( new Runnable()
-        {
+                String.format( "Destroying cluster %s", clusterName ) );
+        executor.execute( new Runnable() {
 
-            public void run()
-            {
+            public void run() {
                 OozieConfig config = dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
-                if ( config == null )
-                {
+                if ( config == null ) {
                     po.addLogFailed(
-                        String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
                 Set<String> nodes = new HashSet<String>();
                 nodes.addAll( config.getClients() );
                 nodes.add( config.getServer() );
-                for ( String node : nodes )
-                {
-                    if ( agentManager.getAgentByHostname( node ) == null )
-                    {
+                for ( String node : nodes ) {
+                    if ( agentManager.getAgentByHostname( node ) == null ) {
                         po.addLogFailed( String.format( "Node %s not connected\nAborted", node ) );
                         return;
                     }
@@ -228,44 +197,37 @@ public class OozieImpl implements Oozie
                 Command uninstallServerCommand = Commands.getUninstallServerCommand( servers );
                 commandRunner.runCommand( uninstallServerCommand );
 
-                if ( uninstallServerCommand.hasSucceeded() )
-                {
+                if ( uninstallServerCommand.hasSucceeded() ) {
                     po.addLog( "Uninstall server succeeded" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed(
-                        String.format( "Uninstall server failed, %s", uninstallServerCommand.getAllErrors() ) );
+                            String.format( "Uninstall server failed, %s", uninstallServerCommand.getAllErrors() ) );
                     return;
                 }
 
                 Set<Agent> clientAgents = new HashSet<Agent>();
-                for ( String clientHostname : config.getClients() )
-                {
+                for ( String clientHostname : config.getClients() ) {
                     Agent clientAgent = agentManager.getAgentByHostname( clientHostname );
                     clientAgents.add( clientAgent );
                 }
                 Command uninstallClientsCommand = Commands.getUninstallClientsCommand( clientAgents );
                 commandRunner.runCommand( uninstallClientsCommand );
 
-                if ( uninstallClientsCommand.hasSucceeded() )
-                {
+                if ( uninstallClientsCommand.hasSucceeded() ) {
                     po.addLog( "Uninstall clients succeeded" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed(
-                        String.format( "Uninstall clients failed, %s", uninstallClientsCommand.getAllErrors() ) );
+                            String.format( "Uninstall clients failed, %s", uninstallClientsCommand.getAllErrors() ) );
                     return;
                 }
 
                 po.addLog( "Updating db..." );
-                if ( dbManager.deleteInfo( OozieConfig.PRODUCT_KEY, config.getClusterName() ) )
-                {
+                if ( dbManager.deleteInfo( OozieConfig.PRODUCT_KEY, config.getClusterName() ) ) {
                     po.addLogDone( "Cluster info deleted from DB\nDone" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
                 }
             }
@@ -275,42 +237,35 @@ public class OozieImpl implements Oozie
     }
 
 
-    public List<OozieConfig> getClusters()
-    {
+    public List<OozieConfig> getClusters() {
 
         return dbManager.getInfo( OozieConfig.PRODUCT_KEY, OozieConfig.class );
     }
 
 
     @Override
-    public OozieConfig getCluster( String clusterName )
-    {
+    public OozieConfig getCluster( String clusterName ) {
         return dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
     }
 
 
     @Override
-    public UUID startServer( final OozieConfig config )
-    {
+    public UUID startServer( final OozieConfig config ) {
         final ProductOperation po = tracker.createProductOperation( config.PRODUCT_KEY,
-            String.format( "Starting cluster %s", config.getClusterName() ) );
+                String.format( "Starting cluster %s", config.getClusterName() ) );
         final String clusterName = config.getClusterName();
-        executor.execute( new Runnable()
-        {
+        executor.execute( new Runnable() {
 
-            public void run()
-            {
+            public void run() {
                 OozieConfig config = dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
-                if ( config == null )
-                {
+                if ( config == null ) {
                     po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                        config.getClusterName() ) );
+                            config.getClusterName() ) );
                     return;
                 }
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
 
-                if ( serverAgent == null )
-                {
+                if ( serverAgent == null ) {
                     po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
@@ -319,25 +274,21 @@ public class OozieImpl implements Oozie
                 Command startServiceCommand = Commands.getStartServerCommand( servers );
                 commandRunner.runCommand( startServiceCommand );
 
-                if ( startServiceCommand.hasCompleted() )
-                {
+                if ( startServiceCommand.hasCompleted() ) {
                     po.addLog( "Checking status..." );
 
                     Command checkCommand = Commands.getStatusServerCommand( servers );
                     commandRunner.runCommand( checkCommand );
 
-                    if ( checkCommand.hasCompleted() )
-                    {
+                    if ( checkCommand.hasCompleted() ) {
 
                         po.addLogDone( checkCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                     }
-                    else
-                    {
+                    else {
                         po.addLogFailed( String.format( "Failed to check status, %s", checkCommand.getAllErrors() ) );
                     }
                 }
-                else
-                {
+                else {
                     po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
@@ -348,26 +299,21 @@ public class OozieImpl implements Oozie
 
 
     @Override
-    public UUID stopServer( final OozieConfig config )
-    {
+    public UUID stopServer( final OozieConfig config ) {
         final ProductOperation po = tracker.createProductOperation( config.PRODUCT_KEY,
-            String.format( "Stopping cluster %s", config.getClusterName() ) );
+                String.format( "Stopping cluster %s", config.getClusterName() ) );
         final String clusterName = config.getClusterName();
-        executor.execute( new Runnable()
-        {
+        executor.execute( new Runnable() {
 
-            public void run()
-            {
+            public void run() {
                 OozieConfig config = dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
-                if ( config == null )
-                {
+                if ( config == null ) {
                     po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                        config.getClusterName() ) );
+                            config.getClusterName() ) );
                     return;
                 }
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
-                if ( serverAgent == null )
-                {
+                if ( serverAgent == null ) {
                     po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
@@ -376,12 +322,10 @@ public class OozieImpl implements Oozie
                 Command stopServiceCommand = Commands.getStopServerCommand( servers );
                 commandRunner.runCommand( stopServiceCommand );
 
-                if ( stopServiceCommand.hasSucceeded() )
-                {
+                if ( stopServiceCommand.hasSucceeded() ) {
                     po.addLogDone( "Stop succeeded" );
                 }
-                else
-                {
+                else {
                     po.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
             }
@@ -392,26 +336,21 @@ public class OozieImpl implements Oozie
 
 
     @Override
-    public UUID checkServerStatus( final OozieConfig config )
-    {
+    public UUID checkServerStatus( final OozieConfig config ) {
         final ProductOperation po = tracker.createProductOperation( config.PRODUCT_KEY,
-            String.format( "Checking status of cluster %s", config.getClusterName() ) );
+                String.format( "Checking status of cluster %s", config.getClusterName() ) );
         final String clusterName = config.getClusterName();
-        executor.execute( new Runnable()
-        {
+        executor.execute( new Runnable() {
 
-            public void run()
-            {
+            public void run() {
                 OozieConfig config = dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
-                if ( config == null )
-                {
+                if ( config == null ) {
                     po.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted",
-                        config.getClusterName() ) );
+                            config.getClusterName() ) );
                     return;
                 }
                 Agent serverAgent = agentManager.getAgentByHostname( config.getServer() );
-                if ( serverAgent == null )
-                {
+                if ( serverAgent == null ) {
                     po.addLogFailed( String.format( "Server agent %s not connected", config.getServer() ) );
                     return;
                 }
@@ -420,15 +359,13 @@ public class OozieImpl implements Oozie
                 Command statusServiceCommand = Commands.getStatusServerCommand( servers );
                 commandRunner.runCommand( statusServiceCommand );
 
-                if ( statusServiceCommand.hasCompleted() )
-                {
+                if ( statusServiceCommand.hasCompleted() ) {
 
                     po.addLogDone( statusServiceCommand.getResults().get( serverAgent.getUuid() ).getStdOut() );
                 }
-                else
-                {
+                else {
                     po.addLogFailed(
-                        String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
+                            String.format( "Failed to check status, %s", statusServiceCommand.getAllErrors() ) );
                 }
             }
         } );

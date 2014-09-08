@@ -7,12 +7,12 @@ package org.safehaus.subutai.impl.zookeeper;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.AgentRequestBuilder;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.enums.OutputRedirection;
 
 import java.util.HashSet;
 import java.util.Set;

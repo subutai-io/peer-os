@@ -1,13 +1,13 @@
 package org.safehaus.subutai.plugin.solr.impl.handler;
 
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
 
 
 public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {
@@ -27,16 +27,14 @@ public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl
         SolrClusterConfig solrClusterConfig = manager.getCluster( clusterName );
 
         if ( solrClusterConfig == null ) {
-            productOperation.addLogFailed(
-                    String.format( "Installation with name %s does not exist", clusterName ) );
+            productOperation.addLogFailed( String.format( "Installation with name %s does not exist", clusterName ) );
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
 
         if ( node == null ) {
-            productOperation.addLogFailed(
-                    String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
 

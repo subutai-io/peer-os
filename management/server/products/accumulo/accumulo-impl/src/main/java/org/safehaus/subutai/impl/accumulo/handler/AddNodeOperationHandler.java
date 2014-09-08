@@ -5,14 +5,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import org.safehaus.subutai.api.accumulo.Config;
 import org.safehaus.subutai.api.accumulo.NodeType;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.dbmanager.DBException;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.impl.accumulo.AccumuloImpl;
 import org.safehaus.subutai.impl.accumulo.Commands;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
@@ -92,15 +93,15 @@ public class AddNodeOperationHandler extends AbstractOperationHandler<AccumuloIm
 
 		boolean install = !result.getStdOut().contains("ksks-accumulo");
 
-		org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+		HadoopClusterConfig hadoopHadoopClusterConfig =
 				manager.getHadoopManager().getCluster(config.getClusterName());
 
-		if (hadoopConfig == null) {
+		if ( hadoopHadoopClusterConfig == null) {
 			po.addLogFailed(String.format("Hadoop cluster with name '%s' not found", config.getClusterName()));
 			return;
 		}
 
-		if (!hadoopConfig.getAllNodes().contains(lxcAgent)) {
+		if (!hadoopHadoopClusterConfig.getAllNodes().contains(lxcAgent)) {
 			po.addLogFailed(String.format("Node '%s' does not belong to Hadoop cluster %s", lxcAgent.getHostname(),
 					config.getClusterName()));
 			return;

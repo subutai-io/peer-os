@@ -1,9 +1,9 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;

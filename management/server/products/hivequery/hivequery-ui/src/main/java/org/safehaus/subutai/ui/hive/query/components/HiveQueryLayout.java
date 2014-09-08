@@ -5,8 +5,8 @@ import com.vaadin.event.FieldEvents;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.hive.query.Config;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.ui.hive.query.HiveQueryUI;
 
 import java.util.Collection;

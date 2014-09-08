@@ -5,6 +5,7 @@
  */
 package org.safehaus.subutai.ui.cassandra;
 
+
 import org.safehaus.subutai.ui.cassandra.manager.Manager;
 import org.safehaus.subutai.ui.cassandra.wizard.Wizard;
 
@@ -12,33 +13,34 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 
+
 /**
  * @author dilshat
  */
 public class CassandraForm extends CustomComponent {
 
-	private final Wizard wizard;
-	private final Manager manager;
+    private final Wizard wizard;
+    private final Manager manager;
 
-	public CassandraForm() {
-		setSizeFull();
 
-		VerticalLayout verticalLayout = new VerticalLayout();
-		verticalLayout.setSpacing(true);
-		verticalLayout.setSizeFull();
+    public CassandraForm() {
+        setSizeFull();
 
-		setCompositionRoot(verticalLayout);
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing( true );
+        verticalLayout.setSizeFull();
 
-		TabSheet sheet = new TabSheet();
-		sheet.setSizeFull();
-		manager = new Manager();
-		wizard = new Wizard();
-		sheet.addTab(wizard.getContent(), "Install");
-//		sheet.addTab(new ConfigurationView(), "Configure");
-		sheet.addTab(manager.getContent(), "Manage");
-		verticalLayout.addComponent(sheet);
+        setCompositionRoot( verticalLayout );
 
-		manager.refreshClustersInfo();
-	}
+        TabSheet sheet = new TabSheet();
+        sheet.setSizeFull();
+        manager = new Manager();
+        wizard = new Wizard();
+        sheet.addTab( wizard.getContent(), "Install" );
+        //		sheet.addTab(new ConfigurationView(), "Configure");
+        sheet.addTab( manager.getContent(), "Manage" );
+        verticalLayout.addComponent( sheet );
 
+        manager.refreshClustersInfo();
+    }
 }

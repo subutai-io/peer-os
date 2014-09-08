@@ -1,13 +1,13 @@
 package org.safehaus.subutai.impl.hadoop.operation.configuration;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.Commands;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
@@ -16,17 +16,17 @@ import java.util.UUID;
  */
 public class DataNode {
 	private HadoopImpl parent;
-	private Config config;
+	private HadoopClusterConfig hadoopClusterConfig;
 
-	public DataNode(HadoopImpl parent, Config config) {
+	public DataNode(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
 		this.parent = parent;
-		this.config = config;
+		this.hadoopClusterConfig = hadoopClusterConfig;
 	}
 
 	public UUID status(final Agent agent) {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Getting status of clusters %s DataNode", agent.getHostname()));
 
 		parent.getExecutor().execute(new Runnable() {
@@ -82,7 +82,7 @@ public class DataNode {
 	public UUID block(final Agent agent) {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Blocking DataNode of %s cluster", agent.getHostname()));
 
 		parent.getExecutor().execute(new Runnable() {
@@ -95,20 +95,21 @@ public class DataNode {
 					return;
 				}
 
-				Command command = Commands.getRemoveDataNodeCommand(config, agent);
+				Command command = Commands.getRemoveDataNodeCommand( hadoopClusterConfig, agent);
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
-				command = Commands.getIncludeDataNodeCommand(config, agent);
+				command = Commands.getIncludeDataNodeCommand( hadoopClusterConfig, agent);
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
-				command = Commands.getRefreshNameNodeCommand(config);
+				command = Commands.getRefreshNameNodeCommand( hadoopClusterConfig );
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
-				config.getBlockedAgents().add(agent);
-				if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+				hadoopClusterConfig.getBlockedAgents().add(agent);
+				if (parent.getDbManager().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                        hadoopClusterConfig )) {
 					po.addLog("Cluster info saved to DB");
 				} else {
 					po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +
@@ -136,7 +137,7 @@ public class DataNode {
 	public UUID unblock(final Agent agent) {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
 				String.format("Unblocking DataNode of %s cluster", agent.getHostname()));
 
 		parent.getExecutor().execute(new Runnable() {
@@ -149,11 +150,11 @@ public class DataNode {
 					return;
 				}
 
-				Command command = Commands.getSetDataNodeCommand(config, agent);
+				Command command = Commands.getSetDataNodeCommand( hadoopClusterConfig, agent);
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
-				command = Commands.getExcludeDataNodeCommand(config, agent);
+				command = Commands.getExcludeDataNodeCommand( hadoopClusterConfig, agent);
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
@@ -161,8 +162,9 @@ public class DataNode {
 				HadoopImpl.getCommandRunner().runCommand(command);
 				logCommand(command, po);
 
-				config.getBlockedAgents().remove(agent);
-				if (parent.getDbManager().saveInfo(Config.PRODUCT_KEY, config.getClusterName(), config)) {
+				hadoopClusterConfig.getBlockedAgents().remove(agent);
+				if (parent.getDbManager().saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                        hadoopClusterConfig )) {
 					po.addLog("Cluster info saved to DB");
 				} else {
 					po.addLogFailed("Could not save cluster info to DB! Please see logs\n" +

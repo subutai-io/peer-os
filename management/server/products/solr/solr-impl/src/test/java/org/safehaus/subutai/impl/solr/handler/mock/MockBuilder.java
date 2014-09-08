@@ -1,8 +1,9 @@
 package org.safehaus.subutai.impl.solr.handler.mock;
 
 
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.solr.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.solr.Commands;
 import org.safehaus.subutai.impl.solr.SolrImpl;
 import org.safehaus.subutai.impl.solr.handler.AddNodeOperationHandler;
@@ -12,7 +13,6 @@ import org.safehaus.subutai.product.common.test.unit.mock.CommandMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
 
 
 public class MockBuilder {

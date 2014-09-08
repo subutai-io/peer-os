@@ -1,71 +1,78 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.presto.api;
-
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
-/**
- * @author dilshat
- */
 public class PrestoClusterConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Presto2";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Presto";
+    public static final String TEMAPLTE_NAME = "presto";
 
-	private Agent coordinatorNode;
-	private Set<Agent> workers;
+    private String clusterName = "";
+    private SetupType setupType;
+    // over-Hadoop params
+    private String hadoopClusterName = "";
+    private Set<Agent> workers = new HashSet<>();
+    private Agent coordinatorNode;
 
-	public Agent getCoordinatorNode() {
-		return coordinatorNode;
-	}
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
 
-	public void setCoordinatorNode(Agent coordinatorNode) {
-		this.coordinatorNode = coordinatorNode;
-	}
+    @Override
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	public String getClusterName() {
-		return clusterName;
-	}
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public SetupType getSetupType() {
+        return setupType;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
+    }
 
-	public Set<Agent> getWorkers() {
-		return workers;
-	}
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
 
-	public void setWorkers(Set<Agent> workers) {
-		this.workers = workers;
-	}
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
-	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<Agent>();
-		if (workers != null) {
-			allNodes.addAll(workers);
-		}
-		if (coordinatorNode != null) {
-			allNodes.add(coordinatorNode);
-		}
+    public Set<Agent> getWorkers() {
+        return workers;
+    }
 
-		return allNodes;
-	}
+    public void setWorkers(Set<Agent> workers) {
+        this.workers = workers;
+    }
 
-	@Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers=" + workers + '}';
-	}
+    public Agent getCoordinatorNode() {
+        return coordinatorNode;
+    }
 
+    public void setCoordinatorNode(Agent coordinatorNode) {
+        this.coordinatorNode = coordinatorNode;
+    }
+
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<>();
+        if(workers != null) allNodes.addAll(workers);
+        if(coordinatorNode != null) allNodes.add(coordinatorNode);
+        return allNodes;
+    }
+
+    @Override
+    public String toString() {
+        return "Config{" + "clusterName=" + clusterName + ", coordinatorNode=" + coordinatorNode + ", workers="
+                + workers + '}';
+    }
 }

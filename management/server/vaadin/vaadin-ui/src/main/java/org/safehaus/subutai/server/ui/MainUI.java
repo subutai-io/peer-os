@@ -32,11 +32,11 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.server.ui.util.HelpManager;
 import org.safehaus.subutai.server.ui.util.HelpOverlay;
 import org.safehaus.subutai.server.ui.views.ModulesView;
 import org.safehaus.subutai.server.ui.views.MonitorView;
-import org.safehaus.subutai.shared.protocol.settings.Common;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -98,7 +98,7 @@ public class MainUI extends UI {
 		root.addComponent(bg);
 
 		// For synchronization issue
-		setPollInterval(Common.REFRESH_UI_SEC * 340);
+		setPollInterval( Common.REFRESH_UI_SEC * 340);
 
 		buildLoginView(false);
 	}

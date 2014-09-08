@@ -1,10 +1,10 @@
 package org.safehaus.subutai.presto.services;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.presto.Config;
 import org.safehaus.subutai.api.presto.Presto;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

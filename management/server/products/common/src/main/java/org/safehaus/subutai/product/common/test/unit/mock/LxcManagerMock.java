@@ -1,9 +1,9 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.lxcmanager.*;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.*;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

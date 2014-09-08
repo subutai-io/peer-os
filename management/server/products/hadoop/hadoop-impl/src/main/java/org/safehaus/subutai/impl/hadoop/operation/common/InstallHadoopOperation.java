@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.hadoop.operation.common;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.impl.hadoop.Commands;
 
 import java.util.ArrayList;
@@ -14,22 +14,22 @@ import java.util.List;
  * Time: 10:08 PM
  */
 public class InstallHadoopOperation {
-	private final Config config;
+	private final HadoopClusterConfig hadoopClusterConfig;
 	private List<Command> commandList;
 
-	public InstallHadoopOperation(Config config) {
+	public InstallHadoopOperation(HadoopClusterConfig hadoopClusterConfig ) {
 
-		this.config = config;
+		this.hadoopClusterConfig = hadoopClusterConfig;
 		commandList = new ArrayList<Command>();
 
-		commandList.add(Commands.getInstallCommand(config));
-		commandList.add(Commands.getClearMastersCommand(config));
-		commandList.add(Commands.getClearSlavesCommand(config));
-		commandList.add(Commands.getSetMastersCommand(config));
-		commandList.add(Commands.getAddSecondaryNamenodeCommand(config));
-		commandList.add(Commands.getSetDataNodeCommand(config));
-		commandList.add(Commands.getSetTaskTrackerCommand(config));
-		commandList.add(Commands.getFormatNameNodeCommand(config));
+		commandList.add(Commands.getInstallCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getClearMastersCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getClearSlavesCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getSetMastersCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getAddSecondaryNamenodeCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getSetDataNodeCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getSetTaskTrackerCommand( hadoopClusterConfig ));
+		commandList.add(Commands.getFormatNameNodeCommand( hadoopClusterConfig ));
 	}
 
 	public List<Command> getCommandList() {

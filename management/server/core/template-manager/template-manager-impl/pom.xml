@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
+            <artifactId>subutai-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -56,7 +56,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.template.manager.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.template.impl</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

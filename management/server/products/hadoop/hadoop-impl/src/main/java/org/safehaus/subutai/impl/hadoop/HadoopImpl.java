@@ -1,195 +1,236 @@
 package org.safehaus.subutai.impl.hadoop;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.impl.hadoop.operation.Adding;
-import org.safehaus.subutai.impl.hadoop.operation.Deletion;
-import org.safehaus.subutai.impl.hadoop.operation.Installation;
-import org.safehaus.subutai.impl.hadoop.operation.configuration.*;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.api.hadoop.Hadoop;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.impl.hadoop.operation.Adding;
+import org.safehaus.subutai.impl.hadoop.operation.Deletion;
+import org.safehaus.subutai.impl.hadoop.operation.Installation;
+import org.safehaus.subutai.impl.hadoop.operation.configuration.DataNode;
+import org.safehaus.subutai.impl.hadoop.operation.configuration.JobTracker;
+import org.safehaus.subutai.impl.hadoop.operation.configuration.NameNode;
+import org.safehaus.subutai.impl.hadoop.operation.configuration.SecondaryNameNode;
+import org.safehaus.subutai.impl.hadoop.operation.configuration.TaskTracker;
+
+
 /**
  * Created by daralbaev on 02.04.14.
  */
 public class HadoopImpl implements Hadoop {
-	public static final String MODULE_NAME = "Hadoop";
-	private static CommandRunner commandRunner;
-	private static Tracker tracker;
-	private AgentManager agentManager;
-	private DbManager dbManager;
-	private LxcManager lxcManager;
-	private NetworkManager networkManager;
-	private ExecutorService executor;
+    public static final String MODULE_NAME = "Hadoop";
+    private static CommandRunner commandRunner;
+    private static Tracker tracker;
+    private AgentManager agentManager;
+    private DbManager dbManager;
+    private LxcManager lxcManager;
+    private NetworkManager networkManager;
+    private ExecutorService executor;
 
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
 
-	public void setCommandRunner(CommandRunner commandRunner) {
-		HadoopImpl.commandRunner = commandRunner;
-	}
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
 
-	public static Tracker getTracker() {
-		return tracker;
-	}
 
-	public void setTracker(Tracker tracker) {
-		this.tracker = tracker;
-	}
+    public void setCommandRunner( CommandRunner commandRunner ) {
+        HadoopImpl.commandRunner = commandRunner;
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
 
-	public void destroy() {
-		executor.shutdown();
-		commandRunner = null;
-	}
+    public static Tracker getTracker() {
+        return tracker;
+    }
 
-	public DbManager getDbManager() {
-		return dbManager;
-	}
 
-	public void setDbManager(DbManager dbManager) {
-		this.dbManager = dbManager;
-	}
+    public void setTracker( Tracker tracker ) {
+        this.tracker = tracker;
+    }
 
-	public LxcManager getLxcManager() {
-		return lxcManager;
-	}
 
-	public void setLxcManager(LxcManager lxcManager) {
-		this.lxcManager = lxcManager;
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
-	public NetworkManager getNetworkManager() {
-		return networkManager;
-	}
 
-	public void setNetworkManager(NetworkManager networkManager) {
-		this.networkManager = networkManager;
-	}
+    public void destroy() {
+        executor.shutdown();
+        commandRunner = null;
+    }
 
-	public ExecutorService getExecutor() {
-		return executor;
-	}
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
+    public DbManager getDbManager() {
+        return dbManager;
+    }
 
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
 
-	@Override
-	public UUID installCluster(final Config config) {
-		return new Installation(this, config).execute();
-	}
+    public void setDbManager( DbManager dbManager ) {
+        this.dbManager = dbManager;
+    }
 
-	@Override
-	public UUID uninstallCluster(final String clusterName) {
-		return new Deletion(this).execute(clusterName);
-	}
 
-	@Override
-	public List<Config> getClusters() {
-		return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
-	}
+    public LxcManager getLxcManager() {
+        return lxcManager;
+    }
 
-	@Override
-	public Config getCluster(String clusterName) {
-		return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-	}
 
-	@Override
-	public UUID startNameNode(Config config) {
-		return new NameNode(this, config).start();
-	}
+    public void setLxcManager( LxcManager lxcManager ) {
+        this.lxcManager = lxcManager;
+    }
 
-	@Override
-	public UUID stopNameNode(Config config) {
-		return new NameNode(this, config).stop();
-	}
 
-	@Override
-	public UUID restartNameNode(Config config) {
-		return new NameNode(this, config).restart();
-	}
+    public NetworkManager getNetworkManager() {
+        return networkManager;
+    }
 
-	@Override
-	public UUID statusNameNode(Config config) {
-		return new NameNode(this, config).status();
-	}
 
-	@Override
-	public UUID statusSecondaryNameNode(Config config) {
-		return new SecondaryNameNode(this, config).status();
-	}
+    public void setNetworkManager( NetworkManager networkManager ) {
+        this.networkManager = networkManager;
+    }
 
-	@Override
-	public UUID statusDataNode(Agent agent) {
-		return new DataNode(this, null).status(agent);
-	}
 
-	@Override
-	public UUID startJobTracker(Config config) {
-		return new JobTracker(this, config).start();
-	}
+    public ExecutorService getExecutor() {
+        return executor;
+    }
 
-	@Override
-	public UUID stopJobTracker(Config config) {
-		return new JobTracker(this, config).stop();
-	}
 
-	@Override
-	public UUID restartJobTracker(Config config) {
-		return new JobTracker(this, config).restart();
-	}
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
 
-	@Override
-	public UUID statusJobTracker(Config config) {
-		return new JobTracker(this, config).status();
-	}
 
-	@Override
-	public UUID statusTaskTracker(Agent agent) {
-		return new TaskTracker(this, null).status(agent);
-	}
+    public void setAgentManager( AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
 
-	@Override
-	public UUID addNode(String clusterName) {
-		return new Adding(this, clusterName).execute();
-	}
 
-	@Override
-	public UUID blockDataNode(Config config, Agent agent) {
-		return new DataNode(this, config).block(agent);
-	}
+    @Override
+    public UUID installCluster( final HadoopClusterConfig hadoopClusterConfig ) {
+        return new Installation( this, hadoopClusterConfig ).execute();
+    }
 
-	@Override
-	public UUID blockTaskTracker(Config config, Agent agent) {
-		return new TaskTracker(this, config).block(agent);
-	}
 
-	@Override
-	public UUID unblockDataNode(Config config, Agent agent) {
-		return new DataNode(this, config).unblock(agent);
-	}
+    @Override
+    public UUID uninstallCluster( final String clusterName ) {
+        return new Deletion( this ).execute( clusterName );
+    }
 
-	@Override
-	public UUID unblockTaskTracker(Config config, Agent agent) {
-		return new TaskTracker(this, config).unblock(agent);
-	}
+
+    @Override
+    public List<HadoopClusterConfig> getClusters() {
+        return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, HadoopClusterConfig.class );
+    }
+
+
+    @Override
+    public HadoopClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( HadoopClusterConfig.PRODUCT_KEY, clusterName, HadoopClusterConfig.class );
+    }
+
+
+    @Override
+    public UUID startNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).start();
+    }
+
+
+    @Override
+    public UUID stopNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).stop();
+    }
+
+
+    @Override
+    public UUID restartNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).restart();
+    }
+
+
+    @Override
+    public UUID statusNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new NameNode( this, hadoopClusterConfig ).status();
+    }
+
+
+    @Override
+    public UUID statusSecondaryNameNode( HadoopClusterConfig hadoopClusterConfig ) {
+        return new SecondaryNameNode( this, hadoopClusterConfig ).status();
+    }
+
+
+    @Override
+    public UUID statusDataNode( Agent agent ) {
+        return new DataNode( this, null ).status( agent );
+    }
+
+
+    @Override
+    public UUID startJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).start();
+    }
+
+
+    @Override
+    public UUID stopJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).stop();
+    }
+
+
+    @Override
+    public UUID restartJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).restart();
+    }
+
+
+    @Override
+    public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig ) {
+        return new JobTracker( this, hadoopClusterConfig ).status();
+    }
+
+
+    @Override
+    public UUID statusTaskTracker( Agent agent ) {
+        return new TaskTracker( this, null ).status( agent );
+    }
+
+
+    @Override
+    public UUID addNode( String clusterName ) {
+        return new Adding( this, clusterName ).execute();
+    }
+
+
+    @Override
+    public UUID blockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new DataNode( this, hadoopClusterConfig ).block( agent );
+    }
+
+
+    @Override
+    public UUID blockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new TaskTracker( this, hadoopClusterConfig ).block( agent );
+    }
+
+
+    @Override
+    public UUID unblockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new DataNode( this, hadoopClusterConfig ).unblock( agent );
+    }
+
+
+    @Override
+    public UUID unblockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent ) {
+        return new TaskTracker( this, hadoopClusterConfig ).unblock( agent );
+    }
 }

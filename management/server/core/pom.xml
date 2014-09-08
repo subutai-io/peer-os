@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>subutai-common</module>
         <module>agent-manager</module>
         <module>db-manager</module>
         <module>communication-manager</module>
@@ -34,5 +33,6 @@
         <module>file-tracker</module>
         <module>config-point-tracker</module>
         <module>pet_core</module>
+        <module>command-dispatcher</module>
     </modules>
 </project>

@@ -5,8 +5,8 @@
  */
 package org.safehaus.subutai.plugin.spark.api;
 
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,7 +52,7 @@ public class SparkClusterConfig implements ConfigBase {
 	}
 
 	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<Agent>();
+		Set<Agent> allNodes = new HashSet<>();
 		if (slaves != null) {
 			allNodes.addAll(slaves);
 		}

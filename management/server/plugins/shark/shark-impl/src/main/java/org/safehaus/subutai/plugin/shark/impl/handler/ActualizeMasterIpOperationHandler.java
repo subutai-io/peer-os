@@ -1,51 +1,46 @@
 package org.safehaus.subutai.plugin.shark.impl.handler;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.impl.Commands;
 import org.safehaus.subutai.plugin.shark.impl.SharkImpl;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
 
 import java.util.UUID;
 
-/**
- * Created by dilshat on 5/7/14.
- */
-public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<SharkImpl> {
-	private final ProductOperation po;
+public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<SharkImpl>
+{
 
 	public ActualizeMasterIpOperationHandler(SharkImpl manager, String clusterName) {
 		super(manager, clusterName);
-		po = manager.getTracker().createProductOperation(Config.PRODUCT_KEY,
+		productOperation = manager.getTracker().createProductOperation( SharkClusterConfig.PRODUCT_KEY,
 				String.format("Actualizing master IP of %s", clusterName));
 	}
 
 	@Override
 	public UUID getTrackerId() {
-		return po.getId();
+		return productOperation.getId();
 	}
 
 	@Override
 	public void run() {
-		Config config = manager.getCluster(clusterName);
+		SharkClusterConfig config = manager.getCluster(clusterName);
 		if (config == null) {
-			po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+			productOperation.addLogFailed( String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
 			return;
 		}
 
-		SparkClusterConfig sparkConfig
-				= manager.getSparkManager().getCluster(clusterName);
+		SparkClusterConfig sparkConfig = manager.getSparkManager().getCluster(clusterName);
 		if (sparkConfig == null) {
-			po.addLogFailed(String.format("Spark cluster '%s' not found\nInstallation aborted", clusterName));
+			productOperation.addLogFailed( String.format( "Spark cluster '%s' not found\nInstallation aborted", clusterName ) );
 			return;
 		}
 
 		for (Agent node : config.getNodes()) {
 			if (manager.getAgentManager().getAgentByHostname(node.getHostname()) == null) {
-				po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
+				productOperation.addLogFailed( String.format( "Node %s is not connected\nOperation aborted", node.getHostname() ) );
 				return;
 			}
 		}
@@ -54,9 +49,9 @@ public class ActualizeMasterIpOperationHandler extends AbstractOperationHandler<
 		manager.getCommandRunner().runCommand(setMasterIPCommand);
 
 		if (setMasterIPCommand.hasSucceeded()) {
-			po.addLogDone("Master IP actualized successfully\nDone");
+			productOperation.addLogDone( "Master IP actualized successfully\nDone" );
 		} else {
-			po.addLogFailed(String.format("Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors()));
+			productOperation.addLogFailed( String.format( "Failed to actualize Master IP, %s", setMasterIPCommand.getAllErrors() ) );
 		}
 	}
 }

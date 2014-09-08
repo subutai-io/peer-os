@@ -3,10 +3,10 @@ package org.safehaus.subutai.zookeeper.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

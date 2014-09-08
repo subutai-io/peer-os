@@ -1,10 +1,10 @@
 package org.safehaus.subutai.lucene.services;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.api.lucene.Lucene;
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

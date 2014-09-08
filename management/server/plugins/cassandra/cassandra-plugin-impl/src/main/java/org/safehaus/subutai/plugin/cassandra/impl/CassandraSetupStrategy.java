@@ -1,11 +1,18 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import org.safehaus.subutai.plugin.cassandra.api.CassandraConfig;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.safehaus.subutai.common.exception.ClusterConfigurationException;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -17,12 +24,12 @@ import com.google.common.base.Strings;
 public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
     private Environment environment;
-    private CassandraConfig config;
+    private CassandraClusterConfig config;
     private CassandraImpl cassandraManager;
     private ProductOperation productOperation;
 
 
-    public CassandraSetupStrategy( final Environment environment, final CassandraConfig config,
+    public CassandraSetupStrategy( final Environment environment, final CassandraClusterConfig config,
                                    final ProductOperation po, final CassandraImpl cassandra ) {
 
         Preconditions.checkNotNull( environment, "Environment is null" );
@@ -37,7 +44,7 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
 
 
     @Override
-    public CassandraConfig setup() throws ClusterSetupException {
+    public CassandraClusterConfig setup() throws ClusterSetupException {
 
         if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
                 Strings.isNullOrEmpty( config.getCommitLogDirectory() ) ||
@@ -54,20 +61,30 @@ public class CassandraSetupStrategy implements ClusterSetupStrategy {
                     String.format( "Cluster with name '%s' already exists", config.getClusterName() ) );
         }
 
+        Set<Agent> cassNodes = new HashSet<Agent>();
+        for ( Node node : environment.getNodes() ) {
+            cassNodes.add( node.getAgent() );
+        }
+        config.setNodes( cassNodes );
+
+        Iterator nodesItr = cassNodes.iterator();
+        Set<Agent> seedNodes = new HashSet<Agent>();
+        while ( nodesItr.hasNext() ) {
+            seedNodes.add( ( Agent ) nodesItr.next() );
+            if ( seedNodes.size() == config.getNumberOfSeeds() ) {
+                break;
+            }
+        }
+        config.setSeedNodes( seedNodes );
 
 
-        /*if ( Strings.isNullOrEmpty( config.getClusterName() ) ||
-                        Strings.isNullOrEmpty( config.getDomainName() ) ||
-                        Strings.isNullOrEmpty( config.getReplicaSetName() ) ||
-                        Strings.isNullOrEmpty( config.getTemplateName() ) ||
-                        !Sets.newHashSet( 1, 3 ).contains( config.getNumberOfConfigServers() ) ||
-                        !Range.closed( 1, 3 ).contains( config.getNumberOfRouters() ) ||
-                        !Sets.newHashSet( 3, 5, 7 ).contains( config.getNumberOfDataNodes() ) ||
-                        !Range.closed( 1024, 65535 ).contains( config.getCfgSrvPort() ) ||
-                        !Range.closed( 1024, 65535 ).contains( config.getRouterPort() ) ||
-                        !Range.closed( 1024, 65535 ).contains( config.getDataNodePort() ) ) {
-                    throw new ClusterSetupException( "Malformed cluster configuration" );
-                }*/
+        try {
+            new ClusterConfiguration( productOperation, cassandraManager ).configureCluster( config );
+        }
+        catch ( ClusterConfigurationException e ) {
+            throw new ClusterSetupException( e.getMessage() );
+        }
+
 
         return config;
     }

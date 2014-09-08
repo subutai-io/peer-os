@@ -3,14 +3,20 @@ package org.safehaus.subutai.plugin.hbase.impl;
 
 import java.util.Set;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 
 
 public class Commands extends CommandsSingleton {
+
+    public Commands( CommandRunner commandRunner ) {
+        init( commandRunner );
+    }
+
 
     public static Command getInstallDialogCommand( Set<Agent> agents ) {
 
@@ -89,7 +95,7 @@ public class Commands extends CommandsSingleton {
     public static Command getConfigMasterTask( Set<Agent> agents, String hadoopNameNodeHostname,
                                                String hMasterMachineHostname ) {
         return createCommand( new RequestBuilder(
-                String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname, hMasterMachineHostname ) ),
-                agents );
+                        String.format( ". /etc/profile && master.sh %s %s", hadoopNameNodeHostname,
+                                hMasterMachineHostname ) ), agents );
     }
 }

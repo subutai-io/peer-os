@@ -5,21 +5,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.networkmanager.NetworkManager;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.network.api.NetworkManager;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.api.zookeeper.Zookeeper;
 import org.safehaus.subutai.impl.zookeeper.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 
 public class ZookeeperImpl implements Zookeeper {

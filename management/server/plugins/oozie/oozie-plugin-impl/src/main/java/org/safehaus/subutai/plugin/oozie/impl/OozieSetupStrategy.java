@@ -1,38 +1,28 @@
 package org.safehaus.subutai.plugin.oozie.impl;
 
 
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupException;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 
 
 /**
  * Created by bahadyr on 8/25/14.
  */
-public class OozieSetupStrategy implements ClusterSetupStrategy {
+abstract class OozieSetupStrategy implements ClusterSetupStrategy {
 
 
-    private Environment environment;
-    private OozieConfig config;
-    private OozieImpl oozieManager;
-    private ProductOperation productOperation;
+    //    private Environment environment;
+    final OozieClusterConfig config;
+    final OozieImpl oozieManager;
+    final ProductOperation po;
 
 
-    public OozieSetupStrategy( final Environment environment, final OozieConfig config, final ProductOperation po,
-                               final OozieImpl oozie ) {
+    public OozieSetupStrategy( OozieImpl oozie, ProductOperation po, OozieClusterConfig config ) {
 
-        this.environment = environment;
-        this.config = config;
-        this.productOperation = po;
+        //        this.environment = environment;
         this.oozieManager = oozie;
-    }
-
-
-    @Override
-    public ConfigBase setup() throws ClusterSetupException {
-        return config;
+        this.po = po;
+        this.config = config;
     }
 }

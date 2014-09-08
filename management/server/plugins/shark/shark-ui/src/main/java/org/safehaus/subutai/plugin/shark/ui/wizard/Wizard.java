@@ -7,7 +7,7 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 
 /**
  * @author dilshat
@@ -16,7 +16,7 @@ public class Wizard {
 
 	private final GridLayout grid;
 	private int step = 1;
-	private Config config = new Config();
+	private SharkClusterConfig config = new SharkClusterConfig();
 
 	public Wizard() {
 		grid = new GridLayout(1, 20);
@@ -68,11 +68,11 @@ public class Wizard {
 
 	protected void init() {
 		step = 1;
-		config = new Config();
+		config = new SharkClusterConfig();
 		putForm();
 	}
 
-	public Config getConfig() {
+	public SharkClusterConfig getConfig() {
 		return config;
 	}
 

@@ -1,7 +1,7 @@
 package org.safehaus.subuta.pet.rest;
 
 
-import org.safehaus.subutai.common.JsonUtil;
+import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.pet.api.PetManager;
 
 
@@ -34,5 +34,11 @@ public class RestServiceImpl implements RestService {
 
         String hello = petManager.helloPet( name );
         return JsonUtil.toJson( MSG_RESPONSE, hello );
+    }
+
+
+    @Override
+    public void somePost() {
+
     }
 }

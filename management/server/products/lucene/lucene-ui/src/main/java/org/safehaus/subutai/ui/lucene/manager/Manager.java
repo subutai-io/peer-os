@@ -11,11 +11,13 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
+
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.lucene.LuceneUI;
 
 import java.util.HashSet;
@@ -137,11 +139,11 @@ public class Manager
             {
                 if ( config != null )
                 {
-                    org.safehaus.subutai.api.hadoop.Config hadoopConfig =
+                    HadoopClusterConfig hadoopHadoopClusterConfig =
                         LuceneUI.getHadoopManager().getCluster( config.getHadoopClusterName() );
-                    if ( hadoopConfig != null )
+                    if ( hadoopHadoopClusterConfig != null )
                     {
-                        Set<Agent> nodes = new HashSet<>( hadoopConfig.getAllNodes() );
+                        Set<Agent> nodes = new HashSet<>( hadoopHadoopClusterConfig.getAllNodes() );
                         nodes.removeAll( config.getNodes() );
                         if ( !nodes.isEmpty() )
                         {

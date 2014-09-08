@@ -3,11 +3,11 @@ package org.safehaus.subutai.plugin.shark.cli;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.api.Shark;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
 
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class UninstallClusterCommand extends OsgiCommandSupport {
 		UUID uuid = sharkManager.uninstallCluster(clusterName);
 		int logSize = 0;
 		while (!Thread.interrupted()) {
-			ProductOperationView po = tracker.getProductOperation(Config.PRODUCT_KEY, uuid);
+			ProductOperationView po = tracker.getProductOperation( SharkClusterConfig.PRODUCT_KEY, uuid);
 			if (po != null) {
 				if (logSize != po.getLog().length()) {
 					System.out.print(po.getLog().substring(logSize, po.getLog().length()));

@@ -1,14 +1,14 @@
 package org.safehaus.subutai.impl.hadoop.operation.configuration;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.hadoop.Commands;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,33 +22,37 @@ public class NameNode {
 	public static final int SLEEP_SECONDS = 10;
 
 	private HadoopImpl parent;
-	private Config config;
+	private HadoopClusterConfig hadoopClusterConfig;
 
-	public NameNode(HadoopImpl parent, Config config) {
+	public NameNode(HadoopImpl parent, HadoopClusterConfig hadoopClusterConfig ) {
 		this.parent = parent;
-		this.config = config;
+		this.hadoopClusterConfig = hadoopClusterConfig;
 	}
 
 	public UUID start() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-				String.format("Starting cluster's %s NameNode", config.getClusterName()));
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				String.format("Starting cluster's %s NameNode", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if (config == null) {
-					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+				if ( hadoopClusterConfig == null) {
+					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted",
+                            hadoopClusterConfig
+                            .getClusterName()));
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(config.getNameNode().getHostname());
+				final Agent node = parent.getAgentManager().getAgentByHostname(
+                        hadoopClusterConfig.getNameNode().getHostname());
 				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", config.getNameNode().getHostname()));
+					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
+                            .getNameNode().getHostname()));
 					return;
 				}
 
-				final Command command = Commands.getNameNodeCommand(config.getNameNode(), "start &");
+				final Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "start &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
@@ -59,7 +63,7 @@ public class NameNode {
 						parent.getExecutor().execute(new CheckTask(status(), new CompleteEvent() {
 							@Override
 							public void onComplete(NodeState state) {
-								if (NodeState.STOPPED.equals(state)) {
+								if ( NodeState.STOPPED.equals(state)) {
 									po.addLogDone(String.format("Task's operation %s finished", command.getDescription()));
 									isSuccessful.set(true);
 								}
@@ -94,29 +98,32 @@ public class NameNode {
 	public UUID status() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-				String.format("Getting status of clusters %s NameNode", config.getClusterName()));
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				String.format("Getting status of clusters %s NameNode", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if (config == null) {
-					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+				if ( hadoopClusterConfig == null) {
+					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
+                            .getClusterName()));
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(config.getNameNode().getHostname());
+				final Agent node = parent.getAgentManager().getAgentByHostname(
+                        hadoopClusterConfig.getNameNode().getHostname());
 				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", config.getNameNode().getHostname()));
+					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
+                            .getNameNode().getHostname()));
 					return;
 				}
 
-				Command command = Commands.getNameNodeCommand(config.getNameNode(), "status");
+				Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "status");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				NodeState nodeState = NodeState.UNKNOWN;
 				if (command.hasCompleted()) {
-					AgentResult result = command.getResults().get(config.getNameNode().getUuid());
+					AgentResult result = command.getResults().get( hadoopClusterConfig.getNameNode().getUuid());
 					if (result.getStdOut() != null && result.getStdOut().contains("NameNode")) {
 						String[] array = result.getStdOut().split("\n");
 
@@ -137,12 +144,12 @@ public class NameNode {
 
 				if (NodeState.UNKNOWN.equals(nodeState)) {
 					po.addLogFailed(String.format("Failed to check status of %s, %s",
-							config.getClusterName(),
-							config.getNameNode().getHostname()
+							hadoopClusterConfig.getClusterName(),
+							hadoopClusterConfig.getNameNode().getHostname()
 					));
 				} else {
 					po.addLogDone(String.format("NameNode of %s is %s",
-							config.getNameNode().getHostname(),
+							hadoopClusterConfig.getNameNode().getHostname(),
 							nodeState
 					));
 				}
@@ -156,24 +163,27 @@ public class NameNode {
 	public UUID stop() {
 
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-				String.format("Stopping cluster's %s NameNode", config.getClusterName()));
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				String.format("Stopping cluster's %s NameNode", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if (config == null) {
-					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+				if ( hadoopClusterConfig == null) {
+					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
+                            .getClusterName()));
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(config.getNameNode().getHostname());
+				final Agent node = parent.getAgentManager().getAgentByHostname(
+                        hadoopClusterConfig.getNameNode().getHostname());
 				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", config.getNameNode().getHostname()));
+					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
+                            .getNameNode().getHostname()));
 					return;
 				}
 
-				final Command command = Commands.getNameNodeCommand(config.getNameNode(), "stop &");
+				final Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "stop &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {
@@ -218,24 +228,27 @@ public class NameNode {
 
 	public UUID restart() {
 		final ProductOperation po
-				= parent.getTracker().createProductOperation(Config.PRODUCT_KEY,
-				String.format("Restarting cluster's %s NameNode", config.getClusterName()));
+				= parent.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
+				String.format("Restarting cluster's %s NameNode", hadoopClusterConfig.getClusterName()));
 
 		parent.getExecutor().execute(new Runnable() {
 
 			public void run() {
-				if (config == null) {
-					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", config.getClusterName()));
+				if ( hadoopClusterConfig == null) {
+					po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", hadoopClusterConfig
+                            .getClusterName()));
 					return;
 				}
 
-				final Agent node = parent.getAgentManager().getAgentByHostname(config.getNameNode().getHostname());
+				final Agent node = parent.getAgentManager().getAgentByHostname(
+                        hadoopClusterConfig.getNameNode().getHostname());
 				if (node == null) {
-					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", config.getNameNode().getHostname()));
+					po.addLogFailed(String.format("Agent with hostname %s is not connected\nOperation aborted", hadoopClusterConfig
+                            .getNameNode().getHostname()));
 					return;
 				}
 
-				final Command command = Commands.getNameNodeCommand(config.getNameNode(), "restart &");
+				final Command command = Commands.getNameNodeCommand( hadoopClusterConfig.getNameNode(), "restart &");
 				HadoopImpl.getCommandRunner().runCommand(command);
 
 				if (command.hasSucceeded()) {

@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.oozie.Oozie;
 import org.safehaus.subutai.api.oozie.OozieConfig;
-import org.safehaus.subutai.common.JsonUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
 
 
 /**
@@ -19,9 +19,9 @@ import org.safehaus.subutai.shared.protocol.Agent;
 
 public class RestServiceImpl implements RestService {
 
+    private static final String OPERATION_ID = "OPERATION_ID";
     private Oozie oozieManager;
     private Hadoop hadoopManager;
-    private static final String OPERATION_ID = "OPERATION_ID";
 
 
     public Hadoop getHadoopManager() {
@@ -46,8 +46,8 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String installCluster( String clusterName, String serverHostname, String hadoopClusterName ) {
-        Config hadoopConfig = hadoopManager.getCluster( hadoopClusterName );
-        if ( hadoopConfig == null ) {
+        HadoopClusterConfig hadoopHadoopClusterConfig = hadoopManager.getCluster( hadoopClusterName );
+        if ( hadoopHadoopClusterConfig == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Hadoop cluster %s not found", hadoopClusterName ) );
         }
 
@@ -56,7 +56,7 @@ public class RestServiceImpl implements RestService {
         config.setServer( serverHostname );
         Set<String> clients = new HashSet<>();
         Set<String> hadoopNodes = new HashSet<String>();
-        for ( Agent agent : hadoopConfig.getAllNodes() ) {
+        for ( Agent agent : hadoopHadoopClusterConfig.getAllNodes() ) {
             clients.add( agent.getHostname() );
             hadoopNodes.add( agent.getHostname() );
         }

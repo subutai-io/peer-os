@@ -11,7 +11,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>shared</module>
     <module>server</module>
   </modules>
 
@@ -471,13 +470,12 @@
 
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-shared-protocol</artifactId>
+        <artifactId>subutai-common</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>subutai-common</artifactId>
+        <artifactId>plugin-common</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -590,6 +588,28 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>git-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Command Dispatcher -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>command-dispatcher-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>command-dispatcher-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>command-dispatcher-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>command-dispatcher-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1121,6 +1141,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Lucene Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Pig -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1145,6 +1192,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>pig-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Pig Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>pig-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1602,7 +1676,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- ElasticSearch -->
+      <!-- Elasticsearch -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-api</artifactId>
@@ -1621,6 +1695,28 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Elasticsearch Plugin -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>elasticsearch-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1709,7 +1805,8 @@
             <!-- Produces XML report -->
             <xmlOutput>true</xmlOutput>
             <!-- Configures the directory in which the XML report is created -->
-            <findbugsXmlOutputDirectory>${project.build.directory}/target/findbugs</findbugsXmlOutputDirectory>
+            <findbugsXmlOutputDirectory>${project.build.directory}/target/findbugs
+            </findbugsXmlOutputDirectory>
           </configuration>
           <executions>
             <!--

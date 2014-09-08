@@ -3,9 +3,9 @@ package org.safehaus.subutai.cli.commands;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -27,28 +27,28 @@ public class DescribeClusterCommand extends OsgiCommandSupport {
 	}
 
 	protected Object doExecute() {
-		Config config = hadoopManager.getCluster(clusterName);
-		if (config != null) {
+		HadoopClusterConfig hadoopClusterConfig = hadoopManager.getCluster(clusterName);
+		if ( hadoopClusterConfig != null) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("Cluster name: ").append(config.getClusterName()).append("\n");
-			sb.append("Domain name: ").append(config.getDomainName()).append("\n");
+			sb.append("Cluster name: ").append( hadoopClusterConfig.getClusterName()).append("\n");
+			sb.append("Domain name: ").append( hadoopClusterConfig.getDomainName()).append("\n");
 			sb.append("All nodes:").append("\n");
-			for (Agent agent : config.getAllNodes()) {
+			for (Agent agent : hadoopClusterConfig.getAllNodes()) {
 				sb.append("Hostname: ").append(agent.getHostname()).append("\n");
 			}
 			sb.append("Slave nodes:").append("\n");
-			for (Agent agent : config.getAllSlaveNodes()) {
+			for (Agent agent : hadoopClusterConfig.getAllSlaveNodes()) {
 				sb.append("Hostname: ").append(agent.getHostname()).append("\n");
 			}
 			sb.append("Data nodes:").append("\n");
-			for (Agent agent : config.getDataNodes()) {
+			for (Agent agent : hadoopClusterConfig.getDataNodes()) {
 				sb.append("Hostname: ").append(agent.getHostname()).append("\n");
 			}
 			sb.append("Task trackers:").append("\n");
-			for (Agent agent : config.getTaskTrackers()) {
+			for (Agent agent : hadoopClusterConfig.getTaskTrackers()) {
 				sb.append("Hostname: ").append(agent.getHostname()).append("\n");
 			}
-			Agent jt = config.getJobTracker();
+			Agent jt = hadoopClusterConfig.getJobTracker();
 			sb.append("Job tracker").append("\n");
 			sb.append("Hostname:").append(jt.getHostname()).append("\n");
 			sb.append("IPs:").append(jt.getListIP()).append("\n");

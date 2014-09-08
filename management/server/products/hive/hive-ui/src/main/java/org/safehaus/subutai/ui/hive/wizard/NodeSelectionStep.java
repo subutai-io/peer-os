@@ -4,9 +4,9 @@ package org.safehaus.subutai.ui.hive.wizard;
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.hive.HiveUI;
 
 import java.util.*;
@@ -59,7 +59,7 @@ public class NodeSelectionStep extends Panel
             {
                 if ( event.getProperty().getValue() != null )
                 {
-                    Config hadoopInfo = ( Config ) event.getProperty().getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     Agent selected = wizard.getConfig().getServer() != null
                         ? wizard.getConfig().getServer()
                         : hadoopInfo.getNameNode();
@@ -71,17 +71,17 @@ public class NodeSelectionStep extends Panel
             }
         } );
 
-        List<Config> clusters = HiveUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = HiveUI.getHadoopManager().getClusters();
         if ( clusters.size() > 0 )
         {
-            for ( Config hci : clusters )
+            for ( HadoopClusterConfig hci : clusters )
             {
                 hadoopClusters.addItem( hci );
                 hadoopClusters.setItemCaption( hci, hci.getClusterName() );
             }
         }
 
-        Config info = HiveUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
+        HadoopClusterConfig info = HiveUI.getHadoopManager().getCluster( wizard.getConfig().getHadoopClusterName() );
         if ( info != null )
         {
             hadoopClusters.setValue( info );
@@ -163,7 +163,7 @@ public class NodeSelectionStep extends Panel
                 Agent hiveMaster = ( Agent ) event.getProperty().getValue();
                 wizard.getConfig().setServer( hiveMaster );
 
-                Config hci = ( Config ) hadoopClusters.getValue();
+                HadoopClusterConfig hci = ( HadoopClusterConfig ) hadoopClusters.getValue();
                 wizard.getConfig().setClients( new HashSet<>( hci.getAllNodes() ) );
                 wizard.getConfig().getClients().remove( hiveMaster );
             }
@@ -172,7 +172,7 @@ public class NodeSelectionStep extends Panel
     }
 
 
-    private void fillServerNodeComboBox( Config hadoopInfo, Agent selected )
+    private void fillServerNodeComboBox( HadoopClusterConfig hadoopInfo, Agent selected )
     {
         serverNode.removeAllItems();
         List<Agent> slaves = hadoopInfo.getAllSlaveNodes();

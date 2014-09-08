@@ -1,16 +1,17 @@
 package org.safehaus.subutai.impl.solr.handler;
 
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.solr.Config;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.impl.solr.SolrImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
 
 
-public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl> {
+public class StartNodeOperationHandler extends AbstractOperationHandler<SolrImpl>
+{
 	private final String lxcHostname;
 
 

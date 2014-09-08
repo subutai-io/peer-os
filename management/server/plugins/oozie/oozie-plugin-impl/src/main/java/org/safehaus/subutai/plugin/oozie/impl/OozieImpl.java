@@ -6,60 +6,70 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.container.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.manager.EnvironmentManager;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.plugin.oozie.api.Oozie;
-import org.safehaus.subutai.plugin.oozie.api.OozieConfig;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerOperationHandler;
-import org.safehaus.subutai.plugin.oozie.impl.handler.InstallOperationHandler;
-import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerOperationHandler;
-import org.safehaus.subutai.plugin.oozie.impl.handler.StopServerOperationHandler;
-import org.safehaus.subutai.plugin.oozie.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
-import org.safehaus.subutai.shared.protocol.NodeGroup;
-import org.safehaus.subutai.shared.protocol.PlacementStrategy;
-import org.safehaus.subutai.shared.protocol.settings.Common;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
+import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.container.api.container.ContainerManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.common.PluginDAO;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
+import org.safehaus.subutai.plugin.oozie.api.SetupType;
+import org.safehaus.subutai.plugin.oozie.impl.handler.CheckServerHandler;
+import org.safehaus.subutai.plugin.oozie.impl.handler.InstallHandler;
+import org.safehaus.subutai.plugin.oozie.impl.handler.StartServerHandler;
+import org.safehaus.subutai.plugin.oozie.impl.handler.StopServerHandler;
+import org.safehaus.subutai.plugin.oozie.impl.handler.UninstallHandler;
 
 import com.google.common.collect.Sets;
 
 
-public class OozieImpl implements Oozie {
+public class OozieImpl extends OozieBase {
 
-    private AgentManager agentManager;
-    private DbManager dbManager;
-    private Tracker tracker;
-    private ExecutorService executor;
-    private CommandRunner commandRunner;
-    private LxcManager lxcManager;
-    private EnvironmentManager environmentManager;
-    private ContainerManager containerManager;
+    PluginDAO pluginDAO;
+    Commands commands;
+    AgentManager agentManager;
+    DbManager dbManager;
+    Tracker tracker;
+    CommandRunner commandRunner;
+    LxcManager lxcManager;
+    EnvironmentManager environmentManager;
+    ContainerManager containerManager;
+    Hadoop hadoopManager;
+    ExecutorService executor;
 
 
-    public OozieImpl( final AgentManager agentManager,
-                      final DbManager dbManager,
-                      final Tracker tracker,
-                      final CommandRunner commandRunner,
-                      final LxcManager lxcManager,
-                      final EnvironmentManager environmentManager,
-                      final ContainerManager containerManager ) {
-        this.agentManager = agentManager;
-        this.dbManager = dbManager;
-        this.tracker = tracker;
-        this.commandRunner = commandRunner;
-        this.lxcManager = lxcManager;
-        this.environmentManager = environmentManager;
-        this.containerManager = containerManager;
+    public OozieImpl() {
+
+    }
+
+
+    public void init() {
+        this.pluginDAO = new PluginDAO( dbManager );
+        this.commands = new Commands( commandRunner );
 
         Commands.init( commandRunner );
+        executor = Executors.newCachedThreadPool();
+    }
+
+
+    public PluginDAO getPluginDAO() {
+        return pluginDAO;
+    }
+
+
+    public void setPluginDAO( final PluginDAO pluginDAO ) {
+        this.pluginDAO = pluginDAO;
     }
 
 
@@ -68,8 +78,18 @@ public class OozieImpl implements Oozie {
     }
 
 
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
     public DbManager getDbManager() {
         return dbManager;
+    }
+
+
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
     }
 
 
@@ -78,18 +98,18 @@ public class OozieImpl implements Oozie {
     }
 
 
-    public ExecutorService getExecutor() {
-        return executor;
-    }
-
-
-    public void setExecutor( final ExecutorService executor ) {
-        this.executor = executor;
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
     }
 
 
     public CommandRunner getCommandRunner() {
         return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
     }
 
 
@@ -123,123 +143,135 @@ public class OozieImpl implements Oozie {
     }
 
 
-    public void init() {
-        //        Commands.init( commandRunner );
-        executor = Executors.newCachedThreadPool();
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
     }
 
 
     public void destroy() {
+        agentManager = null;
+        tracker = null;
+        hadoopManager = null;
         executor.shutdown();
     }
 
 
-    public void setDbManager( DbManager dbManager ) {
-        this.dbManager = dbManager;
-    }
-
-
-    public void setTracker( Tracker tracker ) {
-        this.tracker = tracker;
-    }
-
-
-    public void setAgentManager( AgentManager agentManager ) {
-        this.agentManager = agentManager;
-    }
-
-
-    public void setCommandRunner( CommandRunner commandRunner ) {
-        this.commandRunner = commandRunner;
-    }
-
-
-    public UUID installCluster( final OozieConfig config ) {
-
-        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
-
+    public UUID installCluster( final OozieClusterConfig config ) {
+        AbstractOperationHandler operationHandler = new InstallHandler( this, config );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
-        //        return po.getId();
     }
 
 
     public UUID uninstallCluster( final String clusterName ) {
-        AbstractOperationHandler operationHandler = new UninstallOperationHandler( this, clusterName );
-
+        AbstractOperationHandler operationHandler = new UninstallHandler( this, clusterName );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
-    public List<OozieConfig> getClusters() {
-
-        return dbManager.getInfo( OozieConfig.PRODUCT_KEY, OozieConfig.class );
+    public List<OozieClusterConfig> getClusters() {
+        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, OozieClusterConfig.class );
     }
 
 
     @Override
-    public OozieConfig getCluster( String clusterName ) {
-        return dbManager.getInfo( OozieConfig.PRODUCT_KEY, clusterName, OozieConfig.class );
+    public OozieClusterConfig getCluster( String clusterName ) {
+        return dbManager.getInfo( OozieClusterConfig.PRODUCT_KEY, clusterName, OozieClusterConfig.class );
     }
 
 
     @Override
-    public UUID startServer( final OozieConfig config ) {
-        AbstractOperationHandler operationHandler = new StartServerOperationHandler( this, config.getClusterName() );
-
+    public UUID startServer( final OozieClusterConfig config ) {
+        AbstractOperationHandler operationHandler = new StartServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopServer( final OozieConfig config ) {
-        AbstractOperationHandler operationHandler = new StopServerOperationHandler( this, config.getClusterName() );
-
+    public UUID stopServer( final OozieClusterConfig config ) {
+        AbstractOperationHandler operationHandler = new StopServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID checkServerStatus( final OozieConfig config ) {
-
-        AbstractOperationHandler operationHandler = new CheckServerOperationHandler( this, config.getClusterName() );
-
+    public UUID checkServerStatus( final OozieClusterConfig config ) {
+        AbstractOperationHandler operationHandler = new CheckServerHandler( this, config.getClusterName() );
         executor.execute( operationHandler );
-
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final OozieConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final OozieClusterConfig config,
                                                          final ProductOperation po ) {
-        return new OozieSetupStrategy( environment, config, po, this );
+
+        if ( config.getSetupType() == SetupType.OVER_HADOOP ) {
+            return new OverHadoopSetupStrategy( this, po, config );
+        }
+        else if ( config.getSetupType() == SetupType.WITH_HADOOP ) {
+            WithHadoopSetupStrategy s = new WithHadoopSetupStrategy( this, po, config );
+            s.setEnvironment( environment );
+            return s;
+        }
+        return null;
+
+        //        return new OozieSetupStrategy( environment, config, po, this );
     }
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final OozieConfig config ) {
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final OozieClusterConfig config ) {
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );
 
-        NodeGroup nodeGroup = new NodeGroup();
-        nodeGroup.setTemplateName( config.getTemplateName() );
-        nodeGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
-        int numberOfNodes = config.getClients().size() + 1; // +1 server
-        nodeGroup.setNumberOfNodes( numberOfNodes );
+        NodeGroup oozieGroup = new NodeGroup();
+        oozieGroup.setTemplateName( config.getTemplateNameClient() );
+        oozieGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        int numberOfNodes = config.getClients().size();
+        oozieGroup.setNumberOfNodes( numberOfNodes );
 
-        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
+        NodeGroup oozieServer = new NodeGroup();
+        oozieServer.setTemplateName( config.getTemplateNameServer() );
+        oozieServer.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
+        oozieServer.setNumberOfNodes( 1 );
+
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieGroup ) );
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieServer ) );
 
         return environmentBlueprint;
+    }
+
+
+    @Override
+    public UUID addNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
+    }
+
+
+    @Override
+    public UUID destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
+        return null;
     }
 }

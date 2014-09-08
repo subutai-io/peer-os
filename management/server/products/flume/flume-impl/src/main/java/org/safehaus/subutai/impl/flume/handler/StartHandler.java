@@ -1,20 +1,21 @@
 package org.safehaus.subutai.impl.flume.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.api.flume.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.flume.CommandType;
 import org.safehaus.subutai.impl.flume.Commands;
 import org.safehaus.subutai.impl.flume.FlumeImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class StartHandler extends AbstractOperationHandler<FlumeImpl> {
+public class StartHandler extends AbstractOperationHandler<FlumeImpl>
+{
 
 	private final String hostname;
 

@@ -6,30 +6,41 @@
 package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.CollectionUtil;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.ui.SparkUI;
+
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.common.CollectionUtil;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.plugin.spark.ui.SparkUI;
-import org.safehaus.subutai.shared.protocol.Agent;
-
-import java.util.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.VerticalLayout;
 
 
 /**
  * @author dilshat
  */
-public class ConfigurationStep extends Panel
-{
+public class ConfigurationStep extends Panel {
 
     private final TwinColSelect slaveNodesSelect;
     private final ComboBox masterNodeCombo;
 
 
-    public ConfigurationStep( final Wizard wizard )
-    {
+    public ConfigurationStep( final Wizard wizard ) {
 
         setSizeFull();
 
@@ -63,59 +74,50 @@ public class ConfigurationStep extends Panel
 
         List<HadoopClusterConfig> clusters = SparkUI.getHadoopManager().getClusters();
 
-        if ( clusters.size() > 0 )
-        {
-            for ( HadoopClusterConfig hadoopClusterInfo : clusters )
-            {
+        if ( clusters.size() > 0 ) {
+            for ( HadoopClusterConfig hadoopClusterInfo : clusters ) {
                 hadoopClustersCombo.addItem( hadoopClusterInfo );
-                hadoopClustersCombo.setItemCaption( hadoopClusterInfo,
-                    hadoopClusterInfo.getClusterName() );
+                hadoopClustersCombo.setItemCaption( hadoopClusterInfo, hadoopClusterInfo.getClusterName() );
             }
         }
 
-        HadoopClusterConfig info = SparkUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
-
-        if ( info != null )
-        {
-            hadoopClustersCombo.setValue( info );
+        if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
+            if ( clusters.size() > 0 ) {
+                hadoopClustersCombo.setValue( clusters.iterator().next() );
+            }
         }
-        else if ( clusters.size() > 0 )
-        {
-            hadoopClustersCombo.setValue( clusters.iterator().next() );
+        else {
+            HadoopClusterConfig info = SparkUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+            if ( info != null ) {
+                //restore cluster
+                hadoopClustersCombo.setValue( info );
+            }
+            else if ( clusters.size() > 0 ) {
+                hadoopClustersCombo.setValue( clusters.iterator().next() );
+            }
         }
 
-        if ( hadoopClustersCombo.getValue() != null )
-        {
+        if ( hadoopClustersCombo.getValue() != null ) {
             HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClustersCombo.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
-            slaveNodesSelect.setContainerDataSource(
-                new BeanItemContainer<>(
-                    Agent.class, hadoopInfo.getAllNodes() )
-            );
-            for ( Agent agent : hadoopInfo.getAllNodes() )
-            {
+            slaveNodesSelect.setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
+            for ( Agent agent : hadoopInfo.getAllNodes() ) {
                 masterNodeCombo.addItem( agent );
                 masterNodeCombo.setItemCaption( agent, agent.getHostname() );
             }
         }
 
-        hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        hadoopClustersCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     slaveNodesSelect.setValue( null );
-                    slaveNodesSelect.setContainerDataSource(
-                        new BeanItemContainer<>(
-                            Agent.class, hadoopInfo.getAllNodes() )
-                    );
+                    slaveNodesSelect
+                            .setContainerDataSource( new BeanItemContainer<>( Agent.class, hadoopInfo.getAllNodes() ) );
                     masterNodeCombo.setValue( null );
                     masterNodeCombo.removeAllItems();
-                    for ( Agent agent : hadoopInfo.getAllNodes() )
-                    {
+                    for ( Agent agent : hadoopInfo.getAllNodes() ) {
                         masterNodeCombo.addItem( agent );
                         masterNodeCombo.setItemCaption( agent, agent.getHostname() );
                     }
@@ -126,35 +128,27 @@ public class ConfigurationStep extends Panel
             }
         } );
 
-        if ( wizard.getConfig().getMasterNode() != null )
-        {
+        if ( wizard.getConfig().getMasterNode() != null ) {
             masterNodeCombo.setValue( wizard.getConfig().getMasterNode() );
         }
 
-        masterNodeCombo.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        masterNodeCombo.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     Agent master = ( Agent ) event.getProperty().getValue();
                     wizard.getConfig().setMasterNode( master );
                 }
             }
         } );
 
-        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaveNodes() ) )
-        {
+        if ( !CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaveNodes() ) ) {
             slaveNodesSelect.setValue( wizard.getConfig().getSlaveNodes() );
         }
-        slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener()
-        {
+        slaveNodesSelect.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
-            public void valueChange( Property.ValueChangeEvent event )
-            {
-                if ( event.getProperty().getValue() != null )
-                {
+            public void valueChange( Property.ValueChangeEvent event ) {
+                if ( event.getProperty().getValue() != null ) {
                     Set<Agent> agentList = new HashSet<>( ( Collection<Agent> ) event.getProperty().getValue() );
                     wizard.getConfig().setSlaveNodes( agentList );
                 }
@@ -163,25 +157,19 @@ public class ConfigurationStep extends Panel
 
         Button next = new Button( "Next" );
         next.addStyleName( "default" );
-        next.addClickListener( new Button.ClickListener()
-        {
+        next.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
-                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) )
-                {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
                     show( "Please, select Hadoop cluster" );
                 }
-                else if ( wizard.getConfig().getMasterNode() == null )
-                {
+                else if ( wizard.getConfig().getMasterNode() == null ) {
                     show( "Please, select master node" );
                 }
-                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaveNodes() ) )
-                {
+                else if ( CollectionUtil.isCollectionEmpty( wizard.getConfig().getSlaveNodes() ) ) {
                     show( "Please, select slave nodes" );
                 }
-                else
-                {
+                else {
                     wizard.next();
                 }
             }
@@ -189,11 +177,9 @@ public class ConfigurationStep extends Panel
 
         Button back = new Button( "Back" );
         back.addStyleName( "default" );
-        back.addClickListener( new Button.ClickListener()
-        {
+        back.addClickListener( new Button.ClickListener() {
             @Override
-            public void buttonClick( Button.ClickEvent clickEvent )
-            {
+            public void buttonClick( Button.ClickEvent clickEvent ) {
                 wizard.back();
             }
         } );
@@ -213,13 +199,10 @@ public class ConfigurationStep extends Panel
         content.addComponent( buttons );
 
         setContent( layout );
-
     }
 
 
-    private void show( String notification )
-    {
+    private void show( String notification ) {
         Notification.show( notification );
     }
-
 }

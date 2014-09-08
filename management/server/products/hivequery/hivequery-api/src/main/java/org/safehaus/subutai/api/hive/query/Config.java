@@ -1,6 +1,6 @@
 package org.safehaus.subutai.api.hive.query;
 
-import org.safehaus.subutai.shared.protocol.ConfigBase;
+import org.safehaus.subutai.common.protocol.ConfigBase;
 
 public class Config implements ConfigBase {
 

@@ -7,10 +7,10 @@ package org.safehaus.subutai.plugin.shark.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.shark.ui.SharkUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ public class VerificationStep extends Panel {
 			@Override
 			public void buttonClick(Button.ClickEvent clickEvent) {
 				UUID trackID = SharkUI.getSharkManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(SharkUI.getExecutor(), SharkUI.getTracker(), trackID, Config.PRODUCT_KEY);
+				ProgressWindow window = new ProgressWindow(SharkUI.getExecutor(), SharkUI.getTracker(), trackID, SharkClusterConfig.PRODUCT_KEY);
 				window.getWindow().addCloseListener(new Window.CloseListener() {
 					@Override
 					public void windowClose(Window.CloseEvent closeEvent) {

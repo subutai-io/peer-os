@@ -1,151 +1,150 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.presto.impl;
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
-import org.safehaus.subutai.plugin.presto.api.Presto;
-import org.safehaus.subutai.plugin.presto.impl.handler.*;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.Presto;
+import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
+import org.safehaus.subutai.plugin.presto.impl.handler.*;
 
-/**
- * @author dilshat
- */
-public class PrestoImpl implements Presto {
+public class PrestoImpl extends PrestoBase implements Presto {
 
-	private CommandRunner commandRunner;
-	private AgentManager agentManager;
-	private DbManager dbManager;
-	private Tracker tracker;
-	private ExecutorService executor;
+    public PrestoImpl() {
+    }
 
-	public PrestoImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
-		this.commandRunner = commandRunner;
-		this.agentManager = agentManager;
-		this.dbManager = dbManager;
-		this.tracker = tracker;
+    @Override
+    public UUID installCluster(final PrestoClusterConfig config) {
 
-		Commands.init(commandRunner);
-	}
+        Preconditions.checkNotNull(config, "Configuration is null");
 
-	public CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
+        executor.execute(operationHandler);
 
-	public DbManager getDbManager() {
-		return dbManager;
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public Tracker getTracker() {
-		return tracker;
-	}
+    @Override
+    public UUID installCluster(PrestoClusterConfig config, HadoopClusterConfig hadoopConfig) {
+        InstallOperationHandler h = new InstallOperationHandler(this, config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
+    }
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    @Override
+    public UUID uninstallCluster(final String clusterName) {
 
-	public void destroy() {
-		executor.shutdown();
-	}
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
-	public UUID installCluster(final PrestoClusterConfig config) {
+        executor.execute(operationHandler);
 
-		Preconditions.checkNotNull(config, "Configuration is null");
+        return operationHandler.getTrackerId();
+    }
 
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+    @Override
+    public List<PrestoClusterConfig> getClusters() {
+        try {
+            return pluginDAO.getInfo(PrestoClusterConfig.PRODUCT_KEY, PrestoClusterConfig.class);
+        } catch(DBException e) {
+            return Collections.emptyList();
+        }
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public PrestoClusterConfig getCluster(String clusterName) {
 
-		return operationHandler.getTrackerId();
-	}
+        try {
+            return pluginDAO.getInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class);
+        } catch(DBException e) {
+            return null;
+        }
+    }
 
-	public UUID uninstallCluster(final String clusterName) {
+    @Override
+    public UUID addWorkerNode(final String clusterName, final String lxcHostname) {
 
-		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+        AbstractOperationHandler operationHandler = new AddWorkerNodeOperationHandler(this, clusterName, lxcHostname);
 
-		executor.execute(operationHandler);
+        executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public List<PrestoClusterConfig> getClusters() {
-		return dbManager.getInfo(PrestoClusterConfig.PRODUCT_KEY, PrestoClusterConfig.class);
-	}
+    @Override
+    public UUID destroyWorkerNode(final String clusterName, final String lxcHostname) {
 
-	@Override
-	public PrestoClusterConfig getCluster(String clusterName) {
-		return dbManager.getInfo(PrestoClusterConfig.PRODUCT_KEY, clusterName, PrestoClusterConfig.class);
-	}
+        AbstractOperationHandler operationHandler
+                = new DestroyWorkerNodeOperationHandler(this, clusterName, lxcHostname);
 
-	public UUID addWorkerNode(final String clusterName, final String lxcHostname) {
+        executor.execute(operationHandler);
 
-		AbstractOperationHandler operationHandler = new AddWorkerNodeOperationHandler(this, clusterName, lxcHostname);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID changeCoordinatorNode(final String clusterName, final String newCoordinatorHostname) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler
+                = new ChangeCoordinatorNodeOperationHandler(this, clusterName, newCoordinatorHostname);
 
-	public UUID destroyWorkerNode(final String clusterName, final String lxcHostname) {
+        executor.execute(operationHandler);
 
-		AbstractOperationHandler operationHandler = new DestroyWorkerNodeOperationHandler(this, clusterName, lxcHostname);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID startNode(final String clusterName, final String lxcHostname) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname);
 
-	public UUID changeCoordinatorNode(final String clusterName, final String newCoordinatorHostname) {
+        executor.execute(operationHandler);
 
-		AbstractOperationHandler operationHandler = new ChangeCoordinatorNodeOperationHandler(this, clusterName, newCoordinatorHostname);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID stopNode(final String clusterName, final String lxcHostname) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname);
 
-	public UUID startNode(final String clusterName, final String lxcHostname) {
+        executor.execute(operationHandler);
 
-		AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
 
-		return operationHandler.getTrackerId();
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
 
-	}
+        executor.execute(operationHandler);
 
-	public UUID stopNode(final String clusterName, final String lxcHostname) {
+        return operationHandler.getTrackerId();
+    }
 
-		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname);
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy(final ProductOperation po,
+            final PrestoClusterConfig config,
+            final Environment environment) {
 
-		executor.execute(operationHandler);
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            return new SetupStrategyOverHadoop(po, this, config);
 
-		return operationHandler.getTrackerId();
-	}
+        if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop(po, this, config);
+            s.setEnvironment(environment);
+            return s;
+        }
 
-	public UUID checkNode(final String clusterName, final String lxcHostname) {
-
-		AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
-
-		executor.execute(operationHandler);
-
-		return operationHandler.getTrackerId();
-	}
-
+        return null;
+    }
 }

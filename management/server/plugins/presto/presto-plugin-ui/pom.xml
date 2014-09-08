@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>presto-plugin-ui</artifactId>
-    <name>:: Subutai Presto UI</name>
+    <name>Subutai Presto UI</name>
     <description>Subutai Presto UI</description>
     <packaging>bundle</packaging>
 
@@ -18,10 +18,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

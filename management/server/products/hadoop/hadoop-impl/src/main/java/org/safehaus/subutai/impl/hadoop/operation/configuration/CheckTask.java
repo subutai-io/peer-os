@@ -6,12 +6,12 @@
 package org.safehaus.subutai.impl.hadoop.operation.configuration;
 
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.common.enums.NodeState;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.impl.hadoop.HadoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
 
 import java.util.UUID;
 
@@ -32,7 +32,7 @@ public class CheckTask implements Runnable {
 
 		if (trackID != null) {
 			while (true) {
-				ProductOperationView prevPo = HadoopImpl.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+				ProductOperationView prevPo = HadoopImpl.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID);
 				if (prevPo == null || prevPo.getState() == ProductOperationState.RUNNING) {
 					try {
 						Thread.sleep(1000);
@@ -49,7 +49,7 @@ public class CheckTask implements Runnable {
 
 		long start = System.currentTimeMillis();
 		while (!Thread.interrupted()) {
-			ProductOperationView po = HadoopImpl.getTracker().getProductOperation(Config.PRODUCT_KEY, trackID);
+			ProductOperationView po = HadoopImpl.getTracker().getProductOperation( HadoopClusterConfig.PRODUCT_KEY, trackID);
 			if (po != null) {
 				if (po.getState() != ProductOperationState.RUNNING) {
 					if (po.getLog().contains(NodeState.STOPPED.toString())) {

@@ -15,7 +15,7 @@
     <reference id="prestoManager" availability="mandatory"
                interface="org.safehaus.subutai.api.presto.Presto"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
     <bean id="prestoRestService" class="org.safehaus.subutai.presto.services.RestService">
         <property name="agentManager" ref="agentManager"/>

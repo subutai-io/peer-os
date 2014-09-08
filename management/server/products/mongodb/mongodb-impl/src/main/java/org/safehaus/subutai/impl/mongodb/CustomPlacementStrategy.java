@@ -1,11 +1,11 @@
 package org.safehaus.subutai.impl.mongodb;
 
-import org.safehaus.subutai.api.lxcmanager.LxcCreateException;
-import org.safehaus.subutai.api.lxcmanager.LxcManager;
-import org.safehaus.subutai.api.lxcmanager.LxcPlacementStrategy;
-import org.safehaus.subutai.api.lxcmanager.ServerMetric;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcCreateException;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcManager;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcPlacementStrategy;
+import org.safehaus.subutai.core.container.api.lxcmanager.ServerMetric;
 import org.safehaus.subutai.api.mongodb.NodeType;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;
 

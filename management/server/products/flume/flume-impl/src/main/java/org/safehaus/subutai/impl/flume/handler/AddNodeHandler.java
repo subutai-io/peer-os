@@ -1,21 +1,22 @@
 package org.safehaus.subutai.impl.flume.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.api.flume.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.flume.CommandType;
 import org.safehaus.subutai.impl.flume.Commands;
 import org.safehaus.subutai.impl.flume.FlumeImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
+public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl>
+{
 
 	private final String hostname;
 
@@ -52,14 +53,14 @@ public class AddNodeHandler extends AbstractOperationHandler<FlumeImpl> {
 			return;
 		}
 
-		AgentResult res = cmd.getResults().get(agent.getUuid());
-		if (res.getStdOut().contains("ksks-flume")) {
-			po.addLogFailed("Flume already installed on " + hostname);
-			return;
-		} else if (!res.getStdOut().contains("ksks-hadoop")) {
-			po.addLogFailed("Hadoop not installed on " + hostname);
-			return;
-		}
+        AgentResult res = cmd.getResults().get(agent.getUuid());
+        if(res.getStdOut().contains(Commands.PACKAGE_NAME)) {
+            po.addLogFailed("Flume already installed on " + hostname);
+            return;
+        } else if(!res.getStdOut().contains("ksks-hadoop")) {
+            po.addLogFailed("Hadoop not installed on " + hostname);
+            return;
+        }
 
 		config.getNodes().add(agent);
 

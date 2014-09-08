@@ -5,7 +5,10 @@
  */
 package org.safehaus.subutai.plugin.spark.api;
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 import java.util.UUID;
 
@@ -51,4 +54,9 @@ public interface Spark extends ApiBase<SparkClusterConfig> {
 	 * @return - UUID of operation to track
 	 */
 	public UUID checkNode(String clusterName, String lxcHostName);
+
+    public ClusterSetupStrategy getClusterSetupStrategy(ProductOperation po, SparkClusterConfig sparkClusterConfig);
+
+    public ClusterSetupStrategy getClusterSetupStrategy( ProductOperation po, SparkClusterConfig prestoClusterConfig,
+                                                         Environment environment );
 }

@@ -14,13 +14,15 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
+
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.api.zookeeper.Config;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.CompleteEvent;
-import org.safehaus.subutai.shared.protocol.enums.NodeState;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.ui.zookeeper.ZookeeperUI;
 
 import java.util.HashSet;
@@ -213,7 +215,7 @@ public class Manager
                     }
                     else
                     {
-                        org.safehaus.subutai.api.hadoop.Config info = ZookeeperUI.getHadoopManager()
+                        HadoopClusterConfig info = ZookeeperUI.getHadoopManager()
                             .getCluster( config.getClusterName() );
 
                         if ( info != null )

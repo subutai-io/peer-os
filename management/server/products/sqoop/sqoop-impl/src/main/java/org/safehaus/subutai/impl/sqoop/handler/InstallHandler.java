@@ -1,14 +1,15 @@
 package org.safehaus.subutai.impl.sqoop.handler;
 
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
 import org.safehaus.subutai.api.sqoop.Config;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.sqoop.CommandFactory;
 import org.safehaus.subutai.impl.sqoop.CommandType;
 import org.safehaus.subutai.impl.sqoop.SqoopImpl;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,7 +43,7 @@ public class InstallHandler extends AbstractHandler {
 			return;
 		}
 
-		org.safehaus.subutai.api.hadoop.Config hc
+		HadoopClusterConfig hc
 				= manager.getHadoopManager().getCluster(clusterName);
 		if (hc == null) {
 			po.addLogFailed(String.format("Hadoop cluster %s does not exist", clusterName));

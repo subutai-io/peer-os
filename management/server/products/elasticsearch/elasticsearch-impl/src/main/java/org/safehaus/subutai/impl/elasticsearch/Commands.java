@@ -1,10 +1,10 @@
 package org.safehaus.subutai.impl.elasticsearch;
 
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
-import org.safehaus.subutai.shared.protocol.Agent;
-import org.safehaus.subutai.shared.protocol.enums.OutputRedirection;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
+import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class Commands extends CommandsSingleton {
 		return createCommand(
 				new RequestBuilder(
 						"sleep 10; apt-get --force-yes --assume-yes install ksks-elasticsearch")
-						.withTimeout(90).withStdOutRedirection(OutputRedirection.NO),
+						.withTimeout(90).withStdOutRedirection( OutputRedirection.NO),
 				agents
 		);
 

@@ -2,18 +2,18 @@ package org.safehaus.subutai.impl.lucene;
 
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.api.hadoop.Hadoop;
 import org.safehaus.subutai.api.lucene.Config;
 import org.safehaus.subutai.api.lucene.Lucene;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.impl.lucene.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.impl.lucene.handler.DestroyNodeOperationHandler;
 import org.safehaus.subutai.impl.lucene.handler.InstallOperationHandler;
 import org.safehaus.subutai.impl.lucene.handler.UninstallOperationHandler;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 import java.util.List;
 import java.util.UUID;

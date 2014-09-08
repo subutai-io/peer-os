@@ -9,24 +9,23 @@ package org.safehaus.subutai.plugin.hbase.api;
 import java.util.List;
 import java.util.UUID;
 
-import org.safehaus.subutai.api.hadoop.Config;
-import org.safehaus.subutai.api.manager.helper.Environment;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.ApiBase;
-import org.safehaus.subutai.shared.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.shared.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
  * @author dilshat
  */
-public interface HBase extends ApiBase<HBaseConfig> {
+public interface HBase extends ApiBase<HBaseClusterConfig> {
 
-    public UUID installCluster( HBaseConfig config );
+    public UUID installCluster( HBaseClusterConfig config );
+
+    public List<HBaseClusterConfig> getClusters();
 
     UUID startCluster( String clusterName );
-
-    UUID stopCluster( String clusterName );
 
     //    UUID checkNode(HBaseType type, String clusterName, String lxcHostname);
 
@@ -34,16 +33,24 @@ public interface HBase extends ApiBase<HBaseConfig> {
 
     //    UUID stopNodes(String clusterName);
 
+    UUID stopCluster( String clusterName );
+
     UUID checkCluster( String clusterName );
 
-    public List<HBaseConfig> getClusters();
+    //    List<HadoopClusterConfig> getHadoopClusters();
 
-    List<Config> getHadoopClusters();
+    //    HadoopClusterConfig getHadoopCluster( String clusterName );
 
-    Config getHadoopCluster( String clusterName );
-
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseConfig config,
+    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, HBaseClusterConfig config,
                                                          ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( HBaseConfig config );
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( HBaseClusterConfig config );
+
+    UUID checkNode( String clustername, String lxchostname );
+
+    UUID destroyNode( String clustername, String lxchostname, String nodetype );
+
+    UUID addNode( String clustername, String lxchostname, String nodetype );
+
+    UUID destroyCluster( String clusterName );
 }

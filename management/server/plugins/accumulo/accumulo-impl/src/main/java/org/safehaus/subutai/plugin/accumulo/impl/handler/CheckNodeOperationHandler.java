@@ -1,18 +1,17 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.api.commandrunner.Command;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+
+import java.util.UUID;
 
 
 /**
@@ -20,21 +19,19 @@ import com.google.common.base.Strings;
  */
 public class CheckNodeOperationHandler extends AbstractOperationHandler<AccumuloImpl> {
     private final String lxcHostname;
-    private final ProductOperation po;
-
 
     public CheckNodeOperationHandler( AccumuloImpl manager, String clusterName, String lxcHostname ) {
         super( manager, clusterName );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( lxcHostname ), "Lxc hostname is null or empty" );
         this.lxcHostname = lxcHostname;
-        po = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( AccumuloClusterConfig.PRODUCT_KEY,
                 String.format( "Checking node %s in %s", lxcHostname, clusterName ) );
     }
 
 
     @Override
     public UUID getTrackerId() {
-        return po.getId();
+        return productOperation.getId();
     }
 
 
@@ -42,17 +39,17 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
     public void run() {
         AccumuloClusterConfig accumuloClusterConfig = manager.getCluster( clusterName );
         if ( accumuloClusterConfig == null ) {
-            po.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
             return;
         }
 
         final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
         if ( node == null ) {
-            po.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
             return;
         }
         if ( !accumuloClusterConfig.getAllNodes().contains( node ) ) {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
             return;
         }
@@ -61,11 +58,11 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<Accumulo
         manager.getCommandRunner().runCommand( checkNodeCommand );
 
         if ( checkNodeCommand.hasSucceeded() ) {
-            po.addLogDone( String.format( "Status on %s is %s", lxcHostname,
+            productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
                     checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else {
-            po.addLogFailed(
+            productOperation.addLogFailed(
                     String.format( "Failed to check status of %s, %s", lxcHostname, checkNodeCommand.getAllErrors() ) );
         }
     }

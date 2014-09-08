@@ -10,9 +10,9 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.presto.Config;
-import org.safehaus.subutai.shared.operation.ProductOperationState;
-import org.safehaus.subutai.shared.operation.ProductOperationView;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.ui.presto.PrestoUI;
 
 import java.util.Set;

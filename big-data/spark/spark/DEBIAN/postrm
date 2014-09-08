@@ -18,6 +18,10 @@ then
 	rm /etc/init.d/spark
 fi
 
+if [ -d "/etc/spark" ];
+then 
+	rm -rf /etc/spark
+fi
 # Delete spark.pid file from /var/run/spark/spark.pid
 sudo rm -rf /var/run/spark
 

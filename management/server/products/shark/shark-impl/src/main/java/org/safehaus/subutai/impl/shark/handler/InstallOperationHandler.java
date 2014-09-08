@@ -2,19 +2,20 @@ package org.safehaus.subutai.impl.shark.handler;
 
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.api.shark.Config;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.impl.shark.Commands;
 import org.safehaus.subutai.impl.shark.SharkImpl;
-import org.safehaus.subutai.shared.operation.AbstractOperationHandler;
-import org.safehaus.subutai.shared.operation.ProductOperation;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.UUID;
 
 
-public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl> {
+public class InstallOperationHandler extends AbstractOperationHandler<SharkImpl>
+{
 	private final ProductOperation po;
 	private final Config config;
 

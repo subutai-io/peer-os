@@ -21,10 +21,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mgmt-shared-protocol</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
     <dependency>
@@ -75,7 +71,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.rest.templateregistry</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.registry.rest</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

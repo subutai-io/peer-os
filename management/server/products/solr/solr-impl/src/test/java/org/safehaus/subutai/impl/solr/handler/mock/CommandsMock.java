@@ -1,10 +1,10 @@
 package org.safehaus.subutai.impl.solr.handler.mock;
 
 
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.impl.solr.Commands;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.subutai.shared.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Set;
 

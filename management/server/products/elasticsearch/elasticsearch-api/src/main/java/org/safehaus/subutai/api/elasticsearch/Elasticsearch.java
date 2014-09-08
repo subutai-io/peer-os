@@ -1,7 +1,7 @@
 package org.safehaus.subutai.api.elasticsearch;
 
 
-import org.safehaus.subutai.shared.protocol.ApiBase;
+import org.safehaus.subutai.common.protocol.ApiBase;
 
 import java.util.UUID;
 

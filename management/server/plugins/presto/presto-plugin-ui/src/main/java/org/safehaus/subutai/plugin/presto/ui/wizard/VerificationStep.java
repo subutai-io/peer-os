@@ -1,82 +1,93 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.presto.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
+import java.util.UUID;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
-import org.safehaus.subutai.shared.protocol.Agent;
 
-import java.util.UUID;
-
-/**
- * @author dilshat
- */
 public class VerificationStep extends Panel {
 
-	public VerificationStep(final Wizard wizard) {
+    public VerificationStep(final Wizard wizard) {
 
-		setSizeFull();
+        setSizeFull();
 
-		GridLayout grid = new GridLayout(1, 5);
-		grid.setSpacing(true);
-		grid.setMargin(true);
-		grid.setSizeFull();
+        GridLayout grid = new GridLayout(1, 5);
+        grid.setSpacing(true);
+        grid.setMargin(true);
+        grid.setSizeFull();
 
-		Label confirmationLbl = new Label("<strong>Please verify the installation settings "
-				+ "(you may change them by clicking on Back button)</strong><br/>");
-		confirmationLbl.setContentMode(ContentMode.HTML);
+        Label confirmationLbl = new Label("<strong>Please verify the installation settings "
+                + "(you may change them by clicking on Back button)</strong><br/>");
+        confirmationLbl.setContentMode(ContentMode.HTML);
 
-		ConfigView cfgView = new ConfigView("Installation configuration");
-		cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-		cfgView.addStringCfg("Master Node", wizard.getConfig().getCoordinatorNode().getHostname());
-		for (Agent agent : wizard.getConfig().getWorkers()) {
-			cfgView.addStringCfg("Slave nodes", agent.getHostname() + "");
-		}
+        final PrestoClusterConfig config = wizard.getConfig();
+        final HadoopClusterConfig hc = wizard.getHadoopConfig();
 
-		Button install = new Button("Install");
-		install.addStyleName("default");
-		install.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				UUID trackID = PrestoUI.getPrestoManager().installCluster(wizard.getConfig());
-				ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID, PrestoClusterConfig.PRODUCT_KEY);
-				window.getWindow().addCloseListener(new Window.CloseListener() {
-					@Override
-					public void windowClose(Window.CloseEvent closeEvent) {
-						wizard.init();
-					}
-				});
-				getUI().addWindow(window.getWindow());
-			}
-		});
+        ConfigView cfgView = new ConfigView("Installation configuration");
+        cfgView.addStringCfg("Installation name", config.getClusterName());
+        if(config.getSetupType() == SetupType.OVER_HADOOP) {
+            cfgView.addStringCfg("Hadoop cluster Name", wizard.getConfig().getHadoopClusterName());
+            cfgView.addStringCfg("Master Node", wizard.getConfig().getCoordinatorNode().getHostname());
+            for(Agent agent : wizard.getConfig().getWorkers()) {
+                cfgView.addStringCfg("Slave nodes", agent.getHostname() + "");
+            }
+        } else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+            cfgView.addStringCfg("Hadoop cluster name", hc.getClusterName());
+            cfgView.addStringCfg("Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "");
+            cfgView.addStringCfg("Replication factor", hc.getReplicationFactor() + "");
+            cfgView.addStringCfg("Domain name", hc.getDomainName());
+        }
 
-		Button back = new Button("Back");
-		back.addStyleName("default");
-		back.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				wizard.back();
-			}
-		});
+        Button install = new Button("Install");
+        install.addStyleName("default");
+        install.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                UUID trackId = null;
+                if(config.getSetupType() == SetupType.OVER_HADOOP)
+                    trackId = PrestoUI.getPrestoManager().installCluster(config);
+                else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                    trackId = PrestoUI.getPrestoManager().installCluster(config, hc);
 
-		HorizontalLayout buttons = new HorizontalLayout();
-		buttons.addComponent(back);
-		buttons.addComponent(install);
+                ProgressWindow window = new ProgressWindow(PrestoUI.getExecutor(),
+                        PrestoUI.getTracker(), trackId, PrestoClusterConfig.PRODUCT_KEY);
 
-		grid.addComponent(confirmationLbl, 0, 0);
+                window.getWindow().addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        wizard.init();
+                    }
+                });
+                getUI().addWindow(window.getWindow());
+            }
+        });
 
-		grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
+        Button back = new Button("Back");
+        back.addStyleName("default");
+        back.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                wizard.back();
+            }
+        });
 
-		grid.addComponent(buttons, 0, 4);
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.addComponent(back);
+        buttons.addComponent(install);
 
-		setContent(grid);
+        grid.addComponent(confirmationLbl, 0, 0);
 
-	}
+        grid.addComponent(cfgView.getCfgTable(), 0, 1, 0, 3);
+
+        grid.addComponent(buttons, 0, 4);
+
+        setContent(grid);
+
+    }
 
 }

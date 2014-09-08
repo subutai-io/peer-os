@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mgmt-shared-protocol</artifactId>
+            <artifactId>subutai-common</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -50,7 +50,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.api.lxcmanager</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.container.api</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>
