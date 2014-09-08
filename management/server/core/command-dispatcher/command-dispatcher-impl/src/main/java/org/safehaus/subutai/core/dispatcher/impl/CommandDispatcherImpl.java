@@ -114,7 +114,6 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                 } );
             }
             else {
-                LOG.warning(String.format( "Existing request %s" ,remoteRequest));
                 throw new RunCommandException(
                         String.format( "Command %s is already queued for processing", commandId ) );
             }

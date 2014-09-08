@@ -101,7 +101,6 @@ public class DispatcherDAO {
 
     public void saveRemoteRequest( RemoteRequest remoteRequest ) throws DBException {
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
-        LOG.warning( "Inserting new request" );
 
         dbManager.executeUpdate2( "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
                 remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );
