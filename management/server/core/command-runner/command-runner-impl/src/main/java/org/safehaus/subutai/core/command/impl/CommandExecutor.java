@@ -8,6 +8,7 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.concurrent.ExecutorService;
 
+import org.safehaus.subutai.common.command.AbstractCommand;
 import org.safehaus.subutai.common.command.CommandCallback;
 
 import com.google.common.base.Preconditions;
@@ -18,12 +19,12 @@ import com.google.common.base.Preconditions;
  */
 public class CommandExecutor {
 
-    final private CommandImpl command;
+    final private AbstractCommand command;
     final private ExecutorService executor;
     final private CommandCallback callback;
 
 
-    public CommandExecutor( CommandImpl command, ExecutorService executor, CommandCallback callback ) {
+    public CommandExecutor( AbstractCommand command, ExecutorService executor, CommandCallback callback ) {
 
         Preconditions.checkNotNull( command, "Command is null" );
         Preconditions.checkNotNull( executor, "Executor is null" );
@@ -40,7 +41,7 @@ public class CommandExecutor {
      *
      * @return {@code Command}
      */
-    public CommandImpl getCommand() {
+    public AbstractCommand getCommand() {
         return command;
     }
 

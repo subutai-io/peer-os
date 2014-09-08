@@ -4,6 +4,7 @@ package org.safehaus.subutai.core.dispatcher.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
@@ -20,6 +21,7 @@ import com.google.gson.JsonSyntaxException;
  * DAO for Command Dispatcher
  */
 public class DispatcherDAO {
+    private static final Logger LOG = Logger.getLogger( DispatcherDAO.class.getName() );
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final DbManager dbManager;
@@ -99,6 +101,7 @@ public class DispatcherDAO {
 
     public void saveRemoteRequest( RemoteRequest remoteRequest ) throws DBException {
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
+        LOG.warning( "Inserting new request" );
 
         dbManager.executeUpdate2( "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
                 remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );

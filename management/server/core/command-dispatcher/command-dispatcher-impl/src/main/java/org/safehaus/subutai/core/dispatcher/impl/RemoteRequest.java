@@ -39,4 +39,14 @@ public class RemoteRequest {
     public int getAttempts() {
         return attempts;
     }
+
+
+    @Override
+    public String toString() {
+        return "RemoteRequest{" +
+                "ownerId=" + ownerId +
+                ", commandId=" + commandId +
+                ", attempts=" + attempts +
+                '}';
+    }
 }

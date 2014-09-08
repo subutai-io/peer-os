@@ -61,6 +61,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
         //use PeerManager to figure out IP of target peer by UUID
         //check if peers are accessible otherwise throw RunCommandException
+        //check if agents are connected otherwise throw RunCommandException
         //send requests in batch to each peer
     }
 
@@ -113,6 +114,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                 } );
             }
             else {
+                LOG.warning(String.format( "Existing request %s" ,remoteRequest));
                 throw new RunCommandException(
                         String.format( "Command %s is already queued for processing", commandId ) );
             }

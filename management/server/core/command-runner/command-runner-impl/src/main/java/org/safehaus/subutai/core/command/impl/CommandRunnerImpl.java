@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.command.AbstractCommand;
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
@@ -158,10 +159,10 @@ public class CommandRunnerImpl implements CommandRunner {
      */
     public void runCommandAsync( final Command command, CommandCallback commandCallback ) {
         Preconditions.checkNotNull( command, "Command is null" );
-        Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
+        Preconditions.checkArgument( command instanceof AbstractCommand, "Command is of wrong type" );
         Preconditions.checkNotNull( commandCallback, "Callback is null" );
 
-        final CommandImpl commandImpl = ( CommandImpl ) command;
+        final AbstractCommand commandImpl = ( AbstractCommand ) command;
         Preconditions.checkArgument( commandExecutors.get( commandImpl.getCommandUUID() ) == null,
                 "" + "This command has been already queued for execution" );
         Preconditions.checkArgument( !commandImpl.getRequests().isEmpty(), "Requests are empty" );
