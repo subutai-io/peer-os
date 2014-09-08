@@ -14,6 +14,8 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -144,7 +146,21 @@ public class Manager {
                     return;
                 }
 
-                Set<Agent> set = new HashSet<>(config.getHadoopNodes());
+                Set<Agent> set = null;
+                if(config.getSetupType() == SetupType.OVER_HADOOP) {
+                    String hn = config.getHadoopClusterName();
+                    if(hn != null && !hn.isEmpty()) {
+                        HadoopClusterConfig hci = SparkUI.getHadoopManager().getCluster(hn);
+                        if(hci != null)
+                            set = new HashSet<>(hci.getAllNodes());
+                    }
+                } else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                    set = new HashSet<>(config.getHadoopNodes());
+
+                if(set == null) {
+                    show("Hadoop cluster not found");
+                    return;
+                }
                 set.removeAll(config.getAllNodes());
                 if(set.isEmpty()) {
                     show("All nodes in Hadoop cluster have Hive installed");
