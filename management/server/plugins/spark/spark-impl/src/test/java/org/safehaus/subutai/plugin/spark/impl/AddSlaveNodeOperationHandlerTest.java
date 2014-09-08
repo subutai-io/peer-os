@@ -9,7 +9,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.AddSlaveNodeOperationHandler;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 import java.util.Arrays;

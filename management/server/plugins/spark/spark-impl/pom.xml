@@ -11,7 +11,7 @@
 
   <artifactId>spark-plugin-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Spark</name>
+  <name>Subutai Spark Impl</name>
   <description>Subutai Spark</description>
 
   <dependencies>
@@ -27,10 +27,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>product-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

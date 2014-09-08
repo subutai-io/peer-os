@@ -28,14 +28,4 @@ public class UninstallNodeOperationHandlerTest {
         Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
-
-    @Test
-    public void testWithExistingCluster() {
-        mock.setClusterConfig( new SparkClusterConfig() );
-        handler.run();
-
-        ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue(po.getLog().toLowerCase().contains("uninstallation failed"));
-        Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
-    }
 }

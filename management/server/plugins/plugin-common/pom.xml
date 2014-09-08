@@ -25,6 +25,11 @@
       <artifactId>db-manager-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>command-runner-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -41,7 +46,6 @@
       <artifactId>mockito-all</artifactId>
       <version>1.8.5</version>
     </dependency>
-
   </dependencies>
 
   <build>
