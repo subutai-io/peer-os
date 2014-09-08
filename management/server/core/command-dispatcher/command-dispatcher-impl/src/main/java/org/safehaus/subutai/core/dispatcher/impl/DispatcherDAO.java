@@ -107,11 +107,12 @@ public class DispatcherDAO {
     }
 
 
-    public void deleteRemoteRequest( RemoteRequest remoteRequest ) throws DBException {
-        Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
+    public void deleteRemoteRequest( UUID commandId, int attempts ) throws DBException {
+        Preconditions.checkArgument( attempts >= 0, "Attempts < 0" );
+        Preconditions.checkNotNull( commandId, "Command id is null" );
 
         dbManager.executeUpdate2( "delete from remote_requests where commandId = ? and attempts = ?",
-                remoteRequest.getCommandId().toString(), remoteRequest.getAttempts() );
+                commandId.toString(), attempts );
     }
 
 
