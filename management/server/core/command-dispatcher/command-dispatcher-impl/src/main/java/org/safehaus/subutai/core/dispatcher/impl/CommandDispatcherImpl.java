@@ -35,6 +35,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final DispatcherDAO dispatcherDAO;
+    private UUID subutaiId;
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
@@ -49,6 +50,11 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     public void destroy() {}
+
+
+    public void setSubutaiId( final String subutaiId ) {
+        this.subutaiId = UUID.fromString( subutaiId );
+    }
 
 
     private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
