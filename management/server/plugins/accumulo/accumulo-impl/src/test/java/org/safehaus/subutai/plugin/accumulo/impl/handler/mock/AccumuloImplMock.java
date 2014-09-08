@@ -25,9 +25,7 @@ public class AccumuloImplMock extends AccumuloImpl {
 
 
     public AccumuloImplMock() {
-//        super( new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock(),
-//                mock( Hadoop.class ), mock( Zookeeper.class ), mock( EnvironmentManager.class ));
-        super ( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), MockBuilder.getTrackerMock(),
+        super ( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), mock( Tracker.class ),
                 mock( Hadoop.class ), mock( Zookeeper.class ), mock( EnvironmentManager.class ) );
     }
 

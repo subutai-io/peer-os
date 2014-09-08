@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.mock.AccumuloImplMock;
-import org.safehaus.subutai.plugin.accumulo.impl.handler.mock.MockBuilder;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 
 import static junit.framework.Assert.assertTrue;
