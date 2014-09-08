@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <service ref="peerManager" interface="org.safehaus.subutai.peer.api.PeerManager" />
+
+  <reference id="dbManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.db.api.DbManager" />
+
+  <bean id="peerManager" init-method="init" destroy-method="destroy" scope="singleton"
+        class="org.safehaus.subutai.peer.impl.PeerImpl">
+    <property name="dbManager" ref="dbManager" />
+  </bean>
+
+</blueprint>

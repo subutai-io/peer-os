@@ -6,11 +6,11 @@
 
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
-    <cxf:bus id="cxfBus1">
+    <!--<cxf:bus id="cxfBus1">
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
-    </cxf:bus>
+    </cxf:bus>-->
     <jaxrs:server address="/hadoop2" id="hadoopRestService">
         <jaxrs:serviceBeans>
             <ref component-id="hadoopRestServiceImpl"/>
