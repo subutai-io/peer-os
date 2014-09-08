@@ -1,6 +1,9 @@
 package org.safehaus.subutai.cli.commands;
 
 
+import java.util.UUID;
+
+import org.safehaus.subutai.peer.api.Peer;
 import org.safehaus.subutai.peer.api.PeerManager;
 
 import org.apache.felix.gogo.commands.Command;
@@ -10,8 +13,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command( scope = "peer", name = "get-host-id" )
-public class PetCommand extends OsgiCommandSupport {
+@Command(scope = "peer", name = "register")
+public class PeerRegisterCommand extends OsgiCommandSupport {
 
     private PeerManager peerManager;
 
@@ -28,7 +31,19 @@ public class PetCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        System.out.println( peerManager.getHostId() );
+        Peer peer = getSamplePeer();
+
+        String result = peerManager.registerPeer( peer );
+        System.out.println( result );
         return null;
+    }
+
+
+    private Peer getSamplePeer() {
+        Peer peer = new Peer();
+        peer.setName( "Peer name" );
+        peer.setIp( "10.10.10.10" );
+        peer.setId( UUID.randomUUID().toString() );
+        return peer;
     }
 }

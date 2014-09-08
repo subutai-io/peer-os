@@ -56,6 +56,6 @@ public class PeerUI implements PortalModule {
 
     @Override
     public Component createComponent() {
-        return new PeerForm();
+        return new PeerForm(this);
     }
 }

@@ -41,4 +41,11 @@ create table nodes (
 );
 create index on nodes(env_id);
 
+create table peer_info
+(
+source text,
+key text,
+info text,
+primary key(source,key)
+);
 
