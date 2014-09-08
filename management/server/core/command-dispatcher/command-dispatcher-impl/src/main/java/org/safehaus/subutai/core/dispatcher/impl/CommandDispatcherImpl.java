@@ -47,6 +47,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     public void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         //use PeerManager to figure out IP of target peer by UUID
+        //check if peers are accessible otherwise throw RunCommandException
         //send requests in batch to each peer
     }
 
