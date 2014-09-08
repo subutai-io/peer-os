@@ -59,7 +59,7 @@ public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupSt
         }
 
         SetupHelper helper = new SetupHelper(manager, config, po);
-        helper.configureMaster();
+        helper.configureMasterIP(config.getSlaveNodes());
         helper.registerSlaves();
         helper.startCluster();
 

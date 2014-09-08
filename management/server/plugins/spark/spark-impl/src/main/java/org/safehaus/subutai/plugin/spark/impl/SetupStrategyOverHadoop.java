@@ -94,7 +94,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
                 po.addLog("Installation succeeded");
 
                 SetupHelper helper = new SetupHelper(manager, config, po);
-                helper.configureMaster();
+                helper.configureMasterIP(config.getSlaveNodes());
                 helper.registerSlaves();
                 helper.startCluster();
 

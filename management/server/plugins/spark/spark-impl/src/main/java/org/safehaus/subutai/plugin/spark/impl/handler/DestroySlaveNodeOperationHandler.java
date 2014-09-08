@@ -9,7 +9,9 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -91,25 +93,35 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         boolean uninstall = !agent.equals(config.getMasterNode());
 
         if(uninstall) {
-            po.addLog("Uninstalling Spark...");
 
-            Command uninstallCommand = Commands.getUninstallCommand(Sets.newHashSet(agent));
-            manager.getCommandRunner().runCommand(uninstallCommand);
+            if(config.getSetupType() == SetupType.OVER_HADOOP) {
+                po.addLog("Uninstalling Spark...");
 
-            if(uninstallCommand.hasCompleted()) {
-                AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
-                if(result.getExitCode() != null && result.getExitCode() == 0)
-                    if(result.getStdOut().contains("Spark is not installed, so not removed"))
-                        po.addLog(String.format("Spark is not installed, so not removed on node %s",
-                                agent.getHostname()));
+                Command uninstallCommand = Commands.getUninstallCommand(Sets.newHashSet(agent));
+                manager.getCommandRunner().runCommand(uninstallCommand);
+
+                if(uninstallCommand.hasCompleted()) {
+                    AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
+                    if(result.getExitCode() != null && result.getExitCode() == 0)
+                        if(result.getStdOut().contains("Spark is not installed, so not removed"))
+                            po.addLog(String.format("Spark is not installed, so not removed on node %s",
+                                    agent.getHostname()));
+                        else
+                            po.addLog(String.format("Spark is removed from node %s", agent.getHostname()));
                     else
-                        po.addLog(String.format("Spark is removed from node %s", agent.getHostname()));
-                else
-                    po.addLog(String.format("Error %s on node %s", result.getStdErr(), agent.getHostname()));
-            } else {
-                po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
-                return;
-            }
+                        po.addLog(String.format("Error %s on node %s", result.getStdErr(), agent.getHostname()));
+                } else {
+                    po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
+                    return;
+                }
+            } else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                try {
+                    manager.getContainerManager().cloneDestroy(
+                            agent.getParentHostName(), agent.getHostname());
+                } catch(LxcDestroyException ex) {
+                    po.addLog("Failed to destroy container: " + ex.getMessage());
+                }
+
         } else {
             po.addLog("Stopping slave...");
 

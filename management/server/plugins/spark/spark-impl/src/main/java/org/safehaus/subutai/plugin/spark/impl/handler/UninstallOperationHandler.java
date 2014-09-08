@@ -3,9 +3,10 @@ package org.safehaus.subutai.plugin.spark.impl.handler;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
@@ -34,33 +35,51 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
             }
         }
 
-        po.addLog("Uninstalling Spark...");
+        boolean ok = false;
+        if(config.getSetupType() == SetupType.OVER_HADOOP)
+            ok = uninstall(config);
+        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+            ok = destroyNodes(config);
+        else
+            po.addLog("Undefined setup type");
 
-        Command uninstallCommand = Commands.getUninstallCommand(config.getAllNodes());
-        manager.getCommandRunner().runCommand(uninstallCommand);
-
-        if(uninstallCommand.hasCompleted()) {
-            for(AgentResult result : uninstallCommand.getResults().values()) {
-                Agent agent = manager.getAgentManager().getAgentByUUID(result.getAgentUUID());
-                if(result.getExitCode() != null && result.getExitCode() == 0)
-                    if(result.getStdOut().contains("Spark is not installed, so not removed"))
-                        po.addLog(String.format("Spark is not installed, so not removed on node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname()));
-                    else
-                        po.addLog(String.format("Spark is removed from node %s",
-                                agent == null ? result.getAgentUUID() : agent.getHostname()));
-                else
-                    po.addLog(String.format("Error %s on node %s", result.getStdErr(),
-                            agent == null ? result.getAgentUUID() : agent.getHostname()));
-            }
+        if(ok) {
             po.addLog("Updating db...");
             try {
-                manager.getPluginDAO().deleteInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName());
+                manager.getPluginDAO().deleteInfo(SparkClusterConfig.PRODUCT_KEY,
+                        config.getClusterName());
                 po.addLogDone("Cluster info deleted from DB\nDone");
-            } catch(DBException ex) {
-                po.addLogFailed("Error while deleting cluster info from DB: " + ex.getMessage());
+            } catch(DBException e) {
+                po.addLogFailed("Failed to delete cluster info from DB");
             }
         } else
-            po.addLogFailed(String.format("Uninstallation failed, %s", uninstallCommand.getAllErrors()));
+            po.addLogFailed("Failed to destroy cluster");
+    }
+
+    private boolean uninstall(SparkClusterConfig config) {
+        ProductOperation po = productOperation;
+        po.addLog("Uninstalling Spark...");
+
+        Command cmd = Commands.getUninstallCommand(config.getAllNodes());
+        manager.getCommandRunner().runCommand(cmd);
+
+        if(cmd.hasSucceeded()) return true;
+
+        po.addLog(cmd.getAllErrors());
+        po.addLogFailed("Uninstallation failed");
+        return false;
+    }
+
+    private boolean destroyNodes(SparkClusterConfig config) {
+
+        productOperation.addLog("Destroying node(s)...");
+        try {
+            manager.getContainerManager().clonesDestroy(config.getAllNodes());
+            productOperation.addLog("Destroying node(s) completed");
+            return true;
+        } catch(LxcDestroyException ex) {
+            productOperation.addLog("Failed to destroy node(s): " + ex.getMessage());
+            return false;
+        }
     }
 }
