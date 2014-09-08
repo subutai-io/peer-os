@@ -2,17 +2,24 @@ package org.safehaus.subutai.core.dispatcher.impl;
 
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+
+import com.google.common.base.Preconditions;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -21,7 +28,14 @@ import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 public class CommandDispatcherImpl implements CommandDispatcher {
     private static final Logger LOG = Logger.getLogger( CommandDispatcherImpl.class.getName() );
 
-    private final Queue<ResponseListener> listeners = new ConcurrentLinkedQueue<>();
+    private AgentManager agentManager;
+    private CommandRunner commandRunner;
+
+
+    public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner ) {
+        this.agentManager = agentManager;
+        this.commandRunner = commandRunner;
+    }
 
 
     public void init() {}
@@ -30,7 +44,6 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     public void destroy() {}
 
 
-    @Override
     public void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         //use PeerManager to figure out IP of target peer by UUID
@@ -38,40 +51,86 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     }
 
 
-    @Override
-    public void addListener( final ResponseListener listener ) {
-        try {
-            if ( !listeners.contains( listener ) ) {
-                listeners.add( listener );
-            }
-        }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error to add a listener:", ex );
-        }
-    }
-
-
-    @Override
-    public void removeListener( final ResponseListener listener ) {
-        try {
-            listeners.remove( listener );
-        }
-        catch ( Exception ex ) {
-            LOG.log( Level.SEVERE, "Error in removeListener", ex );
-        }
-    }
-
-
-    @Override
     public void processResponse( final Set<Response> responses ) {
         //trigger CommandRunner.onResponse
     }
 
 
-    @Override
     public void executeRequests( final UUID initiatorId, final Set<BatchRequest> requests ) {
         //execute requests using Command Runner
         //upon response in callback, cache response to persistent queue (key => initiator id)
         //some background thread should iterate this queue and attempt to send responses back to initiator
+    }
+
+
+    @Override
+    public void runCommandAsync( final Command command, final CommandCallback commandCallback ) {
+        Preconditions.checkNotNull( command, "Command is null" );
+        Preconditions.checkArgument( command instanceof CommandImpl, "Command is of wrong type" );
+        Preconditions.checkNotNull( commandCallback, "Callback is null" );
+
+        final CommandImpl commandImpl = ( CommandImpl ) command;
+
+        if ( commandImpl.getRemoteRequests().isEmpty() ) {
+
+            //send local commands
+
+            commandRunner.runCommandAsync( command, commandCallback );
+        }
+        else {
+            //send remote commands
+            //send local commands
+        }
+    }
+
+
+    @Override
+    public void runCommandAsync( final Command command ) {
+        runCommandAsync( command, new CommandCallback() );
+    }
+
+
+    @Override
+    public void runCommand( final Command command ) {
+        runCommandAsync( command, new CommandCallback() );
+        ( ( CommandImpl ) command ).waitCompletion();
+    }
+
+
+    @Override
+    public void runCommand( final Command command, final CommandCallback commandCallback ) {
+        runCommandAsync( command, commandCallback );
+        ( ( CommandImpl ) command ).waitCompletion();
+    }
+
+
+    @Override
+    public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
+        return new CommandImpl( null, requestBuilder, agents );
+    }
+
+
+    @Override
+    public Command createCommand( final String description, final RequestBuilder requestBuilder,
+                                  final Set<Agent> agents ) {
+        return new CommandImpl( description, requestBuilder, agents );
+    }
+
+
+    @Override
+    public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
+        return new CommandImpl( null, agentRequestBuilders );
+    }
+
+
+    @Override
+    public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
+        return new CommandImpl( description, agentRequestBuilders );
+    }
+
+
+    @Override
+    public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
+        throw new NotImplementedException();
     }
 }

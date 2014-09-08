@@ -6,12 +6,10 @@
 package org.safehaus.subutai.core.command.impl;
 
 
-import org.junit.Test;
-import org.safehaus.subutai.core.command.api.CommandCallback;
-import org.safehaus.subutai.core.command.impl.CommandExecutor;
-import org.safehaus.subutai.core.command.impl.CommandImpl;
-
 import java.util.concurrent.ExecutorService;
+
+import org.junit.Test;
+import org.safehaus.subutai.common.command.CommandCallback;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

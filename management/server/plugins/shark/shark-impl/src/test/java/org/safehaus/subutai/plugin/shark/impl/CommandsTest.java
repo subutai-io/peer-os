@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.shark.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 
 import static junit.framework.Assert.assertEquals;

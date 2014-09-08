@@ -8,7 +8,7 @@ package org.safehaus.subutai.core.command.impl;
 
 import java.util.concurrent.ExecutorService;
 
-import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.common.command.CommandCallback;
 
 import com.google.common.base.Preconditions;
 
