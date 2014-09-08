@@ -966,6 +966,33 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <!-- Peer Manager Project -->
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-manager-api</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-manager-impl</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-manager-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-manager-ui</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>peer-manager-rest</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Pet Core Project -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
