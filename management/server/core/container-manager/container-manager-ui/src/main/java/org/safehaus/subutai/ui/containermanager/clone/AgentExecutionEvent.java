@@ -1,5 +1,7 @@
 package org.safehaus.subutai.ui.containermanager.clone;
 
+import java.util.Date;
+
 /**
  * Created by timur on 9/8/14.
  */
@@ -7,10 +9,9 @@ public class AgentExecutionEvent {
     private String hostName;
     private String containerName;
     private String description;
-    // TODO: create eventType enum
-    private String eventType;
+    private AgentExecutionEventType eventType;
 
-    public AgentExecutionEvent(String hostName, String containerName, String eventType, String description) {
+    public AgentExecutionEvent(String hostName, String containerName, AgentExecutionEventType eventType, String description) {
         this.hostName = hostName;
         this.containerName = containerName;
         this.eventType = eventType;
@@ -41,7 +42,7 @@ public class AgentExecutionEvent {
         this.description = description;
     }
 
-    public String getEventType() {
+    public AgentExecutionEventType getEventType() {
         return eventType;
     }
 
