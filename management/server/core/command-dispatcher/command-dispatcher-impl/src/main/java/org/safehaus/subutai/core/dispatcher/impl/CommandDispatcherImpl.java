@@ -19,8 +19,6 @@ import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import com.google.common.base.Preconditions;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 
 /**
  * Implementation of CommandDispatcher interface
@@ -131,6 +129,6 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
     @Override
     public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }
