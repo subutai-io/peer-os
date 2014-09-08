@@ -53,7 +53,7 @@ public class DispatcherDAO {
         try {
             ResultSet rs = dbManager
                     .executeQuery2( "select info from remote_responses where commandId = ? order by responseNumber asc",
-                            commandId );
+                            commandId.toString() );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -72,7 +72,7 @@ public class DispatcherDAO {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
         dbManager.executeUpdate2( "insert into remote_responses(commandId,responseNumber, info) values (?,?,?)",
-                remoteResponse.getCommandId(), remoteResponse.getResponse().getResponseSequenceNumber(),
+                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getResponseSequenceNumber(),
                 gson.toJson( remoteResponse ) );
     }
 
@@ -81,7 +81,7 @@ public class DispatcherDAO {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
         dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and responseNumber = ?",
-                remoteResponse.getCommandId(), remoteResponse.getResponse().getResponseSequenceNumber() );
+                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getResponseSequenceNumber() );
     }
 
 
@@ -101,7 +101,7 @@ public class DispatcherDAO {
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
 
         dbManager.executeUpdate2( "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
-                remoteRequest.getCommandId(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );
+                remoteRequest.getCommandId().toString(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );
     }
 
 
@@ -109,14 +109,15 @@ public class DispatcherDAO {
         Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
 
         dbManager.executeUpdate2( "delete from remote_requests where commandId = ? and attempts = ?",
-                remoteRequest.getCommandId(), remoteRequest.getAttempts() );
+                remoteRequest.getCommandId().toString(), remoteRequest.getAttempts() );
     }
 
 
     public RemoteRequest getRemoteRequest( UUID commandId ) throws DBException {
         Preconditions.checkNotNull( commandId, "Command Id is null" );
 
-        ResultSet rs = dbManager.executeQuery2( "select info from remote_requests where commandId = ?", commandId );
+        ResultSet rs =
+                dbManager.executeQuery2( "select info from remote_requests where commandId = ?", commandId.toString() );
 
         if ( rs != null ) {
             Row row = rs.one();
