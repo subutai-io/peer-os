@@ -5,6 +5,7 @@ import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.solr.api.Solr;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String listClusters()
+    public Response listClusters()
     {
 
         List<SolrClusterConfig> configs = solrManager.getClusters();
@@ -42,19 +43,21 @@ public class RestServiceImpl implements RestService
         {
             clusterNames.add( config.getClusterName() );
         }
-        return JsonUtil.toJson( clusterNames );
+        String clusters = JsonUtil.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
     @Override
-    public String getCluster( final String clustername )
+    public Response getCluster(final String clustername)
     {
-        return JsonUtil.toJson( solrManager.getCluster( clustername ) );
+        String cluster = JsonUtil.toJson(solrManager.getCluster(clustername));
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
 
     @Override
-    public String createCluster( final String config )
+    public Response createCluster(final String config)
     {
         TrimmedSolrConfig solrConfig = JsonUtil.fromJson( config, TrimmedSolrConfig.class );
         SolrClusterConfig expandedSolrClusterConfig = new SolrClusterConfig();
@@ -62,41 +65,47 @@ public class RestServiceImpl implements RestService
         expandedSolrClusterConfig.setClusterName( solrConfig.getClusterName() );
         expandedSolrClusterConfig.setNumberOfNodes( 1 );
 
-        return wrapUUID( solrManager.installCluster( expandedSolrClusterConfig ) );
+        String operationId = wrapUUID(solrManager.installCluster(expandedSolrClusterConfig));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName )
+    public Response destroyCluster(final String clusterName)
     {
-        return wrapUUID( solrManager.uninstallCluster( clusterName ) );
+        String operationId = wrapUUID(solrManager.uninstallCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String startNode( final String clusterName, final String lxchostname )
+    public Response startNode(final String clusterName, final String lxcHostname)
     {
-        return wrapUUID( solrManager.startNode( clusterName, lxchostname ) );
+        String operationId = wrapUUID(solrManager.startNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopNode( final String clusterName, final String lxchostname )
+    public Response stopNode(final String clusterName, final String lxcHostname)
     {
-        return wrapUUID( solrManager.stopNode( clusterName, lxchostname ) );
+        String operationId = wrapUUID(solrManager.stopNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clusterName, final String lxchostname )
+    public Response destroyNode(final String clusterName, final String lxcHostname)
     {
-        return wrapUUID( solrManager.destroyNode( clusterName, lxchostname ) );
+        String operationId = wrapUUID(solrManager.destroyNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clusterName, final String lxchostname )
+    public Response checkNode(final String clusterName, final String lxcHostname)
     {
-        return wrapUUID( solrManager.checkNode( clusterName, lxchostname ) );
+        String operationId = wrapUUID(solrManager.checkNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 }
