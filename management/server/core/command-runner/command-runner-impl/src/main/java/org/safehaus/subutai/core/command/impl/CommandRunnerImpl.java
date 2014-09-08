@@ -22,7 +22,6 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -35,7 +34,7 @@ import com.google.common.base.Preconditions;
  * This class is an implementation of CommandRunner interface. Runs commands on agents and routes received responses to
  * corresponding callbacks.
  */
-public class CommandRunnerImpl implements CommandRunner, ResponseListener {
+public class CommandRunnerImpl implements CommandRunner {
 
     private static final Logger LOG = Logger.getLogger( CommandRunnerImpl.class.getName() );
 

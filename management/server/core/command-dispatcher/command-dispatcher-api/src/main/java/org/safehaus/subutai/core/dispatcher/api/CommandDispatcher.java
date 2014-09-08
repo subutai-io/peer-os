@@ -1,6 +1,11 @@
 package org.safehaus.subutai.core.dispatcher.api;
 
 
+import java.util.Set;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.BatchRequest;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 
 
@@ -9,4 +14,7 @@ import org.safehaus.subutai.core.command.api.CommandRunner;
  */
 public interface CommandDispatcher extends CommandRunner {
 
+    public void executeRequests( final UUID ownerId, final Set<BatchRequest> requests );
+
+    public void processResponse( final Set<Response> responses );
 }

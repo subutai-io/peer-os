@@ -10,6 +10,7 @@ import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 
 
@@ -67,5 +68,11 @@ public class CommandRunnerMock implements CommandRunner {
     @Override
     public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
         return null;
+    }
+
+
+    @Override
+    public void onResponse( final Response response ) {
+
     }
 }

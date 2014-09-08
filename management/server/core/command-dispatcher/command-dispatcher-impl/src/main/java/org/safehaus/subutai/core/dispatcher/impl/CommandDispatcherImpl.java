@@ -4,9 +4,11 @@ package org.safehaus.subutai.core.dispatcher.impl;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.RequestBuilder;
@@ -15,6 +17,7 @@ import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
@@ -46,7 +49,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     public void destroy() {}
 
 
-    public void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
+    private void sendRequests( final Map<UUID, Set<BatchRequest>> requests ) {
 
         //use PeerManager to figure out IP of target peer by UUID
         //check if peers are accessible otherwise throw RunCommandException
@@ -54,15 +57,44 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     }
 
 
+    @Override
     public void processResponse( final Set<Response> responses ) {
         //trigger CommandRunner.onResponse
+        for ( Response response : responses ) {
+            commandRunner.onResponse( response );
+        }
     }
 
 
-    public void executeRequests( final UUID initiatorId, final Set<BatchRequest> requests ) {
+    @Override
+    public void executeRequests( final UUID ownerId, final Set<BatchRequest> requests ) {
         //execute requests using Command Runner
-        //upon response in callback, cache response to persistent queue (key => initiator id)
-        //some background thread should iterate this queue and attempt to send responses back to initiator
+
+        Command command = new CommandImpl( requests );
+        commandRunner.runCommandAsync( command, new CommandCallback() {
+            @Override
+            public void onResponse( final Response response, final AgentResult agentResult, final Command command ) {
+                try {
+                    //upon response in callback, cache response to persistent queue (key => initiator id)
+                    RemoteResponse remoteResponse = dispatcherDAO.getRemoteResponse( ownerId, response.getTaskUuid() );
+                    //if no response exists, create a new one
+                    if ( remoteResponse == null ) {
+                        remoteResponse = new RemoteResponse( ownerId, response.getTaskUuid() );
+                    }
+                    //append response
+                    remoteResponse.addResponse( response );
+
+                    //save response to db
+                    dispatcherDAO.saveRemoteResponse( remoteResponse );
+                }
+                catch ( DBException e ) {
+                    LOG.log( Level.SEVERE,
+                            String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(),
+                                    response ) );
+                }
+            }
+        } );
+        //some background thread should iterate this queue and attempt to send responses back to owner
     }
 
 
@@ -133,6 +165,12 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
     @Override
     public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void onResponse( final Response response ) {
         throw new UnsupportedOperationException();
     }
 }
