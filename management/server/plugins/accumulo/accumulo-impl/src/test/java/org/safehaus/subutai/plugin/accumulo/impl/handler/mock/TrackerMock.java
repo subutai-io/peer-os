@@ -1,12 +1,16 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler.mock;
 
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TrackerMock implements Tracker {
     @Override
@@ -17,7 +21,12 @@ public class TrackerMock implements Tracker {
 
     @Override
     public ProductOperation createProductOperation(String source, String description) {
-        return new ProductOperationMock();
+//        return new ProductOperationMock();
+        ProductOperation mock = mock(ProductOperation.class);
+        when( mock.getId() ).thenReturn( null );
+        when( mock.getDescription() ).thenReturn( null );
+        when( mock.getState() ).thenReturn( ProductOperationState.RUNNING );
+        return mock;
     }
 
 
