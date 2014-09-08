@@ -25,13 +25,13 @@ public class AddNodeOperationHandlerTest {
     }
 
 
-    @Test
-    public void testAgentNotConnected() {
-        AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult( true );
-
-        operationHandler.run();
-
-        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
-        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-    }
+//    @Test
+//    public void testAgentNotConnected() {
+//        AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult( true );
+//
+//        operationHandler.run();
+//
+//        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
+//        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
+//    }
 }
