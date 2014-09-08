@@ -71,15 +71,14 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
         final CommandImpl commandImpl = ( CommandImpl ) command;
 
-        if ( commandImpl.getRemoteRequests().isEmpty() ) {
-
-            //send local commands
-
-            commandRunner.runCommandAsync( command, commandCallback );
+        //send remote requests
+        if ( !commandImpl.getRemoteRequests().isEmpty() ) {
+            sendRequests( commandImpl.getRemoteRequests() );
         }
-        else {
-            //send remote commands
-            //send local commands
+
+        //send local requests
+        if ( !commandImpl.getRequests().isEmpty() ) {
+            commandRunner.runCommandAsync( command, commandCallback );
         }
     }
 
