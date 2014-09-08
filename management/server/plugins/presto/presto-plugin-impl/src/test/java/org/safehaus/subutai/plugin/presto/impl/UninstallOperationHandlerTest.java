@@ -7,6 +7,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
 
@@ -33,7 +34,9 @@ public class UninstallOperationHandlerTest {
 
     @Test
     public void testWithExistingCluster() {
-        mock.setClusterConfig( new PrestoClusterConfig() );
+        PrestoClusterConfig config = new PrestoClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
+        mock.setClusterConfig(config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
