@@ -1,13 +1,17 @@
 package org.safehaus.subutai.plugin.storm.rest;
 
-import java.util.*;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.storm.api.Storm;
 import org.safehaus.subutai.plugin.storm.api.StormConfig;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class RestService {
 
@@ -27,7 +31,7 @@ public class RestService {
     @GET
     @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
-    public String getClusters() {
+    public Response getClusters() {
 
         List<StormConfig> configs = stormManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
@@ -36,21 +40,25 @@ public class RestService {
             clusterNames.add(config.getClusterName());
         }
 
-        return JsonUtil.GSON.toJson(clusterNames);
+        String clusters = JsonUtil.GSON.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
+//        return JsonUtil.GSON.toJson(clusterNames);
     }
 
     @GET
     @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String getCluster(@PathParam("clusterName") String clusterName) {
+    public Response getCluster(@PathParam("clusterName") String clusterName) {
         StormConfig config = stormManager.getCluster(clusterName);
-        return JsonUtil.GSON.toJson(config);
+        String clusterInfo = JsonUtil.GSON.toJson(config);
+        return Response.status(Response.Status.OK).entity(clusterInfo).build();
+//        return JsonUtil.GSON.toJson(config);
     }
 
     @POST
     @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String installCluster(
+    public Response installCluster(
             @PathParam("clusterName") String clusterName,
             @QueryParam("externalZookeeper") boolean externalZookeeper,
             @QueryParam("zookeeperClusterName") String zookeeperClusterName,
@@ -70,84 +78,96 @@ public class RestService {
             Integer c = Integer.valueOf(supervisorsCount);
             config.setSupervisorsCount(c);
         } catch(NumberFormatException ex) {
-            return JsonUtil.toJson("error", ex.getMessage());
+            String exception = JsonUtil.toJson("error", ex.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(exception).build();
+//            return JsonUtil.toJson("error", ex.getMessage());
         }
 
         UUID uuid = stormManager.installCluster(config);
-
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
+//        return JsonUtil.toJson(OPERATION_ID, uuid);
     }
 
     @DELETE
     @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String uninstallCluster(@PathParam("clusterName") String clusterName) {
+    public Response uninstallCluster(@PathParam("clusterName") String clusterName) {
         UUID uuid = stormManager.uninstallCluster(clusterName);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @PUT
     @Path("clusters/{clusterName}/nodes")
     @Produces({MediaType.APPLICATION_JSON})
-    public String addNode(
+    public Response addNode(
             @PathParam("clusterName") String clusterName
     ) {
         UUID uuid = stormManager.addNode(clusterName);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @DELETE
     @Path("clusters/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String destroyNode(
+    public Response destroyNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = stormManager.destroyNode(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @GET
     @Path("clusters/{clusterName}/nodes/{hostname}/status")
     @Produces({MediaType.APPLICATION_JSON})
-    public String statusCheck(
+    public Response statusCheck(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = stormManager.statusCheck(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @PUT
     @Path("clusters/{clusterName}/nodes/{hostname}/start")
     @Produces({MediaType.APPLICATION_JSON})
-    public String startNode(
+    public Response startNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = stormManager.startNode(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @PUT
     @Path("clusters/{clusterName}/nodes/{hostname}/stop")
     @Produces({MediaType.APPLICATION_JSON})
-    public String stopNode(
+    public Response stopNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = stormManager.stopNode(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @PUT
     @Path("clusters/{clusterName}/nodes/{hostname}/restart")
     @Produces({MediaType.APPLICATION_JSON})
-    public String restartNode(
+    public Response restartNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = stormManager.restartNode(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 }
