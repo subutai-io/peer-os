@@ -1,9 +1,9 @@
-package org.safehaus.subuta.pet.rest;
+package org.safehaus.subuta.peer.rest;
 
 
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.pet.api.Peer;
-import org.safehaus.subutai.pet.api.PeerManager;
+import org.safehaus.subutai.peer.api.Peer;
+import org.safehaus.subutai.peer.api.PeerManager;
 
 
 /**

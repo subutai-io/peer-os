@@ -19,10 +19,10 @@
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="peerRestServiceImpl" class="org.safehaus.subuta.pet.rest.RestServiceImpl">
+    <bean id="peerRestServiceImpl" class="org.safehaus.subuta.peer.rest.RestServiceImpl">
         <property name="peerManager" ref="peerManager"/>
     </bean>
 
     <reference id="peerManager" availability="mandatory"
-               interface="org.safehaus.subutai.pet.api.PeerManager"/>
+               interface="org.safehaus.subutai.peer.api.PeerManager"/>
 </blueprint>

@@ -1,13 +1,13 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="pet/get-name">
+    <command name="peer/get-host-id">
       <action class="org.safehaus.subutai.cli.commands.PetCommand">
-        <property name="petManager" ref="petManager" />
+        <property name="peerManager" ref="peerManager" />
       </action>
     </command>
   </command-bundle>
 
-  <reference id="petManager" availability="mandatory" interface="org.safehaus.subutai.pet.api.PeerManager" />
+  <reference id="peerManager" availability="mandatory" interface="org.safehaus.subutai.peer.api.PeerManager" />
 
 </blueprint>

@@ -1,7 +1,7 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import org.safehaus.subutai.pet.api.PeerManager;
+import org.safehaus.subutai.peer.api.PeerManager;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;

@@ -1,4 +1,4 @@
-package org.safehaus.subuta.pet.rest;
+package org.safehaus.subuta.peer.rest;
 
 
 import javax.ws.rs.POST;

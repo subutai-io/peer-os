@@ -1,4 +1,4 @@
-package org.safehaus.subutai.pet.api;
+package org.safehaus.subutai.peer.api;
 
 
 /**

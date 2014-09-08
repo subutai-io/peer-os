@@ -1,11 +1,11 @@
-package org.safehaus.subutai.pet.ui;
+package org.safehaus.subutai.peer.ui;
 
 
 import java.io.File;
 
-import org.safehaus.subutai.pet.api.PeerManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.peer.api.PeerManager;
+import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;
 
@@ -17,16 +17,16 @@ public class PeerUI implements PortalModule {
 
     public static final String MODULE_IMAGE = "peer.png";
     public static final String MODULE_NAME = "Peer";
-    private PeerManager petManager;
+    private PeerManager peerManager;
 
 
-    public PeerManager getPetManager() {
-        return petManager;
+    public PeerManager getPeerManager() {
+        return peerManager;
     }
 
 
-    public void setPetManager( final PeerManager petManager ) {
-        this.petManager = petManager;
+    public void setPeerManager( final PeerManager peerManager ) {
+        this.peerManager = peerManager;
     }
 
 

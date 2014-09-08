@@ -1,9 +1,9 @@
-package org.safehaus.subutai.pet.impl;
+package org.safehaus.subutai.peer.impl;
 
 
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.pet.api.Peer;
-import org.safehaus.subutai.pet.api.PeerManager;
+import org.safehaus.subutai.peer.api.Peer;
+import org.safehaus.subutai.peer.api.PeerManager;
 
 
 /**

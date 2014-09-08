@@ -1,8 +1,8 @@
-package org.safehaus.subutai.pet.ui;
+package org.safehaus.subutai.peer.ui;
 
 
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.pet.ui.forms.PeerRegisterForm;
+import org.safehaus.subutai.peer.ui.forms.PeerRegisterForm;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
