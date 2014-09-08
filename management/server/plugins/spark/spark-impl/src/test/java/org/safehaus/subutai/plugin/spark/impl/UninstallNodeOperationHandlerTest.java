@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.UninstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
@@ -31,7 +32,9 @@ public class UninstallNodeOperationHandlerTest {
 
     @Test
     public void testWithExistingCluster() {
-        mock.setClusterConfig( new SparkClusterConfig() );
+        SparkClusterConfig config = new SparkClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
+        mock.setClusterConfig(config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();

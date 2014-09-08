@@ -1,12 +1,11 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 
 
 public class CommandsTest {
@@ -24,7 +23,7 @@ public class CommandsTest {
         Command command = commands.getInstallCommand( null );
 
         assertNotNull(command);
-        assertEquals("sleep 20; apt-get --force-yes --assume-yes install ksks-spark", command.getDescription() );
+        assertEquals("sleep 20; apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription());
     }
 
     @Test
@@ -32,7 +31,7 @@ public class CommandsTest {
         Command command = commands.getUninstallCommand( null );
 
         assertNotNull(command);
-        assertEquals("apt-get --force-yes --assume-yes purge ksks-spark", command.getDescription() );
+        assertEquals("apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription());
     }
 
     @Test

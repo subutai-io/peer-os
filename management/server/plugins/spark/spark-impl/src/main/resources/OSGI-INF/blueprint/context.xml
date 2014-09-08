@@ -9,13 +9,22 @@
                interface="org.safehaus.subutai.core.tracker.api.Tracker"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.core.db.api.DbManager"/>
+    <reference id="environmentManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
+    <reference id="hadoopManager" availability="mandatory"
+               interface="org.safehaus.subutai.plugin.hadoop.api.Hadoop"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
 
     <bean id="spark-impl" scope="singleton" class="org.safehaus.subutai.plugin.spark.impl.SparkImpl"
           init-method="init" destroy-method="destroy">
-        <argument ref="commandRunner"/>
-        <argument ref="agentManager"/>
-        <argument ref="dbManager"/>
-        <argument ref="tracker"/>
+        <property name="commandRunner" ref="commandRunner"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="tracker" ref="tracker"/>
+        <property name="dbManager" ref="dbManager"/>
+        <property name="environmentManager" ref="environmentManager"/>
+        <property name="hadoopManager" ref="hadoopManager"/>
+        <property name="containerManager" ref="containerManager"/>
     </bean>
 
     <service ref="spark-impl" interface="org.safehaus.subutai.plugin.spark.api.Spark"/>
