@@ -15,6 +15,7 @@ import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import com.google.common.base.Preconditions;
@@ -26,13 +27,16 @@ import com.google.common.base.Preconditions;
 public class CommandDispatcherImpl implements CommandDispatcher {
     private static final Logger LOG = Logger.getLogger( CommandDispatcherImpl.class.getName() );
 
-    private AgentManager agentManager;
-    private CommandRunner commandRunner;
+    private final AgentManager agentManager;
+    private final CommandRunner commandRunner;
+    private final DispatcherDAO dispatcherDAO;
 
 
-    public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner ) {
+    public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
+                                  final DbManager dbManager ) {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
+        this.dispatcherDAO = new DispatcherDAO( dbManager );
     }
 
 

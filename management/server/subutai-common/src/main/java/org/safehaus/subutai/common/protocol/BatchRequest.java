@@ -33,6 +33,11 @@ public class BatchRequest {
     }
 
 
+    public UUID getCommandId() {
+        return request.getTaskUuid();
+    }
+
+
     public Set<Request> getRequests() {
         Set<Request> requests = new HashSet<>();
         for ( UUID targetUUID : targetUUIDs ) {
