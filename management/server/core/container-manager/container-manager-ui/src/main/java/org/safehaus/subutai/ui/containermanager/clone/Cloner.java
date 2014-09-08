@@ -3,6 +3,7 @@ package org.safehaus.subutai.ui.containermanager.clone;
 
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -18,10 +19,12 @@ import org.safehaus.subutai.ui.containermanager.ContainerUI;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 
 @SuppressWarnings("serial")
-public class Cloner extends VerticalLayout {
+public class Cloner extends VerticalLayout implements AgentExecutionListener {
+    private static final Logger LOG = Logger.getLogger(Cloner.class.getName());
 
     private final AgentTree agentTree;
     private final Button cloneBtn;
@@ -38,6 +41,8 @@ public class Cloner extends VerticalLayout {
     private final String hostValidatorRegex =
             "^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,"
                     + "61}[0-9A-Za-z])?)*\\.?$";
+    AtomicInteger countProcessed = null;
+    AtomicInteger errorProcessed = null;
 
 
     public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
@@ -125,10 +130,10 @@ public class Cloner extends VerticalLayout {
             return;
         }
 
-//        show(String.format("Selected physical servers count: %d", physicalAgents.size()));
-        Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        final Map<Agent, List<String>> agentFamilies = new HashMap<>();
+        final double count = (Double) slider.getValue();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
-            final double count = (Double) slider.getValue();
+
             Map<Agent, Integer> bestServers = containerManager.getPhysicalServersWithLxcSlots();
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
@@ -148,8 +153,7 @@ public class Cloner extends VerticalLayout {
                 Map<Agent, Integer> sortedBestServers =
                         CollectionUtil.sortMapByValueDesc(bestServers);
                 final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
-                entry.setValue(entry.getValue() - 1);
-//                bestServers.put(entry.getKey(), entry.getValue() - 1);
+                bestServers.put(entry.getKey(), entry.getValue() - 1);
                 List<String> lxcHostNames = agentFamilies.get(entry.getKey());
                 if (lxcHostNames == null) {
                     lxcHostNames = new ArrayList<>();
@@ -158,7 +162,6 @@ public class Cloner extends VerticalLayout {
                 lxcHostNames.add(String.format("%s%d_%s", productName, lxcHostNames.size() + 1, UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_')));
             }
         } else { // process cloning in selected hosts
-            double count = (Double) slider.getValue();
             for (Agent physAgent : physicalAgents) {
                 List<String> lxcHostNames = new ArrayList<>();
                 for (int i = 1; i <= count; i++) {
@@ -168,20 +171,22 @@ public class Cloner extends VerticalLayout {
             }
         }
 
-//        indicator.setVisible(true);
+        indicator.setVisible(true);
         populateLxcTable(agentFamilies);
-//        final AtomicInteger countProcessed = new AtomicInteger((int) (cloneNames.size()));
-
-        CompletionService completionService = ContainerUI.getCompletionService();
-        for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-            completionService.submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    executeAgent(agg.getKey().getHostname(), "master", agg.getValue());
-                    return true;
+        countProcessed = new AtomicInteger((int) (count));
+        errorProcessed = new AtomicInteger((int) (0));
+        final Cloner self = this;
+        ContainerUI.getExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
+//                    executors.add(executeAgent(agg.getKey().getHostname(), "master", agg.getValue()));
+                    AgentExecutor agentExecutor = new AgentExecutor(agg.getKey().getHostname(), "master", agg.getValue());
+                    agentExecutor.addListener(self);
+                    agentExecutor.execute(Executors.newFixedThreadPool(1));
                 }
-            });
-        }
+            }
+        });
 //
 //        boolean resultCumulator = true;
 //        for (int i = 0; i < agentFamilies.size(); i++) {
@@ -210,31 +215,167 @@ public class Cloner extends VerticalLayout {
      * @param cloneNames
      * @return
      */
-    private void executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
-
+    private ExecutorService executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         for (final String lxcHostname : cloneNames) {
             executor.execute(new Runnable() {
                 public void run() {
-                    Item row = lxcTable.getItem(lxcHostname);
-                    if (row != null)
-                        row.getItemProperty("Status")
-                                .setValue(new Embedded("", new ThemeResource(loadIconSource)));
+                    updateContainerStatus(lxcHostname, new ThemeResource(loadIconSource));
                     try {
                         containerManager.clone(hostName, templateName, lxcHostname);
-
-                        if (row != null)
-                            row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(okIconSource)));
+                        updateContainerStatus(lxcHostname, new ThemeResource(okIconSource));
 
                     } catch (ContainerCreateException ce) {
-                        if (row != null)
-                            row.getItemProperty("Status")
-                                    .setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                        updateContainerStatus(lxcHostname, new ThemeResource(errorIconSource));
+                        errorProcessed.incrementAndGet();
                     }
-//                    countProcessed.decrementAndGet();
                 }
             });
+        }
+        return executor;
+    }
+
+    @Override
+    public void onExecutionEvent(AgentExecutionEvent event) {
+        LOG.info(event.toString());
+        updateContainerStatus(event);
+    }
+
+    private class AgentExecutor {
+        private String hostName;
+        private String templateName;
+        private List<String> cloneNames;
+        private CompletionService<AgentExecutionEvent> completionService;
+        private ExecutorService executor;
+        private List<AgentExecutionListener> listeners = new ArrayList<>();
+        ExecutorService waiter = Executors.newFixedThreadPool(1);
+
+        public AgentExecutor(String hostName, String templateName, List<String> cloneNames) {
+            this.hostName = hostName;
+            this.templateName = templateName;
+            this.cloneNames = cloneNames;
+        }
+
+        public void addListener(org.safehaus.subutai.ui.containermanager.clone.AgentExecutionListener listener) {
+            if (listener != null)
+                listeners.add(listener);
+        }
+
+        public void execute(final ExecutorService executor) {
+            this.executor = executor;
+            completionService = new ExecutorCompletionService(executor);
+            for (final String lxcHostname : cloneNames) {
+                completionService.submit(new Callable() {
+                    public AgentExecutionEvent call() {
+                        fireEvent(new AgentExecutionEvent(hostName, lxcHostname, "STARTED", ""));
+                        try {
+                            containerManager.clone(hostName, templateName, lxcHostname);
+                            return (new AgentExecutionEvent(hostName, lxcHostname, "SUCCESS", ""));
+                        } catch (ContainerCreateException ce) {
+                            return (new AgentExecutionEvent(hostName, lxcHostname, "FAIL", ce.toString()));
+                        }
+//                        return new AgentExecutionEvent(hostName, lxcHostname, "FINISH", "");
+                    }
+                });
+            }
+
+            executor.shutdown();
+            waiter.execute(new Runnable() {
+                @Override
+                public void run() {
+                    for (String cn : cloneNames) {
+                        try {
+                            Future<AgentExecutionEvent> future = completionService.take();
+                            AgentExecutionEvent result = future.get();
+                            fireEvent(result);
+                        } catch (InterruptedException | ExecutionException e) {
+                            fireEvent(new AgentExecutionEvent(hostName, "", "ERROR", e.toString()));
+                        }
+                    }
+                }
+            });
+            waiter.shutdown();
+        }
+
+        private void fireEvent(AgentExecutionEvent event) {
+            for (AgentExecutionListener listener : listeners) {
+                listener.onExecutionEvent(event);
+            }
+        }
+    }
+
+    /**
+     * Executes cloning action for agent.
+     *
+     * @param hostName
+     * @param templateName
+     * @param cloneNames
+     * @return
+     */
+    private void executeAgentOld(final String hostName, final String templateName, List<String> cloneNames) {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        for (final String lxcHostname : cloneNames) {
+            executor.execute(new Runnable() {
+                ExecutorService executor;
+
+                public void run() {
+                    updateContainerStatus(lxcHostname, new ThemeResource(loadIconSource));
+                    try {
+                        containerManager.clone(hostName, templateName, lxcHostname);
+                        updateContainerStatus(lxcHostname, new ThemeResource(okIconSource));
+
+                    } catch (ContainerCreateException ce) {
+                        updateContainerStatus(lxcHostname, new ThemeResource(errorIconSource));
+                        errorProcessed.incrementAndGet();
+                    }
+                    int i = countProcessed.decrementAndGet();
+                    if (i == 0) {
+                        indicator.setVisible(false);
+                    }
+
+                }
+            });
+        }
+    }
+
+    private void updateContainerStatus(final String lxcHostname, final ThemeResource resource) {
+        getUI().access(new Runnable() {
+            @Override
+            public void run() {
+                Item row = lxcTable.getItem(lxcHostname);
+                if (row != null) {
+                    Property p = row.getItemProperty("Status");
+                    p.setValue(new Embedded("", resource));
+
+                }
+            }
+        });
+    }
+
+
+    private void updateContainerStatus(AgentExecutionEvent event) {
+        Item row = lxcTable.getItem(event.getContainerName());
+        if (row != null) {
+            Property p = row.getItemProperty("Status");
+            if ("STARTED".equals(event.getEventType()))
+                p.setValue(new Embedded("", new ThemeResource(loadIconSource)));
+            else if ("SUCCESS".equals(event.getEventType())) {
+                p.setValue(new Embedded("", new ThemeResource(okIconSource)));
+                countProcessed.decrementAndGet();
+            } else if ("FAIL".equals(event.getEventType())) {
+                p.setValue(new Embedded("", new ThemeResource(errorIconSource)));
+                countProcessed.decrementAndGet();
+                errorProcessed.incrementAndGet();
+            }
+        }
+
+        if (countProcessed.intValue() == 0) {
+            indicator.setVisible(false);
+            if (errorProcessed.intValue() == 0)
+                show("Cloning containers finished successfully.");
+            else
+                show("Not all containers successfully created.");
+
         }
     }
 
