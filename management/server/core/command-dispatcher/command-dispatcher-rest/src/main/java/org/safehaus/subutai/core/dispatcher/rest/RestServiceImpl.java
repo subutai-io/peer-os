@@ -31,7 +31,7 @@ public class RestServiceImpl implements RestService {
     public Response processResponses( final String responses ) {
         try {
             Set<org.safehaus.subutai.common.protocol.Response> resps =
-                    gson.fromJson( responses, new TypeToken<LinkedHashSet<BatchRequest>>() {}.getType() );
+                    gson.fromJson( responses, new TypeToken<LinkedHashSet<org.safehaus.subutai.common.protocol.Response>>() {}.getType() );
             dispatcher.processResponses( resps );
             return Response.ok().build();
         }

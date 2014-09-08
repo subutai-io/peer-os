@@ -72,6 +72,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
         //trigger CommandRunner.onResponse
         for ( Response response : responses ) {
+            LOG.warning( response.toString() );
             commandRunner.onResponse( response );
         }
     }
