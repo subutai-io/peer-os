@@ -45,7 +45,7 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public String registerPeer( final Peer peer ) {
+    public String register( final Peer peer ) {
 
         LOG.info( "Registering peer: " + peer.getName() );
         try {
@@ -76,5 +76,18 @@ public class PeerImpl implements PeerManager {
             e.printStackTrace();
         }
         return peers;
+    }
+
+
+    @Override
+    public boolean unregister( final String uuid ) {
+        try {
+            peerDAO.deleteInfo( source, uuid );
+        }
+        catch ( DBException e ) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

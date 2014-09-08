@@ -38,7 +38,7 @@ public class RestServiceImpl implements RestService {
     public String registerPeer( final String config ) {
         Peer peer = JsonUtil.fromJson( config, Peer.class );
 
-        return peerManager.registerPeer( peer );
+        return peerManager.register( peer );
     }
 
 

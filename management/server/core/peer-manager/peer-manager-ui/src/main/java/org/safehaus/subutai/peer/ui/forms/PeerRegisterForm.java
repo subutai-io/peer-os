@@ -190,7 +190,7 @@ public class PeerRegisterForm extends CustomComponent {
                 peer.setName( name );
                 peer.setIp( ip );
                 peer.setId( id );
-                peerUI.getPeerManager().registerPeer(peer);
+                peerUI.getPeerManager().register(peer);
             }
         } );
 

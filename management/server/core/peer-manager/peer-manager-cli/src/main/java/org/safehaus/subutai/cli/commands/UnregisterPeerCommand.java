@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.peer.api.Peer;
 import org.safehaus.subutai.peer.api.PeerManager;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
@@ -13,8 +14,11 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command(scope = "peer", name = "register")
-public class PeerRegisterCommand extends OsgiCommandSupport {
+@Command( scope = "peer", name = "unregister" )
+public class UnregisterPeerCommand extends OsgiCommandSupport {
+
+    @Argument(index = 0, name = "uuid",  multiValued = false, description = "Peer UUID")
+    private String uuid;
 
     private PeerManager peerManager;
 
@@ -31,9 +35,8 @@ public class PeerRegisterCommand extends OsgiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Peer peer = getSamplePeer();
 
-        String result = peerManager.register( peer );
+        boolean result = peerManager.unregister(uuid);
         System.out.println( result );
         return null;
     }
