@@ -1,4 +1,4 @@
-package org.safehaus.subutai.plugin.accumulo.impl.handler.mock;
+package org.safehaus.subutai.plugin.common.mock;
 
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;

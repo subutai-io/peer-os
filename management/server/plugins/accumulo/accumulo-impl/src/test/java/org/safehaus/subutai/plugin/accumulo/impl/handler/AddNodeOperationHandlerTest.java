@@ -1,6 +1,5 @@
 package org.safehaus.subutai.plugin.accumulo.impl.handler;
 
-
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
@@ -22,15 +21,4 @@ public class AddNodeOperationHandlerTest {
         assertTrue( operationHandler.getProductOperation().getLog().contains( "not exist" ) );
         assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
     }
-
-
-//    @Test
-//    public void testAgentNotConnected() {
-//        AbstractOperationHandler operationHandler = MockBuilder.getAddNodeOperationWithResult( true );
-//
-//        operationHandler.run();
-//
-//        assertTrue( operationHandler.getProductOperation().getLog().contains( "not connected" ) );
-//        assertEquals( operationHandler.getProductOperation().getState(), ProductOperationState.FAILED );
-//    }
 }
