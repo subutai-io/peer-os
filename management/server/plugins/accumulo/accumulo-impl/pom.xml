@@ -28,10 +28,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>subutai-common</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>product-common</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>plugin-common</artifactId>
