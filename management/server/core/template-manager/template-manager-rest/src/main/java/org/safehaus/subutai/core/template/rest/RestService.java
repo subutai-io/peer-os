@@ -9,12 +9,12 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface RestService {
 
 	@GET
-	@Path ("/")
+	@Path ("management_hostname")
 	@Produces ({MediaType.TEXT_PLAIN})
 	public String getManagementHostName();
 
 	@PUT
-	@Path ("/{hostname}")
+	@Path ("management_hostname/{hostname}")
 	public void setManagementHostName(@PathParam ("hostname") String hostname);
 
 	@POST
@@ -25,12 +25,12 @@ public interface RestService {
 	                               @Multipart ("config_dir") String configDir);
 
 	@GET
-	@Path ("/{template}")
+	@Path ("{template}")
 	@Produces ({MediaType.APPLICATION_OCTET_STREAM})
     public Response exportTemplate(@PathParam("template") String templateName);
 
     @DELETE
-    @Path("/{template}")
+    @Path("{template}")
     public Response unregister(@PathParam("template") String templateName);
 
 }
