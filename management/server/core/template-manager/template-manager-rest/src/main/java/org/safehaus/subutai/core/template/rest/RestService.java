@@ -18,19 +18,19 @@ public interface RestService {
 	public void setManagementHostName(@PathParam ("hostname") String hostname);
 
 	@POST
-	@Path ("import")
+	@Path ("/")
 	@Consumes ({MediaType.MULTIPART_FORM_DATA})
 	@Produces ({MediaType.TEXT_PLAIN})
 	public Response importTemplate(@Multipart ("file") InputStream in,
 	                               @Multipart ("config_dir") String configDir);
 
 	@GET
-	@Path ("export/{template}")
+	@Path ("{template}")
 	@Produces ({MediaType.APPLICATION_OCTET_STREAM})
     public Response exportTemplate(@PathParam("template") String templateName);
 
-    @GET
-    @Path("unregister/{template}")
+    @DELETE
+    @Path("{template}")
     public Response unregister(@PathParam("template") String templateName);
 
 }
