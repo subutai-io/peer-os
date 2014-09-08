@@ -32,37 +32,28 @@ public class DispatcherDAO {
     }
 
 
-    public RemoteResponse getRemoteResponse( UUID ownerId, UUID commandId ) throws DBException {
-        Preconditions.checkNotNull( ownerId, "Owner Id is null" );
+    /*
+     * table remote_responses
+     *
+     CREATE TABLE remote_responses (
+       commandid text,
+       responsenumber int,
+       info text,
+       PRIMARY KEY (commandid, responsenumber)
+     )
+     *
+     */
+
+
+    public List<RemoteResponse> getRemoteResponses( UUID commandId ) throws DBException {
         Preconditions.checkNotNull( commandId, "Command Id is null" );
 
-        ResultSet rs = dbManager
-                .executeQuery2( "select info from remote_responses where ownerId = ? and commandId = ?", ownerId,
-                        commandId );
-
-        if ( rs != null ) {
-            Row row = rs.one();
-            if ( row != null ) {
-
-                String info = row.getString( "info" );
-                try {
-                    return gson.fromJson( info, RemoteResponse.class );
-                }
-                catch ( JsonSyntaxException ex ) {
-                    throw new DBException( ex.getMessage() );
-                }
-            }
-        }
-
-        return null;
-    }
-
-
-    public List<RemoteResponse> getRemoteResponses( int limit ) throws DBException {
         List<RemoteResponse> responses = new ArrayList<>();
 
         try {
-            ResultSet rs = dbManager.executeQuery2( "select info from remote_responses limit ?", limit );
+            ResultSet rs = dbManager
+                    .executeQuery2( "select info from remote_responses where commandId = ? order by responseNumber asc",
+                            commandId );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -80,15 +71,91 @@ public class DispatcherDAO {
     public void saveRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "insert into remote_responses(ownerId,commandId,info) values (?,?,?)",
-                remoteResponse.getOwnerId(), remoteResponse.getCommandId(), gson.toJson( remoteResponse ) );
+        dbManager.executeUpdate2( "insert into remote_responses(commandId,responseNumber, info) values (?,?,?)",
+                remoteResponse.getCommandId(), remoteResponse.getResponse().getResponseSequenceNumber(),
+                gson.toJson( remoteResponse ) );
     }
 
 
     public void deleteRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "delete from remote_responses where ownerId = ? and commandId = ?",
-                remoteResponse.getOwnerId(), remoteResponse.getCommandId() );
+        dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and responseNumber = ?",
+                remoteResponse.getCommandId(), remoteResponse.getResponse().getResponseSequenceNumber() );
+    }
+
+
+    /* table remote_requests
+     *
+     CREATE TABLE remote_requests (
+       commandid text,
+       attempts int,
+       info text,
+       PRIMARY KEY (commandid, attempts)
+     )
+     *
+     */
+
+
+    public void saveRemoteRequest( RemoteRequest remoteRequest ) throws DBException {
+        Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
+
+        dbManager.executeUpdate2( "insert into remote_requests(commandId,attempts,info) values (?,?,?)",
+                remoteRequest.getCommandId(), remoteRequest.getAttempts(), gson.toJson( remoteRequest ) );
+    }
+
+
+    public void deleteRemoteRequest( RemoteRequest remoteRequest ) throws DBException {
+        Preconditions.checkNotNull( remoteRequest, "Remote request is null" );
+
+        dbManager.executeUpdate2( "delete from remote_requests where commandId = ? and attempts = ?",
+                remoteRequest.getCommandId(), remoteRequest.getAttempts() );
+    }
+
+
+    public RemoteRequest getRemoteRequest( UUID commandId ) throws DBException {
+        Preconditions.checkNotNull( commandId, "Command Id is null" );
+
+        ResultSet rs = dbManager.executeQuery2( "select info from remote_requests where commandId = ?", commandId );
+
+        if ( rs != null ) {
+            Row row = rs.one();
+            if ( row != null ) {
+
+                String info = row.getString( "info" );
+                try {
+                    return gson.fromJson( info, RemoteRequest.class );
+                }
+                catch ( JsonSyntaxException ex ) {
+                    throw new DBException( ex.getMessage() );
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    public List<RemoteRequest> getRemoteRequests( int attempts, int limit ) throws DBException {
+        Preconditions.checkArgument( attempts > 0, "Attempts must be greater than 0" );
+        Preconditions.checkArgument( limit > 0, "Limit must be greater than 0" );
+
+        List<RemoteRequest> remoteRequests = new ArrayList<>();
+
+        try {
+            ResultSet rs = dbManager
+                    .executeQuery2( "select info from remote_requests where attempts < ? limit ? allow filtering",
+                            attempts, limit );
+            if ( rs != null ) {
+                for ( Row row : rs ) {
+                    String info = row.getString( "info" );
+                    remoteRequests.add( gson.fromJson( info, RemoteRequest.class ) );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            throw new DBException( ex.getMessage() );
+        }
+        return remoteRequests;
     }
 }

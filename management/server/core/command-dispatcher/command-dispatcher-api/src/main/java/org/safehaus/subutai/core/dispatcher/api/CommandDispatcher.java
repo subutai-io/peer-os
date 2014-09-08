@@ -16,5 +16,5 @@ public interface CommandDispatcher extends CommandRunner {
 
     public void executeRequests( final UUID ownerId, final Set<BatchRequest> requests );
 
-    public void processResponse( final Set<Response> responses );
+    public void processResponses( final Set<Response> responses );
 }

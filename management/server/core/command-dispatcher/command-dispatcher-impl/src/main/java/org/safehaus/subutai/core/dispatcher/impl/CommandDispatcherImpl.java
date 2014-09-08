@@ -15,11 +15,13 @@ import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 
 import com.google.common.base.Preconditions;
 
@@ -58,7 +60,9 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     @Override
-    public void processResponse( final Set<Response> responses ) {
+    public void processResponses( final Set<Response> responses ) {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( responses ), "Responses are null or empty" );
+
         //trigger CommandRunner.onResponse
         for ( Response response : responses ) {
             commandRunner.onResponse( response );
@@ -68,32 +72,51 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
     @Override
     public void executeRequests( final UUID ownerId, final Set<BatchRequest> requests ) {
-        //execute requests using Command Runner
+        Preconditions.checkNotNull( ownerId, "Owner Id is null" );
+        Preconditions.checkNotNull( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
-        Command command = new CommandImpl( requests );
-        commandRunner.runCommandAsync( command, new CommandCallback() {
-            @Override
-            public void onResponse( final Response response, final AgentResult agentResult, final Command command ) {
-                try {
-                    //upon response in callback, cache response to persistent queue (key => initiator id)
-                    RemoteResponse remoteResponse = dispatcherDAO.getRemoteResponse( ownerId, response.getTaskUuid() );
-                    //if no response exists, create a new one
-                    if ( remoteResponse == null ) {
-                        remoteResponse = new RemoteResponse( ownerId, response.getTaskUuid() );
+
+        try {
+            final UUID commandId = requests.iterator().next().getCommandId();
+            //get request from db
+            RemoteRequest remoteRequest = dispatcherDAO.getRemoteRequest( commandId );
+            //if no request exists, create a new one
+            if ( remoteRequest == null ) {
+                remoteRequest = new RemoteRequest( ownerId, commandId );
+                //save request to db
+                dispatcherDAO.saveRemoteRequest( remoteRequest );
+
+                //execute requests using Command Runner
+                Command command = new CommandImpl( requests );
+                commandRunner.runCommandAsync( command, new CommandCallback() {
+                    @Override
+                    public void onResponse( final Response response, final AgentResult agentResult,
+                                            final Command command ) {
+                        try {
+
+                            //save response to db
+                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( ownerId, commandId, response ) );
+                        }
+                        catch ( DBException e ) {
+                            LOG.log( Level.SEVERE,
+                                    String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(),
+                                            response ) );
+                            throw new RunCommandException( e.getMessage() );
+                        }
                     }
-                    //append response
-                    remoteResponse.addResponse( response );
-
-                    //save response to db
-                    dispatcherDAO.saveRemoteResponse( remoteResponse );
-                }
-                catch ( DBException e ) {
-                    LOG.log( Level.SEVERE,
-                            String.format( "Error in executeRequests: [%s] for response: %s", e.getMessage(),
-                                    response ) );
-                }
+                } );
             }
-        } );
+            else {
+                throw new RunCommandException(
+                        String.format( "Command %s is already queued for processing", commandId ) );
+            }
+        }
+        catch ( DBException e ) {
+            LOG.log( Level.SEVERE, String.format( "Error in executeRequests: [%s]", e.getMessage() ) );
+            throw new RunCommandException( e.getMessage() );
+        }
+
+
         //some background thread should iterate this queue and attempt to send responses back to owner
     }
 

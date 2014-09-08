@@ -1,9 +1,6 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Response;
@@ -18,16 +15,17 @@ public class RemoteResponse {
 
     private final UUID ownerId;
     private final UUID commandId;
-    private final Set<Response> responses = new LinkedHashSet<>();
-    private int attempts = 0;
+    private final Response response;
 
 
-    public RemoteResponse( final UUID ownerId, final UUID commandId ) {
+    public RemoteResponse( final UUID ownerId, final UUID commandId, final Response response ) {
         Preconditions.checkNotNull( ownerId, "Owner Id is null" );
         Preconditions.checkNotNull( commandId, "Command Id is null" );
+        Preconditions.checkNotNull( response, "Response is null" );
 
         this.ownerId = ownerId;
         this.commandId = commandId;
+        this.response = response;
     }
 
 
@@ -41,24 +39,7 @@ public class RemoteResponse {
     }
 
 
-    public void incrementAttempts() {
-        attempts++;
-    }
-
-
-    public int getAttempts() {
-        return attempts;
-    }
-
-
-    public void addResponse( Response response ) {
-        Preconditions.checkNotNull( response, "Response is null" );
-
-        responses.add( response );
-    }
-
-
-    public Set<Response> getResponses() {
-        return Collections.unmodifiableSet( responses );
+    public Response getResponse() {
+        return response;
     }
 }
