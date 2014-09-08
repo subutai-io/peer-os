@@ -1,19 +1,18 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class InstallOperationHandlerTest {
     private SparkImplMock mock;
@@ -33,6 +32,7 @@ public class InstallOperationHandlerTest {
     @Test
     public void testWithInvalidConfig() {
         SparkClusterConfig config = new SparkClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName( "test" );
         handler = new InstallOperationHandler( mock, config );
         handler.run();
@@ -45,8 +45,9 @@ public class InstallOperationHandlerTest {
     @Test
     public void testWithExistingCluster() {
         SparkClusterConfig config = new SparkClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName( "test-cluster" );
-        config.setSlaveNodes( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setSlaveNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setMasterNode( CommonMockBuilder.createAgent() );
 
         mock.setClusterConfig( config );

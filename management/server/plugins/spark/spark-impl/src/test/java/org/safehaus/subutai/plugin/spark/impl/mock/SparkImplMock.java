@@ -7,20 +7,22 @@ import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
 import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
-public class SparkImplMock extends SparkImpl{
+public class SparkImplMock extends SparkImpl {
 
     private SparkClusterConfig clusterConfig;
 
     public SparkImplMock() {
-        super(new CommandRunnerMock(), new AgentManagerMock(), new DbManagerMock(), new TrackerMock());
+        setCommandRunner(new CommandRunnerMock());
+        setAgentManager(new AgentManagerMock());
+        setDbManager(new DbManagerMock());
+        setTracker(new TrackerMock());
+        init();
     }
-
 
     public SparkImplMock setClusterConfig(SparkClusterConfig clusterConfig) {
         this.clusterConfig = clusterConfig;
         return this;
     }
-
 
     @Override
     public SparkClusterConfig getCluster(String clusterName) {
