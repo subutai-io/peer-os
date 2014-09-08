@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
-import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
@@ -140,26 +139,26 @@ public class Manager {
         addNodeBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                if(config != null) {
-                    HadoopClusterConfig info = SparkUI.getHadoopManager().getCluster(config.getClusterName());
-                    if(info != null) {
-                        Set<Agent> nodes = new HashSet<>(info.getAllNodes());
-                        nodes.removeAll(config.getSlaveNodes());
-                        if(!nodes.isEmpty()) {
-                            AddNodeWindow addNodeWindow = new AddNodeWindow(config, nodes);
-                            contentRoot.getUI().addWindow(addNodeWindow);
-                            addNodeWindow.addCloseListener(new Window.CloseListener() {
-                                @Override
-                                public void windowClose(Window.CloseEvent closeEvent) {
-                                    refreshClustersInfo();
-                                }
-                            });
-                        } else
-                            show("All nodes in corresponding Hadoop cluster have Spark installed");
-                    } else
-                        show("Hadoop cluster info not found");
-                } else
-                    show("Please, select cluster");
+                if(config == null) {
+                    show("Select cluster");
+                    return;
+                }
+
+                Set<Agent> set = new HashSet<>(config.getHadoopNodes());
+                set.removeAll(config.getAllNodes());
+                if(set.isEmpty()) {
+                    show("All nodes in Hadoop cluster have Hive installed");
+                    return;
+                }
+
+                AddNodeWindow w = new AddNodeWindow(config, set);
+                contentRoot.getUI().addWindow(w);
+                w.addCloseListener(new Window.CloseListener() {
+                    @Override
+                    public void windowClose(Window.CloseEvent closeEvent) {
+                        refreshClustersInfo();
+                    }
+                });
             }
         });
 

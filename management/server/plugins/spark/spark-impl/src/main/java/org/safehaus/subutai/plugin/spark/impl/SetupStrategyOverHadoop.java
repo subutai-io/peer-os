@@ -1,5 +1,6 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
@@ -10,6 +11,7 @@ import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupStrategy {
@@ -21,7 +23,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
     @Override
     public ConfigBase setup() throws ClusterSetupException {
         check();
-        install();
+        configure();
         return config;
     }
 
@@ -45,6 +47,16 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             if(manager.agentManager.getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException("Not all slave nodes are connected");
         }
+
+        // check Hadoop cluster
+        HadoopClusterConfig hc = manager.hadoopManager.getCluster(config.getHadoopClusterName());
+        if(hc == null)
+            throw new ClusterSetupException("Could not find Hadoop cluster "
+                    + config.getHadoopClusterName());
+        if(!hc.getAllNodes().containsAll(config.getAllNodes()))
+            throw new ClusterSetupException("Not all nodes belong to Hadoop cluster "
+                    + config.getHadoopClusterName());
+        config.setHadoopNodes(new HashSet<>(hc.getAllNodes()));
 
         po.addLog("Checking prerequisites...");
 
@@ -79,7 +91,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             throw new ClusterSetupException("Master node was omitted\nInstallation aborted");
     }
 
-    private void install() throws ClusterSetupException {
+    private void configure() throws ClusterSetupException {
         po.addLog("Updating db...");
         //save to db
         try {

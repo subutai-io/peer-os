@@ -15,6 +15,8 @@ public class SparkClusterConfig implements ConfigBase {
     private SetupType setupType;
     private Agent masterNode;
     private Set<Agent> slaves = new HashSet<>();
+    // for with-Hadoop installation
+    private Set<Agent> hadoopNodes = new HashSet<>();
     // for environment blueprint
     private int slaveNodesCount;
 
@@ -62,6 +64,14 @@ public class SparkClusterConfig implements ConfigBase {
 
     public void setSlaveNodes(Set<Agent> slaves) {
         this.slaves = slaves;
+    }
+
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
+    }
+
+    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+        this.hadoopNodes = hadoopNodes;
     }
 
     public int getSlaveNodesCount() {

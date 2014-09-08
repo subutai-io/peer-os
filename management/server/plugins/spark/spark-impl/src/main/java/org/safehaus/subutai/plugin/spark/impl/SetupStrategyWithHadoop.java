@@ -34,7 +34,9 @@ public class SetupStrategyWithHadoop extends SetupBase implements ClusterSetupSt
             throw new ClusterSetupException("Environment has no nodes");
 
         config.getSlaveNodes().clear();
+        config.getHadoopNodes().clear();
         for(Node n : environment.getNodes()) {
+            config.getHadoopNodes().add(n.getAgent());
             if(n.getTemplate().getProducts().contains(Commands.PACKAGE_NAME))
                 if(config.getMasterNode() == null)
                     config.setMasterNode(n.getAgent());
