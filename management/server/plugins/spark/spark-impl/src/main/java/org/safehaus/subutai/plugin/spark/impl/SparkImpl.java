@@ -1,11 +1,8 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
 import com.google.common.base.Preconditions;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import java.util.*;
+import org.safehaus.subutai.common.protocol.*;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -127,6 +124,21 @@ public class SparkImpl extends SparkBase implements Spark {
         executor.execute(operationHandler);
 
         return operationHandler.getTrackerId();
+    }
+
+    @Override
+    public EnvironmentBlueprint getDefaultEnvironmentBlueprint(SparkClusterConfig config) {
+        EnvironmentBlueprint eb = new EnvironmentBlueprint();
+        eb.setName(SparkClusterConfig.PRODUCT_KEY + UUID.randomUUID());
+
+        NodeGroup ng = new NodeGroup();
+        ng.setName("Default");
+        ng.setNumberOfNodes(1 + config.getSlaveNodesCount()); // master +slaves
+        ng.setTemplateName(SparkClusterConfig.TEMPLATE_NAME);
+        ng.setPlacementStrategy(PlacementStrategy.MORE_RAM);
+        eb.setNodeGroups(new HashSet<>(Arrays.asList(ng)));
+
+        return eb;
     }
 
     @Override

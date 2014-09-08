@@ -146,9 +146,6 @@ public class ConfigurationStep extends Panel {
             }
         });
 
-        if(config.getMasterNode() != null)
-            masterNodeCombo.setValue(config.getMasterNode());
-
         masterNodeCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -176,6 +173,9 @@ public class ConfigurationStep extends Panel {
                 }
             }
         });
+
+        if(config.getMasterNode() != null)
+            masterNodeCombo.setValue(config.getMasterNode());
 
         if(!CollectionUtil.isCollectionEmpty(config.getSlaveNodes()))
             slaveNodesSelect.setValue(config.getSlaveNodes());

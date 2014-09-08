@@ -2,17 +2,13 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.ConfigBase;
-import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.util.StringUtil;
 import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -95,50 +91,16 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             manager.getCommandRunner().runCommand(installCommand);
 
             if(installCommand.hasSucceeded()) {
-                po.addLog("Installation succeeded\nSetting master IP...");
+                po.addLog("Installation succeeded");
 
-                Command setMasterIPCommand = Commands.getSetMasterIPCommand(config.getMasterNode(),
-                        config.getAllNodes());
-                manager.getCommandRunner().runCommand(setMasterIPCommand);
+                SetupHelper helper = new SetupHelper(manager, config, po);
+                helper.configureMaster();
+                helper.registerSlaves();
+                helper.startCluster();
 
-                if(setMasterIPCommand.hasSucceeded()) {
-                    po.addLog("Setting master IP succeeded\nRegistering slaves...");
-
-                    Command addSlavesCommand = Commands.getAddSlavesCommand(config.getSlaveNodes(),
-                            config.getMasterNode());
-                    manager.getCommandRunner().runCommand(addSlavesCommand);
-
-                    if(addSlavesCommand.hasSucceeded()) {
-                        po.addLog("Slaves successfully registered\nStarting cluster...");
-
-                        Command startNodesCommand = Commands.getStartAllCommand(config.getMasterNode());
-                        final AtomicInteger okCount = new AtomicInteger(0);
-                        manager.getCommandRunner().runCommand(startNodesCommand, new CommandCallback() {
-
-                            @Override
-                            public void onResponse(Response response, AgentResult agentResult, Command command) {
-                                okCount.set(
-                                        StringUtil.countNumberOfOccurences(agentResult.getStdOut(), "starting"));
-
-                                if(okCount.get() >= config.getAllNodes().size())
-                                    stop();
-                            }
-                        });
-
-                        if(okCount.get() >= config.getAllNodes().size())
-                            po.addLogDone("cluster started successfully\nDone");
-                        else
-                            throw new ClusterSetupException(
-                                    String.format("Failed to start cluster, %s", startNodesCommand.getAllErrors()));
-                    } else
-                        throw new ClusterSetupException(String.format("Failed to register slaves with master, %s",
-                                addSlavesCommand.getAllErrors()));
-                } else
-                    throw new ClusterSetupException(
-                            String.format("Setting master IP failed, %s", setMasterIPCommand.getAllErrors()));
             } else
-                throw new ClusterSetupException(
-                        String.format("Installation failed, %s", installCommand.getAllErrors()));
+                throw new ClusterSetupException("Installation failed: "
+                        + installCommand.getAllErrors());
         } catch(DBException e) {
             throw new ClusterSetupException(
                     "Could not save cluster info to DB! Please see logs\nInstallation aborted");

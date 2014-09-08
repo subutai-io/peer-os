@@ -62,6 +62,7 @@ public class Wizard {
     protected void init() {
         step = 1;
         config = new SparkClusterConfig();
+        hadoopConfig = new HadoopClusterConfig();
         putForm();
     }
 

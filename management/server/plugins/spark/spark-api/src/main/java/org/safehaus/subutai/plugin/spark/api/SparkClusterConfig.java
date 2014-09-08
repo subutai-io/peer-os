@@ -15,6 +15,8 @@ public class SparkClusterConfig implements ConfigBase {
     private SetupType setupType;
     private Agent masterNode;
     private Set<Agent> slaves = new HashSet<>();
+    // for environment blueprint
+    private int slaveNodesCount;
 
     public Agent getMasterNode() {
         return masterNode;
@@ -60,6 +62,14 @@ public class SparkClusterConfig implements ConfigBase {
 
     public void setSlaveNodes(Set<Agent> slaves) {
         this.slaves = slaves;
+    }
+
+    public int getSlaveNodesCount() {
+        return slaveNodesCount;
+    }
+
+    public void setSlaveNodesCount(int slaveNodesCount) {
+        this.slaveNodesCount = slaveNodesCount;
     }
 
     public Set<Agent> getAllNodes() {
