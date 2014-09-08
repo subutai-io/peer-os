@@ -5,16 +5,11 @@ import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.Commands;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
-//import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
-//import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-//import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
-//import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
 
 import static org.mockito.Mockito.mock;
 
@@ -25,7 +20,7 @@ public class AccumuloImplMock extends AccumuloImpl {
 
 
     public AccumuloImplMock() {
-        super ( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), mock( Tracker.class ),
+        super ( mock( CommandRunner.class ), mock( AgentManager.class ), mock( DbManager.class ), new TrackerMock(),
                 mock( Hadoop.class ), mock( Zookeeper.class ), mock( EnvironmentManager.class ) );
     }
 
