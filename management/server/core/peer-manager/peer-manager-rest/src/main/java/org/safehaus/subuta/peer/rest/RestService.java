@@ -1,6 +1,7 @@
 package org.safehaus.subuta.peer.rest;
 
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -13,12 +14,13 @@ public interface RestService {
 
 
     @POST
-    @Path("peer")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public String registerPeer( @QueryParam("config") String config );
+    @Path( "peer" )
+    @Produces( MediaType.APPLICATION_JSON )
+    @Consumes( "text/plain" )
+    public String registerPeer( @QueryParam( "config" ) String config );
 
     @GET
-    @Path( "peers" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Path( "peer" )
+    @Produces( MediaType.APPLICATION_JSON )
     public String getPeerJsonFormat();
 }

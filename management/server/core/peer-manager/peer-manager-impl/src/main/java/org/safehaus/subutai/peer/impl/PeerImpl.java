@@ -47,7 +47,7 @@ public class PeerImpl implements PeerManager {
     @Override
     public String register( final Peer peer ) {
 
-        LOG.info( "Registering peer: " + peer.getName() );
+//        LOG.info( "Registering peer: " + peer.getName() );
         try {
             String id = peer.getId();
             peerDAO.saveInfo( source, id, peer );

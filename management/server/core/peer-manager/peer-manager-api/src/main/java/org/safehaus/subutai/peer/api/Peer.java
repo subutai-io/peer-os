@@ -1,9 +1,13 @@
 package org.safehaus.subutai.peer.api;
 
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+
 /**
  * Created by bahadyr on 9/6/14.
  */
+@XmlRootElement(name = "Peer")
 public class Peer {
 
     private String name;
@@ -38,5 +42,15 @@ public class Peer {
 
     public void setId( final String id ) {
         this.id = id;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Peer{" +
+                "name='" + name + '\'' +
+                ", ip='" + ip + '\'' +
+                ", id='" + id + '\'' +
+                '}';
     }
 }

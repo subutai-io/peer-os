@@ -7,11 +7,11 @@
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
-    <cxf:bus id="cxfBusPet">
+    <!--<cxf:bus id="cxfBusPet">
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
-    </cxf:bus>
+    </cxf:bus>-->
 
     <jaxrs:server address="/peer" id="petRestService">
         <jaxrs:serviceBeans>

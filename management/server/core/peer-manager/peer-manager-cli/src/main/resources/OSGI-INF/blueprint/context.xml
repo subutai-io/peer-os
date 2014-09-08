@@ -2,7 +2,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/register">
-      <action class="org.safehaus.subutai.cli.commands.PeerRegisterCommand">
+      <action class="org.safehaus.subutai.cli.commands.RegisterCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
@@ -10,7 +10,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/ls">
-      <action class="org.safehaus.subutai.cli.commands.ListPeersCommand">
+      <action class="org.safehaus.subutai.cli.commands.ListCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
@@ -18,7 +18,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
       <command name="peer/unregister">
-        <action class="org.safehaus.subutai.cli.commands.UnregisterPeerCommand">
+        <action class="org.safehaus.subutai.cli.commands.UnregisterCommand">
           <property name="peerManager" ref="peerManager" />
         </action>
       </command>
