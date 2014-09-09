@@ -38,7 +38,6 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Peer registerPeer( String config ) {
-        LOG.info( "REGISTER PEEER" );
         if ( config != null ) {
             LOG.info( config );
             Peer peer = GSON.fromJson( config, Peer.class );
@@ -49,15 +48,6 @@ public class RestServiceImpl implements RestService {
             return null;
         }
     }
-
-
-    /*@Override
-    public Peer registerPeer( final Peer peer ) {
-        LOG.info( peer.toString() );
-        peerManager.register( peer );
-        return peer;
-
-    }*/
 
 
     @Override
