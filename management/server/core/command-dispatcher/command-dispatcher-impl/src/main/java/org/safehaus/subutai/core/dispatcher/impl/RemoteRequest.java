@@ -11,13 +11,19 @@ public class RemoteRequest {
 
     private final UUID ownerId;
     private final UUID commandId;
+    private final long timestamp;
     private int attempts;
 
 
     public RemoteRequest( final UUID ownerId, final UUID commandId ) {
         this.ownerId = ownerId;
         this.commandId = commandId;
+        this.timestamp = System.currentTimeMillis();
         attempts = 0;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 
 
@@ -46,6 +52,7 @@ public class RemoteRequest {
         return "RemoteRequest{" +
                 "ownerId=" + ownerId +
                 ", commandId=" + commandId +
+                ", timestamp=" + timestamp +
                 ", attempts=" + attempts +
                 '}';
     }

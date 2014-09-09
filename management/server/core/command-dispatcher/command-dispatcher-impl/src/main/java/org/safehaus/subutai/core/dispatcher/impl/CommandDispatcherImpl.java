@@ -52,6 +52,16 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     public void destroy() {}
 
 
+    public UUID getSubutaiUUID() {
+        return subutaiId;
+    }
+
+
+    public DispatcherDAO getDispatcherDAO() {
+        return dispatcherDAO;
+    }
+
+
     public void setSubutaiId( final String subutaiId ) {
         this.subutaiId = UUID.fromString( subutaiId );
     }
@@ -78,11 +88,11 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     @Override
-    public void executeRequests( final UUID ownerId, final Set<BatchRequest> requests ) {
+    public void executeRequests( final String IP, final UUID ownerId, final Set<BatchRequest> requests ) {
         Preconditions.checkNotNull( ownerId, "Owner Id is null" );
         Preconditions.checkNotNull( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
-
+        LOG.warning( "IP :" + IP );
         try {
             final UUID commandId = requests.iterator().next().getCommandId();
             //get request from db
@@ -192,17 +202,5 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     @Override
     public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
         return new CommandImpl( description, agentRequestBuilders );
-    }
-
-
-    @Override
-    public Command createBroadcastCommand( final RequestBuilder requestBuilder ) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public void onResponse( final Response response ) {
-        throw new UnsupportedOperationException();
     }
 }
