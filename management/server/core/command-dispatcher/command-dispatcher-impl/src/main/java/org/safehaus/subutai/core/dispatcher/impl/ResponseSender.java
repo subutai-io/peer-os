@@ -101,7 +101,6 @@ public class ResponseSender {
                         //try to send responses to PEER
                         int responseCode = 0;
                         try {
-                            LOG.warning( "Connecting to :" + String.format( SEND_URL, request.getIp() ) );
                             responseCode = httpUtil.httpLitePost( String.format( SEND_URL, request.getIp() ), params );
                             if ( responseCode == RESPONSE_OK ) {
                                 //delete sent responses
