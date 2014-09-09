@@ -53,7 +53,9 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public UUID getOwnerId() {
-        return ownerId;
+        //        return ownerId;
+        //TODO remove in production
+        return UUID.fromString( "1163673e3-924d-45e2-8dba-615b76a6bbb6" );
     }
 
 
@@ -137,12 +139,14 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public boolean isLocal() {
+        //TODO remove this in production
+        return false;
         //TODO remove this after agent supplies host id and owner id
         //temporary workaround until agent correctly supplies hostId and ownerId
-        if ( hostId == null || ownerId == null ) {
-            return true;
-        }
+        //        if ( hostId == null || ownerId == null ) {
+        //            return true;
+        //        }
 
-        return hostId.compareTo( ownerId ) == 0;
+        //        return hostId.compareTo( ownerId ) == 0;
     }
 }

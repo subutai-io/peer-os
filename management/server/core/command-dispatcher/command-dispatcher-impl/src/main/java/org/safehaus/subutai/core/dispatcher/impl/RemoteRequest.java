@@ -13,15 +13,28 @@ public class RemoteRequest {
     private final UUID commandId;
     private final long timestamp;
     private final String ip;
+    private final int requestCount;
     private int attempts;
+    private int requestsCompleted;
 
 
-    public RemoteRequest( final String ip, final UUID ownerId, final UUID commandId ) {
+    public RemoteRequest( final String ip, final UUID ownerId, final UUID commandId, final int requestsCount ) {
         this.ip = ip;
         this.ownerId = ownerId;
         this.commandId = commandId;
         this.timestamp = System.currentTimeMillis();
+        this.requestCount = requestsCount;
         attempts = 0;
+    }
+
+
+    public void incrementCompletedRequestsCount() {
+        requestsCompleted++;
+    }
+
+
+    public boolean isCompleted() {
+        return requestCount == requestsCompleted;
     }
 
 

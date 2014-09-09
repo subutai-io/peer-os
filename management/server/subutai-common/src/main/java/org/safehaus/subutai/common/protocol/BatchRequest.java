@@ -33,6 +33,11 @@ public class BatchRequest {
     }
 
 
+    public int getRequestsCount() {
+        return targetUUIDs.size();
+    }
+
+
     public UUID getCommandId() {
         return request.getTaskUuid();
     }

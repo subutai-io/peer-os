@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.db.api.DBException;
 
@@ -27,17 +28,16 @@ public class ResponseSender {
     private static final int RESPONSE_OK = 200;
     private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 5;
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
-    private static final String SEND_URL = "http://%s:8181/cxf/dispatcher/responses";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final DispatcherDAO dispatcherDAO;
     private final HttpUtil httpUtil;
 
 
-    public ResponseSender( final DispatcherDAO dispatcherDAO ) {
+    public ResponseSender( final DispatcherDAO dispatcherDAO, HttpUtil httpUtil ) {
         Preconditions.checkNotNull( dispatcherDAO, "DispatcherDAO is null" );
 
         this.dispatcherDAO = dispatcherDAO;
-        this.httpUtil = new HttpUtil();
+        this.httpUtil = httpUtil;
     }
 
 
@@ -64,7 +64,6 @@ public class ResponseSender {
 
     public void dispose() {
         executor.shutdown();
-        httpUtil.dispose();
     }
 
 
@@ -87,21 +86,23 @@ public class ResponseSender {
                     }
                     else {
                         //sort responses by responseNumber
-                        Set<RemoteResponse> sortedSet = new TreeSet<>( new Comparator<RemoteResponse>() {
+                        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
                             @Override
-                            public int compare( final RemoteResponse o1, final RemoteResponse o2 ) {
-                                return o1.getResponse().getResponseSequenceNumber() - o2.getResponse()
-                                                                                        .getResponseSequenceNumber();
+                            public int compare( final Response o1, final Response o2 ) {
+                                return o1.getResponseSequenceNumber() - o2.getResponseSequenceNumber();
                             }
                         } );
-                        sortedSet.addAll( responses );
+                        for ( RemoteResponse response : responses ) {
+                            sortedSet.add( response.getResponse() );
+                        }
                         //fill http params
                         Map<String, String> params = new HashMap<>();
                         params.put( "responses", JsonUtil.toJson( sortedSet ) );
                         //try to send responses to PEER
                         int responseCode = 0;
                         try {
-                            responseCode = httpUtil.httpLitePost( String.format( SEND_URL, request.getIp() ), params );
+                            responseCode = httpUtil.httpLitePost( String.format( Common.RESPONSE_URL, request.getIp() ),
+                                    params );
                             if ( responseCode == RESPONSE_OK ) {
                                 //delete sent responses
                                 boolean isFinalResponseSent = false;
@@ -113,7 +114,14 @@ public class ResponseSender {
                                 }
                                 //if final response was sent, delete request
                                 if ( isFinalResponseSent ) {
-                                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
+                                    request.incrementCompletedRequestsCount();
+                                    if ( request.isCompleted() ) {
+                                        dispatcherDAO
+                                                .deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
+                                    }
+                                    else {
+                                        dispatcherDAO.saveRemoteRequest( request );
+                                    }
                                 }
                             }
                             else {

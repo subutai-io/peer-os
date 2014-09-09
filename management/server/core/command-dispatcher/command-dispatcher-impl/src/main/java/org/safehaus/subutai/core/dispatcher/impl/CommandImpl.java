@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,12 +73,11 @@ public class CommandImpl extends AbstractCommand {
      *
      * @param batchRequests - requests to execute
      */
-    public CommandImpl( Set<BatchRequest> batchRequests ) {
+    protected CommandImpl( Set<BatchRequest> batchRequests ) {
 
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( batchRequests ),
                 "Batch Requests are null or empty" );
 
-        this.description = "REMOTE";
         Set<Request> requests = new HashSet<>();
         for ( BatchRequest batchRequest : batchRequests ) {
             requests.addAll( batchRequest.getRequests() );
@@ -89,6 +89,27 @@ public class CommandImpl extends AbstractCommand {
             }
         }
         this.requestsCount = requests.size();
+        this.timeout = timeout;
+        //take any taskUUID since all requests in the batch must belong to the same command
+        this.commandUUID = requests.iterator().next().getTaskUuid();
+        this.requests.addAll( requests );
+    }
+
+
+    /**
+     * Creates command using supplied set of {@code Request} objects. Used when command involves also local agents
+     *
+     * @param requests - requests to execute
+     */
+    protected CommandImpl( Collection<Request> requests ) {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are null or empty" );
+        this.requestsCount = requests.size();
+        int timeout = 0;
+        for ( Request request : requests ) {
+            if ( request.getTimeout() > timeout ) {
+                timeout = request.getTimeout();
+            }
+        }
         this.timeout = timeout;
         //take any taskUUID since all requests in the batch must belong to the same command
         this.commandUUID = requests.iterator().next().getTaskUuid();
