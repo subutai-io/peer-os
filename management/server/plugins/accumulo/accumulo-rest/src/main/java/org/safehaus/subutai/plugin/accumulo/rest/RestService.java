@@ -11,57 +11,57 @@ public interface RestService
     @GET
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String listClusters();
+    public javax.ws.rs.core.Response listClusters();
 
     //view cluster info
     @GET
-    @Path("clusters/{clustername}")
+    @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getCluster( @PathParam("clustername") String source );
+    public javax.ws.rs.core.Response getCluster(@PathParam("clusterName") String clusterName);
 
     //create cluster
     @POST
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String createCluster( @QueryParam("config") String config );
+    public javax.ws.rs.core.Response createCluster(@QueryParam("config") String config);
 
     //destroy cluster
     @DELETE
-    @Path("clusters/{clustername}")
+    @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String destroyCluster( @PathParam("clustername") String clusterName );
+    public javax.ws.rs.core.Response destroyCluster(@PathParam("clusterName") String clusterName);
 
     //start cluster
     @PUT
-    @Path("clusters/{clustername}/start")
+    @Path("clusters/{clusterName}/start")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String startCluster( @PathParam("clustername") String clusterName );
+    public javax.ws.rs.core.Response startCluster(@PathParam("clusterName") String clusterName);
 
     //stop cluster
     @PUT
-    @Path("clusters/{clustername}/stop")
+    @Path("clusters/{clusterName}/stop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String stopCluster( @PathParam("clustername") String clusterName );
+    public javax.ws.rs.core.Response stopCluster(@PathParam("clusterName") String clusterName);
 
     //add node
     @POST
-    @Path("clusters/{clustername}/nodes/{lxchostname}/{nodetype}")
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String addNode( @PathParam("clustername") String clustername,
-        @PathParam("lxchostname") String lxchostname, @PathParam("nodetype") String nodetype );
+    public javax.ws.rs.core.Response addNode(@PathParam("clusterName") String clusterName,
+                                             @PathParam("lxcHostname") String lxcHostname, @PathParam("nodeType") String nodeType);
 
     //destroy node
     @DELETE
-    @Path("clusters/{clustername}/nodes/{lxchostname}/{nodetype}")
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String destroyNode( @PathParam("clustername") String clustername,
-        @PathParam("lxchostname") String lxchostname,
-        @PathParam("nodetype") String nodetype );
+    public javax.ws.rs.core.Response destroyNode(@PathParam("clusterName") String clusterName,
+                                                 @PathParam("lxcHostname") String lxcHostname,
+                                                 @PathParam("nodeType") String nodeType);
 
     //check node status
     @GET
-    @Path("clusters/{clustername}/nodes/{lxchostname}")
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String checkNode( @PathParam("clustername") String clustername,
-        @PathParam("lxchostname") String lxchostname );
+    public javax.ws.rs.core.Response checkNode(@PathParam("clusterName") String clusterName,
+                                               @PathParam("lxcHostname") String lxcHostname);
 }
