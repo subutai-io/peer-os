@@ -468,7 +468,7 @@
 
       <!-- Core Modules - START -->
 
-      <!--<dependency>
+      <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>subutai-common</artifactId>
         <version>${project.version}</version>
@@ -479,7 +479,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Template Manager &ndash;&gt;
+      <!-- Template Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>template-manager-api</artifactId>
@@ -501,7 +501,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Template Registry Manager &ndash;&gt;
+      <!-- Template Registry Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>template-registry-api</artifactId>
@@ -523,7 +523,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; FS Tracker &ndash;&gt;
+      <!-- FS Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>file-tracker-api</artifactId>
@@ -535,7 +535,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Apt Repo Manager &ndash;&gt;
+      <!-- Apt Repo Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>apt-repository-api</artifactId>
@@ -552,7 +552,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Tracker &ndash;&gt;
+      <!-- Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>tracker-api</artifactId>
@@ -574,7 +574,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Git Manager &ndash;&gt;
+      <!-- Git Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>git-manager-api</artifactId>
@@ -591,7 +591,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Command Dispatcher &ndash;&gt;
+      <!-- Command Dispatcher -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>command-dispatcher-api</artifactId>
@@ -613,7 +613,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Command Runner &ndash;&gt;
+      <!-- Command Runner -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>command-runner-api</artifactId>
@@ -635,7 +635,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Agent Manager &ndash;&gt;
+      <!-- Agent Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>agent-manager-api</artifactId>
@@ -647,7 +647,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; DB Manager &ndash;&gt;
+      <!-- DB Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>db-manager-api</artifactId>
@@ -659,7 +659,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Communication Manager &ndash;&gt;
+      <!-- Communication Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>communication-manager-api</artifactId>
@@ -671,7 +671,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; LXC Manager &ndash;&gt;
+      <!-- LXC Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>lxc-manager-ui</artifactId>
@@ -688,7 +688,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash;Network Manager &ndash;&gt;
+      <!--Network Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>network-manager-api</artifactId>
@@ -700,7 +700,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Monitoring &ndash;&gt;
+      <!-- Monitoring -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>monitoring-api</artifactId>
@@ -722,7 +722,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Environment Manager &ndash;&gt;
+      <!-- Environment Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>environment-manager-api</artifactId>
@@ -744,7 +744,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Configuration Manager &ndash;&gt;
+      <!-- Configuration Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>configuration-manager-api</artifactId>
@@ -766,7 +766,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      &lt;!&ndash; Config Point Tracker &ndash;&gt;
+      <!-- Config Point Tracker -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>config-point-tracker-api</artifactId>
@@ -781,7 +781,7 @@
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>config-point-tracker-cli</artifactId>
         <version>${project.version}</version>
-      </dependency>-->
+      </dependency>
 
       <!-- Core Modules - END -->
 
