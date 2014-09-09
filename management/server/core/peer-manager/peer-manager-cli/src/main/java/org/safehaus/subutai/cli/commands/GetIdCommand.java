@@ -29,7 +29,7 @@ public class GetIdCommand extends OsgiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         String id = peerManager.getHostId();
-        System.out.println(id);
+        System.out.println("SUBUTAI ID: " + id);
         return null;
     }
 }
