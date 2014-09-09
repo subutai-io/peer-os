@@ -808,7 +808,16 @@
       </dependency>
       <!--Vaadin - END-->
 
-      <!-- Products Modules - START -->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
+      <!-- DO NOT ADD PLUGIN AND PRODUCT DEPENDENCIES!!!-->
 
       <!-- Common -->
       <dependency>
