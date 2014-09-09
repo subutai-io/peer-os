@@ -15,7 +15,7 @@
   <packaging>pom</packaging>
 
     <modules>
-        <module>mongodb</module>
+        <!--<module>mongodb</module>
         <module>zookeeper</module>
         <module>accumulo</module>
         <module>hadoop</module>
@@ -31,10 +31,10 @@
         <module>mahout</module>
         <module>cassandra</module>
         <module>oozie</module>
-        <module>plugin-common</module>
         <module>lucene</module>
         <module>pig</module>
-        <module>elasticsearch</module>
+        <module>elasticsearch</module>-->
+        <module>plugin-common</module>
     </modules>
 
 </project>

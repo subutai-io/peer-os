@@ -1023,8 +1023,8 @@
                 <!-- Core Modules - END -->
 
                 <!-- Products Modules - START -->
-
-                <!-- Accumulo plugin-->
+<!--
+                &lt;!&ndash; Accumulo plugin&ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>accumulo-plugin-api</artifactId>
@@ -1051,7 +1051,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Cassandra plugin -->
+                &lt;!&ndash; Cassandra plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>cassandra-plugin-api</artifactId>
@@ -1078,7 +1078,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- HBase plugin -->
+                &lt;!&ndash; HBase plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hbase-plugin-api</artifactId>
@@ -1105,7 +1105,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Flume -->
+                &lt;!&ndash; Flume &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>flume-plugin-api</artifactId>
@@ -1132,7 +1132,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Hadoop-->
+                &lt;!&ndash; Hadoop&ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hadoop-plugin-api</artifactId>
@@ -1159,7 +1159,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Hive -->
+                &lt;!&ndash; Hive &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>hive-plugin-api</artifactId>
@@ -1186,7 +1186,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Lucene Plugin -->
+                &lt;!&ndash; Lucene Plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>lucene-plugin-api</artifactId>
@@ -1213,7 +1213,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Mahout plugin -->
+                &lt;!&ndash; Mahout plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>mahout-plugin-api</artifactId>
@@ -1240,7 +1240,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- MongoDB plugin -->
+                &lt;!&ndash; MongoDB plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>mongodb-plugin-api</artifactId>
@@ -1267,7 +1267,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Oozie plugin-->
+                &lt;!&ndash; Oozie plugin&ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>oozie-plugin-api</artifactId>
@@ -1294,7 +1294,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Pig Plugin -->
+                &lt;!&ndash; Pig Plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>pig-plugin-api</artifactId>
@@ -1321,7 +1321,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Presto -->
+                &lt;!&ndash; Presto &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>presto-plugin-api</artifactId>
@@ -1348,7 +1348,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Shark -->
+                &lt;!&ndash; Shark &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>shark-plugin-api</artifactId>
@@ -1375,7 +1375,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Spark -->
+                &lt;!&ndash; Spark &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>spark-plugin-api</artifactId>
@@ -1402,7 +1402,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Solr -->
+                &lt;!&ndash; Solr &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>solr-plugin-api</artifactId>
@@ -1429,7 +1429,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Sqoop -->
+                &lt;!&ndash; Sqoop &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>sqoop-plugin-api</artifactId>
@@ -1456,7 +1456,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Storm -->
+                &lt;!&ndash; Storm &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>storm-plugin-api</artifactId>
@@ -1478,7 +1478,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Zookeeper -->
+                &lt;!&ndash; Zookeeper &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>zookeeper-plugin-api</artifactId>
@@ -1505,7 +1505,7 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
-                <!-- Elasticsearch Plugin -->
+                &lt;!&ndash; Elasticsearch Plugin &ndash;&gt;
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>elasticsearch-plugin-api</artifactId>
@@ -1525,7 +1525,7 @@
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>elasticsearch-plugin-rest</artifactId>
                   <version>${project.version}</version>
-                </artifactItem>
+                </artifactItem>-->
               </artifactItems>
             </configuration>
           </execution>
