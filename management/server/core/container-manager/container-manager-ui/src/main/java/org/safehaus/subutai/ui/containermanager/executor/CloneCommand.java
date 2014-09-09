@@ -1,4 +1,4 @@
-package org.safehaus.subutai.ui.containermanager.clone;
+package org.safehaus.subutai.ui.containermanager.executor;
 
 import org.safehaus.subutai.api.containermanager.ContainerCreateException;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
@@ -6,13 +6,18 @@ import org.safehaus.subutai.api.containermanager.ContainerManager;
 /**
  * Created by timur on 9/8/14.
  */
-public class CloneCommand extends AbstractCommand implements AgentCommand {
+public class CloneCommand implements AgentCommand {
     private ContainerManager containerManager;
+    private String hostName;
+    private String templateName;
+    private String cloneName;
 
 
     public CloneCommand(ContainerManager containerManager, String hostName, String templateName, String cloneName) {
-        super(hostName, templateName, cloneName);
         this.containerManager = containerManager;
+        this.hostName = hostName;
+        this.templateName = templateName;
+        this.cloneName = cloneName;
     }
 
     @Override

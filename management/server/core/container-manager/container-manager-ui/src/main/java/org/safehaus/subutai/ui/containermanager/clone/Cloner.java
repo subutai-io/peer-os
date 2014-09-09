@@ -7,14 +7,13 @@ import com.vaadin.data.Property;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import org.safehaus.subutai.api.containermanager.ContainerCreateException;
-import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.api.containermanager.*;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
 import org.safehaus.subutai.server.ui.component.AgentTree;
-import org.safehaus.subutai.ui.containermanager.ContainerUI;
+import org.safehaus.subutai.ui.containermanager.executor.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -175,67 +174,14 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         indicator.setVisible(true);
         populateLxcTable(agentFamilies);
         countProcessed = new AtomicInteger((int) (count));
-        errorProcessed = new AtomicInteger((int) (0));
-        final Cloner self = this;
-        ContainerUI.getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                for (final Map.Entry<Agent, List<String>> agg : agentFamilies.entrySet()) {
-//                    executors.add(executeAgent(agg.getKey().getHostname(), "master", agg.getValue()));
-                    AgentExecutor agentExecutor = new AgentExecutor(agg.getKey().getHostname(), "master", agg.getValue());
-                    agentExecutor.addListener(self);
-                    ExecutorService executor = Executors.newFixedThreadPool(2);
-                    agentExecutor.execute(executor, new CloneCommandFactory(containerManager, agentExecutor));
-                    executor.shutdown();
-                }
-            }
-        });
-//
-//        boolean resultCumulator = true;
-//        for (int i = 0; i < agentFamilies.size(); i++) {
-//            try {
-//                Future<Boolean> future = completionService.take();
-//                resultCumulator &= future.get();
-//            } catch (InterruptedException | ExecutionException e) {
-//                resultCumulator = false;
-//            }
-//        }
-//        if (resultCumulator)
-//            show("Cloning containers finished successfully.");
-//        else
-//            show("Not all containers successfully created.");
-//
-//        indicator.setVisible(false);
-
-    }
-
-
-    /**
-     * Executes cloning action for agent.
-     *
-     * @param hostName
-     * @param templateName
-     * @param cloneNames
-     * @return
-     */
-    private ExecutorService executeAgent(final String hostName, final String templateName, List<String> cloneNames) {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        for (final String lxcHostname : cloneNames) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    updateContainerStatus(lxcHostname, new ThemeResource(loadIconSource));
-                    try {
-                        containerManager.clone(hostName, templateName, lxcHostname);
-                        updateContainerStatus(lxcHostname, new ThemeResource(okIconSource));
-
-                    } catch (ContainerCreateException ce) {
-                        updateContainerStatus(lxcHostname, new ThemeResource(errorIconSource));
-                        errorProcessed.incrementAndGet();
-                    }
-                }
-            });
+        errorProcessed = new AtomicInteger(0);
+        for (final Map.Entry<Agent, List<String>> agent : agentFamilies.entrySet()) {
+               AgentExecutor agentExecutor = new AgentExecutorImpl(agent.getKey().getHostname(), agent.getValue());
+            agentExecutor.addListener(this);
+            ExecutorService executor = Executors.newFixedThreadPool(1);
+            agentExecutor.execute(executor, new CloneCommandFactory(containerManager, agent.getKey().getHostname(), "master"));
+            executor.shutdown();
         }
-        return executor;
     }
 
     @Override
@@ -243,55 +189,6 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         LOG.info(event.toString());
         updateContainerStatus(event);
     }
-
-    /**
-     * Executes cloning action for agent.
-     *
-     * @param hostName
-     * @param templateName
-     * @param cloneNames
-     * @return
-     */
-    private void executeAgentOld(final String hostName, final String templateName, List<String> cloneNames) {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        for (final String lxcHostname : cloneNames) {
-            executor.execute(new Runnable() {
-                ExecutorService executor;
-
-                public void run() {
-                    updateContainerStatus(lxcHostname, new ThemeResource(loadIconSource));
-                    try {
-                        containerManager.clone(hostName, templateName, lxcHostname);
-                        updateContainerStatus(lxcHostname, new ThemeResource(okIconSource));
-
-                    } catch (ContainerCreateException ce) {
-                        updateContainerStatus(lxcHostname, new ThemeResource(errorIconSource));
-                        errorProcessed.incrementAndGet();
-                    }
-                    int i = countProcessed.decrementAndGet();
-                    if (i == 0) {
-                        indicator.setVisible(false);
-                    }
-
-                }
-            });
-        }
-    }
-
-    private void updateContainerStatus(final String lxcHostname, final ThemeResource resource) {
-        getUI().access(new Runnable() {
-            @Override
-            public void run() {
-                Item row = lxcTable.getItem(lxcHostname);
-                if (row != null) {
-                    Property p = row.getItemProperty("Status");
-                    p.setValue(new Embedded("", resource));
-
-                }
-            }
-        });
-    }
-
 
     private void updateContainerStatus(final AgentExecutionEvent event) {
         getUI().access(new Runnable() {
