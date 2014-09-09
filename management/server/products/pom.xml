@@ -34,8 +34,8 @@
     <module>cassandra</module>
     <module>hbase</module>
     <module>mahout</module>-->
-    <module>hadoop</module>
-    <module>oozie</module>
+    <!--<module>hadoop</module>-->
+    <!--<module>oozie</module>-->
   </modules>
 
 </project>
