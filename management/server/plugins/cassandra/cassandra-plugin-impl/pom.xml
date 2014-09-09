@@ -72,6 +72,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
