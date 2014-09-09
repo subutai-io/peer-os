@@ -57,8 +57,8 @@ public class EnvironmentDAO {
 
         List<T> list = new ArrayList<>();
         try {
-            ResultSet rs =
-                    dbManager.executeQuery2( "select info from environment_info where source = ?", source.toLowerCase() );
+            ResultSet rs = dbManager
+                    .executeQuery2( "select info from environment_info where source = ?", source.toLowerCase() );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -89,9 +89,8 @@ public class EnvironmentDAO {
 
         try {
 
-            ResultSet rs = dbManager
-                    .executeQuery2( "select info from environment_info where source = ? and key = ?", source.toLowerCase(),
-                            key.toLowerCase() );
+            ResultSet rs = dbManager.executeQuery2( "select info from environment_info where source = ? and key = ?",
+                    source.toLowerCase(), key.toLowerCase() );
             if ( rs != null ) {
                 Row row = rs.one();
                 if ( row != null ) {

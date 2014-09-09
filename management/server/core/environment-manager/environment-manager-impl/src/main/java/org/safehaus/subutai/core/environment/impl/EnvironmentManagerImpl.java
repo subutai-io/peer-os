@@ -9,6 +9,7 @@ package org.safehaus.subutai.core.environment.impl;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -44,14 +45,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private DbManager dbManager;
 
 
-    public EnvironmentManagerImpl(){
+    public EnvironmentManagerImpl() {
     }
+
 
     public void init() {
         this.blueprintParser = new BlueprintParser();
         this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
     }
+
 
     public void destroy() {
 
@@ -141,24 +144,40 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     /**
      * Builds an environment by provided blueprint description
      */
-    @Override
-    public boolean buildEnvironment( String blueprintStr ) {
+//    @Override
+//    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask) {
 
-        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-        return build( blueprint );
+//        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+//        environmentBuildTask.setPhysicalNodes( physicalServers );
+
+//        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+
+//        environmentBuildTask.setEnvironmentBlueprint( blueprint );
+//        return build( environmentBuildTask );
+//    }
+
+
+    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
+
+        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
+                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
+            try {
+                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
+                environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+            }
+            catch ( EnvironmentBuildException e ) {
+                System.out.println( e.getMessage() );
+            }
+            catch ( DBException e ) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
 
-    public boolean buildEnvironment( EnvironmentBlueprint blueprint ) {
-        return build( blueprint );
-    }
-
-
-    @Override
-    public Environment buildEnvironmentAndReturn( final EnvironmentBlueprint blueprint )
-            throws EnvironmentBuildException {
-
-        return environmentBuilder.build( blueprint, containerManager );
+    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask ) {
+        return build( environmentBuildTask );
     }
 
 
@@ -220,9 +239,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public List<EnvironmentBlueprint> getBlueprints() {
+    public List<EnvironmentBuildTask> getBlueprints() {
         try {
-            return environmentDAO.getInfo( BLUEPRINT, EnvironmentBlueprint.class );
+            return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
         }
         catch ( DBException e ) {
             e.printStackTrace();
@@ -250,19 +269,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    private boolean build( EnvironmentBlueprint blueprint ) {
-        if ( blueprint != null && !Strings.isNullOrEmpty( blueprint.getName() ) ) {
-            try {
-                Environment environment = environmentBuilder.build( blueprint, containerManager );
-                environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
-            }
-            catch ( EnvironmentBuildException e ) {
-                System.out.println( e.getMessage() );
-            }
-            catch ( DBException e ) {
-                e.printStackTrace();
-            }
-        }
-        return false;
+    @Override
+    public Environment buildEnvironmentAndReturn( final EnvironmentBuildTask environmentBuildTask )
+            throws EnvironmentBuildException {
+
+        return environmentBuilder.build( environmentBuildTask, containerManager );
     }
 }

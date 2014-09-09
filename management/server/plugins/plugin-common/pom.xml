@@ -44,6 +44,9 @@
           <unpackBundle>true</unpackBundle>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.common</Bundle-SymbolicName>
+            <Export-Package>
+              org.safehaus.subutai.plugin.common.*
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

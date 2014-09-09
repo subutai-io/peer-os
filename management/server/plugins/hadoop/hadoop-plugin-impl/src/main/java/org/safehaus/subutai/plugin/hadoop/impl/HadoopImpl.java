@@ -14,6 +14,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -426,8 +427,11 @@ public class HadoopImpl implements Hadoop {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
             throws ClusterSetupException {
+
+        EnvironmentBuildTask  environmentBuildTask = new EnvironmentBuildTask();
+
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", HadoopClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
@@ -441,7 +445,7 @@ public class HadoopImpl implements Hadoop {
         mastersGroup.setNumberOfNodes( HadoopClusterConfig.DEFAULT_HADOOP_MASTER_NODES_QUANTITY );
         mastersGroup.setTemplateName( config.getTemplateName() );
         mastersGroup.setPlacementStrategy( PlacementStrategy.MORE_RAM );
-        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
+//        mastersGroup.setPhysicalNodes( convertAgent2Hostname() );
         nodeGroups.add( mastersGroup );
 
         //hadoop slave nodes
@@ -450,12 +454,16 @@ public class HadoopImpl implements Hadoop {
         slavesGroup.setNumberOfNodes( config.getCountOfSlaveNodes() );
         slavesGroup.setTemplateName( config.getTemplateName() );
         slavesGroup.setPlacementStrategy( PlacementStrategy.MORE_HDD );
-        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
+//        slavesGroup.setPhysicalNodes( convertAgent2Hostname() );
         nodeGroups.add( slavesGroup );
 
         environmentBlueprint.setNodeGroups( nodeGroups );
 
-        return environmentBlueprint;
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        environmentBuildTask.setPhysicalNodes( convertAgent2Hostname() );
+
+
+        return environmentBuildTask;
     }
 
 
