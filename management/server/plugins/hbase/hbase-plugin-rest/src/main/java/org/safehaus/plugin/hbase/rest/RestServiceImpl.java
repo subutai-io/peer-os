@@ -1,12 +1,13 @@
 package org.safehaus.plugin.hbase.rest;
 
 
-import java.util.List;
-import java.util.UUID;
-
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hbase.api.HBase;
 import org.safehaus.subutai.plugin.hbase.api.HBaseClusterConfig;
+
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -28,21 +29,23 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String listClusters() {
+    public Response listClusters() {
         List<HBaseClusterConfig> clusters = hbaseManager.getClusters();
-        return JsonUtil.toJson( clusters );
+        String clusterNames = JsonUtil.toJson(clusters);
+        return Response.status(Response.Status.OK).entity(clusterNames).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
+    public Response getCluster(final String source) {
         HBaseClusterConfig cluster = hbaseManager.getCluster( source );
-        return JsonUtil.toJson( cluster );
+        String clusterName = JsonUtil.toJson(cluster);
+        return Response.status(Response.Status.OK).entity(clusterName).build();
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public Response createCluster(final String config) {
 
 
         HBaseClusterConfig hbcc = new HBaseClusterConfig();
@@ -72,49 +75,56 @@ public class RestServiceImpl implements RestService {
 
         UUID uuid = hbaseManager.installCluster( hbcc );
 
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
+    public Response destroyCluster(final String clusterName) {
         UUID uuid = hbaseManager.destroyCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
+    public Response startCluster(final String clusterName) {
         UUID uuid = hbaseManager.startCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
+    public Response stopCluster(final String clusterName) {
         UUID uuid = hbaseManager.stopCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = hbaseManager.addNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response addNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = hbaseManager.addNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = hbaseManager.destroyNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response destroyNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = hbaseManager.destroyNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clustername, final String lxchostname ) {
-        UUID uuid = hbaseManager.checkNode( clustername, lxchostname );
-        return wrapUUID( uuid );
+    public Response checkNode(final String clusterName, final String lxcHostname) {
+        UUID uuid = hbaseManager.checkNode(clusterName, lxcHostname);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
