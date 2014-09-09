@@ -40,7 +40,6 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response processResponses( final String responses ) {
-        LOG.warning( "Responses:\n" + responses );
         try {
             Set<org.safehaus.subutai.common.protocol.Response> resps = gson.fromJson( responses,
                     new TypeToken<LinkedHashSet<org.safehaus.subutai.common.protocol.Response>>() {}.getType() );
@@ -85,7 +84,7 @@ public class RestServiceImpl implements RestService {
                 for (; a.hasMoreElements(); ) {
                     InetAddress addr = a.nextElement();
                     if ( addr.getHostAddress().startsWith( "172" ) ) {
-                        System.out.println( addr.getHostAddress() );
+                        return addr.getHostAddress();
                     }
                 }
             }
