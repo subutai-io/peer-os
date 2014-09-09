@@ -1,19 +1,136 @@
 package org.safehaus.subutai.plugin.hadoop.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-@Path ("hadoop")
 public interface RestService {
 
-	@GET
-	@Path ("install/{clusterName}")
-	public String installCluster(@PathParam ("clusterName") String clusterName);
+    // get cluster list
+    @GET
+    @Path("clusters")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response listClusters();
 
-	@GET
-	@Path ("uninstall/{clusterName}") //Maps for the `hello/John` in the URL
-	public String uninstallCluster(@PathParam ("clusterName") String clusterName);
+    //view cluster info
+    @GET
+    @Path("clusters/{clusterName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getCluster(@PathParam("clusterName") String clusterName);
 
+    //create cluster
+    @POST
+    @Path("clusters")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response installCluster(@PathParam("clusterName") String clusterName,
+                                   @PathParam("numberOfSlaveNodes") int numberOfSlaveNodes,
+                                   @PathParam("numberOfReplicas") int numberOfReplicas);
 
+    //uninstall cluster
+    @DELETE
+    @Path("clusters/{clusterName}") //Maps for the `hello/John` in the URL
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response uninstallCluster(@PathParam("clusterName") String clusterName);
+
+    //startNameNode
+    @GET
+    @Path("clusters/{clusterName}/start")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response startNameNode(@PathParam("clusterName") String clusterName);
+
+    //stopNameNode
+    @GET
+    @Path("clusters/{clusterName}/stop")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response stopNameNode(@PathParam("clusterName") String clusterName);
+
+    //restartNameNode
+    @GET
+    @Path("clusters/{clusterName}/restart")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response restartNameNode(@PathParam("clusterName") String clusterName);
+
+    //statusNameNode
+    @GET
+    @Path("clusters/{clusterName}/status")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response statusNameNode(@PathParam("clusterName") String clusterName);
+
+    //statusSecondaryNameNode
+    @GET
+    @Path("clusters/{clusterName}/status/secondary")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response statusSecondaryNameNode(@PathParam("clusterName") String clusterName);
+
+    //startJobTracker
+    @GET
+    @Path("clusters/job/{clusterName}/start")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response startJobTracker(@PathParam("clusterName") String clusterName);
+
+    //stopJobTracker
+    @PUT
+    @Path("clusters/job/{clusterName}/stop")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response stopJobTracker(@PathParam("clusterName") String clusterName);
+
+    //restartJobTracker
+    @PUT
+    @Path("clusters/job/{clusterName}/restart")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response restartJobTracker(@PathParam("clusterName") String clusterName);
+
+    //statusJobTracker
+    @PUT
+    @Path("clusters/job/{clusterName}/status")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response statusJobTracker(@PathParam("clusterName") String clusterName);
+
+    //addNode
+    @POST
+    @Path("clusters/{clusterName}/nodes")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response addNode(@PathParam("clusterName") String clusterName);
+
+    //statusDataNode
+    @GET
+    @Path("clusters/{clusterName}/node/{hostname}/status")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response statusDataNode(@PathParam("clusterName") String clusterName,
+                                   @PathParam("hostname") String hostname);
+
+    //blockDataNode
+    @GET
+    @Path("clusters/{clusterName}/node/{lxcHostName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response blockDataNode(@PathParam("clusterName") String clusterName,
+                                  @PathParam("lxcHostName") String lxcHostName);
+
+    //unblockDataNode
+    @GET
+    @Path("clusters/{clusterName}/node/{lxcHostName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response unblockDataNode(@PathParam("clusterName") String clusterName,
+                                    @PathParam("lxcHostName") String lxcHostName);
+
+    //statusTaskTracker
+    @PUT
+    @Path("clusters/{clusterName}/task/{hostname}/status")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response statusTaskTracker(@PathParam("clusterName") String clusterName,
+                                      @PathParam("hostname") String hostname);
+
+    //blockTaskTracker
+    @GET
+    @Path("clusters/{clusterName}/task/{lxcHostName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response blockTaskTracker(@PathParam("clusterName") String clusterName,
+                                     @PathParam("lxcHostName") String lxcHostName);
+
+    //unblockTaskTracker
+    @GET
+    @Path("clusters/{clusterName}/node/{lxcHostName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response unblockTaskTracker(@PathParam("clusterName") String clusterName,
+                                       @PathParam("lxcHostName") String lxcHostName);
 }
