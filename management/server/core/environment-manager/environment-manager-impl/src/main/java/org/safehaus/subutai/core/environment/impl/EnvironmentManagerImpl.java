@@ -38,15 +38,103 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     private EnvironmentBuilder environmentBuilder;
     private BlueprintParser blueprintParser;
     private ContainerManager containerManager;
+    private TemplateRegistryManager templateRegistryManager;
+    private AgentManager agentManager;
+    private NetworkManager networkManager;
+    private DbManager dbManager;
 
 
-    public EnvironmentManagerImpl( final ContainerManager containerManager,
-                                   final TemplateRegistryManager templateRegistryManager, final DbManager dbManager,
-                                   final AgentManager agentManager, final NetworkManager networkManager ) {
-        this.containerManager = containerManager;
-        this.environmentDAO = new EnvironmentDAO( dbManager );
+    public EnvironmentManagerImpl(){
+    }
+
+    public void init() {
         this.blueprintParser = new BlueprintParser();
+        this.environmentDAO = new EnvironmentDAO( dbManager );
         environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
+    }
+
+    public void destroy() {
+
+    }
+
+
+    public EnvironmentDAO getEnvironmentDAO() {
+        return environmentDAO;
+    }
+
+
+    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO ) {
+        this.environmentDAO = environmentDAO;
+    }
+
+
+    public EnvironmentBuilder getEnvironmentBuilder() {
+        return environmentBuilder;
+    }
+
+
+    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder ) {
+        this.environmentBuilder = environmentBuilder;
+    }
+
+
+    public BlueprintParser getBlueprintParser() {
+        return blueprintParser;
+    }
+
+
+    public void setBlueprintParser( final BlueprintParser blueprintParser ) {
+        this.blueprintParser = blueprintParser;
+    }
+
+
+    public ContainerManager getContainerManager() {
+        return containerManager;
+    }
+
+
+    public void setContainerManager( final ContainerManager containerManager ) {
+        this.containerManager = containerManager;
+    }
+
+
+    public TemplateRegistryManager getTemplateRegistryManager() {
+        return templateRegistryManager;
+    }
+
+
+    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager ) {
+        this.templateRegistryManager = templateRegistryManager;
+    }
+
+
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public NetworkManager getNetworkManager() {
+        return networkManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager ) {
+        this.networkManager = networkManager;
+    }
+
+
+    public DbManager getDbManager() {
+        return dbManager;
+    }
+
+
+    public void setDbManager( final DbManager dbManager ) {
+        this.dbManager = dbManager;
     }
 
 

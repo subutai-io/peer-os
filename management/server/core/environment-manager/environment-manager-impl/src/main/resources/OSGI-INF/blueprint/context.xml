@@ -13,12 +13,15 @@
     <reference id="networkManager" availability="mandatory"
                interface="org.safehaus.subutai.core.network.api.NetworkManager"/>
 
-    <bean id="environmentManager" scope="singleton" class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
-        <argument ref="containerManager"/>
-        <argument ref="templateRegistryManager"/>
-        <argument ref="dbManager"/>
-        <argument ref="agentManager"/>
-        <argument ref="networkManager"/>
+    <bean id="environmentManager" scope="singleton"
+          init-method="init"
+          destroy-method="destroy"
+          class="org.safehaus.subutai.core.environment.impl.EnvironmentManagerImpl">
+        <property name="containerManager" ref="containerManager"/>
+        <property name="templateRegistryManager" ref="templateRegistryManager"/>
+        <property name="dbManager" ref="dbManager"/>
+        <property name="agentManager" ref="agentManager"/>
+        <property name="networkManager" ref="networkManager"/>
     </bean>
 
 </blueprint>
