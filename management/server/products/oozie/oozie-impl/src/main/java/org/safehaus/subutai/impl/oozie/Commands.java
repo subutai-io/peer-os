@@ -51,7 +51,7 @@ public class Commands extends CommandsSingleton {
 
 
     public static Command getStopServerCommand( Set<Agent> agents ) {
-        return createCommand( new RequestBuilder( "service oozie-server stop" ), agents );
+        return createCommand( new RequestBuilder( "service oozie-server stop &" ), agents );
     }
 
 
