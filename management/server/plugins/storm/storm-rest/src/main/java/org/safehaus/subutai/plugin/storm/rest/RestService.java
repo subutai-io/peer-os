@@ -56,7 +56,7 @@ public class RestService {
     }
 
     @POST
-    @Path("clusters/{clusterName}")
+    @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
     public Response installCluster(
             @PathParam("clusterName") String clusterName,
@@ -98,7 +98,7 @@ public class RestService {
         return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
-    @PUT
+    @POST
     @Path("clusters/{clusterName}/nodes")
     @Produces({MediaType.APPLICATION_JSON})
     public Response addNode(
@@ -107,7 +107,7 @@ public class RestService {
         UUID uuid = stormManager.addNode(clusterName);
 
         String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
-        return Response.status(Response.Status.OK).entity(operationId).build();
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
     @DELETE

@@ -63,7 +63,7 @@ public class RestService {
     }
 
     @POST
-    @Path("clusters/{clusterName}")
+    @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
     public Response installCluster(
             @PathParam("clusterName") String clusterName,

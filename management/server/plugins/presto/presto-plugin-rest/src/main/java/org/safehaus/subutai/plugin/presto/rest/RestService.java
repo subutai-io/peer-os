@@ -134,7 +134,7 @@ public class RestService {
     }
 
     @GET
-    @Path("clusters/{clusterName}/nodes/{lxcHostName}/")
+    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response checkNode(
             @PathParam("clusterName") String clusterName,

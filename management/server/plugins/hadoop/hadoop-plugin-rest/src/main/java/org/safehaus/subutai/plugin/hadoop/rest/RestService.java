@@ -33,19 +33,19 @@ public interface RestService {
     public Response uninstallCluster(@PathParam("clusterName") String clusterName);
 
     //startNameNode
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/start")
     @Produces({MediaType.APPLICATION_JSON})
     public Response startNameNode(@PathParam("clusterName") String clusterName);
 
     //stopNameNode
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/stop")
     @Produces({MediaType.APPLICATION_JSON})
     public Response stopNameNode(@PathParam("clusterName") String clusterName);
 
     //restartNameNode
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/restart")
     @Produces({MediaType.APPLICATION_JSON})
     public Response restartNameNode(@PathParam("clusterName") String clusterName);
@@ -63,7 +63,7 @@ public interface RestService {
     public Response statusSecondaryNameNode(@PathParam("clusterName") String clusterName);
 
     //startJobTracker
-    @GET
+    @PUT
     @Path("clusters/job/{clusterName}/start")
     @Produces({MediaType.APPLICATION_JSON})
     public Response startJobTracker(@PathParam("clusterName") String clusterName);
@@ -81,7 +81,7 @@ public interface RestService {
     public Response restartJobTracker(@PathParam("clusterName") String clusterName);
 
     //statusJobTracker
-    @PUT
+    @GET
     @Path("clusters/job/{clusterName}/status")
     @Produces({MediaType.APPLICATION_JSON})
     public Response statusJobTracker(@PathParam("clusterName") String clusterName);
@@ -100,35 +100,35 @@ public interface RestService {
                                    @PathParam("hostname") String hostname);
 
     //blockDataNode
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/node/{lxcHostName}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response blockDataNode(@PathParam("clusterName") String clusterName,
                                   @PathParam("lxcHostName") String lxcHostName);
 
     //unblockDataNode
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/node/{lxcHostName}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response unblockDataNode(@PathParam("clusterName") String clusterName,
                                     @PathParam("lxcHostName") String lxcHostName);
 
     //statusTaskTracker
-    @PUT
+    @GET
     @Path("clusters/{clusterName}/task/{hostname}/status")
     @Produces({MediaType.APPLICATION_JSON})
     public Response statusTaskTracker(@PathParam("clusterName") String clusterName,
                                       @PathParam("hostname") String hostname);
 
     //blockTaskTracker
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/task/{lxcHostName}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response blockTaskTracker(@PathParam("clusterName") String clusterName,
                                      @PathParam("lxcHostName") String lxcHostName);
 
     //unblockTaskTracker
-    @GET
+    @PUT
     @Path("clusters/{clusterName}/node/{lxcHostName}")
     @Produces({MediaType.APPLICATION_JSON})
     public Response unblockTaskTracker(@PathParam("clusterName") String clusterName,
