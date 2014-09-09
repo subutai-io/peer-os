@@ -19,7 +19,7 @@
         </jaxrs:serviceBeans>
     </jaxrs:server>
 
-    <bean id="peerRestServiceImpl" class="org.safehaus.subuta.environment.rest.RestServiceImpl">
+    <bean id="environmentRestServiceImpl" class="org.safehaus.subuta.environment.rest.RestServiceImpl">
         <property name="environmentManager" ref="environmentManager"/>
     </bean>
 
