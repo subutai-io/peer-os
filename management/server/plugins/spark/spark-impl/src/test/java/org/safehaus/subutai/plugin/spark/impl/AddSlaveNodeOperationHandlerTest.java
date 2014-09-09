@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
@@ -15,6 +16,7 @@ import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 import java.util.Arrays;
 import java.util.HashSet;
 
+@Ignore
 public class AddSlaveNodeOperationHandlerTest {
 
     private SparkImplMock mock;

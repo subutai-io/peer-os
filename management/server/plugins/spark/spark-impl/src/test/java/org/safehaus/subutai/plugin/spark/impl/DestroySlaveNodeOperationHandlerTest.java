@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -10,6 +11,7 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.DestroySlaveNodeOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 
+@Ignore
 public class DestroySlaveNodeOperationHandlerTest {
     private SparkImplMock mock;
     private AbstractOperationHandler handler;
