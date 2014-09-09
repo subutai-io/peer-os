@@ -52,6 +52,14 @@
       <groupId>org.safehaus.subutai</groupId>
       <artifactId>db-manager-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -66,6 +74,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.dispatcher.impl</Bundle-SymbolicName>
+            <Export-Package>
+              org.apache.http;org.apache.http.*
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>

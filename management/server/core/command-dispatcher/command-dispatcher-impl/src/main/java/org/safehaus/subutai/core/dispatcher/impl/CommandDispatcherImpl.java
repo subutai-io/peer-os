@@ -24,6 +24,7 @@ import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -35,6 +36,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     private final AgentManager agentManager;
     private final CommandRunner commandRunner;
     private final DispatcherDAO dispatcherDAO;
+    private final ResponseSender responseSender;
     private UUID subutaiId;
 
 
@@ -43,13 +45,18 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
+        this.responseSender = new ResponseSender( dispatcherDAO );
     }
 
 
-    public void init() {}
+    public void init() {
+        responseSender.init();
+    }
 
 
-    public void destroy() {}
+    public void destroy() {
+        responseSender.dispose();
+    }
 
 
     public UUID getSubutaiUUID() {
@@ -88,18 +95,18 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
 
     @Override
-    public void executeRequests( final String IP, final UUID ownerId, final Set<BatchRequest> requests ) {
+    public void executeRequests( final String ip, final UUID ownerId, final Set<BatchRequest> requests ) {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "IP is null or empty" );
         Preconditions.checkNotNull( ownerId, "Owner Id is null" );
-        Preconditions.checkNotNull( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
-        LOG.warning( "IP :" + IP );
         try {
             final UUID commandId = requests.iterator().next().getCommandId();
             //get request from db
             RemoteRequest remoteRequest = dispatcherDAO.getRemoteRequest( commandId );
             //if no request exists, create a new one
             if ( remoteRequest == null ) {
-                remoteRequest = new RemoteRequest( ownerId, commandId );
+                remoteRequest = new RemoteRequest( ip, ownerId, commandId );
                 //save request to db
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 

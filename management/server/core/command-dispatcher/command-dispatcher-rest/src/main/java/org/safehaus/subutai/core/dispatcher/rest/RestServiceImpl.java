@@ -1,9 +1,14 @@
 package org.safehaus.subutai.core.dispatcher.rest;
 
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
@@ -22,6 +27,7 @@ import com.google.gson.reflect.TypeToken;
 
 
 public class RestServiceImpl implements RestService {
+    private static final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
 
     private final CommandDispatcher dispatcher;
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -34,6 +40,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response processResponses( final String responses ) {
+        LOG.warning( "Responses:\n" + responses );
         try {
             Set<org.safehaus.subutai.common.protocol.Response> resps = gson.fromJson( responses,
                     new TypeToken<LinkedHashSet<org.safehaus.subutai.common.protocol.Response>>() {}.getType() );
@@ -52,13 +59,41 @@ public class RestServiceImpl implements RestService {
 
             Message message = PhaseInterceptorChain.getCurrentMessage();
             Request request = ( Request ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
+            //            String ip =    request.getRemoteAddr();
+            //for now set IP to local subutai
+            //TODO remove this in production
+            String ip = getLocalIp();
             UUID ownrId = JsonUtil.fromJson( ownerId, UUID.class );
             Set<BatchRequest> reqs = gson.fromJson( requests, new TypeToken<Set<BatchRequest>>() {}.getType() );
-            dispatcher.executeRequests( request.getRemoteAddr(), ownrId, reqs );
+            dispatcher.executeRequests( ip, ownrId, reqs );
             return Response.ok().build();
         }
         catch ( RuntimeException e ) {
             return Response.serverError().entity( e.getMessage() ).build();
         }
+    }
+
+
+    private String getLocalIp() {
+        Enumeration<NetworkInterface> n = null;
+        try {
+            n = NetworkInterface.getNetworkInterfaces();
+            for (; n.hasMoreElements(); ) {
+                NetworkInterface e = n.nextElement();
+
+                Enumeration<InetAddress> a = e.getInetAddresses();
+                for (; a.hasMoreElements(); ) {
+                    InetAddress addr = a.nextElement();
+                    if ( addr.getHostAddress().startsWith( "172" ) ) {
+                        System.out.println( addr.getHostAddress() );
+                    }
+                }
+            }
+        }
+        catch ( SocketException e ) {
+        }
+
+
+        return "172.16.192.64";
     }
 }

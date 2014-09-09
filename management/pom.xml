@@ -141,10 +141,23 @@
     <org.apache.jackrabbit.webdav.version>2.8.0</org.apache.jackrabbit.webdav.version>
     <org.apache.ant.version>1.8.2</org.apache.ant.version>
     <yamlbeans.version>1.08</yamlbeans.version>
+    <http.client.version>4.3.5</http.client.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${http.client.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${http.client.version}</version>
+      </dependency>
+
       <!-- UI -->
       <dependency>
         <groupId>com.vaadin</groupId>

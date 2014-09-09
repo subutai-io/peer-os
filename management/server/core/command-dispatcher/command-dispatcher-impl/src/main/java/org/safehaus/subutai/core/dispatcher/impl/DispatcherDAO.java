@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.dispatcher.impl;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -47,10 +47,10 @@ public class DispatcherDAO {
      */
 
 
-    public List<RemoteResponse> getRemoteResponses( UUID commandId ) throws DBException {
+    public Set<RemoteResponse> getRemoteResponses( UUID commandId ) throws DBException {
         Preconditions.checkNotNull( commandId, "Command Id is null" );
 
-        List<RemoteResponse> responses = new ArrayList<>();
+        Set<RemoteResponse> responses = new LinkedHashSet<>();
 
         try {
             ResultSet rs = dbManager
@@ -107,6 +107,7 @@ public class DispatcherDAO {
     }
 
 
+    //workaround until we change Cassandra to another DB
     public void deleteRemoteRequest( UUID commandId, int attempts ) throws DBException {
         Preconditions.checkArgument( attempts >= 0, "Attempts < 0" );
         Preconditions.checkNotNull( commandId, "Command id is null" );
@@ -140,11 +141,11 @@ public class DispatcherDAO {
     }
 
 
-    public List<RemoteRequest> getRemoteRequests( int attempts, int limit ) throws DBException {
+    public Set<RemoteRequest> getRemoteRequests( int attempts, int limit ) throws DBException {
         Preconditions.checkArgument( attempts > 0, "Attempts must be greater than 0" );
         Preconditions.checkArgument( limit > 0, "Limit must be greater than 0" );
 
-        List<RemoteRequest> remoteRequests = new ArrayList<>();
+        Set<RemoteRequest> remoteRequests = new LinkedHashSet<>();
 
         try {
             ResultSet rs = dbManager
