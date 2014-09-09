@@ -6,10 +6,10 @@ import org.junit.*;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
 import org.safehaus.subutai.plugin.presto.impl.handler.AddWorkerNodeOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 
 public class AddWorkerNodeOperationHandlerTest {
 
@@ -35,7 +35,7 @@ public class AddWorkerNodeOperationHandlerTest {
     public void testWithUnconnectedAgents() {
         PrestoClusterConfig config = new PrestoClusterConfig();
         config.setClusterName("test-cluster");
-        config.setWorkers(new HashSet<>(Arrays.asList(CommonMockBuilder.createAgent())));
+        config.setWorkers(new HashSet<>(Arrays.asList( CommonMockBuilder.createAgent())));
         config.setCoordinatorNode(CommonMockBuilder.createAgent());
         mock.setClusterConfig(config);
 
