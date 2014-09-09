@@ -36,7 +36,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void init() {
-        LOG.info( id );
+        LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
@@ -74,7 +74,7 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public String getHostId() {
-        return "id";
+        return id;
     }
 
 
