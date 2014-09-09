@@ -46,7 +46,7 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
             po.addLog("Preparing environment...");
             hadoopConfig.setTemplateName(FlumeConfig.TEMPLATE_NAME);
             try {
-                EnvironmentBlueprint eb = manager.getHadoopManager()
+                EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
             } catch(ClusterSetupException ex) {

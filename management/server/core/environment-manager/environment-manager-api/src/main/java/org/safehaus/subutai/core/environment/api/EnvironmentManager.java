@@ -6,12 +6,13 @@
 package org.safehaus.subutai.core.environment.api;
 
 
+import java.util.List;
+
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-
-import java.util.List;
 
 
 /**
@@ -19,39 +20,40 @@ import java.util.List;
  */
 public interface EnvironmentManager {
 
-	/**
-	 * Builds the environment with a given blueprint descriptor.
-	 */
-	public boolean buildEnvironment(String blueprintStr);
+    /**
+     * Builds the environment with a given blueprint descriptor.
+     */
+    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
 
-	public boolean buildEnvironment(EnvironmentBlueprint blueprint);
+//    public boolean buildEnvironment( EnvironmentBlueprint blueprint );
 
-	public Environment buildEnvironmentAndReturn(EnvironmentBlueprint blueprint) throws EnvironmentBuildException;
+    public Environment buildEnvironmentAndReturn( EnvironmentBuildTask environmentBuildTask )
+            throws EnvironmentBuildException;
 
 
-	/**
-	 * Returns the set of existing environments.
-	 */
-	public List<Environment> getEnvironments();
+    /**
+     * Returns the set of existing environments.
+     */
+    public List<Environment> getEnvironments();
 
-	/**
-	 * Gets the environment by given environment name.
-	 */
-	public Environment getEnvironmentInfo(String environmentName);
+    /**
+     * Gets the environment by given environment name.
+     */
+    public Environment getEnvironmentInfo( String environmentName );
 
-	/**
-	 * Destroys environment by a given environmentt name.
-	 */
-	public boolean destroyEnvironment(String environmentName) throws EnvironmentDestroyException;
+    /**
+     * Destroys environment by a given environmentt name.
+     */
+    public boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
 
-	/**
-	 * Saves blueprint test into database
-	 */
-	public boolean saveBlueprint(String bluepringStr);
+    /**
+     * Saves blueprint test into database
+     */
+    public boolean saveBlueprint( String bluepringStr );
 
-	public List<EnvironmentBlueprint> getBlueprints();
+    public List<EnvironmentBuildTask> getBlueprints();
 
-	boolean deleteBlueprint(String name);
+    boolean deleteBlueprint( String name );
 
-	public String parseBlueprint(EnvironmentBlueprint blueprint);
+    public String parseBlueprint( EnvironmentBlueprint blueprint );
 }

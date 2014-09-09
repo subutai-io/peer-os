@@ -82,7 +82,7 @@ public class RestServiceImpl implements RestService {
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }
-        oozieManager.startServer( config );
+//        oozieManager.startServer( config );
         return JsonUtil.toJson( OPERATION_ID, oozieManager.startServer( config ) );
     }
 
@@ -93,8 +93,8 @@ public class RestServiceImpl implements RestService {
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }
-        oozieManager.stopServer( config );
-        return JsonUtil.toJson( OPERATION_ID, oozieManager.startServer( config ) );
+//        UUID uuid oozieManager.stopServer( config );
+        return JsonUtil.toJson( OPERATION_ID, oozieManager.stopServer( config ) );
     }
 
 
@@ -104,7 +104,7 @@ public class RestServiceImpl implements RestService {
         if ( config == null ) {
             return JsonUtil.toJson( "ERROR", String.format( "Cluster %s not found", clusterName ) );
         }
-        oozieManager.checkServerStatus( config );
-        return JsonUtil.toJson( OPERATION_ID, oozieManager.startServer( config ) );
+//        oozieManager.checkServerStatus( config );
+        return JsonUtil.toJson( OPERATION_ID, oozieManager.checkServerStatus( config ) );
     }
 }

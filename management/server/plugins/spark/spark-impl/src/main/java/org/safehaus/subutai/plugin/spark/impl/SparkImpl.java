@@ -1,8 +1,17 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
-import com.google.common.base.Preconditions;
-import java.util.*;
-import org.safehaus.subutai.common.protocol.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -10,7 +19,16 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.handler.*;
+import org.safehaus.subutai.plugin.spark.impl.handler.AddSlaveNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.ChangeMasterNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.CheckNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.DestroySlaveNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.InstallOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.StartNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.StopNodeOperationHandler;
+import org.safehaus.subutai.plugin.spark.impl.handler.UninstallOperationHandler;
+
+import com.google.common.base.Preconditions;
 
 public class SparkImpl extends SparkBase implements Spark {
 
@@ -127,7 +145,10 @@ public class SparkImpl extends SparkBase implements Spark {
     }
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint(SparkClusterConfig config) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(SparkClusterConfig config) {
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
         EnvironmentBlueprint eb = new EnvironmentBlueprint();
         eb.setName(SparkClusterConfig.PRODUCT_KEY + UUID.randomUUID());
 
@@ -138,7 +159,9 @@ public class SparkImpl extends SparkBase implements Spark {
         ng.setPlacementStrategy(PlacementStrategy.MORE_RAM);
         eb.setNodeGroups(new HashSet<>(Arrays.asList(ng)));
 
-        return eb;
+        environmentBuildTask.setEnvironmentBlueprint( eb );
+
+        return environmentBuildTask;
     }
 
     @Override
