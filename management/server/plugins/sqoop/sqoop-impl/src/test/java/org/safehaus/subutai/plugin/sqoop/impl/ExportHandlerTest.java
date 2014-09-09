@@ -18,5 +18,4 @@ public class ExportHandlerTest {
         operationHandler.run();
         verify( po ).addLogFailed( "Node is not connected" );
     }
-
 }

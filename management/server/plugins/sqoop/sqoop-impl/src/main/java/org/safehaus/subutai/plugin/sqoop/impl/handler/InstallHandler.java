@@ -34,7 +34,6 @@ public class InstallHandler extends AbstractHandler {
 
     @Override
     public void run() {
-
         ProductOperation po = productOperation;
         Environment env = null;
         if(config.getSetupType() == SetupType.WITH_HADOOP) {
