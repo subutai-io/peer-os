@@ -14,7 +14,7 @@ public interface RestService {
 
 
     @POST
-    @Path("/peer")
+    @Path("/environment")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.TEXT_PLAIN)
     public String buildNodeGroup( String peer );
