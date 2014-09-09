@@ -1695,7 +1695,7 @@
       </dependency>-->
 
       <!-- Hadoop product -->
-      <dependency>
+      <!--<dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>hadoop-api</artifactId>
         <version>${project.version}</version>
@@ -1721,7 +1721,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Oozie product -->
+      &lt;!&ndash; Oozie product &ndash;&gt;
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>oozie-api</artifactId>
@@ -1747,7 +1747,7 @@
         <artifactId>oozie-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+-->
       <!-- Products Modules - END -->
 
       <!--karaf-->
