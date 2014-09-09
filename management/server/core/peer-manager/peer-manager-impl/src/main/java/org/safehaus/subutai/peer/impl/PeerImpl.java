@@ -18,6 +18,17 @@ public class PeerImpl implements PeerManager {
 
     private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
     private String source = "PEER_MANAGER";
+    private String id;
+
+
+    public String getId() {
+        return id;
+    }
+
+
+    public void setId( final String id ) {
+        this.id = id;
+    }
 
 
     private DbManager dbManager;
@@ -25,6 +36,7 @@ public class PeerImpl implements PeerManager {
 
 
     public void init() {
+        LOG.info( id );
         peerDAO = new PeerDAO( dbManager );
     }
 
