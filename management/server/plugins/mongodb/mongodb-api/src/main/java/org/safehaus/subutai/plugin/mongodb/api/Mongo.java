@@ -6,13 +6,13 @@
 package org.safehaus.subutai.plugin.mongodb.api;
 
 
-import org.safehaus.subutai.core.environment.api.helper.Environment;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-
-import java.util.UUID;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
@@ -75,5 +75,5 @@ public interface Mongo extends ApiBase<MongoClusterConfig> {
 	public ClusterSetupStrategy getClusterSetupStrategy(Environment environment, MongoClusterConfig config,
 	                                                    ProductOperation po);
 
-	public EnvironmentBlueprint getDefaultEnvironmentBlueprint(MongoClusterConfig config);
+	public EnvironmentBuildTask getDefaultEnvironmentBlueprint(MongoClusterConfig config);
 }

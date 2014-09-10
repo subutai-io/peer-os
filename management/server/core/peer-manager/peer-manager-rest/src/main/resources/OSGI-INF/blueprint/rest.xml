@@ -13,7 +13,7 @@
         </cxf:features>
     </cxf:bus>-->
 
-    <jaxrs:server address="/peer" id="petRestService">
+    <jaxrs:server address="/peer" id="peerRestService">
         <jaxrs:serviceBeans>
             <ref component-id="peerRestServiceImpl"/>
         </jaxrs:serviceBeans>

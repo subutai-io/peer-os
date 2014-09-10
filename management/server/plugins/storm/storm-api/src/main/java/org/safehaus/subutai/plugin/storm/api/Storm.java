@@ -25,7 +25,7 @@ public interface Storm extends ApiBase<StormConfig> {
 
     public UUID destroyNode(String clusterName, String hostname);
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint(StormConfig config);
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(StormConfig config);
 
     public ClusterSetupStrategy getClusterSetupStrategy(Environment environment,
             StormConfig config, ProductOperation po);

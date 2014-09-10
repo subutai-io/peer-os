@@ -4,7 +4,7 @@ package org.safehaus.subutai.plugin.oozie.impl.handler;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -47,7 +47,7 @@ public class InstallHandler extends AbstractOperationHandler<OozieImpl> {
             po.addLog( "Preparing environment..." );
             hadoopConfig.setTemplateName( OozieClusterConfig.PRODUCT_NAME_SERVER );
             try {
-                EnvironmentBlueprint eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
+                EnvironmentBuildTask eb = manager.getHadoopManager().getDefaultEnvironmentBlueprint( hadoopConfig );
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn( eb );
             }
             catch ( ClusterSetupException ex ) {

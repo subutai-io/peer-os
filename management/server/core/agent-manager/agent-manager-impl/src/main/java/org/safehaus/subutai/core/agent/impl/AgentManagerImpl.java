@@ -200,6 +200,18 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     }
 
 
+    @Override
+    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
+        Set<Agent> agentSet = new HashSet<>();
+        for ( Agent agent : agents.asMap().values() ) {
+            if ( hostnames.contains( agent.getHostname() ) ) {
+                agentSet.add( agent );
+            }
+        }
+        return agentSet;
+    }
+
+
     /**
      * Initialized agent manager
      */
@@ -328,6 +340,17 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
 
 
     /**
+     * Sends ack to agent when it is registered with the management server
+     */
+    private void sendAck( UUID agentUUID ) {
+        Request ack =
+                new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID, UUID.randomUUID(), null,
+                        null, null, null, null, null, null, null, null, null, null, null );
+        communicationService.sendRequest( ack );
+    }
+
+
+    /**
      * Removes agent from the cache of connected agents
      */
     private void removeAgent( Response response ) {
@@ -345,16 +368,5 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         catch ( Exception e ) {
             LOG.log( Level.SEVERE, "Error in removeAgent", e );
         }
-    }
-
-
-    /**
-     * Sends ack to agent when it is registered with the management server
-     */
-    private void sendAck( UUID agentUUID ) {
-        Request ack =
-                new Request( "AGENT-MANAGER", RequestType.REGISTRATION_REQUEST_DONE, agentUUID, UUID.randomUUID(), null,
-                        null, null, null, null, null, null, null, null, null, null, null );
-        communicationService.sendRequest( ack );
     }
 }

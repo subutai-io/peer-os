@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -29,7 +29,7 @@ public interface Oozie extends ApiBase<OozieClusterConfig> {
     public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, OozieClusterConfig config,
                                                          ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieClusterConfig config );
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( OozieClusterConfig config );
 
     UUID addNode( String clustername, String lxchostname, String nodetype );
 

@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.hive.impl.handler;
 
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
@@ -42,7 +42,7 @@ public class InstallHandler extends AbstractHandler {
             po.addLog("Preparing environment...");
             hadoopConfig.setTemplateName(HiveConfig.TEMPLATE_NAME);
             try {
-                EnvironmentBlueprint eb = manager.getHadoopManager()
+                EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
             } catch(ClusterSetupException ex) {

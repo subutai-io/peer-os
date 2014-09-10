@@ -37,12 +37,15 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String registerPeer( String config ) {
+    public Peer registerPeer( String config ) {
         if ( config != null ) {
             Peer peer = GSON.fromJson( config, Peer.class );
-            return peerManager.register( peer );
+            peerManager.register( peer );
+            return peer;
         }
-        return GSON.toJson( "ERROR" );
+        else {
+            return null;
+        }
     }
 
 
@@ -50,6 +53,14 @@ public class RestServiceImpl implements RestService {
     public String getPeerJsonFormat() {
         Peer peer = getSamplePeer();
         return GSON.toJson( peer );
+    }
+
+
+    @Override
+    public String getId() {
+
+        String id = peerManager.getHostId();
+        return GSON.toJson( id );
     }
 
 

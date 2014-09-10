@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -42,17 +43,17 @@ import com.google.common.collect.Sets;
 
 public class CassandraImpl extends CassandraBase {
 
-    Commands commands;
-    DbManager dbManager;
-    Tracker tracker;
-    LxcManager lxcManager;
-    ExecutorService executor;
-    NetworkManager networkManager;
-    CommandRunner commandRunner;
-    AgentManager agentManager;
-    EnvironmentManager environmentManager;
-    ContainerManager containerManager;
-    PluginDAO pluginDAO;
+    private Commands commands;
+    private DbManager dbManager;
+    private Tracker tracker;
+    private LxcManager lxcManager;
+    private ExecutorService executor;
+    private NetworkManager networkManager;
+    private CommandRunner commandRunner;
+    private AgentManager agentManager;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
+    private PluginDAO pluginDAO;
 
 
     public CassandraImpl() {
@@ -285,9 +286,12 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final CassandraClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final CassandraClusterConfig config ) {
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", config.getProductKey(), UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );
@@ -298,6 +302,9 @@ public class CassandraImpl extends CassandraBase {
         nodeGroup.setNumberOfNodes( config.getNumberOfNodes() );
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
-        return environmentBlueprint;
+
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+
+        return environmentBuildTask;
     }
 }

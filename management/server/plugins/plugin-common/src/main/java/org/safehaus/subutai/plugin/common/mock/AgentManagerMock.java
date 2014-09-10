@@ -58,4 +58,9 @@ public class AgentManagerMock implements AgentManager {
 	public void removeListener(AgentListener listener) {
 
 	}
+
+    @Override
+    public Set< Agent > getAgentsByHostnames( Set< String > hostnames ) {
+        return null;
+    }
 }

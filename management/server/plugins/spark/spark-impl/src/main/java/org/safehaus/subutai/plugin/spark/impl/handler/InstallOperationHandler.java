@@ -44,7 +44,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
             po.addLog("Preparing environment...");
             hadoopConfig.setTemplateName(SparkClusterConfig.TEMPLATE_NAME);
             try {
-                EnvironmentBlueprint eb = manager.getHadoopManager()
+                EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
             } catch(ClusterSetupException ex) {

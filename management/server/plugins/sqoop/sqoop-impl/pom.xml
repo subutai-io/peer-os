@@ -2,17 +2,17 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-plugin-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>sqoop-plugin-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
 
-    <artifactId>sqoop-plugin-impl</artifactId>
-    <packaging>bundle</packaging>
-    <name>Subutai Sqoop Impl</name>
-    <description>Subutai Sqoop Impl</description>
+  <artifactId>sqoop-plugin-impl</artifactId>
+  <packaging>bundle</packaging>
+  <name>Subutai Sqoop Impl</name>
+  <description>Subutai Sqoop Impl</description>
 
     <dependencies>
         <dependency>
@@ -47,6 +47,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -67,23 +68,26 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.plugin.sqoop.impl</Bundle-SymbolicName>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.plugin.sqoop.impl</Bundle-SymbolicName>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

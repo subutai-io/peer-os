@@ -8,11 +8,11 @@ package org.safehaus.subutai.plugin.solr.api;
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.environment.api.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
 
 
 /**
@@ -33,5 +33,5 @@ public interface Solr extends ApiBase<SolrClusterConfig> {
     public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final SolrClusterConfig config,
                                                          final ProductOperation po );
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SolrClusterConfig config );
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config );
 }

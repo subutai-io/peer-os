@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
 
@@ -33,5 +33,5 @@ public interface Mahout extends ApiBase<MahoutClusterConfig> {
     ClusterSetupStrategy getClusterSetupStrategy( Environment environment, MahoutClusterConfig config,
                                                   ProductOperation po );
 
-    EnvironmentBlueprint getDefaultEnvironmentBlueprint( MahoutClusterConfig config );
+    EnvironmentBuildTask getDefaultEnvironmentBlueprint( MahoutClusterConfig config );
 }
