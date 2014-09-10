@@ -1052,6 +1052,12 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>product-common</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Core Modules - END -->
 
                 <!-- Product Plugin Modules - START -->
