@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
@@ -315,9 +316,10 @@ public class ZookeeperImpl implements Zookeeper {
     }
 
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( ZookeeperClusterConfig config ) {
         Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
 
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", ZookeeperClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
@@ -332,6 +334,8 @@ public class ZookeeperImpl implements Zookeeper {
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
 
-        return environmentBlueprint;
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+
+        return environmentBuildTask;
     }
 }

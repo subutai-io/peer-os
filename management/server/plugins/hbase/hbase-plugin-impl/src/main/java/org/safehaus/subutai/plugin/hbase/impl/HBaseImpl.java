@@ -12,6 +12,7 @@ import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -219,7 +220,7 @@ public class HBaseImpl implements HBase {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HBaseClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final HBaseClusterConfig config ) {
         return null;
     }
 

@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -36,17 +37,17 @@ import com.google.common.collect.Sets;
 
 public class OozieImpl extends OozieBase {
 
-    PluginDAO pluginDAO;
-    Commands commands;
-    AgentManager agentManager;
-    DbManager dbManager;
-    Tracker tracker;
-    CommandRunner commandRunner;
-    LxcManager lxcManager;
-    EnvironmentManager environmentManager;
-    ContainerManager containerManager;
-    Hadoop hadoopManager;
-    ExecutorService executor;
+    private PluginDAO pluginDAO;
+    private Commands commands;
+    private AgentManager agentManager;
+    private DbManager dbManager;
+    private Tracker tracker;
+    private CommandRunner commandRunner;
+    private LxcManager lxcManager;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
+    private Hadoop hadoopManager;
+    private ExecutorService executor;
 
 
     public OozieImpl() {
@@ -239,7 +240,10 @@ public class OozieImpl extends OozieBase {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final OozieClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final OozieClusterConfig config ) {
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
@@ -260,7 +264,9 @@ public class OozieImpl extends OozieBase {
         environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieGroup ) );
         environmentBlueprint.setNodeGroups( Sets.newHashSet( oozieServer ) );
 
-        return environmentBlueprint;
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+
+        return environmentBuildTask;
     }
 
 

@@ -1,59 +1,123 @@
 package org.safehaus.subutai.core.environment.impl.dao;
 
 
-import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.db.api.DbManager;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
- * Environment Manager DAO
+ * PluginDAO is used to manage cluster configuration information in database
  */
 public class EnvironmentDAO {
 
-	DbManager dbManager;
-	private String source = "ENV";
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private final Logger LOG = Logger.getLogger( EnvironmentDAO.class.getName() );
+    private final DbManager dbManager;
 
 
-	public EnvironmentDAO(final DbManager dbManager) {
-		this.dbManager = dbManager;
-	}
+    public EnvironmentDAO( final DbManager dbManager ) {
+        Preconditions.checkNotNull( dbManager, "Db Manager is null" );
+        this.dbManager = dbManager;
+    }
 
 
-	public List<Environment> getEnvironments() {
-		return dbManager.getEnvironmentInfo(source, Environment.class);
-	}
+    public void saveInfo( String source, String key, Object info ) throws DBException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( info, "Info is null" );
+
+        dbManager.executeUpdate2( "insert into environment_info(source,key,info) values (?,?,?)", source.toLowerCase(),
+                key.toLowerCase(), gson.toJson( info ) );
+    }
 
 
-	public Environment getEnvironment(final String environmentName) {
-		return dbManager.getEnvironmentInfo(source, environmentName, Environment.class);
-	}
+    /**
+     * Returns all POJOs from DB identified by source key
+     *
+     * @param source - source key
+     * @param clazz - class of POJO
+     *
+     * @return - list of POJOs
+     */
+    public <T> List<T> getInfo( String source, Class<T> clazz ) throws DBException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
+        List<T> list = new ArrayList<>();
+        try {
+            ResultSet rs = dbManager
+                    .executeQuery2( "select info from environment_info where source = ?", source.toLowerCase() );
+            if ( rs != null ) {
+                for ( Row row : rs ) {
+                    String info = row.getString( "info" );
+                    list.add( gson.fromJson( info, clazz ) );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            throw new DBException( ex.getMessage() );
+        }
+        return list;
+    }
 
 
-	public boolean saveEnvironment(final Environment environment) {
-		dbManager.saveEnvironmentInfo(source, environment.getName(), environment);
-		return true;
-	}
+    /**
+     * Returns POJO from DB
+     *
+     * @param source - source key
+     * @param key - pojo key
+     * @param clazz - class of POJO
+     *
+     * @return - POJO
+     */
+    public <T> T getInfo( String source, String key, Class<T> clazz ) throws DBException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
+        Preconditions.checkNotNull( clazz, "Class is null" );
+
+        try {
+
+            ResultSet rs = dbManager.executeQuery2( "select info from environment_info where source = ? and key = ?",
+                    source.toLowerCase(), key.toLowerCase() );
+            if ( rs != null ) {
+                Row row = rs.one();
+                if ( row != null ) {
+
+                    String info = row.getString( "info" );
+                    return gson.fromJson( info, clazz );
+                }
+            }
+        }
+        catch ( JsonSyntaxException ex ) {
+            throw new DBException( ex.getMessage() );
+        }
+        return null;
+    }
 
 
-	public boolean saveBlueprint(final EnvironmentBlueprint blueprint) {
-		//TODO Create table for blueprint objects
-		dbManager.saveEnvironmentInfo("BLUEPRINT", blueprint.getName(), blueprint);
-		//TODO Return proper result
-		return true;
-	}
+    /**
+     * deletes POJO from DB
+     *
+     * @param source - source key
+     * @param key - POJO key
+     */
+    public void deleteInfo( String source, String key ) throws DBException {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
 
-
-	public List<EnvironmentBlueprint> getBlueprints() {
-		return dbManager.getEnvironmentInfo("BLUEPRINT", EnvironmentBlueprint.class);
-	}
-
-
-	public boolean deleteBlueprint(final String blueprintName) {
-		dbManager.deleteInfo("BLUEPRINT", blueprintName);
-		//TODO return proper result
-		return true;
-	}
+        dbManager.executeUpdate2( "delete from environment_info where source = ? and key = ?", source.toLowerCase(),
+                key.toLowerCase() );
+    }
 }

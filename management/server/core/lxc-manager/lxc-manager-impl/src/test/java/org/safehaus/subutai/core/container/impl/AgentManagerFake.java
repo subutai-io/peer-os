@@ -86,4 +86,10 @@ public class AgentManagerFake implements AgentManager {
 
     public void removeListener( AgentListener listener ) {
     }
+
+
+    @Override
+    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
+        return null;
+    }
 }

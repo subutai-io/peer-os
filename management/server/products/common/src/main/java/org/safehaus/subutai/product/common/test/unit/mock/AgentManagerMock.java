@@ -1,12 +1,12 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.core.agent.api.AgentListener;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 
 
 public class AgentManagerMock implements AgentManager {
@@ -57,4 +57,10 @@ public class AgentManagerMock implements AgentManager {
 	public void removeListener(AgentListener listener) {
 
 	}
+
+
+    @Override
+    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
+        return null;
+    }
 }

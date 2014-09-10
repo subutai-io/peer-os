@@ -6,10 +6,10 @@
 package org.safehaus.subutai.core.agent.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -75,4 +75,6 @@ public interface AgentManager {
 	 * @param listener - - listener to remove
 	 */
 	public void removeListener(AgentListener listener);
+
+    public Set<Agent> getAgentsByHostnames(Set<String> hostnames);
 }

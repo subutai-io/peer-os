@@ -26,7 +26,7 @@ public class InstallHandler extends AbstractHandler {
     @Override
     public void run() {
         Environment env = null;
-        EnvironmentBlueprint eb = manager.getDefaultEnvironmentBlueprint(config);
+        EnvironmentBuildTask eb = manager.getDefaultEnvironmentBlueprint(config);
         try {
             productOperation.addLog("Building environment...");
             env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
