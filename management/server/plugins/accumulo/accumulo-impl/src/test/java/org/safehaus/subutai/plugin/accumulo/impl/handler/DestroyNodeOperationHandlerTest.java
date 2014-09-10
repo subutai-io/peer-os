@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
+import org.safehaus.subutai.plugin.accumulo.api.NodeType;
 import org.safehaus.subutai.plugin.accumulo.impl.AccumuloImpl;
 import org.safehaus.subutai.plugin.accumulo.impl.handler.mock.AccumuloImplMock;
 import static junit.framework.Assert.assertTrue;
@@ -14,7 +15,7 @@ public class DestroyNodeOperationHandlerTest {
 
     @Test
     public void testWithoutCluster() {
-        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node" );
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node", NodeType.TRACER );
 
         operationHandler.run();
 
