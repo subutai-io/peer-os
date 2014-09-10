@@ -54,11 +54,11 @@ CREATE TABLE remote_requests (
   attempts int,
   info text,
   PRIMARY KEY (commandid, attempts)
-)
+);
 
 CREATE TABLE remote_responses (
   commandid text,
   responsenumber text,
   info text,
   PRIMARY KEY (commandid, responsenumber)
-)
+);
