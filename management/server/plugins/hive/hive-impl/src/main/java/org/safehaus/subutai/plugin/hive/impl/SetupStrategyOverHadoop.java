@@ -3,12 +3,15 @@ package org.safehaus.subutai.plugin.hive.impl;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ConfigBase;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.*;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;

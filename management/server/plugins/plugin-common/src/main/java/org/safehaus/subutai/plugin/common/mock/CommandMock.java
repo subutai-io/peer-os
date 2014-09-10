@@ -1,9 +1,10 @@
 package org.safehaus.subutai.plugin.common.mock;
 
 
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandStatus;
+
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandStatus;
 
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public class CommandMock implements Command {
 	}
 
 	@Override
-	public Map<UUID, AgentResult> getResults() {
+	public Map<UUID, AgentResult > getResults() {
 		return null;
 	}
 

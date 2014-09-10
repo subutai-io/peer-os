@@ -8,15 +8,19 @@ package org.safehaus.subutai.core.command.api;
 
 import java.util.Set;
 
+import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.BatchRequest;
+import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
 /**
  * Command Runner i used to send requests to agents and obtain responses from them using either Command.getResults() or
  * by parsing AgetnResult inside command callbacks.
  */
-public interface CommandRunner {
+public interface CommandRunner extends ResponseListener {
 
     /**
      * Runs command on agents. Runs asynchronously for calling party. The supplied callback is triggered every time a
@@ -64,8 +68,6 @@ public interface CommandRunner {
      */
     public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents );
 
-
-    public Command createCommandInternal( Set<BatchRequest> batchRequests );
 
     /**
      * Creates command based on supplied RequestBuilder and target agents on which to run the command.

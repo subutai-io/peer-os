@@ -1,9 +1,9 @@
 package org.safehaus.subutai.product.common.test.unit.mock;
 
 
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandStatus;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandStatus;
 
 import java.util.Map;
 import java.util.UUID;

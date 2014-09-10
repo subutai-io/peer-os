@@ -1,10 +1,12 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+
 import java.util.Set;
+
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
 public class SetupHelper {

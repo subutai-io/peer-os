@@ -7,9 +7,9 @@ package org.safehaus.subutai.core.command.impl;
 
 
 import org.junit.Test;
-import org.safehaus.subutai.core.command.impl.CacheEntry;
-import org.safehaus.subutai.core.command.impl.CacheEntryWithExpiryCallback;
-import org.safehaus.subutai.core.command.impl.EntryExpiryCallback;
+import org.safehaus.subutai.common.command.CacheEntry;
+import org.safehaus.subutai.common.command.CacheEntryWithExpiryCallback;
+import org.safehaus.subutai.common.command.EntryExpiryCallback;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

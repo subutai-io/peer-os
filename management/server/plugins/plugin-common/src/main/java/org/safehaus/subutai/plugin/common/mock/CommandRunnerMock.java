@@ -1,14 +1,16 @@
 package org.safehaus.subutai.plugin.common.mock;
 
 
+import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+
 
 import java.util.Set;
 import java.util.UUID;
@@ -47,13 +49,6 @@ public class CommandRunnerMock implements CommandRunner
 		return new CommandMock().setDescription(request.getProgram());
 	}
 
-
-    @Override
-    public Command createCommandInternal( final Set<BatchRequest> batchRequests ) {
-        return null;
-    }
-
-
     @Override
 	public Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
 		return null;
@@ -61,7 +56,7 @@ public class CommandRunnerMock implements CommandRunner
 
 
 	@Override
-	public Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders) {
+	public Command createCommand(Set<AgentRequestBuilder > agentRequestBuilders) {
 		return null;
 	}
 
@@ -76,4 +71,9 @@ public class CommandRunnerMock implements CommandRunner
 	public Command createBroadcastCommand(final RequestBuilder requestBuilder) {
 		return null;
 	}
+
+    @Override
+    public void onResponse( Response response ) {
+
+    }
 }

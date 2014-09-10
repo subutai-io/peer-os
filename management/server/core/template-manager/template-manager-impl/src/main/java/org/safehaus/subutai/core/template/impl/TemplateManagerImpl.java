@@ -8,9 +8,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.common.protocol.Agent;
 
