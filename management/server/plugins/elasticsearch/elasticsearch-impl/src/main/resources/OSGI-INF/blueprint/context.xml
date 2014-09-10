@@ -19,9 +19,6 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
-    <reference id="configManager" availability="mandatory"
-               interface="org.safehaus.subutai.core.configuration.api.ConfigManager"/>
-
     <reference id="containerManager" availability="mandatory"
                interface="org.safehaus.subutai.core.container.api.container.ContainerManager"/>
 
