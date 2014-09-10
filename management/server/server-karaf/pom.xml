@@ -667,6 +667,12 @@
                   <version>${project.version}</version>
                 </artifactItem>
 
+                <artifactItem>
+                  <groupId>org.safehaus.subutai</groupId>
+                  <artifactId>product-common</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+
                 <!-- Tracker -->
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
@@ -1049,12 +1055,6 @@
                 <artifactItem>
                   <groupId>org.safehaus.subutai</groupId>
                   <artifactId>pet-core-rest</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-
-                <artifactItem>
-                  <groupId>org.safehaus.subutai</groupId>
-                  <artifactId>product-common</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
 
