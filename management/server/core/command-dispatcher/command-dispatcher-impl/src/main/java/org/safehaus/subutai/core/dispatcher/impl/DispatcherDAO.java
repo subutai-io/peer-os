@@ -73,8 +73,8 @@ public class DispatcherDAO {
     public void saveRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "insert into remote_responses(commandId,responseNumber, info) values (?,?,?)",
-                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getResponseSequenceNumber(),
+        dbManager.executeUpdate2( "insert into remote_responses(commandId,agentId, info) values (?,?,?)",
+                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getUuid().toString(),
                 gson.toJson( remoteResponse ) );
     }
 
@@ -82,8 +82,8 @@ public class DispatcherDAO {
     public void deleteRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and responseNumber = ?",
-                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getResponseSequenceNumber() );
+        dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and agentId = ?",
+                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getUuid().toString());
     }
 
 

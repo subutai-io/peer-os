@@ -89,7 +89,10 @@ public class ResponseSender {
                         Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
                             @Override
                             public int compare( final Response o1, final Response o2 ) {
-                                return o1.getResponseSequenceNumber() - o2.getResponseSequenceNumber();
+                                int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
+                                return compareAgents == 0 ?
+                                       o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) :
+                                       compareAgents;
                             }
                         } );
                         for ( RemoteResponse response : responses ) {

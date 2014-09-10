@@ -15,17 +15,23 @@ public class RemoteResponse {
 
     private final UUID ownerId;
     private final UUID commandId;
+    private final UUID agentId;
     private final Response response;
 
 
-    public RemoteResponse( final UUID ownerId, final UUID commandId, final Response response ) {
+    public RemoteResponse( final UUID ownerId, final Response response ) {
         Preconditions.checkNotNull( ownerId, "Owner Id is null" );
-        Preconditions.checkNotNull( commandId, "Command Id is null" );
         Preconditions.checkNotNull( response, "Response is null" );
 
         this.ownerId = ownerId;
-        this.commandId = commandId;
+        this.commandId = response.getTaskUuid();
+        this.agentId = response.getUuid();
         this.response = response;
+    }
+
+
+    public UUID getAgentId() {
+        return agentId;
     }
 
 

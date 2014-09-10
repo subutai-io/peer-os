@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +57,6 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     private final HttpUtil httpUtil;
     //cache of command executors where key is command UUID and value is CommandExecutor
     private ExpiringCache<UUID, CommandExecutor> commandExecutors;
-    private UUID subutaiId;
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
@@ -87,16 +88,6 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
             }
         }
         commandExecutors.dispose();
-    }
-
-
-    public UUID getSubutaiUUID() {
-        return subutaiId;
-    }
-
-
-    public void setSubutaiId( final String subutaiId ) {
-        this.subutaiId = UUID.fromString( subutaiId );
     }
 
 
@@ -134,7 +125,17 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     public void processResponses( final Set<Response> responses ) {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( responses ), "Responses are null or empty" );
 
-        for ( Response response : responses ) {
+        Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
+
+            @Override
+            public int compare( final Response o1, final Response o2 ) {
+                int compareAgents = o1.getUuid().compareTo( o2.getUuid() );
+                return compareAgents == 0 ? o1.getResponseSequenceNumber().compareTo( o2.getResponseSequenceNumber() ) :
+                       compareAgents;
+            }
+        } );
+        sortedSet.addAll( responses );
+        for ( Response response : sortedSet ) {
             onResponse( response );
         }
     }
@@ -169,7 +170,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                         try {
 
                             //save response to db
-                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( ownerId, commandId, response ) );
+                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( ownerId, response ) );
                         }
                         catch ( DBException e ) {
                             LOG.log( Level.SEVERE,
