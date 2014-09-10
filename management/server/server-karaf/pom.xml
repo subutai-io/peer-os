@@ -24,7 +24,7 @@
     <dependency>
       <groupId>org.apache.karaf.assemblies.features</groupId>
       <artifactId>standard</artifactId>
-      <version>${karaf.version}</version>
+      <version>${karaf.features.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
@@ -342,7 +342,7 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>features-maven-plugin</artifactId>
-        <version>${karaf.version}</version>
+        <version>${karaf.features.version}</version>
         <executions>
           <execution>
             <id>add-features-to-repo</id>
@@ -353,7 +353,7 @@
             <configuration>
               <descriptors>
                 <descriptor>
-                  mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features
+                  mvn:org.apache.karaf.assemblies.features/standard/${karaf.features.version}/xml/features
                 </descriptor>
               </descriptors>
             </configuration>
