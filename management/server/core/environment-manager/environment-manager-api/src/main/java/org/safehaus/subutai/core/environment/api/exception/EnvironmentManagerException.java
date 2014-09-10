@@ -9,8 +9,8 @@ public class EnvironmentManagerException extends Exception {
     private String message;
 
 
-    public EnvironmentManagerException( String message ) {
-        super( message );
+    public EnvironmentManagerException(String message) {
+        super(message);
         this.message = message;
     }
 

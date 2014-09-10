@@ -1,8 +1,5 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
@@ -13,6 +10,10 @@ import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupStrategy {
 
@@ -30,30 +31,30 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
     private void check() throws ClusterSetupException {
 
         String m = "Malformed configuration: ";
-        if(config.getClusterName() == null || config.getClusterName().isEmpty())
+        if (config.getClusterName() == null || config.getClusterName().isEmpty())
             throw new ClusterSetupException(m + "cluster name not specified");
-        if(manager.getCluster(config.getClusterName()) != null)
+        if (manager.getCluster(config.getClusterName()) != null)
             throw new ClusterSetupException(m + String.format(
                     "cluster %s already exists", config.getClusterName()));
-        if(config.getMasterNode() == null)
+        if (config.getMasterNode() == null)
             throw new ClusterSetupException(m + "master node not specified");
-        if(config.getSlaveNodes().isEmpty())
+        if (config.getSlaveNodes().isEmpty())
             throw new ClusterSetupException(m + "no slave nodes");
 
         // check if nodes are connected
-        if(manager.agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null)
+        if (manager.agentManager.getAgentByHostname(config.getMasterNode().getHostname()) == null)
             throw new ClusterSetupException("Master node is not connected");
-        for(Agent a : config.getSlaveNodes()) {
-            if(manager.agentManager.getAgentByHostname(a.getHostname()) == null)
+        for (Agent a : config.getSlaveNodes()) {
+            if (manager.agentManager.getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException("Not all slave nodes are connected");
         }
 
         // check Hadoop cluster
         HadoopClusterConfig hc = manager.hadoopManager.getCluster(config.getHadoopClusterName());
-        if(hc == null)
+        if (hc == null)
             throw new ClusterSetupException("Could not find Hadoop cluster "
                     + config.getHadoopClusterName());
-        if(!hc.getAllNodes().containsAll(config.getAllNodes()))
+        if (!hc.getAllNodes().containsAll(config.getAllNodes()))
             throw new ClusterSetupException("Not all nodes belong to Hadoop cluster "
                     + config.getHadoopClusterName());
         config.setHadoopNodes(new HashSet<>(hc.getAllNodes()));
@@ -65,19 +66,19 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
         Command checkInstalledCommand = Commands.getCheckInstalledCommand(allNodes);
         manager.getCommandRunner().runCommand(checkInstalledCommand);
 
-        if(!checkInstalledCommand.hasCompleted())
+        if (!checkInstalledCommand.hasCompleted())
             throw new ClusterSetupException(
                     "Failed to check presence of installed ksks packages\nInstallation aborted");
-        for(Iterator<Agent> it = allNodes.iterator(); it.hasNext();) {
+        for (Iterator<Agent> it = allNodes.iterator(); it.hasNext(); ) {
             Agent node = it.next();
 
             AgentResult result = checkInstalledCommand.getResults().get(node.getUuid());
-            if(result.getStdOut().contains(Commands.PACKAGE_NAME)) {
+            if (result.getStdOut().contains(Commands.PACKAGE_NAME)) {
                 po.addLog(String.format("Node %s already has Spark installed. Omitting this node from installation",
                         node.getHostname()));
                 config.getSlaveNodes().remove(node);
                 it.remove();
-            } else if(!result.getStdOut().contains("ksks-hadoop")) {
+            } else if (!result.getStdOut().contains("ksks-hadoop")) {
                 po.addLog(String.format("Node %s has no Hadoop installation. Omitting this node from installation",
                         node.getHostname()));
                 config.getSlaveNodes().remove(node);
@@ -85,9 +86,9 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             }
         }
 
-        if(config.getSlaveNodes().isEmpty())
+        if (config.getSlaveNodes().isEmpty())
             throw new ClusterSetupException("No nodes eligible for installation\nInstallation aborted");
-        if(!allNodes.contains(config.getMasterNode()))
+        if (!allNodes.contains(config.getMasterNode()))
             throw new ClusterSetupException("Master node was omitted\nInstallation aborted");
     }
 
@@ -102,7 +103,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             Command installCommand = Commands.getInstallCommand(config.getAllNodes());
             manager.getCommandRunner().runCommand(installCommand);
 
-            if(installCommand.hasSucceeded()) {
+            if (installCommand.hasSucceeded()) {
                 po.addLog("Installation succeeded");
 
                 SetupHelper helper = new SetupHelper(manager, config, po);
@@ -113,7 +114,7 @@ public class SetupStrategyOverHadoop extends SetupBase implements ClusterSetupSt
             } else
                 throw new ClusterSetupException("Installation failed: "
                         + installCommand.getAllErrors());
-        } catch(DBException e) {
+        } catch (DBException e) {
             throw new ClusterSetupException(
                     "Could not save cluster info to DB! Please see logs\nInstallation aborted");
         }

@@ -6,16 +6,15 @@
 package org.safehaus.subutai.core.container.impl;
 
 
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import org.safehaus.subutai.core.agent.api.AgentListener;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.common.protocol.Agent;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -27,30 +26,30 @@ public class AgentManagerFake implements AgentManager {
 
 
     public AgentManagerFake() {
-        agents.add( MockUtils.getPhysicalAgent() );
-        agents.add( MockUtils.getLxcAgent() );
+        agents.add(MockUtils.getPhysicalAgent());
+        agents.add(MockUtils.getLxcAgent());
     }
 
 
     public Set<Agent> getAgents() {
-        return Collections.unmodifiableSet( agents );
+        return Collections.unmodifiableSet(agents);
     }
 
 
     public Set<Agent> getPhysicalAgents() {
-        return Sets.newHashSet( MockUtils.getPhysicalAgent() );
+        return Sets.newHashSet(MockUtils.getPhysicalAgent());
     }
 
 
     public Set<Agent> getLxcAgents() {
-        return Sets.newHashSet( MockUtils.getLxcAgent() );
+        return Sets.newHashSet(MockUtils.getLxcAgent());
     }
 
 
-    public Agent getAgentByHostname( String hostname ) {
+    public Agent getAgentByHostname(String hostname) {
 
-        for ( Agent agent : agents ) {
-            if ( agent.getHostname().equals( hostname ) ) {
+        for (Agent agent : agents) {
+            if (agent.getHostname().equals(hostname)) {
                 return agent;
             }
         }
@@ -59,9 +58,9 @@ public class AgentManagerFake implements AgentManager {
     }
 
 
-    public Agent getAgentByUUID( UUID uuid ) {
-        for ( Agent agent : agents ) {
-            if ( agent.getUuid().equals( uuid ) ) {
+    public Agent getAgentByUUID(UUID uuid) {
+        for (Agent agent : agents) {
+            if (agent.getUuid().equals(uuid)) {
                 return agent;
             }
         }
@@ -69,27 +68,27 @@ public class AgentManagerFake implements AgentManager {
     }
 
 
-    public Set<Agent> getLxcAgentsByParentHostname( String parentHostname ) {
+    public Set<Agent> getLxcAgentsByParentHostname(String parentHostname) {
         Set<Agent> lxcAgents = new HashSet<>();
-        for ( Agent agent : agents ) {
-            if ( agent.getParentHostName().equals( parentHostname ) ) {
-                lxcAgents.add( agent );
+        for (Agent agent : agents) {
+            if (agent.getParentHostName().equals(parentHostname)) {
+                lxcAgents.add(agent);
             }
         }
         return lxcAgents;
     }
 
 
-    public void addListener( AgentListener listener ) {
+    public void addListener(AgentListener listener) {
     }
 
 
-    public void removeListener( AgentListener listener ) {
+    public void removeListener(AgentListener listener) {
     }
 
 
     @Override
-    public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
+    public Set<Agent> getAgentsByHostnames(final Set<String> hostnames) {
         return null;
     }
 }

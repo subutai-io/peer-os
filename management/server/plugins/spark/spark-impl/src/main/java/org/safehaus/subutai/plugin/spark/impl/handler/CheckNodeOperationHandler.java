@@ -24,18 +24,18 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
     public void run() {
         ProductOperation po = productOperation;
         SparkClusterConfig config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
-        if(node == null) {
+        if (node == null) {
             po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
             return;
         }
 
-        if(!config.getAllNodes().contains(node)) {
+        if (!config.getAllNodes().contains(node)) {
             po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
             return;
         }
@@ -46,7 +46,7 @@ public class CheckNodeOperationHandler extends AbstractOperationHandler<SparkImp
         manager.getCommandRunner().runCommand(checkNodeCommand);
 
         AgentResult res = checkNodeCommand.getResults().get(node.getUuid());
-        if(checkNodeCommand.hasSucceeded())
+        if (checkNodeCommand.hasSucceeded())
             po.addLogDone(String.format("%s", res.getStdOut()));
         else
             po.addLogFailed(String.format("Faied to check status, %s", checkNodeCommand.getAllErrors()));

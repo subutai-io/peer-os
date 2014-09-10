@@ -2,7 +2,7 @@ package org.safehaus.subutai.plugin.spark.impl;
 
 import com.google.common.base.Preconditions;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
-import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
@@ -26,11 +26,11 @@ public class SetupBase {
     void checkConnected() throws ClusterSetupException {
 
         String hostname = config.getMasterNode().getHostname();
-        if(manager.getAgentManager().getAgentByHostname(hostname) == null)
+        if (manager.getAgentManager().getAgentByHostname(hostname) == null)
             throw new ClusterSetupException("Master node is not connected");
 
-        for(Agent a : config.getSlaveNodes()) {
-            if(manager.getAgentManager().getAgentByHostname(a.getHostname()) == null)
+        for (Agent a : config.getSlaveNodes()) {
+            if (manager.getAgentManager().getAgentByHostname(a.getHostname()) == null)
                 throw new ClusterSetupException("Not all slave nodes are connected");
         }
     }

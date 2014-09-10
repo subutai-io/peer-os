@@ -1,9 +1,6 @@
 package org.safehaus.subutai.plugin.spark.ui;
 
 import com.vaadin.ui.Component;
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.command.api.CommandRunner;
@@ -12,6 +9,10 @@ import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SparkUI implements PortalModule {
 
@@ -25,7 +26,7 @@ public class SparkUI implements PortalModule {
     private static ExecutorService executor;
 
     public SparkUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager,
-            Spark sparkManager, CommandRunner commandRunner) {
+                   Spark sparkManager, CommandRunner commandRunner) {
         SparkUI.agentManager = agentManager;
         SparkUI.tracker = tracker;
         SparkUI.hadoopManager = hadoopManager;

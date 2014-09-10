@@ -1,14 +1,19 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
 import com.google.common.collect.Sets;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.*;
+import org.safehaus.subutai.core.command.api.AgentResult;
+import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.core.command.api.CommandCallback;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.Commands;
 import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<SparkImpl> {
 
@@ -25,26 +30,26 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
     public void run() {
         ProductOperation po = productOperation;
         final SparkClusterConfig config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
         }
 
         Agent agent = manager.getAgentManager().getAgentByHostname(lxcHostname);
-        if(agent == null) {
+        if (agent == null) {
             po.addLogFailed(
                     String.format("Agent with hostname %s is not connected\nOperation aborted", lxcHostname));
             return;
         }
 
-        if(config.getSlaveNodes().size() == 1) {
+        if (config.getSlaveNodes().size() == 1) {
             po.addLogFailed(
                     "This is the last slave node in the cluster. Please, destroy cluster instead\nOperation aborted");
             return;
         }
 
         //check if node is in the cluster
-        if(!config.getSlaveNodes().contains(agent)) {
+        if (!config.getSlaveNodes().contains(agent)) {
             po.addLogFailed(
                     String.format("Node %s does not belong to this cluster\nOperation aborted", agent.getHostname()));
             return;
@@ -52,12 +57,12 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
         po.addLog("Unregistering slave from master...");
 
-        if(manager.getAgentManager().getAgentByHostname(config.getMasterNode().getHostname()) != null) {
+        if (manager.getAgentManager().getAgentByHostname(config.getMasterNode().getHostname()) != null) {
 
             Command clearSlavesCommand = Commands.getClearSlaveCommand(agent, config.getMasterNode());
             manager.getCommandRunner().runCommand(clearSlavesCommand);
 
-            if(clearSlavesCommand.hasSucceeded()) {
+            if (clearSlavesCommand.hasSucceeded()) {
                 po.addLog("Successfully unregistered slave from master\nRestarting master...");
 
                 Command restartMasterCommand = Commands.getRestartMasterCommand(config.getMasterNode());
@@ -66,7 +71,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
                     @Override
                     public void onResponse(Response response, AgentResult agentResult, Command command) {
-                        if(agentResult.getStdOut().contains("starting")) {
+                        if (agentResult.getStdOut().contains("starting")) {
                             ok.set(true);
                             stop();
                         }
@@ -74,7 +79,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
                 });
 
-                if(ok.get())
+                if (ok.get())
                     po.addLog("Master restarted successfully");
                 else
                     po.addLog(String
@@ -87,16 +92,16 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
 
         boolean uninstall = !agent.equals(config.getMasterNode());
 
-        if(uninstall) {
+        if (uninstall) {
             po.addLog("Uninstalling Spark...");
 
             Command uninstallCommand = Commands.getUninstallCommand(Sets.newHashSet(agent));
             manager.getCommandRunner().runCommand(uninstallCommand);
 
-            if(uninstallCommand.hasCompleted()) {
+            if (uninstallCommand.hasCompleted()) {
                 AgentResult result = uninstallCommand.getResults().get(agent.getUuid());
-                if(result.getExitCode() != null && result.getExitCode() == 0)
-                    if(result.getStdOut().contains("Package ksks-spark is not installed, so not removed"))
+                if (result.getExitCode() != null && result.getExitCode() == 0)
+                    if (result.getStdOut().contains("Package ksks-spark is not installed, so not removed"))
                         po.addLog(String.format("Spark is not installed, so not removed on node %s",
                                 agent.getHostname()));
                     else
@@ -116,7 +121,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
             Command stopSlaveCommand = Commands.getStopSlaveCommand(agent);
             manager.getCommandRunner().runCommand(stopSlaveCommand);
 
-            if(stopSlaveCommand.hasSucceeded())
+            if (stopSlaveCommand.hasSucceeded())
                 po.addLog("Slave stopped successfully");
             else
                 po.addLog(String.format("Failed to stop slave, %s, skipping...", stopSlaveCommand.getAllErrors()));
@@ -128,7 +133,7 @@ public class DestroySlaveNodeOperationHandler extends AbstractOperationHandler<S
         try {
             manager.getPluginDAO().saveInfo(SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config);
             po.addLogDone("Cluster info updated in DB\nDone");
-        } catch(DBException ex) {
+        } catch (DBException ex) {
             po.addLogFailed("Error while updating cluster info in DB. Check logs.\nFailed");
         }
     }

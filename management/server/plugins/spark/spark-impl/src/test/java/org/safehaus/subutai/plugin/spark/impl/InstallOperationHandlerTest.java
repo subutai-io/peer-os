@@ -1,7 +1,5 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +11,9 @@ import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.spark.impl.mock.SparkImplMock;
 import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class InstallOperationHandlerTest {
     private SparkImplMock mock;
@@ -33,12 +34,12 @@ public class InstallOperationHandlerTest {
     public void testWithInvalidConfig() {
         SparkClusterConfig config = new SparkClusterConfig();
         config.setSetupType(SetupType.OVER_HADOOP);
-        config.setClusterName( "test" );
-        handler = new InstallOperationHandler( mock, config );
+        config.setClusterName("test");
+        handler = new InstallOperationHandler(mock, config);
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue( po.getLog().toLowerCase().contains( "malformed" ) );
+        Assert.assertTrue(po.getLog().toLowerCase().contains("malformed"));
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
@@ -46,11 +47,11 @@ public class InstallOperationHandlerTest {
     public void testWithExistingCluster() {
         SparkClusterConfig config = new SparkClusterConfig();
         config.setSetupType(SetupType.OVER_HADOOP);
-        config.setClusterName( "test-cluster" );
-        config.setSlaveNodes( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
-        config.setMasterNode( CommonMockBuilder.createAgent() );
+        config.setClusterName("test-cluster");
+        config.setSlaveNodes(new HashSet<>(Arrays.asList(CommonMockBuilder.createAgent())));
+        config.setMasterNode(CommonMockBuilder.createAgent());
 
-        mock.setClusterConfig( config );
+        mock.setClusterConfig(config);
         handler = new InstallOperationHandler(mock, config);
         handler.run();
 

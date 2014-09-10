@@ -1,14 +1,13 @@
 package org.safehaus.subuta.peer.rest;
 
 
-import java.util.UUID;
-import java.util.logging.Logger;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.safehaus.subutai.peer.api.Peer;
 import org.safehaus.subutai.peer.api.PeerManager;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 
 /**
@@ -18,7 +17,7 @@ import com.google.gson.GsonBuilder;
 public class RestServiceImpl implements RestService {
 
     public final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final Logger LOG = Logger.getLogger( RestServiceImpl.class.getName() );
+    private final Logger LOG = Logger.getLogger(RestServiceImpl.class.getName());
     private PeerManager peerManager;
 
 
@@ -31,19 +30,18 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    public void setPeerManager( PeerManager peerManager ) {
+    public void setPeerManager(PeerManager peerManager) {
         this.peerManager = peerManager;
     }
 
 
     @Override
-    public Peer registerPeer( String config ) {
-        if ( config != null ) {
-            Peer peer = GSON.fromJson( config, Peer.class );
-            peerManager.register( peer );
+    public Peer registerPeer(String config) {
+        if (config != null) {
+            Peer peer = GSON.fromJson(config, Peer.class);
+            peerManager.register(peer);
             return peer;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -52,7 +50,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public String getPeerJsonFormat() {
         Peer peer = getSamplePeer();
-        return GSON.toJson( peer );
+        return GSON.toJson(peer);
     }
 
 
@@ -60,15 +58,15 @@ public class RestServiceImpl implements RestService {
     public String getId() {
 
         String id = peerManager.getHostId();
-        return GSON.toJson( id );
+        return GSON.toJson(id);
     }
 
 
     private Peer getSamplePeer() {
         Peer peer = new Peer();
-        peer.setName( "Peer name" );
-        peer.setIp( "10.10.10.10" );
-        peer.setId( UUID.randomUUID().toString() );
+        peer.setName("Peer name");
+        peer.setIp("10.10.10.10");
+        peer.setId(UUID.randomUUID().toString());
         return peer;
     }
 }

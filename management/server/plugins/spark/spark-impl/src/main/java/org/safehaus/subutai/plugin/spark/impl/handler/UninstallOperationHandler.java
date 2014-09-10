@@ -23,33 +23,33 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
     public void run() {
         ProductOperation po = productOperation;
         SparkClusterConfig config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
             return;
         }
 
-        for(Agent node : config.getAllNodes()) {
-            if(manager.getAgentManager().getAgentByHostname(node.getHostname()) == null) {
+        for (Agent node : config.getAllNodes()) {
+            if (manager.getAgentManager().getAgentByHostname(node.getHostname()) == null) {
                 po.addLogFailed(String.format("Node %s is not connected\nOperation aborted", node.getHostname()));
                 return;
             }
         }
 
         boolean ok = false;
-        if(config.getSetupType() == SetupType.OVER_HADOOP)
+        if (config.getSetupType() == SetupType.OVER_HADOOP)
             ok = uninstall(config);
-        else if(config.getSetupType() == SetupType.WITH_HADOOP)
+        else if (config.getSetupType() == SetupType.WITH_HADOOP)
             ok = destroyNodes(config);
         else
             po.addLog("Undefined setup type");
 
-        if(ok) {
+        if (ok) {
             po.addLog("Updating db...");
             try {
                 manager.getPluginDAO().deleteInfo(SparkClusterConfig.PRODUCT_KEY,
                         config.getClusterName());
                 po.addLogDone("Cluster info deleted from DB\nDone");
-            } catch(DBException e) {
+            } catch (DBException e) {
                 po.addLogFailed("Failed to delete cluster info from DB");
             }
         } else
@@ -63,7 +63,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
         Command cmd = Commands.getUninstallCommand(config.getAllNodes());
         manager.getCommandRunner().runCommand(cmd);
 
-        if(cmd.hasSucceeded()) return true;
+        if (cmd.hasSucceeded()) return true;
 
         po.addLog(cmd.getAllErrors());
         po.addLogFailed("Uninstallation failed");
@@ -77,7 +77,7 @@ public class UninstallOperationHandler extends AbstractOperationHandler<SparkImp
             manager.getContainerManager().clonesDestroy(config.getAllNodes());
             productOperation.addLog("Destroying node(s) completed");
             return true;
-        } catch(LxcDestroyException ex) {
+        } catch (LxcDestroyException ex) {
             productOperation.addLog("Failed to destroy node(s): " + ex.getMessage());
             return false;
         }

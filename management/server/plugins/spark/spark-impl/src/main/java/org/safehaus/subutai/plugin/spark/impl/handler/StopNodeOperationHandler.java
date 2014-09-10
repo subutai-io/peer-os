@@ -25,26 +25,26 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
     public void run() {
         ProductOperation po = productOperation;
         SparkClusterConfig config = manager.getCluster(clusterName);
-        if(config == null) {
+        if (config == null) {
             po.addLogFailed(String.format("Cluster with name %s does not exist", clusterName));
             return;
         }
 
         Agent node = manager.getAgentManager().getAgentByHostname(lxcHostname);
-        if(node == null) {
+        if (node == null) {
             po.addLogFailed(String.format("Agent with hostname %s is not connected", lxcHostname));
             return;
         }
 
-        if(!config.getAllNodes().contains(node)) {
+        if (!config.getAllNodes().contains(node)) {
             po.addLogFailed(String.format("Node %s does not belong to this cluster", lxcHostname));
             return;
         }
 
-        if(master && !config.getMasterNode().equals(node)) {
+        if (master && !config.getMasterNode().equals(node)) {
             po.addLogFailed(String.format("Node %s is not a master node\nOperation aborted", node.getHostname()));
             return;
-        } else if(!master && !config.getSlaveNodes().contains(node)) {
+        } else if (!master && !config.getSlaveNodes().contains(node)) {
             po.addLogFailed(String.format("Node %s is not a slave node\nOperation aborted", node.getHostname()));
             return;
         }
@@ -52,13 +52,13 @@ public class StopNodeOperationHandler extends AbstractOperationHandler<SparkImpl
         po.addLog(String.format("Stopping %s on %s...", master ? "master" : "slave", node.getHostname()));
 
         Command stopCommand;
-        if(master)
+        if (master)
             stopCommand = Commands.getStopMasterCommand(node);
         else
             stopCommand = Commands.getStopSlaveCommand(node);
         manager.getCommandRunner().runCommand(stopCommand);
 
-        if(stopCommand.hasSucceeded())
+        if (stopCommand.hasSucceeded())
             po.addLogDone(String.format("Node %s stopped", node.getHostname()));
         else
             po.addLogFailed(

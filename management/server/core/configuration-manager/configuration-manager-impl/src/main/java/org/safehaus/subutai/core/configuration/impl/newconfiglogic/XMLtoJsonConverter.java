@@ -7,6 +7,4 @@ package org.safehaus.subutai.core.configuration.impl.newconfiglogic;
 public class XMLtoJsonConverter {
 
 
-
-
 }

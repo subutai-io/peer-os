@@ -1,13 +1,12 @@
 package org.safehaus.subutai.peer.ui;
 
 
-import java.io.File;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
 
 
 /**
@@ -25,15 +24,17 @@ public class PeerUI implements PortalModule {
     }
 
 
-    public void setPeerManager( final PeerManager peerManager ) {
+    public void setPeerManager(final PeerManager peerManager) {
         this.peerManager = peerManager;
     }
 
 
-    public void init() {}
+    public void init() {
+    }
 
 
-    public void destroy() {}
+    public void destroy() {
+    }
 
 
     @Override
@@ -50,7 +51,7 @@ public class PeerUI implements PortalModule {
 
     @Override
     public File getImage() {
-        return FileUtil.getFile( MODULE_IMAGE, this );
+        return FileUtil.getFile(MODULE_IMAGE, this);
     }
 
 

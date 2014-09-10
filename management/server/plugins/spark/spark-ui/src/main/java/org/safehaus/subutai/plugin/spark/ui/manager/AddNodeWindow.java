@@ -4,13 +4,14 @@ import com.google.common.base.Strings;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import java.util.Set;
-import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.ui.SparkUI;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class AddNodeWindow extends Window {
 
@@ -42,7 +43,7 @@ public class AddNodeWindow extends Window {
         hadoopNodes.setNullSelectionAllowed(false);
         hadoopNodes.setRequired(true);
         hadoopNodes.setWidth(200, Unit.PIXELS);
-        for(Agent node : nodes) {
+        for (Agent node : nodes) {
             hadoopNodes.addItem(node);
             hadoopNodes.setItemCaption(node, node.getHostname());
         }
@@ -59,17 +60,17 @@ public class AddNodeWindow extends Window {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 addNodeBtn.setEnabled(false);
                 showProgress();
-                Agent agent = (Agent)hadoopNodes.getValue();
+                Agent agent = (Agent) hadoopNodes.getValue();
                 final UUID trackID = SparkUI.getSparkManager().addSlaveNode(config.getClusterName(), agent.getHostname());
                 SparkUI.getExecutor().execute(new Runnable() {
 
                     @Override
                     public void run() {
-                        while(track) {
+                        while (track) {
                             ProductOperationView po = SparkUI.getTracker().getProductOperation(SparkClusterConfig.PRODUCT_KEY, trackID);
-                            if(po != null) {
+                            if (po != null) {
                                 setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-                                if(po.getState() != ProductOperationState.RUNNING) {
+                                if (po.getState() != ProductOperationState.RUNNING) {
                                     hideProgress();
                                     break;
                                 }
@@ -79,7 +80,7 @@ public class AddNodeWindow extends Window {
                             }
                             try {
                                 Thread.sleep(1000);
-                            } catch(InterruptedException ex) {
+                            } catch (InterruptedException ex) {
                                 break;
                             }
                         }
@@ -130,7 +131,7 @@ public class AddNodeWindow extends Window {
     }
 
     private void setOutput(String output) {
-        if(!Strings.isNullOrEmpty(output)) {
+        if (!Strings.isNullOrEmpty(output)) {
             outputTxtArea.setValue(output);
             outputTxtArea.setCursorPosition(outputTxtArea.getValue().length() - 1);
         }

@@ -26,7 +26,7 @@ public class UninstallNodeOperationHandlerTest {
         handler.run();
 
         ProductOperation po = handler.getProductOperation();
-        Assert.assertTrue( po.getLog().toLowerCase().contains( "not exist" ) );
+        Assert.assertTrue(po.getLog().toLowerCase().contains("not exist"));
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 

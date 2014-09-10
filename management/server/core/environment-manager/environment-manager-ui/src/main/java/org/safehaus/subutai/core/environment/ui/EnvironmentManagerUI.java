@@ -1,15 +1,14 @@
 package org.safehaus.subutai.core.environment.ui;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
-import com.vaadin.ui.Component;
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class EnvironmentManagerUI implements PortalModule {
@@ -31,7 +30,7 @@ public class EnvironmentManagerUI implements PortalModule {
     //    }
 
 
-    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+    public void setEnvironmentManager(final EnvironmentManager environmentManager) {
         this.environmentManager = environmentManager;
     }
 
@@ -60,12 +59,12 @@ public class EnvironmentManagerUI implements PortalModule {
 
     @Override
     public File getImage() {
-        return FileUtil.getFile( EnvironmentManagerUI.MODULE_IMAGE, this );
+        return FileUtil.getFile(EnvironmentManagerUI.MODULE_IMAGE, this);
     }
 
 
     @Override
     public Component createComponent() {
-        return new EnvironmentManagerForm( environmentManager );
+        return new EnvironmentManagerForm(environmentManager);
     }
 }
