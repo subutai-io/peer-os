@@ -6,7 +6,8 @@
 package org.safehaus.subutai.core.environment.impl;
 
 
-import com.google.common.base.Strings;
+import java.util.List;
+
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -23,7 +24,8 @@ import org.safehaus.subutai.core.environment.impl.util.BlueprintParser;
 import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
-import java.util.List;
+import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -50,8 +52,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     public void init() {
         this.blueprintParser = new BlueprintParser();
-        this.environmentDAO = new EnvironmentDAO(dbManager);
-        environmentBuilder = new EnvironmentBuilder(templateRegistryManager, agentManager, networkManager);
+        this.environmentDAO = new EnvironmentDAO( dbManager );
+        environmentBuilder = new EnvironmentBuilder( templateRegistryManager, agentManager, networkManager );
     }
 
 
@@ -65,7 +67,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setEnvironmentDAO(final EnvironmentDAO environmentDAO) {
+    public void setEnvironmentDAO( final EnvironmentDAO environmentDAO ) {
         this.environmentDAO = environmentDAO;
     }
 
@@ -75,7 +77,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setEnvironmentBuilder(final EnvironmentBuilder environmentBuilder) {
+    public void setEnvironmentBuilder( final EnvironmentBuilder environmentBuilder ) {
         this.environmentBuilder = environmentBuilder;
     }
 
@@ -85,7 +87,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setBlueprintParser(final BlueprintParser blueprintParser) {
+    public void setBlueprintParser( final BlueprintParser blueprintParser ) {
         this.blueprintParser = blueprintParser;
     }
 
@@ -95,7 +97,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setContainerManager(final ContainerManager containerManager) {
+    public void setContainerManager( final ContainerManager containerManager ) {
         this.containerManager = containerManager;
     }
 
@@ -105,7 +107,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setTemplateRegistryManager(final TemplateRegistryManager templateRegistryManager) {
+    public void setTemplateRegistryManager( final TemplateRegistryManager templateRegistryManager ) {
         this.templateRegistryManager = templateRegistryManager;
     }
 
@@ -115,7 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setAgentManager(final AgentManager agentManager) {
+    public void setAgentManager( final AgentManager agentManager ) {
         this.agentManager = agentManager;
     }
 
@@ -125,7 +127,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setNetworkManager(final NetworkManager networkManager) {
+    public void setNetworkManager( final NetworkManager networkManager ) {
         this.networkManager = networkManager;
     }
 
@@ -135,35 +137,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public void setDbManager(final DbManager dbManager) {
+    public void setDbManager( final DbManager dbManager ) {
         this.dbManager = dbManager;
+    }
+
+
+    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask ) {
+        return build( environmentBuildTask );
     }
 
 
     /**
      * Builds an environment by provided blueprint description
      */
-//    @Override
-//    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask) {
+    //    @Override
+    //    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask) {
 
-//        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-//        environmentBuildTask.setPhysicalNodes( physicalServers );
+    //        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+    //        environmentBuildTask.setPhysicalNodes( physicalServers );
 
-//        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+    //        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
 
-//        environmentBuildTask.setEnvironmentBlueprint( blueprint );
-//        return build( environmentBuildTask );
-//    }
-    private boolean build(EnvironmentBuildTask environmentBuildTask) {
+    //        environmentBuildTask.setEnvironmentBlueprint( blueprint );
+    //        return build( environmentBuildTask );
+    //    }
+    private boolean build( EnvironmentBuildTask environmentBuildTask ) {
 
-        if (environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
-                .isNullOrEmpty(environmentBuildTask.getEnvironmentBlueprint().getName())) {
+        if ( environmentBuildTask.getEnvironmentBlueprint().getName() != null && !Strings
+                .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
             try {
-                Environment environment = environmentBuilder.build(environmentBuildTask, containerManager);
-                environmentDAO.saveInfo(ENVIRONMENT, environment.getUuid().toString(), environment);
-            } catch (EnvironmentBuildException e) {
-                System.out.println(e.getMessage());
-            } catch (DBException e) {
+                Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
+                environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+            }
+            catch ( EnvironmentBuildException e ) {
+                System.out.println( e.getMessage() );
+            }
+            catch ( DBException e ) {
                 e.printStackTrace();
             }
         }
@@ -171,16 +180,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     }
 
 
-    public boolean buildEnvironment(EnvironmentBuildTask environmentBuildTask) {
-        return build(environmentBuildTask);
+    @Override
+    public Environment buildEnvironmentAndReturn( final EnvironmentBuildTask environmentBuildTask )
+            throws EnvironmentBuildException {
+
+        return environmentBuilder.build( environmentBuildTask, containerManager );
     }
 
 
     @Override
     public List<Environment> getEnvironments() {
         try {
-            return environmentDAO.getInfo(ENVIRONMENT, Environment.class);
-        } catch (DBException e) {
+            return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
+        }
+        catch ( DBException e ) {
             e.printStackTrace();
             return null;
         }
@@ -188,10 +201,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public Environment getEnvironmentInfo(final String environmentName) {
+    public Environment getEnvironmentInfo( final String environmentName ) {
         try {
-            return environmentDAO.getInfo(ENVIRONMENT, environmentName, Environment.class);
-        } catch (DBException e) {
+            return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
+        }
+        catch ( DBException e ) {
             e.printStackTrace();
         }
         return null;
@@ -200,15 +214,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean destroyEnvironment(final String environmentName) {
-        Environment environment = getEnvironmentInfo(environmentName);
+    public boolean destroyEnvironment( final String environmentName ) {
+        Environment environment = getEnvironmentInfo( environmentName );
         try {
-            environmentBuilder.destroy(environment);
-            environmentDAO.deleteInfo(ENVIRONMENT, environmentName);
+            environmentBuilder.destroy( environment );
+            environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
             return true;
-        } catch (EnvironmentDestroyException e) {
+        }
+        catch ( EnvironmentDestroyException e ) {
             e.printStackTrace();
-        } catch (DBException e) {
+        }
+        catch ( DBException e ) {
             e.printStackTrace();
         }
         return false;
@@ -216,13 +232,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean saveBlueprint(String blueprintStr) {
-        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText(blueprintStr);
+    public boolean saveBlueprint( String blueprintStr ) {
         try {
-            environmentDAO.saveInfo(BLUEPRINT, blueprint.getName(), blueprint);
+
+            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+            EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+
+            environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
             return true;
-        } catch (DBException e) {
-            e.printStackTrace();
+        }
+        catch ( DBException e ) {
+
+        }
+        catch ( JsonSyntaxException jse ) {
+
         }
         return false;
     }
@@ -231,8 +255,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public List<EnvironmentBuildTask> getBlueprints() {
         try {
-            return environmentDAO.getInfo(BLUEPRINT, EnvironmentBuildTask.class);
-        } catch (DBException e) {
+            return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
+        }
+        catch ( DBException e ) {
             e.printStackTrace();
         }
         return null;
@@ -240,11 +265,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean deleteBlueprint(String blueprintName) {
+    public boolean deleteBlueprint( String uuid ) {
         try {
-            environmentDAO.deleteInfo(BLUEPRINT, blueprintName);
+            environmentDAO.deleteInfo( BLUEPRINT, uuid );
             return true;
-        } catch (DBException e) {
+        }
+        catch ( DBException e ) {
             e.printStackTrace();
         }
         return false;
@@ -252,15 +278,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public String parseBlueprint(final EnvironmentBlueprint blueprint) {
-        return blueprintParser.parseEnvironmentBlueprint(blueprint);
-    }
-
-
-    @Override
-    public Environment buildEnvironmentAndReturn(final EnvironmentBuildTask environmentBuildTask)
-            throws EnvironmentBuildException {
-
-        return environmentBuilder.build(environmentBuildTask, containerManager);
+    public String parseBlueprint( final EnvironmentBlueprint blueprint ) {
+        return blueprintParser.parseEnvironmentBlueprint( blueprint );
     }
 }
