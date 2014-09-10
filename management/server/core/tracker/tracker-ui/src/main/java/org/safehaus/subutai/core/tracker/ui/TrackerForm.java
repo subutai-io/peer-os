@@ -209,8 +209,8 @@ public class TrackerForm extends CustomComponent {
         if ( !track ) {
             track = true;
 
-            if ( getUI() != null ) {
-                getUI().access( new Runnable() {
+            if ( getSession() != null ) {
+                getSession().access( new Runnable() {
                     @Override
                     public void run() {
                         while ( track ) {
