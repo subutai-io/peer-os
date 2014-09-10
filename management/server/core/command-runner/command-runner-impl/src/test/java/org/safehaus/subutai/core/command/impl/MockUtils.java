@@ -6,22 +6,23 @@
 package org.safehaus.subutai.core.command.impl;
 
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.enums.ResponseType;
-import org.safehaus.subutai.core.command.impl.CommandRunnerImpl;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.enums.ResponseType;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 /**

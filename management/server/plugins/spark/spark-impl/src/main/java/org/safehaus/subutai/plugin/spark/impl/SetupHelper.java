@@ -1,12 +1,13 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
+
+import java.util.Set;
+
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-
-import java.util.Set;
 
 public class SetupHelper {
 
@@ -26,7 +27,7 @@ public class SetupHelper {
         Command cmd = Commands.getSetMasterIPCommand(config.getMasterNode(), agents);
         manager.getCommandRunner().runCommand(cmd);
 
-        if (!cmd.hasSucceeded())
+        if(!cmd.hasSucceeded())
             throw new ClusterSetupException("Setting master IP failed:" + cmd.getAllErrors());
 
         po.addLog("Setting master IP succeeded");
@@ -39,7 +40,7 @@ public class SetupHelper {
                 config.getMasterNode());
         manager.getCommandRunner().runCommand(cmd);
 
-        if (!cmd.hasSucceeded())
+        if(!cmd.hasSucceeded())
             throw new ClusterSetupException("Failed to register slave(s) with master: "
                     + cmd.getAllErrors());
 
@@ -52,7 +53,7 @@ public class SetupHelper {
         Command cmd = Commands.getStartAllCommand(config.getMasterNode());
         manager.getCommandRunner().runCommand(cmd);
 
-        if (cmd.hasSucceeded())
+        if(cmd.hasSucceeded())
             po.addLog("Cluster started successfully\nDone");
         else
             throw new ClusterSetupException("Failed to start cluster:" + cmd.getAllErrors());

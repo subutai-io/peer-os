@@ -1,13 +1,22 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.protocol.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.protocol.NodeGroup;
+import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
@@ -21,11 +30,8 @@ import org.safehaus.subutai.plugin.common.PluginDAO;
 import org.safehaus.subutai.plugin.elasticsearch.api.Config;
 import org.safehaus.subutai.plugin.elasticsearch.api.Elasticsearch;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 
 public class ElasticsearchImpl implements Elasticsearch {
@@ -52,7 +58,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setCommandRunner(CommandRunner commandRunner) {
+    public void setCommandRunner( CommandRunner commandRunner ) {
         this.commandRunner = commandRunner;
     }
 
@@ -62,7 +68,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setEnvironmentManager(final EnvironmentManager environmentManager) {
+    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
         this.environmentManager = environmentManager;
     }
 
@@ -72,7 +78,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setDbManager(DbManager dbManager) {
+    public void setDbManager( DbManager dbManager ) {
         this.dbManager = dbManager;
     }
 
@@ -82,7 +88,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setAgentManager(AgentManager agentManager) {
+    public void setAgentManager( AgentManager agentManager ) {
         this.agentManager = agentManager;
     }
 
@@ -92,7 +98,7 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setContainerManager(final ContainerManager containerManager) {
+    public void setContainerManager( final ContainerManager containerManager ) {
         this.containerManager = containerManager;
     }
 
@@ -102,13 +108,13 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setTracker(Tracker tracker) {
+    public void setTracker( Tracker tracker ) {
         this.tracker = tracker;
     }
 
 
     public void init() {
-        Commands.init(commandRunner);
+        Commands.init( commandRunner );
         executor = Executors.newCachedThreadPool();
     }
 
@@ -118,54 +124,56 @@ public class ElasticsearchImpl implements Elasticsearch {
     }
 
 
-    public void setLxcManager(LxcManager lxcManager) {
+    public void setLxcManager( LxcManager lxcManager ) {
         this.lxcManager = lxcManager;
     }
 
 
-    public void setNetworkManager(NetworkManager networkManager) {
+    public void setNetworkManager( NetworkManager networkManager ) {
         this.networkManager = networkManager;
     }
 
 
-    public UUID installCluster(final Config config) {
-        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
-        executor.execute(operationHandler);
+    public UUID installCluster( final Config config ) {
+        AbstractOperationHandler operationHandler = new InstallOperationHandler( this, config );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID uninstallCluster(final String clusterName) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Destroying cluster %s", clusterName));
+    public UUID uninstallCluster( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Destroying cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
+        executor.execute( new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
                     po.addLogFailed(
-                            String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                po.addLog("Destroying lxc containers...");
+                po.addLog( "Destroying lxc containers..." );
 
                 try {
-                    lxcManager.destroyLxcs(config.getNodes());
-                    po.addLog("Lxc containers successfully destroyed");
-                } catch (LxcDestroyException ex) {
-                    po.addLog(String.format("%s, skipping...", ex.getMessage()));
+                    lxcManager.destroyLxcs( config.getNodes() );
+                    po.addLog( "Lxc containers successfully destroyed" );
                 }
-                po.addLog("Updating db...");
-                if (dbManager.deleteInfo(Config.PRODUCT_KEY, config.getClusterName())) {
-                    po.addLogDone("Cluster info deleted from DB\nDone");
-                } else {
-                    po.addLogFailed("Error while deleting cluster info from DB. Check logs.\nFailed");
+                catch ( LxcDestroyException ex ) {
+                    po.addLog( String.format( "%s, skipping...", ex.getMessage() ) );
+                }
+                po.addLog( "Updating db..." );
+                if ( dbManager.deleteInfo( Config.PRODUCT_KEY, config.getClusterName() ) ) {
+                    po.addLogDone( "Cluster info deleted from DB\nDone" );
+                }
+                else {
+                    po.addLogFailed( "Error while deleting cluster info from DB. Check logs.\nFailed" );
                 }
             }
-        });
+        } );
 
         return po.getId();
     }
@@ -173,171 +181,175 @@ public class ElasticsearchImpl implements Elasticsearch {
 
     @Override
     public List<Config> getClusters() {
-        return dbManager.getInfo(Config.PRODUCT_KEY, Config.class);
+        return dbManager.getInfo( Config.PRODUCT_KEY, Config.class );
     }
 
 
     @Override
-    public Config getCluster(String clusterName) {
-        return dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
+    public Config getCluster( String clusterName ) {
+        return dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
     }
 
 
     @Override
-    public UUID startAllNodes(final String clusterName) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Starting cluster %s", clusterName));
+    public UUID startAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Starting cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
+        executor.execute( new Runnable() {
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
                     po.addLogFailed(
-                            String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
-                Command startServiceCommand = Commands.getStartCommand(config.getNodes());
-                commandRunner.runCommand(startServiceCommand);
+                Command startServiceCommand = Commands.getStartCommand( config.getNodes() );
+                commandRunner.runCommand( startServiceCommand );
 
-                if (startServiceCommand.hasSucceeded()) {
-                    po.addLogDone("Start succeeded");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", startServiceCommand.getAllErrors()));
+                if ( startServiceCommand.hasSucceeded() ) {
+                    po.addLogDone( "Start succeeded" );
+                }
+                else {
+                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
-        });
+        } );
 
         return po.getId();
     }
 
 
     @Override
-    public UUID checkAllNodes(final String clusterName) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Checking cluster %s", clusterName));
+    public UUID checkAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Checking cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
+        executor.execute( new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
                     po.addLogFailed(
-                            String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                Command checkStatusCommand = Commands.getStatusCommand(config.getNodes());
-                commandRunner.runCommand(checkStatusCommand);
+                Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
+                commandRunner.runCommand( checkStatusCommand );
 
-                if (checkStatusCommand.hasSucceeded()) {
-                    po.addLogDone("All nodes are running.");
-                } else {
-                    logStatusResults(po, checkStatusCommand);
+                if ( checkStatusCommand.hasSucceeded() ) {
+                    po.addLogDone( "All nodes are running." );
+                }
+                else {
+                    logStatusResults( po, checkStatusCommand );
                 }
             }
-        });
+        } );
 
         return po.getId();
     }
 
 
     @Override
-    public UUID stopAllNodes(final String clusterName) {
-        final ProductOperation po = tracker.createProductOperation(Config.PRODUCT_KEY,
-                String.format("Stopping cluster %s", clusterName));
+    public UUID stopAllNodes( final String clusterName ) {
+        final ProductOperation po = tracker.createProductOperation( Config.PRODUCT_KEY,
+                String.format( "Stopping cluster %s", clusterName ) );
 
-        executor.execute(new Runnable() {
+        executor.execute( new Runnable() {
 
             public void run() {
-                Config config = dbManager.getInfo(Config.PRODUCT_KEY, clusterName, Config.class);
-                if (config == null) {
+                Config config = dbManager.getInfo( Config.PRODUCT_KEY, clusterName, Config.class );
+                if ( config == null ) {
                     po.addLogFailed(
-                            String.format("Cluster with name %s does not exist\nOperation aborted", clusterName));
+                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
                     return;
                 }
 
-                Command stopServiceCommand = Commands.getStopCommand(config.getNodes());
-                commandRunner.runCommand(stopServiceCommand);
+                Command stopServiceCommand = Commands.getStopCommand( config.getNodes() );
+                commandRunner.runCommand( stopServiceCommand );
 
-                if (stopServiceCommand.hasSucceeded()) {
-                    po.addLogDone("Stop succeeded");
-                } else {
-                    po.addLogFailed(String.format("Start failed, %s", stopServiceCommand.getAllErrors()));
+                if ( stopServiceCommand.hasSucceeded() ) {
+                    po.addLogDone( "Stop succeeded" );
+                }
+                else {
+                    po.addLogFailed( String.format( "Start failed, %s", stopServiceCommand.getAllErrors() ) );
                 }
             }
-        });
+        } );
 
         return po.getId();
     }
 
 
     @Override
-    public UUID addNode(final String clusterName, final String lxcHostname) {
-        AbstractOperationHandler operationHandler = new AddNodeOperationHandler(this, clusterName, lxcHostname);
-        executor.execute(operationHandler);
+    public UUID addNode( final String clusterName, final String lxcHostname ) {
+        AbstractOperationHandler operationHandler = new AddNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID destroyNode(final String clusterName, final String lxcHostname) {
-        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler(this, clusterName, lxcHostname);
-        executor.execute(operationHandler);
+    public UUID destroyNode( final String clusterName, final String lxcHostname ) {
+        AbstractOperationHandler operationHandler = new DestroyNodeOperationHandler( this, clusterName, lxcHostname );
+        executor.execute( operationHandler );
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public ClusterSetupStrategy getClusterSetupStrategy(final Environment environment, final Config config,
-                                                        final ProductOperation po) {
+    public ClusterSetupStrategy getClusterSetupStrategy( final Environment environment, final Config config,
+                                                         final ProductOperation po ) {
 
-        Preconditions.checkNotNull(environment, "Environment is null");
-        Preconditions.checkNotNull(config, "Zookeeper cluster config is null");
-        Preconditions.checkNotNull(po, "Product operation is null");
+        Preconditions.checkNotNull( environment, "Environment is null" );
+        Preconditions.checkNotNull( config, "Zookeeper cluster config is null" );
+        Preconditions.checkNotNull( po, "Product operation is null" );
 
-        return new StandaloneSetupStrategy(environment, config, po, this);
+        return new StandaloneSetupStrategy( environment, config, po, this );
     }
 
 
-    private void logStatusResults(ProductOperation po, Command checkStatusCommand) {
+    private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
 
         String log = "";
 
-        for (Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet()) {
+        for ( Map.Entry<UUID, AgentResult> e : checkStatusCommand.getResults().entrySet() ) {
 
             String status = "UNKNOWN";
-            if (e.getValue().getExitCode() == 0) {
+            if ( e.getValue().getExitCode() == 0 ) {
                 status = "RUNNING";
-            } else if (e.getValue().getExitCode() == 768) {
+            }
+            else if ( e.getValue().getExitCode() == 768 ) {
                 status = "NOT RUNNING";
             }
 
-            log += String.format("- %s: %s\n", e.getValue().getAgentUUID(), status);
+            log += String.format( "- %s: %s\n", e.getValue().getAgentUUID(), status );
         }
 
-        po.addLogDone(log);
+        po.addLogDone( log );
     }
 
 
-    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(Config config) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( Config config ) {
 
-        Preconditions.checkNotNull(config, "Elasticsearch cluster config is null");
+        Preconditions.checkNotNull( config, "Elasticsearch cluster config is null" );
 
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName(String.format("%s-%s", Config.PRODUCT_KEY, UUID.randomUUID()));
+        environmentBlueprint.setName( String.format( "%s-%s", Config.PRODUCT_KEY, UUID.randomUUID() ) );
 
         // Node group
         NodeGroup nodesGroup = new NodeGroup();
-        nodesGroup.setName("DEFAULT");
-        nodesGroup.setNumberOfNodes(config.getNumberOfNodes());
-        nodesGroup.setTemplateName(config.getTemplateName());
-        nodesGroup.setPlacementStrategy(PlacementStrategy.ROUND_ROBIN);
+        nodesGroup.setName( "DEFAULT" );
+        nodesGroup.setNumberOfNodes( config.getNumberOfNodes() );
+        nodesGroup.setTemplateName( config.getTemplateName() );
+        nodesGroup.setPlacementStrategy( PlacementStrategy.ROUND_ROBIN );
 
-        environmentBlueprint.setNodeGroups(Sets.newHashSet(nodesGroup));
+        environmentBlueprint.setNodeGroups( Sets.newHashSet( nodesGroup ) );
 
-        environmentBuildTask.setEnvironmentBlueprint(environmentBlueprint);
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
         return environmentBuildTask;
     }
 }

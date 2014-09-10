@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.core.command.impl;
+package org.safehaus.subutai.common.command;
 
 
 import java.util.UUID;
 
-import org.safehaus.subutai.core.command.api.AgentResult;
 import org.safehaus.subutai.common.protocol.Response;
 
 import com.google.common.base.Preconditions;

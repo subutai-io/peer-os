@@ -1,24 +1,25 @@
 package org.safehaus.subutai.core.command.ui.old;
 
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
-
 import java.io.File;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
 
 
 public class CommandRunnerUI implements PortalModule {
 
 	public static final String MODULE_IMAGE = "terminal.png";
 	public static final String MODULE_NAME = "Terminal Old";
-	private CommandRunner commandRunner;
+	private CommandDispatcher commandRunner;
 	private AgentManager agentManager;
 
 
-	public void setCommandRunner(CommandRunner commandRunner) {
+	public void setCommandRunner(CommandDispatcher commandRunner) {
 		this.commandRunner = commandRunner;
 	}
 
