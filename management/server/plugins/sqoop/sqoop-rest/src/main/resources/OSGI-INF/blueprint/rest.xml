@@ -15,8 +15,8 @@
         <property name="sqoopManager" ref="sqoopManager"/>
     </bean>
 
-    <jaxrs:server address="/sqoop2" id="sqoopRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/sqoop" id="sqoopRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

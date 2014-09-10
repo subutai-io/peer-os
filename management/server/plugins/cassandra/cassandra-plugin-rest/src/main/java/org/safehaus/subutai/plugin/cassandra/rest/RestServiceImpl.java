@@ -25,7 +25,7 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    public void setCassandraManager( final Cassandra cassandraManager ) {
+    public void setCassandraManager(final Cassandra cassandraManager) {
         this.cassandraManager = cassandraManager;
     }
 
@@ -34,11 +34,11 @@ public class RestServiceImpl implements RestService {
     public Response listClusters() {
         List<CassandraClusterConfig> configs = cassandraManager.getClusters();
         List<String> clusterNames = new ArrayList<>();
-        for ( CassandraClusterConfig config : configs ) {
-            clusterNames.add( config.getClusterName() );
+        for (CassandraClusterConfig config : configs) {
+            clusterNames.add(config.getClusterName());
         }
         String clusters = JsonUtil.toJson(clusterNames);
-        return Response.status(Response.Status.CREATED).entity(clusters).build();
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
@@ -52,15 +52,15 @@ public class RestServiceImpl implements RestService {
     @Override
     public Response createCluster(final String config) {
         TrimmedCassandraClusterConfig trimmedCassandraConfig =
-                JsonUtil.fromJson( config, TrimmedCassandraClusterConfig.class );
+                JsonUtil.fromJson(config, TrimmedCassandraClusterConfig.class);
 
         CassandraClusterConfig cassandraConfig = new CassandraClusterConfig();
-        cassandraConfig.setClusterName( trimmedCassandraConfig.getClusterName() );
-        cassandraConfig.setDomainName( trimmedCassandraConfig.getDomainName() );
-        cassandraConfig.setNumberOfNodes( trimmedCassandraConfig.getNumberOfNodes() );
-        cassandraConfig.setNumberOfSeeds( trimmedCassandraConfig.getNumberOfSeeds() );
+        cassandraConfig.setClusterName(trimmedCassandraConfig.getClusterName());
+        cassandraConfig.setDomainName(trimmedCassandraConfig.getDomainName());
+        cassandraConfig.setNumberOfNodes(trimmedCassandraConfig.getNumberOfNodes());
+        cassandraConfig.setNumberOfSeeds(trimmedCassandraConfig.getNumberOfSeeds());
 
-        UUID uuid = cassandraManager.installCluster( cassandraConfig );
+        UUID uuid = cassandraManager.installCluster(cassandraConfig);
         String operationId = wrapUUID(uuid);
         return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
@@ -68,7 +68,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response destroyCluster(final String clusterName) {
-        UUID uuid = cassandraManager.uninstallCluster( clusterName );
+        UUID uuid = cassandraManager.uninstallCluster(clusterName);
         String operationId = wrapUUID(uuid);
         return Response.status(Response.Status.OK).entity(operationId).build();
     }
@@ -76,7 +76,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response startCluster(final String clusterName) {
-        UUID uuid = cassandraManager.startCluster( clusterName );
+        UUID uuid = cassandraManager.startCluster(clusterName);
         String operationId = wrapUUID(uuid);
         return Response.status(Response.Status.OK).entity(operationId).build();
     }
@@ -84,7 +84,7 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response stopCluster(final String clusterName) {
-        UUID uuid = cassandraManager.stopCluster( clusterName );
+        UUID uuid = cassandraManager.stopCluster(clusterName);
         String operationId = wrapUUID(uuid);
         return Response.status(Response.Status.OK).entity(operationId).build();
     }
@@ -114,7 +114,7 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    private String wrapUUID( UUID uuid ) {
-        return JsonUtil.toJson( "OPERATION_ID", uuid );
+    private String wrapUUID(UUID uuid) {
+        return JsonUtil.toJson("OPERATION_ID", uuid);
     }
 }
