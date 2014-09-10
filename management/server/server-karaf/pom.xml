@@ -33,6 +33,11 @@
       <artifactId>pax-logging-service</artifactId>
       <version>1.7.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${org.slf4j.version}</version>
+    </dependency>
 
     <!-- UI -->
     <dependency>
@@ -368,6 +373,13 @@
             <configuration>
               <outputDirectory>target/dependencies/kiskis-server</outputDirectory>
               <artifactItems>
+
+                <artifactItem>
+                  <groupId>org.slf4j</groupId>
+                  <artifactId>slf4j-simple</artifactId>
+                  <version>${org.slf4j.version}</version>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.apache.httpcomponents</groupId>
                   <artifactId>httpclient</artifactId>
