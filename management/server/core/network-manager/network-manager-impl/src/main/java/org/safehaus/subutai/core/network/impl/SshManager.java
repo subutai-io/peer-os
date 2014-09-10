@@ -1,8 +1,8 @@
 package org.safehaus.subutai.core.network.impl;
 
 import com.google.common.base.Strings;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.Arrays;

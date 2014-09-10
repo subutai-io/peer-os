@@ -3,10 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.core.command.api;
+package org.safehaus.subutai.common.command;
 
+
+import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.protocol.Request;
 
 import com.google.common.base.Preconditions;
 
@@ -42,5 +45,10 @@ public class AgentRequestBuilder extends RequestBuilder {
      */
     public Agent getAgent() {
         return agent;
+    }
+
+
+    public Request build( final UUID taskUUID ) {
+        return super.build( agent.getUuid(), taskUUID );
     }
 }

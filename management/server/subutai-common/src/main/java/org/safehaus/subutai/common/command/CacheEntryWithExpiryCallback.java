@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.core.command.impl;
+package org.safehaus.subutai.common.command;
 
 
 import com.google.common.base.Preconditions;

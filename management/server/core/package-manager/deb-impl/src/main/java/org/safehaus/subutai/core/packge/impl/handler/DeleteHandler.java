@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.packge.impl.handler;
 
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.packge.api.PackageInfo;
 import org.safehaus.subutai.core.packge.impl.DebPackageManager;
 import org.safehaus.subutai.common.protocol.Agent;
