@@ -3,10 +3,13 @@
 
   <reference id="environmentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="peerManager" availability="mandatory"
+              interface="org.safehaus.subutai.peer.api.PeerManager" />
 
   <bean id="module" scope="singleton" class="org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI"
         init-method="init" destroy-method="destroy">
     <property name="environmentManager" ref="environmentManager" />
+    <property name="peerManager" ref="peerManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule" />

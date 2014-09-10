@@ -29,7 +29,7 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
     private EnvironmentsForm environmentForm;
 
 
-    public EnvironmentManagerForm( EnvironmentManager environmentManager ) {
+    public EnvironmentManagerForm( EnvironmentManagerUI managerUI ) {
         setHeight( 100, UNITS_PERCENTAGE );
 
         VerticalLayout verticalLayout = new VerticalLayout();
@@ -39,9 +39,9 @@ public class EnvironmentManagerForm extends CustomComponent implements Disposabl
         TabSheet sheet = new TabSheet();
         sheet.setStyleName( Runo.TABSHEET_SMALL );
         sheet.setSizeFull();
-        blueprintManager = new BlueprintLoadForm( environmentManager );
-        blueprintsForm = new BlueprintsForm( environmentManager );
-        environmentForm = new EnvironmentsForm( environmentManager );
+        blueprintManager = new BlueprintLoadForm( managerUI );
+        blueprintsForm = new BlueprintsForm( managerUI );
+        environmentForm = new EnvironmentsForm( managerUI );
         sheet.addTab( blueprintManager.getContentRoot(), "Blueprint load" );
         sheet.addTab( blueprintsForm.getContentRoot(), "Blueprints" );
         sheet.addTab( environmentForm.getContentRoot(), "Environments" );
