@@ -1,8 +1,5 @@
 package org.safehaus.subutai.plugin.sqoop.impl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.db.api.DBException;
@@ -12,7 +9,15 @@ import org.safehaus.subutai.plugin.sqoop.api.SetupType;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ExportSetting;
 import org.safehaus.subutai.plugin.sqoop.api.setting.ImportSetting;
-import org.safehaus.subutai.plugin.sqoop.impl.handler.*;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.CheckHandler;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.DestroyNodeHandler;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.ExportHandler;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.ImportHandler;
+import org.safehaus.subutai.plugin.sqoop.impl.handler.InstallHandler;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class SqoopImpl extends SqoopBase {
 

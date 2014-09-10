@@ -1,8 +1,12 @@
 package org.safehaus.subutai.plugin.flume.impl.handler.mock;
 
+import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
+import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
+import org.safehaus.subutai.plugin.common.mock.DbManagerMock;
+import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
-import org.safehaus.subutai.product.common.test.unit.mock.*;
+
 
 public class FlumeImplMock extends FlumeImpl {
 
