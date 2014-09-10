@@ -205,32 +205,30 @@ public class TrackerForm extends CustomComponent {
     }
 
 
-    public void startTracking() {
+    public synchronized void startTracking() {
         if ( !track ) {
             track = true;
 
-            if ( getSession() != null ) {
-                getSession().access( new Runnable() {
-                    @Override
-                    public void run() {
-                        while ( track ) {
-                            try {
-                                populateOperations();
-                                populateLogs();
-                            }
-                            catch ( Exception e ) {
-                                LOG.log( Level.SEVERE, "Error in tracker", e );
-                            }
-                            try {
-                                Thread.sleep( 1000 );
-                            }
-                            catch ( InterruptedException ex ) {
-                                break;
-                            }
+            TrackerUI.getExecutor().execute( new Runnable() {
+                @Override
+                public void run() {
+                    while ( track ) {
+                        try {
+                            populateOperations();
+                            populateLogs();
+                        }
+                        catch ( Exception e ) {
+                            LOG.log( Level.SEVERE, "Error in tracker", e );
+                        }
+                        try {
+                            Thread.sleep( 1000 );
+                        }
+                        catch ( InterruptedException ex ) {
+                            break;
                         }
                     }
-                } );
-            }
+                }
+            } );
         }
     }
 
