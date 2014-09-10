@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -29,6 +30,7 @@ import org.apache.http.util.EntityUtils;
  * @author daliev
  */
 public class HttpUtil {
+    private static final Logger LOG = Logger.getLogger( HttpUtil.class.getName() );
 
     private final HttpClient client;
     private final PoolingClientConnectionManager conMan;
@@ -66,7 +68,7 @@ public class HttpUtil {
     }
 
 
-    public int httpLitePost( String url, Map<String, String> postParams ) throws IOException {
+    public int post( String url, Map<String, String> postParams ) throws IOException {
         cleanConnections();
         HttpEntity entity = null;
         try {
@@ -82,13 +84,9 @@ public class HttpUtil {
             entity = httpResponse.getEntity();
             int resCode = httpResponse.getStatusLine().getStatusCode();
 
+            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
+
             return resCode;
-            //            if ( resCode == 200 ) {
-            //                return EntityUtils.toString( entity, "utf-8" ).trim();
-            //            }
-            //            else {
-            //                throw new IOException( "Http Error Code " + resCode );
-            //            }
         }
         finally {
             EntityUtils.consumeQuietly( entity );

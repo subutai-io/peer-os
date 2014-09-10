@@ -108,7 +108,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
             params.put( "ownerId", request.getKey().toString() );
             params.put( "requests", JsonUtil.toJson( request.getValue() ) );
             try {
-                httpUtil.httpLitePost( String.format( Common.REQUEST_URL, peerIP ), params );
+                httpUtil.post( String.format( Common.REQUEST_URL, peerIP ), params );
             }
             catch ( IOException e ) {
                 String errString =

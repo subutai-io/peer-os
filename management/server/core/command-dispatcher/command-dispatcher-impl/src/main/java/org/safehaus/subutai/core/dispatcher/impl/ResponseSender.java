@@ -84,7 +84,7 @@ public class ResponseSender {
                         //delete previous request (workaround until we change Cassandra to another DB)
                         dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() - 1 );
                     }
-                    else {
+                    else if ( !responses.isEmpty() ) {
                         //sort responses by responseNumber
                         Set<Response> sortedSet = new TreeSet<>( new Comparator<Response>() {
                             @Override
@@ -104,31 +104,25 @@ public class ResponseSender {
                         //try to send responses to PEER
                         int responseCode = 0;
                         try {
-                            responseCode = httpUtil.httpLitePost( String.format( Common.RESPONSE_URL, request.getIp() ),
+                            responseCode = httpUtil.post( String.format( Common.RESPONSE_URL, request.getIp() ),
                                     params );
                             if ( responseCode == RESPONSE_OK ) {
                                 //delete sent responses
-                                boolean isFinalResponseSent = false;
                                 for ( RemoteResponse response : responses ) {
                                     dispatcherDAO.deleteRemoteResponse( response );
                                     if ( response.getResponse().isFinal() ) {
-                                        isFinalResponseSent = true;
+                                        request.incrementCompletedRequestsCount();
                                     }
                                 }
                                 //if final response was sent, delete request
-                                if ( isFinalResponseSent ) {
-                                    request.incrementCompletedRequestsCount();
-                                    if ( request.isCompleted() ) {
-                                        dispatcherDAO
-                                                .deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
-                                    }
-                                    else {
-                                        dispatcherDAO.saveRemoteRequest( request );
-                                    }
+                                if ( request.isCompleted() ) {
+                                    dispatcherDAO.deleteRemoteRequest( request.getCommandId(), request.getAttempts() );
+                                }
+                                else {
+                                    dispatcherDAO.saveRemoteRequest( request );
                                 }
                             }
                             else {
-
 
                                 LOG.log( Level.WARNING,
                                         String.format( "Error sending response to %s: error code = %s", request.getIp(),
