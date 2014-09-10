@@ -1,7 +1,4 @@
-package org.safehaus.subutai.core.command.impl;
-
-
-import org.safehaus.subutai.core.command.api.CommandStatus;
+package org.safehaus.subutai.common.command;
 
 
 /**

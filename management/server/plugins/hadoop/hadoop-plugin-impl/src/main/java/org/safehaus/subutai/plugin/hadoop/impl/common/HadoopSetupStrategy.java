@@ -11,7 +11,7 @@ import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;

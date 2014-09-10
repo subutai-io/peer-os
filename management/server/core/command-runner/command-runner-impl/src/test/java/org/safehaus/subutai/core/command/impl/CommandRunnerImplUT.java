@@ -6,15 +6,6 @@
 package org.safehaus.subutai.core.command.impl;
 
 
-import com.jayway.awaitility.Awaitility;
-import org.junit.*;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.*;
-import org.safehaus.subutai.core.communication.api.CommunicationManager;
-import org.safehaus.subutai.common.protocol.Request;
-import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
-
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +13,33 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.CommandStatus;
+import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.communication.api.CommunicationManager;
+
+import com.jayway.awaitility.Awaitility;
+
 import static com.jayway.awaitility.Awaitility.to;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 
 /**
@@ -37,7 +51,6 @@ public class CommandRunnerImplUT {
 	private final boolean allTests = true;
 	private AgentManager agentManager;
 	private CommunicationManager communicationManager;
-	private CommandDispatcher dispatcher;
 	private CommandRunnerImpl commandRunner;
 
 
@@ -57,8 +70,7 @@ public class CommandRunnerImplUT {
 	public void beforeMethod() {
 		communicationManager = mock(CommunicationManager.class);
 		agentManager = mock(AgentManager.class);
-        dispatcher = mock(CommandDispatcher.class);
-		commandRunner = new CommandRunnerImpl(communicationManager, agentManager, dispatcher);
+		commandRunner = new CommandRunnerImpl(communicationManager, agentManager);
 		commandRunner.init();
 	}
 
@@ -201,7 +213,7 @@ public class CommandRunnerImplUT {
 		});
 
 		Awaitility.await().atMost(1, TimeUnit.SECONDS).with().pollInterval(100, TimeUnit.MILLISECONDS)
-				.untilCall(to(command).getCommandStatus(), is(CommandStatus.FAILED));
+				.untilCall(to(command).getCommandStatus(), is( CommandStatus.FAILED));
 	}
 
 

@@ -53,7 +53,9 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public UUID getOwnerId() {
-        return ownerId;
+        //        return ownerId;
+        //TODO remove in production
+        return UUID.fromString( "1163673e3-924d-45e2-8dba-615b76a6bbb6" );
     }
 
 

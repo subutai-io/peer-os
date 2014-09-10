@@ -60,6 +60,12 @@
       <artifactId>org.apache.servicemix.bundles.junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>7.6.8.v20121106</version>
+      <scope>provided</scope>
+    </dependency>
     <!--CXF-->
     <dependency>
       <groupId>org.apache.cxf</groupId>

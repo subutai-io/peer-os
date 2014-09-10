@@ -11,20 +11,20 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.safehaus.subutai.core.agent.api.AgentManager;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.CommandCallback;
-import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
-import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.server.ui.component.AgentTree;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.enums.RequestType;
+import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Disposable;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.enums.RequestType;
-import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.StringUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
+import org.safehaus.subutai.server.ui.component.AgentTree;
 
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
@@ -54,7 +54,7 @@ public class TerminalForm extends CustomComponent implements Disposable {
     private ExecutorService executor;
 
 
-    public TerminalForm( final CommandRunner commandRunner, final AgentManager agentManager ) {
+    public TerminalForm( final CommandDispatcher commandRunner, final AgentManager agentManager ) {
         setSizeFull();
 
         executor = Executors.newCachedThreadPool();

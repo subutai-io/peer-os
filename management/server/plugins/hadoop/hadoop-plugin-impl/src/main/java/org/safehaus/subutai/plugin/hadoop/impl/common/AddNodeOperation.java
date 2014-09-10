@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 
 

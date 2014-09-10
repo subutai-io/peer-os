@@ -8,9 +8,9 @@ package org.safehaus.subutai.core.command.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.AgentRequestBuilder;
-import org.safehaus.subutai.core.command.api.CommandStatus;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.CommandStatus;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 
@@ -71,7 +71,7 @@ public class CommandImplUT {
 	@Test
 	public void shouldReturnSameNumberOfRequestAsAgents() {
 
-		assertEquals(1, command.getLocalRequests().size());
+		assertEquals(1, command.getRequests().size());
 	}
 
 
