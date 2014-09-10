@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.safehaus.subutai.api.hadoop.Config;
+import org.safehaus.subutai.api.hadoop.HadoopClusterConfig;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.ui.oozie.OozieUI;
@@ -57,15 +57,15 @@ public class ConfigurationStep extends Panel {
         hadoopClusters.setRequired( true );
         hadoopClusters.setNullSelectionAllowed( false );
 
-        List<Config> clusters = OozieUI.getHadoopManager().getClusters();
+        List<HadoopClusterConfig> clusters = OozieUI.getHadoopManager().getClusters();
         if ( clusters.size() > 0 ) {
-            for ( Config Config : clusters ) {
-                hadoopClusters.addItem( Config );
-                hadoopClusters.setItemCaption( Config, Config.getClusterName() );
+            for ( HadoopClusterConfig config : clusters ) {
+                hadoopClusters.addItem( config );
+                hadoopClusters.setItemCaption( config, config.getClusterName() );
             }
         }
 
-        Config info = OozieUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
+        HadoopClusterConfig info = OozieUI.getHadoopManager().getCluster( wizard.getConfig().getClusterName() );
 
         if ( info != null ) {
             hadoopClusters.setValue( info );
@@ -75,7 +75,7 @@ public class ConfigurationStep extends Panel {
         }
 
         if ( hadoopClusters.getValue() != null ) {
-            Config hadoopInfo = ( Config ) hadoopClusters.getValue();
+            HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) hadoopClusters.getValue();
             wizard.getConfig().setClusterName( hadoopInfo.getClusterName() );
             hadoopInfo.getAllNodes();
             Set<String> hadoopNodes = new HashSet<>();
@@ -89,7 +89,7 @@ public class ConfigurationStep extends Panel {
             @Override
             public void valueChange( Property.ValueChangeEvent event ) {
                 if ( event.getProperty().getValue() != null ) {
-                    Config hadoopInfo = ( Config ) event.getProperty().getValue();
+                    HadoopClusterConfig hadoopInfo = ( HadoopClusterConfig ) event.getProperty().getValue();
                     select.setValue( null );
                     Set<String> hadoopNodes = new HashSet<String>();
                     for ( Agent hadoopNode : hadoopInfo.getAllNodes() ) {

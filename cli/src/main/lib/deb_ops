@@ -10,7 +10,7 @@
 # should echo out the path to the newly generated deb package file
 #
 # notes:
-#   - the tmp_path variable is where all the files have been collected
+#   - the debian_dir variable is where all the files have been collected
 #     that need to be packaged and distributed within the deb pkg
 #   - the following files and directory structure exist:
 #      .
@@ -25,7 +25,7 @@
 #
 #   - all template deb packages must depend on host-scripts package
 #   - post installation of the package should call subutai-import
-#   - installation should dump package contents under the $tmp directory
+#   - installation should dump package contents under the $debian_dir directory
 #     into a new directory with the name of the container: the import
 #     command will expect this file structure to import the newly installed
 #     container
@@ -55,22 +55,14 @@ function deb_pkg {
     exit 1
   fi
 
-  local tmp="$SUBUTAI_TMPDIR"
-  local tmp_path="$tmp/$lxc"
   local debian_package_name=`get_debian_package_name $lxc`
   local debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
-  local debian_copy_dir=$debian_dir/$tmp_path
+  
   # ----------------------------------------------------------------------------
-  # (1) create DEBIAN folder and copy required files.
+  # (1) create DEBIAN folder
   # ----------------------------------------------------------------------------
-  # Delete debian directory if exists and create it from scratch
-  rm -rf $debian_dir
   mkdir -p $debian_dir/DEBIAN
   
-  # Copy required files under relevant directories
-  mkdir -p $debian_copy_dir
-  cp -r $tmp_path/* $debian_copy_dir
-
   # ----------------------------------------------------------------------------
   # (2)  create control file of debian package
   # ----------------------------------------------------------------------------
@@ -82,31 +74,30 @@ function deb_pkg {
   create_preinst_script $lxc $debian_dir
   create_postinst_script $lxc $debian_dir
   create_prerm_script $lxc $debian_dir
-  
+ 
   # ----------------------------------------------------------------------------
-  # (4) create debian package
+  # (4) insert subutai.template.package info inside containers config file
+  # ----------------------------------------------------------------------------
+  conf="/var/lib/lxc/$lxc/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    debian_file=$debian_dir".deb"
+  else
+    debian_file=`echo $propline | awk '{print $3}'`
+  fi
+
+ 
+  # ----------------------------------------------------------------------------
+  # (5) create debian package
   # ----------------------------------------------------------------------------
   dpkg-deb -z8 -Zgzip --build $debian_dir > /dev/null
   check_status "Template \"$lxc\" Debian package generation" "$?" > /dev/null
 
   # ----------------------------------------------------------------------------
-  # (5) remove copied directories for creating debian package
-  # ----------------------------------------------------------------------------		
-  rm -rf $debian_dir
-
-  # ----------------------------------------------------------------------------
   # (6) return path of newly generated debian package
   # ----------------------------------------------------------------------------
   
-  conf="/var/lib/lxc/$lxc/config"
-  propline="`cat $conf | grep subutai.template.package`"
-
-  if [ -z "$propline" ]; then
-    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$lxc/config
-    debian_file=$debian_dir".deb"
-  else
-    debian_file=`echo $propline | awk '{print $3}'`
-  fi
   echo $debian_file
 }
 

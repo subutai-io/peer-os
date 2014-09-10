@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
@@ -239,7 +240,10 @@ public class MahoutImpl implements Mahout {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final MahoutClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( final MahoutClusterConfig config ) {
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
@@ -253,6 +257,7 @@ public class MahoutImpl implements Mahout {
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( nodeGroup ) );
 
-        return environmentBlueprint;
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+        return environmentBuildTask;
     }
 }

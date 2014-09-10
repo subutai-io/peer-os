@@ -47,7 +47,7 @@ public class InstallOperationHandler extends AbstractOperationHandler<PrestoImpl
             po.addLog("Preparing environment...");
             hadoopConfig.setTemplateName(PrestoClusterConfig.TEMAPLTE_NAME);
             try {
-                EnvironmentBlueprint eb = manager.getHadoopManager()
+                EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
             } catch(ClusterSetupException ex) {

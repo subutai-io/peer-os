@@ -15,6 +15,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>db-manager-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -44,6 +45,10 @@
           <unpackBundle>true</unpackBundle>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.plugin.common</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
       </plugin>

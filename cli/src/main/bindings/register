@@ -111,7 +111,11 @@ function register {
      grep subutai.template.package | awk '{print $3}'`"
   
   send_n_register $pkg $SUBUTAI_TMPDIR/$container 
-
+ 
+  if [ "`is_registered $container`" == "true" ]; then
+    notify_template_import $container
+  fi
+ 
   unlock_container_write $container
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }

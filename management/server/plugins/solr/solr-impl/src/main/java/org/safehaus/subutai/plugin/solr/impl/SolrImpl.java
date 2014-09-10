@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.protocol.NodeGroup;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.agent.api.AgentManager;
@@ -236,8 +237,10 @@ public class SolrImpl implements Solr {
 
 
     @Override
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( SolrClusterConfig config ) {
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint( SolrClusterConfig config ) {
         Preconditions.checkNotNull( config, "Solr cluster config is null" );
+
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
         environmentBlueprint.setName( String.format( "%s-%s", SolrClusterConfig.PRODUCT_KEY, UUID.randomUUID() ) );
@@ -252,6 +255,9 @@ public class SolrImpl implements Solr {
 
         environmentBlueprint.setNodeGroups( Sets.newHashSet( solrGroup ) );
 
-        return environmentBlueprint;
+        environmentBuildTask.setEnvironmentBlueprint( environmentBlueprint );
+
+
+        return environmentBuildTask;
     }
 }

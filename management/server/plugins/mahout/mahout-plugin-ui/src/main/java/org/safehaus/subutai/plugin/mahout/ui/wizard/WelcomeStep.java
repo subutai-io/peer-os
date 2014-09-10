@@ -33,7 +33,7 @@ public class WelcomeStep extends Panel {
         grid.setMargin( true );
         grid.setSizeFull();
 
-        Label welcomeMsg = new Label( "<center><h2>Welcome to Oozie Installation Wizard!</h2>" );
+        Label welcomeMsg = new Label( "<center><h2>Welcome to Mahout Installation Wizard!</h2>" );
         welcomeMsg.setContentMode( ContentMode.HTML );
         grid.addComponent( welcomeMsg, 3, 1, 6, 2 );
 
