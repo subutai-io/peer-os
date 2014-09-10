@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -209,7 +210,7 @@ public class TrackerForm extends CustomComponent {
         if ( !track ) {
             track = true;
 
-            getUI().access( new Runnable() {
+            final Future<Void> access = getUI().access( new Runnable() {
                 @Override
                 public void run() {
                     while ( track ) {
