@@ -19,5 +19,6 @@
     <module>environment-manager-impl</module>
     <module>environment-manager-ui</module>
     <module>environment-manager-cli</module>
+    <module>environment-manager-rest</module>
   </modules>
 </project>

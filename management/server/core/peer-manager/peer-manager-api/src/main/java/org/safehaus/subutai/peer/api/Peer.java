@@ -1,13 +1,10 @@
 package org.safehaus.subutai.peer.api;
 
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-
 /**
  * Created by bahadyr on 9/6/14.
  */
-@XmlRootElement(name = "Peer")
+//@XmlRootElement(name = "Peer")
 public class Peer {
 
     private String name;

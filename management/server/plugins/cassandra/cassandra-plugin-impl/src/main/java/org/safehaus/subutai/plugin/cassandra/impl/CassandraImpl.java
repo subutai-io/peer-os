@@ -43,17 +43,17 @@ import com.google.common.collect.Sets;
 
 public class CassandraImpl extends CassandraBase {
 
-    Commands commands;
-    DbManager dbManager;
-    Tracker tracker;
-    LxcManager lxcManager;
-    ExecutorService executor;
-    NetworkManager networkManager;
-    CommandRunner commandRunner;
-    AgentManager agentManager;
-    EnvironmentManager environmentManager;
-    ContainerManager containerManager;
-    PluginDAO pluginDAO;
+    private Commands commands;
+    private DbManager dbManager;
+    private Tracker tracker;
+    private LxcManager lxcManager;
+    private ExecutorService executor;
+    private NetworkManager networkManager;
+    private CommandRunner commandRunner;
+    private AgentManager agentManager;
+    private EnvironmentManager environmentManager;
+    private ContainerManager containerManager;
+    private PluginDAO pluginDAO;
 
 
     public CassandraImpl() {
@@ -291,7 +291,7 @@ public class CassandraImpl extends CassandraBase {
         EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
         EnvironmentBlueprint environmentBlueprint = new EnvironmentBlueprint();
-        environmentBlueprint.setName( String.format( "%s-%s", config.PRODUCT_KEY, UUID.randomUUID() ) );
+        environmentBlueprint.setName( String.format( "%s-%s", config.getProductKey(), UUID.randomUUID() ) );
         environmentBlueprint.setLinkHosts( true );
         environmentBlueprint.setDomainName( Common.DEFAULT_DOMAIN_NAME );
         environmentBlueprint.setExchangeSshKeys( true );

@@ -16,26 +16,26 @@ import org.safehaus.subutai.peer.impl.dao.PeerDAO;
  */
 public class PeerImpl implements PeerManager {
 
+    private final static String source = "PEER_MANAGER";
     private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
-    private String source = "PEER_MANAGER";
-
-
+    private String id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
 
 
+    public void setId( final String id ) {
+        this.id = id;
+    }
+
+
     public void init() {
+        LOG.info( "SUBUTAID ID: " + id );
         peerDAO = new PeerDAO( dbManager );
     }
 
 
     public void destroy() {
-        System.out.println( "destroy" );
-    }
-
-
-    public DbManager getDbManager() {
-        return dbManager;
+        this.dbManager = null;
     }
 
 
@@ -47,13 +47,14 @@ public class PeerImpl implements PeerManager {
     @Override
     public String register( final Peer peer ) {
 
-//        LOG.info( "Registering peer: " + peer.getName() );
+        //        LOG.info( "Registering peer: " + peer.getName() );
         try {
             String id = peer.getId();
             peerDAO.saveInfo( source, id, peer );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            //            e.printStackTrace();
+            LOG.info( e.getMessage() );
             return null;
         }
         return peer.getId();
@@ -62,7 +63,7 @@ public class PeerImpl implements PeerManager {
 
     @Override
     public String getHostId() {
-        return "id";
+        return id;
     }
 
 
@@ -73,7 +74,8 @@ public class PeerImpl implements PeerManager {
             peers = peerDAO.getInfo( source, Peer.class );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
+            //            e.printStackTrace();
         }
         return peers;
     }
@@ -85,7 +87,8 @@ public class PeerImpl implements PeerManager {
             peerDAO.deleteInfo( source, uuid );
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+            LOG.info( e.getMessage() );
+            //            e.printStackTrace();
             return false;
         }
         return true;
