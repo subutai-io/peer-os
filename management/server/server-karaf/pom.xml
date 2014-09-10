@@ -90,21 +90,6 @@
       <version>${commons-net.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
-      <version>${org.apache.geronimo.specs.jms.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-ejb_3.0_spec</artifactId>
-      <version>${org.apache.geronimo.specs.ejb.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jpa_2.0_spec</artifactId>
-      <version>${org.apache.geronimo.specs.jpa.version}</version>
-    </dependency>
-    <dependency>
       <groupId>javax.jmdns</groupId>
       <artifactId>jmdns</artifactId>
       <version>${javax.jmdns.version}</version>
@@ -457,21 +442,6 @@
                   <groupId>commons-net</groupId>
                   <artifactId>commons-net</artifactId>
                   <version>${commons-net.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-jms_1.1_spec</artifactId>
-                  <version>${org.apache.geronimo.specs.jms.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-ejb_3.0_spec</artifactId>
-                  <version>${org.apache.geronimo.specs.ejb.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-jpa_2.0_spec</artifactId>
-                  <version>${org.apache.geronimo.specs.jpa.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>javax.jmdns</groupId>

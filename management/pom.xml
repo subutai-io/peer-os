@@ -63,8 +63,8 @@
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Runtime -->
-    <karaf.version>3.0.1</karaf.version>
-    <karaf.features.version>2.3.6</karaf.features.version>
+    <karaf.version>2.3.7</karaf.version>
+    <karaf.features.version>2.3.7</karaf.features.version>
     <!-- OSGI -->
     <org.osgi.version>4.3.1</org.osgi.version>
     <!-- servlet -->
@@ -105,9 +105,6 @@
     <org.apache.cxf.version>2.7.11</org.apache.cxf.version>
     <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
     <org.apache.felix.version>2.4.0</org.apache.felix.version>
-    <org.apache.geronimo.specs.ejb.version>1.0.1</org.apache.geronimo.specs.ejb.version>
-    <org.apache.geronimo.specs.jms.version>1.1.1</org.apache.geronimo.specs.jms.version>
-    <org.apache.geronimo.specs.jpa.version>1.1</org.apache.geronimo.specs.jpa.version>
     <org.apache.lucene.version>4.7.0</org.apache.lucene.version>
     <org.apache.maven.plugins.version>3.1</org.apache.maven.plugins.version>
     <org.apache.servicemix.bundles.version>4.10_1</org.apache.servicemix.bundles.version>
@@ -408,21 +405,6 @@
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
         <version>${org.apache.ant.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jms_1.1_spec</artifactId>
-        <version>${org.apache.geronimo.specs.jms.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-ejb_3.0_spec</artifactId>
-        <version>${org.apache.geronimo.specs.ejb.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jpa_2.0_spec</artifactId>
-        <version>${org.apache.geronimo.specs.jpa.version}</version>
       </dependency>
       <dependency>
         <groupId>javax.jmdns</groupId>
