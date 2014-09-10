@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -210,26 +209,28 @@ public class TrackerForm extends CustomComponent {
         if ( !track ) {
             track = true;
 
-            final Future<Void> access = getUI().access( new Runnable() {
-                @Override
-                public void run() {
-                    while ( track ) {
-                        try {
-                            populateOperations();
-                            populateLogs();
-                        }
-                        catch ( Exception e ) {
-                            LOG.log( Level.SEVERE, "Error in tracker", e );
-                        }
-                        try {
-                            Thread.sleep( 1000 );
-                        }
-                        catch ( InterruptedException ex ) {
-                            break;
+            if ( getUI() != null ) {
+                getUI().access( new Runnable() {
+                    @Override
+                    public void run() {
+                        while ( track ) {
+                            try {
+                                populateOperations();
+                                populateLogs();
+                            }
+                            catch ( Exception e ) {
+                                LOG.log( Level.SEVERE, "Error in tracker", e );
+                            }
+                            try {
+                                Thread.sleep( 1000 );
+                            }
+                            catch ( InterruptedException ex ) {
+                                break;
+                            }
                         }
                     }
-                }
-            } );
+                } );
+            }
         }
     }
 
