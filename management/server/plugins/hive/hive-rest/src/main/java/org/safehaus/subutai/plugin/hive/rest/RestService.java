@@ -10,7 +10,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
-import javax.ws.rs.core.Response
+import javax.ws.rs.core.Response;
 
 public class RestService {
 
@@ -121,7 +121,7 @@ public class RestService {
     public Response uninstallCluster(@PathParam("clusterName") String clusterName) {
         UUID uuid = hiveManager.uninstallCluster(clusterName);
         String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
-        return Response.status(Response.status.OK).entity(operationId).build();
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @POST
