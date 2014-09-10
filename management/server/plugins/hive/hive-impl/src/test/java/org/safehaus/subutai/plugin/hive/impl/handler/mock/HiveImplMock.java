@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.plugin.common.mock.AgentManagerMock;
+import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
+import org.safehaus.subutai.plugin.common.mock.DbManagerMock;
+import org.safehaus.subutai.plugin.common.mock.TrackerMock;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.HiveImpl;
-import org.safehaus.subutai.product.common.test.unit.mock.AgentManagerMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
-import org.safehaus.subutai.product.common.test.unit.mock.TrackerMock;
+
 
 public class HiveImplMock extends HiveImpl {
 

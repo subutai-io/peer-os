@@ -58,12 +58,6 @@
             <artifactId>lxc-manager-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.safehaus.subutai</groupId>
-            <artifactId>product-common</artifactId>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
             <version>${project.version}</version>

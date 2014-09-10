@@ -6,10 +6,10 @@ import org.junit.*;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
 import org.safehaus.subutai.plugin.flume.impl.handler.mock.FlumeImplMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 
 
 public class InstallHandlerTest {
@@ -46,7 +46,7 @@ public class InstallHandlerTest {
         FlumeConfig config = new FlumeConfig();
         config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName("test-cluster");
-        config.setNodes(new HashSet<>(Arrays.asList(CommonMockBuilder.createAgent())));
+        config.setNodes(new HashSet<>(Arrays.asList( CommonMockBuilder.createAgent())));
 
         mock.setConfig(config);
         handler = new InstallHandler(mock, config);
