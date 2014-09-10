@@ -96,7 +96,7 @@ public class BlueprintsForm {
                 deleteBlueprintButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        environmentManager.deleteBlueprint( environmentBuildTask.getEnvironmentBlueprint().getName() );
+                        environmentManager.deleteBlueprint( environmentBuildTask.getUuid().toString() );
                     }
                 } );
 

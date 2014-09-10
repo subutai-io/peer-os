@@ -4,11 +4,12 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class BlueprintLoadForm {
 
     private final VerticalLayout contentRoot;
@@ -26,7 +27,7 @@ public class BlueprintLoadForm {
 
         blueprintTxtArea = getTextArea();
 
-        Button loadBlueprintButton = new Button( "Load blueprint" );
+        Button loadBlueprintButton = new Button( "Save blueprint" );
 
         loadBlueprintButton.addClickListener( new Button.ClickListener() {
             @Override
@@ -51,7 +52,11 @@ public class BlueprintLoadForm {
 
 
     private void uploadBlueprint() {
-        environmentManager.saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
+
+        boolean result = environmentManager.saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
+        if ( !result ) {
+            Notification.show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
+        }
     }
 
 

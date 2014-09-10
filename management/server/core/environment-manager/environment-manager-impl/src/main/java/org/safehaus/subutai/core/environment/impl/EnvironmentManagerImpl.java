@@ -25,6 +25,7 @@ import org.safehaus.subutai.core.network.api.NetworkManager;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonSyntaxException;
 
 
 /**
@@ -232,16 +233,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-        environmentBuildTask.setEnvironmentBlueprint( blueprint );
-
         try {
+
+            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+            EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+
             environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
             return true;
         }
         catch ( DBException e ) {
-            e.printStackTrace();
+
+        }
+        catch ( JsonSyntaxException jse ) {
+
         }
         return false;
     }
@@ -260,9 +265,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public boolean deleteBlueprint( String blueprintName ) {
+    public boolean deleteBlueprint( String uuid ) {
         try {
-            environmentDAO.deleteInfo( BLUEPRINT, blueprintName );
+            environmentDAO.deleteInfo( BLUEPRINT, uuid );
             return true;
         }
         catch ( DBException e ) {
