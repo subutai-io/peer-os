@@ -4,10 +4,11 @@ package org.safehaus.subutai.core.environment.ui.manage;
 import java.util.List;
 
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
+import org.safehaus.subutai.peer.api.Peer;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
@@ -19,11 +20,11 @@ public class BlueprintsForm {
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManager environmentManager;
+    private EnvironmentManagerUI managerUI;
 
 
-    public BlueprintsForm( EnvironmentManager environmentManager ) {
-        this.environmentManager = environmentManager;
+    public BlueprintsForm( EnvironmentManagerUI managerUI ) {
+        this.managerUI = managerUI;
 
 
         contentRoot = new VerticalLayout();
@@ -63,7 +64,7 @@ public class BlueprintsForm {
 
     private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<EnvironmentBuildTask> environmentBuildTasks = environmentManager.getBlueprints();
+        List<EnvironmentBuildTask> environmentBuildTasks = managerUI.getEnvironmentManager().getBlueprints();
         if ( environmentBuildTasks.size() > 0 ) {
             for ( final EnvironmentBuildTask environmentBuildTask : environmentBuildTasks ) {
 
@@ -71,7 +72,8 @@ public class BlueprintsForm {
                 viewButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        BlueprintDetails details = new BlueprintDetails( "Blueprint details", environmentManager );
+                        BlueprintDetails details =
+                                new BlueprintDetails( "Blueprint details", managerUI.getEnvironmentManager() );
                         details.setContent( environmentBuildTask.getEnvironmentBlueprint() );
                         contentRoot.getUI().addWindow( details );
                         details.setVisible( true );
@@ -82,13 +84,17 @@ public class BlueprintsForm {
                 buildEnvironmentButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        EnvironmentManagerUI.getExecutor().execute( new Runnable() {
-                            @Override
-                            public void run() {
+                        //                        EnvironmentManagerUI.getExecutor().execute( new Runnable() {
+                        //                            @Override
+                        //                            public void run() {
+                        WizardWindow wizardWindow = new WizardWindow( "Wizard" );
+                        wizardWindow.setContent( getPeersTable() );
+                        contentRoot.getUI().addWindow( wizardWindow );
+                        wizardWindow.setVisible( true );
 
-                                environmentManager.buildEnvironment( environmentBuildTask );
-                            }
-                        } );
+                        //                                environmentManager.buildEnvironment( environmentBuildTask );
+                        //                            }
+                        //                        } );
                     }
                 } );
 
@@ -96,7 +102,7 @@ public class BlueprintsForm {
                 deleteBlueprintButton.addClickListener( new Button.ClickListener() {
                     @Override
                     public void buttonClick( final Button.ClickEvent clickEvent ) {
-                        environmentManager.deleteBlueprint( environmentBuildTask.getUuid().toString() );
+                        managerUI.getEnvironmentManager().deleteBlueprint( environmentBuildTask.getUuid().toString() );
                     }
                 } );
 
@@ -115,5 +121,22 @@ public class BlueprintsForm {
 
     public VerticalLayout getContentRoot() {
         return this.contentRoot;
+    }
+
+
+    private Table getPeersTable() {
+        Table peersTable = new Table();
+        peersTable.setCaption( "Peers" );
+        peersTable.setImmediate( false );
+        peersTable.setWidth( "780px" );
+        peersTable.setHeight( "283px" );
+
+
+        List<Peer> peers = managerUI.getPeerManager().peers();
+        BeanItemContainer<Peer> ds = new BeanItemContainer<Peer>( Peer.class );
+        ds.addAll( peers );
+        peersTable.setContainerDataSource( ds );
+
+        return peersTable;
     }
 }

@@ -3,8 +3,8 @@ package org.safehaus.subutai.core.environment.ui.manage;
 
 import java.util.List;
 
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.EnvironmentDetails;
 
 import com.vaadin.ui.Button;
@@ -12,16 +12,16 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings( "serial" )
 public class EnvironmentsForm {
 
     private VerticalLayout contentRoot;
     private Table environmentsTable;
-    private EnvironmentManager environmentManager;
+    private EnvironmentManagerUI managerUI;
 
 
-    public EnvironmentsForm( EnvironmentManager environmentManager ) {
-        this.environmentManager = environmentManager;
+    public EnvironmentsForm( EnvironmentManagerUI managerUI ) {
+        this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
         contentRoot.setSpacing( true );
@@ -72,7 +72,7 @@ public class EnvironmentsForm {
 
     private void updateTableData() {
         environmentsTable.removeAllItems();
-        List<Environment> environmentList = environmentManager.getEnvironments();
+        List<Environment> environmentList = managerUI.getEnvironmentManager().getEnvironments();
         for ( final Environment environment : environmentList ) {
             Button viewEnvironmentInfoButton = new Button( "Info" );
             viewEnvironmentInfoButton.addClickListener( new Button.ClickListener() {

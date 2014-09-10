@@ -1,7 +1,7 @@
 package org.safehaus.subutai.core.environment.ui.manage;
 
 
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -14,11 +14,11 @@ public class BlueprintLoadForm {
 
     private final VerticalLayout contentRoot;
     private TextArea blueprintTxtArea;
-    private EnvironmentManager environmentManager;
+    private EnvironmentManagerUI managerUI;
 
 
-    public BlueprintLoadForm( EnvironmentManager environmentManager ) {
-        this.environmentManager = environmentManager;
+    public BlueprintLoadForm( EnvironmentManagerUI managerUI ) {
+        this.managerUI = managerUI;
 
         contentRoot = new VerticalLayout();
 
@@ -53,7 +53,7 @@ public class BlueprintLoadForm {
 
     private void uploadBlueprint() {
 
-        boolean result = environmentManager.saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
+        boolean result = managerUI.getEnvironmentManager().saveBlueprint( blueprintTxtArea.getValue().toString().trim() );
         if ( !result ) {
             Notification.show( "Error saving blueprint", "Check blueprint format", Notification.Type.WARNING_MESSAGE );
         }
