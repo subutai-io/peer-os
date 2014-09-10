@@ -99,10 +99,10 @@ public class ProgressWindow {
     }
 
 
-    private void start() {
+    private synchronized void start() {
 
         showProgress();
-        window.getUI().access( new Runnable() {
+        executor.execute( new Runnable() {
 
             public void run() {
                 while ( track ) {
