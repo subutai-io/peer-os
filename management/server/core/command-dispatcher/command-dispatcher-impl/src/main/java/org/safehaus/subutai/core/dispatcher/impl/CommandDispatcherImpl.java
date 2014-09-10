@@ -222,11 +222,13 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
             //send remote requests
             if ( !commandImpl.getRemoteRequests().isEmpty() ) {
+                LOG.warning( "executing remote requests" );
                 sendRequests( commandImpl.getRemoteRequests() );
             }
 
             //send local requests
             if ( !commandImpl.getRequests().isEmpty() ) {
+                LOG.warning( "executing local requests" );
                 Command localCommand = new CommandImpl( commandImpl.getRequests() );
                 final CommandDispatcherImpl self = this;
                 commandRunner.runCommandAsync( localCommand, new CommandCallback() {

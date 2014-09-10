@@ -84,7 +84,7 @@ public class HttpUtil {
             entity = httpResponse.getEntity();
             int resCode = httpResponse.getStatusLine().getStatusCode();
 
-            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
+//            LOG.warning( "ENTITY: " + EntityUtils.toString( entity, "utf-8" ).trim() );
 
             return resCode;
         }
