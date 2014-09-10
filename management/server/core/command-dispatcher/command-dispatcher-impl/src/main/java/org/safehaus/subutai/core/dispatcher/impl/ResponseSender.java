@@ -26,7 +26,7 @@ public class ResponseSender {
     private static final Logger LOG = Logger.getLogger( ResponseSender.class.getName() );
 
     private static final int RESPONSE_OK = 200;
-    private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 5;
+    private static final int SLEEP_BETWEEN_ITERATIONS_SEC = 1;
     private static final int AGENT_CHUNK_SEND_INTERVAL_SEC = 15;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final DispatcherDAO dispatcherDAO;

@@ -54,8 +54,7 @@ public class DispatcherDAO {
 
         try {
             ResultSet rs = dbManager
-                    .executeQuery2( "select info from remote_responses where commandId = ? order by responseNumber asc",
-                            commandId.toString() );
+                    .executeQuery2( "select info from remote_responses where commandId = ?", commandId.toString() );
             if ( rs != null ) {
                 for ( Row row : rs ) {
                     String info = row.getString( "info" );
@@ -73,17 +72,20 @@ public class DispatcherDAO {
     public void saveRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "insert into remote_responses(commandId,agentId, info) values (?,?,?)",
-                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getUuid().toString(),
-                gson.toJson( remoteResponse ) );
+        dbManager.executeUpdate2( "insert into remote_responses(commandId, responseNumber, info) values (?,?,?)",
+                remoteResponse.getCommandId().toString(),
+                String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
+                        remoteResponse.getResponse().getResponseSequenceNumber() ), gson.toJson( remoteResponse ) );
     }
 
 
     public void deleteRemoteResponse( RemoteResponse remoteResponse ) throws DBException {
         Preconditions.checkNotNull( remoteResponse, "Remote response is null" );
 
-        dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and agentId = ?",
-                remoteResponse.getCommandId().toString(), remoteResponse.getResponse().getUuid().toString());
+        dbManager.executeUpdate2( "delete from remote_responses where commandId = ? and responseNumber = ?",
+                remoteResponse.getCommandId().toString(),
+                String.format( "%s_%s", remoteResponse.getResponse().getUuid(),
+                        remoteResponse.getResponse().getResponseSequenceNumber() ) );
     }
 
 
