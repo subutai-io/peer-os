@@ -496,6 +496,12 @@
         <artifactId>plugin-common</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <!-- Common -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>product-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- Template Manager -->
       <dependency>
@@ -825,13 +831,6 @@
         <version>${project.version}</version>
       </dependency>
       <!--Vaadin - END-->
-
-      <!-- Common -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>product-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!--Plugins-->
       <!-- Accumulo plugin -->
