@@ -63,7 +63,7 @@
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Runtime -->
-    <karaf.version>2.3.3</karaf.version>
+    <karaf.version>2.3.7</karaf.version>
     <!-- OSGI -->
     <org.osgi.version>4.3.1</org.osgi.version>
     <!-- servlet -->
@@ -94,7 +94,6 @@
     <javax.jmdns.version>3.4.1</javax.jmdns.version>
     <javax.ws.rs.jsr311-apiversion>1.1-ea</javax.ws.rs.jsr311-apiversion>
     <junit.version>4.11</junit.version>
-    <karaf.version>2.3.3</karaf.version>
     <log4j.version>1.2.17</log4j.version>
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <net.jpountz.lz4.version>1.2.0</net.jpountz.lz4.version>
@@ -179,7 +178,8 @@
         <artifactId>vaadin-themes</artifactId>
         <version>${vaadin.version}</version>
       </dependency>
-      <dependency>
+
+        <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-push</artifactId>
         <version>${vaadin.version}</version>
