@@ -177,7 +177,7 @@
         <version>${vaadin.version}</version>
       </dependency>
 
-        <dependency>
+      <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-push</artifactId>
         <version>${vaadin.version}</version>
@@ -467,11 +467,10 @@
         <version>${org.slf4j.version}</version>
       </dependency>
       <dependency>
-      	<groupId>org.ops4j.pax.url</groupId>
-      	<artifactId>pax-url-wrap</artifactId>
-      	<version>1.4.2</version>
+        <groupId>org.ops4j.pax.url</groupId>
+        <artifactId>pax-url-wrap</artifactId>
+        <version>1.4.2</version>
       </dependency>
-
 
       <!-- Core Modules - START -->
 
@@ -787,6 +786,33 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>config-point-tracker-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- Peer Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
