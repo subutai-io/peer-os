@@ -1,14 +1,23 @@
 package org.safehaus.subutai.api.strategymanager;
 
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by timur on 9/11/14.
  */
 public interface ContainerPlacementStrategy {
+
+    public boolean hasCriteria();
+    public String getId();
+    public String getTitle();
+
+    void addCriteria(Criteria criteria);
+    void setCriteria(List<Criteria> criteria);
+
+    public List<Criteria> getCriteria();
 
     public Map<Agent, Integer> calculateSlots(int nodesCount, Map<Agent, ServerMetric> serverMetrics);
 
@@ -22,9 +31,9 @@ public interface ContainerPlacementStrategy {
      * @param serverMetrics - map where key is a physical agent and value is a
      *                      metric
      */
-    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics);
+    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria);
 
     public Map<Agent, Integer> getPlacementDistribution();
 
-    public PlacementStrategy getStrategy();
+//    public PlacementStrategy getStrategy();
 }

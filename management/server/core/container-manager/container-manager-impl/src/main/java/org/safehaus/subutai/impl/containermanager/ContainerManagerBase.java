@@ -8,6 +8,8 @@ import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ContainerManagerBase implements ContainerManager {
@@ -17,7 +19,7 @@ public abstract class ContainerManagerBase implements ContainerManager {
 	TemplateManager templateManager;
 	TemplateRegistryManager templateRegistry;
 	DbManager dbManager;
-    List<ContainerPlacementStrategy> placementStrategies;
+    List<ContainerPlacementStrategy> placementStrategies = Collections.synchronizedList(new ArrayList<ContainerPlacementStrategy>());
 
 	public AgentManager getAgentManager() {
 		return agentManager;

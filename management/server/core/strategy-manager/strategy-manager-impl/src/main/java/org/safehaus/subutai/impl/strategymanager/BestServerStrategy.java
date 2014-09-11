@@ -3,7 +3,6 @@ package org.safehaus.subutai.impl.strategymanager;
 import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.*;
 
@@ -60,8 +59,12 @@ public class BestServerStrategy extends RoundRobinStrategy {
 	}
 
     @Override
-    public PlacementStrategy getStrategy() {
-        return PlacementStrategy.BEST_SERVER;
+    public String getId() {
+        return "BEST_SERVER";
     }
 
+    @Override
+    public String getTitle() {
+        return "Best server placement strategy";
+    }
 }

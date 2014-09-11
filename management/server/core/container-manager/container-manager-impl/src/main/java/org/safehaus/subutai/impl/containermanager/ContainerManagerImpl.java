@@ -43,17 +43,14 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
     private Monitor monitor;
-    private PlacementStrategyFactory placementStrategyFactory;
 
-
-    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager, PlacementStrategyFactory placementStrategyFactory) {
+    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager) {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.monitor = monitor;
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
-        this.placementStrategyFactory = placementStrategyFactory;
 
         Commands.init(commandRunner);
     }
@@ -72,18 +69,42 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         executor.shutdown();
     }
 
+    public synchronized void registerStrategy(ContainerPlacementStrategy containerPlacementStrategy) {
+        LOG.info(String.format("Registering container placement strategy: %s", containerPlacementStrategy.getId()));
+        placementStrategies.add(containerPlacementStrategy);
+    }
+
+    public synchronized void unregisterStrategy(ContainerPlacementStrategy containerPlacementStrategy) {
+        if (containerPlacementStrategy != null) {
+            LOG.info(String.format("Registering container placement strategy: %s", containerPlacementStrategy.getId()));
+            placementStrategies.remove(containerPlacementStrategy);
+        }
+    }
+
+    private ContainerPlacementStrategy findStrategyById(String strategyId) {
+        ContainerPlacementStrategy placementStrategy = null;
+        for (int i = 0; i < placementStrategies.size() && placementStrategy == null; i++) {
+            LOG.info(" ============> " + placementStrategies.get(i));
+            if (strategyId.equals(placementStrategies.get(i).getId()))
+                placementStrategy = placementStrategies.get(i);
+        }
+        return placementStrategy;
+    }
+
     @Override
-    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
-        AbstractContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
-        containerPlacementStrategy.calculatePlacement(nodesCount, getPhysicalServerMetrics());
-        if (placementStrategies != null)
-            for (int i = 0; i < placementStrategies.size(); i++)
-                LOG.info(" ============> " + placementStrategies.get(i));
+    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, String strategyId, List<Criteria> criteria) {
+        ContainerPlacementStrategy containerPlacementStrategy = findStrategyById(strategyId);
+        if (containerPlacementStrategy == null) {
+            //TODO: add throw exception
+            return null;
+        }
+        containerPlacementStrategy.calculatePlacement(nodesCount, getPhysicalServerMetrics(), criteria);
+
         return containerPlacementStrategy.getPlacementDistribution();
     }
 
     @Override
-    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategy strategy,
+    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, String strategyId,
                             List<Criteria> criteria) throws ContainerCreateException {
 
         // restrict metrics to provided hosts only
@@ -97,9 +118,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             }
         }
 
-        AbstractContainerPlacementStrategy st = placementStrategyFactory.create(nodesCount, strategy, criteria);
-
-        st.calculatePlacement(nodesCount,metrics);
+        ContainerPlacementStrategy st = findStrategyById(strategyId);// placementStrategyFactory.create(nodesCount, strategy, criteria);
+        st.calculatePlacement(nodesCount, metrics,criteria);
 
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
@@ -218,21 +238,22 @@ public class ContainerManagerImpl extends ContainerManagerBase {
                             cloneNames));
         }
 
-        try {
-            if (envId != null) {
-                saveNodeGroup(envId, templateName, clones, strategy);
-            }
-        } catch (Exception ex) {
-            logger.error("Failed to save nodes info", ex);
-        }
+        // TODO: uncomment and implement later
+//        try {
+//            if (envId != null) {
+//                saveNodeGroup(envId, templateName, clones, strategy);
+//            }
+//        } catch (Exception ex) {
+//            logger.error("Failed to save nodes info", ex);
+//        }
 
         return clones;
     }
 
 
     public Set<Agent> clone(String templateName, int nodesCount, Collection<Agent> hosts,
-                            PlacementStrategy strategy, List<Criteria> criteria) throws ContainerCreateException {
-        return clone(null, templateName, nodesCount, hosts, strategy, criteria);
+                            String strategyId, List<Criteria> criteria) throws ContainerCreateException {
+        return clone(null, templateName, nodesCount, hosts, strategyId, criteria);
     }
 
     public void cloneDestroy(final String hostName, final String cloneName) throws ContainerDestroyException {
@@ -657,11 +678,12 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         NodeInfo group = new NodeInfo();
         group.setEnvId(envId);
         group.setTemplateName(templateName);
-        if (strategy == null || strategy.length == 0) {
-            strategy = new PlacementStrategy[]{
-                    placementStrategyFactory.getDefaultStrategyType()
-            };
-        }
+        //TODO: uncomment and implement this later
+//        if (strategy == null || strategy.length == 0) {
+//            strategy = new PlacementStrategy[]{
+//                    placementStrategyFactory.getDefaultStrategyType()
+//            };
+//        }
         group.setStrategy(EnumSet.of(strategy[0], strategy));
         Template template = templateRegistry.getTemplate(templateName);
         group.setProducts(template.getProducts());

@@ -1,8 +1,8 @@
 package org.safehaus.subutai.api.containermanager;
 
-import org.safehaus.subutai.api.strategymanager.*;
+import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.*;
 
@@ -12,9 +12,9 @@ import java.util.*;
 public interface ContainerManager {
 
     public List<ContainerPlacementStrategy> getPlacementStrategies();
-    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria);
+    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, String strategyId, List<Criteria> criteria);
     public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                            PlacementStrategy strategy,
+                            String strategyId,
                             List<Criteria> criteria) throws ContainerCreateException;
 
     public void clonesDestroy(final String hostName, final Set<String> cloneNames) throws ContainerDestroyException;

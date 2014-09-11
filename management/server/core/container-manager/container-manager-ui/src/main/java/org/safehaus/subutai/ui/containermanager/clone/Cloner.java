@@ -12,7 +12,6 @@ import org.safehaus.subutai.api.containermanager.ContainerManager;
 import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
 import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.util.AgentUtil;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
@@ -197,10 +196,13 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
 
             List<ContainerPlacementStrategy> strategies = containerManager.getPlacementStrategies();
-            if (strategies != null) {
-                LOG.info(String.format("There are %d placement strategies", strategies.size()));
+            if (strategies == null || strategies.size() == 0) {
+                show("There is no placement strategy.");
+                return;
             }
-            Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, PlacementStrategy.ROUND_ROBIN, criteria);
+            LOG.info(String.format("There are %d placement strategies", strategies.size()));
+            String placementStrategyId = ((ContainerPlacementStrategy)strategies.get(0)).getId();
+            Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, placementStrategyId , criteria);
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
                 return;
@@ -273,7 +275,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         List<Criteria> criteria = new ArrayList<Criteria>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
 //            containerManager.listAllStrategies();
-            Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, PlacementStrategy.ROUND_ROBIN, criteria);
+            Map<Agent, Integer> bestServers = null;// = containerManager.getPlacementDistribution((int)count, PlacementStrategy.ROUND_ROBIN, criteria);
 //                    getPhysicalServersWithLxcSlots(((Strategy)strategy.getValue()).getId());
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");

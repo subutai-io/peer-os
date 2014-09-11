@@ -41,14 +41,21 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
         placementInfo.put(nodeType, numberOfLxcsToCreate);
     }
 
+    @Override
     public void addCriteria(Criteria criteria) {
         if (criteria == null)
             throw new IllegalArgumentException("Criteria could not be null.");
         this.criteria.add(criteria);
     }
 
+    @Override
     public List<Criteria> getCriteria() {
         return Collections.unmodifiableList(criteria);
+    }
+
+    @Override
+    public void setCriteria(List<Criteria> criteria) {
+        this.criteria = criteria;
     }
 
     /**
@@ -78,4 +85,8 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
         return res;
     }
 
+    @Override
+    public boolean hasCriteria() {
+        return false;
+    }
 }

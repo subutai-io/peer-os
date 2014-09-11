@@ -1,9 +1,9 @@
 package org.safehaus.subutai.impl.strategymanager;
 
 import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.*;
 
@@ -11,8 +11,18 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy {
 
 	public static final String DEFAULT_NODE_TYPE = "default";
 
-	@Override
-	public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
+    @Override
+    public String getId() {
+        return "ROUND_ROBIN";
+    }
+
+    @Override
+    public String getTitle() {
+        return "Round Robin placement strategy";
+    }
+
+    @Override
+	public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria) {
 		if (serverMetrics == null || serverMetrics.isEmpty()) return;
 
 		List<Agent> ls = sortServers(serverMetrics);
@@ -29,11 +39,6 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy {
 			addPlacementInfo(e.getKey(), DEFAULT_NODE_TYPE, e.getValue());
 		}
 	}
-
-    @Override
-    public PlacementStrategy getStrategy() {
-        return PlacementStrategy.ROUND_ROBIN;
-    }
 
     protected List<Agent> sortServers(Map<Agent, ServerMetric> serverMetrics) {
 		List<Agent> ls = new ArrayList(serverMetrics.keySet());

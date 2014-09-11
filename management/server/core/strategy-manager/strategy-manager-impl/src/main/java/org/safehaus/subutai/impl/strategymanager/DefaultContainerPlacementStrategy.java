@@ -2,12 +2,13 @@ package org.safehaus.subutai.impl.strategymanager;
 
 
 import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.util.CollectionUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +27,16 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
     private final double MIN_CPU_LXC_PERCENT = 5;           // 5%
     private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
     Logger LOG = Logger.getLogger(DefaultContainerPlacementStrategy.class.getName());
+
+    @Override
+    public String getId() {
+        return "DEFAULT-STRATEGY";
+    }
+
+    @Override
+    public String getTitle() {
+        return "Default container placement strategy";
+    }
 
     /**
      * Optional method to implement if placement uses simple logic to calculate lxc slots on a physical server
@@ -71,7 +82,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * @param serverMetrics - map where key is a physical agent and value is a metric
      */
     @Override
-    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
+    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics, List<Criteria> criteria) {
 
         Map<Agent, Integer> serversWithSlots = calculateSlots(nodesCount, serverMetrics);
 
@@ -102,9 +113,9 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
             }
         }
     }
-
-    @Override
-    public PlacementStrategy getStrategy() {
-        return PlacementStrategy.FILLUP_PROCEED;
-    }
+//
+//    @Override
+//    public PlacementStrategy getStrategy() {
+//        return PlacementStrategy.FILLUP_PROCEED;
+//    }
 }
