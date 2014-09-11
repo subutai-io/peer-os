@@ -145,12 +145,6 @@
     <dependencies>
 
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>${org.slf4j.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>${http.client.version}</version>
@@ -466,6 +460,17 @@
         <artifactId>commons-collections</artifactId>
         <version>${org.apache.commons.collections.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
+      <dependency>
+      	<groupId>org.ops4j.pax.url</groupId>
+      	<artifactId>pax-url-wrap</artifactId>
+      	<version>1.4.2</version>
+      </dependency>
+
 
       <!-- Core Modules - START -->
 
