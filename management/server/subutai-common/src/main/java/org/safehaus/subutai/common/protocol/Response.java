@@ -33,27 +33,12 @@ public class Response implements Serializable {
     private Boolean isLxc;
     private String transportId;
 
-    //TODO remove hostId and ownerId
-    //host subutai id
-    private UUID hostId;
-    //owner subutai id
-    private UUID ownerId;
 
     // inotify fields
     private String confPoints[];
     private String configPoint;
     private String changeType;
     private String dateTime;
-
-
-    public UUID getHostId() {
-        return hostId;
-    }
-
-
-    public UUID getOwnerId() {
-        return ownerId;
-    }
 
 
     public String getParentHostName() {

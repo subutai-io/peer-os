@@ -11,8 +11,8 @@ import com.google.common.base.Strings;
 
 
 /**
- * Used to define a physical host on the whole network. It could be management server or the agent. It just defines a
- * host in the network.
+ * Used to define a physical/lxc host on the network. It could be management server, physical server or container. It
+ * just defines a host on the network.
  */
 public class Agent implements Serializable, Comparable<Agent> {
 
@@ -31,9 +31,8 @@ public class Agent implements Serializable, Comparable<Agent> {
                   boolean isLXC, String transportId, UUID hostId, UUID ownerId ) {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
-        //TODO uncomment checks when agent supplies host id and owner id
-        //        Preconditions.checkNotNull( hostId, "Host id is null" );
-        //        Preconditions.checkNotNull( ownerId, "Owner id is null" );
+        Preconditions.checkNotNull( hostId, "Host id is null" );
+        Preconditions.checkNotNull( ownerId, "Owner id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
@@ -53,9 +52,7 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public UUID getOwnerId() {
-        //        return ownerId;
-        //TODO remove in production
-        return UUID.fromString( "1163673e3-924d-45e2-8dba-615b76a6bbb6" );
+        return ownerId;
     }
 
 
@@ -139,12 +136,6 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public boolean isLocal() {
-        //TODO remove this after agent supplies host id and owner id
-        //temporary workaround until agent correctly supplies hostId and ownerId
-        if ( hostId == null || ownerId == null ) {
-            return true;
-        }
-
         return hostId.compareTo( ownerId ) == 0;
     }
 }
