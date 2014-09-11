@@ -75,7 +75,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     @Override
     public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
         AbstractContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
-        containerPlacementStrategy.calculatePlacement(getPhysicalServerMetrics());
+        containerPlacementStrategy.calculatePlacement(nodesCount, getPhysicalServerMetrics());
         if (placementStrategies != null)
             for (int i = 0; i < placementStrategies.size(); i++)
                 LOG.info(" ============> " + placementStrategies.get(i));
@@ -99,7 +99,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
         AbstractContainerPlacementStrategy st = placementStrategyFactory.create(nodesCount, strategy, criteria);
 
-        st.calculatePlacement(metrics);
+        st.calculatePlacement(nodesCount,metrics);
 
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
@@ -709,11 +709,11 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 //
 //        return bestServers;
 //    }
-    public Map<Agent, Integer> getPlacementDistribution(AbstractContainerPlacementStrategy strategy, int numOfContainers) throws ContainerCreateException {
-        Map<Agent, ServerMetric> serverMetrics = getPhysicalServerMetrics();
-        strategy.calculatePlacement(serverMetrics);
-        return strategy.getPlacementDistribution();
-    }
+//    public Map<Agent, Integer> getPlacementDistribution(AbstractContainerPlacementStrategy strategy, int nodesCount) throws ContainerCreateException {
+//        Map<Agent, ServerMetric> serverMetrics = getPhysicalServerMetrics();
+//        strategy.calculatePlacement(nodesCount, serverMetrics);
+//        return strategy.getPlacementDistribution();
+//    }
 
     /**
      * Clones lxc on a given physical server and set its hostname
