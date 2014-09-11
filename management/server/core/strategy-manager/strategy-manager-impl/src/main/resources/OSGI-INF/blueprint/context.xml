@@ -13,8 +13,13 @@
           class="org.safehaus.subutai.impl.strategymanager.DefaultContainerPlacementStrategy">
     </bean>
 
+    <bean id="bestServerStrategy"
+          class="org.safehaus.subutai.impl.strategymanager.BestServerStrategy">
+    </bean>
+
     <service ref="placementStrategyFactory" interface="org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory"/>
     <service ref="roundRobinStrategy" interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"/>
     <service ref="defaultStrategy" interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"/>
+    <service ref="bestServerStrategy" interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"/>
 
 </blueprint>
