@@ -10,12 +10,5 @@
     </command>
   </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="pig/uninstall-cluster">
-      <action class="org.safehaus.subutai.plugin.pig.cli.UninstallClusterCommand">
-        <property name="pigManager" ref="pigManager" />
-      </action>
-    </command>
-  </command-bundle>
 
 </blueprint>
