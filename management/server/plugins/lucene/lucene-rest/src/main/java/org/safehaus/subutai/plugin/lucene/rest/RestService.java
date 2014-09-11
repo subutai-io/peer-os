@@ -1,16 +1,14 @@
 package org.safehaus.subutai.plugin.lucene.rest;
 
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.plugin.lucene.api.*;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.plugin.lucene.api.Config;
+import org.safehaus.subutai.plugin.lucene.api.Lucene;
 
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,9 +33,9 @@ public class RestService {
 
 
 	@GET
-	@Path ("getClusters")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String getClusters() {
+    @Path("clusters")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response getClusters() {
 
 		List<Config> configs = luceneManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
@@ -46,26 +44,32 @@ public class RestService {
 			clusterNames.add(config.getClusterName());
 		}
 
-		return JsonUtil.GSON.toJson(clusterNames);
-	}
+        String clusters = JsonUtil.GSON.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
+    }
 
 
 	@GET
-	@Path ("getCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String getCluster(@QueryParam ("clusterName") String clusterName) {
+    @Path("clusters/{clusterName}")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response getCluster(
+            @PathParam("clusterName") String clusterName
+    ) {
 		Config config = luceneManager.getCluster(clusterName);
 
-		return JsonUtil.GSON.toJson(config);
-	}
+        String cluster = JsonUtil.GSON.toJson(config);
+        return Response.status(Response.Status.OK).entity(cluster).build();
+    }
 
 
-	@GET
-	@Path ("installCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String installCluster(@QueryParam ("clusterName") String clusterName,
-	                             @QueryParam ("hadoopClusterName") String hadoopClusterName,
-	                             @QueryParam ("nodes") String nodes) {
+	@POST
+    @Path("clusters/")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response installCluster(
+            @PathParam("clusterName") String clusterName,
+            @QueryParam("hadoopClusterName") String hadoopClusterName,
+            @QueryParam("nodes") String nodes
+    ) {
 
 		Config config = new Config();
 		config.setClusterName(clusterName);
@@ -80,36 +84,48 @@ public class RestService {
 
 		UUID uuid = luceneManager.installCluster(config);
 
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
+    }
 
 
-	@GET
-	@Path ("uninstallCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String uninstallCluster(@QueryParam ("clusterName") String clusterName) {
+	@DELETE
+    @Path("clusters/{clusterName}")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response uninstallCluster(
+            @PathParam("clusterName") String clusterName
+    ) {
 		UUID uuid = luceneManager.uninstallCluster(clusterName);
 
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
 
 
-	@GET
-	@Path ("addNode")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String addNode(@QueryParam ("clusterName") String clusterName, @QueryParam ("node") String node) {
+	@POST
+    @Path("clusters/{clusterName}/nodes/{node}")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response addNode(
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
+    ) {
 		UUID uuid = luceneManager.addNode(clusterName, node);
 
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).build();
+    }
 
 
-	@GET
-	@Path ("destroyNode")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String destroyNode(@QueryParam ("clusterName") String clusterName, @QueryParam ("node") String node) {
+	@DELETE
+    @Path("clusters/{clusterName}/nodes/{node}")
+    @Produces ( {MediaType.APPLICATION_JSON} )
+    public Response destroyNode(
+            @PathParam("clusterName") String clusterName,
+            @PathParam("node") String node
+    ) {
 		UUID uuid = luceneManager.destroyNode(clusterName, node);
 
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
 }

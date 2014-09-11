@@ -6,28 +6,32 @@
 package org.safehaus.subutai.plugin.oozie.api;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+
+import java.util.UUID;
 
 
 /**
  * @author dilshat
  */
-public interface Oozie extends ApiBase<OozieConfig> {
+public interface Oozie extends ApiBase<OozieClusterConfig> {
 
-    UUID startServer( OozieConfig config );
+    UUID startServer(OozieClusterConfig config);
 
-    UUID stopServer( OozieConfig config );
+    UUID stopServer(OozieClusterConfig config);
 
-    UUID checkServerStatus( OozieConfig config );
+    UUID checkServerStatus(OozieClusterConfig config);
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, OozieConfig config,
-                                                         ProductOperation po );
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment environment, OozieClusterConfig config,
+                                                        ProductOperation po);
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( OozieConfig config );
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(OozieClusterConfig config);
+
+    UUID addNode(String clustername, String lxchostname, String nodetype);
+
+    UUID destroyNode(String clustername, String lxchostname, String nodetype);
 }

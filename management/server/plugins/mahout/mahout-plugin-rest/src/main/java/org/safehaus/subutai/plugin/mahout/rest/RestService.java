@@ -1,125 +1,68 @@
 package org.safehaus.subutai.plugin.mahout.rest;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
-import org.safehaus.subutai.common.protocol.Agent;
+import javax.ws.rs.core.Response;
 
 
-@Path( "mahout" )
-public class RestService {
+public interface RestService {
 
-	private static final String OPERATION_ID = "OPERATION_ID";
+    //list clusters
+    @GET
+    @Path("clusters")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response listClusters();
 
-	private Mahout mahoutManager;
-	private AgentManager agentManager;
+    //view cluster info
+    @GET
+    @Path("clusters/{clusterName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getCluster(@PathParam("clusterName") String clusterName);
 
+    //create cluster
+    @POST
+    @Path("clusters")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response createCluster(@QueryParam("config") String config);
 
-	public void setAgentManager(AgentManager agentManager) {
-		this.agentManager = agentManager;
-	}
+    //destroy cluster
+    @DELETE
+    @Path("clusters/{clusterName}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response destroyCluster(@PathParam("clusterName") String clusterName);
 
+    //start cluster
+    @PUT
+    @Path("clusters/{clusterName}/start")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response startCluster(@PathParam("clusterName") String clusterName);
 
-	public void setMahoutManager(Mahout mahoutManager) {
-		this.mahoutManager = mahoutManager;
-	}
+    //stop cluster
+    @PUT
+    @Path("clusters/{clusterName}/stop")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response stopCluster(@PathParam("clusterName") String clusterName);
 
+    //TODO unused variable nodeType in Mahout-plugin-rest
+    //add node
+    @POST
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodetype}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response addNode(@PathParam("clusterName") String clusterName, @PathParam("lxcHostname") String lxcHostname);
 
-	@GET
-	@Path ("getClusters")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String getClusters() {
+    //TODO unused variable nodeType in Mahout-plugin-rest
+    //destroy node
+    @DELETE
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodetype}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response destroyNode(@PathParam("clusterName") String clusterName,
+                                @PathParam("lxcHostname") String lxcHostname);
 
-		List<MahoutConfig> configs = mahoutManager.getClusters();
-		ArrayList<String> clusterNames = new ArrayList();
-
-		for (MahoutConfig config : configs) {
-			clusterNames.add(config.getClusterName());
-		}
-
-		return JsonUtil.GSON.toJson(clusterNames);
-	}
-
-
-	@GET
-	@Path ("getCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String getCluster(
-			@QueryParam ("clusterName") String clusterName
-	) {
-		MahoutConfig config = mahoutManager.getCluster(clusterName);
-
-		return JsonUtil.GSON.toJson(config);
-	}
-
-
-	@GET
-	@Path ("installCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String installCluster(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("nodes") String nodes
-	) {
-		MahoutConfig config = new MahoutConfig();
-		config.setClusterName(clusterName);
-
-		for (String node : nodes.split(",")) {
-			Agent agent = agentManager.getAgentByHostname(node);
-			config.getNodes().add(agent);
-		}
-
-		UUID uuid = mahoutManager.installCluster(config);
-
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
-
-
-	@GET
-	@Path ("uninstallCluster")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String uninstallCluster(
-			@QueryParam ("clusterName") String clusterName
-	) {
-		UUID uuid = mahoutManager.uninstallCluster(clusterName);
-
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
-
-
-	@GET
-	@Path ("addNode")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String addNode(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("node") String node
-	) {
-		UUID uuid = mahoutManager.addNode(clusterName, node);
-
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
-
-
-	@GET
-	@Path ("destroyNode")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String destroyNode(
-			@QueryParam ("clusterName") String clusterName,
-			@QueryParam ("node") String node
-	) {
-		UUID uuid = mahoutManager.destroyNode(clusterName, node);
-
-		return JsonUtil.toJson(OPERATION_ID, uuid);
-	}
+    //check node status
+    @GET
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response checkNode(@PathParam("clusterName") String clusterName,
+                              @PathParam("lxcHostname") String lxcHostname);
 }

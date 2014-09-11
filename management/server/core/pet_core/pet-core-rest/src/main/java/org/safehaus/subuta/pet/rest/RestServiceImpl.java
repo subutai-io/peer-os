@@ -35,4 +35,10 @@ public class RestServiceImpl implements RestService {
         String hello = petManager.helloPet( name );
         return JsonUtil.toJson( MSG_RESPONSE, hello );
     }
+
+
+    @Override
+    public void somePost() {
+
+    }
 }

@@ -1,11 +1,9 @@
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
-           xmlns:cxf="http://cxf.apache.org/blueprint/core"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cxf="http://cxf.apache.org/blueprint/core"
            xsi:schemaLocation=
                    "http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-                 http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
-                 http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+                 http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
 
     <cxf:bus id="cxfBusTemplateManager">
         <cxf:features>
@@ -14,17 +12,17 @@
     </cxf:bus>
 
     <reference id="templateManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.template.manager.TemplateManager"/>
+               interface="org.safehaus.subutai.core.template.api.TemplateManager"/>
     <reference id="templateRegistry" availability="mandatory"
-               interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
+               interface="org.safehaus.subutai.core.registry.api.TemplateRegistryManager"/>
     <reference id="agentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.agentmanager.AgentManager"/>
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
     <reference id="repoManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.aptrepositorymanager.AptRepositoryManager"/>
+               interface="org.safehaus.subutai.core.apt.api.AptRepositoryManager"/>
     <reference id="commandRunner" availability="mandatory"
-               interface="org.safehaus.subutai.api.commandrunner.CommandRunner"/>
+               interface="org.safehaus.subutai.core.command.api.CommandRunner"/>
 
-    <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.rest.template.manager.RestServiceImpl">
+    <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.core.template.rest.RestServiceImpl">
         <property name="templateManager" ref="templateManager"/>
         <property name="templateRegistry" ref="templateRegistry"/>
         <property name="aptRepoManager" ref="repoManager"/>

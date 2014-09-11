@@ -1,75 +1,95 @@
 package org.safehaus.subutai.plugin.accumulo.rest;
 
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.accumulo.api.Accumulo;
 import org.safehaus.subutai.plugin.accumulo.api.AccumuloClusterConfig;
 import org.safehaus.subutai.plugin.accumulo.api.NodeType;
-import org.safehaus.subutai.common.protocol.Agent;
+
+import javax.ws.rs.core.Response;
+import java.util.*;
 
 
 /**
  * REST implementation of Accumulo API
  */
 
-public class RestServiceImpl implements RestService {
+public class RestServiceImpl implements RestService
+{
 
     private Accumulo accumuloManager;
     private AgentManager agentManager;
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager( final AgentManager agentManager )
+    {
         this.agentManager = agentManager;
     }
 
 
-    public void setAccumuloManager( final Accumulo accumuloManager ) {
+    public void setAccumuloManager( final Accumulo accumuloManager )
+    {
         this.accumuloManager = accumuloManager;
     }
 
 
     @Override
-    public String listClusters() {
-        return JsonUtil.toJson( accumuloManager.getClusters() );
+    public Response listClusters()
+    {
+        List<AccumuloClusterConfig> configs = accumuloManager.getClusters();
+        List<String> clusterNames = new ArrayList<>();
+        for ( AccumuloClusterConfig config : configs )
+        {
+            clusterNames.add( config.getClusterName() );
+        }
+        String clusters = JsonUtil.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
-        return JsonUtil.toJson( accumuloManager.getCluster( source ) );
+    public Response getCluster(final String clusterName)
+    {
+        String cluster = JsonUtil.toJson(accumuloManager.getCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
-        return wrapUUID( accumuloManager.uninstallCluster( clusterName ) );
+    public Response destroyCluster(final String clusterName)
+    {
+        String operationId = wrapUUID(accumuloManager.uninstallCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
-    private String wrapUUID( UUID uuid ) {
+    private String wrapUUID( UUID uuid )
+    {
         return JsonUtil.toJson( "OPERATION_ID", uuid );
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
-        return wrapUUID( accumuloManager.startCluster( clusterName ) );
+    public Response startCluster(final String clusterName)
+    {
+        String operationId = wrapUUID(accumuloManager.startCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
-        return wrapUUID( accumuloManager.stopCluster( clusterName ) );
+    public Response stopCluster(final String clusterName)
+    {
+        String operationId = wrapUUID(accumuloManager.stopCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public Response createCluster(final String config)
+    {
         TrimmedAccumuloConfig trimmedAccumuloConfig = JsonUtil.fromJson( config, TrimmedAccumuloConfig.class );
         AccumuloClusterConfig expandedConfig = new AccumuloClusterConfig();
         expandedConfig.setClusterName( trimmedAccumuloConfig.getClusterName() );
@@ -81,38 +101,47 @@ public class RestServiceImpl implements RestService {
 
         Set<Agent> tracers = new HashSet<>();
         Set<Agent> slaves = new HashSet<>();
-        for ( String tracer : trimmedAccumuloConfig.getTracers() ) {
+        for ( String tracer : trimmedAccumuloConfig.getTracers() )
+        {
             tracers.add( agentManager.getAgentByHostname( tracer ) );
         }
-        for ( String slave : trimmedAccumuloConfig.getSlaves() ) {
+        for ( String slave : trimmedAccumuloConfig.getSlaves() )
+        {
             slaves.add( agentManager.getAgentByHostname( slave ) );
         }
 
         expandedConfig.setTracers( tracers );
         expandedConfig.setSlaves( slaves );
 
-        return wrapUUID( accumuloManager.installCluster( expandedConfig ) );
+        String operationId = wrapUUID(accumuloManager.installCluster(expandedConfig));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        NodeType accumuloNodeType = NodeType.valueOf( nodetype.toUpperCase() );
+    public Response addNode(final String clusterName, final String lxcHostname, final String nodeType)
+    {
+        NodeType accumuloNodeType = NodeType.valueOf(nodeType.toUpperCase());
 
-        return wrapUUID( accumuloManager.addNode( clustername, lxchostname, accumuloNodeType ) );
+        String operationId = wrapUUID(accumuloManager.addNode(clusterName, lxcHostname, accumuloNodeType));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        NodeType accumuloNodeType = NodeType.valueOf( nodetype.toUpperCase() );
+    public Response destroyNode(final String clusterName, final String lxcHostname, final String nodeType)
+    {
+        NodeType accumuloNodeType = NodeType.valueOf(nodeType.toUpperCase());
 
-        return wrapUUID( accumuloManager.destroyNode( clustername, lxchostname, accumuloNodeType ) );
+        String operationId = wrapUUID(accumuloManager.destroyNode(clusterName, lxcHostname, accumuloNodeType));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( accumuloManager.checkNode( clusterName, lxchostname ) );
+    public Response checkNode(final String clusterName, final String lxcHostname)
+    {
+        String operationId = wrapUUID(accumuloManager.checkNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 }

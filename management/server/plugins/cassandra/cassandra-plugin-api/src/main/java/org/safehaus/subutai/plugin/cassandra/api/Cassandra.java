@@ -1,34 +1,40 @@
 package org.safehaus.subutai.plugin.cassandra.api;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.api.manager.helper.Environment;
 import org.safehaus.subutai.common.protocol.ApiBase;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
-import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+
+import java.util.UUID;
 
 
 /**
  * @author dilshat
  */
-public interface Cassandra extends ApiBase<CassandraConfig> {
+public interface Cassandra extends ApiBase<CassandraClusterConfig> {
 
-    UUID startAllNodes( String clusterName );
+    UUID startCluster(String clusterName);
 
-    UUID checkAllNodes( String clusterName );
+    UUID checkCluster(String clusterName);
 
-    UUID stopAllNodes( String clusterName );
+    UUID stopCluster(String clusterName);
 
-    UUID startCassandraService( String clusterName, String agentUUID );
+    UUID startService(String clusterName, String agentUUID);
 
-    UUID stopCassandraService( String clusterName, String agentUUID );
+    UUID stopService(String clusterName, String agentUUID);
 
-    UUID statusCassandraService( String clusterName, String agentUUID );
+    UUID statusService(String clusterName, String agentUUID);
 
-    public ClusterSetupStrategy getClusterSetupStrategy( Environment environment, CassandraConfig config,
-                                                         ProductOperation po );
+    UUID addNode(String clusterName, String lxchostname, String nodetype);
 
-    public EnvironmentBlueprint getDefaultEnvironmentBlueprint( CassandraConfig config );
+    UUID destroyNode(String clusterName, String lxchostname, String nodetype);
+
+    UUID checkNode(String clustername, String lxchostname);
+
+    public ClusterSetupStrategy getClusterSetupStrategy(Environment environment, CassandraClusterConfig config,
+                                                        ProductOperation po);
+
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(CassandraClusterConfig config);
 }

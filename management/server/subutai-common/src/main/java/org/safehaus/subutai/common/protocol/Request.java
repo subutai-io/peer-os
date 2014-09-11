@@ -1,15 +1,16 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import org.safehaus.subutai.common.enums.OutputRedirection;
-import org.safehaus.subutai.common.enums.RequestType;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.enums.OutputRedirection;
+import org.safehaus.subutai.common.enums.RequestType;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class Request implements Serializable

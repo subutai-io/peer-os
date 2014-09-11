@@ -5,148 +5,155 @@
  */
 package org.safehaus.subutai.server.ui.component;
 
-import com.google.common.base.Strings;
-import com.vaadin.server.Sizeable;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.common.tracker.ProductOperationState;
-import org.safehaus.subutai.common.tracker.ProductOperationView;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+
+import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+
+import com.google.common.base.Strings;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+
 
 /**
  * @author dilshat
  */
 public class ProgressWindow {
-	private Window window;
-	private TextArea outputTxtArea;
-	private Button ok;
-	private Label indicator;
-	private UUID trackID;
-	private Tracker tracker;
-	private String source;
-	private VerticalLayout l = new VerticalLayout();
-	private volatile boolean track = true;
-	private ExecutorService executor;
+    private Window window;
+    private TextArea outputTxtArea;
+    private Button ok;
+    private Label indicator;
+    private UUID trackID;
+    private Tracker tracker;
+    private String source;
+    private volatile boolean track = true;
+    private ExecutorService executor;
 
-	public ProgressWindow(ExecutorService executor, Tracker tracker, UUID trackID, String source) {
 
-		window = new Window("Operation progress", l);
-		window.setImmediate(true);
-		window.setModal(true);
-		window.setWidth(650, Sizeable.Unit.PIXELS);
+    public ProgressWindow( ExecutorService executor, Tracker tracker, UUID trackID, String source ) {
 
-		this.trackID = trackID;
-		this.tracker = tracker;
-		this.source = source;
-		this.executor = executor;
+        final VerticalLayout l = new VerticalLayout();
+        window = new Window( "Operation progress", l );
+        window.setImmediate( true );
+        window.setModal( true );
+        window.setWidth( 650, Sizeable.Unit.PIXELS );
 
-		GridLayout content = new GridLayout(1, 2);
-		content.setSizeFull();
-		content.setMargin(true);
-		content.setSpacing(true);
+        this.trackID = trackID;
+        this.tracker = tracker;
+        this.source = source;
+        this.executor = executor;
 
-		outputTxtArea = new TextArea("Operation output");
-		outputTxtArea.setRows(13);
-		outputTxtArea.setColumns(42);
-		outputTxtArea.setImmediate(true);
-		outputTxtArea.setWordwrap(true);
+        GridLayout content = new GridLayout( 1, 2 );
+        content.setSizeFull();
+        content.setMargin( true );
+        content.setSpacing( true );
 
-		content.addComponent(outputTxtArea);
+        outputTxtArea = new TextArea( "Operation output" );
+        outputTxtArea.setRows( 13 );
+        outputTxtArea.setColumns( 42 );
+        outputTxtArea.setImmediate( true );
+        outputTxtArea.setWordwrap( true );
 
-		ok = new Button("Ok");
-		ok.setStyleName("default");
-		ok.addClickListener(new Button.ClickListener() {
-			@Override
-			public void buttonClick(Button.ClickEvent clickEvent) {
-				//close window
-				track = false;
-				window.close();
-			}
-		});
+        content.addComponent( outputTxtArea );
 
-		indicator = new Label();
-		indicator.setIcon(new ThemeResource("img/spinner.gif"));
-		indicator.setContentMode(ContentMode.HTML);
-		indicator.setHeight(11, Sizeable.Unit.PIXELS);
-		indicator.setWidth(50, Sizeable.Unit.PIXELS);
-		indicator.setVisible(false);
+        ok = new Button( "Ok" );
+        ok.setStyleName( "default" );
+        ok.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                //close window
+                track = false;
+                window.close();
+            }
+        } );
 
-		HorizontalLayout bottomContent = new HorizontalLayout();
-		bottomContent.addComponent(indicator);
-		bottomContent.setComponentAlignment(indicator, Alignment.MIDDLE_RIGHT);
-		bottomContent.addComponent(ok);
+        indicator = new Label();
+        indicator.setIcon( new ThemeResource( "img/spinner.gif" ) );
+        indicator.setContentMode( ContentMode.HTML );
+        indicator.setHeight( 11, Sizeable.Unit.PIXELS );
+        indicator.setWidth( 50, Sizeable.Unit.PIXELS );
+        indicator.setVisible( false );
 
-		content.addComponent(bottomContent);
-		content.setComponentAlignment(bottomContent, Alignment.MIDDLE_RIGHT);
+        HorizontalLayout bottomContent = new HorizontalLayout();
+        bottomContent.addComponent( indicator );
+        bottomContent.setComponentAlignment( indicator, Alignment.MIDDLE_RIGHT );
+        bottomContent.addComponent( ok );
 
-		l.addComponent(content);
-		start();
-	}
+        content.addComponent( bottomContent );
+        content.setComponentAlignment( bottomContent, Alignment.MIDDLE_RIGHT );
 
-	private void start() {
+        l.addComponent( content );
+        start();
+    }
 
-		showProgress();
-		executor.execute(new Runnable() {
 
-			public void run() {
-				while (track) {
-					ProductOperationView po = tracker.getProductOperation(source, trackID);
-					if (po != null) {
-						try {
-							VaadinSession.getCurrent().getLockInstance().lock();
-							setOutput(po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog());
-						} finally {
-							VaadinSession.getCurrent().getLockInstance().unlock();
-						}
+    private synchronized void start() {
 
-						if (po.getState() == ProductOperationState.SUCCEEDED ||
-								po.getState() == ProductOperationState.FAILED) {
-							hideProgress();
-							break;
-						}
-					} else {
-						try {
-							VaadinSession.getCurrent().getLockInstance().lock();
-							setOutput("Product operation not found. Check logs");
-						} finally {
-							VaadinSession.getCurrent().getLockInstance().unlock();
-						}
+        showProgress();
+        executor.execute( new Runnable() {
 
-						break;
-					}
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException ex) {
-						break;
-					}
-				}
-			}
-		});
-	}
+            public void run() {
+                while ( track ) {
+                    ProductOperationView po = tracker.getProductOperation( source, trackID );
+                    if ( po != null ) {
+                        setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
 
-	private void showProgress() {
-		indicator.setVisible(true);
-		ok.setEnabled(false);
-	}
+                        if ( po.getState() == ProductOperationState.SUCCEEDED
+                                || po.getState() == ProductOperationState.FAILED ) {
+                            hideProgress();
+                            break;
+                        }
+                    }
+                    else {
+                        setOutput( "Product operation not found. Check logs" );
 
-	private void setOutput(String output) {
-		if (!Strings.isNullOrEmpty(output)) {
-			outputTxtArea.setValue(output);
-			outputTxtArea.setCursorPosition(outputTxtArea.getValue().toString().length() - 1);
-		}
-	}
+                        break;
+                    }
+                    try {
+                        Thread.sleep( 1000 );
+                    }
+                    catch ( InterruptedException ex ) {
+                        break;
+                    }
+                }
+            }
+        } );
+    }
 
-	private void hideProgress() {
-		indicator.setVisible(false);
-		ok.setEnabled(true);
-	}
 
-	public Window getWindow() {
-		return window;
-	}
+    private void showProgress() {
+        indicator.setVisible( true );
+        ok.setEnabled( false );
+    }
+
+
+    private void setOutput( String output ) {
+        if ( !Strings.isNullOrEmpty( output ) ) {
+            outputTxtArea.setValue( output );
+            outputTxtArea.setCursorPosition( outputTxtArea.getValue().length() - 1 );
+        }
+    }
+
+
+    private void hideProgress() {
+        indicator.setVisible( false );
+        ok.setEnabled( true );
+    }
+
+
+    public Window getWindow() {
+        return window;
+    }
 }

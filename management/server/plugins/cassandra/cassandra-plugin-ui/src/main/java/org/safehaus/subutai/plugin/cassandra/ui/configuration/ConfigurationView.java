@@ -17,19 +17,18 @@ public class ConfigurationView extends VerticalLayout {
             @Override
             public void buttonClick( final Button.ClickEvent clickEvent ) {
                 Object[] o = getClusters();
-                clustersTable.refreshData(o);
-
+                clustersTable.refreshData( o );
             }
         } );
         addComponent( viewClustersButton );
         addComponent( clustersTable );
     }
 
+
     private Object[] getClusters() {
-        Object[] o = {"Environment1", new Button("Configure"),
-        "Environment2", new Button("Configure")};
+        Object[] o = {
+                "Environment1", new Button( "Configure" ), "Environment2", new Button( "Configure" )
+        };
         return o;
     }
-
-
 }

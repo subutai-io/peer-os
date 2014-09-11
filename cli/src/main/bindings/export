@@ -101,7 +101,9 @@ function export {
   #     'pool/parent-partition@child' -> 'pool/child-partition@template'
   # ----------------------------------------------------------------------------
 
-  debian_root="$SUBUTAI_TMPDIR/$container"
+  debian_package_name=`get_debian_package_name $container`
+  debian_dir=$SUBUTAI_TMPDIR/$debian_package_name
+  debian_root="$debian_dir$SUBUTAI_TMPDIR/$container"
   deltas="$debian_root/deltas"
   mkdir -p $deltas
   zfs send -I "lxc/$parent@template" "lxc/$container@template" > "$deltas/rootfs.delta"
@@ -113,6 +115,17 @@ function export {
   # ----------------------------------------------------------------------------
   # (3) generate the debian file from deltas, and package info
   # ----------------------------------------------------------------------------
+  
+  # insert subutai.template.package info inside containers config file
+  conf="/var/lib/lxc/$container/config"
+  propline="`cat $conf | grep subutai.template.package`"
+
+  if [ -z "$propline" ]; then
+    echo "subutai.template.package = $debian_dir.deb" >> /var/lib/lxc/$container/config
+    debian_file=$debian_dir".deb"
+  else
+    debian_file=`echo $propline | awk '{print $3}'`
+  fi
 
   cp /var/lib/lxc/$container/config $debian_root
   cp /var/lib/lxc/$container/fstab  $debian_root
@@ -121,8 +134,8 @@ function export {
   pkg=`deb_pkg $container`
   check_status "debian package $pkg generated" "$?"
   
-  # Remove debian root directory after debian package generation
-  rm -rf $debian_root
+  # Remove debian directory after debian package generation
+  rm -rf $debian_dir
   unlock_container_write $container
   if [ $? != 0 ]; then msg_error "Container(s) cannot be unlocked!"; exit 1; fi
 }

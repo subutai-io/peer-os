@@ -1,15 +1,14 @@
 package org.safehaus.subutai.plugin.zookeeper.rest;
 
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import org.safehaus.subutai.api.agentmanager.AgentManager;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.zookeeper.api.Zookeeper;
 import org.safehaus.subutai.plugin.zookeeper.api.ZookeeperClusterConfig;
-import org.safehaus.subutai.common.protocol.Agent;
+
+import javax.ws.rs.core.Response;
+import java.util.*;
 
 
 /**
@@ -18,97 +17,108 @@ import org.safehaus.subutai.common.protocol.Agent;
 
 public class RestServiceImpl implements RestService {
 
-
     private Zookeeper zookeeperManager;
     private AgentManager agentManager;
 
 
-    public void setAgentManager( final AgentManager agentManager ) {
+    public void setAgentManager(final AgentManager agentManager) {
         this.agentManager = agentManager;
     }
 
 
-    public void setZookeeperManager( Zookeeper zookeeperManager ) {
+    public void setZookeeperManager(Zookeeper zookeeperManager) {
         this.zookeeperManager = zookeeperManager;
     }
 
 
     @Override
-    public String listClusters() {
-        return JsonUtil.toJson( zookeeperManager.getClusters() );
+    public Response listClusters() {
+        List<ZookeeperClusterConfig> configs = zookeeperManager.getClusters();
+        List<String> clusterNames = new ArrayList<>();
+        for (ZookeeperClusterConfig config : configs) {
+            clusterNames.add(config.getClusterName());
+        }
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(clusterNames)).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
-        return JsonUtil.toJson( zookeeperManager.getCluster( source ) );
+    public Response getCluster(final String source) {
+        String clusters = JsonUtil.toJson(zookeeperManager.getCluster(source));
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
     @Override
-    public String createCluster( String config ) {
-        TrimmedZKConfig trimmedZKConfig = JsonUtil.fromJson( config, TrimmedZKConfig.class );
+    public Response createCluster(String config) {
+        TrimmedZKConfig trimmedZKConfig = JsonUtil.fromJson(config, TrimmedZKConfig.class);
         ZookeeperClusterConfig expandedConfig = new ZookeeperClusterConfig();
 
-        expandedConfig.setClusterName( trimmedZKConfig.getClusterName() );
-        expandedConfig.setNumberOfNodes( trimmedZKConfig.getNumberOfNodes() );
-        expandedConfig.setSetupType( trimmedZKConfig.getSetupType() );
-        if ( trimmedZKConfig.getNodes() != null && !trimmedZKConfig.getNodes().isEmpty() ) {
+        expandedConfig.setClusterName(trimmedZKConfig.getClusterName());
+        expandedConfig.setNumberOfNodes(trimmedZKConfig.getNumberOfNodes());
+        expandedConfig.setSetupType(trimmedZKConfig.getSetupType());
+        if (trimmedZKConfig.getNodes() != null && !trimmedZKConfig.getNodes().isEmpty()) {
             Set<Agent> nodes = new HashSet<>();
-            for ( String node : trimmedZKConfig.getNodes() ) {
-                nodes.add( agentManager.getAgentByHostname( node ) );
+            for (String node : trimmedZKConfig.getNodes()) {
+                nodes.add(agentManager.getAgentByHostname(node));
             }
-            expandedConfig.setNodes( nodes );
+            expandedConfig.setNodes(nodes);
         }
-
-
-        return wrapUUID( zookeeperManager.installCluster( expandedConfig ) );
+        String operationId = wrapUUID(zookeeperManager.installCluster(expandedConfig));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
-    private String wrapUUID( UUID uuid ) {
-        return JsonUtil.toJson( "OPERATION_ID", uuid );
-    }
-
-
-    @Override
-    public String destroyCluster( String clusterName ) {
-        return wrapUUID( zookeeperManager.uninstallCluster( clusterName ) );
+    private String wrapUUID(UUID uuid) {
+        return JsonUtil.toJson("OPERATION_ID", uuid);
     }
 
 
     @Override
-    public String startNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( zookeeperManager.startNode( clusterName, lxchostname ) );
+    public Response destroyCluster(String clusterName) {
+        String operationId = wrapUUID(zookeeperManager.uninstallCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( zookeeperManager.stopNode( clusterName, lxchostname ) );
+    public Response startNode(final String clusterName, final String lxcHostname) {
+        String operationId = wrapUUID(zookeeperManager.startNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( zookeeperManager.destroyNode( clusterName, lxchostname ) );
+    public Response stopNode(final String clusterName, final String lxcHostname) {
+        String operationId = wrapUUID(zookeeperManager.stopNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( zookeeperManager.checkNode( clusterName, lxchostname ) );
+    public Response destroyNode(final String clusterName, final String lxcHostname) {
+        String operationId = wrapUUID(zookeeperManager.destroyNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clusterName, final String lxchostname ) {
-        return wrapUUID( zookeeperManager.addNode( clusterName, lxchostname ) );
+    public Response checkNode(final String clusterName, final String lxcHostname) {
+        String operationId = wrapUUID(zookeeperManager.checkNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNodeStandalone( final String clusterName ) {
-        return wrapUUID( zookeeperManager.addNode( clusterName ) );
+    public Response addNode(final String clusterName, final String lxcHostname) {
+        String operationId = wrapUUID(zookeeperManager.addNode(clusterName, lxcHostname));
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
+
+
+    @Override
+    public Response addNodeStandalone(final String clusterName) {
+        String operationId = wrapUUID(zookeeperManager.addNode(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 }

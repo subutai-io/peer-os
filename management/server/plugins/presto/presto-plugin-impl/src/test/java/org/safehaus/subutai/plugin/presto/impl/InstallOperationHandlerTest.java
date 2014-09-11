@@ -1,21 +1,19 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.presto.api.PrestoClusterConfig;
+import org.safehaus.subutai.plugin.presto.api.SetupType;
 import org.safehaus.subutai.plugin.presto.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.presto.impl.mock.PrestoImplMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 public class InstallOperationHandlerTest {
 
@@ -36,6 +34,7 @@ public class InstallOperationHandlerTest {
     @Test
     public void testWithInvalidConfig() {
         PrestoClusterConfig config = new PrestoClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName( "test" );
         handler = new InstallOperationHandler( mock, config );
         handler.run();
@@ -48,8 +47,9 @@ public class InstallOperationHandlerTest {
     @Test
     public void testWithExistingCluster() {
         PrestoClusterConfig config = new PrestoClusterConfig();
+        config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName( "test-cluster" );
-        config.setWorkers( new HashSet<Agent>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
+        config.setWorkers( new HashSet<>( Arrays.asList( CommonMockBuilder.createAgent() ) ) );
         config.setCoordinatorNode( CommonMockBuilder.createAgent() );
 
         mock.setClusterConfig( config );

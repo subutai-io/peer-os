@@ -1,10 +1,8 @@
 package org.safehaus.subutai.plugin.elasticsearch.impl;
 
-import org.safehaus.subutai.api.commandrunner.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.plugin.elasticsearch.api.Config;
 import org.safehaus.subutai.common.exception.*;
-import org.safehaus.subutai.common.protocol.*;
-import org.safehaus.subutai.common.settings.*;
 import org.safehaus.subutai.common.tracker.*;
 
 

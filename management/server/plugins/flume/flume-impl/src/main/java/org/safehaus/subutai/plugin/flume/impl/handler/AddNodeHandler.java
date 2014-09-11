@@ -1,8 +1,11 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
 import java.util.*;
-import org.safehaus.subutai.api.commandrunner.*;
-import org.safehaus.subutai.api.dbmanager.DBException;
+
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.impl.CommandType;
 import org.safehaus.subutai.plugin.flume.impl.Commands;

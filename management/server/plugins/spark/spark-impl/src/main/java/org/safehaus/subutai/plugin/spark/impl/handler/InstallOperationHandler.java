@@ -1,216 +1,97 @@
 package org.safehaus.subutai.plugin.spark.impl.handler;
 
-
-import com.google.common.base.Strings;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandCallback;
-import org.safehaus.subutai.common.util.CollectionUtil;
-import org.safehaus.subutai.common.util.StringUtil;
-import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
-import org.safehaus.subutai.plugin.spark.impl.Commands;
-import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
+import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
+import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.core.environment.api.helper.Node;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
+import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
+import org.safehaus.subutai.plugin.spark.impl.SparkImpl;
 
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
+public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl> {
 
-/**
- * Created by dilshat on 5/7/14.
- */
-public class InstallOperationHandler extends AbstractOperationHandler<SparkImpl>
-{
-    private final ProductOperation po;
     private final SparkClusterConfig config;
+    private HadoopClusterConfig hadoopConfig;
 
-
-    public InstallOperationHandler( SparkImpl manager, SparkClusterConfig config )
-    {
-        super( manager, config.getClusterName() );
+    public InstallOperationHandler(SparkImpl manager, SparkClusterConfig config) {
+        super(manager, config.getClusterName());
         this.config = config;
-        po = manager.getTracker().createProductOperation( SparkClusterConfig.PRODUCT_KEY,
-            String.format( "Installing %s", SparkClusterConfig.PRODUCT_KEY ) );
+        productOperation = manager.getTracker().createProductOperation(SparkClusterConfig.PRODUCT_KEY,
+                String.format("Installing %s", SparkClusterConfig.PRODUCT_KEY));
     }
 
+    public void setHadoopConfig(HadoopClusterConfig hadoopConfig) {
+        this.hadoopConfig = hadoopConfig;
+    }
 
     @Override
-    public UUID getTrackerId()
-    {
-        return po.getId();
+    public void run() {
+        ProductOperation po = productOperation;
+        Environment env = null;
+        if (config.getSetupType() == SetupType.WITH_HADOOP) {
+
+            if (hadoopConfig == null) {
+                po.addLogFailed("No Hadoop configuration specified");
+                return;
+            }
+
+            po.addLog("Preparing environment...");
+            hadoopConfig.setTemplateName(SparkClusterConfig.TEMPLATE_NAME);
+            try {
+                EnvironmentBuildTask eb = manager.getHadoopManager()
+                        .getDefaultEnvironmentBlueprint(hadoopConfig);
+                env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
+            } catch (ClusterSetupException ex) {
+                po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
+                destroyNodes(env);
+                return;
+            } catch (EnvironmentBuildException ex) {
+                po.addLogFailed("Failed to build environment: " + ex.getMessage());
+                destroyNodes(env);
+                return;
+            }
+            po.addLog("Environment preparation completed");
+        }
+
+        ClusterSetupStrategy s = manager.getClusterSetupStrategy(po, config, env);
+        try {
+            if (s == null) throw new ClusterSetupException("No setup strategy");
+
+            po.addLog("Installing cluster...");
+            s.setup();
+            po.addLogDone("Installing cluster completed");
+
+        } catch (ClusterSetupException ex) {
+            po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
+            destroyNodes(env);
+        }
+
     }
 
+    void destroyNodes(Environment env) {
 
-    @Override
-    public void run()
-    {
-        if ( Strings.isNullOrEmpty( config.getClusterName() ) || CollectionUtil
-            .isCollectionEmpty( config.getSlaveNodes() ) || config.getMasterNode() == null )
-        {
-            po.addLogFailed( "Malformed configuration\nInstallation aborted" );
-            return;
-        }
+        if (env == null || env.getNodes().isEmpty()) return;
 
-        if ( manager.getCluster( config.getClusterName() ) != null )
-        {
-            po.addLogFailed( String
-                .format( "Cluster with name '%s' already exists\nInstallation aborted", config.getClusterName() ) );
-            return;
-        }
+        Set<Agent> set = new HashSet<>(env.getNodes().size());
+        for (Node n : env.getNodes()) set.add(n.getAgent());
 
-        if ( manager.getAgentManager().getAgentByHostname( config.getMasterNode().getHostname() ) == null )
-        {
-            po.addLogFailed( "Master node is not connected\nInstallation aborted" );
-            return;
-        }
-
-        //check if node agent is connected
-        for ( Iterator<Agent> it = config.getSlaveNodes().iterator(); it.hasNext(); )
-        {
-            Agent node = it.next();
-            if ( manager.getAgentManager().getAgentByHostname( node.getHostname() ) == null )
-            {
-                po.addLog( String
-                    .format( "Node %s is not connected. Omitting this node from installation", node.getHostname() ) );
-                it.remove();
-            }
-        }
-
-        if ( config.getSlaveNodes().isEmpty() )
-        {
-            po.addLogFailed( "No nodes eligible for installation\nInstallation aborted" );
-            return;
-        }
-
-        po.addLog( "Checking prerequisites..." );
-
-        //check installed ksks packages
-        Set<Agent> allNodes = config.getAllNodes();
-        Command checkInstalledCommand = Commands.getCheckInstalledCommand( allNodes );
-        manager.getCommandRunner().runCommand( checkInstalledCommand );
-
-        if ( !checkInstalledCommand.hasCompleted() )
-        {
-            po.addLogFailed( "Failed to check presence of installed ksks packages\nInstallation aborted" );
-            return;
-        }
-        for ( Iterator<Agent> it = allNodes.iterator(); it.hasNext(); )
-        {
-            Agent node = it.next();
-
-            AgentResult result = checkInstalledCommand.getResults().get( node.getUuid() );
-            if ( result.getStdOut().contains( "ksks-spark" ) )
-            {
-                po.addLog( String.format( "Node %s already has Spark installed. Omitting this node from installation",
-                    node.getHostname() ) );
-                config.getSlaveNodes().remove( node );
-                it.remove();
-            }
-            else if ( !result.getStdOut().contains( "ksks-hadoop" ) )
-            {
-                po.addLog( String.format( "Node %s has no Hadoop installation. Omitting this node from installation",
-                    node.getHostname() ) );
-                config.getSlaveNodes().remove( node );
-                it.remove();
-            }
-        }
-
-        if ( config.getSlaveNodes().isEmpty() )
-        {
-            po.addLogFailed( "No nodes eligible for installation\nInstallation aborted" );
-            return;
-        }
-        if ( !allNodes.contains( config.getMasterNode() ) )
-        {
-            po.addLogFailed( "Master node was omitted\nInstallation aborted" );
-            return;
-        }
-
-        po.addLog( "Updating db..." );
-        //save to db
-        if ( manager.getDbManager().saveInfo( SparkClusterConfig.PRODUCT_KEY, config.getClusterName(), config ) )
-        {
-            po.addLog( "Cluster info saved to DB\nInstalling Spark..." );
-            //install spark
-            Command installCommand = Commands.getInstallCommand( config.getAllNodes() );
-            manager.getCommandRunner().runCommand( installCommand );
-
-            if ( installCommand.hasSucceeded() )
-            {
-                po.addLog( "Installation succeeded\nSetting master IP..." );
-
-                Command setMasterIPCommand = Commands
-                    .getSetMasterIPCommand( config.getMasterNode(), config.getAllNodes() );
-                manager.getCommandRunner().runCommand( setMasterIPCommand );
-
-                if ( setMasterIPCommand.hasSucceeded() )
-                {
-                    po.addLog( "Setting master IP succeeded\nRegistering slaves..." );
-
-                    Command addSlavesCommand = Commands
-                        .getAddSlavesCommand( config.getSlaveNodes(), config.getMasterNode() );
-                    manager.getCommandRunner().runCommand( addSlavesCommand );
-
-                    if ( addSlavesCommand.hasSucceeded() )
-                    {
-                        po.addLog( "Slaves successfully registered\nStarting cluster..." );
-
-                        Command startNodesCommand = Commands.getStartAllCommand( config.getMasterNode() );
-                        final AtomicInteger okCount = new AtomicInteger( 0 );
-                        manager.getCommandRunner().runCommand( startNodesCommand, new CommandCallback()
-                        {
-
-                            @Override
-                            public void onResponse( Response response, AgentResult agentResult, Command command )
-                            {
-                                okCount
-                                    .set( StringUtil.countNumberOfOccurences( agentResult.getStdOut(), "starting" ) );
-
-                                if ( okCount.get() >= config.getAllNodes().size() )
-                                {
-                                    stop();
-                                }
-                            }
-
-                        } );
-
-                        if ( okCount.get() >= config.getAllNodes().size() )
-                        {
-                            po.addLogDone( "cluster started successfully\nDone" );
-                        }
-                        else
-                        {
-                            po.addLogFailed(
-                                String.format( "Failed to start cluster, %s", startNodesCommand.getAllErrors() ) );
-                        }
-
-                    }
-                    else
-                    {
-                        po.addLogFailed( String
-                            .format( "Failed to register slaves with master, %s", addSlavesCommand.getAllErrors() ) );
-                    }
-                }
-                else
-                {
-                    po.addLogFailed(
-                        String.format( "Setting master IP failed, %s", setMasterIPCommand.getAllErrors() ) );
-                }
-
-            }
-            else
-            {
-                po.addLogFailed( String.format( "Installation failed, %s", installCommand.getAllErrors() ) );
-            }
-        }
-        else
-        {
-            po.addLogFailed( "Could not save cluster info to DB! Please see logs\nInstallation aborted" );
+        productOperation.addLog("Destroying node(s)...");
+        try {
+            manager.getContainerManager().clonesDestroy(set);
+            productOperation.addLog("Destroying node(s) completed");
+        } catch (LxcDestroyException ex) {
+            productOperation.addLog("Failed to destroy node(s): " + ex.getMessage());
         }
     }
+
 }

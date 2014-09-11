@@ -1,9 +1,11 @@
 package org.safehaus.subutai.plugin.hbase.cli;
 
+
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hbase.api.HBase;
+
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.safehaus.subutai.plugin.hbase.api.HBase;
-import org.safehaus.subutai.api.tracker.Tracker;
 
 
 /**
@@ -15,37 +17,42 @@ public class InstallHBaseClusterCommand extends OsgiCommandSupport {
     private Tracker tracker;
     private HBase hbaseManager;
 
+
     public Tracker getTracker() {
         return tracker;
     }
 
-    public void setTracker(Tracker tracker) {
+
+    public void setTracker( Tracker tracker ) {
         this.tracker = tracker;
     }
+
 
     public HBase getHbaseManager() {
         return hbaseManager;
     }
 
-    public void setHbaseManager(HBase hbaseManager) {
+
+    public void setHbaseManager( HBase hbaseManager ) {
         this.hbaseManager = hbaseManager;
     }
 
+
     protected Object doExecute() {
 
-//        List<Config> configs = hbaseManager.getClusters();
-//        Config config = new Config();
-//        config.setClusterName(clusterName);
-//        config.set
-//        hbaseManager.installCluster()
-//        StringBuilder sb = new StringBuilder();
-//
-//        for(Config config : configs) {
-//            sb.append(config.getClusterName()).append("\n");
-//        }
-//
-//        System.out.println(sb.toString());
-        System.out.println("install");
+        //        List<Config> configs = hbaseManager.getClusters();
+        //        Config config = new Config();
+        //        config.setClusterName(clusterName);
+        //        config.set
+        //        hbaseManager.installCluster()
+        //        StringBuilder sb = new StringBuilder();
+        //
+        //        for(Config config : configs) {
+        //            sb.append(config.getClusterName()).append("\n");
+        //        }
+        //
+        //        System.out.println(sb.toString());
+        System.out.println( "install" );
         return null;
     }
 }

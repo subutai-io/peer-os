@@ -32,7 +32,7 @@ public class SolrForm extends CustomComponent {
 		verticalLayout.addComponent(mongoSheet);
 
 		setCompositionRoot(verticalLayout);
-		manager.refreshClustersInfo();
+        manager.refreshClustersInfo();
 	}
 
 }

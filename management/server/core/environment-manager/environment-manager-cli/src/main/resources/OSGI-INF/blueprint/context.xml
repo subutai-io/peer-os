@@ -2,7 +2,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="environment/build">
-            <action class="org.safehaus.subutai.cli.commands.BuildEnvironmentCommand">
+            <action class="org.safehaus.subutai.core.environment.cli.BuildEnvironmentCommand">
                 <property name="environmentManager" ref="environmentManager"/>
             </action>
         </command>
@@ -10,7 +10,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="environment/ls">
-            <action class="org.safehaus.subutai.cli.commands.ListEnvironmentsCommand">
+            <action class="org.safehaus.subutai.core.environment.cli.ListEnvironmentsCommand">
                 <property name="environmentManager" ref="environmentManager"/>
             </action>
         </command>
@@ -18,7 +18,7 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="environment/destroy">
-            <action class="org.safehaus.subutai.cli.commands.DestroyEnvironmentCommand">
+            <action class="org.safehaus.subutai.core.environment.cli.DestroyEnvironmentCommand">
                 <property name="environmentManager" ref="environmentManager"/>
             </action>
         </command>
@@ -26,13 +26,13 @@
 
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
         <command name="environment/describe">
-            <action class="org.safehaus.subutai.cli.commands.DescribeEnvironmentCommand">
+            <action class="org.safehaus.subutai.core.environment.cli.DescribeEnvironmentCommand">
                 <property name="environmentManager" ref="environmentManager"/>
             </action>
         </command>
     </command-bundle>
 
     <reference id="environmentManager" availability="mandatory"
-               interface="org.safehaus.subutai.api.manager.EnvironmentManager"/>
+               interface="org.safehaus.subutai.core.environment.api.EnvironmentManager"/>
 
 </blueprint>

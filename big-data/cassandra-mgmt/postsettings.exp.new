@@ -1,18 +1,18 @@
 #!/usr/bin/expect
 #Updating Default Settgins for base lxc package
-set timeout 600
+set timeout 1500
 
 set ip [lindex $argv 0]
 set user [lindex $argv 1]
 set password [lindex $argv 2]
-
+ 
 sleep 3
 spawn ssh "$user\@$ip"
 sleep 3
 expect "password:"
 sleep 3
 send "$password\r";
-
+sleep 1
 #updating apt-get
 expect "# " { send "apt-get update\r"  }
 sleep 2
@@ -20,7 +20,7 @@ sleep 2
 expect "# " { send "echo \"export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64\" >> /etc/profile\r" }
 sleep 2
 expect "# " { send "apt-get --assume-yes --force-yes install openjdk-7-jre\r" }
-sleep 2
+sleep 5
 #installing cassandra-mgmt package
 expect "# " { send "dpkg -i ksks-cassandra-mgmt-1.0.8-amd64.deb\r" }
 sleep 2
@@ -33,7 +33,6 @@ sleep 3
 expect "# " { send "service cassandra start\r" }
 sleep 5
 #import cassandra keyspace
-
 expect "# " { send "/opt/cassandra-2.0.4/bin/cqlsh\r" }
 sleep 2
 expect "cqlsh> " { send "drop keyspace kiskis;\r" }

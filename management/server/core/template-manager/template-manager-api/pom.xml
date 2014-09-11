@@ -37,7 +37,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.template.manager.api</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.template.api</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

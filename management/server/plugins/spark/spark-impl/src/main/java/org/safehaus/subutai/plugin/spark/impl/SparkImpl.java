@@ -1,151 +1,169 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.spark.impl;
 
 import com.google.common.base.Preconditions;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.dbmanager.DbManager;
-import org.safehaus.subutai.api.tracker.Tracker;
+import org.safehaus.subutai.common.protocol.*;
+import org.safehaus.subutai.common.tracker.ProductOperation;
+import org.safehaus.subutai.core.db.api.DBException;
+import org.safehaus.subutai.core.environment.api.helper.Environment;
+import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.impl.handler.*;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
 
-/**
- * @author dilshat
- */
-public class SparkImpl implements Spark {
+public class SparkImpl extends SparkBase implements Spark {
 
-	private CommandRunner commandRunner;
-	private AgentManager agentManager;
-	private DbManager dbManager;
-	private Tracker tracker;
-	private ExecutorService executor;
+    @Override
+    public UUID installCluster(final SparkClusterConfig config) {
 
-	public SparkImpl(CommandRunner commandRunner, AgentManager agentManager, DbManager dbManager, Tracker tracker) {
-		this.commandRunner = commandRunner;
-		this.agentManager = agentManager;
-		this.dbManager = dbManager;
-		this.tracker = tracker;
+        Preconditions.checkNotNull(config, "Configuration is null");
 
-		Commands.init(commandRunner);
-	}
+        AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
 
-	public CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
+        executor.execute(operationHandler);
 
-	public AgentManager getAgentManager() {
-		return agentManager;
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public DbManager getDbManager() {
-		return dbManager;
-	}
+    @Override
+    public UUID installCluster(SparkClusterConfig config, HadoopClusterConfig hadoopConfig) {
+        InstallOperationHandler h = new InstallOperationHandler(this, config);
+        h.setHadoopConfig(hadoopConfig);
+        executor.execute(h);
+        return h.getTrackerId();
+    }
 
-	public Tracker getTracker() {
-		return tracker;
-	}
+    @Override
+    public UUID uninstallCluster(final String clusterName) {
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+        AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
 
-	public void destroy() {
-		executor.shutdown();
-	}
+        executor.execute(operationHandler);
 
-	public UUID installCluster(final SparkClusterConfig config) {
+        return operationHandler.getTrackerId();
+    }
 
-		Preconditions.checkNotNull(config, "Configuration is null");
+    @Override
+    public List<SparkClusterConfig> getClusters() {
+        try {
+            return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, SparkClusterConfig.class);
+        } catch (DBException e) {
+            return Collections.emptyList();
+        }
+    }
 
-		AbstractOperationHandler operationHandler = new InstallOperationHandler(this, config);
+    @Override
+    public SparkClusterConfig getCluster(String clusterName) {
+        try {
+            return pluginDAO.getInfo(SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class);
+        } catch (DBException e) {
+            return null;
+        }
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler(this, clusterName, lxcHostname);
 
-	public UUID uninstallCluster(final String clusterName) {
+        executor.execute(operationHandler);
 
-		AbstractOperationHandler operationHandler = new UninstallOperationHandler(this, clusterName);
+        return operationHandler.getTrackerId();
+    }
 
-		executor.execute(operationHandler);
+    @Override
+    public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
 
-		return operationHandler.getTrackerId();
-	}
+        AbstractOperationHandler operationHandler
+                = new DestroySlaveNodeOperationHandler(this, clusterName, lxcHostname);
 
-	public List<SparkClusterConfig> getClusters() {
-		return dbManager.getInfo(SparkClusterConfig.PRODUCT_KEY, SparkClusterConfig.class);
-	}
+        executor.execute(operationHandler);
 
-	@Override
-	public SparkClusterConfig getCluster(String clusterName) {
-		return dbManager.getInfo(SparkClusterConfig.PRODUCT_KEY, clusterName, SparkClusterConfig.class);
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID addSlaveNode(final String clusterName, final String lxcHostname) {
+    @Override
+    public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
 
-		AbstractOperationHandler operationHandler = new AddSlaveNodeOperationHandler(this, clusterName, lxcHostname);
+        AbstractOperationHandler operationHandler
+                = new ChangeMasterNodeOperationHandler(this, clusterName, newMasterHostname, keepSlave);
 
-		executor.execute(operationHandler);
+        executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID destroySlaveNode(final String clusterName, final String lxcHostname) {
+    @Override
+    public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
 
-		AbstractOperationHandler operationHandler = new DestroySlaveNodeOperationHandler(this, clusterName, lxcHostname);
+        AbstractOperationHandler operationHandler
+                = new StartNodeOperationHandler(this, clusterName, lxcHostname, master);
 
-		executor.execute(operationHandler);
+        executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID changeMasterNode(final String clusterName, final String newMasterHostname, final boolean keepSlave) {
+    @Override
+    public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
 
-		AbstractOperationHandler operationHandler = new ChangeMasterNodeOperationHandler(this, clusterName, newMasterHostname, keepSlave);
+        AbstractOperationHandler operationHandler
+                = new StopNodeOperationHandler(this, clusterName, lxcHostname, master);
 
-		executor.execute(operationHandler);
+        executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
-	}
+        return operationHandler.getTrackerId();
+    }
 
-	public UUID startNode(final String clusterName, final String lxcHostname, final boolean master) {
+    @Override
+    public UUID checkNode(final String clusterName, final String lxcHostname) {
 
-		AbstractOperationHandler operationHandler = new StartNodeOperationHandler(this, clusterName, lxcHostname, master);
+        AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
 
-		executor.execute(operationHandler);
+        executor.execute(operationHandler);
 
-		return operationHandler.getTrackerId();
+        return operationHandler.getTrackerId();
+    }
 
-	}
+    @Override
+    public EnvironmentBuildTask getDefaultEnvironmentBlueprint(SparkClusterConfig config) {
 
-	public UUID stopNode(final String clusterName, final String lxcHostname, final boolean master) {
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
 
-		AbstractOperationHandler operationHandler = new StopNodeOperationHandler(this, clusterName, lxcHostname, master);
+        EnvironmentBlueprint eb = new EnvironmentBlueprint();
+        eb.setName(SparkClusterConfig.PRODUCT_KEY + UUID.randomUUID());
 
-		executor.execute(operationHandler);
+        NodeGroup ng = new NodeGroup();
+        ng.setName("Default");
+        ng.setNumberOfNodes(1 + config.getSlaveNodesCount()); // master +slaves
+        ng.setTemplateName(SparkClusterConfig.TEMPLATE_NAME);
+        ng.setPlacementStrategy(PlacementStrategy.MORE_RAM);
+        eb.setNodeGroups(new HashSet<>(Arrays.asList(ng)));
 
-		return operationHandler.getTrackerId();
-	}
+        environmentBuildTask.setEnvironmentBlueprint(eb);
 
-	public UUID checkNode(final String clusterName, final String lxcHostname) {
+        return environmentBuildTask;
+    }
 
-		AbstractOperationHandler operationHandler = new CheckNodeOperationHandler(this, clusterName, lxcHostname);
+    @Override
+    public ClusterSetupStrategy getClusterSetupStrategy(final ProductOperation po,
+                                                        final SparkClusterConfig config,
+                                                        final Environment environment) {
 
-		executor.execute(operationHandler);
+        Preconditions.checkNotNull(po, "Product operation is null");
+        Preconditions.checkNotNull(config, "Spark cluster config is null");
 
-		return operationHandler.getTrackerId();
-	}
+        if (config.getSetupType() == SetupType.OVER_HADOOP)
+            return new SetupStrategyOverHadoop(po, this, config);
+        else if (config.getSetupType() == SetupType.WITH_HADOOP) {
+            SetupStrategyWithHadoop s = new SetupStrategyWithHadoop(po, this, config);
+            s.setEnvironment(environment);
+            return s;
+        }
+
+        return null;
+    }
 
 }

@@ -1,48 +1,66 @@
 package org.safehaus.subutai.plugin.cassandra.rest;
 
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
-@Path("cassandra")
 public interface RestService {
-
+    //list clusters
     @GET
-    @Path("install/{clusterName}/{domainName}/{numberOfNodes}/{numberOfSeeds}")
-    @Produces( MediaType.APPLICATION_JSON )
-    public String install( @PathParam("clusterName") String clusterName, @PathParam("domainName") String domainName,
-                           @PathParam("numberOfNodes") String numberOfNodes,
-                           @PathParam("numberOfSeeds") String numberOfSeeds );
+    @Path("clusters")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response listClusters();
 
+    //view cluster info
     @GET
-    @Path("uninstall/{clusterName}")
-    @Produces( MediaType.APPLICATION_JSON )
-    public String uninstall( @PathParam("clusterName") String clusterName );
+    @Path("clusters/{clusterName}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getCluster(@PathParam("clusterName") String source);
 
-    //    @POST
-    //    @Path("install_from_json")
-    //    @Consumes(MediaType.APPLICATION_JSON)
-    //    public Response installFromJson( final String json );
+    //create cluster
+    @POST
+    @Path("clusters")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response createCluster(@QueryParam("config") String config);
 
+    //destroy cluster
+    @DELETE
+    @Path("clusters/{clusterName}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response destroyCluster(@PathParam("clusterName") String clusterName);
+
+    //start cluster
+    @PUT
+    @Path("clusters/{clusterName}/start")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response startCluster(@PathParam("clusterName") String clusterName);
+
+    //stop cluster
+    @PUT
+    @Path("clusters/{clusterName}/stop")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response stopCluster(@PathParam("clusterName") String clusterName);
+
+    //add node
+    @POST
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response addNode(@PathParam("clusterName") String clusterName, @PathParam("lxcHostname") String lxcHostname,
+                            @PathParam("nodeType") String nodeType);
+
+    //destroy node
+    @DELETE
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}/{nodeType}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response destroyNode(@PathParam("clusterName") String clusterName,
+                                @PathParam("lxcHostname") String lxcHostname, @PathParam("nodeType") String nodeType);
+
+    //check node status
     @GET
-    @Path( "startNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String startNode( @PathParam( "clusterName" ) String clusterName,
-                             @PathParam( "lxchostname" ) String lxchostname );
-
-    @GET
-    @Path( "stopNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String stopNode( @PathParam( "clusterName" ) String clusterName,
-                            @PathParam( "lxchostname" ) String lxchostname );
-
-    @GET
-    @Path( "checkNode/{clusterName}/{lxchostname}" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public String checkNode( @PathParam( "clusterName" ) String clusterName,
-                             @PathParam( "lxchostname" ) String lxchostname );
+    @Path("clusters/{clusterName}/nodes/{lxcHostname}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response checkNode(@PathParam("clusterName") String clusterName,
+                              @PathParam("lxcHostname") String lxcHostname);
 }

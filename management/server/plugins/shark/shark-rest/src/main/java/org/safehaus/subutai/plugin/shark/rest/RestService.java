@@ -1,17 +1,15 @@
 package org.safehaus.subutai.plugin.shark.rest;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.common.util.JsonUtil;
-import org.safehaus.subutai.plugin.shark.api.Config;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.shark.api.Shark;
+import org.safehaus.subutai.plugin.shark.api.SharkClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.Spark;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,72 +33,79 @@ public class RestService {
 	}
 
 	@GET
-	@Path ("list_clusters")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String listClusters() {
+    @Path("clusters")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response listClusters() {
 
-		List<Config> configList = sharkManager.getClusters();
+		List<SharkClusterConfig > configList = sharkManager.getClusters();
 		ArrayList<String> clusterNames = new ArrayList();
 
-		for (Config config : configList) {
+		for (SharkClusterConfig config : configList) {
 			clusterNames.add(config.getClusterName());
 		}
 
-		return JsonUtil.GSON.toJson(clusterNames);
-	}
+        String clusters = JsonUtil.GSON.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
+    }
 
 	@GET
-	@Path ("get_cluster/{clusterName}")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String getCluster(
-			@PathParam ("clusterName") String clusterName
+    @Path("clusters/{clusterName}")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response getCluster(
+            @PathParam ("clusterName") String clusterName
 	) {
-		return JsonUtil.GSON.toJson(sharkManager.getCluster(clusterName));
-	}
+        String cluster = JsonUtil.GSON.toJson(sharkManager.getCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(cluster).build();
+    }
 
-	@GET
-	@Path ("install")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String installCluster(@PathParam ("clusterName") String clusterName) {
-		SparkClusterConfig sparkConfig = sparkManager.getCluster(clusterName);
-		Config sharkConfig = new Config();
+    @POST
+    @Path("clusters")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response installCluster(@PathParam("clusterName") String clusterName) {
+        SparkClusterConfig sparkConfig = sparkManager.getCluster(clusterName);
+		SharkClusterConfig sharkConfig = new SharkClusterConfig();
 
 		sharkConfig.setClusterName(sparkConfig.getClusterName());
 		sharkConfig.setNodes(sparkConfig.getAllNodes());
 
-		return JsonUtil.toJson(OPERATION_ID, sharkManager.installCluster(sharkConfig));
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, sharkManager.installCluster(sharkConfig));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
+    }
 
-	@GET
-	@Path ("uninstall/{clusterName}")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String uninstallCluster(@PathParam ("clusterName") String clusterName) {
-		return JsonUtil.toJson(OPERATION_ID, sharkManager.uninstallCluster(clusterName));
-	}
+    @DELETE
+    @Path("clusters/{clusterName}")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response uninstallCluster(@PathParam("clusterName") String clusterName) {
+        String operationId = JsonUtil.toJson(OPERATION_ID, sharkManager.uninstallCluster(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
 
-	@GET
-	@Path ("add_node/{clusterName}/{lxcHostName}")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String addNode(
-			@PathParam ("clusterName") String clusterName,
+    @POST
+    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response addNode(
+            @PathParam ("clusterName") String clusterName,
 			@PathParam ("lxcHostName") String lxcHostName) {
-		return JsonUtil.toJson(OPERATION_ID, sharkManager.addNode(clusterName, lxcHostName));
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, sharkManager.addNode(clusterName, lxcHostName));
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
+    }
 
-	@GET
-	@Path ("destroy_node/{clusterName}/{lxcHostName}")
-	@Produces ( {MediaType.APPLICATION_JSON})
-	public String destroyNode(
-			@PathParam ("clusterName") String clusterName,
+    @DELETE
+    @Path("clusters/{clusterName}/nodes/{lxcHostName}")
+    @Produces ( {MediaType.APPLICATION_JSON})
+    public Response destroyNode(
+            @PathParam ("clusterName") String clusterName,
 			@PathParam ("lxcHostName") String lxcHostName) {
-		return JsonUtil.toJson(OPERATION_ID, sharkManager.destroyNode(clusterName, lxcHostName));
-	}
+        String operationId = JsonUtil.toJson(OPERATION_ID, sharkManager.destroyNode(clusterName, lxcHostName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
 
-	@GET
-	@Path ("actualize_master_ip/{clusterName}")
+    @PUT
+    @Path ("actualize_master_ip/{clusterName}")
 	@Produces ( {MediaType.APPLICATION_JSON})
-	public String actualizeMasterIP(
-			@PathParam ("clusterName") String clusterName) {
-		return JsonUtil.toJson(OPERATION_ID, sharkManager.actualizeMasterIP(clusterName));
-	}
+    public Response actualizeMasterIP(
+            @PathParam ("clusterName") String clusterName) {
+        String operationId = JsonUtil.toJson(OPERATION_ID, sharkManager.actualizeMasterIP(clusterName));
+        return Response.status(Response.Status.OK).entity(operationId).build();
+    }
 }

@@ -1,17 +1,17 @@
 package org.safehaus.subutai.plugin.solr.impl.handler.mock;
 
 
-import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.plugin.common.mock.CommandMock;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
+import org.safehaus.subutai.plugin.common.mock.DbManagerMock;
+import org.safehaus.subutai.plugin.common.mock.LxcManagerMock;
 import org.safehaus.subutai.plugin.solr.api.SolrClusterConfig;
 import org.safehaus.subutai.plugin.solr.impl.Commands;
 import org.safehaus.subutai.plugin.solr.impl.SolrImpl;
 import org.safehaus.subutai.plugin.solr.impl.handler.AddNodeOperationHandler;
 import org.safehaus.subutai.plugin.solr.impl.handler.InstallOperationHandler;
 import org.safehaus.subutai.plugin.solr.impl.handler.UninstallOperationHandler;
-import org.safehaus.subutai.product.common.test.unit.mock.CommandMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
-import org.safehaus.subutai.product.common.test.unit.mock.DbManagerMock;
-import org.safehaus.subutai.product.common.test.unit.mock.LxcManagerMock;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 
 
@@ -29,7 +29,7 @@ public class MockBuilder {
 
         DbManager dbManager = new DbManagerMock().setDeleteInfoResult( success );
 
-        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig() );
+        SolrImpl solrImpl = new SolrImplMock().setClusterSolrClusterConfig( new SolrClusterConfig().setClusterName( "test-cluster" ) );
 
         return new UninstallOperationHandler( solrImpl, "test-cluster" );
     }

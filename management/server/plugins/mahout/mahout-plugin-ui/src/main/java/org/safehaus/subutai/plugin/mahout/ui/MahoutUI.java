@@ -5,95 +5,134 @@
  */
 package org.safehaus.subutai.plugin.mahout.ui;
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.hadoop.Hadoop;
-import org.safehaus.subutai.plugin.mahout.api.MahoutConfig;
-import org.safehaus.subutai.plugin.mahout.api.Mahout;
-import org.safehaus.subutai.api.tracker.Tracker;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.tracker.api.Tracker;
+import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
+import org.safehaus.subutai.plugin.mahout.api.Mahout;
+import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 /**
  * @author dilshat
  */
 public class MahoutUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "mahout.png";
+    public static final String MODULE_IMAGE = "mahout.png";
 
-	private static Mahout mahoutManager;
-	private static AgentManager agentManager;
-	private static Tracker tracker;
-	private static Hadoop hadoopManager;
-	private static CommandRunner commandRunner;
-	private static ExecutorService executor;
-
-	public MahoutUI(AgentManager agentManager, Tracker tracker, Hadoop hadoopManager, Mahout mahoutManager, CommandRunner commandRunner) {
-		MahoutUI.agentManager = agentManager;
-		MahoutUI.tracker = tracker;
-		MahoutUI.hadoopManager = hadoopManager;
-		MahoutUI.mahoutManager = mahoutManager;
-		MahoutUI.commandRunner = commandRunner;
-	}
-
-	public static Tracker getTracker() {
-		return tracker;
-	}
-
-	public static Mahout getMahoutManager() {
-		return mahoutManager;
-	}
-
-	public static Hadoop getHadoopManager() {
-		return hadoopManager;
-	}
-
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
-
-	public static AgentManager getAgentManager() {
-		return agentManager;
-	}
-
-	public static CommandRunner getCommandRunner() {
-		return commandRunner;
-	}
-
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
-
-	public void destroy() {
-		mahoutManager = null;
-		agentManager = null;
-		hadoopManager = null;
-		tracker = null;
-		executor.shutdown();
-	}
-
-	@Override
-	public String getId() {
-		return MahoutConfig.PRODUCT_KEY;
-	}
-
-	public String getName() {
-		return MahoutConfig.PRODUCT_KEY;
-	}
-
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(MahoutUI.MODULE_IMAGE, this);
-	}
+    private Mahout mahoutManager;
+    private AgentManager agentManager;
+    private Tracker tracker;
+    private Hadoop hadoopManager;
+    private CommandRunner commandRunner;
+    private ExecutorService executor;
 
 
-	public Component createComponent() {
-		return new MahoutForm();
-	}
+    public MahoutUI() {
+    }
 
+
+    public Mahout getMahoutManager() {
+        return mahoutManager;
+    }
+
+
+    public void setMahoutManager( final Mahout mahoutManager ) {
+        this.mahoutManager = mahoutManager;
+    }
+
+
+    public AgentManager getAgentManager() {
+        return agentManager;
+    }
+
+
+    public void setAgentManager( final AgentManager agentManager ) {
+        this.agentManager = agentManager;
+    }
+
+
+    public Tracker getTracker() {
+        return tracker;
+    }
+
+
+    public void setTracker( final Tracker tracker ) {
+        this.tracker = tracker;
+    }
+
+
+    public Hadoop getHadoopManager() {
+        return hadoopManager;
+    }
+
+
+    public void setHadoopManager( final Hadoop hadoopManager ) {
+        this.hadoopManager = hadoopManager;
+    }
+
+
+    public CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
+
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        this.commandRunner = commandRunner;
+    }
+
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+
+    public void setExecutor( final ExecutorService executor ) {
+        this.executor = executor;
+    }
+
+
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
+
+
+    public void destroy() {
+        mahoutManager = null;
+        agentManager = null;
+        hadoopManager = null;
+        tracker = null;
+        executor.shutdown();
+    }
+
+
+    @Override
+    public String getId() {
+        return MahoutClusterConfig.PRODUCT_KEY;
+    }
+
+
+    public String getName() {
+        return MahoutClusterConfig.PRODUCT_KEY;
+    }
+
+
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( MahoutUI.MODULE_IMAGE, this );
+    }
+
+
+    public Component createComponent() {
+        return new MahoutForm(this);
+    }
 }

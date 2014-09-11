@@ -1,13 +1,12 @@
 package org.safehaus.subutai.plugin.presto.impl;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
+import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
+import org.safehaus.subutai.common.command.Command;
 
 public class CommandsTest {
 
@@ -21,15 +20,15 @@ public class CommandsTest {
 
     @Test
     public void testInstallCommand() {
-        Command command = commands.getInstallCommand( null );
+        Command command = Commands.getInstallCommand(null);
 
         assertNotNull(command);
-        assertEquals("apt-get --force-yes --assume-yes install ksks-presto", command.getDescription() );
+        assertEquals("apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription());
     }
 
     @Test
     public void getStartCommand() {
-        Command command = commands.getStartCommand( null );
+        Command command = Commands.getStartCommand(null);
 
         assertNotNull( command );
         assertEquals( "service presto start", command.getDescription() );
@@ -37,7 +36,7 @@ public class CommandsTest {
 
     @Test
     public void getRestartCommand() {
-        Command command = commands.getRestartCommand( null );
+        Command command = Commands.getRestartCommand(null);
 
         assertNotNull( command );
         assertEquals( "service presto restart", command.getDescription() );
@@ -45,7 +44,7 @@ public class CommandsTest {
 
     @Test
     public void getStatusCommand() {
-        Command command = commands.getStatusCommand( null );
+        Command command = Commands.getStatusCommand(null);
 
         assertNotNull( command );
         assertEquals( "service presto status", command.getDescription() );
@@ -53,7 +52,7 @@ public class CommandsTest {
 
     @Test
     public void getStopCommand() {
-        Command command = commands.getStopCommand( null );
+        Command command = Commands.getStopCommand(null);
 
         assertNotNull( command );
         assertEquals( "service presto stop", command.getDescription() );
@@ -61,16 +60,16 @@ public class CommandsTest {
 
     @Test
     public void testUninstallCommand() {
-        Command command = commands.getUninstallCommand( null );
+        Command command = Commands.getUninstallCommand(null);
 
         assertNotNull(command);
-        assertEquals("apt-get --force-yes --assume-yes purge ksks-presto", command.getDescription() );
+        assertEquals("apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription());
     }
 
 
     @Test
     public void testCheckCommand() {
-        Command command = commands.getCheckInstalledCommand( null );
+        Command command = Commands.getCheckInstalledCommand(null);
 
         assertNotNull(command);
         assertEquals("dpkg -l | grep '^ii' | grep ksks", command.getDescription() );

@@ -41,4 +41,24 @@ create table nodes (
 );
 create index on nodes(env_id);
 
+create table peer_info
+(
+source text,
+key text,
+info text,
+primary key(source,key)
+);
 
+CREATE TABLE remote_requests (
+  commandid text,
+  attempts int,
+  info text,
+  PRIMARY KEY (commandid, attempts)
+);
+
+CREATE TABLE remote_responses (
+  commandid text,
+  responsenumber text,
+  info text,
+  PRIMARY KEY (commandid, responsenumber)
+);

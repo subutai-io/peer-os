@@ -12,11 +12,11 @@ downloadFileAndMakeChanges() {
 	sharkVersion=0.9.1
 
 	# Create directories that are required for the debian package
-    mkdir -p $tempDirectory
-    mkdir -p $confDirectory
+	mkdir -p $tempDirectory
+	mkdir -p $confDirectory
 
 	# download shark which is compatible with hadoop1 version. 
-	wget https://s3.amazonaws.com/spark-related-packages/shark-$sharkVersion-bin-hadoop1.tgz -P $tempDirectory
+	wget http://s3.amazonaws.com/spark-related-packages/shark-$sharkVersion-bin-hadoop1.tgz -P $tempDirectory
 	
 	pushd $tempDirectory
 	tar -xzpf shark-*.tgz
