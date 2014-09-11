@@ -9,6 +9,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
+import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
 import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -194,6 +195,11 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         final double count = (Double) slider.getValue();
         List<Criteria> criteria = new ArrayList<Criteria>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
+
+            List<ContainerPlacementStrategy> strategies = containerManager.getPlacementStrategies();
+            if (strategies != null) {
+                LOG.info(String.format("There are %d placement strategies", strategies.size()));
+            }
             Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, PlacementStrategy.ROUND_ROBIN, criteria);
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
