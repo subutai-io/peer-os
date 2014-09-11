@@ -23,7 +23,7 @@ public class Wizard {
     private void putForm() {
         grid.removeComponent(0, 1);
         Component component = null;
-        switch(step) {
+        switch (step) {
             case 1: {
                 component = new WelcomeStep(this);
                 break;
@@ -41,7 +41,7 @@ public class Wizard {
             }
         }
 
-        if(component != null)
+        if (component != null)
             grid.addComponent(component, 0, 1, 0, 19);
     }
 

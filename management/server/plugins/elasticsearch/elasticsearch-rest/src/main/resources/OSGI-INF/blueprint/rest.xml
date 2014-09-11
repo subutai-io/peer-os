@@ -16,8 +16,8 @@
         <property name="elasticsearch" ref="elasticsearch"/>
     </bean>
 
-    <jaxrs:server address="/elasticsearch2" id="elasticsearchRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/elasticsearch" id="elasticsearchRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

@@ -1,14 +1,14 @@
 package org.safehaus.subutai.peer.impl;
 
 
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.peer.api.Peer;
 import org.safehaus.subutai.peer.api.PeerManager;
 import org.safehaus.subutai.peer.impl.dao.PeerDAO;
+
+import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -17,20 +17,20 @@ import org.safehaus.subutai.peer.impl.dao.PeerDAO;
 public class PeerImpl implements PeerManager {
 
     private final static String source = "PEER_MANAGER";
-    private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
+    private final Logger LOG = Logger.getLogger(PeerImpl.class.getName());
     private String id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
 
 
-    public void setId( final String id ) {
+    public void setId(final String id) {
         this.id = id;
     }
 
 
     public void init() {
-        LOG.info( "SUBUTAID ID: " + id );
-        peerDAO = new PeerDAO( dbManager );
+        LOG.info("SUBUTAID ID: " + id);
+        peerDAO = new PeerDAO(dbManager);
     }
 
 
@@ -39,22 +39,21 @@ public class PeerImpl implements PeerManager {
     }
 
 
-    public void setDbManager( final DbManager dbManager ) {
+    public void setDbManager(final DbManager dbManager) {
         this.dbManager = dbManager;
     }
 
 
     @Override
-    public String register( final Peer peer ) {
+    public String register(final Peer peer) {
 
         //        LOG.info( "Registering peer: " + peer.getName() );
         try {
             String id = peer.getId();
-            peerDAO.saveInfo( source, id, peer );
-        }
-        catch ( DBException e ) {
+            peerDAO.saveInfo(source, id, peer);
+        } catch (DBException e) {
             //            e.printStackTrace();
-            LOG.info( e.getMessage() );
+            LOG.info(e.getMessage());
             return null;
         }
         return peer.getId();
@@ -71,10 +70,9 @@ public class PeerImpl implements PeerManager {
     public List<Peer> peers() {
         List<Peer> peers = null;
         try {
-            peers = peerDAO.getInfo( source, Peer.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            peers = peerDAO.getInfo(source, Peer.class);
+        } catch (DBException e) {
+            LOG.info(e.getMessage());
             //            e.printStackTrace();
         }
         return peers;
@@ -82,12 +80,11 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public boolean unregister( final String uuid ) {
+    public boolean unregister(final String uuid) {
         try {
-            peerDAO.deleteInfo( source, uuid );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
+            peerDAO.deleteInfo(source, uuid);
+        } catch (DBException e) {
+            LOG.info(e.getMessage());
             //            e.printStackTrace();
             return false;
         }

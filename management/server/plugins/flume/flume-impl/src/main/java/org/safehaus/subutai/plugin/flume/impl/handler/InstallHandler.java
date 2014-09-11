@@ -1,15 +1,16 @@
 package org.safehaus.subutai.plugin.flume.impl.handler;
 
+import org.safehaus.subutai.common.exception.ClusterSetupException;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
+import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
+import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
-import org.safehaus.subutai.common.exception.ClusterSetupException;
 import org.safehaus.subutai.plugin.flume.api.FlumeConfig;
 import org.safehaus.subutai.plugin.flume.api.SetupType;
-import org.safehaus.subutai.plugin.flume.impl.*;
+import org.safehaus.subutai.plugin.flume.impl.FlumeImpl;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.common.protocol.*;
 
 public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
@@ -36,9 +37,9 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
         ProductOperation po = productOperation;
         Environment env = null;
 
-        if(config.getSetupType() == SetupType.WITH_HADOOP) {
+        if (config.getSetupType() == SetupType.WITH_HADOOP) {
 
-            if(hadoopConfig == null) {
+            if (hadoopConfig == null) {
                 po.addLogFailed("No Hadoop configuration specified");
                 return;
             }
@@ -49,10 +50,10 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
                 EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
-            } catch(ClusterSetupException ex) {
+            } catch (ClusterSetupException ex) {
                 po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
                 return;
-            } catch(EnvironmentBuildException ex) {
+            } catch (EnvironmentBuildException ex) {
                 po.addLogFailed("Failed to build environment: " + ex.getMessage());
                 return;
             }
@@ -61,11 +62,11 @@ public class InstallHandler extends AbstractOperationHandler<FlumeImpl> {
 
         ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, po);
         try {
-            if(s == null) throw new ClusterSetupException("No setup strategy");
+            if (s == null) throw new ClusterSetupException("No setup strategy");
 
             s.setup();
             po.addLogDone("Done");
-        } catch(ClusterSetupException ex) {
+        } catch (ClusterSetupException ex) {
             po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
         }
     }

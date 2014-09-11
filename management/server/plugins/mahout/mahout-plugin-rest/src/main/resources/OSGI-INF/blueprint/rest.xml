@@ -15,7 +15,7 @@
     <property name="mahoutManager" ref="mahoutManager" />
   </bean>
 
-  <jaxrs:server address="/mahout-plugin" id="mahoutRestService">
+    <jaxrs:server address="/mahout" id="mahoutRestService">
     <jaxrs:serviceBeans>
       <ref component-id="restService" />
     </jaxrs:serviceBeans>

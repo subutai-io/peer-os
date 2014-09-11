@@ -7,10 +7,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
@@ -21,6 +17,11 @@ import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class Manager {
 
@@ -56,7 +57,7 @@ public class Manager {
         clusterCombo.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                config = (SparkClusterConfig)event.getProperty().getValue();
+                config = (SparkClusterConfig) event.getProperty().getValue();
                 refreshUI();
             }
         });
@@ -108,7 +109,7 @@ public class Manager {
         destroyClusterBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                if(config != null) {
+                if (config != null) {
                     ConfirmationDialog alert = new ConfirmationDialog(
                             String.format("Do you want to destroy the %s cluster?", config.getClusterName()),
                             "Yes", "No");
@@ -141,28 +142,28 @@ public class Manager {
         addNodeBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                if(config == null) {
+                if (config == null) {
                     show("Select cluster");
                     return;
                 }
 
                 Set<Agent> set = null;
-                if(config.getSetupType() == SetupType.OVER_HADOOP) {
+                if (config.getSetupType() == SetupType.OVER_HADOOP) {
                     String hn = config.getHadoopClusterName();
-                    if(hn != null && !hn.isEmpty()) {
+                    if (hn != null && !hn.isEmpty()) {
                         HadoopClusterConfig hci = SparkUI.getHadoopManager().getCluster(hn);
-                        if(hci != null)
+                        if (hci != null)
                             set = new HashSet<>(hci.getAllNodes());
                     }
-                } else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                } else if (config.getSetupType() == SetupType.WITH_HADOOP)
                     set = new HashSet<>(config.getHadoopNodes());
 
-                if(set == null) {
+                if (set == null) {
                     show("Hadoop cluster not found");
                     return;
                 }
                 set.removeAll(config.getAllNodes());
-                if(set.isEmpty()) {
+                if (set.isEmpty()) {
                     show("All nodes in Hadoop cluster have Hive installed");
                     return;
                 }
@@ -202,11 +203,11 @@ public class Manager {
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick(ItemClickEvent event) {
-                if(event.isDoubleClick()) {
-                    String lxcHostname = (String)table.getItem(event.getItemId()).getItemProperty("Host")
+                if (event.isDoubleClick()) {
+                    String lxcHostname = (String) table.getItem(event.getItemId()).getItemProperty("Host")
                             .getValue();
                     Agent lxcAgent = SparkUI.getAgentManager().getAgentByHostname(lxcHostname);
-                    if(lxcAgent != null) {
+                    if (lxcAgent != null) {
                         TerminalWindow terminal = new TerminalWindow(Sets.newHashSet(lxcAgent),
                                 SparkUI.getExecutor(), SparkUI.getCommandRunner(), SparkUI.getAgentManager());
                         contentRoot.getUI().addWindow(terminal.getWindow());
@@ -219,7 +220,7 @@ public class Manager {
     }
 
     private void refreshUI() {
-        if(config != null) {
+        if (config != null) {
             populateTable(nodesTable, config.getSlaveNodes(), config.getMasterNode());
             checkAllNodesStatus();
         } else
@@ -228,16 +229,16 @@ public class Manager {
 
     public void refreshClustersInfo() {
         List<SparkClusterConfig> clustersInfo = SparkUI.getSparkManager().getClusters();
-        SparkClusterConfig clusterInfo = (SparkClusterConfig)clusterCombo.getValue();
+        SparkClusterConfig clusterInfo = (SparkClusterConfig) clusterCombo.getValue();
         clusterCombo.removeAllItems();
-        if(clustersInfo != null && clustersInfo.size() > 0) {
-            for(SparkClusterConfig ci : clustersInfo) {
+        if (clustersInfo != null && clustersInfo.size() > 0) {
+            for (SparkClusterConfig ci : clustersInfo) {
                 clusterCombo.addItem(ci);
                 clusterCombo.setItemCaption(ci, ci.getClusterName());
             }
-            if(clusterInfo != null) {
-                for(SparkClusterConfig mongoClusterInfo : clustersInfo) {
-                    if(mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
+            if (clusterInfo != null) {
+                for (SparkClusterConfig mongoClusterInfo : clustersInfo) {
+                    if (mongoClusterInfo.getClusterName().equals(clusterInfo.getClusterName())) {
                         clusterCombo.setValue(mongoClusterInfo);
                         return;
                     }
@@ -248,28 +249,28 @@ public class Manager {
     }
 
     public void checkAllNodesStatus() {
-        for(Object o : nodesTable.getItemIds()) {
-            int rowId = (Integer)o;
+        for (Object o : nodesTable.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = nodesTable.getItem(rowId);
-            Button checkBtn = (Button)(row.getItemProperty("Check").getValue());
+            Button checkBtn = (Button) (row.getItemProperty("Check").getValue());
             checkBtn.click();
         }
     }
 
     public void startAllNodes() {
-        for(Object o : nodesTable.getItemIds()) {
-            int rowId = (Integer)o;
+        for (Object o : nodesTable.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = nodesTable.getItem(rowId);
-            Button checkBtn = (Button)(row.getItemProperty("Start").getValue());
+            Button checkBtn = (Button) (row.getItemProperty("Start").getValue());
             checkBtn.click();
         }
     }
 
     public void stopAllNodes() {
-        for(Object o : nodesTable.getItemIds()) {
-            int rowId = (Integer)o;
+        for (Object o : nodesTable.getItemIds()) {
+            int rowId = (Integer) o;
             Item row = nodesTable.getItem(rowId);
-            Button checkBtn = (Button)(row.getItemProperty("Stop").getValue());
+            Button checkBtn = (Button) (row.getItemProperty("Stop").getValue());
             checkBtn.click();
         }
     }
@@ -282,7 +283,7 @@ public class Manager {
 
         table.removeAllItems();
 
-        for(final Agent agent : agents) {
+        for (final Agent agent : agents) {
             final Button checkBtn = new Button("Check");
             checkBtn.addStyleName("default");
             final Button startBtn = new Button("Start");
@@ -299,14 +300,14 @@ public class Manager {
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
-                agent.getHostname()
-                + String.format(" (%s)", agent.getListIP().get(0)),
-                checkBtn,
-                startBtn,
-                stopBtn,
-                master.equals(agent) ? null : setMasterBtn,
-                destroyBtn,
-                progressIcon},
+                            agent.getHostname()
+                                    + String.format(" (%s)", agent.getListIP().get(0)),
+                            checkBtn,
+                            startBtn,
+                            stopBtn,
+                            master.equals(agent) ? null : setMasterBtn,
+                            destroyBtn,
+                            progressIcon},
                     null
             );
 
@@ -324,10 +325,10 @@ public class Manager {
 
                                 @Override
                                 public void onComplete(NodeState state) {
-                                    synchronized(progressIcon) {
-                                        if(state == NodeState.RUNNING)
+                                    synchronized (progressIcon) {
+                                        if (state == NodeState.RUNNING)
                                             stopBtn.setEnabled(true);
-                                        else if(state == NodeState.STOPPED)
+                                        else if (state == NodeState.STOPPED)
                                             startBtn.setEnabled(true);
                                         setMasterBtn.setEnabled(true);
                                         destroyBtn.setEnabled(true);
@@ -352,10 +353,10 @@ public class Manager {
 
                                 @Override
                                 public void onComplete(NodeState state) {
-                                    synchronized(progressIcon) {
-                                        if(state == NodeState.RUNNING)
+                                    synchronized (progressIcon) {
+                                        if (state == NodeState.RUNNING)
                                             stopBtn.setEnabled(true);
-                                        else if(state == NodeState.STOPPED)
+                                        else if (state == NodeState.STOPPED)
                                             startBtn.setEnabled(true);
                                         setMasterBtn.setEnabled(true);
                                         destroyBtn.setEnabled(true);
@@ -380,10 +381,10 @@ public class Manager {
 
                                 @Override
                                 public void onComplete(NodeState state) {
-                                    synchronized(progressIcon) {
-                                        if(state == NodeState.RUNNING)
+                                    synchronized (progressIcon) {
+                                        if (state == NodeState.RUNNING)
                                             stopBtn.setEnabled(true);
-                                        else if(state == NodeState.STOPPED)
+                                        else if (state == NodeState.STOPPED)
                                             startBtn.setEnabled(true);
                                         setMasterBtn.setEnabled(true);
                                         destroyBtn.setEnabled(true);
@@ -490,14 +491,14 @@ public class Manager {
         progressIcon.setVisible(false);
 
         table.addItem(new Object[]{
-            MASTER_PREFIX + master.getHostname()
-            + String.format(" (%s)", master.getListIP().get(0)),
-            checkBtn,
-            startBtn,
-            stopBtn,
-            null,
-            null,
-            progressIcon},
+                        MASTER_PREFIX + master.getHostname()
+                                + String.format(" (%s)", master.getListIP().get(0)),
+                        checkBtn,
+                        startBtn,
+                        stopBtn,
+                        null,
+                        null,
+                        progressIcon},
                 null
         );
 
@@ -513,10 +514,10 @@ public class Manager {
 
                             @Override
                             public void onComplete(NodeState state) {
-                                synchronized(progressIcon) {
-                                    if(state == NodeState.RUNNING)
+                                synchronized (progressIcon) {
+                                    if (state == NodeState.RUNNING)
                                         stopBtn.setEnabled(true);
-                                    else if(state == NodeState.STOPPED)
+                                    else if (state == NodeState.STOPPED)
                                         startBtn.setEnabled(true);
                                     progressIcon.setVisible(false);
                                 }
@@ -529,7 +530,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                if(!stopBtn.isEnabled())
+                if (!stopBtn.isEnabled())
                     Notification.show("Node already started");
 
                 progressIcon.setVisible(true);
@@ -541,10 +542,10 @@ public class Manager {
 
                             @Override
                             public void onComplete(NodeState state) {
-                                synchronized(progressIcon) {
-                                    if(state == NodeState.RUNNING)
+                                synchronized (progressIcon) {
+                                    if (state == NodeState.RUNNING)
                                         stopBtn.setEnabled(true);
-                                    else if(state == NodeState.STOPPED)
+                                    else if (state == NodeState.STOPPED)
                                         startBtn.setEnabled(true);
                                     progressIcon.setVisible(false);
                                 }
@@ -557,7 +558,7 @@ public class Manager {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                if(!startBtn.isEnabled())
+                if (!startBtn.isEnabled())
                     Notification.show("Node already stopped");
 
                 progressIcon.setVisible(true);
@@ -569,10 +570,10 @@ public class Manager {
 
                             @Override
                             public void onComplete(NodeState state) {
-                                synchronized(progressIcon) {
-                                    if(state == NodeState.RUNNING)
+                                synchronized (progressIcon) {
+                                    if (state == NodeState.RUNNING)
                                         stopBtn.setEnabled(true);
-                                    else if(state == NodeState.STOPPED)
+                                    else if (state == NodeState.STOPPED)
                                         startBtn.setEnabled(true);
                                     progressIcon.setVisible(false);
                                 }

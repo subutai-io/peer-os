@@ -2,13 +2,14 @@ package org.safehaus.subutai.plugin.spark.ui.wizard;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
-import java.util.UUID;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.spark.api.SetupType;
 import org.safehaus.subutai.plugin.spark.api.SparkClusterConfig;
 import org.safehaus.subutai.plugin.spark.ui.SparkUI;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
+
+import java.util.UUID;
 
 public class VerificationStep extends Panel {
 
@@ -30,13 +31,13 @@ public class VerificationStep extends Panel {
 
         ConfigView cfgView = new ConfigView("Installation configuration");
         cfgView.addStringCfg("Cluster Name", wizard.getConfig().getClusterName());
-        if(config.getSetupType() == SetupType.OVER_HADOOP) {
+        if (config.getSetupType() == SetupType.OVER_HADOOP) {
             cfgView.addStringCfg("Hadoop cluster Name", wizard.getConfig().getHadoopClusterName());
             cfgView.addStringCfg("Master Node", wizard.getConfig().getMasterNode().getHostname());
-            for(Agent agent : wizard.getConfig().getSlaveNodes()) {
+            for (Agent agent : wizard.getConfig().getSlaveNodes()) {
                 cfgView.addStringCfg("Slave nodes", agent.getHostname() + "");
             }
-        } else if(config.getSetupType() == SetupType.WITH_HADOOP) {
+        } else if (config.getSetupType() == SetupType.WITH_HADOOP) {
             cfgView.addStringCfg("Hadoop cluster name", hc.getClusterName());
             cfgView.addStringCfg("Number of Hadoop slave nodes", hc.getCountOfSlaveNodes() + "");
             cfgView.addStringCfg("Replication factor", hc.getReplicationFactor() + "");
@@ -48,9 +49,9 @@ public class VerificationStep extends Panel {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 UUID trackId = null;
-                if(config.getSetupType() == SetupType.OVER_HADOOP)
+                if (config.getSetupType() == SetupType.OVER_HADOOP)
                     trackId = SparkUI.getSparkManager().installCluster(config);
-                else if(config.getSetupType() == SetupType.WITH_HADOOP)
+                else if (config.getSetupType() == SetupType.WITH_HADOOP)
                     trackId = SparkUI.getSparkManager().installCluster(config, hc);
 
                 ProgressWindow window = new ProgressWindow(SparkUI.getExecutor(),

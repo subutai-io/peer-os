@@ -15,8 +15,8 @@
         <property name="hiveManager" ref="hiveManager"/>
     </bean>
 
-    <jaxrs:server address="/hive2" id="hiveRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/hive" id="hiveRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

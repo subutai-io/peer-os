@@ -23,7 +23,7 @@ public class NodeGroup {
     }
 
 
-    public void setDomainName( final String domainName ) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
@@ -33,7 +33,7 @@ public class NodeGroup {
     }
 
 
-    public void setName( final String name ) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -43,7 +43,7 @@ public class NodeGroup {
     }
 
 
-    public void setNumberOfNodes( final int numberOfNodes ) {
+    public void setNumberOfNodes(final int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
     }
 
@@ -53,7 +53,7 @@ public class NodeGroup {
     }
 
 
-    public void setTemplateName( final String templateName ) {
+    public void setTemplateName(final String templateName) {
         this.templateName = templateName;
     }
 
@@ -63,7 +63,7 @@ public class NodeGroup {
     }
 
 
-    public void setPlacementStrategy( final PlacementStrategy placementStrategy ) {
+    public void setPlacementStrategy(final PlacementStrategy placementStrategy) {
         this.placementStrategy = placementStrategy;
     }
 
@@ -73,7 +73,7 @@ public class NodeGroup {
     }
 
 
-    public void setLinkHosts( final boolean linkHosts ) {
+    public void setLinkHosts(final boolean linkHosts) {
         this.linkHosts = linkHosts;
     }
 
@@ -83,7 +83,7 @@ public class NodeGroup {
     }
 
 
-    public void setExchangeSshKeys( final boolean exchangeSshKeys ) {
+    public void setExchangeSshKeys(final boolean exchangeSshKeys) {
         this.exchangeSshKeys = exchangeSshKeys;
     }
 

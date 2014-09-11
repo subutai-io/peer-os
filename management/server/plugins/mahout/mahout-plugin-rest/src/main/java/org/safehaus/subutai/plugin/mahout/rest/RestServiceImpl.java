@@ -1,15 +1,16 @@
 package org.safehaus.subutai.plugin.mahout.rest;
 
 
-import java.util.List;
-import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.plugin.mahout.api.Mahout;
 import org.safehaus.subutai.plugin.mahout.api.MahoutClusterConfig;
 import org.safehaus.subutai.plugin.mahout.api.TrimmedMahoutClusterConfig;
+
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -42,21 +43,23 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String listClusters() {
+    public Response listClusters() {
         List<MahoutClusterConfig> clusters = mahoutManager.getClusters();
-        return JsonUtil.toJson( clusters );
+        String clusterNames = JsonUtil.toJson(clusters);
+        return Response.status(Response.Status.OK).entity(clusterNames).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
-        MahoutClusterConfig mahoutConfig = mahoutManager.getCluster( source );
-        return JsonUtil.toJson( mahoutConfig );
+    public Response getCluster(final String clusterName) {
+        MahoutClusterConfig mahoutConfig = mahoutManager.getCluster(clusterName);
+        String cluster = JsonUtil.toJson(mahoutConfig);
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public Response createCluster(final String config) {
         TrimmedMahoutClusterConfig tmcc = JsonUtil.fromJson( config, TrimmedMahoutClusterConfig.class );
 
         MahoutClusterConfig mahoutConfig = new MahoutClusterConfig();
@@ -69,49 +72,56 @@ public class RestServiceImpl implements RestService {
 
         UUID uuid = mahoutManager.installCluster( mahoutConfig );
 
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
+    public Response destroyCluster(final String clusterName) {
         UUID uuid = mahoutManager.uninstallCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
+    public Response startCluster(final String clusterName) {
         UUID uuid = mahoutManager.startCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
+    public Response stopCluster(final String clusterName) {
         UUID uuid = mahoutManager.stopCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname ) {
-        UUID uuid = mahoutManager.addNode( clustername, lxchostname );
-        return wrapUUID( uuid );
+    public Response addNode(final String clusterName, final String lxcHostname) {
+        UUID uuid = mahoutManager.addNode(clusterName, lxcHostname);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname ) {
-        UUID uuid = mahoutManager.destroyNode( clustername, lxchostname );
-        return wrapUUID( uuid );
+    public Response destroyNode(final String clusterName, final String lxcHostname) {
+        UUID uuid = mahoutManager.destroyNode(clusterName, lxcHostname);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clustername, final String lxchostname ) {
-        UUID uuid = mahoutManager.checkNode( clustername, lxchostname );
-        return wrapUUID( uuid );
+    public Response checkNode(final String clusterName, final String lxcHostname) {
+        UUID uuid = mahoutManager.checkNode(clusterName, lxcHostname);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 

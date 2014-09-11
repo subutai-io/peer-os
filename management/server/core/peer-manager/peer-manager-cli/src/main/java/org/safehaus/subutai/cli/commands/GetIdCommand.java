@@ -1,16 +1,15 @@
 package org.safehaus.subutai.cli.commands;
 
 
-import org.safehaus.subutai.peer.api.PeerManager;
-
 import org.apache.felix.gogo.commands.Command;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.subutai.peer.api.PeerManager;
 
 
 /**
  * Created by bahadyr on 8/28/14.
  */
-@Command( scope = "peer", name = "id" )
+@Command(scope = "peer", name = "id")
 public class GetIdCommand extends OsgiCommandSupport {
 
     private PeerManager peerManager;
@@ -21,7 +20,7 @@ public class GetIdCommand extends OsgiCommandSupport {
     }
 
 
-    public void setPeerManager( final PeerManager peerManager ) {
+    public void setPeerManager(final PeerManager peerManager) {
         this.peerManager = peerManager;
     }
 
