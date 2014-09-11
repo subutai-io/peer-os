@@ -13,7 +13,7 @@ public interface RestService {
     // should return Set<Agent> in Json format
     @GET
     @Path("agents")
-    public Response getListeners();
+    public Response getAgents();
 
     //should return Set<Agent> in Json format
     @GET
@@ -54,9 +54,4 @@ public interface RestService {
     @GET
     @Path("agents/{hostNames}")
     public Response getAgentsByHostNames(@PathParam("hostNames") String hostNames);
-
-    @POST
-    @Path("agents/agent")
-    public Response addAgent(@PathParam("agent") String agent);
-
 }

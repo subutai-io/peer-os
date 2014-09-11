@@ -1,9 +1,18 @@
 package org.safehaus.subutai.core.agent.rest;
 
 
+import com.google.gson.reflect.TypeToken;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.common.util.JsonUtil;
+import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 
 import javax.ws.rs.core.Response;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 
@@ -16,55 +25,78 @@ public class RestServiceImpl implements RestService {
         this.agentManager = agentManager;
     }
 
-
     @Override
-    public Response getListeners() {
-        String listeners = agentManager.getListeners();
-        return null;
+    public Response getAgents() {
+        ArrayList<String> agentList = new ArrayList<>();
+        Set<Agent> agents = agentManager.getAgents();
+        for (Agent agent : agents) {
+            agentList.add(JsonUtil.toJson(agent));
+        }
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agentList)).build();
     }
 
     @Override
     public Response getPhysicalAgents() {
-        return null;
+        Set<Agent> agents = agentManager.getPhysicalAgents();
+        List<String> agentList = new ArrayList<>();
+        for (Agent agent : agents) {
+            agentList.add(JsonUtil.toJson(agent));
+        }
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agentList)).build();
     }
 
     @Override
     public Response getLxcAgents() {
-        return null;
+        Set<Agent> agents = agentManager.getLxcAgents();
+        List<String> agentList = new ArrayList<>();
+        for (Agent agent : agents) {
+            agentList.add(JsonUtil.toJson(agent));
+        }
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agentList)).build();
     }
 
     @Override
     public Response getAgentByHostname(String hostname) {
-        return null;
+        Agent agent = agentManager.getAgentByHostname(hostname);
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agent)).build();
     }
 
     @Override
     public Response getAgentByUUID(String uuid) {
-        return null;
+        UUID agentUuid = JsonUtil.fromJson(uuid, UUID.class);
+        Agent agent = agentManager.getAgentByUUID(agentUuid);
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agent)).build();
     }
 
     @Override
     public Response getLxcAgentsByParentHostname(String parentHostname) {
-        return null;
+        Set<Agent> agents = agentManager.getLxcAgentsByParentHostname(parentHostname);
+        List<String> agentList = new ArrayList<>();
+        for (Agent agent : agents) {
+            agentList.add(JsonUtil.toJson(agent));
+        }
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agentList)).build();
     }
 
     @Override
     public Response addListener(String agentListener) {
-        return null;
+        AgentListener listener = JsonUtil.fromJson(agentListener, AgentListener.class);
+        agentManager.addListener(listener);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @Override
     public Response removeListener(String agentListener) {
-        return null;
+        AgentListener listener = JsonUtil.fromJson(agentListener, AgentListener.class);
+        agentManager.removeListener(listener);
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     @Override
     public Response getAgentsByHostNames(String hostNames) {
-        return null;
-    }
-
-    @Override
-    public Response addAgent(String agent) {
-        return null;
+        Type listType = new TypeToken<Set<String>>(){}.getType();
+        Set<String> names = JsonUtil.GSON.fromJson(hostNames, listType);
+        Set<Agent> agents = agentManager.getAgentsByHostnames(names);
+        return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agents)).build();
     }
 }
