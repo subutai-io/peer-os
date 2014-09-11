@@ -1,6 +1,7 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -190,14 +191,37 @@ public class CassandraImpl extends CassandraBase {
     }
 
 
+//    public List<CassandraClusterConfig> getClusters() {
+//        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+//    }
+//
+//
+//    @Override
+//    public CassandraClusterConfig getCluster( String clusterName ) {
+//        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+//        try {
+//            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
+//        }
+//        catch ( DBException e ) {
+//            return null;
+//        }
+//    }
+
+    @Override
     public List<CassandraClusterConfig> getClusters() {
-        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+        try {
+            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
+        }
+        catch ( DBException e ) {
+            return Collections.emptyList();
+        }
     }
 
 
     @Override
     public CassandraClusterConfig getCluster( String clusterName ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
+
         try {
             return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
         }
