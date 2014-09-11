@@ -1,13 +1,14 @@
 package org.safehaus.subutai.core.peer.rest;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.UUID;
+import java.util.logging.Logger;
+
 import org.safehaus.subutai.core.peer.api.Peer;
 import org.safehaus.subutai.core.peer.api.PeerManager;
 
-import java.util.UUID;
-import java.util.logging.Logger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 /**
@@ -57,7 +58,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public String getId() {
 
-        String id = peerManager.getHostId();
+        UUID id = peerManager.getHostId();
         return GSON.toJson(id);
     }
 
