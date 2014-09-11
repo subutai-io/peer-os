@@ -15,10 +15,7 @@ import org.safehaus.subutai.api.containermanager.ContainerState;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
-import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
-import org.safehaus.subutai.api.strategymanager.Criteria;
-import org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory;
-import org.safehaus.subutai.api.strategymanager.ServerMetric;
+import org.safehaus.subutai.api.strategymanager.*;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
@@ -47,7 +44,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ExecutorService executor;
     private Monitor monitor;
     private PlacementStrategyFactory placementStrategyFactory;
-    private List<PlacementStrategyFactory> strategyFactories;
+
 
     public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager, PlacementStrategyFactory placementStrategyFactory) {
         this.agentManager = agentManager;
@@ -75,17 +72,13 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         executor.shutdown();
     }
 
-    public void setStrategyFactories(List<PlacementStrategyFactory> strategyFactories) {
-        this.strategyFactories = strategyFactories;
-    }
-
     @Override
     public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
-        ContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
+        AbstractContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
         containerPlacementStrategy.calculatePlacement(getPhysicalServerMetrics());
-        if (strategyFactories != null)
-            for (int i = 0; i < strategyFactories.size(); i++)
-                LOG.info(" ============> " + strategyFactories.get(i));
+        if (placementStrategies != null)
+            for (int i = 0; i < placementStrategies.size(); i++)
+                LOG.info(" ============> " + placementStrategies.get(i));
         return containerPlacementStrategy.getPlacementDistribution();
     }
 
@@ -104,7 +97,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             }
         }
 
-        ContainerPlacementStrategy st = placementStrategyFactory.create(nodesCount, strategy, criteria);
+        AbstractContainerPlacementStrategy st = placementStrategyFactory.create(nodesCount, strategy, criteria);
 
         st.calculatePlacement(metrics);
 
@@ -716,7 +709,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 //
 //        return bestServers;
 //    }
-    public Map<Agent, Integer> getPlacementDistribution(ContainerPlacementStrategy strategy, int numOfContainers) throws ContainerCreateException {
+    public Map<Agent, Integer> getPlacementDistribution(AbstractContainerPlacementStrategy strategy, int numOfContainers) throws ContainerCreateException {
         Map<Agent, ServerMetric> serverMetrics = getPhysicalServerMetrics();
         strategy.calculatePlacement(serverMetrics);
         return strategy.getPlacementDistribution();

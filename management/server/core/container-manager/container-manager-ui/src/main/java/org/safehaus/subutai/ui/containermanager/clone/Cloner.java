@@ -195,15 +195,30 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         List<Criteria> criteria = new ArrayList<Criteria>();
         if (physicalAgents.isEmpty()) { // process cloning by selected strategy
             Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, PlacementStrategy.ROUND_ROBIN, criteria);
+            if (bestServers.isEmpty()) {
+                show("No servers available to accommodate new lxc containers");
+                return;
+            }
+            int numOfLxcSlots = 0;
+            for (Map.Entry<Agent, Integer> srv : bestServers.entrySet()) {
+                numOfLxcSlots += srv.getValue();
+            }
 
-            for (Map.Entry<Agent, Integer> entry : bestServers.entrySet()) {
+            if (numOfLxcSlots < count) {
+                show(String.format("Only %s lxc containers can be created", numOfLxcSlots));
+                return;
+            }
+            for (int i = 1; i <= count; i++) {
+                Map<Agent, Integer> sortedBestServers =
+                        CollectionUtil.sortMapByValueDesc(bestServers);
+                final Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();
+                bestServers.put(entry.getKey(), entry.getValue() - 1);
                 List<String> lxcHostNames = agentFamilies.get(entry.getKey());
                 if (lxcHostNames == null) {
                     lxcHostNames = new ArrayList<>();
                     agentFamilies.put(entry.getKey(), lxcHostNames);
                 }
                 lxcHostNames.add(String.format("%s%d_%s", productName, lxcHostNames.size() + 1, UUIDUtil.generateTimeBasedUUID().toString().replace('-', '_')));
-                agentFamilies.put(entry.getKey(), lxcHostNames);
             }
         } else { // process cloning in selected hosts
             for (Agent physAgent : physicalAgents) {

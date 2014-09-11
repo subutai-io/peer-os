@@ -4,25 +4,20 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
 import org.safehaus.subutai.api.dbmanager.DbManager;
+import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 
+import java.util.List;
+
 public abstract class ContainerManagerBase implements ContainerManager {
 
-//	ContainerManager containerManager;
 	AgentManager agentManager;
 	CommandRunner commandRunner;
 	TemplateManager templateManager;
 	TemplateRegistryManager templateRegistry;
 	DbManager dbManager;
-
-//	public ContainerManager getContainerManager() {
-//		return containerManager;
-//	}
-//
-//	public void setContainerManager(ContainerManager containerManager) {
-//		this.containerManager = containerManager;
-//	}
+    List<ContainerPlacementStrategy> placementStrategies;
 
 	public AgentManager getAgentManager() {
 		return agentManager;
@@ -63,4 +58,12 @@ public abstract class ContainerManagerBase implements ContainerManager {
 	public void setDbManager(DbManager dbManager) {
 		this.dbManager = dbManager;
 	}
+
+    public List<ContainerPlacementStrategy> getPlacementStrategies() {
+        return placementStrategies;
+    }
+
+    public void setPlacementStrategies(List<ContainerPlacementStrategy> placementStrategies) {
+        this.placementStrategies = placementStrategies;
+    }
 }

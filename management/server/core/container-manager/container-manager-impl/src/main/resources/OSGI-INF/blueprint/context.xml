@@ -24,8 +24,8 @@
     </bean>
     -->
 
-    <reference-list id="strategyFactories"
-                    interface="org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory"
+    <reference-list id="placementStrategies"
+                    interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"
                     member-type="service-object"/>
 
     <bean id="containerManager" scope="singleton"
@@ -38,7 +38,7 @@
         <argument ref="templateRegistry"/>
         <argument ref="dbManager"/>
         <argument ref="placementStrategyFactory"/>
-        <property name="strategyFactories" ref="strategyFactories"/>
+        <property name="placementStrategies" ref="placementStrategies"/>
     </bean>
 
     <!--
