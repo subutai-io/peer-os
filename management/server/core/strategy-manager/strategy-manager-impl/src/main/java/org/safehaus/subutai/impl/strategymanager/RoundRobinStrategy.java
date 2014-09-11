@@ -1,13 +1,13 @@
 package org.safehaus.subutai.impl.strategymanager;
 
-import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.*;
 
-public class RoundRobinStrategy extends ContainerPlacementStrategy {
+public class RoundRobinStrategy extends AbstractContainerPlacementStrategy {
 
 	public static final String DEFAULT_NODE_TYPE = "default";
 

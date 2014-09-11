@@ -5,6 +5,16 @@
           class="org.safehaus.subutai.impl.strategymanager.PlacementStrategyFactoryImpl">
     </bean>
 
+    <bean id="roundRobinStrategy"
+          class="org.safehaus.subutai.impl.strategymanager.RoundRobinStrategy">
+    </bean>
+
+    <bean id="defaultStrategy"
+          class="org.safehaus.subutai.impl.strategymanager.DefaultContainerPlacementStrategy">
+    </bean>
+
     <service ref="placementStrategyFactory" interface="org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory"/>
+    <service ref="roundRobinStrategy" interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"/>
+    <service ref="defaultStrategy" interface="org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy"/>
 
 </blueprint>

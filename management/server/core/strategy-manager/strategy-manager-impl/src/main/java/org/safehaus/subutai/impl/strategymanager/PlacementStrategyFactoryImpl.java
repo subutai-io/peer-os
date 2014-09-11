@@ -1,6 +1,6 @@
 package org.safehaus.subutai.impl.strategymanager;
 
-import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -15,7 +15,7 @@ public class PlacementStrategyFactoryImpl implements PlacementStrategyFactory {
 	}
 
     @Override
-    public ContainerPlacementStrategy create(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
+    public AbstractContainerPlacementStrategy create(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
         if (PlacementStrategy.ROUND_ROBIN.equals(strategy))
             return new RoundRobinStrategy(nodesCount);
         if (PlacementStrategy.FILLUP_PROCEED.equals(strategy))
@@ -26,7 +26,7 @@ public class PlacementStrategyFactoryImpl implements PlacementStrategyFactory {
     }
 
     @Override
-    public ContainerPlacementStrategy getDefaultStrategy(int nodesCount, List<Criteria> criteria) {
+    public AbstractContainerPlacementStrategy getDefaultStrategy(int nodesCount, List<Criteria> criteria) {
         return new RoundRobinStrategy(nodesCount);
     }
 

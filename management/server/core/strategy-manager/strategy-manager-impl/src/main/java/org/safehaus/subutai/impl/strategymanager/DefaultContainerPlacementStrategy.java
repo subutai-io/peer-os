@@ -1,7 +1,7 @@
 package org.safehaus.subutai.impl.strategymanager;
 
 
-import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
 import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * This is a default container placement strategy. According to metrics and limits calculates number of containers that each
  * connected physical host can accommodate
  */
-public class DefaultContainerPlacementStrategy extends ContainerPlacementStrategy {
+public class DefaultContainerPlacementStrategy extends AbstractContainerPlacementStrategy {
     public static final String defaultNodeType = "default";
     private final double MIN_HDD_LXC_MB = 5 * 1024;
     private final double MIN_HDD_IN_RESERVE_MB = 20 * 1024;
