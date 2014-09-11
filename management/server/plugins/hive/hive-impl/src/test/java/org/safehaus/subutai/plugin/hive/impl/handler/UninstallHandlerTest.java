@@ -5,9 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.impl.handler.mock.HiveImplMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 
 public class UninstallHandlerTest {
 
@@ -32,7 +32,7 @@ public class UninstallHandlerTest {
 	@Test
 	public void testWithExistingCluster() {
         HiveConfig config = new HiveConfig();
-		config.setServer(CommonMockBuilder.createAgent());
+		config.setServer( CommonMockBuilder.createAgent());
 		mock.setConfig(config);
 		handler.run();
 

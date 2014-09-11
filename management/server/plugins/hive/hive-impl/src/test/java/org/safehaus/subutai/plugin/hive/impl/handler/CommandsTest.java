@@ -3,10 +3,10 @@ package org.safehaus.subutai.plugin.hive.impl.handler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.hive.impl.CommandType;
 import org.safehaus.subutai.plugin.hive.impl.Commands;
 import org.safehaus.subutai.plugin.hive.impl.Product;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 
 public class CommandsTest {
