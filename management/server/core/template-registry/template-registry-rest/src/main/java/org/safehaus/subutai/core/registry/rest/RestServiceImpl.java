@@ -116,13 +116,21 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String getChildTemplates( final String parentTemplateName ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
+        List<String> children = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName ) ) {
+            children.add( template.getTemplateName() );
+        }
+        return gson.toJson( children );
     }
 
 
     @Override
     public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
+        List<String> children = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) ) {
+            children.add( template.getTemplateName() );
+        }
+        return gson.toJson( children );
     }
 
 
@@ -166,13 +174,21 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listTemplates() {
-        return gson.toJson( templateRegistryManager.getAllTemplates() );
+        List<String> templates = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getAllTemplates() ) {
+            templates.add( template.getTemplateName() );
+        }
+        return gson.toJson( templates );
     }
 
 
     @Override
     public String listTemplates( final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
+        List<String> templates = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getAllTemplates( lxcArch ) ) {
+            templates.add( template.getTemplateName() );
+        }
+        return gson.toJson( templates );
     }
 
 
