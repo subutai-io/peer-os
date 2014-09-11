@@ -43,7 +43,6 @@
         <dependency>
             <groupId>org.safehaus.subutai</groupId>
             <artifactId>vaadin-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
