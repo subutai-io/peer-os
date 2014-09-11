@@ -14,9 +14,6 @@ public interface ContainerPlacementStrategy {
     public String getId();
     public String getTitle();
 
-    void addCriteria(Criteria criteria);
-    void setCriteria(List<Criteria> criteria);
-
     public List<Criteria> getCriteria();
 
     public Map<Agent, Integer> calculateSlots(int nodesCount, Map<Agent, ServerMetric> serverMetrics);

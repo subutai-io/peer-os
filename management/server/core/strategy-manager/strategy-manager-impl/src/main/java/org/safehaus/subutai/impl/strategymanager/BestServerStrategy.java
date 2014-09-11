@@ -67,4 +67,22 @@ public class BestServerStrategy extends RoundRobinStrategy {
     public String getTitle() {
         return "Best server placement strategy";
     }
+
+    @Override
+    public boolean hasCriteria() {
+        return true;
+    }
+
+    @Override
+    public List<Criteria> getCriteria() {
+        List<Criteria> criteria = new ArrayList<Criteria>();
+        Criteria c = new Criteria("MORE_HDD", "More HDD", new Boolean(false));
+        criteria.add(c);
+        c = new Criteria("MORE_RAM", "More RAM", new Boolean(false));
+        criteria.add(c);
+        c = new Criteria("MORE_CPU", "More CPU", new Boolean(false));
+        criteria.add(c);
+
+        return Collections.unmodifiableList(criteria);
+    }
 }

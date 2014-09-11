@@ -76,7 +76,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
     public synchronized void unregisterStrategy(ContainerPlacementStrategy containerPlacementStrategy) {
         if (containerPlacementStrategy != null) {
-            LOG.info(String.format("Registering container placement strategy: %s", containerPlacementStrategy.getId()));
+            LOG.info(String.format("Unregistering container placement strategy: %s", containerPlacementStrategy.getId()));
             placementStrategies.remove(containerPlacementStrategy);
         }
     }

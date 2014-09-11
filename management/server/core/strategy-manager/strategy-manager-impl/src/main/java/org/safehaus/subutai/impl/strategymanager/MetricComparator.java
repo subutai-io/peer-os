@@ -7,51 +7,42 @@ import org.safehaus.subutai.api.strategymanager.ServerMetric;
 
 abstract class MetricComparator {
 
-	static MetricComparator create(Criteria criteria) {
-		MetricComparator mc = null;
-		// TODO: add missing case clauses
-		switch (criteria) {
-			case MORE_HDD:
-				mc = new MetricComparator() {
-					@Override
-					public int getValue(ServerMetric m) {
-						return m.getFreeHddMb();
-					}
-				};
-				break;
-			case MORE_RAM:
-				mc = new MetricComparator() {
-					@Override
-					int getValue(ServerMetric m) {
-						return m.getFreeRamMb();
-					}
-				};
-				break;
-			case MORE_CPU:
-				mc = new MetricComparator() {
-					@Override
-					int getValue(ServerMetric m) {
-						return m.getCpuLoadPercent();
-					}
+    static MetricComparator create(Criteria criteria) {
+        MetricComparator mc = null;
+        if ("MORE_HDD".equals(criteria.getId()))
+            mc = new MetricComparator() {
+                @Override
+                public int getValue(ServerMetric m) {
+                    return m.getFreeHddMb();
+                }
+            };
+        if ("MORE_RAM".equals(criteria.getId()))
+            mc = new MetricComparator() {
+                @Override
+                int getValue(ServerMetric m) {
+                    return m.getFreeRamMb();
+                }
+            };
+        if ("MORE_CPU".equals(criteria.getId()))
+            mc = new MetricComparator() {
+                @Override
+                int getValue(ServerMetric m) {
+                    return m.getCpuLoadPercent();
+                }
 
 
-					@Override
-					boolean isLessBetter() {
-						return true;
-					}
-				};
-				break;
-			default:
-				throw new AssertionError(criteria.name());
-		}
-		return mc;
-	}
+                @Override
+                boolean isLessBetter() {
+                    return true;
+                }
+            };
+        return null;
+    }
+
+    abstract int getValue(ServerMetric m);
 
 
-	abstract int getValue(ServerMetric m);
-
-
-	boolean isLessBetter() {
-		return false;
-	}
+    boolean isLessBetter() {
+        return false;
+    }
 }

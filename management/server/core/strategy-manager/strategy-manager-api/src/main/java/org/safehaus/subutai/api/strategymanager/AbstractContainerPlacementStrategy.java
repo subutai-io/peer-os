@@ -42,21 +42,10 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     }
 
     @Override
-    public void addCriteria(Criteria criteria) {
-        if (criteria == null)
-            throw new IllegalArgumentException("Criteria could not be null.");
-        this.criteria.add(criteria);
-    }
-
-    @Override
     public List<Criteria> getCriteria() {
         return Collections.unmodifiableList(criteria);
     }
 
-    @Override
-    public void setCriteria(List<Criteria> criteria) {
-        this.criteria = criteria;
-    }
 
     /**
      * Returns placement map

@@ -1,16 +1,40 @@
 package org.safehaus.subutai.api.strategymanager;
 
 /**
- * Created by timur on 9/10/14.
+ * Class for holding container placement strategy criteria.
  */
-public enum Criteria {
-    MORE_HDD("More HDD"), MORE_RAM("More RAM"), MORE_CPU("More CPU");
-    String value;
-    Criteria(String value) {
+public class Criteria {
+    private String id;
+    private String title;
+    private Object value;
+
+    public Criteria(String id, String title, Object value) {
+        this.id = id;
+        this.title = title;
         this.value = value;
     }
 
-    String getValue() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Object getValue() {
         return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
     }
 }

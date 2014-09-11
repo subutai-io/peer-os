@@ -200,8 +200,12 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
                 show("There is no placement strategy.");
                 return;
             }
+            ContainerPlacementStrategy containerPlacementStrategy = strategies.get(0);
             LOG.info(String.format("There are %d placement strategies", strategies.size()));
-            String placementStrategyId = ((ContainerPlacementStrategy)strategies.get(0)).getId();
+            String placementStrategyId = containerPlacementStrategy.getId();
+            if (containerPlacementStrategy.hasCriteria()) {
+
+            }
             Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int)count, placementStrategyId , criteria);
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
