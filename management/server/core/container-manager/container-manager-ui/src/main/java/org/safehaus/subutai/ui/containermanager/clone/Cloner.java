@@ -4,6 +4,7 @@ package org.safehaus.subutai.ui.containermanager.clone;
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -50,6 +51,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
     AtomicInteger countProcessed = null;
     AtomicInteger errorProcessed = null;
     Map<ContainerPlacementStrategy, List<Component>> criteriaMap = new HashMap<ContainerPlacementStrategy, List<Component>>();
+    Map<ContainerPlacementStrategy, Component> criteriaUI = new HashMap<ContainerPlacementStrategy, Component>();
     List<ContainerPlacementStrategy> placementStrategies;
 
     public Cloner(final ContainerManager containerManager, AgentTree agentTree) {
@@ -63,13 +65,37 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
         BeanItemContainer<ContainerPlacementStrategy> container = new BeanItemContainer<ContainerPlacementStrategy>(ContainerPlacementStrategy.class);
         placementStrategies = containerManager.getPlacementStrategies();
+//        for (ContainerPlacementStrategy st : placementStrategies) {
+//            BeanContainer<String, Criteria> beans =
+//                    new BeanContainer<String, Criteria>(Criteria.class);
+//
+//            // Use the name property as the item ID of the bean
+//            beans.setBeanIdProperty("id");
+//            for (Criteria c : st.getCriteria()) {
+//                beans.addBean(c);
+//            }
+//
+//            // Bind a table to it
+//            Table table = new Table("Beans of All Sorts", beans);
+//            criteriaUI.put(st, table);
+//        }
+
         for (ContainerPlacementStrategy st : placementStrategies) {
             List<Component> components = new ArrayList<Component>();
             for (Criteria c : st.getCriteria()) {
-                Component label = new Label(c.getTitle());
+                BeanItem<Criteria> beanItem = new BeanItem<Criteria>(c);
+
+                String title = c.getTitle();
+                Component component=null;
+                Object value = c.getValue();
+                if (value instanceof Boolean) {
+                    component = new CheckBox(c.getTitle(), (Boolean)c.getValue());
+                    component.setId(c.getId());
+                    title = "";
+                }
+                Component label = new Label(title);
                 components.add(label);
-                Component checkbox = new CheckBox(c.getTitle(), (Boolean)c.getValue());
-                components.add(checkbox);
+                components.add(component);
             }
 
             criteriaMap.put(st, components);
@@ -135,7 +161,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         indicator.setWidth(50, Unit.PIXELS);
         indicator.setVisible(false);
 
-        topContent = new GridLayout(7, 2);
+        topContent = new GridLayout(7, 3);
         topContent.setSpacing(true);
         strategy = new ComboBox(null, container);
         strategy.setItemCaptionPropertyId("title");
@@ -145,9 +171,9 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
         strategy.setNullSelectionAllowed(false);
         Property.ValueChangeListener listener = new Property.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
-                show(event.getProperty().getValue().toString());
+//                show(event.getProperty().getValue().toString());
 
-                Component prevComponent = topContent.getComponent(2, 4);
+                Component prevComponent = topContent.getComponent(0, 2);
                 if (prevComponent != null)
                     topContent.removeComponent(prevComponent);
                 List<Component> criteriaComponents = criteriaMap.get(event.getProperty().getValue());
@@ -155,16 +181,17 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
                 if (criteriaComponents.size() == 0)
                     return;
 
-                GridLayout criteriaContent = new GridLayout(criteriaComponents.size(), 2);
+                GridLayout criteriaContent = new GridLayout(2,criteriaComponents.size());
                 criteriaContent.setSpacing(true);
 
                 for (Component c : criteriaComponents) {
                     criteriaContent.addComponent(c);
                 }
 
-                topContent.addComponent(criteriaContent, 2, 4);
+                topContent.addComponent(criteriaContent, 0, 2);
             }
         };
+
         strategy.addValueChangeListener(listener);
 //        strategy.setValue(defaultStrategy);
 
@@ -239,12 +266,26 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
                 show("There is no placement strategy.");
                 return;
             }
-            ContainerPlacementStrategy containerPlacementStrategy = placementStrategies.get(0);
-            String placementStrategyId = containerPlacementStrategy.getId();
-            if (containerPlacementStrategy.hasCriteria()) {
+            ContainerPlacementStrategy selectedStrategy = placementStrategies.get(placementStrategies.indexOf(strategy.getValue()));
+            String placementStrategyId = selectedStrategy.getId();
+            if (selectedStrategy.hasCriteria()) {
+                //TODO: will be implemented later
+//                List<Component> criteriaComponents = criteriaMap.get(selectedStrategy);
+//                for (Criteria ci : selectedStrategy.getCriteria()) {
+//                    String id;
+//                    String title;
+//                    Object value;
+//                    for (Component com : criteriaComponents) {
+//                        if (com.getId().equals(ci.getId())) {
+//                        }
+//                    }
+//                    //Criteria newCriteria = new Criteria(id,title, value);
+//
+////                    criteriaComponents.
+//                }
 
             }
-            Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int) count, placementStrategyId, criteria);
+            Map<Agent, Integer> bestServers = containerManager.getPlacementDistribution((int) count, selectedStrategy.getId(), criteria);
             if (bestServers.isEmpty()) {
                 show("No servers available to accommodate new lxc containers");
                 return;
