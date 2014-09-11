@@ -12,7 +12,7 @@ public interface PeerManager {
 
     String register( Peer peer );
 
-    UUID getHostId();
+    UUID getSiteId();
 
     List<Peer> peers();
 

@@ -115,7 +115,7 @@ public final class AgentTree extends ConcurrentComponent
 				//grab parents
 				Set<Agent> parents = new HashSet<>();
 				for (Agent agent : allFreshAgents) {
-					if (!agent.isIsLXC() && agent.getUuid() != null && agent.getHostname() != null) {
+					if (!agent.isLXC() && agent.getUuid() != null && agent.getHostname() != null) {
 						parents.add(agent);
 					}
 				}
@@ -129,7 +129,7 @@ public final class AgentTree extends ConcurrentComponent
 						//find children
 						Set<Agent> children = new HashSet<>();
 						for (Agent possibleChild : allFreshAgents) {
-							if (possibleChild.isIsLXC()
+							if (possibleChild.isLXC()
 									&& possibleChild.getUuid() != null && possibleChild.getHostname() != null) {
 								//add for further orphan children processing
 								possibleOrphans.add(possibleChild);
@@ -153,7 +153,7 @@ public final class AgentTree extends ConcurrentComponent
 				} else {
 					//all agents are orphans
 					for (Agent possibleChild : allFreshAgents) {
-						if (possibleChild.isIsLXC()
+						if (possibleChild.isLXC()
 								&& possibleChild.getUuid() != null && possibleChild.getHostname() != null) {
 							//add for further orphan children processing
 							possibleOrphans.add(possibleChild);

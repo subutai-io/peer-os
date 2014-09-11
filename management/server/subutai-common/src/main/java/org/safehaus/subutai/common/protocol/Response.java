@@ -32,12 +32,8 @@ public class Response implements Serializable {
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
+    private UUID environmentId;
 
-    //TODO remove hostId and ownerId
-    //host subutai id
-    private UUID hostId;
-    //owner subutai id
-    private UUID ownerId;
 
     // inotify fields
     private String confPoints[];
@@ -46,13 +42,8 @@ public class Response implements Serializable {
     private String dateTime;
 
 
-    public UUID getHostId() {
-        return hostId;
-    }
-
-
-    public UUID getOwnerId() {
-        return ownerId;
+    public UUID getEnvironmentId() {
+        return environmentId;
     }
 
 
@@ -74,7 +65,7 @@ public class Response implements Serializable {
     }
 
 
-    public Boolean isIsLxc() {
+    public Boolean isLxc() {
         return isLxc;
     }
 

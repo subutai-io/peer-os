@@ -19,5 +19,5 @@ public interface RestService {
     @POST
     @Path("requests")
     @Produces({ MediaType.TEXT_PLAIN })
-    public Response executeRequests( @FormParam("ownerId") String ownerId, @FormParam("requests") String requests );
+    public Response executeRequests( @FormParam("requests") String requests );
 }
