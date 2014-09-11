@@ -174,13 +174,21 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String listTemplates() {
-        return gson.toJson( templateRegistryManager.getAllTemplates() );
+        List<String> templates = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getAllTemplates() ) {
+            templates.add( template.getTemplateName() );
+        }
+        return gson.toJson( templates );
     }
 
 
     @Override
     public String listTemplates( final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
+        List<String> templates = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getAllTemplates( lxcArch ) ) {
+            templates.add( template.getTemplateName() );
+        }
+        return gson.toJson( templates );
     }
 
 
