@@ -90,4 +90,25 @@ public class PeerImpl implements PeerManager {
         }
         return true;
     }
+
+
+    @Override
+    public Peer getPeerByUUID( String uuid ) {
+        try {
+            Peer peer = peerDAO.getInfo( source, uuid, Peer.class );
+            return peer;
+        }
+        catch ( DBException e ) {
+            LOG.info( e.getMessage() );
+        }
+        finally {
+            return null;
+        }
+    }
+
+
+    @Override
+    public boolean unregisterPeer( final String uuid ) {
+        return false;
+    }
 }

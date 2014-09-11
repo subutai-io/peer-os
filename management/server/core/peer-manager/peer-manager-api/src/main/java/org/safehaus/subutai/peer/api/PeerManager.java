@@ -9,11 +9,15 @@ import java.util.List;
  */
 public interface PeerManager {
 
-    String register(Peer peer);
+    String register( Peer peer );
 
     String getHostId();
 
     List<Peer> peers();
+
+    boolean unregister( String uuid );
+
+    Peer getPeerByUUID( String uuid );
 
     boolean unregister(String uuid);
 }
