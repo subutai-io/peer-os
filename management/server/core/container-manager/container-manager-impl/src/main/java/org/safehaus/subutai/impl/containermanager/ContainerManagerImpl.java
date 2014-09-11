@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 
 public class ContainerManagerImpl extends ContainerManagerBase {
+    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(ContainerManagerImpl.class.getName());
 
     private static final Logger logger = LoggerFactory.getLogger(ContainerManagerImpl.class);
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
@@ -46,6 +47,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ExecutorService executor;
     private Monitor monitor;
     private PlacementStrategyFactory placementStrategyFactory;
+    private List<PlacementStrategyFactory> strategyFactories;
 
     public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager, PlacementStrategyFactory placementStrategyFactory) {
         this.agentManager = agentManager;
@@ -73,10 +75,17 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         executor.shutdown();
     }
 
+    public void setStrategyFactories(List<PlacementStrategyFactory> strategyFactories) {
+        this.strategyFactories = strategyFactories;
+    }
+
     @Override
     public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
         ContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
         containerPlacementStrategy.calculatePlacement(getPhysicalServerMetrics());
+        if (strategyFactories != null)
+            for (int i = 0; i < strategyFactories.size(); i++)
+                LOG.info(" ============> " + strategyFactories.get(i));
         return containerPlacementStrategy.getPlacementDistribution();
     }
 
