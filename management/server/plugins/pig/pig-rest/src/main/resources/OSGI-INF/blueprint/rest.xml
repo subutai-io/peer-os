@@ -15,8 +15,8 @@
         <property name="pigManager" ref="pigManager"/>
     </bean>
 
-    <jaxrs:server address="/pig2" id="pigRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/pig" id="pigRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

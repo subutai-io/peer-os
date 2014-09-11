@@ -9,8 +9,8 @@ public class EnvironmentBuildException extends EnvironmentManagerException {
     private String message;
 
 
-    public EnvironmentBuildException( final String message ) {
-        super( message );
+    public EnvironmentBuildException(final String message) {
+        super(message);
         this.message = message;
     }
 

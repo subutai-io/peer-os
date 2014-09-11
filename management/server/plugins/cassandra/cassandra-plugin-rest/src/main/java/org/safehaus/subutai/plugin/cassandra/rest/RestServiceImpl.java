@@ -1,14 +1,15 @@
 package org.safehaus.subutai.plugin.cassandra.rest;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.cassandra.api.Cassandra;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.api.TrimmedCassandraClusterConfig;
+
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -24,87 +25,96 @@ public class RestServiceImpl implements RestService {
     }
 
 
-    public void setCassandraManager( final Cassandra cassandraManager ) {
+    public void setCassandraManager(final Cassandra cassandraManager) {
         this.cassandraManager = cassandraManager;
     }
 
 
     @Override
-    public String listClusters() {
+    public Response listClusters() {
         List<CassandraClusterConfig> configs = cassandraManager.getClusters();
         List<String> clusterNames = new ArrayList<>();
-        for ( CassandraClusterConfig config : configs ) {
-            clusterNames.add( config.getClusterName() );
+        for (CassandraClusterConfig config : configs) {
+            clusterNames.add(config.getClusterName());
         }
-        return JsonUtil.toJson( clusterNames );
+        String clusters = JsonUtil.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
-        return JsonUtil.toJson( cassandraManager.getCluster( source ) );
+    public Response getCluster(final String source) {
+        String cluster = JsonUtil.toJson(cassandraManager.getCluster(source));
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public Response createCluster(final String config) {
         TrimmedCassandraClusterConfig trimmedCassandraConfig =
-                JsonUtil.fromJson( config, TrimmedCassandraClusterConfig.class );
+                JsonUtil.fromJson(config, TrimmedCassandraClusterConfig.class);
 
         CassandraClusterConfig cassandraConfig = new CassandraClusterConfig();
-        cassandraConfig.setClusterName( trimmedCassandraConfig.getClusterName() );
-        cassandraConfig.setDomainName( trimmedCassandraConfig.getDomainName() );
-        cassandraConfig.setNumberOfNodes( trimmedCassandraConfig.getNumberOfNodes() );
-        cassandraConfig.setNumberOfSeeds( trimmedCassandraConfig.getNumberOfSeeds() );
+        cassandraConfig.setClusterName(trimmedCassandraConfig.getClusterName());
+        cassandraConfig.setDomainName(trimmedCassandraConfig.getDomainName());
+        cassandraConfig.setNumberOfNodes(trimmedCassandraConfig.getNumberOfNodes());
+        cassandraConfig.setNumberOfSeeds(trimmedCassandraConfig.getNumberOfSeeds());
 
-        UUID uuid = cassandraManager.installCluster( cassandraConfig );
-        return wrapUUID( uuid );
+        UUID uuid = cassandraManager.installCluster(cassandraConfig);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
-        UUID uuid = cassandraManager.uninstallCluster( clusterName );
-        return wrapUUID( uuid );
+    public Response destroyCluster(final String clusterName) {
+        UUID uuid = cassandraManager.uninstallCluster(clusterName);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
-        UUID uuid = cassandraManager.startCluster( clusterName );
-        return wrapUUID( uuid );
+    public Response startCluster(final String clusterName) {
+        UUID uuid = cassandraManager.startCluster(clusterName);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
-        UUID uuid = cassandraManager.stopCluster( clusterName );
-        return wrapUUID( uuid );
+    public Response stopCluster(final String clusterName) {
+        UUID uuid = cassandraManager.stopCluster(clusterName);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = cassandraManager.addNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response addNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = cassandraManager.addNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = cassandraManager.destroyNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response destroyNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = cassandraManager.destroyNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clustername, final String lxchostname ) {
-        UUID uuid = cassandraManager.checkNode( clustername, lxchostname );
-        return wrapUUID( uuid );
+    public Response checkNode(final String clusterName, final String lxcHostname) {
+        UUID uuid = cassandraManager.checkNode(clusterName, lxcHostname);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
-    private String wrapUUID( UUID uuid ) {
-        return JsonUtil.toJson( "OPERATION_ID", uuid );
+    private String wrapUUID(UUID uuid) {
+        return JsonUtil.toJson("OPERATION_ID", uuid);
     }
 }

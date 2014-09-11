@@ -1,9 +1,9 @@
 package org.safehaus.subutai.common.protocol;
 
 
-import java.util.Set;
-
 import org.safehaus.subutai.common.settings.Common;
+
+import java.util.Set;
 
 
 /**
@@ -23,7 +23,7 @@ public class EnvironmentBlueprint {
     }
 
 
-    public void setDomainName( final String domainName ) {
+    public void setDomainName(final String domainName) {
         this.domainName = domainName;
     }
 
@@ -33,7 +33,7 @@ public class EnvironmentBlueprint {
     }
 
 
-    public void setLinkHosts( final boolean linkHosts ) {
+    public void setLinkHosts(final boolean linkHosts) {
         this.linkHosts = linkHosts;
     }
 
@@ -43,7 +43,7 @@ public class EnvironmentBlueprint {
     }
 
 
-    public void setExchangeSshKeys( final boolean exchangeSshKeys ) {
+    public void setExchangeSshKeys(final boolean exchangeSshKeys) {
         this.exchangeSshKeys = exchangeSshKeys;
     }
 
@@ -53,7 +53,7 @@ public class EnvironmentBlueprint {
     }
 
 
-    public void setName( final String name ) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -63,7 +63,7 @@ public class EnvironmentBlueprint {
     }
 
 
-    public void setNodeGroups( final Set<NodeGroup> nodeGroups ) {
+    public void setNodeGroups(final Set<NodeGroup> nodeGroups) {
         this.nodeGroups = nodeGroups;
     }
 
