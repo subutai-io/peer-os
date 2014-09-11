@@ -13,7 +13,8 @@
                interface="org.safehaus.subutai.api.templateregistry.TemplateRegistryManager"/>
     <reference id="dbManager" availability="mandatory"
                interface="org.safehaus.subutai.api.dbmanager.DbManager"/>
-
+    <reference id="placementStrategyFactory" availability="mandatory"
+               interface="org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory"/>
     <!--
     <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
@@ -32,6 +33,7 @@
         <argument ref="templateManager"/>
         <argument ref="templateRegistry"/>
         <argument ref="dbManager"/>
+        <argument ref="placementStrategyFactory"/>
     </bean>
 
     <!--
