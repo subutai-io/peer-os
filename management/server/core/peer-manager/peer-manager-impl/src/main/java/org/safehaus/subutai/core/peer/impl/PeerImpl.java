@@ -62,7 +62,7 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public UUID getHostId() {
+    public UUID getSiteId() {
         return id;
     }
 

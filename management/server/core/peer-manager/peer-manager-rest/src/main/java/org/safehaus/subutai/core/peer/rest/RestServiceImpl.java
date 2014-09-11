@@ -58,7 +58,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public String getId() {
 
-        UUID id = peerManager.getHostId();
+        UUID id = peerManager.getSiteId();
         return GSON.toJson(id);
     }
 

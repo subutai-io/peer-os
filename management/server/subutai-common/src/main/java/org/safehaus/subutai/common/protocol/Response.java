@@ -32,6 +32,7 @@ public class Response implements Serializable {
     private List<String> ips;
     private Boolean isLxc;
     private String transportId;
+    private UUID environmentId;
 
 
     // inotify fields
@@ -39,6 +40,11 @@ public class Response implements Serializable {
     private String configPoint;
     private String changeType;
     private String dateTime;
+
+
+    public UUID getEnvironmentId() {
+        return environmentId;
+    }
 
 
     public String getParentHostName() {
@@ -59,7 +65,7 @@ public class Response implements Serializable {
     }
 
 
-    public Boolean isIsLxc() {
+    public Boolean isLxc() {
         return isLxc;
     }
 

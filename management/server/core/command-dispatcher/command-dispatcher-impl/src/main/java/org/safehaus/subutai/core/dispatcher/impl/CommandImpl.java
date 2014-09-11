@@ -53,10 +53,10 @@ public class CommandImpl extends AbstractCommand {
                 requests.add( request );
             }
             else {
-                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getEnvironmentId() );
                 if ( batchRequests == null ) {
                     batchRequests = new HashSet<>();
-                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                    remoteRequests.put( agent.getEnvironmentId(), batchRequests );
                     batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
                 }
                 else {
@@ -143,10 +143,10 @@ public class CommandImpl extends AbstractCommand {
                 requests.add( request );
             }
             else {
-                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getEnvironmentId() );
                 if ( batchRequests == null ) {
                     batchRequests = new HashSet<>();
-                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                    remoteRequests.put( agent.getEnvironmentId(), batchRequests );
                 }
                 batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
             }

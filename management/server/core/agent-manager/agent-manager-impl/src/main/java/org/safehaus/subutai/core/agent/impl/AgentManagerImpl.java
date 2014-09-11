@@ -329,7 +329,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), peerManager.getHostId(), getOwnerIdByAgentId( response.getUuid() ) );
+                        response.getTransportId(), peerManager.getSiteId(), response.getEnvironmentId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
@@ -342,12 +342,6 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
         catch ( Exception e ) {
             LOG.log( Level.SEVERE, "Error in addAgent", e );
         }
-    }
-
-
-    private UUID getOwnerIdByAgentId( UUID agentId ) {
-        //TODO return ownerId from database
-        return peerManager.getHostId();
     }
 
 

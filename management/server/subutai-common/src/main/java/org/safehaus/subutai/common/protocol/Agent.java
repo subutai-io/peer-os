@@ -23,16 +23,17 @@ public class Agent implements Serializable, Comparable<Agent> {
     private boolean isLXC;
     private String parentHostName;
     private String transportId;
-    private UUID hostId;
-    private UUID ownerId;
+    private UUID siteId;
+    private UUID environmentId;
 
 
     public Agent( UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP,
-                  boolean isLXC, String transportId, UUID hostId, UUID ownerId ) {
+                  boolean isLXC, String transportId, UUID siteId, UUID environmentId ) {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
-        Preconditions.checkNotNull( hostId, "Host id is null" );
-        Preconditions.checkNotNull( ownerId, "Owner id is null" );
+        Preconditions.checkNotNull( siteId, "Site id is null" );
+        //TODO enable this check when agents starts supplying environmentId
+        //        Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
@@ -41,18 +42,18 @@ public class Agent implements Serializable, Comparable<Agent> {
         this.isLXC = isLXC;
         this.parentHostName = parentHostName;
         this.transportId = transportId;
-        this.hostId = hostId;
-        this.ownerId = ownerId;
+        this.siteId = siteId;
+        this.environmentId = environmentId;
     }
 
 
-    public UUID getHostId() {
-        return hostId;
+    public UUID getSiteId() {
+        return siteId;
     }
 
 
-    public UUID getOwnerId() {
-        return ownerId;
+    public UUID getEnvironmentId() {
+        return environmentId;
     }
 
 
@@ -136,6 +137,6 @@ public class Agent implements Serializable, Comparable<Agent> {
 
 
     public boolean isLocal() {
-        return hostId.compareTo( ownerId ) == 0;
+        return siteId.compareTo( environmentId ) == 0;
     }
 }
