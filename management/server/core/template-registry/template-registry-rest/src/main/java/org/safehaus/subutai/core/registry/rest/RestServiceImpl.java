@@ -116,13 +116,21 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public String getChildTemplates( final String parentTemplateName ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
+        List<String> children = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName ) ) {
+            children.add( template.getTemplateName() );
+        }
+        return gson.toJson( children );
     }
 
 
     @Override
     public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
+        List<String> children = new ArrayList<>();
+        for ( Template template : templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) ) {
+            children.add( template.getTemplateName() );
+        }
+        return gson.toJson( children );
     }
 
 
