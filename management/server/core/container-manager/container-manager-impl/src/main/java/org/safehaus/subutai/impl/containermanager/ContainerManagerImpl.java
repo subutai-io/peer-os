@@ -9,18 +9,22 @@ import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.commandrunner.AgentResult;
 import org.safehaus.subutai.api.commandrunner.Command;
 import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.containermanager.*;
+import org.safehaus.subutai.api.containermanager.ContainerCreateException;
+import org.safehaus.subutai.api.containermanager.ContainerDestroyException;
+import org.safehaus.subutai.api.containermanager.ContainerState;
 import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.monitoring.Metric;
 import org.safehaus.subutai.api.monitoring.Monitor;
+import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
+import org.safehaus.subutai.api.strategymanager.Criteria;
+import org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory;
+import org.safehaus.subutai.api.strategymanager.ServerMetric;
 import org.safehaus.subutai.api.template.manager.TemplateManager;
 import org.safehaus.subutai.api.templateregistry.Template;
 import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 import org.safehaus.subutai.common.settings.Common;
-import org.safehaus.subutai.impl.containermanager.strategy.DefaultContainerPlacementStrategy;
-import org.safehaus.subutai.impl.containermanager.strategy.PlacementStrategyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,14 +45,16 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     private ConcurrentMap<String, AtomicInteger> sequences;
     private ExecutorService executor;
     private Monitor monitor;
+    private PlacementStrategyFactory placementStrategyFactory;
 
-    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager) {
+    public ContainerManagerImpl(AgentManager agentManager, CommandRunner commandRunner, Monitor monitor, TemplateManager templateManager, TemplateRegistryManager templateRegistry, DbManager dbManager, PlacementStrategyFactory placementStrategyFactory) {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.monitor = monitor;
         this.templateManager = templateManager;
         this.templateRegistry = templateRegistry;
         this.dbManager = dbManager;
+        this.placementStrategyFactory = placementStrategyFactory;
 
         Commands.init(commandRunner);
     }
@@ -68,8 +74,15 @@ public class ContainerManagerImpl extends ContainerManagerBase {
     }
 
     @Override
-    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                            PlacementStrategy... strategy) throws ContainerCreateException {
+    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
+        ContainerPlacementStrategy containerPlacementStrategy = placementStrategyFactory.create(nodesCount, strategy, criteria);
+        containerPlacementStrategy.calculatePlacement(getPhysicalServerMetrics());
+        return containerPlacementStrategy.getPlacementDistribution();
+    }
+
+    @Override
+    public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts, PlacementStrategy strategy,
+                            List<Criteria> criteria) throws ContainerCreateException {
 
         // restrict metrics to provided hosts only
         Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
@@ -82,13 +95,10 @@ public class ContainerManagerImpl extends ContainerManagerBase {
             }
         }
 
-        ContainerPlacementStrategy st = PlacementStrategyFactory.create(nodesCount, strategy);
+        ContainerPlacementStrategy st = placementStrategyFactory.create(nodesCount, strategy, criteria);
 
-        try {
-            st.calculatePlacement(metrics);
-        } catch (ContainerCreateException e) {
-            throw new ContainerCreateException(e.getMessage());
-        }
+        st.calculatePlacement(metrics);
+
         Map<Agent, Integer> slots = st.getPlacementDistribution();
 
         int totalSlots = 0;
@@ -219,8 +229,8 @@ public class ContainerManagerImpl extends ContainerManagerBase {
 
 
     public Set<Agent> clone(String templateName, int nodesCount, Collection<Agent> hosts,
-                            PlacementStrategy... strategy) throws ContainerCreateException {
-        return clone(null, templateName, nodesCount, hosts, strategy);
+                            PlacementStrategy strategy, List<Criteria> criteria) throws ContainerCreateException {
+        return clone(null, templateName, nodesCount, hosts, strategy, criteria);
     }
 
     public void cloneDestroy(final String hostName, final String cloneName) throws ContainerDestroyException {
@@ -310,7 +320,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         if (getMetricsCommand.hasCompleted()) {
             for (AgentResult result : getMetricsCommand.getResults().values()) {
                 String[] metrics = result.getStdOut().split("\n");
-                org.safehaus.subutai.api.containermanager.ServerMetric serverMetric = gatherMetrics(metrics);
+                ServerMetric serverMetric = gatherMetrics(metrics);
                 if (serverMetric != null) {
                     Agent agent = agentManager.getAgentByUUID(result.getAgentUUID());
                     Map<Metric, Double> averageMetrics = gatherAvgMetrics(agent);
@@ -323,9 +333,9 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         if (!serverMetrics.isEmpty()) {
             //get number of lxcs currently present on servers
             Map<String, EnumMap<ContainerState, List<String>>> lxcInfo = getLxcOnPhysicalServers();
-            for (Iterator<Map.Entry<Agent, org.safehaus.subutai.api.containermanager.ServerMetric>> it = serverMetrics.entrySet().iterator();
+            for (Iterator<Map.Entry<Agent, ServerMetric>> it = serverMetrics.entrySet().iterator();
                  it.hasNext(); ) {
-                Map.Entry<Agent, org.safehaus.subutai.api.containermanager.ServerMetric> entry = it.next();
+                Map.Entry<Agent, ServerMetric> entry = it.next();
                 EnumMap<ContainerState, List<String>> info = lxcInfo.get(entry.getKey().getHostname());
                 if (info != null) {
                     int numOfExistingLxcs =
@@ -447,7 +457,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         }
         if (parseOk) {
             ServerMetric serverMetric =
-                    new org.safehaus.subutai.api.containermanager.ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc,
+                    new ServerMetric(freeHddMb, freeRamMb, (int) cpuLoadPercent, numOfProc,
                             null);
             return serverMetric;
         } else
@@ -647,7 +657,7 @@ public class ContainerManagerImpl extends ContainerManagerBase {
         group.setTemplateName(templateName);
         if (strategy == null || strategy.length == 0) {
             strategy = new PlacementStrategy[]{
-                    PlacementStrategyFactory.getDefaultStrategyType()
+                    placementStrategyFactory.getDefaultStrategyType()
             };
         }
         group.setStrategy(EnumSet.of(strategy[0], strategy));
@@ -665,31 +675,43 @@ public class ContainerManagerImpl extends ContainerManagerBase {
      *
      * @return map where key is a physical server and value is the number of lxc slots
      */
-    public Map<Agent, Integer> getPhysicalServersWithLxcSlots() {
-        final Map<Agent, Integer> bestServers = new HashMap<>();
-        Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
-
-        ContainerPlacementStrategy placementStrategy = new DefaultContainerPlacementStrategy(1);
-        Map<Agent, Integer> serversSlots = placementStrategy.calculateSlots(metrics);
-        // set all values to some equal amount so that RR strategy works from UI
-        // TODO: remove this! This is for showing round-robin from UI
-        int max = Integer.MIN_VALUE;
-        for (Integer i : serversSlots.values()) {
-            if (i > max) {
-                max = i;
-            }
-        }
-        max = 10;
-
-        if (!serversSlots.isEmpty()) {
-            for (Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet()) {
-                bestServers.put(serverSlots.getKey(), max);
-            }
-        }
-
-        return bestServers;
+//    public Map<Agent, Integer> getPhysicalServersWithLxcSlots(String strategy) {
+//        final Map<Agent, Integer> bestServers = new HashMap<>();
+//        Map<Agent, ServerMetric> metrics = getPhysicalServerMetrics();
+//
+//        ContainerPlacementStrategy placementStrategy = null;
+//        if ("MORE_HDD".equals(strategy)) {
+//            placementStrategy = new BestServerStrategy(1, PlacementStrategy.MORE_HDD);
+//        } else if ("MORE_CPU".equals(strategy)) {
+//            placementStrategy = new BestServerStrategy(1, PlacementStrategy.MORE_CPU);
+//        } else if ("MORE_RAM".equals(strategy)) {
+//            placementStrategy = new BestServerStrategy(1, PlacementStrategy.MORE_RAM);
+//        } else
+//            placementStrategy = new DefaultContainerPlacementStrategy(1);
+//        Map<Agent, Integer> serversSlots = placementStrategy.calculateSlots(metrics);
+//        // set all values to some equal amount so that RR strategy works from UI
+//        // TODO: remove this! This is for showing round-robin from UI
+//        int max = Integer.MIN_VALUE;
+//        for (Integer i : serversSlots.values()) {
+//            if (i > max) {
+//                max = i;
+//            }
+//        }
+//        max = 10;
+//
+//        if (!serversSlots.isEmpty()) {
+//            for (Map.Entry<Agent, Integer> serverSlots : serversSlots.entrySet()) {
+//                bestServers.put(serverSlots.getKey(), max);
+//            }
+//        }
+//
+//        return bestServers;
+//    }
+    public Map<Agent, Integer> getPlacementDistribution(ContainerPlacementStrategy strategy, int numOfContainers) throws ContainerCreateException {
+        Map<Agent, ServerMetric> serverMetrics = getPhysicalServerMetrics();
+        strategy.calculatePlacement(serverMetrics);
+        return strategy.getPlacementDistribution();
     }
-
 
     /**
      * Clones lxc on a given physical server and set its hostname

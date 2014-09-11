@@ -649,6 +649,19 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- Strategy Manager -->
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>strategy-manager-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.safehaus.subutai</groupId>
+                <artifactId>strategy-manager-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Container Manager -->
             <dependency>
                 <groupId>org.safehaus.subutai</groupId>

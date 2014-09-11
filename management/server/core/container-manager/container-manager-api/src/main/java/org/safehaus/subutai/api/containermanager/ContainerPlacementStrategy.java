@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class ContainerPlacementStrategy {
 
 	private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<>();
-
+//    private PlacementData placementInfo = null;
 	/**
 	 * Optional method to implement for calculating total number of lxc slots
 	 * each physical server can accommodate

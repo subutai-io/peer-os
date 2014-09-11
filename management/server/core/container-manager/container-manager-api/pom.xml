@@ -30,6 +30,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>strategy-manager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>monitoring-api</artifactId>
         </dependency>
         <dependency>

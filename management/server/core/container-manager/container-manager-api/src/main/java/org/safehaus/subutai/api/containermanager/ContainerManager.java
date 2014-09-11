@@ -1,5 +1,6 @@
 package org.safehaus.subutai.api.containermanager;
 
+import org.safehaus.subutai.api.strategymanager.Criteria;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
@@ -10,8 +11,10 @@ import java.util.*;
  */
 public interface ContainerManager {
 
+    public Map<Agent, Integer> getPlacementDistribution(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria);
     public Set<Agent> clone(UUID envId, String templateName, int nodesCount, Collection<Agent> hosts,
-                            PlacementStrategy... strategy) throws ContainerCreateException;
+                            PlacementStrategy strategy,
+                            List<Criteria> criteria) throws ContainerCreateException;
 
     public void clonesDestroy(final String hostName, final Set<String> cloneNames) throws ContainerDestroyException;
 
@@ -32,13 +35,13 @@ public interface ContainerManager {
      */
     public Map<String, EnumMap<ContainerState, List<String>>> getContainersOnPhysicalServers();
 
-    /**
-     * Returns number of lxc slots that each currently connected physical server can host. This method uses default lxc
-     * placement strategy for calculations
-     *
-     * @return map where key is a physical server and value is the number of lxc slots
-     */
-    public Map<Agent, Integer> getPhysicalServersWithLxcSlots();
+//    /**
+//     * Returns number of lxc slots that each currently connected physical server can host. This method uses default lxc
+//     * placement strategy for calculations
+//     *
+//     * @return map where key is a physical server and value is the number of lxc slots
+//     */
+//    public Map<Agent, Integer> getPhysicalServersWithLxcSlots(String strategy);
 
     /**
      * Starts lxc on a given physical server

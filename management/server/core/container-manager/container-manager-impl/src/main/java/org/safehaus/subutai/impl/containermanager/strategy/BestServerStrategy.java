@@ -18,7 +18,7 @@ public class BestServerStrategy extends RoundRobinStrategy {
 
 	@Override
 	protected List<Agent> sortServers(Map<Agent, ServerMetric> serverMetrics) {
-		// using each startegy criteria, grade servers one by one
+		// using each strategy criteria, grade servers one by one
 		Map<Agent, Integer> grades = new HashMap<>();
 		for (Agent a : serverMetrics.keySet()) grades.put(a, 0);
 		for (PlacementStrategy sf : strategyFactors) {

@@ -102,7 +102,6 @@ public class DefaultContainerPlacementStrategy extends ContainerPlacementStrateg
                     Map<String, Integer> info = getPlacementInfoMap().get( physicalNode );
 
                     if ( info == null ) {
-
                         addPlacementInfo( physicalNode, defaultNodeType, 1 );
                     }
                     else {
