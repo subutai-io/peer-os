@@ -17,7 +17,7 @@ public class Peer {
     }
 
 
-    public void setName( final String name ) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -27,7 +27,7 @@ public class Peer {
     }
 
 
-    public void setIp( final String ip ) {
+    public void setIp(final String ip) {
         this.ip = ip;
     }
 
@@ -37,7 +37,7 @@ public class Peer {
     }
 
 
-    public void setId( final String id ) {
+    public void setId(final String id) {
         this.id = id;
     }
 

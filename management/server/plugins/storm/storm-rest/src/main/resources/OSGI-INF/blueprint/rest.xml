@@ -15,8 +15,8 @@
         <property name="stormManager" ref="stormManager"/>
     </bean>
 
-    <jaxrs:server address="/storm2" id="stormRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/storm" id="stormRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

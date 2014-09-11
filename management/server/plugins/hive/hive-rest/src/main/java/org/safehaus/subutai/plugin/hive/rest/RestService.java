@@ -10,6 +10,7 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hive.api.Hive;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
+import javax.ws.rs.core.Response;
 
 public class RestService {
 
@@ -29,7 +30,7 @@ public class RestService {
     @GET
     @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
-    public String getClusters() {
+    public Response getClusters() {
 
         List<HiveConfig> configs = hiveManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
@@ -38,21 +39,23 @@ public class RestService {
             clusterNames.add(config.getClusterName());
         }
 
-        return JsonUtil.GSON.toJson(clusterNames);
+        String clusters = JsonUtil.GSON.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
     @GET
     @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String getCluster(@PathParam("clusterName") String clusterName) {
+    public Response getCluster(@PathParam("clusterName") String clusterName) {
         HiveConfig config = hiveManager.getCluster(clusterName);
-        return JsonUtil.GSON.toJson(config);
+        String cluster = JsonUtil.GSON.toJson(config);
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
     @POST
-    @Path("clusters/{clusterName}")
+    @Path("clusters")
     @Produces({MediaType.APPLICATION_JSON})
-    public String installCluster(
+    public Response installCluster(
             @PathParam("clusterName") String clusterName,
             @QueryParam("hadoopClusterName") String hadoopClusterName,
             @QueryParam("server") String server,
@@ -74,13 +77,14 @@ public class RestService {
 
         UUID uuid = hiveManager.installCluster(config);
 
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
     @POST
     @Path("clusters/{name}/{hadoopName}/{slaveNodesCount}/{replFactor}/{domainName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String install(@PathParam("name") String name,
+    public Response install(@PathParam("name") String name,
             @PathParam("hadoopName") String hadoopName,
             @PathParam("slaveNodesCount") String slaveNodesCount,
             @PathParam("replFactor") String replFactor,
@@ -107,38 +111,42 @@ public class RestService {
 
         UUID trackId = hiveManager.installCluster(config, hc);
 
-        return JsonUtil.toJson(OPERATION_ID, trackId);
+        String operationId = JsonUtil.toJson(OPERATION_ID, trackId);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
     @DELETE
     @Path("clusters/{clusterName}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String uninstallCluster(@PathParam("clusterName") String clusterName) {
+    public Response uninstallCluster(@PathParam("clusterName") String clusterName) {
         UUID uuid = hiveManager.uninstallCluster(clusterName);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
     @POST
     @Path("clusters/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String addNode(
+    public Response addNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = hiveManager.addNode(clusterName, hostname);
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
     @DELETE
     @Path("clusters/{clusterName}/nodes/{hostname}")
     @Produces({MediaType.APPLICATION_JSON})
-    public String destroyNode(
+    public Response destroyNode(
             @PathParam("clusterName") String clusterName,
             @PathParam("hostname") String hostname
     ) {
         UUID uuid = hiveManager.destroyNode(clusterName, hostname);
 
-        return JsonUtil.toJson(OPERATION_ID, uuid);
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 }

@@ -10,6 +10,7 @@ import org.safehaus.subutai.plugin.pig.api.Pig;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.*;
 
 
@@ -38,7 +39,7 @@ public class RestService
     @POST
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String installCluster( @QueryParam("config") String config )
+    public Response installCluster(@QueryParam("config") String config)
     {
         TrimmedConfig trimmedConfig = JsonUtil.fromJson( config, TrimmedConfig.class );
         Config pigConfig = new Config();
@@ -56,7 +57,8 @@ public class RestService
 
         UUID uuid = pigManager.installCluster( pigConfig );
 
-        return JsonUtil.toJson( OPERATION_ID, uuid );
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
@@ -64,13 +66,12 @@ public class RestService
     @DELETE
     @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String destroyCluster(
+    public Response destroyCluster(
         @PathParam("clusterName") String clusterName
-    )
-    {
+    ) {
         UUID uuid = pigManager.uninstallCluster( clusterName );
-
-        return JsonUtil.toJson( OPERATION_ID, uuid );
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
@@ -78,8 +79,7 @@ public class RestService
     @GET
     @Path("clusters")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getClusters()
-    {
+    public Response getClusters() {
 
         List<Config> configs = pigManager.getClusters();
         ArrayList<String> clusterNames = new ArrayList();
@@ -88,8 +88,8 @@ public class RestService
         {
             clusterNames.add( config.getClusterName() );
         }
-
-        return JsonUtil.GSON.toJson( clusterNames );
+        String clusters = JsonUtil.GSON.toJson(clusterNames);
+        return Response.status(Response.Status.OK).entity(clusters).build();
     }
 
 
@@ -97,11 +97,12 @@ public class RestService
     @GET
     @Path("clusters/{clusterName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getCluster( @PathParam("clusterName") String clusterName )
+    public Response getCluster(@PathParam("clusterName") String clusterName)
     {
         Config config = pigManager.getCluster( clusterName );
 
-        return JsonUtil.GSON.toJson( config );
+        String cluster = JsonUtil.GSON.toJson(config);
+        return Response.status(Response.Status.OK).entity(cluster).build();
     }
 
 
@@ -109,13 +110,13 @@ public class RestService
     @DELETE
     @Path("clusters/{clusterName}/nodes/{lxchostname}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getCluster(
+    public Response getCluster(
         @PathParam("clusterName") String clusterName,
         @PathParam("lxchostname") String node
     )
     {
         UUID uuid = pigManager.destroyNode( clusterName, node );
-
-        return JsonUtil.toJson( OPERATION_ID, uuid );
+        String operationId = JsonUtil.toJson(OPERATION_ID, uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 }

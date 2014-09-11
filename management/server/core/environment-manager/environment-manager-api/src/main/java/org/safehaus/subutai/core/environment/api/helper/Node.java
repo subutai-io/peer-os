@@ -15,7 +15,7 @@ public class Node {
     private String nodeGroupName;
 
 
-    public Node( final Agent agent, final Template template, final String nodeGroupName ) {
+    public Node(final Agent agent, final Template template, final String nodeGroupName) {
         this.agent = agent;
         this.template = template;
         this.nodeGroupName = nodeGroupName;

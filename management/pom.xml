@@ -182,7 +182,8 @@
         <artifactId>vaadin-themes</artifactId>
         <version>${vaadin.version}</version>
       </dependency>
-      <dependency>
+
+        <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-push</artifactId>
         <version>${vaadin.version}</version>

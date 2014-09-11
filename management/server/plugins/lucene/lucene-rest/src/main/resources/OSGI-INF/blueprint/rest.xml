@@ -15,8 +15,8 @@
         <property name="luceneManager" ref="luceneManager"/>
     </bean>
 
-    <jaxrs:server address="/lucene2" id="luceneRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/lucene" id="luceneRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

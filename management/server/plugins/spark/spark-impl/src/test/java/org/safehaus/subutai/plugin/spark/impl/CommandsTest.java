@@ -1,12 +1,13 @@
 package org.safehaus.subutai.plugin.spark.impl;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
 import org.safehaus.subutai.common.command.Command;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 
 
 @Ignore
@@ -16,13 +17,13 @@ public class CommandsTest {
 
     @BeforeClass
     public static void setUp() {
-        commands = new Commands( new CommandRunnerMock() );
+        commands = new Commands(new CommandRunnerMock());
     }
 
 
     @Test
     public void testInstallCommand() {
-        Command command = commands.getInstallCommand( null );
+        Command command = commands.getInstallCommand(null);
 
         assertNotNull(command);
         assertEquals("sleep 20; apt-get --force-yes --assume-yes install " + Commands.PACKAGE_NAME, command.getDescription());
@@ -30,7 +31,7 @@ public class CommandsTest {
 
     @Test
     public void testUninstallCommand() {
-        Command command = commands.getUninstallCommand( null );
+        Command command = commands.getUninstallCommand(null);
 
         assertNotNull(command);
         assertEquals("apt-get --force-yes --assume-yes purge " + Commands.PACKAGE_NAME, command.getDescription());
@@ -38,82 +39,82 @@ public class CommandsTest {
 
     @Test
     public void testCheckCommand() {
-        Command command = commands.getCheckInstalledCommand( null );
+        Command command = commands.getCheckInstalledCommand(null);
 
         assertNotNull(command);
-        assertEquals("dpkg -l | grep '^ii' | grep ksks", command.getDescription() );
+        assertEquals("dpkg -l | grep '^ii' | grep ksks", command.getDescription());
     }
 
 
     @Test
     public void testStartAllCommand() {
-        Command command = commands.getStartAllCommand( null );
+        Command command = commands.getStartAllCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-all start &", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-all start &", command.getDescription());
     }
 
     @Test
     public void testStopAllCommand() {
-        Command command = commands.getStopAllCommand( null );
+        Command command = commands.getStopAllCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-all stop", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-all stop", command.getDescription());
     }
 
     @Test
     public void testStatusAllCommand() {
-        Command command = commands.getStatusAllCommand( null );
+        Command command = commands.getStatusAllCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-all status", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-all status", command.getDescription());
     }
 
     @Test
     public void testStartMasterCommand() {
-        Command command = commands.getRestartMasterCommand( null );
+        Command command = commands.getRestartMasterCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-master stop && service spark-master start", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-master stop && service spark-master start", command.getDescription());
     }
 
     @Test
     public void testStopMasterCommand() {
-        Command command = commands.getStopMasterCommand( null );
+        Command command = commands.getStopMasterCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-master stop", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-master stop", command.getDescription());
     }
 
     @Test
     public void testRestartMasterCommand() {
-        Command command = commands.getRestartMasterCommand( null );
+        Command command = commands.getRestartMasterCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-master stop && service spark-master start", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-master stop && service spark-master start", command.getDescription());
     }
 
     @Test
     public void testStartSlaveCommand() {
-        Command command = commands.getStartSlaveCommand( null );
+        Command command = commands.getStartSlaveCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-slave start", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-slave start", command.getDescription());
     }
 
     @Test
     public void testStopSlaveCommand() {
-        Command command = commands.getStopSlaveCommand( null );
+        Command command = commands.getStopSlaveCommand(null);
 
-        assertNotNull( command );
-        assertEquals( "service spark-slave stop", command.getDescription() );
+        assertNotNull(command);
+        assertEquals("service spark-slave stop", command.getDescription());
     }
 
     @Test
     public void testSetMasterIPCommand() {
-        Command command = commands.getClearSlavesCommand( null );
+        Command command = commands.getClearSlavesCommand(null);
 
-        assertNotNull( command );
-        assertEquals( ". /etc/profile && sparkSlaveConf.sh clear", command.getDescription() );
+        assertNotNull(command);
+        assertEquals(". /etc/profile && sparkSlaveConf.sh clear", command.getDescription());
     }
 }
