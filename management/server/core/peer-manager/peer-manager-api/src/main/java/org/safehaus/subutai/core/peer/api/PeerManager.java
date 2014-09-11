@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -11,7 +12,7 @@ public interface PeerManager {
 
     String register( Peer peer );
 
-    String getHostId();
+    UUID getHostId();
 
     List<Peer> peers();
 

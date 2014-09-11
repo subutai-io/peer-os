@@ -329,7 +329,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), response.getHostId(), response.getOwnerId() );
+                        response.getTransportId(), peerManager.getHostId(), response.getOwnerId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );

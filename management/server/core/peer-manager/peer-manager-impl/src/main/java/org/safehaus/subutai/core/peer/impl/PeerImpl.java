@@ -2,6 +2,7 @@ package org.safehaus.subutai.core.peer.impl;
 
 
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
@@ -18,13 +19,13 @@ public class PeerImpl implements PeerManager {
 
     private final static String source = "PEER_MANAGER";
     private final Logger LOG = Logger.getLogger( PeerImpl.class.getName() );
-    private String id;
+    private UUID id;
     private DbManager dbManager;
     private PeerDAO peerDAO;
 
 
     public void setId( final String id ) {
-        this.id = id;
+        this.id = UUID.fromString( id );
     }
 
 
@@ -61,7 +62,7 @@ public class PeerImpl implements PeerManager {
 
 
     @Override
-    public String getHostId() {
+    public UUID getHostId() {
         return id;
     }
 
