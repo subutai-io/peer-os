@@ -1,15 +1,9 @@
 package org.safehaus.subutai.plugin.cassandra.impl;
 
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.safehaus.subutai.common.command.AgentResult;
-import org.safehaus.subutai.common.command.Command;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -40,9 +34,11 @@ import org.safehaus.subutai.plugin.cassandra.impl.handler.StopServiceHandler;
 import org.safehaus.subutai.plugin.cassandra.impl.handler.UninstallClusterHandler;
 import org.safehaus.subutai.plugin.common.PluginDAO;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class CassandraImpl extends CassandraBase {
@@ -300,9 +296,7 @@ public class CassandraImpl extends CassandraBase {
     public UUID checkNode( final String clustername, final String lxchostname ) {
         AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
         executor.execute( operationHandler );
-        UUID res = operationHandler.getTrackerId();
-        return res;
-//        return operationHandler.getTrackerId();
+        return operationHandler.getTrackerId();
     }
 
 

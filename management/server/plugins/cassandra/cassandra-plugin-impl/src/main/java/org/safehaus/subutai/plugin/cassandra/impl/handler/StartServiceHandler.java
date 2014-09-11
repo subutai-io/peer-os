@@ -1,18 +1,16 @@
 package org.safehaus.subutai.plugin.cassandra.impl.handler;
 
 
-import java.util.UUID;
-
-import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.tracker.ProductOperation;
+import com.google.common.collect.Sets;
 import org.safehaus.subutai.common.command.AgentResult;
 import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
-import com.google.common.collect.Sets;
+import java.util.UUID;
 
 
 public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl> {
@@ -32,11 +30,8 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
 
     @Override
     public void run() {
-        final ProductOperation po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
-                String.format( "Starting Cassandra service on %s", agentUUID ) );
         manager.getExecutor().execute( new Runnable() {
             Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
-
 
             public void run() {
                 Command startServiceCommand = Commands.getStartCommand( Sets.newHashSet( agent ) );
@@ -45,12 +40,12 @@ public class StartServiceHandler extends AbstractOperationHandler<CassandraImpl>
                     AgentResult ar = startServiceCommand.getResults().get( agent.getUuid() );
                     if ( ar.getStdOut().contains( "starting Cassandra ..." ) || ar.getStdOut().contains(
                             "is already running..." ) ) {
-                        po.addLog( ar.getStdOut() );
-                        po.addLogDone( "Start succeeded" );
+                        productOperation.addLog( ar.getStdOut() );
+                        productOperation.addLogDone( "Start succeeded" );
                     }
                 }
                 else {
-                    po.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
+                    productOperation.addLogFailed( String.format( "Start failed, %s", startServiceCommand.getAllErrors() ) );
                 }
             }
         } );

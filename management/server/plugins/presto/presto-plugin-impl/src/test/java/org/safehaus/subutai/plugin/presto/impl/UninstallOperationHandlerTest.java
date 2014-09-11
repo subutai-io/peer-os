@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.presto.impl;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.tracker.ProductOperation;
@@ -32,6 +33,7 @@ public class UninstallOperationHandlerTest {
         Assert.assertEquals(po.getState(), ProductOperationState.FAILED);
     }
 
+    @Ignore
     @Test
     public void testWithExistingCluster() {
         PrestoClusterConfig config = new PrestoClusterConfig();

@@ -10,10 +10,7 @@ import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    //    private CassandraConfig config;
-
     private String clusterName;
-
 
     public StartClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
@@ -28,9 +25,7 @@ public class StartClusterHandler extends AbstractOperationHandler<CassandraImpl>
         manager.getExecutor().execute( new Runnable() {
 
             public void run() {
-                CassandraClusterConfig config = manager.getDbManager()
-                                                       .getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName,
-                                                               CassandraClusterConfig.class );
+                CassandraClusterConfig config = manager.getCluster( clusterName );
                 if ( config == null ) {
                     productOperation.addLogFailed(
                             String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );

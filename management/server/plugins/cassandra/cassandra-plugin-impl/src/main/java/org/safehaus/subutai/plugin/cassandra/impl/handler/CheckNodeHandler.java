@@ -67,26 +67,16 @@ public class CheckNodeHandler extends AbstractOperationHandler<CassandraImpl> {
             return;
         }
 
-        Command checkStatusCommand = Commands.getStatusCommand( node );
-        manager.getCommandRunner().runCommand( checkStatusCommand );
+        Command checkNodeCommand = Commands.getStatusCommand( node );
+        manager.getCommandRunner().runCommand( checkNodeCommand );
 
-        if ( checkStatusCommand.hasSucceeded() ) {
-            productOperation.addLogDone( "All nodes are running." );
+        if ( checkNodeCommand.hasSucceeded() ) {
+            String s = checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ;
+            productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
+                    checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
         }
         else {
-            logStatusResults( productOperation, checkStatusCommand );
+            logStatusResults( productOperation, checkNodeCommand );
         }
-
-//        Command checkNodeCommand = Commands.getStatusCommand( node );
-//        manager.getCommandRunner().runCommand( checkNodeCommand );
-//
-//        if ( checkNodeCommand.hasSucceeded() ) {
-//            productOperation.addLogDone( String.format( "Status on %s is %s", lxcHostname,
-//                    checkNodeCommand.getResults().get( node.getUuid() ).getStdOut() ) );
-//        }
-//        else {
-//            productOperation.addLogFailed(
-//                    String.format( "Failed to check status of %s, %s", lxcHostname, checkNodeCommand.getAllErrors() ) );
-//        }
     }
 }

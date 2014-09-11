@@ -6,11 +6,9 @@ import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.command.CommandCallback;
 import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-
 
 import java.util.Set;
 import java.util.UUID;
