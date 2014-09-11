@@ -54,7 +54,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.peer_manager.impl</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.peer.impl</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>

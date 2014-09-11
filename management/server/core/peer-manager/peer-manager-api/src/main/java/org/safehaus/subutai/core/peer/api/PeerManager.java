@@ -1,4 +1,4 @@
-package org.safehaus.subutai.peer.api;
+package org.safehaus.subutai.core.peer.api;
 
 
 import java.util.List;

@@ -1,9 +1,9 @@
-package org.safehaus.subutai.peer.ui;
+package org.safehaus.subutai.core.peer.ui;
 
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.common.util.FileUtil;
-import org.safehaus.subutai.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;

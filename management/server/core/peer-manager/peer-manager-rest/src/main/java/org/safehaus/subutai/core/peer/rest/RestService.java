@@ -1,7 +1,7 @@
-package org.safehaus.subuta.peer.rest;
+package org.safehaus.subutai.core.peer.rest;
 
 
-import org.safehaus.subutai.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.Peer;
 
 import javax.jws.WebService;
 import javax.ws.rs.*;

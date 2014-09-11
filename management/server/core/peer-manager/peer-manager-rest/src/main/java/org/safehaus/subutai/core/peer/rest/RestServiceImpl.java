@@ -1,10 +1,10 @@
-package org.safehaus.subuta.peer.rest;
+package org.safehaus.subutai.core.peer.rest;
 
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.safehaus.subutai.peer.api.Peer;
-import org.safehaus.subutai.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import java.util.UUID;
 import java.util.logging.Logger;
