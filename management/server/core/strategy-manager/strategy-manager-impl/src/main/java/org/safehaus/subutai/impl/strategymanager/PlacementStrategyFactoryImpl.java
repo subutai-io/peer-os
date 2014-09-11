@@ -17,17 +17,17 @@ public class PlacementStrategyFactoryImpl implements PlacementStrategyFactory {
     @Override
     public AbstractContainerPlacementStrategy create(int nodesCount, PlacementStrategy strategy, List<Criteria> criteria) {
         if (PlacementStrategy.ROUND_ROBIN.equals(strategy))
-            return new RoundRobinStrategy(nodesCount);
+            return new RoundRobinStrategy();
         if (PlacementStrategy.FILLUP_PROCEED.equals(strategy))
-            return new DefaultContainerPlacementStrategy(nodesCount);
+            return new DefaultContainerPlacementStrategy();
         if (PlacementStrategy.BEST_SERVER.equals(strategy))
-            return new BestServerStrategy(nodesCount, criteria);
+            return new BestServerStrategy();
         return getDefaultStrategy(nodesCount, criteria);
     }
 
     @Override
     public AbstractContainerPlacementStrategy getDefaultStrategy(int nodesCount, List<Criteria> criteria) {
-        return new RoundRobinStrategy(nodesCount);
+        return new RoundRobinStrategy();
     }
 
 }

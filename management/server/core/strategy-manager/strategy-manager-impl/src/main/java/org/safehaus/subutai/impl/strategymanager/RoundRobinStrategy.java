@@ -11,19 +11,15 @@ public class RoundRobinStrategy extends AbstractContainerPlacementStrategy {
 
 	public static final String DEFAULT_NODE_TYPE = "default";
 
-    public RoundRobinStrategy(int nodesCount) {
-            super(nodesCount);
-    }
-
 	@Override
-	public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) {
+	public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
 		if (serverMetrics == null || serverMetrics.isEmpty()) return;
 
 		List<Agent> ls = sortServers(serverMetrics);
 
 		// distribute required nodes among servers in round-robin fashion
 		Map<Agent, Integer> slots = new HashMap<Agent, Integer>();
-		for (int i = 0; i < getNodesCount(); i++) {
+		for (int i = 0; i < nodesCount; i++) {
 			Agent best = ls.get(i % ls.size());
 			if (slots.containsKey(best)) slots.put(best, slots.get(best) + 1);
 			else slots.put(best, 1);

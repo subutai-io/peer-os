@@ -11,21 +11,6 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
     private final Map<Agent, Map<String, Integer>> placementInfoMap = new HashMap<Agent, Map<String, Integer>>();
     private List<Criteria> criteria = new ArrayList<Criteria>();
 
-    private int nodesCount;
-
-    public AbstractContainerPlacementStrategy(int nodesCount) {
-        this.nodesCount = nodesCount;
-    }
-
-    @Override
-    public int getNodesCount() {
-        return nodesCount;
-    }
-
-    public AbstractContainerPlacementStrategy(int nodesCount, List<Criteria> criteria) {
-        this.criteria = criteria;
-    }
-
     /**
      * Optional method to implement for calculating total number of lxc slots
      * each physical server can accommodate
@@ -35,7 +20,7 @@ public abstract class AbstractContainerPlacementStrategy implements ContainerPla
      * this physical server can accommodate
      */
     @Override
-    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
+    public Map<Agent, Integer> calculateSlots(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
         return null;
     }
 

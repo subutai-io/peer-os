@@ -10,11 +10,6 @@ import java.util.*;
 public class BestServerStrategy extends RoundRobinStrategy {
     private List<Criteria> criteria = new ArrayList<Criteria>();
 
-	public BestServerStrategy(int nodesCount, List<Criteria> criteria) {
-		super(nodesCount);
-        this.criteria = criteria;
-	}
-
 	@Override
 	protected List<Agent> sortServers(Map<Agent, ServerMetric> serverMetrics) {
 		// using each strategy criteria, grade servers one by one

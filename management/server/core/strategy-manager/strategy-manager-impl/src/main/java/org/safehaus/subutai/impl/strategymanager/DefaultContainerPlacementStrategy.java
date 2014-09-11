@@ -27,11 +27,6 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
     private final double MIN_CPU_IN_RESERVE_PERCENT = 10;    // 10%
     Logger LOG = Logger.getLogger(DefaultContainerPlacementStrategy.class.getName());
 
-    public DefaultContainerPlacementStrategy(int numOfNodes) {
-        super(numOfNodes);
-    }
-
-
     /**
      * Optional method to implement if placement uses simple logic to calculate lxc slots on a physical server
      *
@@ -39,7 +34,7 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * @return map where key is a physical agent and value is a number of lxcs this physical server can accommodate
      */
     @Override
-    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics) {
+    public Map<Agent, Integer> calculateSlots(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
         Map<Agent, Integer> serverSlots = new HashMap<Agent, Integer>();
 
         if (serverMetrics != null && !serverMetrics.isEmpty()) {
@@ -76,9 +71,9 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
      * @param serverMetrics - map where key is a physical agent and value is a metric
      */
     @Override
-    public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics) {
+    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics) {
 
-        Map<Agent, Integer> serversWithSlots = calculateSlots(serverMetrics);
+        Map<Agent, Integer> serversWithSlots = calculateSlots(nodesCount, serverMetrics);
 
         if (!serversWithSlots.isEmpty()) {
             int numOfAvailableLxcSlots = 0;
@@ -86,9 +81,9 @@ public class DefaultContainerPlacementStrategy extends AbstractContainerPlacemen
                 numOfAvailableLxcSlots += srv.getValue();
             }
 
-            if (numOfAvailableLxcSlots >= getNodesCount()) {
+            if (numOfAvailableLxcSlots >= nodesCount) {
 
-                for (int i = 0; i < getNodesCount(); i++) {
+                for (int i = 0; i < nodesCount; i++) {
                     Map<Agent, Integer> sortedBestServers = CollectionUtil.sortMapByValueDesc(serversWithSlots);
 
                     Map.Entry<Agent, Integer> entry = sortedBestServers.entrySet().iterator().next();

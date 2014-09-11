@@ -9,9 +9,8 @@ import java.util.Map;
  * Created by timur on 9/11/14.
  */
 public interface ContainerPlacementStrategy {
-    public int getNodesCount();
 
-    public Map<Agent, Integer> calculateSlots(Map<Agent, ServerMetric> serverMetrics);
+    public Map<Agent, Integer> calculateSlots(int nodesCount, Map<Agent, ServerMetric> serverMetrics);
 
     /**
      * This method calculates placement of lxcs on physical servers. Code should
@@ -23,7 +22,7 @@ public interface ContainerPlacementStrategy {
      * @param serverMetrics - map where key is a physical agent and value is a
      *                      metric
      */
-    public void calculatePlacement(Map<Agent, ServerMetric> serverMetrics);
+    public void calculatePlacement(int nodesCount, Map<Agent, ServerMetric> serverMetrics);
 
     public Map<Agent, Integer> getPlacementDistribution();
 
