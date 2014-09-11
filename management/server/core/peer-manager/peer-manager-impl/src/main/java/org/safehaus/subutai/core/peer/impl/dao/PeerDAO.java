@@ -1,4 +1,4 @@
-package org.safehaus.subutai.peer.impl.dao;
+package org.safehaus.subutai.core.peer.impl.dao;
 
 
 import com.datastax.driver.core.ResultSet;

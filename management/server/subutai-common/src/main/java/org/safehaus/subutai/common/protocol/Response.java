@@ -33,6 +33,7 @@ public class Response implements Serializable {
     private Boolean isLxc;
     private String transportId;
 
+    //TODO remove hostId and ownerId
     //host subutai id
     private UUID hostId;
     //owner subutai id

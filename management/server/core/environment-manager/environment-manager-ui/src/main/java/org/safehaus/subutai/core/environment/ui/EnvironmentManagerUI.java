@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import com.vaadin.ui.Component;

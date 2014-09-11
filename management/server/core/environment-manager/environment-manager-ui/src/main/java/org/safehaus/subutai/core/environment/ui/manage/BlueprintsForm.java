@@ -6,7 +6,7 @@ import java.util.List;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.ui.EnvironmentManagerUI;
 import org.safehaus.subutai.core.environment.ui.window.BlueprintDetails;
-import org.safehaus.subutai.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.Peer;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;

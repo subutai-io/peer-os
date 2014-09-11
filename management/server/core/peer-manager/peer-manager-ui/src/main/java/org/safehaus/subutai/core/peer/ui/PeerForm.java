@@ -1,4 +1,4 @@
-package org.safehaus.subutai.peer.ui;
+package org.safehaus.subutai.core.peer.ui;
 
 
 import com.vaadin.ui.CustomComponent;
@@ -6,7 +6,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Runo;
 import org.safehaus.subutai.common.protocol.Disposable;
-import org.safehaus.subutai.peer.ui.forms.PeerRegisterForm;
+import org.safehaus.subutai.core.peer.ui.forms.PeerRegisterForm;
 
 
 /**

@@ -72,7 +72,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.peer_manager.rest</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.groupId}.core.peer.rest</Bundle-SymbolicName>
                         <Export-Package>
                             {local-packages};version=${project.version};-noimport:=true
                         </Export-Package>

@@ -1,4 +1,4 @@
-package org.safehaus.subutai.peer.impl;
+package org.safehaus.subutai.core.peer.impl;
 
 
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.logging.Logger;
 
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
-import org.safehaus.subutai.peer.api.Peer;
-import org.safehaus.subutai.peer.api.PeerManager;
-import org.safehaus.subutai.peer.impl.dao.PeerDAO;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.core.peer.impl.dao.PeerDAO;
 
 
 /**
