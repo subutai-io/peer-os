@@ -3,10 +3,13 @@ package org.safehaus.subutai.plugin.cassandra.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.ClusterSetupStrategy;
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
@@ -230,7 +233,6 @@ public class CassandraImpl extends CassandraBase {
         }
     }
 
-
     @Override
     public UUID startCluster( final String clusterName ) {
         AbstractOperationHandler operationHandler = new StartClusterHandler( this, clusterName );
@@ -243,7 +245,8 @@ public class CassandraImpl extends CassandraBase {
     public UUID checkCluster( final String clusterName ) {
         AbstractOperationHandler operationHandler = new CheckClusterHandler( this, clusterName );
         executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        UUID res = operationHandler.getTrackerId();
+        return res;
     }
 
 
@@ -297,7 +300,9 @@ public class CassandraImpl extends CassandraBase {
     public UUID checkNode( final String clustername, final String lxchostname ) {
         AbstractOperationHandler operationHandler = new CheckNodeHandler( this, clustername, lxchostname );
         executor.execute( operationHandler );
-        return operationHandler.getTrackerId();
+        UUID res = operationHandler.getTrackerId();
+        return res;
+//        return operationHandler.getTrackerId();
     }
 
 

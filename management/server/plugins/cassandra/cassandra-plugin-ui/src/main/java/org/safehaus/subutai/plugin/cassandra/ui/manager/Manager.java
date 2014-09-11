@@ -6,10 +6,11 @@
 package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
@@ -46,6 +47,7 @@ public class Manager {
     private ComboBox clusterCombo;
     private HorizontalLayout controlsContent;
     private CassandraClusterConfig config;
+    private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
 
 
     public Manager() {
@@ -80,12 +82,16 @@ public class Manager {
     private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Check", Button.class, null );
+        table.addContainerProperty( "Service Status", Label.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
         table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
+            // TODO getting agent is not connected error, fix this.
             @Override
             public void itemClick( ItemClickEvent event ) {
                 if ( event.isDoubleClick() ) {
@@ -150,14 +156,45 @@ public class Manager {
 
     private void populateTable( final Table table, Set<Agent> agents ) {
         table.removeAllItems();
-        for ( Iterator it = agents.iterator(); it.hasNext(); ) {
-            final Agent agent = ( Agent ) it.next();
+        for( final Agent agent : agents ) {
+            final Label resultHolder = new Label();
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            progressIcon.setVisible( false );
-            final Object rowId = table.addItem( new Object[] {
-                    agent.getHostname(), progressIcon
+            final Button checkButton = new Button( "Check" );
+
+            final Object rowId = table.addItem( new Object[]{
+                    agent.getHostname(), agent.getListIP().toString(), checkButton, resultHolder, progressIcon
             }, null );
+
+            progressIcon.setVisible( false );
+            checkButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( Button.ClickEvent event ) {
+                    progressIcon.setVisible( true );
+
+                    CassandraUI.getExecutor().execute(
+                            new CheckTask( config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                resultHolder.setValue( parseServiceResult( result ) );
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
         }
+    }
+
+
+    public static String parseServiceResult( String result){
+        StringBuilder parsedResult = new StringBuilder();
+        Matcher tracersMatcher = cassandraPattern.matcher( result );
+        if ( tracersMatcher.find() ) {
+            parsedResult.append( tracersMatcher.group( 1 ) ).append( " " );
+        }
+
+        return parsedResult.toString();
     }
 
 
@@ -216,7 +253,6 @@ public class Manager {
                         refreshClustersInfo();
                     }
                 } );
-                contentRoot.getUI().addWindow( window.getWindow() );
             }
         } );
 

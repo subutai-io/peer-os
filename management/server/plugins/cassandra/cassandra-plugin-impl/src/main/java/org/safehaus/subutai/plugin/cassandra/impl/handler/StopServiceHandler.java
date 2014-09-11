@@ -14,16 +14,9 @@ import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 import com.google.common.collect.Sets;
 
-
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private ProductOperation po;
-    //    private CassandraConfig config;
     private String agentUUID;
-
     private String clusterName;
 
 
@@ -31,7 +24,7 @@ public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> 
         super( manager, clusterName );
         this.agentUUID = agentUUID;
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 

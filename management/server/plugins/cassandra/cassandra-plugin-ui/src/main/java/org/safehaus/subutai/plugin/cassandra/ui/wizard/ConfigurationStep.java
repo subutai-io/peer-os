@@ -37,7 +37,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField clusterNameTxtFld = new TextField( "Enter cluster name" );
         clusterNameTxtFld.setInputPrompt( "Cluster name" );
         clusterNameTxtFld.setRequired( true );
-        clusterNameTxtFld.setMaxLength( 20 );
         clusterNameTxtFld.setValue( wizard.getConfig().getClusterName() );
         clusterNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -48,8 +47,8 @@ public class ConfigurationStep extends VerticalLayout {
 
         final TextField domainNameTxtFld = new TextField( "Enter domain name" );
         domainNameTxtFld.setInputPrompt( "Domain name" );
+        domainNameTxtFld.setInputPrompt( "intra.lan" );
         domainNameTxtFld.setRequired( true );
-        domainNameTxtFld.setMaxLength( 20 );
         domainNameTxtFld.setValue( wizard.getConfig().getClusterName() );
         domainNameTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -61,7 +60,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField dataDirectoryTxtFld = new TextField( "Data directory" );
         dataDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/data" );
         dataDirectoryTxtFld.setRequired( true );
-        dataDirectoryTxtFld.setMaxLength( 20 );
         dataDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         dataDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -73,7 +71,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField commitLogDirectoryTxtFld = new TextField( "Commit log directory" );
         commitLogDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/commitlog" );
         commitLogDirectoryTxtFld.setRequired( true );
-        commitLogDirectoryTxtFld.setMaxLength( 20 );
         commitLogDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         commitLogDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override
@@ -85,7 +82,6 @@ public class ConfigurationStep extends VerticalLayout {
         final TextField savedCachesDirectoryTxtFld = new TextField( "Saved caches directory" );
         savedCachesDirectoryTxtFld.setInputPrompt( "/var/lib/cassandra/saved_caches" );
         savedCachesDirectoryTxtFld.setRequired( true );
-        savedCachesDirectoryTxtFld.setMaxLength( 20 );
         savedCachesDirectoryTxtFld.setValue( wizard.getConfig().getClusterName() );
         savedCachesDirectoryTxtFld.addValueChangeListener( new Property.ValueChangeListener() {
             @Override

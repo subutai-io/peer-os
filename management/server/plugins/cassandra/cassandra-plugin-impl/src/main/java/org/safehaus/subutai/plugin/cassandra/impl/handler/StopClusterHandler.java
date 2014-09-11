@@ -9,20 +9,14 @@ import org.safehaus.subutai.plugin.cassandra.impl.CassandraImpl;
 import org.safehaus.subutai.plugin.cassandra.impl.Commands;
 
 
-/**
- * Created by bahadyr on 8/25/14.
- */
 public class StopClusterHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private ProductOperation po;
-    //    private CassandraConfig config;
     private String clusterName;
-
 
     public StopClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        po = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Setting up %s cluster...", clusterName ) );
     }
 
