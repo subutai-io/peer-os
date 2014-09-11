@@ -8,6 +8,8 @@
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="dbManager" availability="mandatory"
              interface="org.safehaus.subutai.core.db.api.DbManager" />
+  <reference id="peerManager" availability="mandatory"
+             interface="org.safehaus.subutai.core.peer.api.PeerManager" />
 
   <bean id="module" scope="singleton"
         class="org.safehaus.subutai.core.dispatcher.impl.CommandDispatcherImpl"
@@ -15,6 +17,7 @@
     <argument ref="agentManager" />
     <argument ref="commandRunner" />
     <argument ref="dbManager" />
+    <argument ref="peerManager" />
   </bean>
 
   <service ref="module" interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />

@@ -67,7 +67,7 @@ public class Agent implements Serializable, Comparable<Agent> {
     }
 
 
-    public boolean isIsLXC() {
+    public boolean isLXC() {
         return isLXC;
     }
 
@@ -133,10 +133,5 @@ public class Agent implements Serializable, Comparable<Agent> {
 
     public void setHostname( String hostname ) {
         this.hostname = hostname;
-    }
-
-
-    public boolean isLocal() {
-        return siteId.compareTo( environmentId ) == 0;
     }
 }

@@ -2,12 +2,12 @@ package org.safehaus.subutai.plugin.common.mock;
 
 
 
+import java.util.Set;
+import java.util.UUID;
+
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
-
-import java.util.Set;
-import java.util.UUID;
 
 
 public class AgentManagerMock implements AgentManager {
@@ -61,6 +61,12 @@ public class AgentManagerMock implements AgentManager {
 
     @Override
     public Set< Agent > getAgentsByHostnames( Set< String > hostnames ) {
+        return null;
+    }
+
+
+    @Override
+    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
         return null;
     }
 }

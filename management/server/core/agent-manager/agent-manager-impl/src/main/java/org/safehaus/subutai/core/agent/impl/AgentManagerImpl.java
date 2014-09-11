@@ -26,6 +26,7 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
@@ -97,7 +98,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     public Set<Agent> getPhysicalAgents() {
         Set<Agent> physicalAgents = new HashSet<>();
         for ( Agent agent : agents.asMap().values() ) {
-            if ( !agent.isIsLXC() ) {
+            if ( !agent.isLXC() ) {
                 physicalAgents.add( agent );
             }
         }
@@ -113,7 +114,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     public Set<Agent> getLxcAgents() {
         Set<Agent> lxcAgents = new HashSet<>();
         for ( Agent agent : agents.asMap().values() ) {
-            if ( agent.isIsLXC() ) {
+            if ( agent.isLXC() ) {
                 lxcAgents.add( agent );
             }
         }
@@ -209,9 +210,25 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     @Override
     public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
         Set<Agent> agentSet = new HashSet<>();
-        for ( Agent agent : agents.asMap().values() ) {
-            if ( hostnames.contains( agent.getHostname() ) ) {
-                agentSet.add( agent );
+        if ( !CollectionUtil.isCollectionEmpty( hostnames ) ) {
+            for ( Agent agent : agents.asMap().values() ) {
+                if ( hostnames.contains( agent.getHostname() ) ) {
+                    agentSet.add( agent );
+                }
+            }
+        }
+        return agentSet;
+    }
+
+
+    @Override
+    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
+        Set<Agent> agentSet = new HashSet<>();
+        if ( environmentId != null ) {
+            for ( Agent agent : agents.asMap().values() ) {
+                if ( agent.getEnvironmentId() != null && environmentId.compareTo( agent.getEnvironmentId() ) == 0 ) {
+                    agentSet.add( agent );
+                }
             }
         }
         return agentSet;
