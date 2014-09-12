@@ -94,7 +94,8 @@ public class RestServiceImpl implements RestService {
 
     @Override
     public Response getAgentsByHostNames(String hostNames) {
-        Type listType = new TypeToken<Set<String>>(){}.getType();
+        Type listType = new TypeToken<Set<String>>() {
+        }.getType();
         Set<String> names = JsonUtil.GSON.fromJson(hostNames, listType);
         Set<Agent> agents = agentManager.getAgentsByHostnames(names);
         return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agents)).build();

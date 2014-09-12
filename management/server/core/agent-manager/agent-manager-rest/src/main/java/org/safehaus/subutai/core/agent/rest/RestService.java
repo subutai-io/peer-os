@@ -1,12 +1,7 @@
 package org.safehaus.subutai.core.agent.rest;
 
-import java.io.InputStream;
-import java.util.UUID;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.safehaus.subutai.core.agent.api.AgentListener;
 
 public interface RestService {
 
@@ -28,7 +23,7 @@ public interface RestService {
     //Agent
     @GET
     @Path("agents/{hostname}")
-    public Response getAgentByHostname(@PathParam("hostname")String hostname);
+    public Response getAgentByHostname(@PathParam("hostname") String hostname);
 
     //Agent
     @GET
@@ -38,7 +33,7 @@ public interface RestService {
     //Set<Agent>
     @GET
     @Path("agents/lxc/{parentHostname}")
-    public Response getLxcAgentsByParentHostname(@PathParam("parentHostname")String parentHostname);
+    public Response getLxcAgentsByParentHostname(@PathParam("parentHostname") String parentHostname);
 
     //Adds AgentListener
     @POST
