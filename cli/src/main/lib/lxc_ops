@@ -179,8 +179,11 @@ function lxc_clone {
 
   local child="$2"
   lxc_assert_name "$child"
-
-  local usage="$3"
+  
+  local environmentId="$3"
+  lxc_assert_name "$environmentId"
+  
+  local usage="$4"
 
   if [ -z "$parent" ]; then
     msg_error "Parameters not provided. Aborting ..."
@@ -191,6 +194,13 @@ function lxc_clone {
   if [ -z "$child" ]; then
     msg_error "Child parameter not provided. Aborting ..."
     unlock_container_read $parent
+    exit 1
+  fi
+
+  if [ -z "$environmentId" ]; then
+    msg_error "environmentId parameter not provided. Aborting ..."
+    unlock_container_read $parent
+    unlcok_container_read $child
     exit 1
   fi
 
@@ -244,13 +254,27 @@ function lxc_clone {
     rm $child_rootfs/etc/profile
     mv $child_rootfs/etc/profile.new $child_rootfs/etc/profile
   fi
-    
+
+  # creating subutai folder and lxc-config file with environmentId parameter
+  if [ ! -d "$child_rootfs/etc/subutai" ]; then
+     mkdir $child_rootfs/etc/subutai
+  fi
+
+  if [ ! -f $child_rootfs/etc/subutai/lxc-config ]; then
+     touch $child_rootfs/etc/subutai/lxc-config
+  else
+     cp /dev/null $child_rootfs/etc/subutai/lxc-config
+  fi
+
+  echo "subutai.env.id = $environmentId"  >> $child_rootfs/etc/subutai/lxc-config
+
   # adding physical hostname to cloned instance or template   
-  echo "export PHY_HOST=`hostname`" >> $child_rootfs/etc/profile
+  echo "subutai.parent.hostname = `hostname`" >> $child_rootfs/etc/subutai/lxc-config
+
   # removing the agent uuid of the cloned instance template
   if [ -s "$child_rootfs/etc/ksks-agent/config/uuid.txt" ]; then
     echo "" > $child_rootfs/etc/ksks-agent/config/uuid.txt
-  fi
+  fi  
 }
 
 
