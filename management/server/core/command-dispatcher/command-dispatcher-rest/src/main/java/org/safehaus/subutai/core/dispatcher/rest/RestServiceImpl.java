@@ -7,14 +7,12 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
 import org.eclipse.jetty.server.Request;
 import org.safehaus.subutai.common.protocol.BatchRequest;
-import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 
 import org.apache.cxf.message.Message;
@@ -53,7 +51,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response executeRequests( final String ownerId, final String requests ) {
+    public Response executeRequests( final String requests ) {
         try {
 
             Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -62,9 +60,8 @@ public class RestServiceImpl implements RestService {
             //for now set IP to local subutai
             //TODO remove this in production
             String ip = getLocalIp();
-            UUID ownrId = JsonUtil.fromJson( ownerId, UUID.class );
             Set<BatchRequest> reqs = gson.fromJson( requests, new TypeToken<Set<BatchRequest>>() {}.getType() );
-            dispatcher.executeRequests( ip, ownrId, reqs );
+            dispatcher.executeRequests( ip, reqs );
             return Response.ok().build();
         }
         catch ( RuntimeException e ) {

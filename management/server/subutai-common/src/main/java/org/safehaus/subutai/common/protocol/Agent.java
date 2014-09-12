@@ -11,8 +11,8 @@ import com.google.common.base.Strings;
 
 
 /**
- * Used to define a physical host on the whole network. It could be management server or the agent. It just defines a
- * host in the network.
+ * Used to define a physical/lxc host on the network. It could be management server, physical server or container. It
+ * just defines a host on the network.
  */
 public class Agent implements Serializable, Comparable<Agent> {
 
@@ -23,17 +23,17 @@ public class Agent implements Serializable, Comparable<Agent> {
     private boolean isLXC;
     private String parentHostName;
     private String transportId;
-    private UUID hostId;
-    private UUID ownerId;
+    private UUID siteId;
+    private UUID environmentId;
 
 
     public Agent( UUID uuid, String hostname, String parentHostName, String macAddress, List<String> listIP,
-                  boolean isLXC, String transportId, UUID hostId, UUID ownerId ) {
+                  boolean isLXC, String transportId, UUID siteId, UUID environmentId ) {
         Preconditions.checkNotNull( uuid, "UUID is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Hostname is null or empty" );
-        //TODO uncomment checks when agent supplies host id and owner id
-        //        Preconditions.checkNotNull( hostId, "Host id is null" );
-        //        Preconditions.checkNotNull( ownerId, "Owner id is null" );
+        Preconditions.checkNotNull( siteId, "Site id is null" );
+        //TODO enable this check when agents starts supplying environmentId
+        //        Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         this.uuid = uuid;
         this.macAddress = macAddress;
@@ -42,20 +42,18 @@ public class Agent implements Serializable, Comparable<Agent> {
         this.isLXC = isLXC;
         this.parentHostName = parentHostName;
         this.transportId = transportId;
-        this.hostId = hostId;
-        this.ownerId = ownerId;
+        this.siteId = siteId;
+        this.environmentId = environmentId;
     }
 
 
-    public UUID getHostId() {
-        return hostId;
+    public UUID getSiteId() {
+        return siteId;
     }
 
 
-    public UUID getOwnerId() {
-        //        return ownerId;
-        //TODO remove in production
-        return UUID.fromString( "1163673e3-924d-45e2-8dba-615b76a6bbb6" );
+    public UUID getEnvironmentId() {
+        return environmentId;
     }
 
 
@@ -69,7 +67,7 @@ public class Agent implements Serializable, Comparable<Agent> {
     }
 
 
-    public boolean isIsLXC() {
+    public boolean isLXC() {
         return isLXC;
     }
 
@@ -135,16 +133,5 @@ public class Agent implements Serializable, Comparable<Agent> {
 
     public void setHostname( String hostname ) {
         this.hostname = hostname;
-    }
-
-
-    public boolean isLocal() {
-        //TODO remove this after agent supplies host id and owner id
-        //temporary workaround until agent correctly supplies hostId and ownerId
-        if ( hostId == null || ownerId == null ) {
-            return true;
-        }
-
-        return hostId.compareTo( ownerId ) == 0;
     }
 }

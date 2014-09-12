@@ -6,10 +6,10 @@
 package org.safehaus.subutai.core.agent.api;
 
 
-import org.safehaus.subutai.common.protocol.Agent;
-
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
 
 
 /**
@@ -42,39 +42,45 @@ public interface AgentManager {
      * Returns agent by its node's hostname or null if agent is not connected
      *
      * @param hostname - hostname of agent's node
+     *
      * @return agent
      */
-    public Agent getAgentByHostname(String hostname);
+    public Agent getAgentByHostname( String hostname );
 
     /**
      * Returns agent by its UUID or null if agent is not connected
      *
      * @param uuid - UUID of agent
+     *
      * @return agent
      */
-    public Agent getAgentByUUID(UUID uuid);
+    public Agent getAgentByUUID( UUID uuid );
 
     /**
      * Returns agent by its physical parent node's hostname or null if agent is not connected
      *
      * @param parentHostname - hostname of agent's node physical parent node
+     *
      * @return agent
      */
-    public Set<Agent> getLxcAgentsByParentHostname(String parentHostname);
+    public Set<Agent> getLxcAgentsByParentHostname( String parentHostname );
 
     /**
      * Adds listener which wants to be notified when agents connect/disconnect
      *
      * @param listener - listener to add
      */
-    public void addListener(AgentListener listener);
+    public void addListener( AgentListener listener );
 
     /**
      * Removes listener
      *
      * @param listener - - listener to remove
      */
-    public void removeListener(AgentListener listener);
+    public void removeListener( AgentListener listener );
 
-    public Set<Agent> getAgentsByHostnames(Set<String> hostnames);
+    public Set<Agent> getAgentsByHostnames( Set<String> hostnames );
+
+
+    public Set<Agent> getAgentsByEnvironmentId( UUID environmentId );
 }

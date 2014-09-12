@@ -17,6 +17,7 @@ import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.common.util.UUIDUtil;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 
@@ -37,7 +38,8 @@ public class CommandImpl extends AbstractCommand {
      * @param requestBuilder - request builder used to produce request
      * @param agents - target agents
      */
-    public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
+    public CommandImpl( String description, RequestBuilder requestBuilder, Set<Agent> agents,
+                        PeerManager peerManager ) {
 
         Preconditions.checkNotNull( requestBuilder, "Request Builder is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( agents ), "Agents are null or empty" );
@@ -49,14 +51,15 @@ public class CommandImpl extends AbstractCommand {
 
         for ( Agent agent : agents ) {
             Request request = requestBuilder.build( agent.getUuid(), commandUUID );
-            if ( agent.isLocal() ) {
+            //this is a local agent
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
                 requests.add( request );
             }
             else {
-                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
                 if ( batchRequests == null ) {
                     batchRequests = new HashSet<>();
-                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                    remoteRequests.put( agent.getSiteId(), batchRequests );
                     batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
                 }
                 else {
@@ -124,7 +127,7 @@ public class CommandImpl extends AbstractCommand {
      * @param description - command description
      * @param requestBuilders - request builder used to produce request
      */
-    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders ) {
+    public CommandImpl( String description, Set<AgentRequestBuilder> requestBuilders, PeerManager peerManager ) {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requestBuilders ),
                 "Request Builders are null or empty" );
 
@@ -139,14 +142,15 @@ public class CommandImpl extends AbstractCommand {
             if ( requestBuilder.getTimeout() > maxTimeout ) {
                 maxTimeout = requestBuilder.getTimeout();
             }
-            if ( agent.isLocal() ) {
+            //this is a local agent
+            if ( peerManager.getSiteId().compareTo( agent.getSiteId() ) == 0 ) {
                 requests.add( request );
             }
             else {
-                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getOwnerId() );
+                Set<BatchRequest> batchRequests = remoteRequests.get( agent.getSiteId() );
                 if ( batchRequests == null ) {
                     batchRequests = new HashSet<>();
-                    remoteRequests.put( agent.getOwnerId(), batchRequests );
+                    remoteRequests.put( agent.getSiteId(), batchRequests );
                 }
                 batchRequests.add( new BatchRequest( request, agent.getUuid() ) );
             }
