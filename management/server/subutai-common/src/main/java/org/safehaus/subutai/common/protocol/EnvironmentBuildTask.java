@@ -25,7 +25,7 @@ public class EnvironmentBuildTask {
     }
 
 
-    public void setUuid( final UUID uuid ) {
+    public void setUuid(final UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -35,7 +35,7 @@ public class EnvironmentBuildTask {
     }
 
 
-    public void setEnvironmentBlueprint( final EnvironmentBlueprint environmentBlueprint ) {
+    public void setEnvironmentBlueprint(final EnvironmentBlueprint environmentBlueprint) {
         this.environmentBlueprint = environmentBlueprint;
     }
 
@@ -45,7 +45,7 @@ public class EnvironmentBuildTask {
     }
 
 
-    public void setPhysicalNodes( final Set<String> physicalNodes ) {
+    public void setPhysicalNodes(final Set<String> physicalNodes) {
         this.physicalNodes = physicalNodes;
     }
 }

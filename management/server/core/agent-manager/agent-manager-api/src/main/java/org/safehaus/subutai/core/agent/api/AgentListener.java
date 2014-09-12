@@ -13,5 +13,5 @@ import java.util.Set;
  */
 public interface AgentListener {
 
-	public void onAgent(Set<Agent> freshAgents);
+    public void onAgent(Set<Agent> freshAgents);
 }

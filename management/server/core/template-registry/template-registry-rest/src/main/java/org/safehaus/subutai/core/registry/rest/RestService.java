@@ -2,13 +2,13 @@ package org.safehaus.subutai.core.registry.rest;
 
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -22,9 +22,9 @@ public interface RestService {
 
     @POST
     @Path("templates")
-    public Response registerTemplate( @QueryParam("config") String configFilePath,
-                                      @QueryParam("packages") String packagesFilePath,
-                                      @QueryParam("md5sum") String md5sum );
+    public Response registerTemplate( @FormParam("config") String configFilePath,
+                                      @FormParam("packages") String packagesFilePath,
+                                      @FormParam("md5sum") String md5sum );
 
     @DELETE
     @Path("templates/{templateName}")

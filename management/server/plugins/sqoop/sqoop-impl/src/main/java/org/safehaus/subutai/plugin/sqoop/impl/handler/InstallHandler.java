@@ -36,9 +36,9 @@ public class InstallHandler extends AbstractHandler {
     public void run() {
         ProductOperation po = productOperation;
         Environment env = null;
-        if(config.getSetupType() == SetupType.WITH_HADOOP) {
+        if (config.getSetupType() == SetupType.WITH_HADOOP) {
 
-            if(hadoopConfig == null) {
+            if (hadoopConfig == null) {
                 po.addLogFailed("No Hadoop configuration specified");
                 return;
             }
@@ -49,10 +49,10 @@ public class InstallHandler extends AbstractHandler {
                 EnvironmentBuildTask eb = manager.getHadoopManager()
                         .getDefaultEnvironmentBlueprint(hadoopConfig);
                 env = manager.getEnvironmentManager().buildEnvironmentAndReturn(eb);
-            } catch(ClusterSetupException ex) {
+            } catch (ClusterSetupException ex) {
                 po.addLogFailed("Failed to prepare environment: " + ex.getMessage());
                 return;
-            } catch(EnvironmentBuildException ex) {
+            } catch (EnvironmentBuildException ex) {
                 po.addLogFailed("Failed to build environment: " + ex.getMessage());
                 return;
             }
@@ -61,11 +61,11 @@ public class InstallHandler extends AbstractHandler {
 
         ClusterSetupStrategy s = manager.getClusterSetupStrategy(env, config, po);
         try {
-            if(s == null) throw new ClusterSetupException("No setup strategy");
+            if (s == null) throw new ClusterSetupException("No setup strategy");
 
             s.setup();
             po.addLogDone("Done");
-        } catch(ClusterSetupException ex) {
+        } catch (ClusterSetupException ex) {
             po.addLogFailed("Failed to setup cluster: " + ex.getMessage());
             manager.getLogger().error("Failed to setup cluster", ex);
         }

@@ -15,24 +15,24 @@ public abstract class DetailsWindow extends Window {
     public VerticalLayout verticalLayout = getVLayout();
 
 
-    public DetailsWindow( String caption ) {
-        setCaption( caption );
-        setModal( true );
-        setClosable( true );
-        setVisible( false );
-        setWidth( 600, UNITS_PIXELS );
-        setHeight( 400, UNITS_PIXELS );
+    public DetailsWindow(String caption) {
+        setCaption(caption);
+        setModal(true);
+        setClosable(true);
+        setVisible(false);
+        setWidth(600, UNITS_PIXELS);
+        setHeight(400, UNITS_PIXELS);
         //        blueprintTxtArea = getTextArea();
         //        verticalLayout.addComponent( blueprintTxtArea );
-        setContent( verticalLayout );
+        setContent(verticalLayout);
     }
 
 
     private VerticalLayout getVLayout() {
         VerticalLayout content = new VerticalLayout();
         content.setSizeFull();
-        content.setMargin( true );
-        content.setSpacing( true );
+        content.setMargin(true);
+        content.setSpacing(true);
         return content;
     }
 

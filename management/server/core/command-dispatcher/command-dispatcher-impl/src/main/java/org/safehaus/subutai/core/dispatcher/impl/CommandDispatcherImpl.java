@@ -39,6 +39,7 @@ import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.dispatcher.api.CommandDispatcher;
 import org.safehaus.subutai.core.dispatcher.api.RunCommandException;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -55,16 +56,18 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
     private final DispatcherDAO dispatcherDAO;
     private final ResponseSender responseSender;
     private final HttpUtil httpUtil;
+    private final PeerManager peerManager;
     //cache of command executors where key is command UUID and value is CommandExecutor
     private ExpiringCache<UUID, CommandExecutor> commandExecutors;
 
 
     public CommandDispatcherImpl( final AgentManager agentManager, final CommandRunner commandRunner,
-                                  final DbManager dbManager ) {
+                                  final DbManager dbManager, final PeerManager peerManager ) {
         this.agentManager = agentManager;
         this.commandRunner = commandRunner;
         this.dispatcherDAO = new DispatcherDAO( dbManager );
         this.httpUtil = new HttpUtil();
+        this.peerManager = peerManager;
         this.responseSender = new ResponseSender( dispatcherDAO, httpUtil );
     }
 
@@ -105,7 +108,6 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
             //send requests in batch to each peer
             Map<String, String> params = new HashMap<>();
-            params.put( "ownerId", request.getKey().toString() );
             params.put( "requests", JsonUtil.toJson( request.getValue() ) );
             try {
                 httpUtil.post( String.format( Common.REQUEST_URL, peerIP ), params );
@@ -142,9 +144,8 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
 
     @Override
-    public void executeRequests( final String ip, final UUID ownerId, final Set<BatchRequest> requests ) {
+    public void executeRequests( final String ip, final Set<BatchRequest> requests ) {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "IP is null or empty" );
-        Preconditions.checkNotNull( ownerId, "Owner Id is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( requests ), "Requests are empty or null" );
 
         try {
@@ -157,7 +158,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
             RemoteRequest remoteRequest = dispatcherDAO.getRemoteRequest( commandId );
             //if no request exists, create a new one
             if ( remoteRequest == null ) {
-                remoteRequest = new RemoteRequest( ip, ownerId, commandId, requestsCount );
+                remoteRequest = new RemoteRequest( ip, commandId, requestsCount );
                 //save request to db
                 dispatcherDAO.saveRemoteRequest( remoteRequest );
 
@@ -170,7 +171,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                         try {
 
                             //save response to db
-                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( ownerId, response ) );
+                            dispatcherDAO.saveRemoteResponse( new RemoteResponse( response ) );
                         }
                         catch ( DBException e ) {
                             LOG.log( Level.SEVERE,
@@ -265,31 +266,31 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
 
     @Override
     public Command createCommand( final RequestBuilder requestBuilder, final Set<Agent> agents ) {
-        return new CommandImpl( null, requestBuilder, agents );
+        return new CommandImpl( null, requestBuilder, agents, peerManager );
     }
 
 
     @Override
     public Command createCommand( final String description, final RequestBuilder requestBuilder,
                                   final Set<Agent> agents ) {
-        return new CommandImpl( description, requestBuilder, agents );
+        return new CommandImpl( description, requestBuilder, agents, peerManager );
     }
 
 
     @Override
     public Command createCommand( final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( null, agentRequestBuilders );
+        return new CommandImpl( null, agentRequestBuilders, peerManager );
     }
 
 
     @Override
     public Command createCommand( final String description, final Set<AgentRequestBuilder> agentRequestBuilders ) {
-        return new CommandImpl( description, agentRequestBuilders );
+        return new CommandImpl( description, agentRequestBuilders, peerManager );
     }
 
 
     private String getLocalIp() {
-        Enumeration<NetworkInterface> n = null;
+        Enumeration<NetworkInterface> n;
         try {
             n = NetworkInterface.getNetworkInterfaces();
             for (; n.hasMoreElements(); ) {
@@ -304,7 +305,7 @@ public class CommandDispatcherImpl implements CommandDispatcher, ResponseListene
                 }
             }
         }
-        catch ( SocketException e ) {
+        catch ( SocketException ignore ) {
         }
 
 

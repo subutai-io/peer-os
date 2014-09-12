@@ -6,13 +6,13 @@
 package org.safehaus.subutai.core.environment.api;
 
 
-import java.util.List;
-
 import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentDestroyException;
 import org.safehaus.subutai.core.environment.api.helper.Environment;
+
+import java.util.List;
 
 
 /**
@@ -23,11 +23,11 @@ public interface EnvironmentManager {
     /**
      * Builds the environment with a given blueprint descriptor.
      */
-    public boolean buildEnvironment( EnvironmentBuildTask environmentBuildTask );
+    public boolean buildEnvironment(EnvironmentBuildTask environmentBuildTask);
 
 //    public boolean buildEnvironment( EnvironmentBlueprint blueprint );
 
-    public Environment buildEnvironmentAndReturn( EnvironmentBuildTask environmentBuildTask )
+    public Environment buildEnvironmentAndReturn(EnvironmentBuildTask environmentBuildTask)
             throws EnvironmentBuildException;
 
 
@@ -39,21 +39,21 @@ public interface EnvironmentManager {
     /**
      * Gets the environment by given environment name.
      */
-    public Environment getEnvironmentInfo( String environmentName );
+    public Environment getEnvironmentInfo(String environmentName);
 
     /**
      * Destroys environment by a given environmentt name.
      */
-    public boolean destroyEnvironment( String environmentName ) throws EnvironmentDestroyException;
+    public boolean destroyEnvironment(String environmentName) throws EnvironmentDestroyException;
 
     /**
      * Saves blueprint test into database
      */
-    public boolean saveBlueprint( String bluepringStr );
+    public boolean saveBlueprint(String bluepringStr);
 
     public List<EnvironmentBuildTask> getBlueprints();
 
-    boolean deleteBlueprint( String name );
+    boolean deleteBlueprint(String name);
 
-    public String parseBlueprint( EnvironmentBlueprint blueprint );
+    public String parseBlueprint(EnvironmentBlueprint blueprint);
 }

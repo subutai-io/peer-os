@@ -16,7 +16,7 @@ public class Environment {
     private String name;
 
 
-    public Environment( String name ) {
+    public Environment(String name) {
         this.uuid = UUID.randomUUID();
         this.nodes = new HashSet<>();
         this.name = name;

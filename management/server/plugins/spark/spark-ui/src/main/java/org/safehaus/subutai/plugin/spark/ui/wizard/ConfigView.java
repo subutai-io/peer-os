@@ -17,7 +17,7 @@ public class ConfigView {
 
     public void addStringCfg(String cfgCategory, String cfgValue) {
         Item ctg = configTbl.getItem(cfgCategory);
-        if(ctg == null)
+        if (ctg == null)
             configTbl.addItem(new Object[]{cfgCategory}, cfgCategory);
         configTbl.addItem(new Object[]{cfgValue}, cfgCategory + "_" + cfgValue);
         configTbl.setParent(cfgCategory + "_" + cfgValue, cfgCategory);

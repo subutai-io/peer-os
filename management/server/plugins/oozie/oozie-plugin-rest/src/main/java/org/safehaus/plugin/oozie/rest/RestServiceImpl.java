@@ -1,10 +1,6 @@
 package org.safehaus.plugin.oozie.rest;
 
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.util.JsonUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -12,6 +8,11 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.Oozie;
 import org.safehaus.subutai.plugin.oozie.api.OozieClusterConfig;
 import org.safehaus.subutai.plugin.oozie.api.TrimmedOozieClusterConfig;
+
+import javax.ws.rs.core.Response;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -44,26 +45,28 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public String listClusters() {
-        return null;
+    public Response listClusters() {
+        return Response.status(Response.Status.OK).build();
     }
 
 
     @Override
-    public String getCluster( final String source ) {
-        return null;
+    public Response getCluster(final String clusterName) {
+        return Response.status(Response.Status.OK).build();
     }
 
 
     @Override
-    public String createCluster( final String config ) {
+    public Response createCluster(final String config) {
 
         TrimmedOozieClusterConfig tocc = JsonUtil.fromJson( config, TrimmedOozieClusterConfig.class );
 
         HadoopClusterConfig hadoopConfig = hadoopManager.getCluster( tocc.getHadoopClusterName() );
         if ( hadoopConfig == null ) {
-            return JsonUtil
+
+            String errorMsg = JsonUtil
                     .toJson( "ERROR", String.format( "Hadoop cluster %s not found", tocc.getHadoopClusterName() ) );
+            return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).entity(errorMsg).build();
         }
 
         OozieClusterConfig occ = new OozieClusterConfig();
@@ -81,52 +84,59 @@ public class RestServiceImpl implements RestService {
         occ.setHadoopClusterName( hadoopConfig.getClusterName() );
 
         UUID uuid = this.oozieManager.installCluster( occ );
-        return JsonUtil.toJson( "OPERATION_ID", uuid.toString() );
+        String operationId = JsonUtil.toJson("OPERATION_ID", uuid.toString());
+        return Response.status(Response.Status.CREATED).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyCluster( final String clusterName ) {
+    public Response destroyCluster(final String clusterName) {
         UUID uuid = oozieManager.uninstallCluster( clusterName );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String startCluster( final String clusterName ) {
+    public Response startCluster(final String clusterName) {
         OozieClusterConfig occ = oozieManager.getCluster( clusterName );
         UUID uuid = oozieManager.startServer( occ );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String stopCluster( final String clusterName ) {
+    public Response stopCluster(final String clusterName) {
         OozieClusterConfig occ = oozieManager.getCluster( clusterName );
         UUID uuid = oozieManager.stopServer( occ );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String addNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = oozieManager.addNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response addNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = oozieManager.addNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String destroyNode( final String clustername, final String lxchostname, final String nodetype ) {
-        UUID uuid = oozieManager.destroyNode( clustername, lxchostname, nodetype );
-        return wrapUUID( uuid );
+    public Response destroyNode(final String clusterName, final String lxcHostname, final String nodeType) {
+        UUID uuid = oozieManager.destroyNode(clusterName, lxcHostname, nodeType);
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 
     @Override
-    public String checkNode( final String clustername, final String lxchostname ) {
-        OozieClusterConfig occ = oozieManager.getCluster( clustername );
+    public Response checkNode(final String clusterName, final String lxcHostname) {
+        OozieClusterConfig occ = oozieManager.getCluster(clusterName);
         UUID uuid = oozieManager.checkServerStatus( occ );
-        return wrapUUID( uuid );
+        String operationId = wrapUUID(uuid);
+        return Response.status(Response.Status.OK).entity(operationId).build();
     }
 
 

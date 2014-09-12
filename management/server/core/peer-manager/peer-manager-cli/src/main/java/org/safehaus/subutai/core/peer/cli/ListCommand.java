@@ -1,0 +1,40 @@
+package org.safehaus.subutai.core.peer.cli;
+
+
+import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.safehaus.subutai.core.peer.api.Peer;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+
+import java.util.List;
+
+
+/**
+ * Created by bahadyr on 8/28/14.
+ */
+@Command(scope = "peer", name = "ls")
+public class ListCommand extends OsgiCommandSupport {
+
+    private PeerManager peerManager;
+
+
+    public PeerManager getPeerManager() {
+        return peerManager;
+    }
+
+
+    public void setPeerManager(final PeerManager peerManager) {
+        this.peerManager = peerManager;
+    }
+
+
+    @Override
+    protected Object doExecute() throws Exception {
+        List<Peer> list = peerManager.peers();
+        System.out.println("Found " + list.size() + " registered peers");
+        for (Peer peer : list) {
+            System.out.println(peer.getId() + " " + peer.getIp() + " " + peer.getName());
+        }
+        return null;
+    }
+}

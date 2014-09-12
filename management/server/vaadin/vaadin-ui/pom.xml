@@ -55,6 +55,7 @@
                             com.vaadin.server.*;
                             com.vaadin.event.*;
                             com.vaadin.client.*;
+                            <!--com.vaadin.shared.*;-->
                             com.google.gwt.*;
                         </Export-Package>
 

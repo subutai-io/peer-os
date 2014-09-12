@@ -2,7 +2,6 @@ package org.safehaus.subutai.core.dispatcher.api;
 
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.safehaus.subutai.common.command.AgentRequestBuilder;
 import org.safehaus.subutai.common.command.Command;
@@ -95,7 +94,7 @@ public interface CommandDispatcher {
      */
     public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders );
 
-    public void executeRequests( final String IP, final UUID ownerId, final Set<BatchRequest> requests );
+    public void executeRequests( final String IP, final Set<BatchRequest> requests );
 
     public void processResponses( final Set<Response> responses );
 }

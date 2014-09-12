@@ -26,9 +26,11 @@ import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.settings.Common;
+import org.safehaus.subutai.common.util.CollectionUtil;
 import org.safehaus.subutai.core.agent.api.AgentListener;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -49,7 +51,8 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     /**
      * reference to communication manager
      */
-    private CommunicationManager communicationService;
+    private final CommunicationManager communicationService;
+    private final PeerManager peerManager;
     /**
      * executor for notifying agent listeners
      */
@@ -63,8 +66,12 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     private volatile boolean notifyAgentListeners = true;
 
 
-    public void setCommunicationService( CommunicationManager communicationService ) {
+    public AgentManagerImpl( final CommunicationManager communicationService, final PeerManager peerManager ) {
+        Preconditions.checkNotNull( communicationService, "Communication Manager is null" );
+        Preconditions.checkNotNull( peerManager, "Peer Manager is null" );
+
         this.communicationService = communicationService;
+        this.peerManager = peerManager;
     }
 
 
@@ -91,7 +98,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     public Set<Agent> getPhysicalAgents() {
         Set<Agent> physicalAgents = new HashSet<>();
         for ( Agent agent : agents.asMap().values() ) {
-            if ( !agent.isIsLXC() ) {
+            if ( !agent.isLXC() ) {
                 physicalAgents.add( agent );
             }
         }
@@ -107,7 +114,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     public Set<Agent> getLxcAgents() {
         Set<Agent> lxcAgents = new HashSet<>();
         for ( Agent agent : agents.asMap().values() ) {
-            if ( agent.isIsLXC() ) {
+            if ( agent.isLXC() ) {
                 lxcAgents.add( agent );
             }
         }
@@ -203,9 +210,25 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
     @Override
     public Set<Agent> getAgentsByHostnames( final Set<String> hostnames ) {
         Set<Agent> agentSet = new HashSet<>();
-        for ( Agent agent : agents.asMap().values() ) {
-            if ( hostnames.contains( agent.getHostname() ) ) {
-                agentSet.add( agent );
+        if ( !CollectionUtil.isCollectionEmpty( hostnames ) ) {
+            for ( Agent agent : agents.asMap().values() ) {
+                if ( hostnames.contains( agent.getHostname() ) ) {
+                    agentSet.add( agent );
+                }
+            }
+        }
+        return agentSet;
+    }
+
+
+    @Override
+    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
+        Set<Agent> agentSet = new HashSet<>();
+        if ( environmentId != null ) {
+            for ( Agent agent : agents.asMap().values() ) {
+                if ( agent.getEnvironmentId() != null && environmentId.compareTo( agent.getEnvironmentId() ) == 0 ) {
+                    agentSet.add( agent );
+                }
             }
         }
         return agentSet;
@@ -323,7 +346,7 @@ public class AgentManagerImpl implements ResponseListener, AgentManager {
                         Strings.isNullOrEmpty( response.getHostname() ) ? response.getUuid().toString() :
                         response.getHostname(), response.getParentHostName(), response.getMacAddress(),
                         response.getIps(), !Strings.isNullOrEmpty( response.getParentHostName() ),
-                        response.getTransportId(), response.getHostId(), response.getOwnerId() );
+                        response.getTransportId(), peerManager.getSiteId(), response.getEnvironmentId() );
 
                 //send registration acknowledgement to agent
                 sendAck( agent.getUuid() );
