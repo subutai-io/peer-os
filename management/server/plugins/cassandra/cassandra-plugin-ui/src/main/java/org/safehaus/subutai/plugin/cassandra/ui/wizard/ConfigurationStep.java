@@ -6,8 +6,6 @@
 package org.safehaus.subutai.plugin.cassandra.ui.wizard;
 
 
-import java.util.Arrays;
-
 import com.google.common.base.Strings;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
@@ -18,6 +16,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+
+import java.util.Arrays;
 
 
 /**
@@ -91,11 +91,12 @@ public class ConfigurationStep extends VerticalLayout {
         } );
 
         //configuration servers number
-        ComboBox nodesCountCombo =
+        final ComboBox nodesCountCombo =
                 new ComboBox( "Choose number of nodes in cluster", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         //        nodesCountCombo.setMultiSelect(false);
         nodesCountCombo.setImmediate( true );
-        nodesCountCombo.setTextInputAllowed( false );
+        nodesCountCombo.setTextInputAllowed( true );
+        nodesCountCombo.setImmediate(true);
         nodesCountCombo.setNullSelectionAllowed( false );
         nodesCountCombo.setValue( wizard.getConfig() );
 
@@ -107,11 +108,12 @@ public class ConfigurationStep extends VerticalLayout {
         } );
 
         //configuration servers number
-        ComboBox seedsCountCombo =
+        final ComboBox seedsCountCombo =
                 new ComboBox( "Choose number of seeds", Arrays.asList( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ) );
         //        seedsCountCombo.setMultiSelect(false);
         seedsCountCombo.setImmediate( true );
-        seedsCountCombo.setTextInputAllowed( false );
+        seedsCountCombo.setTextInputAllowed( true );
+        seedsCountCombo.setImmediate(true);
         seedsCountCombo.setNullSelectionAllowed( false );
         seedsCountCombo.setValue( wizard.getConfig() );
 
@@ -128,10 +130,13 @@ public class ConfigurationStep extends VerticalLayout {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( Strings.isNullOrEmpty( wizard.getConfig().getClusterName() ) ) {
-                    show( "Please provide cluster name" );
+                    show( "Please provide cluster name !" );
                 }
                 else if ( Strings.isNullOrEmpty( wizard.getConfig().getDomainName() ) ) {
-                    show( "Please provide domain name" );
+                    show( "Please provide domain name !" );
+                }
+                else if ( ( int ) nodesCountCombo.getValue()  <= ( int ) seedsCountCombo.getValue() ){
+                    show( "Number of seeds should be smaller than total number nodes in the cluster !");
                 }
                 else {
                     wizard.next();
