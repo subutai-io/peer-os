@@ -142,10 +142,9 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
                 BeanItemContainer<Criteria> criteriaBeans = criteriaBeansMap.get(st);
 
-
-                final Table criteriaTable = new Table("Strategy criteria", new BeanItemContainer<Criteria>(Criteria.class));
+                final Table criteriaTable = new Table("Strategy criteria", criteriaBeans);
                 criteriaTable.setColumnHeaders("ID", "Name", "Value");
-                criteriaTable.setPageLength(3);
+                criteriaTable.setPageLength(5);
 
                 criteriaTable.setSelectable(false);
 
@@ -163,7 +162,7 @@ public class Cloner extends VerticalLayout implements AgentExecutionListener {
 
                 criteriaTable.setEditable(true);
 
-                criteriaTable.setContainerDataSource(criteriaBeans);
+//                criteriaTable.setContainerDataSource(criteriaBeans);
 
                 criteriaLayout.addComponent(criteriaTable);
                 criteriaLayout.setVisible(st.hasCriteria());
