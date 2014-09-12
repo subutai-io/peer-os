@@ -14,13 +14,13 @@
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
 
-    <bean id="templateManagerRestServiceBean" class="org.safehaus.subutai.core.agent.rest.RestServiceImpl">
+    <bean id="agentManagerRestServiceBean" class="org.safehaus.subutai.core.agent.rest.RestServiceImpl">
         <property name="agentManager" ref="agentManager"/>
     </bean>
 
     <jaxrs:server address="/agent_manager" id="agentManagerRestService">
         <jaxrs:serviceBeans>
-            <ref component-id="templateManagerRestServiceBean"/>
+            <ref component-id="agentManagerRestServiceBean"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
 

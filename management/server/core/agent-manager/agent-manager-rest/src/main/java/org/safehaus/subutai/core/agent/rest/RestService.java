@@ -9,7 +9,7 @@ public interface RestService {
     // should return Set<Agent> in Json format
     @GET
     @Path("agents")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON})
     public Response getAgents();
 
     //should return Set<Agent> in Json format
