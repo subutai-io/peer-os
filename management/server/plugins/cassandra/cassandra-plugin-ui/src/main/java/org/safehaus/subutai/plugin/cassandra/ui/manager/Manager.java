@@ -37,9 +37,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/**
- * @author dilshat
- */
 public class Manager {
 
     private final Table nodesTable;
@@ -84,14 +81,16 @@ public class Manager {
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
         table.addContainerProperty( "Check", Button.class, null );
+        table.addContainerProperty( "Seed", String.class, null );
         table.addContainerProperty( "Service Status", Label.class, null );
         table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
+        table.setColumnCollapsingAllowed(true);
+        table.setColumnCollapsed( "Check", true);
         table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
-            // TODO getting agent is not connected error, fix this.
             @Override
             public void itemClick( ItemClickEvent event ) {
                 if ( event.isDoubleClick() ) {
@@ -162,11 +161,13 @@ public class Manager {
             final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             final Button checkButton = new Button( "Check" );
             checkButton.addStyleName( "default" );
+            checkButton.setVisible( false );
+
+            String isSeed = checkIfSeed( agent );
 
             final Object rowId = table.addItem( new Object[]{
-                    agent.getHostname(), agent.getListIP().toString(), checkButton, resultHolder, progressIcon
+                    agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkButton, isSeed, resultHolder, progressIcon
             }, null );
-
             progressIcon.setVisible( false );
             checkButton.addClickListener( new Button.ClickListener() {
                 @Override
@@ -188,6 +189,13 @@ public class Manager {
         }
     }
 
+
+    public String checkIfSeed( Agent agent ){
+        if ( config.getSeedNodes().contains( agent ) ){
+            return "Yes";
+        }
+        return "No";
+    }
 
     public static String parseServiceResult( String result){
         StringBuilder parsedResult = new StringBuilder();
@@ -237,7 +245,6 @@ public class Manager {
             }
         }
     }
-
 
     private void getCheckAllButton() {
         final Button checkAllBtn = new Button( "Check all" );
@@ -307,6 +314,10 @@ public class Manager {
 
         controlsContent.addComponent( stopAllBtn );
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
+    }
+
+    public String parseIPList( String ipList ){
+        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," )  );
     }
 
 
