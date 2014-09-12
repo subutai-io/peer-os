@@ -32,6 +32,8 @@ public class RestServiceImpl implements RestService {
         for (Agent agent : agents) {
             agentList.add(JsonUtil.toJson(agent));
         }
+        logger.info("Agent Manager Log");
+        logger.info(JsonUtil.toJson(agentList));
         return Response.status(Response.Status.OK).entity(JsonUtil.toJson(agentList)).build();
     }
 

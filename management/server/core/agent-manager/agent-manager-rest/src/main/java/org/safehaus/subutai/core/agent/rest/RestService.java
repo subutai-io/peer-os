@@ -1,6 +1,7 @@
 package org.safehaus.subutai.core.agent.rest;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public interface RestService {
@@ -8,6 +9,7 @@ public interface RestService {
     // should return Set<Agent> in Json format
     @GET
     @Path("agents")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAgents();
 
     //should return Set<Agent> in Json format
