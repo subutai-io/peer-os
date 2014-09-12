@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.impl.lxcmanager;
+package org.safehaus.subutai.impl.containermanager;
 
 
 import org.mockito.invocation.InvocationOnMock;
@@ -40,7 +40,7 @@ public class MockUtils {
 		Agent agent = mock(Agent.class);
 		when(agent.getHostname()).thenReturn(PHYSICAL_HOSTNAME);
 		when(agent.getUuid()).thenReturn(physicalUUID);
-		when(agent.isIsLXC()).thenReturn(false);
+//		when(agent.isIsLXC()).thenReturn(false);
 		when(agent.getParentHostName()).thenReturn(null);
 		when(agent.compareTo(agent)).thenCallRealMethod();
 		return agent;
@@ -51,7 +51,7 @@ public class MockUtils {
 		Agent agent = mock(Agent.class);
 		when(agent.getHostname()).thenReturn(LXC_HOSTNAME);
 		when(agent.getUuid()).thenReturn(lxcUUID);
-		when(agent.isIsLXC()).thenReturn(true);
+//		when(agent.isIsLXC()).thenReturn(true);
 		when(agent.getParentHostName()).thenReturn(PHYSICAL_HOSTNAME);
 		when(agent.compareTo(agent)).thenCallRealMethod();
 		return agent;
