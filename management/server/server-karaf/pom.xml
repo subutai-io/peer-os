@@ -1044,6 +1044,37 @@
                                     <version>${project.version}</version>
                                 </artifactItem>
 
+
+                                <!-- Strategy Manager  -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>strategy-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>strategy-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+                                <!-- Container Manager  -->
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>container-manager-ui</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>container-manager-api</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.safehaus.subutai</groupId>
+                                    <artifactId>container-manager-impl</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+
+
                                 <!-- Core Modules - END -->
 
                                 <!-- <artifactItem>

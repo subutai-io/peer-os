@@ -21,7 +21,7 @@ function clone {
 
   local parent="$1"
   local child="$2"
-  
+
   if [ "`are_containers_locked_write $parent $child`" == "true" ]
   then
      msg_error "Container(s) locked by a subutai process"
@@ -38,11 +38,36 @@ function clone {
     show_usage "`usage`"
   fi
   
+  OPTIND=0
+  if [ "$2" == $child ]; then
+    shift
+    shift
+  fi
+  #getting environmentId using getopts
+  local environmentId=""
+  shift_amount=0;
+  while getopts ":e:" opt; do
+     case $opt in
+       e)
+          environmentId=$OPTARG;
+          ;;
+       \?)
+          msg_error "Unrecognized option -$OPTARG"
+          exit 1
+          ;;
+     esac
+     shift_amount=$(($shift_amount + 1))
+  done
+   
   lock_container_write $parent $child
   if [ $? != 0 ]; then msg_error "Containers cannot be locked!"; exit 1; fi
-
+  
   # NOTE: underscore for our own lxc clone impl not supplied lxc-clone
-  lxc_clone $parent $child "`usage`"
+  if [ -z "$environmentId" ]; then
+     environmentId="null"
+  fi
+
+  lxc_clone $parent $child $environmentId "`usage`"
   git_child_branch $child
 
   msg_ok "Successfully cloned $child container from $parent"
