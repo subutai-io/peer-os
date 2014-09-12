@@ -6,15 +6,16 @@
 package org.safehaus.subutai.core.container.impl;
 
 
-import com.google.common.collect.Sets;
-import org.safehaus.subutai.common.protocol.Agent;
-import org.safehaus.subutai.core.agent.api.AgentListener;
-import org.safehaus.subutai.core.agent.api.AgentManager;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+
+import com.google.common.collect.Sets;
 
 
 /**
@@ -89,6 +90,12 @@ public class AgentManagerFake implements AgentManager {
 
     @Override
     public Set<Agent> getAgentsByHostnames(final Set<String> hostnames) {
+        return null;
+    }
+
+
+    @Override
+    public Set<Agent> getAgentsByEnvironmentId( final UUID environmentId ) {
         return null;
     }
 }
