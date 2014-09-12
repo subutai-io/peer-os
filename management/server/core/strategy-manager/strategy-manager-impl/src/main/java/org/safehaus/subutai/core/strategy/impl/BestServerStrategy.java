@@ -1,7 +1,7 @@
-package org.safehaus.subutai.impl.strategymanager;
+package org.safehaus.subutai.core.strategy.impl;
 
-import org.safehaus.subutai.api.strategymanager.Criteria;
-import org.safehaus.subutai.api.strategymanager.ServerMetric;
+import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.ServerMetric;
 import org.safehaus.subutai.common.protocol.Agent;
 
 import java.util.*;

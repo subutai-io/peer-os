@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.strategymanager;
+package org.safehaus.subutai.core.strategy.api;
 
 /**
  * Class for holding container placement strategy criteria.

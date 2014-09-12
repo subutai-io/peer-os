@@ -1,8 +1,8 @@
-package org.safehaus.subutai.impl.strategymanager;
+package org.safehaus.subutai.core.strategy.impl;
 
-import org.safehaus.subutai.api.strategymanager.AbstractContainerPlacementStrategy;
-import org.safehaus.subutai.api.strategymanager.Criteria;
-import org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory;
+import org.safehaus.subutai.core.strategy.api.AbstractContainerPlacementStrategy;
+import org.safehaus.subutai.core.strategy.api.Criteria;
+import org.safehaus.subutai.core.strategy.api.PlacementStrategyFactory;
 import org.safehaus.subutai.common.protocol.PlacementStrategy;
 
 import java.util.List;

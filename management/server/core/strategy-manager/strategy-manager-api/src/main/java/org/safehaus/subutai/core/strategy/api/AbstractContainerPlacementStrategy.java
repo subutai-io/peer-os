@@ -1,4 +1,4 @@
-package org.safehaus.subutai.api.strategymanager;
+package org.safehaus.subutai.core.strategy.api;
 
 import org.safehaus.subutai.common.protocol.Agent;
 

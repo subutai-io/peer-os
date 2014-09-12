@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.safehaus.subutai.api.containermanager;
+package org.safehaus.subutai.core.strategy.api;
 
 
 import org.safehaus.subutai.core.monitor.api.Metric;
