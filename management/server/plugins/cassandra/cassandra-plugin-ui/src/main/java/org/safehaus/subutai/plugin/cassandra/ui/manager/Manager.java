@@ -23,6 +23,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
+import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
@@ -87,8 +88,10 @@ public class Manager {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
         table.addContainerProperty( "IP", String.class, null );
-        table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Seed", String.class, null );
+        table.addContainerProperty( "Check", Button.class, null );
+        table.addContainerProperty( "Start", Button.class, null );
+        table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Service Status", Label.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
@@ -131,12 +134,24 @@ public class Manager {
             checkButton.addStyleName( "default" );
             checkButton.setVisible( false );
 
+            final Button startButton = new Button( "Start" );
+            startButton.addStyleName( "default" );
+            startButton.setVisible( true );
+
+            final Button stopButton = new Button( "Stop" );
+            stopButton.addStyleName( "default" );
+            stopButton.setVisible( true );
+
+            startButton.setEnabled(false);
+            stopButton.setEnabled(false);
+            progressIcon.setVisible(false);
+
             String isSeed = checkIfSeed( agent );
 
             final Object rowId = table.addItem( new Object[]{
-                    agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkButton, isSeed, resultHolder
+                    agent.getHostname(), parseIPList( agent.getListIP().toString() ),  isSeed, checkButton, startButton, stopButton, resultHolder
             }, null );
-            progressIcon.setVisible( false );
+
             checkButton.addClickListener( new Button.ClickListener() {
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
@@ -153,6 +168,58 @@ public class Manager {
                                     } ) );
                 }
             } );
+
+            startButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    progressIcon.setVisible(true);
+                    startButton.setEnabled(false);
+                    stopButton.setEnabled(false);
+
+                    CassandraUI.getExecutor()
+                            .execute(new StartTask(config.getClusterName(), agent.getHostname(), new org.safehaus.subutai.common.protocol.CompleteEvent() {
+
+                                @Override
+                                public void onComplete(NodeState state) {
+                                    synchronized(progressIcon) {
+                                        if(state == NodeState.RUNNING){
+                                            stopButton.setEnabled(true);
+                                        }
+                                        else if(state == NodeState.STOPPED){
+                                            startButton.setEnabled(true);
+                                        }
+                                        progressIcon.setVisible(false);
+                                    }
+                                }
+                            }));
+                }
+            });
+
+            stopButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    progressIcon.setVisible( true );
+                    startButton.setEnabled(false);
+                    stopButton.setEnabled(false);
+
+                    CassandraUI.getExecutor()
+                            .execute(new StopTask(config.getClusterName(), agent.getHostname(), new org.safehaus.subutai.common.protocol.CompleteEvent() {
+
+                                @Override
+                                public void onComplete(NodeState state) {
+                                    synchronized(progressIcon) {
+                                        if(state == NodeState.RUNNING){
+                                            stopButton.setEnabled(true);
+                                        }
+                                        else if(state == NodeState.STOPPED){
+                                            startButton.setEnabled(true);
+                                        }
+                                        progressIcon.setVisible(false);
+                                    }
+                                }
+                            }));
+                }
+            });
         }
     }
 
@@ -174,6 +241,40 @@ public class Manager {
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
     }
 
+    public void stopAllNodes() {
+        for(Object o : nodesTable.getItemIds()) {
+            int rowId = (Integer)o;
+            Item row = nodesTable.getItem(rowId);
+            Button checkBtn = (Button)(row.getItemProperty("Stop").getValue());
+            checkBtn.click();
+        }
+    }
+
+
+    public void startAllNodes() {
+        for(Object o : nodesTable.getItemIds()) {
+            int rowId = (Integer)o;
+            Item row = nodesTable.getItem(rowId);
+            Button checkBtn = (Button)(row.getItemProperty("Start").getValue());
+            checkBtn.click();
+        }
+    }
+
+
+    /**
+     * Clicks all "Check" buttons on table in which on nodes are listed.
+     * "Check" button is made hidden deliberately on this table.
+     */
+    public void checkAllNodes(){
+        for ( Object o : nodesTable.getItemIds() ) {
+            int rowId = ( Integer ) o;
+            Item row = nodesTable.getItem( rowId );
+            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
+            checkBtn.addStyleName( "default" );
+            checkBtn.click();
+        }
+    }
+
 
     /**
      * Creates combo box in which available clusters are listed.
@@ -188,7 +289,7 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( CassandraClusterConfig ) event.getProperty().getValue();
                 refreshUI();
-                checkAll();
+                checkAllNodes();
             }
         } );
 
@@ -293,15 +394,7 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 UUID trackID = CassandraUI.getCassandraManager().checkCluster( config.getClusterName() );
-                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
-                        CassandraClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        checkAll();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
+                checkAllNodes();
             }
         } );
 
@@ -319,16 +412,9 @@ public class Manager {
         startAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = CassandraUI.getCassandraManager().startCluster( config.getClusterName() );
-                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
-                        CassandraClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        checkAll();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
+                startAllNodes();
+//                UUID trackID = CassandraUI.getCassandraManager().startCluster( config.getClusterName() );
+//                checkAllNodes();
             }
         } );
         controlsContent.addComponent( startAllBtn );
@@ -345,16 +431,9 @@ public class Manager {
         stopAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = CassandraUI.getCassandraManager().stopCluster( config.getClusterName() );
-                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
-                        CassandraClusterConfig.PRODUCT_KEY );
-                window.getWindow().addCloseListener( new Window.CloseListener() {
-                    @Override
-                    public void windowClose( Window.CloseEvent closeEvent ) {
-                        checkAll();
-                    }
-                } );
-                contentRoot.getUI().addWindow( window.getWindow() );
+                stopAllNodes();
+//                UUID trackID = CassandraUI.getCassandraManager().stopCluster( config.getClusterName() );
+//                checkAllNodes();
             }
         } );
 
@@ -419,20 +498,5 @@ public class Manager {
 
     public Component getContent() {
         return contentRoot;
-    }
-
-
-    /**
-     * Clicks all "Check" buttons on table in which on nodes are listed.
-     * "Check" button is made hidden deliberately on this table.
-     */
-    public void checkAll(){
-        for ( Object o : nodesTable.getItemIds() ) {
-            int rowId = ( Integer ) o;
-            Item row = nodesTable.getItem( rowId );
-            Button checkBtn = ( Button ) ( row.getItemProperty( "Check" ).getValue() );
-            checkBtn.addStyleName( "default" );
-            checkBtn.click();
-        }
     }
 }

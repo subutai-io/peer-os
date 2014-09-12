@@ -39,6 +39,7 @@ public class Manager {
     private final Table nodesTable;
     private final String COORDINATOR_PREFIX = "Coordinator: ";
     private PrestoClusterConfig config;
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
 
     public Manager() {
 
@@ -68,6 +69,7 @@ public class Manager {
             public void valueChange(Property.ValueChangeEvent event) {
                 config = (PrestoClusterConfig)event.getProperty().getValue();
                 refreshUI();
+                checkAllNodes();
             }
         });
 
@@ -199,8 +201,10 @@ public class Manager {
 
         controlsContent.addComponent(addNodeBtn);
 
+        controlsContent.addComponent( progressIcon );
         contentRoot.addComponent(controlsContent, 0, 0);
         contentRoot.addComponent(nodesTable, 0, 1, 0, 9);
+
     }
 
     private Table createTableTemplate(String caption) {
@@ -213,7 +217,6 @@ public class Manager {
         table.addContainerProperty( "Stop", Button.class, null );
         table.addContainerProperty( "Action", Button.class, null );
         table.addContainerProperty( "Destroy", Button.class, null );
-        table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength(10);
         table.setSelectable(false);
@@ -337,13 +340,12 @@ public class Manager {
             setCoordinatorBtn.addStyleName("default");
             final Button destroyBtn = new Button("Destroy");
             destroyBtn.addStyleName("default");
-            final Embedded progressIcon = new Embedded("", new ThemeResource("img/spinner.gif"));
             stopBtn.setEnabled(false);
             startBtn.setEnabled(false);
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
-                agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkIfCoordinator( agent ), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn, progressIcon
+                agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkIfCoordinator( agent ), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn
             }, null);
 
             checkBtn.addClickListener(new Button.ClickListener() {
@@ -499,7 +501,7 @@ public class Manager {
         progressIcon.setVisible(false);
 
         table.addItem(new Object[]{
-            coordinator.getHostname(), parseIPList( coordinator.getListIP().toString() ), checkIfCoordinator( coordinator ), checkBtn, startBtn, stopBtn, null, null, progressIcon
+            coordinator.getHostname(), parseIPList( coordinator.getListIP().toString() ), checkIfCoordinator( coordinator ), checkBtn, startBtn, stopBtn, null, null
         }, null);
 
         checkBtn.addClickListener(new Button.ClickListener() {
