@@ -6,11 +6,16 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
@@ -21,6 +26,11 @@ import org.safehaus.subutai.plugin.presto.ui.PrestoUI;
 import org.safehaus.subutai.server.ui.component.ConfirmationDialog;
 import org.safehaus.subutai.server.ui.component.ProgressWindow;
 import org.safehaus.subutai.server.ui.component.TerminalWindow;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class Manager {
 
@@ -195,17 +205,21 @@ public class Manager {
 
     private Table createTableTemplate(String caption) {
         final Table table = new Table(caption);
-        table.addContainerProperty("Host", String.class, null);
-        table.addContainerProperty("Check", Button.class, null);
-        table.addContainerProperty("Start", Button.class, null);
-        table.addContainerProperty("Stop", Button.class, null);
-        table.addContainerProperty("Action", Button.class, null);
-        table.addContainerProperty("Destroy", Button.class, null);
-        table.addContainerProperty("Status", Embedded.class, null);
+        table.addContainerProperty( "Host", String.class, null );
+        table.addContainerProperty( "IP", String.class, null );
+        table.addContainerProperty( "Role", String.class, null );
+        table.addContainerProperty( "Check", Button.class, null );
+        table.addContainerProperty( "Start", Button.class, null );
+        table.addContainerProperty( "Stop", Button.class, null );
+        table.addContainerProperty( "Action", Button.class, null );
+        table.addContainerProperty( "Destroy", Button.class, null );
+        table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength(10);
         table.setSelectable(false);
         table.setImmediate(true);
+        table.setColumnCollapsingAllowed( true );
+        table.setColumnCollapsed( "Check", true );
 
         table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
@@ -226,6 +240,27 @@ public class Manager {
             }
         });
         return table;
+    }
+
+    /**
+     * @param agent agent
+     * @return Yes if give agent is among seeds, otherwise returns No
+     */
+    public String checkIfCoordinator( Agent agent ){
+        if ( config.getCoordinatorNode().equals( agent ) ){
+            return "Coordinator";
+        }
+        return "Worker";
+    }
+
+
+    /**
+     * Parses supplied string argument to extract external IP.
+     * @param ipList ex: [10.10.10.10, 127.0.0.1]
+     * @return 10.10.10.10
+     */
+    public String parseIPList( String ipList ){
+        return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," )  );
     }
 
     private void refreshUI() {
@@ -308,7 +343,7 @@ public class Manager {
             progressIcon.setVisible(false);
 
             table.addItem(new Object[]{
-                agent.getHostname(), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn, progressIcon
+                agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkIfCoordinator( agent ), checkBtn, startBtn, stopBtn, setCoordinatorBtn, destroyBtn, progressIcon
             }, null);
 
             checkBtn.addClickListener(new Button.ClickListener() {
@@ -464,7 +499,7 @@ public class Manager {
         progressIcon.setVisible(false);
 
         table.addItem(new Object[]{
-            COORDINATOR_PREFIX + coordinator.getHostname(), checkBtn, startBtn, stopBtn, null, null, progressIcon
+            coordinator.getHostname(), parseIPList( coordinator.getListIP().toString() ), checkIfCoordinator( coordinator ), checkBtn, startBtn, stopBtn, null, null, progressIcon
         }, null);
 
         checkBtn.addClickListener(new Button.ClickListener() {

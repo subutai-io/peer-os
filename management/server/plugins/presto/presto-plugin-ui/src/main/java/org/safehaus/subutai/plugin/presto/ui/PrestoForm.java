@@ -15,13 +15,24 @@ public class PrestoForm extends CustomComponent {
         verticalLayout.setSpacing(true);
         verticalLayout.setSizeFull();
 
-        TabSheet mongoSheet = new TabSheet();
-        mongoSheet.setSizeFull();
-        Manager manager = new Manager();
+        TabSheet cassandraSheet = new TabSheet();
+        cassandraSheet.setSizeFull();
+        final Manager manager = new Manager();
         Wizard wizard = new Wizard();
-        mongoSheet.addTab(wizard.getContent(), "Install");
-        mongoSheet.addTab(manager.getContent(), "Manage");
-        verticalLayout.addComponent(mongoSheet);
+        cassandraSheet.addTab( wizard.getContent(), "Install" );
+        cassandraSheet.addTab( manager.getContent(), "Manage" );
+        cassandraSheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if ( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
+        verticalLayout.addComponent( cassandraSheet );
+        verticalLayout.addComponent(cassandraSheet);
 
         setCompositionRoot(verticalLayout);
         manager.refreshClustersInfo();
