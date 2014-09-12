@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint
+        default-activation="eager"
+        xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+    <reference id="agentManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
+    <reference id="containerManager" availability="mandatory"
+               interface="org.safehaus.subutai.core.container.api.ContainerManager"/>
+
+    <bean id="module" scope="singleton" class="org.safehaus.subutai.core.container.ui.ContainerUI"
+          init-method="init" destroy-method="destroy">
+        <property name="agentManager" ref="agentManager"/>
+        <property name="containerManager" ref="containerManager"/>
+    </bean>
+
+    <service ref="module" interface="org.safehaus.subutai.server.ui.api.PortalModule"/>
+
+</blueprint>
