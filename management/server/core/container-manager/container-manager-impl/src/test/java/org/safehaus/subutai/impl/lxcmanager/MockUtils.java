@@ -8,12 +8,12 @@ package org.safehaus.subutai.impl.lxcmanager;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.api.commandrunner.AgentResult;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 
 import java.util.HashMap;
 import java.util.Map;

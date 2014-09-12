@@ -6,7 +6,7 @@
 package org.safehaus.subutai.api.strategymanager;
 
 
-import org.safehaus.subutai.api.monitoring.Metric;
+import org.safehaus.subutai.core.monitor.api.Metric;
 
 import java.util.Collections;
 import java.util.Map;

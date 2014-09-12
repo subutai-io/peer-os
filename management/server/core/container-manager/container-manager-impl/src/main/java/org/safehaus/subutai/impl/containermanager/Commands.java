@@ -7,10 +7,10 @@ package org.safehaus.subutai.impl.containermanager;
 
 
 import com.google.common.collect.Sets;
-import org.safehaus.subutai.api.commandrunner.Command;
-import org.safehaus.subutai.api.commandrunner.CommandsSingleton;
-import org.safehaus.subutai.api.commandrunner.RequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.command.api.CommandsSingleton;
 
 import java.util.Set;
 

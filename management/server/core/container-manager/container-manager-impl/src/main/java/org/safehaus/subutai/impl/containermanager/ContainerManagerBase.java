@@ -1,12 +1,12 @@
 package org.safehaus.subutai.impl.containermanager;
 
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.api.commandrunner.CommandRunner;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
-import org.safehaus.subutai.api.dbmanager.DbManager;
 import org.safehaus.subutai.api.strategymanager.ContainerPlacementStrategy;
-import org.safehaus.subutai.api.template.manager.TemplateManager;
-import org.safehaus.subutai.api.templateregistry.TemplateRegistryManager;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
+import org.safehaus.subutai.core.db.api.DbManager;
+import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
+import org.safehaus.subutai.core.template.api.TemplateManager;
 
 import java.util.ArrayList;
 import java.util.Collections;

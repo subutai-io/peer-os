@@ -1,9 +1,9 @@
 package org.safehaus.subutai.ui.containermanager;
 
 import com.vaadin.ui.Component;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
 import org.safehaus.subutai.api.containermanager.ContainerManager;
 import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.server.ui.api.PortalModule;
 
 import java.io.File;

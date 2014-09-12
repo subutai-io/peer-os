@@ -6,16 +6,15 @@
 package org.safehaus.subutai.impl.lxcmanager;
 
 
+import com.google.common.collect.Sets;
+import org.safehaus.subutai.common.protocol.Agent;
+import org.safehaus.subutai.core.agent.api.AgentListener;
+import org.safehaus.subutai.core.agent.api.AgentManager;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import org.safehaus.subutai.api.agentmanager.AgentListener;
-import org.safehaus.subutai.api.agentmanager.AgentManager;
-import org.safehaus.subutai.common.protocol.Agent;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -85,5 +84,10 @@ public class AgentManagerFake implements AgentManager {
 
 
     public void removeListener( AgentListener listener ) {
+    }
+
+    @Override
+    public Set<Agent> getAgentsByHostnames(Set<String> hostnames) {
+        return null;
     }
 }
