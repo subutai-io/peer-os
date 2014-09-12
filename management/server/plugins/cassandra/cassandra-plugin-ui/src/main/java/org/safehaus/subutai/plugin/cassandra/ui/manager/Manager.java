@@ -90,7 +90,6 @@ public class Manager {
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Seed", String.class, null );
         table.addContainerProperty( "Service Status", Label.class, null );
-//        table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
@@ -128,7 +127,6 @@ public class Manager {
         table.removeAllItems();
         for( final Agent agent : agents ) {
             final Label resultHolder = new Label();
-//            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
             final Button checkButton = new Button( "Check" );
             checkButton.addStyleName( "default" );
             checkButton.setVisible( false );
