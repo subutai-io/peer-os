@@ -6,9 +6,9 @@ package org.safehaus.subutai.core.strategy.api;
 public class Criteria {
     private String id;
     private String title;
-    private Object value;
+    private Boolean value;
 
-    public Criteria(String id, String title, Object value) {
+    public Criteria(String id, String title, Boolean value) {
         this.id = id;
         this.title = title;
         this.value = value;
@@ -34,7 +34,7 @@ public class Criteria {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(Boolean value) {
         this.value = value;
     }
 }
