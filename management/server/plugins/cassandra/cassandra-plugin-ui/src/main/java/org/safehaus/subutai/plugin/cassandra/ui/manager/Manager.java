@@ -45,6 +45,7 @@ public class Manager {
     private HorizontalLayout controlsContent;
     private CassandraClusterConfig config;
     private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
+    private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
 
 
     public Manager() {
@@ -71,13 +72,14 @@ public class Manager {
         getStopAllButton();
         getDestroyClusterButton();
 
+        controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
         contentRoot.addComponent( nodesTable, 0, 1, 0, 9 );
     }
 
 
     /**
-     * Created table in which all nodes in the cluster are listed.
+     * Creates table in which all nodes in the cluster are listed.
      * @param caption title of table
      * @return nodes table
      */
@@ -88,27 +90,26 @@ public class Manager {
         table.addContainerProperty( "Check", Button.class, null );
         table.addContainerProperty( "Seed", String.class, null );
         table.addContainerProperty( "Service Status", Label.class, null );
-        table.addContainerProperty( "Status", Embedded.class, null );
+//        table.addContainerProperty( "Status", Embedded.class, null );
         table.setSizeFull();
         table.setPageLength( 10 );
         table.setSelectable( false );
         table.setImmediate( true );
-        table.setColumnCollapsingAllowed(true);
-        table.setColumnCollapsed( "Check", true);
+        table.setColumnCollapsingAllowed( true );
+        table.setColumnCollapsed( "Check", true );
         table.addItemClickListener( new ItemClickEvent.ItemClickListener() {
             @Override
             public void itemClick( ItemClickEvent event ) {
-                if ( event.isDoubleClick() ) {
+                if( event.isDoubleClick() ) {
                     String lxcHostname =
                             ( String ) table.getItem( event.getItemId() ).getItemProperty( "Host" ).getValue();
                     Agent lxcAgent = CassandraUI.getAgentManager().getAgentByHostname( lxcHostname );
-                    if ( lxcAgent != null ) {
+                    if( lxcAgent != null ) {
                         TerminalWindow terminal =
                                 new TerminalWindow( Sets.newHashSet( lxcAgent ), CassandraUI.getExecutor(),
                                         CassandraUI.getCommandRunner(), CassandraUI.getAgentManager() );
                         contentRoot.getUI().addWindow( terminal.getWindow() );
-                    }
-                    else {
+                    } else {
                         show( "Agent is not connected" );
                     }
                 }
@@ -117,6 +118,45 @@ public class Manager {
         return table;
     }
 
+
+    /**
+     * Fill out the table in which all nodes in the cluster are listed.
+     * @param table table to be filled
+     * @param agents nodes
+     */
+    private void populateTable( final Table table, Set<Agent> agents ) {
+        table.removeAllItems();
+        for( final Agent agent : agents ) {
+            final Label resultHolder = new Label();
+//            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+            final Button checkButton = new Button( "Check" );
+            checkButton.addStyleName( "default" );
+            checkButton.setVisible( false );
+
+            String isSeed = checkIfSeed( agent );
+
+            final Object rowId = table.addItem( new Object[]{
+                    agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkButton, isSeed, resultHolder
+            }, null );
+            progressIcon.setVisible( false );
+            checkButton.addClickListener( new Button.ClickListener() {
+                @Override
+                public void buttonClick( Button.ClickEvent event ) {
+                    progressIcon.setVisible( true );
+                    CassandraUI.getExecutor().execute(
+                            new CheckTask( config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                resultHolder.setValue( parseServiceResult( result ) );
+                                                progressIcon.setVisible( false );
+                                            }
+                                        }
+                                    } ) );
+                }
+            } );
+        }
+    }
 
     /**
      * Shows notification with the given argument
@@ -137,7 +177,7 @@ public class Manager {
     }
 
     /**
-     * Created combo box in which available clusters are listed.
+     * Creates combo box in which available clusters are listed.
      */
     private void getClusterCombo() {
         clusterCombo = new ComboBox();
@@ -169,47 +209,6 @@ public class Manager {
             nodesTable.removeAllItems();
         }
     }
-
-
-    /**
-     * Fill out the table in which all nodes in the cluster are listed.
-     * @param table table to be filled
-     * @param agents nodes
-     */
-    private void populateTable( final Table table, Set<Agent> agents ) {
-        table.removeAllItems();
-        for( final Agent agent : agents ) {
-            final Label resultHolder = new Label();
-            final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
-            final Button checkButton = new Button( "Check" );
-            checkButton.addStyleName( "default" );
-            checkButton.setVisible( false );
-
-            String isSeed = checkIfSeed( agent );
-
-            final Object rowId = table.addItem( new Object[]{
-                    agent.getHostname(), parseIPList( agent.getListIP().toString() ), checkButton, isSeed, resultHolder, progressIcon
-            }, null );
-            progressIcon.setVisible( false );
-            checkButton.addClickListener( new Button.ClickListener() {
-                @Override
-                public void buttonClick( Button.ClickEvent event ) {
-                    progressIcon.setVisible( true );
-                    CassandraUI.getExecutor().execute(
-                            new CheckTask( config.getClusterName(), agent.getHostname(),
-                                    new CompleteEvent() {
-                                        public void onComplete( String result ) {
-                                            synchronized( progressIcon ) {
-                                                resultHolder.setValue( parseServiceResult( result ) );
-                                                progressIcon.setVisible( false );
-                                            }
-                                        }
-                                    } ) );
-                }
-            } );
-        }
-    }
-
 
     /**
      * @param agent agent
