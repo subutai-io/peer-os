@@ -25,6 +25,10 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 
     public UUID statusSecondaryNameNode( HadoopClusterConfig hadoopClusterConfig );
 
+    public UUID startDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
+    public UUID stopDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
     public UUID statusDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public UUID startJobTracker( HadoopClusterConfig hadoopClusterConfig );
@@ -35,11 +39,21 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 
     public UUID statusJobTracker( HadoopClusterConfig hadoopClusterConfig );
 
+    public UUID startTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
+    public UUID stopTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
     public UUID statusTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
-    public UUID addNode( String clusterName );
+    public UUID addNode( String clusterName, int nodeCount );
 
     public UUID blockDataNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
+    public UUID destroyNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
+    public UUID excludeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
+
+    public UUID includeNode( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
     public UUID blockTaskTracker( HadoopClusterConfig hadoopClusterConfig, Agent agent );
 
@@ -54,4 +68,5 @@ public interface Hadoop extends ApiBase<HadoopClusterConfig> {
 
     public EnvironmentBlueprint getDefaultEnvironmentBlueprint( final HadoopClusterConfig config )
             throws ClusterSetupException;
+
 }

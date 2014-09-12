@@ -26,7 +26,7 @@ public class HadoopForm extends CustomComponent {
 		manager = new Manager();
 		wizard = new Wizard();
 		sheet.addTab(wizard.getContent(), "Install");
-		sheet.addTab(manager, "Manage");
+		sheet.addTab(manager.getContent(), "Manage");
 
 
 		verticalLayout.addComponent(sheet);

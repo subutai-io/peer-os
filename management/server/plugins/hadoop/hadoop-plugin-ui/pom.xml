@@ -47,6 +47,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>command-runner-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

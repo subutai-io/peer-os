@@ -17,10 +17,16 @@ import org.safehaus.subutai.plugin.hadoop.impl.common.AddNodeOperation;
 
 public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
 
-    public AddOperationHandler( HadoopImpl manager, String clusterName ) {
+    private int nodeCount;
+
+
+    public AddOperationHandler( HadoopImpl manager, String clusterName, int nodeCount ) {
+//    public AddOperationHandler( HadoopImpl manager, String clusterName ) {
         super( manager, clusterName );
+        this.nodeCount = nodeCount;
         productOperation = manager.getTracker().createProductOperation( HadoopClusterConfig.PRODUCT_KEY,
-                String.format( "Adding node to cluster %s", clusterName ) );
+                String.format( "Adding %d node to cluster %s", nodeCount, clusterName ) );
+//                String.format( "Adding node to cluster %s", clusterName ) );
     }
 
 
@@ -34,54 +40,60 @@ public class AddOperationHandler extends AbstractOperationHandler<HadoopImpl> {
             return;
         }
 
-        productOperation.addLog( "Creating lxc container..." );
+        productOperation.addLog( String.format( "Creating %d lxc container(s)...", nodeCount ) );
+//        productOperation.addLog( String.format( "Creating " + nodeCount + " lxc containers..." ) );
         try {
-            Set<Agent> agents = manager.getContainerManager().clone( hadoopClusterConfig.getTemplateName(), 1,
-                    manager.getAgentManager().getPhysicalAgents(),
+            Set<Agent> agents = manager.getContainerManager().clone( hadoopClusterConfig.getTemplateName(),
+                    nodeCount, manager.getAgentManager().getPhysicalAgents(),
                     HadoopSetupStrategy.getNodePlacementStrategyByNodeType( NodeType.SLAVE_NODE ) );
 
-            Agent agent = agents.iterator().next();
             productOperation.addLog( "Lxc containers created successfully\nConfiguring network..." );
+            for ( Agent agent : agents ) {
+                if ( manager.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
+                        hadoopClusterConfig.getDomainName() ) && manager.getNetworkManager().configSshOnAgents(
+                        hadoopClusterConfig.getAllNodes(), agent ) ) {
+                    productOperation.addLog( "Cluster network configured for " + agent.getHostname() );
 
-            if ( manager.getNetworkManager().configHostsOnAgents( hadoopClusterConfig.getAllNodes(), agent,
-                    hadoopClusterConfig.getDomainName() ) && manager.getNetworkManager().configSshOnAgents(
-                    hadoopClusterConfig.getAllNodes(), agent ) ) {
-                productOperation.addLog( "Cluster network configured" );
+                    AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
+                    for ( Command command : addOperation.getCommandList() ) {
+                        productOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
+                        manager.getCommandRunner().runCommand( command );
 
-                AddNodeOperation addOperation = new AddNodeOperation( hadoopClusterConfig, agent );
-                for ( Command command : addOperation.getCommandList() ) {
-                    productOperation.addLog( ( String.format( "%s started...", command.getDescription() ) ) );
-                    manager.getCommandRunner().runCommand( command );
-
-                    if ( command.hasSucceeded() ) {
-                        productOperation.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
+                        if ( command.hasSucceeded() ) {
+                            productOperation.addLogDone( String.format( "%s succeeded", command.getDescription() ) );
+                        }
+                        else {
+                            productOperation.addLogFailed(
+                                    String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
+                        }
                     }
-                    else {
+
+                    hadoopClusterConfig.getTaskTrackers().add( agent );
+                    hadoopClusterConfig.getDataNodes().add( agent );
+
+                    try {
+                        manager.getPluginDAO()
+                               .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
+                                       hadoopClusterConfig );
+                        productOperation.addLog( "Cluster info saved to DB" );
+                    }
+                    catch ( DBException e ) {
                         productOperation.addLogFailed(
-                                String.format( "%s failed, %s", command.getDescription(), command.getAllErrors() ) );
+                                "Could not save cluster info to DB! Please see logs\n" + "Adding new node aborted" );
                     }
                 }
-
-                hadoopClusterConfig.getTaskTrackers().add( agent );
-                hadoopClusterConfig.getDataNodes().add( agent );
-
-                try {
-                    manager.getPluginDAO()
-                           .saveInfo( HadoopClusterConfig.PRODUCT_KEY, hadoopClusterConfig.getClusterName(),
-                                   hadoopClusterConfig );
-                    productOperation.addLog( "Cluster info saved to DB" );
+                else {
+                    productOperation.addLogFailed( "Could not configure network! Please see logs\nLXC creation aborted" );
                 }
-                catch ( DBException e ) {
-                    productOperation.addLogFailed(
-                            "Could not save cluster info to DB! Please see logs\n" + "Adding new node aborted" );
-                }
-            }
-            else {
-                productOperation.addLogFailed( "Could not configure network! Please see logs\nLXC creation aborted" );
             }
         }
         catch ( LxcCreateException e ) {
             productOperation.addLogFailed( e.getMessage() );
         }
     }
+
+
+//    public int getNodeCount() {
+//        return nodeCount;
+//    }
 }

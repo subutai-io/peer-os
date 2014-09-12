@@ -2,6 +2,7 @@ package org.safehaus.subutai.plugin.hadoop.ui;
 
 import com.vaadin.ui.Component;
 import org.safehaus.subutai.core.agent.api.AgentManager;
+import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.tracker.api.Tracker;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.plugin.hadoop.api.Hadoop;
@@ -22,6 +23,7 @@ public class HadoopUI implements PortalModule {
 	private static Hadoop hadoopManager;
 	private static AgentManager agentManager;
 	private static ExecutorService executor;
+    private static CommandRunner commandRunner;
 	private static Tracker tracker;
 
 	public static Hadoop getHadoopManager() {
@@ -35,6 +37,10 @@ public class HadoopUI implements PortalModule {
 	public static AgentManager getAgentManager() {
 		return agentManager;
 	}
+
+    public static CommandRunner getCommandRunner() {
+        return commandRunner;
+    }
 
 	public void setAgentManager(AgentManager agentManager) {
 		HadoopUI.agentManager = agentManager;
@@ -51,6 +57,10 @@ public class HadoopUI implements PortalModule {
 	public static Tracker getTracker() {
 		return tracker;
 	}
+
+    public void setCommandRunner( final CommandRunner commandRunner ) {
+        HadoopUI.commandRunner = commandRunner;
+    }
 
 	public void setTracker(Tracker tracker) {
 		HadoopUI.tracker = tracker;
@@ -86,4 +96,5 @@ public class HadoopUI implements PortalModule {
 	public Component createComponent() {
 		return new HadoopForm();
 	}
+
 }

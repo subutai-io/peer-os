@@ -17,11 +17,10 @@ import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
+import com.vaadin.ui.Notification;
 
-/**
- * @author dilshat
- */
-public class CheckTask implements Runnable {
+
+public class StopTask implements Runnable {
 
     private final CompleteEvent completeEvent;
     private UUID trackID;
@@ -30,9 +29,8 @@ public class CheckTask implements Runnable {
     private NodeType nodeType;
 
 
-
-    public CheckTask( NodeType nodeType, HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent, UUID trackID,
-                      Agent agent ) {
+    public StopTask( NodeType nodeType, HadoopClusterConfig hadoopClusterConfig, CompleteEvent completeEvent,
+                     UUID trackID, Agent agent ) {
         this.completeEvent = completeEvent;
         this.trackID = trackID;
         this.hadoopClusterConfig = hadoopClusterConfig;
@@ -64,20 +62,17 @@ public class CheckTask implements Runnable {
         NodeState state = NodeState.UNKNOWN;
         if ( agent != null ) {
             if ( nodeType.equals( NodeType.NAMENODE ) ) {
-                trackID = HadoopUI.getHadoopManager().statusNameNode( hadoopClusterConfig );
+                trackID = HadoopUI.getHadoopManager().stopNameNode( hadoopClusterConfig );
             }
             else if ( nodeType.equals( NodeType.JOBTRACKER ) ) {
-                trackID = HadoopUI.getHadoopManager().statusJobTracker( hadoopClusterConfig );
+                trackID = HadoopUI.getHadoopManager().stopJobTracker( hadoopClusterConfig );
             }
-            else if ( nodeType.equals( NodeType.SECONDARY_NAMENODE ) ) {
-                trackID = HadoopUI.getHadoopManager().statusSecondaryNameNode( hadoopClusterConfig );
-            }
-            if ( nodeType.equals( NodeType.DATANODE ) ) {
-                trackID = HadoopUI.getHadoopManager().statusDataNode( hadoopClusterConfig, agent );
-            }
-            else if ( nodeType.equals( NodeType.TASKTRACKER ) ){
-                trackID = HadoopUI.getHadoopManager().statusTaskTracker( hadoopClusterConfig, agent );
-            }
+//            if ( nodeType.equals( NodeType.DATANODE )  ) {
+//                trackID = HadoopUI.getHadoopManager().stopDataNode( hadoopClusterConfig, agent );
+//            }
+//            else {
+//                trackID = HadoopUI.getHadoopManager().stopTaskTracker( hadoopClusterConfig, agent );
+//            }
 
 
             long start = System.currentTimeMillis();

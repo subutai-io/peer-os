@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.CompleteEvent;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
+import org.safehaus.subutai.plugin.hadoop.api.NodeType;
 import org.safehaus.subutai.plugin.hadoop.ui.HadoopUI;
 
 
@@ -30,7 +31,7 @@ public class SecondaryNameNode extends ClusterNode {
     protected void getStatus( UUID trackID ) {
         setLoading( true );
 
-        HadoopUI.getExecutor().execute( new CheckTask( cluster, new CompleteEvent() {
+        HadoopUI.getExecutor().execute( new CheckTask( NodeType.SECONDARY_NAMENODE, cluster, new CompleteEvent() {
 
             public void onComplete( NodeState state ) {
                 synchronized ( progressButton ) {
