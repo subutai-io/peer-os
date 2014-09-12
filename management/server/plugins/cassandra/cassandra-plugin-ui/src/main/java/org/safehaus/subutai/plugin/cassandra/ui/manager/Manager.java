@@ -174,6 +174,7 @@ public class Manager {
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
     }
 
+
     /**
      * Creates combo box in which available clusters are listed.
      */
@@ -208,6 +209,7 @@ public class Manager {
         }
     }
 
+
     /**
      * @param agent agent
      * @return Yes if give agent is among seeds, otherwise returns No
@@ -218,6 +220,7 @@ public class Manager {
         }
         return "No";
     }
+
 
     /**
      * Parses output of 'service cassandra status' command
@@ -279,6 +282,7 @@ public class Manager {
         }
     }
 
+
     /**
      * Creates "Check All" button and adds click listener to this button.
      */
@@ -307,7 +311,7 @@ public class Manager {
 
 
     /**
-     * Created "Start All" button and adds click listener to this button.
+     * Creates "Start All" button and adds click listener to this button.
      */
     private void getStartAllButton() {
         Button startAllBtn = new Button( "Start all" );
@@ -333,7 +337,7 @@ public class Manager {
 
 
     /**
-     * Created "Stop All" button and adds click listener to this button.
+     * Creates "Stop All" button and adds click listener to this button.
      */
     private void getStopAllButton() {
         Button stopAllBtn = new Button( "Stop all" );
@@ -358,6 +362,7 @@ public class Manager {
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
     }
 
+
     /**
      * Parses supplied string argument to extract external IP.
      * @param ipList ex: [10.10.10.10, 127.0.0.1]
@@ -369,7 +374,7 @@ public class Manager {
 
 
     /**
-     * Created "Destroy Cluster" button and adds click listener to this button.
+     * Creates "Destroy Cluster" button and adds click listener to this button.
      */
     private void getDestroyClusterButton() {
         Button destroyClusterBtn = new Button( "Destroy cluster" );
@@ -407,7 +412,6 @@ public class Manager {
                 }
             }
         } );
-
         controlsContent.addComponent( destroyClusterBtn );
         controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
     }
