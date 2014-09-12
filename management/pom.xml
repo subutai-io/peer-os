@@ -690,7 +690,37 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- LXC Manager -->
+        <!-- Strategy Manager -->
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>strategy-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>strategy-manager-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Container Manager -->
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- LXC Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>lxc-manager-ui</artifactId>
