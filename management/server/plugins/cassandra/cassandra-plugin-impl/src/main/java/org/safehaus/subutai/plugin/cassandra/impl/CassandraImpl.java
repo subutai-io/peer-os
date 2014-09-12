@@ -189,23 +189,6 @@ public class CassandraImpl extends CassandraBase {
         return operationHandler.getTrackerId();
     }
 
-
-//    public List<CassandraClusterConfig> getClusters() {
-//        return dbManager.getInfo( CassandraClusterConfig.PRODUCT_KEY, CassandraClusterConfig.class );
-//    }
-//
-//
-//    @Override
-//    public CassandraClusterConfig getCluster( String clusterName ) {
-//        Preconditions.checkArgument( !Strings.isNullOrEmpty( clusterName ), "Cluster name is null or empty" );
-//        try {
-//            return pluginDAO.getInfo( CassandraClusterConfig.PRODUCT_KEY, clusterName, CassandraClusterConfig.class );
-//        }
-//        catch ( DBException e ) {
-//            return null;
-//        }
-//    }
-
     @Override
     public List<CassandraClusterConfig> getClusters() {
         try {

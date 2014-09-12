@@ -39,6 +39,16 @@ public class CassandraForm extends CustomComponent {
         sheet.addTab( wizard.getContent(), "Install" );
         //		sheet.addTab(new ConfigurationView(), "Configure");
         sheet.addTab( manager.getContent(), "Manage" );
+        sheet.addSelectedTabChangeListener( new TabSheet.SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange( TabSheet.SelectedTabChangeEvent event ) {
+                TabSheet tabsheet = event.getTabSheet();
+                String caption = tabsheet.getTab( event.getTabSheet().getSelectedTab() ).getCaption();
+                if( caption.equals( "Manage" ) ) {
+                    manager.refreshClustersInfo();
+                }
+            }
+        } );
         verticalLayout.addComponent( sheet );
 
         manager.refreshClustersInfo();

@@ -28,25 +28,26 @@ public class InstallClusterHandler extends AbstractOperationHandler<CassandraImp
 
     @Override
     public UUID getTrackerId() {
-        return productOperation.getId();
+        return po.getId();
     }
 
 
     @Override
     public void run() {
+        productOperation = po;
         po.addLog( "Building environment..." );
 
         try {
             Environment env = manager.getEnvironmentManager()
                                      .buildEnvironmentAndReturn( manager.getDefaultEnvironmentBlueprint( config ) );
 
-            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, productOperation );
+            ClusterSetupStrategy clusterSetupStrategy = manager.getClusterSetupStrategy( env, config, po );
             clusterSetupStrategy.setup();
 
-            productOperation.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
+            po.addLogDone( String.format( "Cluster %s set up successfully", clusterName ) );
         }
         catch ( EnvironmentBuildException | ClusterSetupException e ) {
-            productOperation.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
+            po.addLogFailed( String.format( "Failed to setup cluster %s : %s", clusterName, e.getMessage() ) );
         }
     }
 }

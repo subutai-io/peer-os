@@ -41,7 +41,7 @@ public class UninstallClusterHandler extends AbstractOperationHandler<CassandraI
         productOperation.addLog( "Deleting cluster information from database.." );
 
         try {
-            manager.getDbManager().deleteInfo2( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
+            manager.getPluginDAO().deleteInfo( CassandraClusterConfig.PRODUCT_KEY, config.getClusterName() );
             productOperation.addLogDone( "Cluster info deleted from database" );
         }
         catch ( DBException e ) {

@@ -136,6 +136,7 @@ public class Manager {
             public void valueChange( Property.ValueChangeEvent event ) {
                 config = ( CassandraClusterConfig ) event.getProperty().getValue();
                 refreshUI();
+                checkAll();
             }
         } );
 
@@ -239,13 +240,21 @@ public class Manager {
 
 
     private void getCheckAllButton() {
-        Button checkAllBtn = new Button( "Check all" );
+        final Button checkAllBtn = new Button( "Check all" );
         checkAllBtn.addStyleName( "default" );
         checkAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 UUID trackID = CassandraUI.getCassandraManager().checkCluster( config.getClusterName() );
-                checkAll();
+                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
+                        CassandraClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        checkAll();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
             }
         } );
 
@@ -261,7 +270,15 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 UUID trackID = CassandraUI.getCassandraManager().startCluster( config.getClusterName() );
-                checkAll();
+                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
+                        CassandraClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        checkAll();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
             }
         } );
         controlsContent.addComponent( startAllBtn );
@@ -276,7 +293,15 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 UUID trackID = CassandraUI.getCassandraManager().stopCluster( config.getClusterName() );
-                checkAll();
+                ProgressWindow window = new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
+                        CassandraClusterConfig.PRODUCT_KEY );
+                window.getWindow().addCloseListener( new Window.CloseListener() {
+                    @Override
+                    public void windowClose( Window.CloseEvent closeEvent ) {
+                        checkAll();
+                    }
+                } );
+                contentRoot.getUI().addWindow( window.getWindow() );
             }
         } );
 
