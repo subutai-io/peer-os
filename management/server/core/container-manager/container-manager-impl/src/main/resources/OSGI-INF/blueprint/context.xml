@@ -16,7 +16,7 @@
     <reference id="placementStrategyFactory" availability="mandatory"
                interface="org.safehaus.subutai.api.strategymanager.PlacementStrategyFactory"/>
     <!--
-    <bean id="lxcmanager" scope="singleton" class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
+    <bean id="containermanager" scope="singleton" class="org.safehaus.subutai.impl.containermanager.ContainerManagerImpl"
           init-method="init" destroy-method="destroy">
         <argument ref="agentManager"/>
         <argument ref="commandRunner"/>
@@ -43,7 +43,7 @@
     </bean>
 
     <!--
-    <service ref="lxcmanager" interface="org.safehaus.subutai.api.lxcmanager.LxcManager"/>
+    <service ref="containermanager" interface="org.safehaus.subutai.api.containermanager.LxcManager"/>
     -->
     <service ref="containerManager" interface="org.safehaus.subutai.api.containermanager.ContainerManager"/>
 
