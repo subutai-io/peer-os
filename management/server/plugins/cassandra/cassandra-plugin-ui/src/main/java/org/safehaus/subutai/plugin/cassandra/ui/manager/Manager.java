@@ -76,6 +76,11 @@ public class Manager {
     }
 
 
+    /**
+     * Created table in which all nodes in the cluster are listed.
+     * @param caption title of table
+     * @return nodes table
+     */
     private Table createTableTemplate( String caption ) {
         final Table table = new Table( caption );
         table.addContainerProperty( "Host", String.class, null );
@@ -113,18 +118,27 @@ public class Manager {
     }
 
 
+    /**
+     * Shows notification with the given argument
+     * @param notification notification which will shown.
+     */
     private void show( String notification ) {
         Notification.show( notification );
     }
 
 
+    /**
+     * Creates "Select the cluster" label.
+     */
     private void getClusterNameLabel() {
         Label clusterNameLabel = new Label( "Select the cluster" );
         controlsContent.addComponent( clusterNameLabel );
         controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
     }
 
-
+    /**
+     * Created combo box in which available clusters are listed.
+     */
     private void getClusterCombo() {
         clusterCombo = new ComboBox();
         clusterCombo.setImmediate( true );
@@ -144,6 +158,9 @@ public class Manager {
     }
 
 
+    /**
+     * Removes all items in the table, and populate it again with {@link #populateTable(com.vaadin.ui.Table, java.util.Set)}.
+     */
     private void refreshUI() {
         if ( config != null ) {
             populateTable( nodesTable, config.getNodes() );
@@ -154,6 +171,11 @@ public class Manager {
     }
 
 
+    /**
+     * Fill out the table in which all nodes in the cluster are listed.
+     * @param table table to be filled
+     * @param agents nodes
+     */
     private void populateTable( final Table table, Set<Agent> agents ) {
         table.removeAllItems();
         for( final Agent agent : agents ) {
@@ -173,7 +195,6 @@ public class Manager {
                 @Override
                 public void buttonClick( Button.ClickEvent event ) {
                     progressIcon.setVisible( true );
-
                     CassandraUI.getExecutor().execute(
                             new CheckTask( config.getClusterName(), agent.getHostname(),
                                     new CompleteEvent() {
@@ -190,6 +211,10 @@ public class Manager {
     }
 
 
+    /**
+     * @param agent agent
+     * @return Yes if give agent is among seeds, otherwise returns No
+     */
     public String checkIfSeed( Agent agent ){
         if ( config.getSeedNodes().contains( agent ) ){
             return "Yes";
@@ -197,6 +222,11 @@ public class Manager {
         return "No";
     }
 
+    /**
+     * Parses output of 'service cassandra status' command
+     * @param result
+     * @return
+     */
     public static String parseServiceResult( String result){
         StringBuilder parsedResult = new StringBuilder();
         Matcher tracersMatcher = cassandraPattern.matcher( result );
@@ -208,6 +238,9 @@ public class Manager {
     }
 
 
+    /**
+     * Creates "Refresh Cluster" button and adds click listener to this button.
+     */
     private void getRefreshClusterButton() {
         Button refreshClustersBtn = new Button( "Refresh clusters" );
         refreshClustersBtn.addStyleName( "default" );
@@ -223,6 +256,9 @@ public class Manager {
     }
 
 
+    /**
+     * Refreshes combo box which lists available clusters in DB
+     */
     public void refreshClustersInfo() {
         List<CassandraClusterConfig> info = CassandraUI.getCassandraManager().getClusters();
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
@@ -246,6 +282,9 @@ public class Manager {
         }
     }
 
+    /**
+     * Creates "Check All" button and adds click listener to this button.
+     */
     private void getCheckAllButton() {
         final Button checkAllBtn = new Button( "Check all" );
         checkAllBtn.addStyleName( "default" );
@@ -270,6 +309,9 @@ public class Manager {
     }
 
 
+    /**
+     * Created "Start All" button and adds click listener to this button.
+     */
     private void getStartAllButton() {
         Button startAllBtn = new Button( "Start all" );
         startAllBtn.addStyleName( "default" );
@@ -293,6 +335,9 @@ public class Manager {
     }
 
 
+    /**
+     * Created "Stop All" button and adds click listener to this button.
+     */
     private void getStopAllButton() {
         Button stopAllBtn = new Button( "Stop all" );
         stopAllBtn.addStyleName( "default" );
@@ -316,11 +361,19 @@ public class Manager {
         controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
     }
 
+    /**
+     * Parses supplied string argument to extract external IP.
+     * @param ipList ex: [10.10.10.10, 127.0.0.1]
+     * @return 10.10.10.10
+     */
     public String parseIPList( String ipList ){
         return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," )  );
     }
 
 
+    /**
+     * Created "Destroy Cluster" button and adds click listener to this button.
+     */
     private void getDestroyClusterButton() {
         Button destroyClusterBtn = new Button( "Destroy cluster" );
         destroyClusterBtn.addStyleName( "default" );
@@ -367,6 +420,11 @@ public class Manager {
         return contentRoot;
     }
 
+
+    /**
+     * Clicks all "Check" buttons on table in which on nodes are listed.
+     * "Check" button is made hidden deliberately on this table.
+     */
     public void checkAll(){
         for ( Object o : nodesTable.getItemIds() ) {
             int rowId = ( Integer ) o;
