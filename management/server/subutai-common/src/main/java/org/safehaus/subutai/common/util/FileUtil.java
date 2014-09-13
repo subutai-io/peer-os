@@ -42,23 +42,37 @@ public class FileUtil {
 
 
     private static void writeFile( String fileName, Object object ) {
-
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
         try {
             String currentPath = System.getProperty( "user.dir" ) + "/res/" + fileName;
-            InputStream inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
-            OutputStream outputStream = new FileOutputStream( new File( currentPath ) );
+            inputStream = getClassLoader( object.getClass() ).getResourceAsStream( "img/" + fileName );
+            outputStream = new FileOutputStream( new File( currentPath ) );
             int read = 0;
             byte[] bytes = new byte[1024];
 
             while ( ( read = inputStream.read( bytes ) ) != -1 ) {
                 outputStream.write( bytes, 0, read );
             }
-
-            inputStream.close();
-            outputStream.close();
         }
         catch ( Exception ex ) {
-            ex.printStackTrace();
+            log.log( Level.SEVERE, "Error while writing to file: " + ex );
+        }
+        finally {
+            if ( inputStream != null ) {
+                try {
+                    inputStream.close();
+                }
+                catch ( IOException ignore ) {
+                }
+            }
+            if ( outputStream != null ) {
+                try {
+                    outputStream.close();
+                }
+                catch ( IOException ignore ) {
+                }
+            }
         }
     }
 
@@ -66,8 +80,10 @@ public class FileUtil {
     private static URLClassLoader getClassLoader( Class clazz ) {
         // Needed an instance to get URL, i.e. the static way doesn't work: FileUtil.class.getClass().
         URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
+        URLClassLoader classLoader =
+                new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
 
-        return new URLClassLoader( new URL[] { url }, Thread.currentThread().getContextClassLoader() );
+        return classLoader;
     }
 
 

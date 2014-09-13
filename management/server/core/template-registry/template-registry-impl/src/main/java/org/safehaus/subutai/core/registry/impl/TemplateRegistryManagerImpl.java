@@ -424,8 +424,7 @@ public class TemplateRegistryManagerImpl implements TemplateRegistryManager {
             }
             return result;
         }
-        catch ( DBException e ) {
-            e.printStackTrace();
+        catch ( DBException ignored ) {
         }
 
         return Collections.emptyList();

@@ -193,6 +193,7 @@ public class Response implements Serializable {
                                                                             .append( "ips", ips )
                                                                             .append( "isLxc", isLxc )
                                                                             .append( "transportId", transportId )
+                                                                            .append( "environmentId", environmentId )
                                                                             .append( "confPoints", confPoints )
                                                                             .append( "changeType", changeType )
                                                                             .append( "configPoint", configPoint )
