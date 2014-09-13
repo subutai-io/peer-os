@@ -13,12 +13,12 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAConnection.h"
+#include "SubutaiConnection.h"
 
 /**
- *  \details   Default constructor of KAConnection class.
+ *  \details   Default constructor of SubutaiConnection class.
  */
-KAConnection::KAConnection(const char * id, const char * subscribedTopic, const char * publishedTopic
+SubutaiConnection::SubutaiConnection(const char * id, const char * subscribedTopic, const char * publishedTopic
 		, const char * broadcastTopic, const char * host, int port) : mosqpp::mosquittopp(id)
 {
 	this->keepalive = 60;
@@ -31,7 +31,7 @@ KAConnection::KAConnection(const char * id, const char * subscribedTopic, const 
 	this->reveivedMessage=false;
 	this->connectionStatus=false;
 	this->bufferSize = 10000;
-	this->certpath = "/etc/ksks-agent/config/";
+	this->certpath = "/etc/subutai-agent/";
 };
 
 /**
@@ -40,7 +40,7 @@ KAConnection::KAConnection(const char * id, const char * subscribedTopic, const 
 static int password_callback(char* buf, int size, int rwflag, void* userdata)
 {
 	pugi::xml_document doc;
-	if(doc.load_file("/etc/ksks-agent/config/settings.xml").status)		//if the settings file does not exist
+	if(doc.load_file("/etc/subutai-agent/agent.xml").status)		//if the settings file does not exist
 	{
 		return 100;
 		exit(1);
@@ -52,11 +52,11 @@ static int password_callback(char* buf, int size, int rwflag, void* userdata)
 }
 
 /**
- *  \details   openSession method is one of the most important function of the KAConnection class.
+ *  \details   openSession method is one of the most important function of the SubutaiConnection class.
  *  		   It tries to open a connection to MQTT Broker.
  *  		   if this operation is successfully done it returns true. Otherwise it returns false.
  */
-bool KAConnection::openSession()
+bool SubutaiConnection::openSession()
 {
 	tls_opts_set(1, "tlsv1.1", NULL);
 	string ca = certpath + "ca.crt";
@@ -80,7 +80,7 @@ bool KAConnection::openSession()
  *  \details   This method is tries to reconnect to MQTT Broker.
  *  		   if this operation is successfully done it returns true. Otherwise it returns false.
  */
-bool KAConnection::reConnect()
+bool SubutaiConnection::reConnect()
 {
 	int result;
 	result = reconnect();
@@ -94,9 +94,9 @@ bool KAConnection::reConnect()
 }
 
 /**
- *  \details   Default destructor of KAConnection class.
+ *  \details   Default destructor of SubutaiConnection class.
  */
-KAConnection::~KAConnection()
+SubutaiConnection::~SubutaiConnection()
 {
 	loop_stop();              // Kill the thread
 	mosqpp::lib_cleanup();    // Mosquitto library cleanup
@@ -105,7 +105,7 @@ KAConnection::~KAConnection()
 /**
  *  \details   This method sends the given strings about execution responses to MQTT Broker.
  */
-bool KAConnection::sendMessage(string message)
+bool SubutaiConnection::sendMessage(string message)
 {
 	const  char * _message = message.c_str();
 	int ret = publish(NULL,this->publishedTopic,strlen(_message),_message,2,true);
@@ -115,20 +115,20 @@ bool KAConnection::sendMessage(string message)
 /**
  *  \details   This method informs the user about the disconnecting from MQTT Broker.
  */
-void KAConnection::on_disconnect(int rc)
+void SubutaiConnection::on_disconnect(int rc)
 {
-	std::cout << " KAConnection - disconnection(" << rc << ")" << std::endl;
+	std::cout << " SubutaiConnection - disconnection(" << rc << ")" << std::endl;
 	this->connectionStatus=false;
 }
 
 /**
  *  \details   This method informs the user about the connecting to MQTT Broker.
  */
-void KAConnection::on_connect(int rc)
+void SubutaiConnection::on_connect(int rc)
 {
 	if ( rc == 0 )
 	{
-		cout << " KAConnection - connected with server" << endl;
+		cout << " SubutaiConnection - connected with server" << endl;
 		if(connectionStatus==false)
 		{
 			subscribe(NULL,this->subscribedTopic,2); // resubscribe to agent own Topic.
@@ -138,22 +138,22 @@ void KAConnection::on_connect(int rc)
 	}
 	else
 	{
-		cout << " KAConnection - Impossible to connect with server(" << rc << ")" << endl;
+		cout << " SubutaiConnection - Impossible to connect with server(" << rc << ")" << endl;
 	}
 }
 
 /**
  *  \details   This method informs the user about the published message to MQTT Broker.
  */
-void KAConnection::on_publish(int mid)
+void SubutaiConnection::on_publish(int mid)
 {
-	cout << " KAConnection - Message (" << mid << ") succeed to be published " << endl;
+	cout << " SubutaiConnection - Message (" << mid << ") succeed to be published " << endl;
 }
 
 /**
  *  \details   This method informs the user about the published message to MQTT Broker.
  */
-void KAConnection::on_subscribe(int mid)
+void SubutaiConnection::on_subscribe(int mid)
 {
 	cout << "Subscriptions succesfully Done!"  << endl;
 }
@@ -161,7 +161,7 @@ void KAConnection::on_subscribe(int mid)
 /**
  *  \details   This method gets the message from buffer asynchronously and changes status of the received message flag.
  */
-void KAConnection::on_message(const struct mosquitto_message *message)
+void SubutaiConnection::on_message(const struct mosquitto_message *message)
 {
 	char buf[this->bufferSize+1];
 
@@ -181,7 +181,7 @@ void KAConnection::on_message(const struct mosquitto_message *message)
 /**
  *  \details   This method returns the status of the new message.
  */
-bool KAConnection::checkMessageStatus()
+bool SubutaiConnection::checkMessageStatus()
 {
 	return reveivedMessage;
 }
@@ -189,34 +189,34 @@ bool KAConnection::checkMessageStatus()
 /**
  *  \details   This method resets the status of the new message flag.
  */
-void KAConnection::resetMessageStatus()
+void SubutaiConnection::resetMessageStatus()
 {
 	this->reveivedMessage = false;
 }
 
 /**
- *  \details   This method is one of the most important function of the KAConnection class.
+ *  \details   This method is one of the most important function of the SubutaiConnection class.
  *  		   It tries to return the message from MQTT Broker in none-blocking mode.
  */
-string KAConnection::getMessage()
+string SubutaiConnection::getMessage()
 {
 	return this->messsage;
 }
 
 /**
- *  \details   setting "message" private variable of the KAConnection class.
+ *  \details   setting "message" private variable of the SubutaiConnection class.
  *
  */
-void KAConnection::setMessage(string message)
+void SubutaiConnection::setMessage(string message)
 {
 	this->messsage = message;
 }
 
 /**
- *  \details   setting "id" private variable of the KAConnection class.
+ *  \details   setting "id" private variable of the SubutaiConnection class.
  *
  */
-string KAConnection::getID()
+string SubutaiConnection::getID()
 {
 	string uuid= this->id;
 	return uuid;

@@ -13,12 +13,12 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAStreamReader.h"
+#include "SubutaiStreamReader.h"
 
 /**
- *  \details   Default constructor of the KAStreamReader class.
+ *  \details   Default constructor of the SubutaiStreamReader class.
  */
-KAStreamReader::KAStreamReader()
+SubutaiStreamReader::SubutaiStreamReader()
 {
 	setIdentity("");
 	setMode("");
@@ -29,9 +29,9 @@ KAStreamReader::KAStreamReader()
 }
 
 /**
- *  \details   Overloaded constructor of the KAStreamReader class.
+ *  \details   Overloaded constructor of the SubutaiStreamReader class.
  */
-KAStreamReader::KAStreamReader(string mode,string path,string identity)
+SubutaiStreamReader::SubutaiStreamReader(string mode,string path,string identity)
 {
 	setMode(mode);
 	setPath(path);
@@ -42,69 +42,69 @@ KAStreamReader::KAStreamReader(string mode,string path,string identity)
 }
 
 /**
- *  \details   Default destructor of the KAStreamReader class.
+ *  \details   Default destructor of the SubutaiStreamReader class.
  */
-KAStreamReader::~KAStreamReader()
+SubutaiStreamReader::~SubutaiStreamReader()
 {
 
 }
 
 /**
- *  \details   setting "identity" private variable of KAStreamReader instance.
+ *  \details   setting "identity" private variable of SubutaiStreamReader instance.
  *  		   identity should be "error" or "output".
  */
-void KAStreamReader::setIdentity(string identity)
+void SubutaiStreamReader::setIdentity(string identity)
 {
 	this->identity = identity;
 }
 
 /**
- *  \details   getting "identity" private variable of KAStreamReader instance.
+ *  \details   getting "identity" private variable of SubutaiStreamReader instance.
  */
-string& KAStreamReader::getIdentity()
+string& SubutaiStreamReader::getIdentity()
 {
 	return this->identity;
 }
 
 /**
- *  \details   setting "mode" private variable of KAStreamReader instance.
+ *  \details   setting "mode" private variable of SubutaiStreamReader instance.
  *  		   mode has the value of: "CAPTURE" or "CAPTURE_AND_RETURN" or "RETURN" or "NO".
  */
-void KAStreamReader::setMode(string mode)
+void SubutaiStreamReader::setMode(string mode)
 {
 	this->mode = mode;
 }
 
 /**
- *  \details   getting "mode" private variable of KAStreamReader instance
+ *  \details   getting "mode" private variable of SubutaiStreamReader instance
  */
-string& KAStreamReader::getMode()
+string& SubutaiStreamReader::getMode()
 {
 	return this->mode;
 }
 
 /**
- *  \details   getting "path" private variable of KAStreamReader instance.
+ *  \details   getting "path" private variable of SubutaiStreamReader instance.
  *  		   this path is used for capturing intermediate response's location.
  */
-void KAStreamReader::setPath(string path)
+void SubutaiStreamReader::setPath(string path)
 {
 	this->path = path;
 }
 
 /**
- *  \details   getting "path" private variable of KAStreamReader instance.
+ *  \details   getting "path" private variable of SubutaiStreamReader instance.
  */
-string& KAStreamReader::getPath()
+string& SubutaiStreamReader::getPath()
 {
 	return this->path;
 }
 
 /**
- *  \details   setting "fileDec" private variable of KAStreamReader instance.
+ *  \details   setting "fileDec" private variable of SubutaiStreamReader instance.
  *  		   Each StreamReader instance has a file descriptor to open a pipe.
  */
-void KAStreamReader::setFileDec(fd_set fileDec)
+void SubutaiStreamReader::setFileDec(fd_set fileDec)
 {
 	this->fileDec = fileDec;
 }
@@ -112,16 +112,16 @@ void KAStreamReader::setFileDec(fd_set fileDec)
 /**
  *  \details   This method prepares its file descriptor to pipe operation.
  */
-void KAStreamReader::prepareFileDec()
+void SubutaiStreamReader::prepareFileDec()
 {
 	FD_ZERO(&fileDec);
 	FD_SET(mypipe[0],&fileDec);
 }
 
 /**
- *  \details   getting "fileDec" private variable of KAStreamReader instance.
+ *  \details   getting "fileDec" private variable of SubutaiStreamReader instance.
  */
-fd_set& KAStreamReader::getFileDec()
+fd_set& SubutaiStreamReader::getFileDec()
 {
 	return this->fileDec;
 }
@@ -130,7 +130,7 @@ fd_set& KAStreamReader::getFileDec()
  *  \details   This method prepares pipelines using its file descriptor.
  *  		   It duplicates the stderr and stdout pipelines to its private pipes.
  */
-void KAStreamReader::preparePipe()
+void SubutaiStreamReader::preparePipe()
 {
 	dup2(mypipe[0], STDIN_FILENO);
 	if(identity == "output")
@@ -143,9 +143,9 @@ void KAStreamReader::preparePipe()
 	}
 }
 /**
- *  \details   getting "mypipe" private variable of KAStreamReader instance.
+ *  \details   getting "mypipe" private variable of SubutaiStreamReader instance.
  */
-int* KAStreamReader::getPipe()
+int* SubutaiStreamReader::getPipe()
 {
 	return mypipe;
 }
@@ -154,7 +154,7 @@ int* KAStreamReader::getPipe()
  *  \details   This method opens the pipe.
  *  			Return true if open operation is successfull otherwise it returns false.
  */
-bool KAStreamReader::openPipe()
+bool SubutaiStreamReader::openPipe()
 {
 	if(!pipe(mypipe))
 	{
@@ -169,41 +169,41 @@ bool KAStreamReader::openPipe()
 /**
  *  \details   	This method closes the pipe.
  */
-void KAStreamReader::closePipe(int i)
+void SubutaiStreamReader::closePipe(int i)
 {
 	close(mypipe[i]);
 }
 
 /**
- *  \details   	 setting "selectResult" private variable of KAStreamReader instance.
+ *  \details   	 setting "selectResult" private variable of SubutaiStreamReader instance.
  *  			 selectResult indicates that the timeout is occured or not.
  */
-void KAStreamReader::setSelectResult(int selectresult)
+void SubutaiStreamReader::setSelectResult(int selectresult)
 {
 	this->selectResult = selectresult;
 }
 
 /**
- *  \details   	 getting "selectResult" private variable of KAStreamReader instance.
+ *  \details   	 getting "selectResult" private variable of SubutaiStreamReader instance.
  */
-int KAStreamReader::getSelectResult()
+int SubutaiStreamReader::getSelectResult()
 {
 	return this->selectResult;
 }
 
 /**
- *  \details   	 setting "readResult" private variable of KAStreamReader instance.
+ *  \details   	 setting "readResult" private variable of SubutaiStreamReader instance.
  *  			 readResult indicates that EOF is occured in the pipe or not.
  */
-void KAStreamReader::setReadResult(int readresult)
+void SubutaiStreamReader::setReadResult(int readresult)
 {
 	this->readResult = readresult;
 }
 
 /**
- *  \details   	 getting "readResult" private variable of KAStreamReader instance.
+ *  \details   	 getting "readResult" private variable of SubutaiStreamReader instance.
  */
-int KAStreamReader::getReadResult()
+int SubutaiStreamReader::getReadResult()
 {
 	return this->readResult;
 }
@@ -211,15 +211,15 @@ int KAStreamReader::getReadResult()
 /**
  *  \details   	 This method clears the Stream buffer.
  */
-void KAStreamReader::clearBuffer()
+void SubutaiStreamReader::clearBuffer()
 {
 	memset(buffer,0,1000);
 }
 
 /**
- *  \details   	 getting "buffer" private variable of KAStreamReader instance.
+ *  \details   	 getting "buffer" private variable of SubutaiStreamReader instance.
  */
-char* KAStreamReader::getBuffer()
+char* SubutaiStreamReader::getBuffer()
 {
 	return buffer;
 }
@@ -227,7 +227,7 @@ char* KAStreamReader::getBuffer()
 /**
  *  \details   	 This method set the timeout value of the Stream. it is used by default 20000 for now. (20000 usec = 20ms)
  */
-void KAStreamReader::setTimeout(unsigned int usecond)
+void SubutaiStreamReader::setTimeout(unsigned int usecond)
 {
 	this->timeout.tv_sec = 0;
 	this->timeout.tv_usec = usecond;
@@ -236,7 +236,7 @@ void KAStreamReader::setTimeout(unsigned int usecond)
 /**
  *  \details   	 This method starts selection and timeout if it is set.
  */
-void KAStreamReader::startSelection()
+void SubutaiStreamReader::startSelection()
 {
 	this->selectResult = select(mypipe[0]+1,&fileDec,NULL,NULL,&timeout);
 }
@@ -244,7 +244,7 @@ void KAStreamReader::startSelection()
 /**
  *  \details   	 This method starts reading the buffer contents.
  */
-void KAStreamReader::startReading()
+void SubutaiStreamReader::startReading()
 {
 	this->readResult = read(mypipe[0] , buffer,sizeof(buffer));
 }
@@ -252,7 +252,7 @@ void KAStreamReader::startReading()
 /**
  *  \details   	 This method opens the file that is filling with intermediate responses.
  */
-bool KAStreamReader::openFile()
+bool SubutaiStreamReader::openFile()
 {
 	this->file = fopen(this->path.c_str(),"a+");
 
@@ -269,7 +269,7 @@ bool KAStreamReader::openFile()
 /**
  *  \details   	 This method closes the file that was filled with intermediate responses.
  */
-void KAStreamReader::closeFile()
+void SubutaiStreamReader::closeFile()
 {
 	fclose(this->file);
 }
@@ -277,7 +277,7 @@ void KAStreamReader::closeFile()
 /**
  *  \details   	 This method append a given contents to the file.
  */
-void KAStreamReader::appendFile(string value)
+void SubutaiStreamReader::appendFile(string value)
 {
 	fputs(value.c_str(),this->file);
 }

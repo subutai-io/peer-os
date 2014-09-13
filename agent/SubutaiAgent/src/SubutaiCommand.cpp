@@ -13,11 +13,11 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KACommand.h"
+#include "SubutaiCommand.h"
 /**
- *  \details   Default constructor of KACommand class.
+ *  \details   Default constructor of SubutaiCommand class.
  */
-KACommand::KACommand()
+SubutaiCommand::SubutaiCommand()
 {			//Setting default values..
 	// TODO Auto-generated constructor stub
 	this->setType("");
@@ -42,9 +42,9 @@ KACommand::KACommand()
 }
 
 /**
- *  \details   Default destructor of KACommand class.
+ *  \details   Default destructor of SubutaiCommand class.
  */
-KACommand::~KACommand()
+SubutaiCommand::~SubutaiCommand()
 {
 	// TODO Auto-generated destructor stub
 }
@@ -52,7 +52,7 @@ KACommand::~KACommand()
 /**
  *  \details   This method clears given instance's all private and public variables.
  */
-void KACommand::clear()
+void SubutaiCommand::clear()
 {		//clear the all variables..
 	this->setType("");
 	this->setProgram("");
@@ -76,13 +76,13 @@ void KACommand::clear()
 }
 
 /**
- *  \details   deserialize function deserialize the given Json strings to KACommand instance.
+ *  \details   deserialize function deserialize the given Json strings to SubutaiCommand instance.
  *     		   This is one of the most frequently used function is the class.
  *  		   It also check the existing variable in the JSON strings when deserializing the instance.
- *  		   it uses reference input and deserialize it to called KAcommand instance
+ *  		   it uses reference input and deserialize it to called SubutaiCommand instance
  *  		   it returns true if the given input string is true formatted otherwise return false.
  */
-bool KACommand::deserialize(string& input)
+bool SubutaiCommand::deserialize(string& input)
 {														//Deserialize a Json String to Command instance
 	Json::Reader reader;								//return true Deserialize operation is successfully done
 	Json::Value root;
@@ -206,18 +206,18 @@ bool KACommand::deserialize(string& input)
 }
 
 /**
- *  \details   getting "envioronment" private variable of KACommand instance
+ *  \details   getting "envioronment" private variable of SubutaiCommand instance
  */
-list<pair<string,string> >& KACommand::getEnvironment()
+list<pair<string,string> >& SubutaiCommand::getEnvironment()
 {					//getting EnvPath
 	return this->environment;
 }
 
 /**
- *  \details   setting "envioronment" private variable of KACommand instance
+ *  \details   setting "envioronment" private variable of SubutaiCommand instance
  *  		   environment parameter is set and used in execution.
  */
-void KACommand::setEnvironment(list<pair<string,string> >& envr)
+void SubutaiCommand::setEnvironment(list<pair<string,string> >& envr)
 {			//setting EnvPath
 	this->environment.clear();
 	pair <string,string> dummy;
@@ -231,45 +231,45 @@ void KACommand::setEnvironment(list<pair<string,string> >& envr)
 }
 
 /**
- *  \details   getting "pid" private variable of KACommand instance
+ *  \details   getting "pid" private variable of SubutaiCommand instance
  */
-int KACommand::getPid()
+int SubutaiCommand::getPid()
 {
 	return this->pid;
 }
 
 /**
- *  \details   setting "pid" private variable of KACommand instance.
+ *  \details   setting "pid" private variable of SubutaiCommand instance.
  *  		   It carries the process id of the execution.
  */
-void KACommand::setPid(int pid)
+void SubutaiCommand::setPid(int pid)
 {
 	this->pid=pid;
 }
 
 /**
- *  \details   setting "uuid" private variable of KACommand instance
+ *  \details   setting "uuid" private variable of SubutaiCommand instance
  */
-void KACommand::setUuid(const string& uu_id)
+void SubutaiCommand::setUuid(const string& uu_id)
 {					//setting UUid
 	this->uuid = uu_id;
 }
 
 /**
- *  \details   getting "uuid" private variable of KACommand instance.
+ *  \details   getting "uuid" private variable of SubutaiCommand instance.
  *  		   It is command specific uuid parameter.
  *  		   It should be match with KiskisAgent static uuid.
  */
-string& KACommand::getUuid()
+string& SubutaiCommand::getUuid()
 {								//getting UUid
 	return this->uuid;
 }
 
 /**
- *  \details   setting "args" private vector variable of KACommand instance.
+ *  \details   setting "args" private vector variable of SubutaiCommand instance.
  *  		   This is the list of arguments vector that is used in execution.
  */
-void KACommand::setArguments(vector<string> myvector)
+void SubutaiCommand::setArguments(vector<string> myvector)
 {		//setting Argument vector
 
 	for(unsigned int index=0 ; index< myvector.size(); index++)
@@ -279,243 +279,243 @@ void KACommand::setArguments(vector<string> myvector)
 }
 
 /**
- *  \details   getting "args" private vector variable of KACommand instance.
+ *  \details   getting "args" private vector variable of SubutaiCommand instance.
  *  		   This is the list of arguments vector that is used in execution.
  */
-vector<string>& KACommand::getArguments()
+vector<string>& SubutaiCommand::getArguments()
 {
 
 	return this->args;
 }
 
 /**
- *  \details   getting "workingDirectory" private variable of KACommand instance.
+ *  \details   getting "workingDirectory" private variable of SubutaiCommand instance.
  */
-string& KACommand::getWorkingDirectory()
+string& SubutaiCommand::getWorkingDirectory()
 {						//getting Current Working directory
 	return this->workingDirectory;
 }
 
 /**
- *  \details   setting "workingDirectory" private variable of KACommand instance.
+ *  \details   setting "workingDirectory" private variable of SubutaiCommand instance.
  */
-void KACommand::setWorkingDirectory(const string& workingdirectory)
+void SubutaiCommand::setWorkingDirectory(const string& workingdirectory)
 {			//setting Current Working directory
 	this->workingDirectory = workingdirectory;
 }
 
 /**
- *  \details   getting "program" private variable of KACommand instance.
+ *  \details   getting "program" private variable of SubutaiCommand instance.
  */
-string& KACommand::getProgram()
+string& SubutaiCommand::getProgram()
 {					//getting Program path
 	return this->program;
 }
 
 /**
- *  \details   setting "program" private variable of KACommand instance.
+ *  \details   setting "program" private variable of SubutaiCommand instance.
  *  		   This variable is an absolute program path.
  *  		   For instance: "/bin/ls" or "/usr/bin/tail"
  */
-void KACommand::setProgram(const string& myprogram)
+void SubutaiCommand::setProgram(const string& myprogram)
 {	//setting Program path
 	this->program = myprogram;
 }
 
 /**
- *  \details   getting "requestSequenceNumber" private variable of KACommand instance.
+ *  \details   getting "requestSequenceNumber" private variable of SubutaiCommand instance.
  */
-int KACommand::getRequestSequenceNumber()
+int SubutaiCommand::getRequestSequenceNumber()
 {					//getting RequestSeqnum
 	return this->requestSequenceNumber;
 }
 
 /**
- *  \details   setting "requestSequenceNumber" private variable of KACommand instance.
- *  		   This variable holds the sequenceNumber of the KACommand instance.
+ *  \details   setting "requestSequenceNumber" private variable of SubutaiCommand instance.
+ *  		   This variable holds the sequenceNumber of the SubutaiCommand instance.
  */
-void KACommand::setRequestSequenceNumber(int requestSequenceNumber)
+void SubutaiCommand::setRequestSequenceNumber(int requestSequenceNumber)
 {	//setting RequestSeqnum
 	this->requestSequenceNumber = requestSequenceNumber;
 }
 
 /**
- *  \details   getting "runAs" private variable of KACommand instance.
+ *  \details   getting "runAs" private variable of SubutaiCommand instance.
  */
-string& KACommand::getRunAs()
+string& SubutaiCommand::getRunAs()
 {						//getting runAs
 	return this->runAs;
 }
 
 /**
- *  \details   setting "runAs" private variable of KACommand instance.
+ *  \details   setting "runAs" private variable of SubutaiCommand instance.
  *  		   This is the user of execution.
  *  		   It should be: "root", "Alex" , "Emin" etc..
  */
-void KACommand::setRunAs(const string& runAs)
+void SubutaiCommand::setRunAs(const string& runAs)
 {		//setting runAs
 	this->runAs = runAs;
 }
 
 /**
- *  \details   getting "stdErr" private variable of KACommand instance.
+ *  \details   getting "stdErr" private variable of SubutaiCommand instance.
  */
-string& KACommand::getStandardError()
+string& SubutaiCommand::getStandardError()
 {						//getting standard err
 	return this->stdErr;
 }
 
 /**
- *  \details   getting "stdErrPath" private variable of KACommand instance.
+ *  \details   getting "stdErrPath" private variable of SubutaiCommand instance.
  */
-string& KACommand::getStandardErrPath()
+string& SubutaiCommand::getStandardErrPath()
 {					//getting standard errpath
 	return this->stdErrPath;
 }
 /**
- *  \details   setting "stdErr" private variable of KACommand instance.
+ *  \details   setting "stdErr" private variable of SubutaiCommand instance.
  *  			It has the mode of Error.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
  */
-void KACommand::setStandardError(const string& mystderr)
+void SubutaiCommand::setStandardError(const string& mystderr)
 {		//setting standard err
 	this->stdErr = mystderr;
 }
 
 /**
- *  \details   setting "stdErrPath" private variable of KACommand instance.
+ *  \details   setting "stdErrPath" private variable of SubutaiCommand instance.
  *  		   This variable holds the path and file name for capturing error responses
  */
-void KACommand::setStandardErrPath(const string& mystderrpath)
+void SubutaiCommand::setStandardErrPath(const string& mystderrpath)
 {		//setting standard errpath
 	this->stdErrPath=mystderrpath;
 }
 /**
- *  \details   getting "stdOut" private variable of KACommand instance.
+ *  \details   getting "stdOut" private variable of SubutaiCommand instance.
  */
-string& KACommand::getStandardOutput()
+string& SubutaiCommand::getStandardOutput()
 {						//getting standard out
 	return this->stdOut;
 }
 
 /**
- *  \details   getting "stdOuthPath" private variable of KACommand instance.
+ *  \details   getting "stdOuthPath" private variable of SubutaiCommand instance.
  */
-string& KACommand::getStandardOutputPath()
+string& SubutaiCommand::getStandardOutputPath()
 {					//getting standard outpath
 	return this->stdOuthPath;
 }
 /**
- *  \details   setting "stdOut" private variable of KACommand instance.
+ *  \details   setting "stdOut" private variable of SubutaiCommand instance.
  *  			It has the mode of Output.
  *  			it Should be: "CAPTURE", "CAPTURE_AND_RETURN" ,"RETURN" , "NO"
  */
-void KACommand::setStandardOutput(const string& mystdout)
+void SubutaiCommand::setStandardOutput(const string& mystdout)
 { 	//setting standard out
 	this->stdOut = mystdout;
 }
 
 /**
- *  \details   setting "stdOuthPath" private variable of KACommand instance.
+ *  \details   setting "stdOuthPath" private variable of SubutaiCommand instance.
  *  		   This variable holds the path and file name for capturing error responses
  */
-void KACommand::setStandardOutPath(const string& mystdoutpath)
+void SubutaiCommand::setStandardOutPath(const string& mystdoutpath)
 {		//setting standard outpath
 	this->stdOuthPath=mystdoutpath;
 }
 
 /**
- *  \details   getting "type" private variable of KACommand instance.
+ *  \details   getting "type" private variable of SubutaiCommand instance.
  */
-string& KACommand::getType()
+string& SubutaiCommand::getType()
 {						//getting command type
 	return this->type;
 }
 
 /**
- *  \details   setting "type" private variable of KACommand instance.
+ *  \details   setting "type" private variable of SubutaiCommand instance.
  *  		   This holds the type of command.
  *  		   it should be: "EXECUTE_REQUEST" or "REGISTRATION_REQUEST_DONE" or "HEARTBEAT_REQUEST" or "TERMINATE_REQUEST"
  */
-void KACommand::setType(const string& mytype)
+void SubutaiCommand::setType(const string& mytype)
 { 		//setting command type
 	this->type = mytype;
 }
 
 /**
- *  \details   getting "timeout" private variable of KACommand instance.
+ *  \details   getting "timeout" private variable of SubutaiCommand instance.
  */
-int KACommand::getTimeout()
+int SubutaiCommand::getTimeout()
 {
 	return this->timeout;
 }
 
 /**
- *  \details   setting "timeout" private variable of KACommand instance.
+ *  \details   setting "timeout" private variable of SubutaiCommand instance.
  *  		   This holds the timeout value of the command.
  *  		   Command is terminated due to this variable value default:30 seconds
  */
-void KACommand::setTimeout(int timeout)
+void SubutaiCommand::setTimeout(int timeout)
 {
 	this->timeout = timeout;
 }
 
 /**
- *  \details   getting "hostname" private variable of KACommand instance.
+ *  \details   getting "hostname" private variable of SubutaiCommand instance.
  */
-string& KACommand::getHostname()
+string& SubutaiCommand::getHostname()
 {
 	return this->hostname;
 }
 
 /**
- *  \details   setting "hostname" private variable of KACommand instance.
+ *  \details   setting "hostname" private variable of SubutaiCommand instance.
  *  		   This holds the hostname of the agent machine
  */
-void KACommand::setHostname(const string& hostname)
+void SubutaiCommand::setHostname(const string& hostname)
 {
 	this->hostname = hostname;
 }
 
 /**
- *  \details   getting "macAddress" private variable of KACommand instance.
+ *  \details   getting "macAddress" private variable of SubutaiCommand instance.
  */
-string& KACommand::getMacAddress()
+string& SubutaiCommand::getMacAddress()
 {
 	return this->macAddress;
 }
 
 /**
- *  \details   setting "macAddress" private variable of KACommand instance.
+ *  \details   setting "macAddress" private variable of SubutaiCommand instance.
  *  		   This holds the macAddress(eth0) of the agent machine
  */
-void KACommand::setMacAddress(const string& macAddress)
+void SubutaiCommand::setMacAddress(const string& macAddress)
 {
 	this->macAddress = macAddress;
 }
 
 /**
- *  \details   getting "taskUuid" private variable of KACommand instance.
+ *  \details   getting "taskUuid" private variable of SubutaiCommand instance.
  */
-string& KACommand::getTaskUuid()
+string& SubutaiCommand::getTaskUuid()
 {
 	return this->taskUuid;
 }
 
 /**
- *  \details   setting "taskUuid" private variable of KACommand instance.
+ *  \details   setting "taskUuid" private variable of SubutaiCommand instance.
  *  		   This holds the task uuid of the command
  */
-void KACommand::setTaskUuid(const string& taskuuid)
+void SubutaiCommand::setTaskUuid(const string& taskuuid)
 {
 	this->taskUuid = taskuuid;
 }
 
 /**
- *  \details   setting "ips" private vector variable of KACommand instance.
+ *  \details   setting "ips" private vector variable of SubutaiCommand instance.
  *  		   This is the list of ips vector that holds the ip addresses of the machine
  */
-void KACommand::setIps(vector<string> myvector)
+void SubutaiCommand::setIps(vector<string> myvector)
 {		//setting ips vector
 
 	for(unsigned int index=0 ; index< myvector.size(); index++)
@@ -525,36 +525,36 @@ void KACommand::setIps(vector<string> myvector)
 }
 
 /**
- *  \details   getting "ips" private vector variable of KACommand instance.
+ *  \details   getting "ips" private vector variable of SubutaiCommand instance.
  */
-vector<string>& KACommand::getIps()
+vector<string>& SubutaiCommand::getIps()
 {					//getting ips vector
 
 	return this->ips;
 }
 
 /**
- *  \details   getting "source" private variable of KACommand instance.
+ *  \details   getting "source" private variable of SubutaiCommand instance.
  */
-string& KACommand::getSource()
+string& SubutaiCommand::getSource()
 {
 	return this->source;
 }
 
 /**
- *  \details   setting "source" private variable of KACommand instance.
+ *  \details   setting "source" private variable of SubutaiCommand instance.
  *  		   This holds the task source information of the command
  */
-void KACommand::setSource(const string& source)
+void SubutaiCommand::setSource(const string& source)
 {
 	this->source = source;
 }
 
 /**
- *  \details   getting "watchArgs" private vector variable of KACommand instance.
+ *  \details   getting "watchArgs" private vector variable of SubutaiCommand instance.
  *  		   This is the list of arguments vector that is used in execution.
  */
-vector<string>& KACommand::getWatchArguments()
+vector<string>& SubutaiCommand::getWatchArguments()
 {
 	return this->watchArgs;
 }
@@ -563,7 +563,7 @@ vector<string>& KACommand::getWatchArguments()
  *  \details   checking the number of curly braces in the command string
  *
  */
-bool KACommand::checkCommandString(const string& input)
+bool SubutaiCommand::checkCommandString(const string& input)
 {
 	unsigned int leftBrace=0;
 	unsigned int rightBrace=0;

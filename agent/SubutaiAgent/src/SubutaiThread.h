@@ -14,25 +14,25 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KAThread.h
- *  @class     KAThread.h
- *  @details   KAThread Class is designed to handle executions.
+ *  @brief     SubutaiThread.h
+ *  @class     SubutaiThread.h
+ *  @details   SubutaiThread Class is designed to handle executions.
  *  		   Each Execution runs concurrently and does the given command job.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.4
- *  @date      May 08, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KATHREAD_H_
-#define KATHREAD_H_
+#ifndef SUBUTAITHREAD_H_
+#define SUBUTAITHREAD_H_
 #include <sys/wait.h>
 #include <pthread.h>
 #include <list>
-#include "KAUserID.h"
-#include "KACommand.h"
-#include "KAResponsePack.h"
-#include "KAStreamReader.h"
-#include "KALogger.h"
+#include "SubutaiUserID.h"
+#include "SubutaiCommand.h"
+#include "SubutaiResponsePack.h"
+#include "SubutaiStreamReader.h"
+#include "SubutaiLogger.h"
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -42,21 +42,21 @@
 using namespace std;
 using namespace boost::interprocess;
 
-class KAThread
+class SubutaiThread
 {
 public:
-	KAThread();
-	virtual ~KAThread();
-	int threadFunction(message_queue*,KACommand*,char*[]);			//Execute command concurrently
-	bool checkCWD(KACommand*);
-	bool checkUID(KACommand*);
+	SubutaiThread();
+	virtual ~SubutaiThread();
+	int threadFunction(message_queue*,SubutaiCommand*,char*[]);
+	bool checkCWD(SubutaiCommand*);
+	bool checkUID(SubutaiCommand*);
 	static string getProcessPid(const char*);
-	string createExecString(KACommand*);
-	KAUserID& getUserID();
-	KAResponsePack& getResponse();
-	KALogger& getLogger();
-	KAStreamReader& getErrorStream();
-	KAStreamReader& getOutputStream();
+	string createExecString(SubutaiCommand*);
+	SubutaiUserID& getUserID();
+	SubutaiResponsePack& getResponse();
+	SubutaiLogger& getLogger();
+	SubutaiStreamReader& getErrorStream();
+	SubutaiStreamReader& getOutputStream();
 	bool& getCWDERR();
 	bool& getUIDERR();
 	int& getEXITSTATUS();
@@ -73,19 +73,19 @@ public:
 	string& geterrBuff();
 	void setoutBuff(string);
 	void seterrBuff(string);
-	void setLogger(KALogger);
-	int optionReadSend(message_queue*,KACommand*,int,int*);
-	void checkAndWrite(message_queue*,KACommand*);
-	void checkAndSend(message_queue*,KACommand*);
-	void lastCheckAndSend(message_queue*,KACommand*);
+	void setLogger(SubutaiLogger);
+	int optionReadSend(message_queue*,SubutaiCommand*,int,int*);
+	void checkAndWrite(message_queue*,SubutaiCommand*);
+	void checkAndSend(message_queue*,SubutaiCommand*);
+	void lastCheckAndSend(message_queue*,SubutaiCommand*);
 	bool checkExecutionTimeout(unsigned int*,bool*,unsigned int*,unsigned int*);
 	static string toString(int);
 private:
-	KAUserID uid;
-	KALogger logger;
-	KAResponsePack response;
-	KAStreamReader errorStream;
-	KAStreamReader outputStream;
+	SubutaiUserID uid;
+	SubutaiLogger logger;
+	SubutaiResponsePack response;
+	SubutaiStreamReader errorStream;
+	SubutaiStreamReader outputStream;
 	string argument,exec,sendout,environment;
 	string outBuff, errBuff;	//general buffers for error and output
 	pid_t pid;
@@ -97,4 +97,4 @@ private:
 	bool UIDERR;		//UID error flag
 	int EXITSTATUS;    //Execution Error Detection Flag
 };
-#endif /* KATHREAD_H_ */
+#endif /* SUBUTAITHREAD_H_ */
