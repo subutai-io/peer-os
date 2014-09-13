@@ -18,6 +18,7 @@
     <module>agent-manager</module>
     <module>apt-repository-manager</module>
     <module>command-dispatcher</module>
+    <module>command-runner</module>
     <!--<module>db-manager</module>
     <module>communication-manager</module>
     <module>strategy-manager</module>
@@ -26,7 +27,6 @@
     <module>network-manager</module>
     <module>tracker</module>
     <module>monitoring</module>
-    <module>command-runner</module>
     <module>git-manager</module>
     <module>package-manager</module>
     <module>environment-manager</module>

@@ -112,6 +112,13 @@
                   <artifactId>command-dispatcher-api</artifactId>
                 </dependency>
 
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- command-runner -->
+                <dependency>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>command-runner-api</artifactId>
+                </dependency>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>

@@ -26,46 +26,46 @@ import com.google.common.base.Preconditions;
  * <p/> Then somewhere in client code prior to using this class: <p/> {@code Commands.init(commandRunnner);}
  */
 public class CommandsSingleton {
-	private static CommandsSingleton INSTANCE = new CommandsSingleton();
-	private CommandRunner commandRunner;
+    private static CommandsSingleton INSTANCE = new CommandsSingleton();
+    private CommandRunner commandRunner;
 
 
-	protected CommandsSingleton() {
-	}
+    protected CommandsSingleton() {
+    }
 
 
-	public static void init(CommandRunner commandRunner) {
-		Preconditions.checkNotNull(commandRunner, "Command Runner is null");
-		INSTANCE.commandRunner = commandRunner;
-	}
+    public static void init( CommandRunner commandRunner ) {
+        Preconditions.checkNotNull( commandRunner, "Command Runner is null" );
+        INSTANCE.commandRunner = commandRunner;
+    }
 
 
-	protected static Command createCommand(RequestBuilder requestBuilder, Set<Agent> agents) {
+    protected static Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents ) {
 
-		return getCommandRunner().createCommand(requestBuilder, agents);
-	}
-
-
-	private static CommandRunner getCommandRunner() {
-		if (INSTANCE.commandRunner == null) {
-			throw new RuntimeException("Command Runner is null or not set. Call init method first");
-		}
-		return INSTANCE.commandRunner;
-	}
+        return getCommandRunner().createCommand( requestBuilder, agents );
+    }
 
 
-	protected static Command createCommand(Set<AgentRequestBuilder> agentRequestBuilders) {
-		return getCommandRunner().createCommand(agentRequestBuilders);
-	}
+    private static CommandRunner getCommandRunner() {
+        if ( INSTANCE.commandRunner == null ) {
+            throw new RuntimeException( "Command Runner is null or not set. Call init method first" );
+        }
+        return INSTANCE.commandRunner;
+    }
 
 
-	protected static Command createCommand(String description, RequestBuilder requestBuilder, Set<Agent> agents) {
+    protected static Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders ) {
+        return getCommandRunner().createCommand( agentRequestBuilders );
+    }
 
-		return getCommandRunner().createCommand(description, requestBuilder, agents);
-	}
+
+    protected static Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents ) {
+
+        return getCommandRunner().createCommand( description, requestBuilder, agents );
+    }
 
 
-	protected static Command createCommand(String description, Set<AgentRequestBuilder> agentRequestBuilders) {
-		return getCommandRunner().createCommand(description, agentRequestBuilders);
-	}
+    protected static Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders ) {
+        return getCommandRunner().createCommand( description, agentRequestBuilders );
+    }
 }

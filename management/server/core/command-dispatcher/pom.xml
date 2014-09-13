@@ -2,22 +2,22 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mgmt-server-core-parent</artifactId>
-        <version>2.0.0</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.safehaus.subutai</groupId>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <version>2.0.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>command-dispatcher-parent</artifactId>
-    <name>Subutai Command Dispatcher Parent</name>
-    <description>Subutai Command Dispatcher Parent</description>
-    <packaging>pom</packaging>
+  <artifactId>command-dispatcher-parent</artifactId>
+  <name>Subutai Command Dispatcher Parent</name>
+  <description>Subutai Command Dispatcher Parent</description>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>command-dispatcher-api</module>
-        <!--<module>command-dispatcher-cli</module>-->
-        <!--<module>command-dispatcher-impl</module>-->
-        <!--<module>command-dispatcher-rest</module>-->
-    </modules>
+  <modules>
+    <module>command-dispatcher-api</module>
+    <!--<module>command-dispatcher-impl</module>-->
+    <!--<module>command-dispatcher-cli</module>-->
+    <!--<module>command-dispatcher-rest</module>-->
+  </modules>
 </project>
