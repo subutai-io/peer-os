@@ -13,19 +13,19 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAResponsePack.h"
+#include "SubutaiResponsePack.h"
 
 /**
- *  \details   Default constructor of the KAResponsePack class.
+ *  \details   Default constructor of the SubutaiResponsePack class.
  */
-KAResponsePack::KAResponsePack()
+SubutaiResponsePack::SubutaiResponsePack()
 {
 }
 
 /**
- *  \details   Default destructor of the KAResponsePack class.
+ *  \details   Default destructor of the SubutaiResponsePack class.
  */
-KAResponsePack::~KAResponsePack()
+SubutaiResponsePack::~SubutaiResponsePack()
 {
 	// TODO Auto-generated destructor stub
 }
@@ -33,7 +33,7 @@ KAResponsePack::~KAResponsePack()
 /**
  *  \details   This method creates default chunk message.
  */
-string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
+string SubutaiResponsePack::createResponseMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string error,string output,string source,string taskuuid)
 {
 	clear();
@@ -53,7 +53,7 @@ string KAResponsePack::createResponseMessage(string uuid,int pid,int requestSeqN
 /**
  *  \details   This method creates Exit done message.
  */
-string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
+string SubutaiResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string source, string taskuuid,int exitcode)	//Creating Exit message
 {
 	clear();
@@ -72,13 +72,16 @@ string KAResponsePack::createExitMessage(string uuid,int pid,int requestSeqNum,i
 /**
  *  \details   This method creates Registration message.
  */
-string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,string hostname,string parenthostname)
-{	//Creating Registration Message
+string SubutaiResponsePack::createRegistrationMessage(string uuid, string macaddress, string hostname, string parenthostname
+		,string environmentID ,vector<string> ips)
+{
 	this->setType("REGISTRATION_REQUEST");
+	this->setIps(ips);
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);
 	this->setParentHostname(parenthostname);
 	this->setUuid(uuid);
+	this->setEnvironmentId(environmentID);
 	this->serialize(sendout);
 	return sendout;
 }
@@ -86,7 +89,7 @@ string KAResponsePack::createRegistrationMessage(string uuid,string macaddress,s
 /**
  *  \details   This method creates IN_QUEUE Message
  */
-string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
+string SubutaiResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creating IN_QUEUE Message
 {
 	clear();
 	this->setType("IN_QUEUE");
@@ -99,7 +102,7 @@ string KAResponsePack::createInQueueMessage(string uuid,string taskuuid)	//Creat
 /**
  *  \details   This method creates HeartBeat message.
  */
-string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string macaddress,
+string SubutaiResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,string environmentID,string macaddress,
 		string hostname,string parenthostname,string source,string taskuuid)	//Creating HeartBeat Message
 {
 	this->setType("HEARTBEAT_RESPONSE");
@@ -108,6 +111,7 @@ string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,stri
 	this->setMacAddress(macaddress);
 	this->setHostname(hostname);
 	this->setParentHostname(parenthostname);
+	this->setEnvironmentId(environmentID);
 	this->setUuid(uuid);
 	this->setRequestSequenceNumber(requestSeqNum);
 	this->setResponseSequenceNumber(1);
@@ -118,7 +122,7 @@ string KAResponsePack::createHeartBeatMessage(string uuid,int requestSeqNum,stri
 /**
  *  \details   This method creates  SuccessTermination message.
  */
-string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
+string SubutaiResponsePack::createTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Terminate Message
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE_DONE");
@@ -135,7 +139,7 @@ string KAResponsePack::createTerminateMessage(string uuid,int requestSeqNum,stri
 /**
  *  \details   This method creates Fail Termination message.
  */
-string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)	//Creating Failed Terminate Message
+string SubutaiResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,string source,string taskuuid)
 {
 	clear();
 	this->setType("TERMINATE_RESPONSE_FAILED");
@@ -152,7 +156,7 @@ string KAResponsePack::createFailTerminateMessage(string uuid,int requestSeqNum,
 /**
  *  \details   This method creates Timeout message.
  */
-string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
+string SubutaiResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNum,int responseSeqNum,
 		string stdOut,string stdErr,string source,string taskuuid)	//Creating Timeout Message
 {
 	clear();
@@ -172,7 +176,7 @@ string KAResponsePack::createTimeoutMessage(string uuid,int pid,int requestSeqNu
 /**
  *  \details   This method creates Inotify response message.
  */
-string KAResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
+string SubutaiResponsePack::createInotifyMessage(string uuid ,string configPoint,string dateTime,string changeType)
 {
 	clear();
 	this->setType("INOTIFY_ACTION_RESPONSE");
@@ -188,7 +192,7 @@ string KAResponsePack::createInotifyMessage(string uuid ,string configPoint,stri
 /**
  *  \details   This method creates Inotify showing all watcher message.
  */
-string KAResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
+string SubutaiResponsePack::createInotifyShowMessage(string uuid ,vector<string>  configPoint)
 {
 	clear();
 	this->setType("INOTIFY_LIST_RESPONSE");

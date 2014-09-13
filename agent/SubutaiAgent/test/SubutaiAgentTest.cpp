@@ -15,13 +15,13 @@
 #include <cppunit/XmlOutputter.h>
 #include <netinet/in.h>
 
-#include "KACommand.h"
-#include "KAResponse.h"
-#include "KALogger.h"
-#include "KAConnection.h"
-#include "KAResponsePack.h"
-#include "KAStreamReader.h"
-#include "KAThread.h"
+#include "SubutaiCommand.h"
+#include "SubutaiResponse.h"
+#include "SubutaiLogger.h"
+#include "SubutaiConnection.h"
+#include "SubutaiResponsePack.h"
+#include "SubutaiStreamReader.h"
+#include "SubutaiThread.h"
 
 using namespace CppUnit;
 using namespace std;
@@ -71,22 +71,22 @@ protected:
 
 private:
 
-	KACommand *cmd;
-	KAResponse *resp;
-	KAResponsePack *pack;
-	KAThread *thr;
-	KALogger *logger;
-	KAUserID *usr;
+	SubutaiCommand *cmd;
+	SubutaiResponse *resp;
+	SubutaiResponsePack *pack;
+	SubutaiThread *thr;
+	SubutaiLogger *logger;
+	SubutaiUserID *usr;
 };
 
 void AgentTest::setUp(void)
 {
-	cmd = new KACommand();
-	resp = new KAResponse();
-	pack = new KAResponsePack();
-	thr = new KAThread();
-	logger = new KALogger();
-	usr = new KAUserID();
+	cmd = new SubutaiCommand();
+	resp = new SubutaiResponse();
+	pack = new SubutaiResponsePack();
+	thr = new SubutaiThread();
+	logger = new SubutaiLogger();
+	usr = new SubutaiUserID();
 }
 
 void AgentTest::tearDown(void)
@@ -98,7 +98,7 @@ void AgentTest::tearDown(void)
 	delete logger;
 	delete usr;
 }
-//KACommand-Deserialize
+//SubutaiCommand-Deserialize
 void AgentTest::testCommandDeserialize(void)
 {
 	//Test string for deserialization
@@ -121,7 +121,7 @@ void AgentTest::testCommandDeserialize(void)
 	CPPUNIT_ASSERT("root"== cmd->getRunAs());
 	CPPUNIT_ASSERT(30== cmd->getTimeout());
 }
-//KACommand-Clear
+//SubutaiCommand-Clear
 void AgentTest::testCommandClear(void)
 {
 	cmd->setType("123");
@@ -163,7 +163,7 @@ void AgentTest::testCommandClear(void)
 	CPPUNIT_ASSERT(30== cmd->getTimeout());
 	CPPUNIT_ASSERT(-1== cmd->getPid());
 }
-//KAResponse-Serialize
+//SubutaiResponse-Serialize
 void AgentTest::testResponseSerialize(void)
 {
 	//Test string for serialization
@@ -185,7 +185,7 @@ void AgentTest::testResponseSerialize(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponse-SerializeDone
+//SubutaiResponse-SerializeDone
 void AgentTest::testResponseSerializeDone(void)
 {
 	//Test string for serialization
@@ -208,7 +208,7 @@ void AgentTest::testResponseSerializeDone(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponse-Clear
+//SubutaiResponse-Clear
 void AgentTest::testResponseClear(void)
 {
 	resp->setType("123");
@@ -237,7 +237,7 @@ void AgentTest::testResponseClear(void)
 	CPPUNIT_ASSERT(""== resp->getStandardError());
 	CPPUNIT_ASSERT(-1== resp->getPid());
 }
-//KALogger-LoggingwithfileName
+//SubutaiLogger-LoggingwithfileName
 void AgentTest::testLoggerOpenLogFileWithName(void)
 {
 	string filename = "test";
@@ -246,13 +246,13 @@ void AgentTest::testLoggerOpenLogFileWithName(void)
 	if(result)
 	{
 		logger->closeLogFile();
-		if(remove("/var/log/ksks-agent/test") != 0 )
+		if(remove("/var/log/subutai-agent/test") != 0 )
 			perror( "Error deleting file" );
 	}
 
 	CPPUNIT_ASSERT(true == result);
 }
-//KALogger-Loggingwithfile
+//SubutaiLogger-Loggingwithfile
 void AgentTest::testLoggerOpenLogFile(void)
 {
 
@@ -264,7 +264,7 @@ void AgentTest::testLoggerOpenLogFile(void)
 	CPPUNIT_ASSERT(true == result);
 
 }
-//KALogger-WriteLog
+//SubutaiLogger-WriteLog
 void AgentTest::testLoggerWriteLog(void)
 {
 	string filename = "test";
@@ -278,7 +278,7 @@ void AgentTest::testLoggerWriteLog(void)
 		string testlog = "This is a test log!!";
 		logger->writeLog(5,testlog);
 
-		string filename="/var/log/ksks-agent/test";
+		string filename="/var/log/subutai-agent/test";
 		FILE *p_file = NULL;
 		p_file = fopen(filename.c_str(),"rb");
 		fseek(p_file,0,SEEK_END);
@@ -289,18 +289,18 @@ void AgentTest::testLoggerWriteLog(void)
 		CPPUNIT_ASSERT(size > 0);
 
 		logger->closeLogFile();
-		if(remove("/var/log/ksks-agent/test") != 0 )
+		if(remove("/var/log/subutai-agent/test") != 0 )
 			perror( "Error deleting file" );
 	}
 
 }
-//KAUserID-CheekRootUser
+//SubutaiUserID-CheekRootUser
 void AgentTest::testUserIDCheekRootUser(void)
 {
 	CPPUNIT_ASSERT(true == usr->checkRootUser());
 }
 
-//KAResponsePack-CreateResponseMessage
+//SubutaiResponsePack-CreateResponseMessage
 void AgentTest::testResponsePackCreateResponse(void)
 {
 	//Test string for serialization
@@ -326,7 +326,7 @@ void AgentTest::testResponsePackCreateResponse(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponsePack-CreateExitMessage
+//SubutaiResponsePack-CreateExitMessage
 void AgentTest::testResponsePackCreateExit(void)
 {
 	//Test string for serialization
@@ -347,7 +347,7 @@ void AgentTest::testResponsePackCreateExit(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponsePack-CreateRegisterMessage
+//SubutaiResponsePack-CreateRegisterMessage
 void AgentTest::testResponsePackCreateRegistration(void)
 {
 	//Test string for serialization
@@ -367,16 +367,16 @@ void AgentTest::testResponsePackCreateRegistration(void)
 	string hostname = "management";
 	string parentHostName= "";
 	pack->setIps(ipaddress);
-	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName);
-
-
+        string envid = "6673b7c4-a079-77a9-7270-770e45d54sdf";
+	
+	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName,envid,ipaddress);
 }
-//KAResponsePack-CreateHeartBeatMessage
+//SubutaiResponsePack-CreateHeartBeatMessage
 void AgentTest::testResponsePackCreateHeartbeat(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
-			"\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
+	string input =  "{\"response\":{\"environmentId\":\"6673b7c4-a079-77a9-7270-770e45d54sdf\",\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
+                        "\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
                         "\"type\":\"HEARTBEAT_RESPONSE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string result;
@@ -389,7 +389,7 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 	ipaddress.push_back("127.0.0.1");
 	pack->setIps(ipaddress);
 
-
+        
 	string macAddress = "08:00:27:59:3b:2e";
 
 	int reqnumber = -1;
@@ -397,12 +397,13 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 
 	string source = "";
 	string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";
+        string envid = "6673b7c4-a079-77a9-7270-770e45d54sdf";
 
-	result = pack->createHeartBeatMessage(uuid,reqnumber,macAddress,hostname,parentHostName,source,taskuuid);
+	result = pack->createHeartBeatMessage(uuid,reqnumber,envid,macAddress,hostname,parentHostName,source,taskuuid);
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponsePack-CreateTermiateMessage
+//SubutaiResponsePack-CreateTermiateMessage
 void AgentTest::testResponsePackCreateTerminate(void)
 {
 	//Test string for serialization
@@ -418,7 +419,7 @@ void AgentTest::testResponsePackCreateTerminate(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponsePack-CreateTermiateFailMessage
+//SubutaiResponsePack-CreateTermiateFailMessage
 void AgentTest::testResponsePackCreateTerminateFail(void)
 {
 	//Test string for serialization
@@ -434,7 +435,7 @@ void AgentTest::testResponsePackCreateTerminateFail(void)
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
-//KAResponsePack-CreateTimeoutMessage
+//SubutaiResponsePack-CreateTimeoutMessage
 void AgentTest::testResponsePackCreateTimeout(void)
 {
 	//Test string for serialization

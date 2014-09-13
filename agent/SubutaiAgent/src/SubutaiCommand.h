@@ -14,17 +14,17 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KACommand.h
- *  @class     KACommand.h
- *  @details   KACommand Class is designed for marshaling and unmarshalling command instance.
+ *  @brief     SubutaiCommand.h
+ *  @class     SubutaiCommand.h
+ *  @details   SubutaiCommand Class is designed for marshaling and unmarshalling command instance.
  *  		   This class's instance can serialize and deserialize JSON/string datas.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.3
- *  @date      Feb 04, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KACOMMAND_H_
-#define KACOMMAND_H_
+#ifndef SUBUTAICOMMAND_H_
+#define SUBUTAICOMMAND_H_
 #include <syslog.h>
 #include <iostream>
 #include <jsoncpp/json.h>
@@ -37,11 +37,11 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
-class KACommand
+class SubutaiCommand
 {
 public:
-	KACommand( void );
-	virtual ~KACommand( void );
+	SubutaiCommand( void );
+	virtual ~SubutaiCommand( void );
 	list<pair<string,string> >& getEnvironment();
 	vector<string>& getArguments();
 	vector<string>& getWatchArguments();
@@ -106,4 +106,4 @@ private:
 	string			source;
 	vector<string>	watchArgs;
 };
-#endif /* KACOMMAND_H_ */
+#endif /* SUBUTAICOMMAND_H_ */

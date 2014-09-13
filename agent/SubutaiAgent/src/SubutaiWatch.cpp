@@ -13,11 +13,11 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAWatch.h"
+#include "SubutaiWatch.h"
 /**
- *  \details   Default constructor of KAWatch class.
+ *  \details   Default constructor of SubutaiWatch class.
  */
-KAWatch::KAWatch(KAConnection* connection, KAResponsePack* response, KALogger* logger)
+SubutaiWatch::SubutaiWatch(SubutaiConnection* connection, SubutaiResponsePack* response, SubutaiLogger* logger)
 {
 #ifdef IN_NONBLOCK
 	fd = inotify_init1( IN_NONBLOCK );
@@ -35,16 +35,16 @@ KAWatch::KAWatch(KAConnection* connection, KAResponsePack* response, KALogger* l
 }
 
 /**
- *  \details   Default destructor of KAWatch class.
+ *  \details   Default destructor of SubutaiWatch class.
  */
-KAWatch::~KAWatch()
+SubutaiWatch::~SubutaiWatch()
 {
 }
 
 /**
  *  \details   This method Insert event information, used to create new watch, into Watch object.
  */
-bool KAWatch::addWatcher(const string &name)
+bool SubutaiWatch::addWatcher(const string &name)
 {
 	if(folderExistenceChecker(name) && !checkDuplicateName(name))
 	{
@@ -70,7 +70,7 @@ bool KAWatch::addWatcher(const string &name)
 /**
  *  \details   This method checks given pattern is a valid file or folder
  */
-bool KAWatch::folderExistenceChecker(const string &name)
+bool SubutaiWatch::folderExistenceChecker(const string &name)
 {
 	struct stat sb;
 
@@ -87,7 +87,7 @@ bool KAWatch::folderExistenceChecker(const string &name)
 /**
  *  \details   This method checks the given folder is already added to list or not
  */
-bool KAWatch::checkDuplicateName(const string &name)
+bool SubutaiWatch::checkDuplicateName(const string &name)
 {
 	typedef map<int, wd_elem>::const_iterator MapIterator;
 	for (MapIterator iter = watch.begin(); iter != watch.end(); iter++)
@@ -101,7 +101,7 @@ bool KAWatch::checkDuplicateName(const string &name)
 /**
  *  \details   This methods Initialize watchset with given timeout value.
  */
-void KAWatch::initialize(unsigned int timevalue)
+void SubutaiWatch::initialize(unsigned int timevalue)
 {
 	FD_ZERO( &this->watch_set );
 	FD_SET( this->fd, &this->watch_set);
@@ -113,7 +113,7 @@ void KAWatch::initialize(unsigned int timevalue)
 /**
  *  \details    This method is a Erase wrapper.
  */
-bool KAWatch::eraseWatcher(const string &name)
+bool SubutaiWatch::eraseWatcher(const string &name)
 {
 	bool foundOnWatchlist = false;
 
@@ -148,7 +148,7 @@ bool KAWatch::eraseWatcher(const string &name)
 /**
  *  \details 	This method Given a watch descriptor, return the full directory name as string.
  */
-string KAWatch::get(int wd)
+string SubutaiWatch::get(int wd)
 {
 	const wd_elem &elem = watch[wd];
 	return elem.pd == -1 ? elem.name : this->get(elem.pd) + "/" + elem.name;
@@ -158,7 +158,7 @@ string KAWatch::get(int wd)
  *  \details   	Given a parent wd and name (provided in IN_DELETE events), return the watch descriptor.
  *			    Main purpose is to help remove directories from watch list.
  */
-int KAWatch::get(int pd, string name)
+int SubutaiWatch::get(int pd, string name)
 {
 	wd_elem elem = {pd, name};
 	return rwatch[elem];
@@ -168,7 +168,7 @@ int KAWatch::get(int pd, string name)
  *  \details   This method cleans up the all descriptors.
  *
  */
-void KAWatch::cleanup()
+void SubutaiWatch::cleanup()
 {
 	for (map<int, wd_elem>::iterator wi = watch.begin(); wi != watch.end(); wi++)
 	{
@@ -181,9 +181,9 @@ void KAWatch::cleanup()
 /**
  *  \details   This method shows the status of the watchers.
  */
-void KAWatch::stats()
+void SubutaiWatch::stats()
 {
-	watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::stats>","Watcher Stats logging.."));
+	watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::stats>","Watcher Stats logging.."));
 	vector<string> myvector;
 	cout << "number of watches=" << watch.size() << " & reverse watches=" << rwatch.size() << endl;
 	cout << "*************" << endl;
@@ -195,7 +195,7 @@ void KAWatch::stats()
 				<<"    Second Item pd: " << iter->second.pd
 				<<" Second Item name: " << iter->second.name << endl;
 		myvector.push_back(iter->second.name);
-		watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::stats>","Watcher: "
+		watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::stats>","Watcher: "
 				,iter->second.name));
 	}
 	watchRepsonse->setConfPoints(myvector);
@@ -215,7 +215,7 @@ void KAWatch::stats()
 /**
  *  \details   	 This method starts selection and timeout if it is set.
  */
-void KAWatch::startSelection()
+void SubutaiWatch::startSelection()
 {
 	this->selectResult = select(fd+1,&watch_set,NULL,NULL,&timeout);
 }
@@ -223,73 +223,73 @@ void KAWatch::startSelection()
 /**
  *  \details   	 This method starts reading the buffer contents.
  */
-void KAWatch::startReading()
+void SubutaiWatch::startReading()
 {
 	this->readResult = read(fd , buffer,EVENT_BUF_LEN);
 }
 
 /**
- *  \details   	 setting "selectResult" private variable of KAWatch instance.
+ *  \details   	 setting "selectResult" private variable of SubutaiWatch instance.
  *  			 selectResult indicates that the timeout is occured or not.
  */
-void KAWatch::setSelectResult(int selectresult)
+void SubutaiWatch::setSelectResult(int selectresult)
 {
 	this->selectResult = selectresult;
 }
 
 /**
- *  \details   	 getting "selectResult" private variable of KAWatch instance.
+ *  \details   	 getting "selectResult" private variable of SubutaiWatch instance.
  */
-int KAWatch::getSelectResult()
+int SubutaiWatch::getSelectResult()
 {
 	return this->selectResult;
 }
 
 /**
- *  \details   	 setting "readResult" private variable of KAWatch instance.
+ *  \details   	 setting "readResult" private variable of SubutaiWatch instance.
  *  			 readResult indicates that EOF is occured in the pipe or not.
  */
-void KAWatch::setReadResult(int readresult)
+void SubutaiWatch::setReadResult(int readresult)
 {
 	this->readResult = readresult;
 }
 
 /**
- *  \details   	 getting "readResult" private variable of KAWatch instance.
+ *  \details   	 getting "readResult" private variable of SubutaiWatch instance.
  */
-int KAWatch::getReadResult()
+int SubutaiWatch::getReadResult()
 {
 	return this->readResult;
 }
 
 /**
- *  \details   	 getting "currentDirectory" private variable of KAWatch instance.
+ *  \details   	 getting "currentDirectory" private variable of SubutaiWatch instance.
  */
-string KAWatch::getCurrentDirectory()
+string SubutaiWatch::getCurrentDirectory()
 {
 	return this->currentDirectory;
 }
 
 /**
- *  \details   	 setting "currentDirectory" private variable of KAWatch instance.
+ *  \details   	 setting "currentDirectory" private variable of SubutaiWatch instance.
  */
-void KAWatch::setCurrentDirectory(string currDir)
+void SubutaiWatch::setCurrentDirectory(string currDir)
 {
 	this->currentDirectory = currDir;
 }
 
 /**
- *  \details   	 getting "newDirectory" private variable of KAWatch instance.
+ *  \details   	 getting "newDirectory" private variable of SubutaiWatch instance.
  */
-string KAWatch::getNewDirectory()
+string SubutaiWatch::getNewDirectory()
 {
 	return this->newDirectory;
 }
 
 /**
- *  \details   	 setting "currentDirectory" private variable of KAWatch instance.
+ *  \details   	 setting "currentDirectory" private variable of SubutaiWatch instance.
  */
-void KAWatch::setNewDirectory(string newDir)
+void SubutaiWatch::setNewDirectory(string newDir)
 {
 	this->newDirectory = newDir;
 }
@@ -297,15 +297,15 @@ void KAWatch::setNewDirectory(string newDir)
 /**
  *  \details   	 This method clears the Watchers Event buffer.
  */
-void KAWatch::clearBuffer()
+void SubutaiWatch::clearBuffer()
 {
 	memset(buffer,0,EVENT_BUF_LEN);
 }
 
 /**
- *  \details   	 getting "buffer" private variable of KAWatch instance.
+ *  \details   	 getting "buffer" private variable of SubutaiWatch instance.
  */
-char* KAWatch::getBuffer()
+char* SubutaiWatch::getBuffer()
 {
 	return buffer;
 }
@@ -314,7 +314,7 @@ char* KAWatch::getBuffer()
  *  \details   	 This method checks the notification for file system watchers
  *  			 This method also understands the type of events and changes(Create/Delete/Modify) of files
  */
-bool KAWatch::checkNotification()
+bool SubutaiWatch::checkNotification()
 {
 	bool status=false;
 	int length = 0;
@@ -332,7 +332,7 @@ bool KAWatch::checkNotification()
 		}
 		if (length < 0)
 		{
-			watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Length is under zero"));
+			watchLogger->writeLog(3,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Length is under zero"));
 			status=false;
 			return status;
 		}
@@ -342,14 +342,14 @@ bool KAWatch::checkNotification()
 
 			if ( event->wd == -1 )
 			{
-				watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Overflow!!"));
+				watchLogger->writeLog(3,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Overflow!!"));
 				status=false;
 				return status;
 			}
 
 			if ( event->mask & IN_Q_OVERFLOW )
 			{
-				watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","Overflow!!"));
+				watchLogger->writeLog(3,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Overflow!!"));
 				status=false;
 				return status;
 			}
@@ -358,12 +358,12 @@ bool KAWatch::checkNotification()
 			{
 				if ( event->mask & IN_IGNORED )
 				{
-					watchLogger->writeLog(3,watchLogger->setLogData("<KAWatch::checkNotification>","IN_IGNORED!!"));
+					watchLogger->writeLog(3,watchLogger->setLogData("<SubutaiWatch::checkNotification>","IN_IGNORED!!"));
 				}
 				if ( event->mask & IN_CREATE )
 				{
 					setCurrentDirectory(get(event->wd));
-					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+					watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Event Directory: "
 							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR ) //folder events
 					{
@@ -372,7 +372,7 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),false),"Create_Folder");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 					else //file events
@@ -382,14 +382,14 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,false),"Create_File");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 				}
 				else if ( event->mask & IN_DELETE )
 				{
 					setCurrentDirectory(get(event->wd));
-					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+					watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Event Directory: "
 							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
@@ -398,7 +398,7 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								getNewDirectory(),getModificationTime(getNewDirectory(),true),"Delete_Folder");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 					else
@@ -408,14 +408,14 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								newFile,getModificationTime(newFile,true),"Delete_File");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 				}
 				else if ( event->mask & IN_MODIFY )
 				{
 					setCurrentDirectory(get(event->wd));
-					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+					watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Event Directory: "
 							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
@@ -429,14 +429,14 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_file");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 				}
 				else if ( event->mask & IN_ATTRIB )
 				{
 					setCurrentDirectory(get(event->wd));
-					watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Event Directory: "
+					watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Event Directory: "
 							,getCurrentDirectory()));
 					if ( event->mask & IN_ISDIR )
 					{
@@ -445,7 +445,7 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_Folder");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 					else
@@ -455,7 +455,7 @@ bool KAWatch::checkNotification()
 						sendout = watchRepsonse->createInotifyMessage(watchConnection->getID(),
 								modFile,getModificationTime(modFile,false),"Modify_Permission_File");
 						watchConnection->sendMessage(sendout);
-						watchLogger->writeLog(7,watchLogger->setLogData("<KAWatch::checkNotification>","Sending Event Response: "
+						watchLogger->writeLog(7,watchLogger->setLogData("<SubutaiWatch::checkNotification>","Sending Event Response: "
 								,sendout));
 					}
 				}
@@ -470,7 +470,7 @@ bool KAWatch::checkNotification()
 	return status;
 }
 
-string KAWatch::getModificationTime(string folderpath,bool generate)
+string SubutaiWatch::getModificationTime(string folderpath,bool generate)
 {
 	string unixResult;
 	string deleteResult;
@@ -510,7 +510,7 @@ string KAWatch::getModificationTime(string folderpath,bool generate)
 /**
  *  \details   This method designed for Typically conversion from integer to string.
  */
-string KAWatch::toString(int intcont)
+string SubutaiWatch::toString(int intcont)
 {
 	ostringstream dummy;
 	dummy << intcont;

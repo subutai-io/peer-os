@@ -14,16 +14,16 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KAConnection.h
- *  @class     KAConnection.h
- *  @details   KAConnection class is designed for communication with MQTT ACtiveMQ broker.
+ *  @brief     SubutaiConnection.h
+ *  @class     SubutaiConnection.h
+ *  @details   SubutaiConnection class is designed for communication with MQTT ACtiveMQ broker.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.4
- *  @date      Sep 02, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KACONNECTION_H_
-#define KACONNECTION_H_
+#ifndef SUBUTAICONNECTION_H_
+#define SUBUTAICONNECTION_H_
 
 #include "mosquittopp.h"
 #include <iostream>
@@ -35,11 +35,11 @@
 using namespace std;
 using std::string;
 
-class KAConnection : public mosqpp::mosquittopp
+class SubutaiConnection : public mosqpp::mosquittopp
 {
 public:
-	KAConnection(const char*,const char*,const char*,const char*,const char*,int);
-	virtual ~KAConnection();
+	SubutaiConnection(const char*,const char*,const char*,const char*,const char*,int);
+	virtual ~SubutaiConnection();
 	bool openSession();
 	bool sendMessage(string);
 	bool checkMessageStatus();
@@ -69,5 +69,5 @@ private:
 	void on_subscribe(int);
 	void on_message(const struct mosquitto_message*);
 };
-#endif /* KACONNECTION_H_ */
+#endif /* SUBUTAICONNECTION_H_ */
 

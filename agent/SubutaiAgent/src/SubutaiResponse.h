@@ -14,16 +14,16 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KAResponse.h
- *  @class     KAResponse.h
- *  @details   KAResponse class is designed for marshaling and unmarshalling response messages.
+ *  @brief     SubutaiResponse.h
+ *  @class     SubutaiResponse.h
+ *  @details   SubutaiResponse class is designed for marshaling and unmarshalling response messages.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.4
- *  @date      July 02, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KARESPONSE_H_
-#define KARESPONSE_H_
+#ifndef SUBUTAIRESPONSE_H_
+#define SUBUTAIRESPONSE_H_
 
 #include <syslog.h>
 #include <iostream>
@@ -34,11 +34,11 @@ using namespace std;
 using std::stringstream;
 using std::string;
 
-class KAResponse
+class SubutaiResponse
 {
 public:
-	KAResponse( void );
-	virtual ~KAResponse( void );
+	SubutaiResponse( void );
+	virtual ~SubutaiResponse( void );
 	string& getType();
 	string& getUuid();
 	int getRequestSequenceNumber();
@@ -50,6 +50,7 @@ public:
 	string& getHostname();
 	string& getParentHostname();
 	string& getMacAddress();
+	string& getEnvironmentId();
 	string& getTaskUuid();
 	vector<string>& getIps();
 	string& getSource();
@@ -66,6 +67,7 @@ public:
 	void setPid(int);
 	void setType(const string&);
 	void setUuid(const string&);
+	void setEnvironmentId(const string&);
 	void setRequestSequenceNumber(int);
 	void setResponseSequenceNumber(int);
 	void setStandardError(const string&);
@@ -91,6 +93,7 @@ private:
 	string			macAddress;
 	string			hostname;
 	string			parentHostname;
+	string			environmentId;
 	vector<string>  ips;
 	string			source;
 	string 			configPoint;
@@ -98,4 +101,4 @@ private:
 	string			changeType;
 	vector<string>  confPoints;
 };
-#endif /* KARESPONSE_H_ */
+#endif /* SUBUTAIRESPONSE_H_ */
