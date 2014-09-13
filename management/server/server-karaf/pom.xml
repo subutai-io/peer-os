@@ -99,6 +99,13 @@
                 </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- agent-manager -->
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>apt-repository-api</artifactId>
+                </artifactItem>
+
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>
                   <groupId>com.google.code.gson</groupId>
