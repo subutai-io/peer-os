@@ -105,6 +105,13 @@
                   <artifactId>apt-repository-api</artifactId>
                 </artifactItem>
 
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- command-dispatcher -->
+                <dependency>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>command-dispatcher-api</artifactId>
+                </dependency>
+
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>

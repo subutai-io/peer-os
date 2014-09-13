@@ -16,8 +16,8 @@
 
     <modules>
         <module>command-dispatcher-api</module>
-        <module>command-dispatcher-cli</module>
-        <module>command-dispatcher-impl</module>
-        <module>command-dispatcher-rest</module>
+        <!--<module>command-dispatcher-cli</module>-->
+        <!--<module>command-dispatcher-impl</module>-->
+        <!--<module>command-dispatcher-rest</module>-->
     </modules>
 </project>
