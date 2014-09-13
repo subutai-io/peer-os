@@ -347,7 +347,7 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>target/assembly/lib</outputDirectory>
+              <outputDirectory>target/assembly/system/subutai</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.slf4j</groupId>
