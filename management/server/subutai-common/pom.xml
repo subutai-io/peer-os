@@ -17,10 +17,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
@@ -29,16 +25,12 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.doomdark</groupId>
-      <artifactId>com.springsource.org.doomdark.uuid</artifactId>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.eaio.uuid</groupId>
-        <artifactId>uuid</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
   </dependencies>
 
