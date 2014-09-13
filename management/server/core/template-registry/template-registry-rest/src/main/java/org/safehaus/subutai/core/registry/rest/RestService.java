@@ -2,13 +2,13 @@ package org.safehaus.subutai.core.registry.rest;
 
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,13 +18,13 @@ public interface RestService {
     @GET
     @Path("templates/{templateName}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getTemplate( @PathParam("templateName") String templateName );
+    public Response getTemplate( @PathParam("templateName") String templateName );
 
     @POST
     @Path("templates")
-    public Response registerTemplate( @QueryParam("config") String configFilePath,
-                                      @QueryParam("packages") String packagesFilePath,
-                                      @QueryParam("md5sum") String md5sum );
+    public Response registerTemplate( @FormParam("config") String configFilePath,
+                                      @FormParam("packages") String packagesFilePath,
+                                      @FormParam("md5sum") String md5sum );
 
     @DELETE
     @Path("templates/{templateName}")
@@ -33,50 +33,50 @@ public interface RestService {
     @GET
     @Path("templates/{templateName}/arch/{lxcArch}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getTemplate( @PathParam("templateName") String templateName, @PathParam("lxcArch") String lxcArch );
+    public Response getTemplate( @PathParam("templateName") String templateName, @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/{childTemplateName}/parent")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getParentTemplate( @PathParam("childTemplateName") String childTemplateName );
+    public Response getParentTemplate( @PathParam("childTemplateName") String childTemplateName );
 
     @GET
     @Path("templates/{childTemplateName}/arch/{lxcArch}/parent")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getParentTemplate( @PathParam("childTemplateName") String childTemplateName,
+    public Response getParentTemplate( @PathParam("childTemplateName") String childTemplateName,
                                      @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/{childTemplateName}/parents")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getParentTemplates( @PathParam("childTemplateName") String childTemplateName );
+    public Response getParentTemplates( @PathParam("childTemplateName") String childTemplateName );
 
     @GET
     @Path("templates/{childTemplateName}/arch/{lxcArch}/parents")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getParentTemplates( @PathParam("childTemplateName") String childTemplateName,
+    public Response getParentTemplates( @PathParam("childTemplateName") String childTemplateName,
                                       @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/{parentTemplateName}/children")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName );
+    public Response getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName );
 
     @GET
     @Path("templates/{parentTemplateName}/arch/{lxcArch}/children")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName,
+    public Response getChildTemplates( @PathParam("parentTemplateName") String parentTemplateName,
                                      @PathParam("lxcArch") String lxcArch );
 
     @GET
     @Path("templates/tree")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getTemplateTree();
+    public Response getTemplateTree();
 
     @GET
     @Path("templates/{templateName}/is-used-on-fai")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String isTemplateInUse( @PathParam("templateName") String templateName );
+    public Response isTemplateInUse( @PathParam("templateName") String templateName );
 
     @PUT
     @Path("templates/{templateName}/fai/{faiHostname}/is-used/{isInUse}")
@@ -88,22 +88,22 @@ public interface RestService {
     @GET
     @Path("templates")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String listTemplates();
+    public Response listTemplates();
 
 
     @GET
     @Path("templates/arch/{lxcArch}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public String listTemplates( @PathParam("lxcArch") String lxcArch );
+    public Response listTemplates( @PathParam("lxcArch") String lxcArch );
 
 
     @GET
     @Path("templates/plain-list")
     @Produces({ MediaType.TEXT_PLAIN })
-    public String listTemplatesPlain();
+    public Response listTemplatesPlain();
 
     @GET
     @Path("templates/arch/{lxcArch}/plain-list")
     @Produces({ MediaType.TEXT_PLAIN })
-    public String listTemplatesPlain( @PathParam("lxcArch") String lxcArch );
+    public Response listTemplatesPlain( @PathParam("lxcArch") String lxcArch );
 }

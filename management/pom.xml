@@ -16,6 +16,19 @@
 
   <description>Parent project for the Subutai Project Artifacts</description>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
   <repositories>
     <repository>
       <id>apache-repo</id>
@@ -63,7 +76,8 @@
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Runtime -->
-    <karaf.version>2.3.3</karaf.version>
+    <karaf.version>2.3.7</karaf.version>
+    <karaf.features.version>2.3.7</karaf.features.version>
     <!-- OSGI -->
     <org.osgi.version>4.3.1</org.osgi.version>
     <!-- servlet -->
@@ -94,7 +108,6 @@
     <javax.jmdns.version>3.4.1</javax.jmdns.version>
     <javax.ws.rs.jsr311-apiversion>1.1-ea</javax.ws.rs.jsr311-apiversion>
     <junit.version>4.11</junit.version>
-    <karaf.version>2.3.3</karaf.version>
     <log4j.version>1.2.17</log4j.version>
     <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
     <net.jpountz.lz4.version>1.2.0</net.jpountz.lz4.version>
@@ -105,9 +118,6 @@
     <org.apache.cxf.version>2.7.11</org.apache.cxf.version>
     <org.apache.felix.gogo.version>0.4.0</org.apache.felix.gogo.version>
     <org.apache.felix.version>2.4.0</org.apache.felix.version>
-    <org.apache.geronimo.specs.ejb.version>1.0.1</org.apache.geronimo.specs.ejb.version>
-    <org.apache.geronimo.specs.jms.version>1.1.1</org.apache.geronimo.specs.jms.version>
-    <org.apache.geronimo.specs.jpa.version>1.1</org.apache.geronimo.specs.jpa.version>
     <org.apache.lucene.version>4.7.0</org.apache.lucene.version>
     <org.apache.maven.plugins.version>3.1</org.apache.maven.plugins.version>
     <org.apache.servicemix.bundles.version>4.10_1</org.apache.servicemix.bundles.version>
@@ -119,7 +129,7 @@
     <org.elasticsearch.version>1.0.1</org.elasticsearch.version>
     <org.mockito.version>1.9.5</org.mockito.version>
     <org.osgi.version>4.3.1</org.osgi.version>
-    <org.slf4j.version>1.7.6</org.slf4j.version>
+    <org.slf4j.version>1.7.7</org.slf4j.version>
     <org.springframework.osgi.version>1.2.1</org.springframework.osgi.version>
     <org.xerial.snappy.version>1.1.0.1</org.xerial.snappy.version>
     <xalan.version>2.7.1</xalan.version>
@@ -141,10 +151,23 @@
     <org.apache.jackrabbit.webdav.version>2.8.0</org.apache.jackrabbit.webdav.version>
     <org.apache.ant.version>1.8.2</org.apache.ant.version>
     <yamlbeans.version>1.08</yamlbeans.version>
+    <http.client.version>4.3.5</http.client.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${http.client.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${http.client.version}</version>
+      </dependency>
+
       <!-- UI -->
       <dependency>
         <groupId>com.vaadin</groupId>
@@ -166,6 +189,7 @@
         <artifactId>vaadin-themes</artifactId>
         <version>${vaadin.version}</version>
       </dependency>
+
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-push</artifactId>
@@ -391,21 +415,6 @@
         <version>${org.apache.ant.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jms_1.1_spec</artifactId>
-        <version>${org.apache.geronimo.specs.jms.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-ejb_3.0_spec</artifactId>
-        <version>${org.apache.geronimo.specs.ejb.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jpa_2.0_spec</artifactId>
-        <version>${org.apache.geronimo.specs.jpa.version}</version>
-      </dependency>
-      <dependency>
         <groupId>javax.jmdns</groupId>
         <artifactId>jmdns</artifactId>
         <version>${javax.jmdns.version}</version>
@@ -464,6 +473,16 @@
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>${org.apache.commons.collections.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${org.slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.url</groupId>
+        <artifactId>pax-url-wrap</artifactId>
+        <version>1.4.2</version>
       </dependency>
 
       <!-- Core Modules - START -->
@@ -671,7 +690,37 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- LXC Manager -->
+        <!-- Strategy Manager -->
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>strategy-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>strategy-manager-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Container Manager -->
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.safehaus.subutai</groupId>
+            <artifactId>container-manager-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- LXC Manager -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>lxc-manager-ui</artifactId>
@@ -783,6 +832,33 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- Peer Manager -->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>peer-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- Core Modules - END -->
 
       <!--Vaadin - START-->
@@ -808,43 +884,8 @@
       </dependency>
       <!--Vaadin - END-->
 
-      <!-- Products Modules - START -->
-
-      <!-- Common -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>product-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Accumulo -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>accumulo-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>accumulo-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>accumulo-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>accumulo-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>accumulo-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Accumulo2 -->
+      <!--Plugins-->
+      <!-- Accumulo plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>accumulo-plugin-api</artifactId>
@@ -871,34 +912,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Presto -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>presto-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>presto-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>presto-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>presto-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>presto-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Presto 2 -->
+      <!-- Presto plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>presto-plugin-api</artifactId>
@@ -925,34 +939,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Shark -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>shark-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>shark-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>shark-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>shark-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>shark-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Shark 2-->
+      <!-- Shark plugin-->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>shark-plugin-api</artifactId>
@@ -979,34 +966,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Spark -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>spark-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>spark-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>spark-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>spark-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>spark-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Spark 2 -->
+      <!-- Spark plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>spark-plugin-api</artifactId>
@@ -1033,34 +993,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- MongoDB -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mongodb-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mongodb-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mongodb-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mongodb-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>mongodb-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- MongoDB 2 -->
+      <!-- MongoDB plugin -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mongodb-plugin-api</artifactId>
@@ -1087,7 +1020,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Solr 2 -->
+      <!-- Solr plugin -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>solr-plugin-api</artifactId>
@@ -1114,88 +1047,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Lucene -->
+      <!-- Zookeeper plugin-->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-api</artifactId>
+        <artifactId>zookeeper-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-impl</artifactId>
+        <artifactId>zookeeper-plugin-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-ui</artifactId>
+        <artifactId>zookeeper-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-cli</artifactId>
+        <artifactId>zookeeper-plugin-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Lucene Plugin -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>lucene-plugin-rest</artifactId>
+        <artifactId>zookeeper-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Pig -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>pig-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>pig-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>pig-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>pig-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>pig-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Pig Plugin -->
+      <!-- Pig plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>pig-plugin-api</artifactId>
@@ -1249,114 +1128,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Mahout old -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>mahout-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Solr -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>solr-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>solr-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>solr-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>solr-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>solr-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Zookeeper -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Zookeeper 2-->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-plugin-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-plugin-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-plugin-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-plugin-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>zookeeper-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- HBase plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1381,33 +1152,6 @@
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>hbase-plugin-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- HBase old -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hbase-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hbase-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hbase-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hbase-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hbase-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -1438,33 +1182,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Cassandra old -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>cassandra-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>cassandra-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>cassandra-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>cassandra-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>cassandra-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
       <!-- Oozie plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
@@ -1492,164 +1209,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Oozie old -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>oozie-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Flume -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>flume-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>flume-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>flume-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>flume-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>flume-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Hive -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hive-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hive-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hive-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hive-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hive-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Hive Query-->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hivequery-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hivequery-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hivequery-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hivequery-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Sqoop -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>sqoop-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Hadoop -->
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-cli</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.safehaus.subutai</groupId>
-        <artifactId>hadoop-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!-- Hadoop 2 -->
+      <!-- Hadoop plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>hadoop-plugin-api</artifactId>
@@ -1676,29 +1236,34 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Elasticsearch -->
+      <!-- Lucene plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-api</artifactId>
+        <artifactId>lucene-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-impl</artifactId>
+        <artifactId>lucene-plugin-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-ui</artifactId>
+        <artifactId>lucene-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>elasticsearch-rest</artifactId>
+        <artifactId>lucene-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>lucene-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Elasticsearch Plugin -->
+      <!-- Elasticsearch plugin -->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
         <artifactId>elasticsearch-plugin-api</artifactId>
@@ -1720,31 +1285,115 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Storm -->
+      <!--Flume plugin-->
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>storm-api</artifactId>
+        <artifactId>flume-plugin-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>storm-impl</artifactId>
+        <artifactId>flume-plugin-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>storm-ui</artifactId>
+        <artifactId>flume-plugin-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.safehaus.subutai</groupId>
-        <artifactId>storm-rest</artifactId>
+        <artifactId>flume-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>flume-plugin-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Products Modules - END -->
+      <!--Hive plugin-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hive-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hive-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hive-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hive-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>hive-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
+      <!--Sqoop plugin-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>sqoop-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>sqoop-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>sqoop-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>sqoop-plugin-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>sqoop-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!--Storm plugin-->
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-plugin-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-plugin-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-plugin-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.safehaus.subutai</groupId>
+        <artifactId>storm-plugin-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--karaf-->
+
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>findbugs</artifactId>
+        <version>3.0.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -1857,15 +1506,23 @@
               </goals>
             </execution>
           </executions>
-          <dependencies>
-            <dependency>
-              <groupId>com.google.code.findbugs</groupId>
-              <artifactId>findbugs</artifactId>
-              <version>2.0.3</version>
-            </dependency>
-          </dependencies>
         </plugin>
-
+        <!--<plugin>-->
+        <!--<artifactId>maven-dependency-plugin</artifactId>-->
+        <!--<version>2.8</version>-->
+        <!--<executions>-->
+        <!--<execution>-->
+        <!--<id>analyze</id>-->
+        <!--<goals>-->
+        <!--<goal>analyze-only</goal>-->
+        <!--</goals>-->
+        <!--<configuration>-->
+        <!--<failOnWarning>true</failOnWarning>-->
+        <!--<outputXML>true</outputXML>-->
+        <!--</configuration>-->
+        <!--</execution>-->
+        <!--</executions>-->
+        <!--</plugin>-->
       </plugins>
     </pluginManagement>
   </build>

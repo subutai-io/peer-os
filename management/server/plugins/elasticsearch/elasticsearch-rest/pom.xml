@@ -27,6 +27,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>elasticsearch-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

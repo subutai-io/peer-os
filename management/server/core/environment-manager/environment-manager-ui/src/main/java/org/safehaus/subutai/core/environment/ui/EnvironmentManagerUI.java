@@ -1,70 +1,94 @@
 package org.safehaus.subutai.core.environment.ui;
 
 
-import com.vaadin.ui.Component;
-import org.safehaus.subutai.core.environment.api.EnvironmentManager;
-import org.safehaus.subutai.server.ui.api.PortalModule;
-import org.safehaus.subutai.common.util.FileUtil;
-
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.safehaus.subutai.common.util.FileUtil;
+import org.safehaus.subutai.core.environment.api.EnvironmentManager;
+import org.safehaus.subutai.core.peer.api.PeerManager;
+import org.safehaus.subutai.server.ui.api.PortalModule;
+
+import com.vaadin.ui.Component;
+
 
 public class EnvironmentManagerUI implements PortalModule {
 
-	public static final String MODULE_IMAGE = "env.png";
-	public static final String MODULE_NAME = "Environment";
-	private static ExecutorService executor;
-	private EnvironmentManager environmentManager;
-	//    private AgentManager agentManager;
+    public static final String MODULE_IMAGE = "env.png";
+    public static final String MODULE_NAME = "Environment";
+    private static ExecutorService executor;
+    private EnvironmentManager environmentManager;
+    private PeerManager peerManager;
 
 
-	public static ExecutorService getExecutor() {
-		return executor;
-	}
+    public static ExecutorService getExecutor() {
+        return executor;
+    }
 
 
-	//    public void setAgentManager( AgentManager agentManager ) {
-	//        this.agentManager = agentManager;
-	//    }
+    public static void setExecutor( final ExecutorService executor ) {
+        EnvironmentManagerUI.executor = executor;
+    }
 
 
-	public void setEnvironmentManager(final EnvironmentManager environmentManager) {
-		this.environmentManager = environmentManager;
-	}
+    public EnvironmentManager getEnvironmentManager() {
+        return environmentManager;
+    }
 
 
-	public void init() {
-		executor = Executors.newCachedThreadPool();
-	}
+    public void setEnvironmentManager( final EnvironmentManager environmentManager ) {
+        this.environmentManager = environmentManager;
+    }
+
+    //    private AgentManager agentManager;
 
 
-	public void destroy() {
-		executor.shutdown();
-	}
+    public PeerManager getPeerManager() {
+        return peerManager;
+    }
 
 
-	@Override
-	public String getId() {
-		return MODULE_NAME;
-	}
+    //    public void setAgentManager( AgentManager agentManager ) {
+    //        this.agentManager = agentManager;
+    //    }
 
 
-	@Override
-	public String getName() {
-		return MODULE_NAME;
-	}
+    public void setPeerManager( final PeerManager peerManager ) {
+        this.peerManager = peerManager;
+    }
 
 
-	@Override
-	public File getImage() {
-		return FileUtil.getFile(EnvironmentManagerUI.MODULE_IMAGE, this);
-	}
+    public void init() {
+        executor = Executors.newCachedThreadPool();
+    }
 
 
-	@Override
-	public Component createComponent() {
-		return new EnvironmentManagerForm(environmentManager);
-	}
+    public void destroy() {
+        executor.shutdown();
+    }
+
+
+    @Override
+    public String getId() {
+        return MODULE_NAME;
+    }
+
+
+    @Override
+    public String getName() {
+        return MODULE_NAME;
+    }
+
+
+    @Override
+    public File getImage() {
+        return FileUtil.getFile( EnvironmentManagerUI.MODULE_IMAGE, this );
+    }
+
+
+    @Override
+    public Component createComponent() {
+        return new EnvironmentManagerForm( this );
+    }
 }

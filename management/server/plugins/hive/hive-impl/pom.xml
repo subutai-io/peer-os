@@ -60,12 +60,6 @@
         </dependency>
         <dependency>
             <groupId>org.safehaus.subutai</groupId>
-            <artifactId>product-common</artifactId>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.safehaus.subutai</groupId>
             <artifactId>plugin-common</artifactId>
         </dependency>
     </dependencies>

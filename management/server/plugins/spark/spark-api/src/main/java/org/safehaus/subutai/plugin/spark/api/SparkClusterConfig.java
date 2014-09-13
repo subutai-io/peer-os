@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.safehaus.subutai.plugin.spark.api;
 
 import org.safehaus.subutai.common.protocol.Agent;
@@ -11,61 +6,94 @@ import org.safehaus.subutai.common.protocol.ConfigBase;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author dilshat
- */
 public class SparkClusterConfig implements ConfigBase {
 
-	public static final String PRODUCT_KEY = "Spark";
-	private String clusterName = "";
+    public static final String PRODUCT_KEY = "Spark";
+    public static final String TEMPLATE_NAME = "spark";
 
-	private Agent masterNode;
-	private Set<Agent> slaves;
+    private String clusterName = "";
+    private String hadoopClusterName = "";
+    private SetupType setupType;
+    private Agent masterNode;
+    private Set<Agent> slaves = new HashSet<>();
+    // for with-Hadoop installation
+    private Set<Agent> hadoopNodes = new HashSet<>();
+    // for environment blueprint
+    private int slaveNodesCount;
 
-	public Agent getMasterNode() {
-		return masterNode;
-	}
+    public Agent getMasterNode() {
+        return masterNode;
+    }
 
-	public void setMasterNode(Agent masterNode) {
-		this.masterNode = masterNode;
-	}
+    public void setMasterNode(Agent masterNode) {
+        this.masterNode = masterNode;
+    }
 
-	public String getClusterName() {
-		return clusterName;
-	}
+    @Override
+    public String getClusterName() {
+        return clusterName;
+    }
 
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
-	@Override
-	public String getProductName() {
-		return PRODUCT_KEY;
-	}
+    public String getHadoopClusterName() {
+        return hadoopClusterName;
+    }
 
-	public Set<Agent> getSlaveNodes() {
-		return slaves;
-	}
+    public void setHadoopClusterName(String hadoopClusterName) {
+        this.hadoopClusterName = hadoopClusterName;
+    }
 
-	public void setSlaveNodes(Set<Agent> slaves) {
-		this.slaves = slaves;
-	}
+    public SetupType getSetupType() {
+        return setupType;
+    }
 
-	public Set<Agent> getAllNodes() {
-		Set<Agent> allNodes = new HashSet<>();
-		if (slaves != null) {
-			allNodes.addAll(slaves);
-		}
-		if (masterNode != null) {
-			allNodes.add(masterNode);
-		}
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
+    }
 
-		return allNodes;
-	}
+    @Override
+    public String getProductName() {
+        return PRODUCT_KEY;
+    }
 
-	@Override
-	public String toString() {
-		return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
-	}
+    public Set<Agent> getSlaveNodes() {
+        return slaves;
+    }
+
+    public void setSlaveNodes(Set<Agent> slaves) {
+        this.slaves = slaves;
+    }
+
+    public Set<Agent> getHadoopNodes() {
+        return hadoopNodes;
+    }
+
+    public void setHadoopNodes(Set<Agent> hadoopNodes) {
+        this.hadoopNodes = hadoopNodes;
+    }
+
+    public int getSlaveNodesCount() {
+        return slaveNodesCount;
+    }
+
+    public void setSlaveNodesCount(int slaveNodesCount) {
+        this.slaveNodesCount = slaveNodesCount;
+    }
+
+    public Set<Agent> getAllNodes() {
+        Set<Agent> allNodes = new HashSet<>();
+        if (slaves != null) allNodes.addAll(slaves);
+        if (masterNode != null) allNodes.add(masterNode);
+
+        return allNodes;
+    }
+
+    @Override
+    public String toString() {
+        return "Config{" + "clusterName=" + clusterName + ", masterNode=" + masterNode + ", slaves=" + slaves + '}';
+    }
 
 }

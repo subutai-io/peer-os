@@ -9,7 +9,7 @@ package org.safehaus.subutai.core.command.impl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.impl.ExpiringCache;
+import org.safehaus.subutai.common.command.ExpiringCache;
 
 import static org.junit.Assert.*;
 

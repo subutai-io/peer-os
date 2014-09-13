@@ -8,10 +8,10 @@ package org.safehaus.subutai.core.container.impl;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Request;
 
@@ -40,7 +40,7 @@ public class MockUtils {
 		Agent agent = mock(Agent.class);
 		when(agent.getHostname()).thenReturn(PHYSICAL_HOSTNAME);
 		when(agent.getUuid()).thenReturn(physicalUUID);
-		when(agent.isIsLXC()).thenReturn(false);
+		when(agent.isLXC()).thenReturn(false);
 		when(agent.getParentHostName()).thenReturn(null);
 		when(agent.compareTo(agent)).thenCallRealMethod();
 		return agent;
@@ -51,7 +51,7 @@ public class MockUtils {
 		Agent agent = mock(Agent.class);
 		when(agent.getHostname()).thenReturn(LXC_HOSTNAME);
 		when(agent.getUuid()).thenReturn(lxcUUID);
-		when(agent.isIsLXC()).thenReturn(true);
+		when(agent.isLXC()).thenReturn(true);
 		when(agent.getParentHostName()).thenReturn(PHYSICAL_HOSTNAME);
 		when(agent.compareTo(agent)).thenCallRealMethod();
 		return agent;

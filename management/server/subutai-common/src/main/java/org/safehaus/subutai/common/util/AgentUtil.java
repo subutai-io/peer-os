@@ -40,7 +40,7 @@ public class AgentUtil
         {
             for ( Agent agent : agents )
             {
-                if ( agent.isIsLXC() )
+                if ( agent.isLXC() )
                 {
                     filteredAgents.add( agent );
                 }
@@ -57,7 +57,7 @@ public class AgentUtil
         {
             for ( Agent agent : agents )
             {
-                if ( !agent.isIsLXC() )
+                if ( !agent.isLXC() )
                 {
                     filteredAgents.add( agent );
                 }

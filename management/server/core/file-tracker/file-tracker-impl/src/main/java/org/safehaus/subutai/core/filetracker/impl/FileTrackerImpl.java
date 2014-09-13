@@ -8,9 +8,9 @@ import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.Response;
 import org.safehaus.subutai.common.protocol.ResponseListener;
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.core.communication.api.CommunicationManager;
 import org.safehaus.subutai.core.filetracker.api.FileTracker;
 

@@ -4,8 +4,9 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.product.common.test.unit.mock.CommandRunnerMock;
+
+import org.safehaus.subutai.plugin.common.mock.CommandRunnerMock;
+import org.safehaus.subutai.common.command.Command;
 
 public class CommandsTest {
 

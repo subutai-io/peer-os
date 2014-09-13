@@ -5,10 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.safehaus.subutai.common.tracker.ProductOperation;
 import org.safehaus.subutai.common.tracker.ProductOperationState;
+import org.safehaus.subutai.plugin.common.mock.CommonMockBuilder;
 import org.safehaus.subutai.plugin.hive.api.HiveConfig;
 import org.safehaus.subutai.plugin.hive.api.SetupType;
 import org.safehaus.subutai.plugin.hive.impl.handler.mock.HiveImplMock;
-import org.safehaus.subutai.product.common.test.unit.mock.CommonMockBuilder;
 
 public class InstallHandlerTest {
 
@@ -47,7 +47,7 @@ public class InstallHandlerTest {
         HiveConfig config = new HiveConfig();
         config.setSetupType(SetupType.OVER_HADOOP);
         config.setClusterName("test-cluster");
-        config.setServer(CommonMockBuilder.createAgent());
+        config.setServer( CommonMockBuilder.createAgent());
 
         handler = new InstallHandler(mock, config);
         handler.run();

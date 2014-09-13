@@ -1,13 +1,9 @@
 package org.safehaus.subutai.core.registry.rest;
 
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.Response;
-
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.safehaus.subutai.common.settings.Common;
 import org.safehaus.subutai.common.util.FileUtil;
 import org.safehaus.subutai.common.util.JsonUtil;
@@ -16,9 +12,11 @@ import org.safehaus.subutai.core.registry.api.Template;
 import org.safehaus.subutai.core.registry.api.TemplateRegistryManager;
 import org.safehaus.subutai.core.registry.api.TemplateTree;
 
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -35,174 +33,206 @@ public class RestServiceImpl implements RestService {
     private TemplateRegistryManager templateRegistryManager;
 
 
-    public void setTemplateRegistryManager( TemplateRegistryManager templateRegistryManager ) {
+    public void setTemplateRegistryManager(TemplateRegistryManager templateRegistryManager) {
         this.templateRegistryManager = templateRegistryManager;
     }
 
 
     @Override
-    public String getTemplate( final String templateName ) {
-        return gson.toJson( templateRegistryManager.getTemplate( templateName ) );
+    public Response getTemplate(final String templateName) {
+        Template template = templateRegistryManager.getTemplate(templateName);
+        if (template != null) {
+            return Response.ok().entity(gson.toJson(template)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
 
     @Override
-    public Response registerTemplate( final String configFilePath, final String packagesFilePath,
-                                      final String md5sum ) {
+    public Response registerTemplate(final String configFilePath, final String packagesFilePath,
+                                     final String md5sum) {
         try {
 
-            templateRegistryManager.registerTemplate( FileUtil.readFile( configFilePath, Charset.defaultCharset() ),
-                    FileUtil.readFile( packagesFilePath, Charset.defaultCharset() ), md5sum );
+            templateRegistryManager.registerTemplate(FileUtil.readFile(configFilePath, Charset.defaultCharset()),
+                    FileUtil.readFile(packagesFilePath, Charset.defaultCharset()), md5sum);
 
-            return Response.status( Response.Status.OK ).build();
-        }
-        catch ( IOException | RegistryException | RuntimeException e ) {
-            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+            return Response.ok().build();
+        } catch (IOException | RegistryException | RuntimeException e) {
+            return Response.status(Response.Status.BAD_REQUEST).header("exception", e.getMessage()).build();
         }
     }
 
 
     @Override
-    public Response unregisterTemplate( final String templateName ) {
+    public Response unregisterTemplate(final String templateName) {
         try {
 
-            templateRegistryManager.unregisterTemplate( templateName );
+            templateRegistryManager.unregisterTemplate(templateName);
 
-            return Response.status( Response.Status.OK ).build();
+            return Response.ok().build();
+        } catch (RegistryException | RuntimeException e) {
+            return Response.status(Response.Status.BAD_REQUEST).header("exception", e.getMessage()).build();
         }
-        catch ( RegistryException | RuntimeException e ) {
-            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+    }
+
+
+    @Override
+    public Response getTemplate(final String templateName, final String lxcArch) {
+        Template template = templateRegistryManager.getTemplate(templateName, lxcArch);
+        if (template != null) {
+            return Response.ok().entity(gson.toJson(template)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 
 
     @Override
-    public String getTemplate( final String templateName, final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getTemplate( templateName, lxcArch ) );
+    public Response getParentTemplate(final String childTemplateName) {
+        Template template = templateRegistryManager.getParentTemplate(childTemplateName);
+        if (template != null) {
+            return Response.ok().entity(gson.toJson(template)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
 
     @Override
-    public String getParentTemplate( final String childTemplateName ) {
-        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName ) );
+    public Response getParentTemplate(final String childTemplateName, final String lxcArch) {
+        Template template = templateRegistryManager.getParentTemplate(childTemplateName, lxcArch);
+        if (template != null) {
+            return Response.ok().entity(gson.toJson(template)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
 
     @Override
-    public String getParentTemplate( final String childTemplateName, final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getParentTemplate( childTemplateName, lxcArch ) );
-    }
-
-
-    @Override
-    public String getParentTemplates( final String childTemplateName ) {
+    public Response getParentTemplates(final String childTemplateName) {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName ) ) {
-            parents.add( template.getTemplateName() );
+        for (Template template : templateRegistryManager.getParentTemplates(childTemplateName)) {
+            parents.add(template.getTemplateName());
         }
-        return gson.toJson( parents );
+        return Response.ok().entity(gson.toJson(parents)).build();
     }
 
 
     @Override
-    public String getParentTemplates( final String childTemplateName, final String lxcArch ) {
+    public Response getParentTemplates(final String childTemplateName, final String lxcArch) {
         List<String> parents = new ArrayList<>();
-        for ( Template template : templateRegistryManager.getParentTemplates( childTemplateName, lxcArch ) ) {
-            parents.add( template.getTemplateName() );
+        for (Template template : templateRegistryManager.getParentTemplates(childTemplateName, lxcArch)) {
+            parents.add(template.getTemplateName());
         }
-        return gson.toJson( parents );
+        return Response.ok().entity(gson.toJson(parents)).build();
     }
 
 
     @Override
-    public String getChildTemplates( final String parentTemplateName ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName ) );
+    public Response getChildTemplates(final String parentTemplateName) {
+        List<String> children = new ArrayList<>();
+        for (Template template : templateRegistryManager.getChildTemplates(parentTemplateName)) {
+            children.add(template.getTemplateName());
+        }
+        return Response.ok().entity(gson.toJson(children)).build();
     }
 
 
     @Override
-    public String getChildTemplates( final String parentTemplateName, final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getChildTemplates( parentTemplateName, lxcArch ) );
+    public Response getChildTemplates(final String parentTemplateName, final String lxcArch) {
+        List<String> children = new ArrayList<>();
+        for (Template template : templateRegistryManager.getChildTemplates(parentTemplateName, lxcArch)) {
+            children.add(template.getTemplateName());
+        }
+        return Response.ok().entity(gson.toJson(children)).build();
     }
 
 
     @Override
-    public String getTemplateTree() {
+    public Response getTemplateTree() {
         TemplateTree tree = templateRegistryManager.getTemplateTree();
         List<Template> uberTemplates = tree.getRootTemplates();
-        if ( uberTemplates != null ) {
-            for ( Template template : uberTemplates ) {
-                addChildren( tree, template );
+        if (uberTemplates != null) {
+            for (Template template : uberTemplates) {
+                addChildren(tree, template);
             }
         }
-        return gson.toJson( uberTemplates );
+        return Response.ok().entity(gson.toJson(uberTemplates)).build();
     }
 
 
     @Override
-    public String isTemplateInUse( final String templateName ) {
+    public Response isTemplateInUse(final String templateName) {
         try {
-            return JsonUtil.toJson( "RESULT", templateRegistryManager.isTemplateInUse( templateName ) );
-        }
-        catch ( RegistryException e ) {
-            return JsonUtil.toJson( "ERROR", e.getMessage() );
+            return Response.ok().entity(JsonUtil.toJson("RESULT", templateRegistryManager.isTemplateInUse(templateName))).build();
+        } catch (RegistryException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("exception", e.getMessage()).build();
         }
     }
 
 
     @Override
-    public Response setTemplateInUse( final String faiHostname, final String templateName, final String isInUse ) {
+    public Response setTemplateInUse(final String faiHostname, final String templateName, final String isInUse) {
         try {
 
-            templateRegistryManager.updateTemplateUsage( faiHostname, templateName, Boolean.parseBoolean( isInUse ) );
+            templateRegistryManager.updateTemplateUsage(faiHostname, templateName, Boolean.parseBoolean(isInUse));
 
-            return Response.status( Response.Status.OK ).build();
+            return Response.ok().build();
+        } catch (RegistryException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("exception", e.getMessage()).build();
         }
-        catch ( RegistryException e ) {
-            return Response.status( Response.Status.BAD_REQUEST ).header( "exception", e.getMessage() ).build();
+    }
+
+
+    @Override
+    public Response listTemplates() {
+        List<String> templates = new ArrayList<>();
+        for (Template template : templateRegistryManager.getAllTemplates()) {
+            templates.add(template.getTemplateName());
         }
+        return Response.ok().entity(gson.toJson(templates)).build();
     }
 
 
     @Override
-    public String listTemplates() {
-        return gson.toJson( templateRegistryManager.getAllTemplates() );
+    public Response listTemplates(final String lxcArch) {
+        List<String> templates = new ArrayList<>();
+        for (Template template : templateRegistryManager.getAllTemplates(lxcArch)) {
+            templates.add(template.getTemplateName());
+        }
+        return Response.ok().entity(gson.toJson(templates)).build();
     }
 
 
     @Override
-    public String listTemplates( final String lxcArch ) {
-        return gson.toJson( templateRegistryManager.getAllTemplates( lxcArch ) );
+    public Response listTemplatesPlain() {
+        return listTemplatesPlain(Common.DEFAULT_LXC_ARCH);
     }
 
 
     @Override
-    public String listTemplatesPlain() {
-        return listTemplatesPlain( Common.DEFAULT_LXC_ARCH );
-    }
-
-
-    @Override
-    public String listTemplatesPlain( final String lxcArch ) {
+    public Response listTemplatesPlain(final String lxcArch) {
         StringBuilder output = new StringBuilder();
-        List<Template> templates = templateRegistryManager.getAllTemplates( lxcArch );
+        List<Template> templates = templateRegistryManager.getAllTemplates(lxcArch);
 
-        for ( final Template template : templates ) {
-            output.append( template.getTemplateName() ).append( TEMPLATE_PARENT_DELIMITER ).append(
-                    Strings.isNullOrEmpty( template.getParentTemplateName() ) ? "" : template.getParentTemplateName() )
-                  .append( TEMPLATES_DELIMITER );
+        for (final Template template : templates) {
+            output.append(template.getTemplateName()).append(TEMPLATE_PARENT_DELIMITER).append(
+                    Strings.isNullOrEmpty(template.getParentTemplateName()) ? "" : template.getParentTemplateName())
+                    .append(TEMPLATES_DELIMITER);
         }
 
-        return output.toString();
+        return Response.ok().entity(gson.toJson(output.toString())).build();
     }
 
 
-    private void addChildren( TemplateTree tree, Template currentTemplate ) {
-        List<Template> children = tree.getChildrenTemplates( currentTemplate );
-        if ( !( children == null || children.isEmpty() ) ) {
-            currentTemplate.addChildren( children );
-            for ( Template child : children ) {
-                addChildren( tree, child );
+    private void addChildren(TemplateTree tree, Template currentTemplate) {
+        List<Template> children = tree.getChildrenTemplates(currentTemplate);
+        if (!(children == null || children.isEmpty())) {
+            currentTemplate.addChildren(children);
+            for (Template child : children) {
+                addChildren(tree, child);
             }
         }
     }

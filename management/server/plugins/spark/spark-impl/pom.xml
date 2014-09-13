@@ -11,8 +11,8 @@
 
   <artifactId>spark-plugin-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Spark</name>
-  <description>Subutai Spark</description>
+  <name>Subutai Spark Impl</name>
+  <description>Subutai Spark Impl</description>
 
   <dependencies>
     <dependency>
@@ -27,10 +27,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>product-common</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -61,6 +57,15 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>command-runner-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.safehaus.subutai</groupId>
+      <artifactId>hadoop-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+        </dependency>
   </dependencies>
 
   <build>

@@ -26,6 +26,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mongodb-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

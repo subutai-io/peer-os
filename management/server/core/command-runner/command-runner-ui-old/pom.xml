@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>command-runner-api</artifactId>
+      <artifactId>command-dispatcher-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

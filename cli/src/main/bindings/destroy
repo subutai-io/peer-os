@@ -19,7 +19,8 @@ function destroy {
   # (5) destroy all snapshots on clones's rootfs
   # (6) lxc-destroy the clone
   # (7) destroy mounted partitions
-  # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
+  # (8) notify template destroy if template is registered
+  # (9) remove relevant directories under $SUBUTAI_TMPDIR if any
   # ----------------------------------------------------------------------------
 
   # Parse provided arguments
@@ -150,9 +151,14 @@ function destroy {
   remove-mount $clone $parent var lxc-data
   remove-mount $clone $parent home lxc-data
 
+  # (8) notify template destroy if template is registered
+  if [ "`is_registered $clone`" == "true" ]; then
+    notify_template_destroy $clone
+  fi
+
   msg_ok "Destruction of \"$clone\" completed successfully"
-  
-  # (8) remove relevant directories under $SUBUTAI_TMPDIR if any
+
+  # (9) remove relevant directories under $SUBUTAI_TMPDIR if any
   local debian_root="$SUBUTAI_TMPDIR/$container"
   rm -rf $debian_root
   unlock_container_read $clone

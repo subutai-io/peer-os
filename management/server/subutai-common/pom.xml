@@ -36,6 +36,10 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
+    <dependency>
+        <groupId>com.eaio.uuid</groupId>
+        <artifactId>uuid</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -51,7 +55,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.common</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages};
+              {local-packages}.*;
+              version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

@@ -34,6 +34,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>spark-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -42,6 +43,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

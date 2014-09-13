@@ -13,8 +13,8 @@
              interface="org.safehaus.subutai.core.command.api.CommandRunner" />
   <reference id="agentManager" availability="mandatory"
              interface="org.safehaus.subutai.core.agent.api.AgentManager" />
-  <reference id="configManager" availability="mandatory"
-             interface="org.safehaus.subutai.core.configuration.api.ConfigManager" />
+  <!--<reference id="configManager" availability="mandatory"-->
+             <!--interface="org.safehaus.subutai.core.configuration.api.ConfigManager" />-->
   <reference id="containerManager" availability="mandatory"
              interface="org.safehaus.subutai.core.container.api.container.ContainerManager" />
   <reference id="environmentManager" availability="mandatory"
@@ -33,13 +33,13 @@
 
   </bean>
 
-  <bean id="cassandra-configuration-logic" scope="singleton"
-        class="org.safehaus.subutai.plugin.cassandra.impl.configuration.ConfigurationLogicImpl">
-    <property name="configManager" ref="configManager" />
-  </bean>
+  <!--<bean id="cassandra-configuration-logic" scope="singleton"-->
+        <!--class="org.safehaus.subutai.plugin.cassandra.impl.configuration.ConfigurationLogicImpl">-->
+    <!--<property name="configManager" ref="configManager" />-->
+  <!--</bean>-->
 
-  <service ref="cassandra-configuration-logic"
-           interface="org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic" />
+  <!--<service ref="cassandra-configuration-logic"-->
+           <!--interface="org.safehaus.subutai.plugin.cassandra.api.ConfigurationLogic" />-->
   <service ref="cassandra-impl" interface="org.safehaus.subutai.plugin.cassandra.api.Cassandra" />
 
 </blueprint>

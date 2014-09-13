@@ -12,6 +12,7 @@ import static junit.framework.Assert.assertTrue;
 
 
 public class UninstallOperationHandlerTest {
+
     @Test
     public void testWithoutCluster() {
         AbstractOperationHandler operationHandler = new CheckNodeOperationHandler( new AccumuloImplMock(), "test-cluster", "test-node" );

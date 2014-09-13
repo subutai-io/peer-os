@@ -28,10 +28,11 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>configuration-manager-api</artifactId>
-    </dependency>
+      <version>${project.version}</version>
+    </dependency>-->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
@@ -72,6 +73,7 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>plugin-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

@@ -1,10 +1,10 @@
 package org.safehaus.subutai.plugin.solr.impl;
 
 
-import org.safehaus.subutai.core.command.api.Command;
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.core.command.api.CommandRunner;
 import org.safehaus.subutai.core.command.api.CommandsSingleton;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.enums.OutputRedirection;
 

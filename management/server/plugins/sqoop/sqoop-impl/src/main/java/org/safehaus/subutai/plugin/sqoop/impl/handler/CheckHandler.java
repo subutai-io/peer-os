@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.AgentResult;
-import org.safehaus.subutai.core.command.api.Command;
-import org.safehaus.subutai.core.command.api.RequestBuilder;
+import org.safehaus.subutai.common.command.AgentResult;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.RequestBuilder;
 import org.safehaus.subutai.plugin.sqoop.api.SqoopConfig;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandFactory;
 import org.safehaus.subutai.plugin.sqoop.impl.CommandType;
@@ -21,7 +21,7 @@ public class CheckHandler extends AbstractHandler {
     @Override
     public void run() {
         ProductOperation po = productOperation;
-        SqoopConfig config = getClusterConfig();
+        SqoopConfig config = manager.getCluster( clusterName );
         if(config == null) {
             po.addLogFailed("Sqoop installation not found: " + clusterName);
             return;

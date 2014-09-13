@@ -26,10 +26,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hadoop-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>zookeeper-plugin-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -38,6 +40,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>

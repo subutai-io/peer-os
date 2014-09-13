@@ -1,48 +1,100 @@
 package org.safehaus.subutai.core.dispatcher.api;
 
 
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
+import org.safehaus.subutai.common.command.AgentRequestBuilder;
+import org.safehaus.subutai.common.command.Command;
+import org.safehaus.subutai.common.command.CommandCallback;
+import org.safehaus.subutai.common.command.RequestBuilder;
+import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.protocol.BatchRequest;
 import org.safehaus.subutai.common.protocol.Response;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 
 
 /**
- * This class allows to send commands to remote Subutai and receive responses from it.
- *
- * Used internally by CommandRunner module.
+ * This class allows to send commands to local and remote agents.
  */
 public interface CommandDispatcher {
 
     /**
-     * Sends requests to remote peer Subutai
+     * Runs command on agents. Runs asynchronously for calling party. The supplied callback is triggered every time a
+     * response is received from agent. Calling party may examine the command to see its status and results of each
+     * agent.
      *
-     * @param requests - requests to send
+     * @param command - command to run
+     * @param commandCallback - callback to trigger on every response
      */
-    public void sendRequests( Map<UUID, Set<BatchRequest>> requests );
-
-    public void addListener( ResponseListener listener );
-
-    public void removeListener( ResponseListener listener );
+    public void runCommandAsync( Command command, CommandCallback commandCallback );
 
     /**
-     * This method is called via REST only by remote peer Subutai.
+     * Runs command on agents. Runs asynchronously for calling party. Calling party may examine the command to see its
+     * status and results of each agent.
      *
-     * Caller will always be a remote peer Subutai supplying responses to requests previously sent to it.
-     *
-     * @param responses - responses to process
+     * @param command - command to run
      */
-    public void processResponse( Set<Response> responses );
+    public void runCommandAsync( Command command );
 
     /**
-     * This method is called via REST only by remote peer Subutai.
+     * Runs command on agents. Runs synchronously for calling party. Calling party may examine the command to see its
+     * status and results of each agent after this call returns.
      *
-     * It will execute requests on local agents and supply responses to remote peer Subutai.
-     *
-     * @param requests - requests to execute
+     * @param command - command to run
      */
-    public void executeRequests( UUID initiatorId, Set<BatchRequest> requests );
+    public void runCommand( Command command );
+
+    /**
+     * Runs command on agents. Runs synchronously for calling party. The supplied callback is triggered every time a
+     * response is received from agent. Calling party may examine the command to see its status and results of each
+     * agent after this call returns.
+     *
+     * @param command - command to run
+     * @param commandCallback - - callback to trigger on every response
+     */
+    public void runCommand( Command command, CommandCallback commandCallback );
+
+    /**
+     * Creates command based on supplied RequestBuilder and target agents on which to run the command.
+     *
+     * @param requestBuilder - request builder
+     * @param agents - target agents
+     *
+     * @return - command
+     */
+    public Command createCommand( RequestBuilder requestBuilder, Set<Agent> agents );
+
+
+    /**
+     * Creates command based on supplied RequestBuilder and target agents on which to run the command.
+     *
+     * @param description - description of command
+     * @param requestBuilder - request builder
+     * @param agents - target agents
+     *
+     * @return - command
+     */
+    public Command createCommand( String description, RequestBuilder requestBuilder, Set<Agent> agents );
+
+    /**
+     * Creates command based on supplied set of AgentRequestBuilders.
+     *
+     * @param agentRequestBuilders - agent request builders
+     *
+     * @return - command
+     */
+    public Command createCommand( Set<AgentRequestBuilder> agentRequestBuilders );
+
+    /**
+     * Creates command based on supplied set of AgentRequestBuilders.
+     *
+     * @param description - description of command
+     * @param agentRequestBuilders - agent request builders
+     *
+     * @return - command
+     */
+    public Command createCommand( String description, Set<AgentRequestBuilder> agentRequestBuilders );
+
+    public void executeRequests( final String IP, final Set<BatchRequest> requests );
+
+    public void processResponses( final Set<Response> responses );
 }

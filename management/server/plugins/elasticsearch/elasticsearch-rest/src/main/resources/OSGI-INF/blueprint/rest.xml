@@ -1,9 +1,15 @@
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
-           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cxf="http://cxf.apache.org/blueprint/core"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
             http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+    <cxf:bus id="cxfBusElasticSearch">
+        <cxf:features>
+            <cxf:logging />
+        </cxf:features>
+    </cxf:bus>
 
     <reference id="agentManager" availability="mandatory"
                interface="org.safehaus.subutai.core.agent.api.AgentManager"/>
@@ -16,8 +22,8 @@
         <property name="elasticsearch" ref="elasticsearch"/>
     </bean>
 
-    <jaxrs:server address="/elasticsearch2" id="elasticsearchRestService">
-        <jaxrs:serviceBeans>
+    <jaxrs:server address="/elasticsearch" id="elasticsearchRestService">
+    <jaxrs:serviceBeans>
             <ref component-id="restService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>

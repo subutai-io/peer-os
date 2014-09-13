@@ -59,6 +59,6 @@ export SUBUTAI_REST_PATH=cxf
 # Below are paths to specific actions, do not inclue leading and trailing
 # slashes in paths
 export SUBUTAI_REST_REGISTER_PATH=template/import
+export SUBUTAI_REST_UNREGISTER_PATH=template/unregister
 export SUBUTAI_REST_GET_TEMPLATE_PATH=registry/templates
 export SUBUTAI_REST_LIST_TEMPLATES=registry/templates/plain-list
-

@@ -7,23 +7,23 @@
   http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
   http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
 
-  <cxf:bus id="cxfBusPet">
+  <cxf:bus id="cxfBusCommandDispatcher">
     <cxf:features>
       <cxf:logging />
     </cxf:features>
   </cxf:bus>
 
-  <!--<reference id="petManager" availability="mandatory"-->
-             <!--interface="org.safehaus.subutai.pet.api.PetManager" />-->
+  <reference id="dispatcher" availability="mandatory"
+             interface="org.safehaus.subutai.core.dispatcher.api.CommandDispatcher" />
 
-  <!--<bean id="dispatcherRestServiceImpl" class="org.safehaus.subuta.pet.rest.RestServiceImpl">-->
-    <!--<property name="petManager" ref="petManager" />-->
-  <!--</bean>-->
+  <bean id="dispatcherRestServiceimpl" class="org.safehaus.subutai.core.dispatcher.rest.RestServiceImpl">
+    <argument ref="dispatcher" />
+  </bean>
 
-  <!--<jaxrs:server address="/dispatcher" id="petRestService">-->
-    <!--<jaxrs:serviceBeans>-->
-      <!--<ref component-id="dispatcherRestServiceImpl" />-->
-    <!--</jaxrs:serviceBeans>-->
-  <!--</jaxrs:server>-->
+  <jaxrs:server address="/dispatcher" id="dispatcherRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="dispatcherRestServiceimpl" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
 
 </blueprint>

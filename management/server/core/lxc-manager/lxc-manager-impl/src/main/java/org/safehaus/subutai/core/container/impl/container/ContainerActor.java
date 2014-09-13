@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 
 
 /**
- * Handles parallel container creation/destruction
+ * Handles parallel containermanager creation/destruction
  */
 public class ContainerActor implements Callable<ContainerInfo> {
 	private final ContainerInfo containerInfo;

@@ -18,6 +18,8 @@
         <module>agent-manager</module>
         <module>db-manager</module>
         <module>communication-manager</module>
+        <module>strategy-manager</module>
+        <module>container-manager</module>
         <module>lxc-manager</module>
         <module>network-manager</module>
         <module>tracker</module>
@@ -33,6 +35,7 @@
         <module>file-tracker</module>
         <module>config-point-tracker</module>
         <module>pet_core</module>
+        <module>peer-manager</module>
         <module>command-dispatcher</module>
     </modules>
 </project>

@@ -1,17 +1,15 @@
 package org.safehaus.subutai.plugin.hadoop.impl.handler.namenode;
 
 
+import org.safehaus.subutai.common.command.Command;
 import org.safehaus.subutai.common.protocol.AbstractOperationHandler;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.common.tracker.ProductOperation;
-import org.safehaus.subutai.core.command.api.Command;
 import org.safehaus.subutai.core.container.api.lxcmanager.LxcDestroyException;
 import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.plugin.hadoop.api.HadoopClusterConfig;
 import org.safehaus.subutai.plugin.hadoop.impl.HadoopImpl;
 import org.safehaus.subutai.plugin.hadoop.impl.common.Commands;
-
-import com.google.common.collect.Sets;
 
 
 public class DestroyNodeOperationHandler extends AbstractOperationHandler<HadoopImpl> {
