@@ -367,9 +367,9 @@ void AgentTest::testResponsePackCreateRegistration(void)
 	string hostname = "management";
 	string parentHostName= "";
 	pack->setIps(ipaddress);
-	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName);
-
-
+        string envid = "6673b7c4-a079-77a9-7270-770e45d54sdf";
+	
+	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName,envid);
 }
 //SubutaiResponsePack-CreateHeartBeatMessage
 void AgentTest::testResponsePackCreateHeartbeat(void)
@@ -389,7 +389,7 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 	ipaddress.push_back("127.0.0.1");
 	pack->setIps(ipaddress);
 
-
+        
 	string macAddress = "08:00:27:59:3b:2e";
 
 	int reqnumber = -1;
@@ -397,8 +397,9 @@ void AgentTest::testResponsePackCreateHeartbeat(void)
 
 	string source = "";
 	string taskuuid = "4573n9c4-a051-44a9-9660-9e0e45d54add";
+        string envid = "6673b7c4-a079-77a9-7270-770e45d54sdf";
 
-	result = pack->createHeartBeatMessage(uuid,reqnumber,macAddress,hostname,parentHostName,source,taskuuid);
+	result = pack->createHeartBeatMessage(uuid,reqnumber,envid,macAddress,hostname,parentHostName,source,taskuuid);
 
 	CPPUNIT_ASSERT_EQUAL(input,result); //expected,actual
 }
