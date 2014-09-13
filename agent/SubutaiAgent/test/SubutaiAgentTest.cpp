@@ -369,14 +369,14 @@ void AgentTest::testResponsePackCreateRegistration(void)
 	pack->setIps(ipaddress);
         string envid = "6673b7c4-a079-77a9-7270-770e45d54sdf";
 	
-	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName,envid);
+	string result = pack->createRegistrationMessage(uuid,macaddress,hostname,parentHostName,envid,ipaddress);
 }
 //SubutaiResponsePack-CreateHeartBeatMessage
 void AgentTest::testResponsePackCreateHeartbeat(void)
 {
 	//Test string for serialization
-	string input =	"{\"response\":{\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
-			"\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
+	string input =  "{\"response\":{\"environmentId\":\"6673b7c4-a079-77a9-7270-770e45d54sdf\",\"hostname\":\"management\",\"ips\":[\"10.10.10.1\",\"172.16.11.4\",\"127.0.0.1\"],"
+                        "\"macAddress\":\"08:00:27:59:3b:2e\",\"responseSequenceNumber\":1,\"taskUuid\":\"4573n9c4-a051-44a9-9660-9e0e45d54add\","
                         "\"type\":\"HEARTBEAT_RESPONSE\",\"uuid\":\"5373b7c4-a039-44a9-9270-9e0e45d549cf\"}}\n";
 
 	string result;
