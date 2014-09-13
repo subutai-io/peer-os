@@ -41,12 +41,6 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- <dependency>
-       <groupId>${project.groupId}</groupId>
-       <artifactId>subutai-common</artifactId>
-       <version>${project.version}</version>
-     </dependency>-->
   </dependencies>
   <build>
     <plugins>
@@ -90,10 +84,34 @@
             <configuration>
               <outputDirectory>target/assembly/system/subutai</outputDirectory>
               <artifactItems>
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- subutai-common -->
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>subutai-common</artifactId>
-                  <version>${project.version}</version>
+                </artifactItem>
+
+                <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+                <!-- subutai-common -->
+                <artifactItem>
+                  <groupId>com.google.code.gson</groupId>
+                  <artifactId>gson</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.google.guava</groupId>
+                  <artifactId>guava</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.fasterxml.uuid</groupId>
+                  <artifactId>java-uuid-generator</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.commons</groupId>
+                  <artifactId>commons-lang3</artifactId>
                 </artifactItem>
               </artifactItems>
             </configuration>
