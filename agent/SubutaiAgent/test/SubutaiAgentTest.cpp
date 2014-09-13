@@ -246,7 +246,7 @@ void AgentTest::testLoggerOpenLogFileWithName(void)
 	if(result)
 	{
 		logger->closeLogFile();
-		if(remove("/var/log/ksks-agent/test") != 0 )
+		if(remove("/var/log/subutai-agent/test") != 0 )
 			perror( "Error deleting file" );
 	}
 
@@ -278,7 +278,7 @@ void AgentTest::testLoggerWriteLog(void)
 		string testlog = "This is a test log!!";
 		logger->writeLog(5,testlog);
 
-		string filename="/var/log/ksks-agent/test";
+		string filename="/var/log/subutai-agent/test";
 		FILE *p_file = NULL;
 		p_file = fopen(filename.c_str(),"rb");
 		fseek(p_file,0,SEEK_END);
@@ -289,7 +289,7 @@ void AgentTest::testLoggerWriteLog(void)
 		CPPUNIT_ASSERT(size > 0);
 
 		logger->closeLogFile();
-		if(remove("/var/log/ksks-agent/test") != 0 )
+		if(remove("/var/log/subutai-agent/test") != 0 )
 			perror( "Error deleting file" );
 	}
 
