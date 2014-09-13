@@ -7,15 +7,20 @@ import org.safehaus.subutai.server.ui.api.PortalModuleService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class PortalModuleServiceImpl implements PortalModuleService {
+
+    private static final Logger LOG = Logger.getLogger(PortalModuleServiceImpl.class.getName());
 
 	private List<PortalModule> modules = Collections.synchronizedList(new ArrayList<PortalModule>());
 
 	private List<PortalModuleListener> listeners = Collections.synchronizedList(new ArrayList<PortalModuleListener>());
 
-	public synchronized void registerModule(PortalModule module) {
+	public void registerModule(PortalModule module) {
+        LOG.info("ModuleServiceImpl: Registering module: " + module.getName() + " " + module.getId());
 		System.out.println("ModuleServiceImpl: Registering module " + module.getId());
 		modules.add(module);
 		for (PortalModuleListener listener : listeners) {
@@ -23,14 +28,19 @@ public class PortalModuleServiceImpl implements PortalModuleService {
 		}
 	}
 
-	public synchronized void unregisterModule(PortalModule module) {
+	public void unregisterModule(PortalModule module) {
+
+        LOG.log(Level.WARNING, "ModuleServiceImpl: Unregister module.");
 		if (module != null) {
-			System.out.println("ModuleServiceImpl: Unregistering module " + module.getId());
+            LOG.info("ModuleServiceImpl: Unregister module: " + module.getName() + " " + module.getId());
+			System.out.println("ModuleServiceImpl: Unregister module " + module.getId());
 			modules.remove(module);
 			for (PortalModuleListener listener : listeners) {
 				listener.moduleUnregistered(module);
 			}
-		}
+		} else {
+            LOG.log(Level.WARNING, "ModuleServiceImpl: Unregister module is null");
+        }
 	}
 
 	@Override
