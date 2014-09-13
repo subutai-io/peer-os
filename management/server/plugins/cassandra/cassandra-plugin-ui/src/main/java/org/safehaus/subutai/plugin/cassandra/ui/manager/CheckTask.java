@@ -5,8 +5,6 @@
  */
 package org.safehaus.subutai.plugin.cassandra.ui.manager;
 
-
-
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;

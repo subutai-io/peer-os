@@ -23,35 +23,27 @@ public class CheckServiceHandler extends AbstractOperationHandler<CassandraImpl>
         super( manager, clusterName );
         this.agentUUID = agentUUID;
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        this.productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Starting %s cluster...", clusterName ) );
     }
 
 
     @Override
     public void run() {
-        manager.getExecutor().execute( new Runnable() {
-            Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
-
-
-            public void run() {
-                Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( agent ) );
-                manager.getCommandRunner().runCommand( statusServiceCommand );
-                if ( statusServiceCommand.hasSucceeded() ) {
-                    AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
-                    if ( ar.getStdOut().contains( "is running" ) ) {
-                        productOperation.addLogDone( "Cassandra is running" );
-                    }
-                    else {
-                        productOperation.addLogFailed( "Cassandra is not running" );
-                    }
-                }
-                else {
-                    productOperation.addLogFailed( "Cassandra is not running" );
-                    //                    po.addLogFailed(String.format("Status check failed, %s",
-                    // statusServiceCommand.getAllErrors()));
-                }
+        Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
+        Command statusServiceCommand = Commands.getStatusCommand( Sets.newHashSet( agent ) );
+        manager.getCommandRunner().runCommand( statusServiceCommand );
+        if ( statusServiceCommand.hasSucceeded() ) {
+            AgentResult ar = statusServiceCommand.getResults().get( agent.getUuid() );
+            if ( ar.getStdOut().contains( "is running" ) ) {
+                productOperation.addLogDone( "Cassandra is running" );
             }
-        } );
+            else {
+                productOperation.addLogFailed( "Cassandra is not running" );
+            }
+        }
+        else {
+            productOperation.addLogFailed( "Cassandra is not running" );
+        }
     }
 }

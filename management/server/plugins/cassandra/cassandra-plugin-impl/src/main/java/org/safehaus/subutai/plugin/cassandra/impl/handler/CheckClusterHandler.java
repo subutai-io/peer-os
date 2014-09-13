@@ -22,8 +22,35 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
     public CheckClusterHandler( final CassandraImpl manager, final String clusterName ) {
         super( manager, clusterName );
         this.clusterName = clusterName;
-        productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
+        this.productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Checking all nodes of %s cluster...", clusterName ) );
+    }
+
+
+    @Override
+    public void run() {
+        CassandraClusterConfig config = null;
+        try {
+            config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName, CassandraClusterConfig.class );
+        } catch( DBException e ) {
+            e.printStackTrace();
+        }
+
+        if ( config == null ) {
+            productOperation.addLogFailed(
+                    String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
+            return;
+        }
+
+        Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
+        manager.getCommandRunner().runCommand( checkStatusCommand );
+
+        if ( checkStatusCommand.hasSucceeded() ) {
+            productOperation.addLogDone( "All nodes are running." );
+        }
+        else {
+            logStatusResults( productOperation, checkStatusCommand );
+        }
     }
 
     private void logStatusResults( ProductOperation po, Command checkStatusCommand ) {
@@ -44,46 +71,5 @@ public class CheckClusterHandler extends AbstractOperationHandler<CassandraImpl>
         }
 
         po.addLogDone( log );
-    }
-
-    @Override
-    public void run() {
-        manager.getExecutor().execute( new Runnable() {
-
-            public void run() {
-                CassandraClusterConfig config = null;
-                try {
-                    config = manager.getPluginDAO().getInfo( CassandraClusterConfig.PRODUCT_KEY.toLowerCase(), clusterName, CassandraClusterConfig.class );
-                } catch( DBException e ) {
-                    e.printStackTrace();
-                }
-
-                if ( config == null ) {
-                    productOperation.addLogFailed(
-                            String.format( "Cluster with name %s does not exist\nOperation aborted", clusterName ) );
-                    return;
-                }
-
-                Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
-                manager.getCommandRunner().runCommand( checkStatusCommand );
-
-                if ( checkStatusCommand.hasSucceeded() ) {
-                    productOperation.addLogDone( "All nodes are running." );
-                }
-                else {
-                    logStatusResults( productOperation, checkStatusCommand );
-                }
-
-//                Command checkStatusCommand = Commands.getStatusCommand( config.getNodes() );
-//                manager.getCommandRunner().runCommand( checkStatusCommand );
-//
-//                if ( checkStatusCommand.hasSucceeded() ) {
-//                    productOperation.addLogDone( "All nodes are running." );
-//                }
-//                else {
-//                    productOperation.addLogFailed( String.format( "Check status failed, %s", checkStatusCommand.getAllErrors() ) );
-//                }
-            }
-        } );
     }
 }

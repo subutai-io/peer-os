@@ -14,37 +14,47 @@ import java.util.UUID;
 
 public class StopServiceHandler extends AbstractOperationHandler<CassandraImpl> {
 
-    private String agentUUID;
+    private String lxcHostname;
     private String clusterName;
 
 
-    public StopServiceHandler( final CassandraImpl manager, final String clusterName, final String agentUUID ) {
+    public StopServiceHandler( final CassandraImpl manager, final String clusterName, final String lxcHostname ) {
         super( manager, clusterName );
-        this.agentUUID = agentUUID;
+        this.lxcHostname = lxcHostname;
         this.clusterName = clusterName;
         productOperation = manager.getTracker().createProductOperation( CassandraClusterConfig.PRODUCT_KEY,
                 String.format( "Stopping %s cluster...", clusterName ) );
     }
 
-
     @Override
     public void run() {
-        manager.getExecutor().execute( new Runnable() {
-            Agent agent = manager.getAgentManager().getAgentByUUID( UUID.fromString( agentUUID ) );
+        CassandraClusterConfig cassandraConfig = manager.getCluster( clusterName );
+        if ( cassandraConfig == null ) {
+            productOperation.addLogFailed( String.format( "Cluster with name %s does not exist", clusterName ) );
+            return;
+        }
 
+        final Agent node = manager.getAgentManager().getAgentByHostname( lxcHostname );
+        if ( node == null ) {
+            productOperation.addLogFailed( String.format( "Agent with hostname %s is not connected", lxcHostname ) );
+            return;
+        }
+        if ( !cassandraConfig.getNodes().contains( node ) ) {
+            productOperation.addLogFailed(
+                    String.format( "Agent with hostname %s does not belong to cluster %s", lxcHostname, clusterName ) );
+            return;
+        }
 
-            public void run() {
-                Command stopServiceCommand = Commands.getStopCommand( Sets.newHashSet( agent ) );
-                manager.getCommandRunner().runCommand( stopServiceCommand );
-                if ( stopServiceCommand.hasSucceeded() ) {
-                    AgentResult ar = stopServiceCommand.getResults().get( agent.getUuid() );
-                    productOperation.addLog( ar.getStdOut() );
-                    productOperation.addLogDone( "Stop succeeded" );
-                }
-                else {
-                    productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
-                }
-            }
-        } );
+        Command stopServiceCommand = Commands.getStopCommand( Sets.newHashSet( node ) );
+        manager.getCommandRunner().runCommand( stopServiceCommand );
+
+        if ( stopServiceCommand.hasSucceeded() ) {
+            AgentResult ar = stopServiceCommand.getResults().get( node.getUuid() );
+            productOperation.addLog( ar.getStdOut() );
+            productOperation.addLogDone( "Stop succeeded" );
+        }
+        else {
+            productOperation.addLogFailed( String.format( "Stop failed, %s", stopServiceCommand.getAllErrors() ) );
+        }
     }
 }

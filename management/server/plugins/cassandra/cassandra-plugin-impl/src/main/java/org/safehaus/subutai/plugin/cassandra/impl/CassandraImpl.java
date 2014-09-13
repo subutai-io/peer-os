@@ -231,16 +231,16 @@ public class CassandraImpl extends CassandraBase {
 
 
     @Override
-    public UUID startService(final String clusterName, final String agentUUID) {
-        AbstractOperationHandler operationHandler = new StartServiceHandler(this, clusterName, agentUUID);
+    public UUID startService(final String clusterName, final String lxchostname) {
+        AbstractOperationHandler operationHandler = new StartServiceHandler(this, clusterName, lxchostname);
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }
 
 
     @Override
-    public UUID stopService(final String clusterName, final String agentUUID) {
-        AbstractOperationHandler operationHandler = new StopServiceHandler(this, clusterName, agentUUID);
+    public UUID stopService(final String clusterName, final String lxchostname) {
+        AbstractOperationHandler operationHandler = new StopServiceHandler(this, clusterName, lxchostname);
         executor.execute(operationHandler);
         return operationHandler.getTrackerId();
     }

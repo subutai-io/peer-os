@@ -23,7 +23,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
-import org.safehaus.subutai.common.enums.NodeState;
 import org.safehaus.subutai.common.protocol.Agent;
 import org.safehaus.subutai.plugin.cassandra.api.CassandraClusterConfig;
 import org.safehaus.subutai.plugin.cassandra.ui.CassandraUI;
@@ -43,7 +42,6 @@ public class Manager {
     private final Table nodesTable;
     private GridLayout contentRoot;
     private ComboBox clusterCombo;
-    private HorizontalLayout controlsContent;
     private CassandraClusterConfig config;
     private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
@@ -61,17 +59,120 @@ public class Manager {
         //tables go here
         nodesTable = createTableTemplate( "Cluster nodes" );
 
+        HorizontalLayout controlsContent = new HorizontalLayout();
+        controlsContent.setSpacing(true);
+
         controlsContent = new HorizontalLayout();
         controlsContent.setSpacing( true );
         controlsContent.setHeight( 100, Sizeable.Unit.PERCENTAGE );
 
-        getClusterNameLabel();
-        getClusterCombo();
-        getRefreshClusterButton();
-        getCheckAllButton();
-        getStartAllButton();
-        getStopAllButton();
-        getDestroyClusterButton();
+
+        Label clusterNameLabel = new Label( "Select the cluster" );
+        controlsContent.addComponent( clusterNameLabel );
+        controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
+
+        clusterCombo = new ComboBox();
+        clusterCombo.setImmediate( true );
+        clusterCombo.setTextInputAllowed( false );
+        clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
+        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
+            @Override
+            public void valueChange( Property.ValueChangeEvent event ) {
+                config = ( CassandraClusterConfig ) event.getProperty().getValue();
+                refreshUI();
+                checkAllNodes();
+            }
+        } );
+        controlsContent.addComponent( clusterCombo );
+        controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
+
+        /** Refresh button */
+        Button refreshClustersBtn = new Button( "Refresh clusters" );
+        refreshClustersBtn.addStyleName( "default" );
+        refreshClustersBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                refreshClustersInfo();
+            }
+        } );
+        controlsContent.addComponent( refreshClustersBtn );
+        controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
+
+        /** Check all button */
+        final Button checkAllBtn = new Button( "Check all" );
+        checkAllBtn.addStyleName( "default" );
+        checkAllBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                checkAllNodes();
+            }
+        } );
+        controlsContent.addComponent( checkAllBtn );
+        controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
+
+        /** Start all button */
+        Button startAllBtn = new Button( "Start all" );
+        startAllBtn.addStyleName( "default" );
+        startAllBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                startAllNodes();
+            }
+        } );
+        controlsContent.addComponent( startAllBtn );
+        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
+
+        /** Stop all button */
+        Button stopAllBtn = new Button( "Stop all" );
+        stopAllBtn.addStyleName( "default" );
+        stopAllBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                stopAllNodes();
+            }
+        } );
+        controlsContent.addComponent( stopAllBtn );
+        controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
+
+
+        /** Destroy Cluster button */
+        Button destroyClusterBtn = new Button( "Destroy cluster" );
+        destroyClusterBtn.addStyleName( "default" );
+        destroyClusterBtn.addClickListener( new Button.ClickListener() {
+            @Override
+            public void buttonClick( Button.ClickEvent clickEvent ) {
+                if ( config != null ) {
+                    ConfirmationDialog alert = new ConfirmationDialog(
+                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
+                            "No" );
+                    alert.getOk().addClickListener( new Button.ClickListener() {
+                        @Override
+                        public void buttonClick( Button.ClickEvent clickEvent ) {
+                            UUID trackID =
+                                    CassandraUI.getCassandraManager().uninstallCluster( config.getClusterName() );
+
+                            ProgressWindow window =
+                                    new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
+                                            CassandraClusterConfig.PRODUCT_KEY );
+                            window.getWindow().addCloseListener( new Window.CloseListener() {
+                                @Override
+                                public void windowClose( Window.CloseEvent closeEvent ) {
+                                    refreshClustersInfo();
+                                }
+                            } );
+                            contentRoot.getUI().addWindow( window.getWindow() );
+                        }
+                    } );
+
+                    contentRoot.getUI().addWindow( alert.getAlert() );
+                }
+                else {
+                    show( "Please, select cluster" );
+                }
+            }
+        } );
+        controlsContent.addComponent( destroyClusterBtn );
+        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent( controlsContent, 0, 0 );
@@ -161,7 +262,15 @@ public class Manager {
                                     new CompleteEvent() {
                                         public void onComplete( String result ) {
                                             synchronized( progressIcon ) {
-                                                resultHolder.setValue( parseServiceResult( result ) );
+                                                String status = parseServiceResult( result );
+                                                resultHolder.setValue( status );
+                                                if ( status.contains( "not" ) ){
+                                                    startButton.setEnabled( true );
+                                                    stopButton.setEnabled( false );
+                                                } else {
+                                                    startButton.setEnabled( false );
+                                                    stopButton.setEnabled( true );
+                                                }
                                                 progressIcon.setVisible( false );
                                             }
                                         }
@@ -175,23 +284,17 @@ public class Manager {
                     progressIcon.setVisible(true);
                     startButton.setEnabled(false);
                     stopButton.setEnabled(false);
-
                     CassandraUI.getExecutor()
-                            .execute(new StartTask(config.getClusterName(), agent.getHostname(), new org.safehaus.subutai.common.protocol.CompleteEvent() {
-
-                                @Override
-                                public void onComplete(NodeState state) {
-                                    synchronized(progressIcon) {
-                                        if(state == NodeState.RUNNING){
-                                            stopButton.setEnabled(true);
+                            .execute(new StartTask(config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
+                                        @Override
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                checkButton.click();
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else if(state == NodeState.STOPPED){
-                                            startButton.setEnabled(true);
-                                        }
-                                        progressIcon.setVisible(false);
-                                    }
-                                }
-                            }));
+                                    }));
                 }
             });
 
@@ -201,27 +304,22 @@ public class Manager {
                     progressIcon.setVisible( true );
                     startButton.setEnabled(false);
                     stopButton.setEnabled(false);
-
                     CassandraUI.getExecutor()
-                            .execute(new StopTask(config.getClusterName(), agent.getHostname(), new org.safehaus.subutai.common.protocol.CompleteEvent() {
-
-                                @Override
-                                public void onComplete(NodeState state) {
-                                    synchronized(progressIcon) {
-                                        if(state == NodeState.RUNNING){
-                                            stopButton.setEnabled(true);
+                            .execute(new StopTask(config.getClusterName(), agent.getHostname(),
+                                    new CompleteEvent() {
+                                        @Override
+                                        public void onComplete( String result ) {
+                                            synchronized( progressIcon ) {
+                                                checkButton.click();
+                                                progressIcon.setVisible( false );
+                                            }
                                         }
-                                        else if(state == NodeState.STOPPED){
-                                            startButton.setEnabled(true);
-                                        }
-                                        progressIcon.setVisible(false);
-                                    }
-                                }
                             }));
                 }
             });
         }
     }
+
 
     /**
      * Shows notification with the given argument
@@ -231,15 +329,6 @@ public class Manager {
         Notification.show( notification );
     }
 
-
-    /**
-     * Creates "Select the cluster" label.
-     */
-    private void getClusterNameLabel() {
-        Label clusterNameLabel = new Label( "Select the cluster" );
-        controlsContent.addComponent( clusterNameLabel );
-        controlsContent.setComponentAlignment( clusterNameLabel, Alignment.MIDDLE_CENTER );
-    }
 
     public void stopAllNodes() {
         for(Object o : nodesTable.getItemIds()) {
@@ -273,28 +362,6 @@ public class Manager {
             checkBtn.addStyleName( "default" );
             checkBtn.click();
         }
-    }
-
-
-    /**
-     * Creates combo box in which available clusters are listed.
-     */
-    private void getClusterCombo() {
-        clusterCombo = new ComboBox();
-        clusterCombo.setImmediate( true );
-        clusterCombo.setTextInputAllowed( false );
-        clusterCombo.setWidth( 200, Sizeable.Unit.PIXELS );
-        clusterCombo.addValueChangeListener( new Property.ValueChangeListener() {
-            @Override
-            public void valueChange( Property.ValueChangeEvent event ) {
-                config = ( CassandraClusterConfig ) event.getProperty().getValue();
-                refreshUI();
-                checkAllNodes();
-            }
-        } );
-
-        controlsContent.addComponent( clusterCombo );
-        controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
     }
 
 
@@ -340,24 +407,6 @@ public class Manager {
 
 
     /**
-     * Creates "Refresh Cluster" button and adds click listener to this button.
-     */
-    private void getRefreshClusterButton() {
-        Button refreshClustersBtn = new Button( "Refresh clusters" );
-        refreshClustersBtn.addStyleName( "default" );
-        refreshClustersBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                refreshClustersInfo();
-            }
-        } );
-
-        controlsContent.addComponent( refreshClustersBtn );
-        controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
-    }
-
-
-    /**
      * Refreshes combo box which lists available clusters in DB
      */
     public void refreshClustersInfo() {
@@ -385,114 +434,12 @@ public class Manager {
 
 
     /**
-     * Creates "Check All" button and adds click listener to this button.
-     */
-    private void getCheckAllButton() {
-        final Button checkAllBtn = new Button( "Check all" );
-        checkAllBtn.addStyleName( "default" );
-        checkAllBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                UUID trackID = CassandraUI.getCassandraManager().checkCluster( config.getClusterName() );
-                checkAllNodes();
-            }
-        } );
-
-        controlsContent.addComponent( checkAllBtn );
-        controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
-    }
-
-
-    /**
-     * Creates "Start All" button and adds click listener to this button.
-     */
-    private void getStartAllButton() {
-        Button startAllBtn = new Button( "Start all" );
-        startAllBtn.addStyleName( "default" );
-        startAllBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                startAllNodes();
-//                UUID trackID = CassandraUI.getCassandraManager().startCluster( config.getClusterName() );
-//                checkAllNodes();
-            }
-        } );
-        controlsContent.addComponent( startAllBtn );
-        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
-    }
-
-
-    /**
-     * Creates "Stop All" button and adds click listener to this button.
-     */
-    private void getStopAllButton() {
-        Button stopAllBtn = new Button( "Stop all" );
-        stopAllBtn.addStyleName( "default" );
-        stopAllBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                stopAllNodes();
-//                UUID trackID = CassandraUI.getCassandraManager().stopCluster( config.getClusterName() );
-//                checkAllNodes();
-            }
-        } );
-
-        controlsContent.addComponent( stopAllBtn );
-        controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
-    }
-
-
-    /**
      * Parses supplied string argument to extract external IP.
      * @param ipList ex: [10.10.10.10, 127.0.0.1]
      * @return 10.10.10.10
      */
     public String parseIPList( String ipList ){
         return ipList.substring( ipList.indexOf( "[" ) + 1, ipList.indexOf( "," )  );
-    }
-
-
-    /**
-     * Creates "Destroy Cluster" button and adds click listener to this button.
-     */
-    private void getDestroyClusterButton() {
-        Button destroyClusterBtn = new Button( "Destroy cluster" );
-        destroyClusterBtn.addStyleName( "default" );
-        destroyClusterBtn.addClickListener( new Button.ClickListener() {
-            @Override
-            public void buttonClick( Button.ClickEvent clickEvent ) {
-                if ( config != null ) {
-                    ConfirmationDialog alert = new ConfirmationDialog(
-                            String.format( "Do you want to destroy the %s cluster?", config.getClusterName() ), "Yes",
-                            "No" );
-                    alert.getOk().addClickListener( new Button.ClickListener() {
-                        @Override
-                        public void buttonClick( Button.ClickEvent clickEvent ) {
-                            UUID trackID =
-                                    CassandraUI.getCassandraManager().uninstallCluster( config.getClusterName() );
-
-                            ProgressWindow window =
-                                    new ProgressWindow( CassandraUI.getExecutor(), CassandraUI.getTracker(), trackID,
-                                            CassandraClusterConfig.PRODUCT_KEY );
-                            window.getWindow().addCloseListener( new Window.CloseListener() {
-                                @Override
-                                public void windowClose( Window.CloseEvent closeEvent ) {
-                                    refreshClustersInfo();
-                                }
-                            } );
-                            contentRoot.getUI().addWindow( window.getWindow() );
-                        }
-                    } );
-
-                    contentRoot.getUI().addWindow( alert.getAlert() );
-                }
-                else {
-                    show( "Please, select cluster" );
-                }
-            }
-        } );
-        controlsContent.addComponent( destroyClusterBtn );
-        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
     }
 
 
