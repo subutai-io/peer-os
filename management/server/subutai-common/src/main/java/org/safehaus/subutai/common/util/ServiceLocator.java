@@ -29,6 +29,13 @@ public class ServiceLocator {
     }
 
 
+    /**
+     * @param clazz - Service Interface class to look up for
+     *
+     * @return - service reference
+     *
+     * @throws NamingException - thrown if service is not found
+     */
     public <T> T getService( Class<T> clazz ) throws NamingException {
         Preconditions.checkNotNull( clazz, "Class is null" );
 
