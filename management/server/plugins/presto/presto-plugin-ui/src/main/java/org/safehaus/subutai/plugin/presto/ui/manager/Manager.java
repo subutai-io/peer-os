@@ -6,6 +6,7 @@ import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -40,6 +41,7 @@ public class Manager {
     private final String COORDINATOR_PREFIX = "Coordinator: ";
     private PrestoClusterConfig config;
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String message = "No cluster is installed !";
 
     public Manager() {
 
@@ -74,6 +76,7 @@ public class Manager {
         });
 
         controlsContent.addComponent(clusterCombo);
+        controlsContent.setComponentAlignment( clusterCombo, Alignment.MIDDLE_CENTER );
 
         Button refreshClustersBtn = new Button("Refresh clusters");
         refreshClustersBtn.addStyleName("default");
@@ -84,36 +87,52 @@ public class Manager {
             }
         });
         controlsContent.addComponent(refreshClustersBtn);
+        controlsContent.setComponentAlignment( refreshClustersBtn, Alignment.MIDDLE_CENTER );
 
         Button checkAllBtn = new Button("Check All");
         checkAllBtn.addStyleName("default");
         checkAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                checkAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    checkAllNodes();
+                }
             }
         });
         controlsContent.addComponent(checkAllBtn);
+        controlsContent.setComponentAlignment( checkAllBtn, Alignment.MIDDLE_CENTER );
 
         Button startAllBtn = new Button("Start All");
         startAllBtn.addStyleName("default");
         startAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                startAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    startAllNodes();
+                }
             }
         });
         controlsContent.addComponent(startAllBtn);
+        controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
-        Button stopAllBtn = new Button("Stop All");
+        final Button stopAllBtn = new Button("Stop All");
         stopAllBtn.addStyleName("default");
         stopAllBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                stopAllNodes();
+                if ( config == null ){
+                    show( message );
+                } else{
+                    stopAllNodes();
+                }
             }
         });
         controlsContent.addComponent(stopAllBtn);
+        controlsContent.setComponentAlignment( stopAllBtn, Alignment.MIDDLE_CENTER );
 
         Button destroyClusterBtn = new Button("Destroy cluster");
         destroyClusterBtn.addStyleName("default");
@@ -127,6 +146,8 @@ public class Manager {
                     alert.getOk().addClickListener(new Button.ClickListener() {
                         @Override
                         public void buttonClick(Button.ClickEvent clickEvent) {
+                            /** before destroying cluster, stop it first to not leave background zombie processes **/
+                            stopAllBtn.click();
                             UUID trackID = PrestoUI.getPrestoManager().uninstallCluster(config.getClusterName());
                             ProgressWindow window
                                     = new ProgressWindow(PrestoUI.getExecutor(), PrestoUI.getTracker(), trackID,
@@ -148,6 +169,7 @@ public class Manager {
         });
 
         controlsContent.addComponent(destroyClusterBtn);
+        controlsContent.setComponentAlignment( destroyClusterBtn, Alignment.MIDDLE_CENTER );
 
         Button addNodeBtn = new Button("Add Node");
         addNodeBtn.addStyleName("default");
@@ -200,6 +222,7 @@ public class Manager {
         });
 
         controlsContent.addComponent(addNodeBtn);
+        controlsContent.setComponentAlignment( addNodeBtn, Alignment.MIDDLE_CENTER );
 
         controlsContent.addComponent( progressIcon );
         contentRoot.addComponent(controlsContent, 0, 0);
@@ -292,6 +315,7 @@ public class Manager {
             } else
                 clusterCombo.setValue(clustersInfo.iterator().next());
         }
+        progressIcon.setVisible( false );
     }
 
     public void checkAllNodes() {

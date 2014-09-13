@@ -45,6 +45,7 @@ public class Manager {
     private CassandraClusterConfig config;
     private static final Pattern cassandraPattern = Pattern.compile( ".*(Cassandra.+?g).*" );
     private final Embedded progressIcon = new Embedded( "", new ThemeResource( "img/spinner.gif" ) );
+    private final String message = "No cluster is installed !";
 
 
     public Manager() {
@@ -105,7 +106,7 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ){
-                    show( "There is no installed cluster !" );
+                    show( message );
                 } else{
                     checkAllNodes();
                 }
@@ -121,7 +122,7 @@ public class Manager {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ){
-                    show( "There is no installed cluster !" );
+                    show( message );
                 } else{
                     startAllNodes();
                 }
@@ -131,13 +132,13 @@ public class Manager {
         controlsContent.setComponentAlignment( startAllBtn, Alignment.MIDDLE_CENTER );
 
         /** Stop all button */
-        Button stopAllBtn = new Button( "Stop all" );
+        final Button stopAllBtn = new Button( "Stop all" );
         stopAllBtn.addStyleName( "default" );
         stopAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
                 if ( config == null ){
-                    show( "There is no installed cluster !" );
+                    show( message );
                 } else{
                     stopAllNodes();
                 }
@@ -160,6 +161,8 @@ public class Manager {
                     alert.getOk().addClickListener( new Button.ClickListener() {
                         @Override
                         public void buttonClick( Button.ClickEvent clickEvent ) {
+                            /** before destroying cluster, stop it first to not leave background zombie processes **/
+                            stopAllBtn.click();
                             UUID trackID =
                                     CassandraUI.getCassandraManager().uninstallCluster( config.getClusterName() );
 
