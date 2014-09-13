@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <!--<module>core</module>-->
+    <module>core</module>
     <module>subutai-common</module>
     <!--<module>vaadin</module>-->
     <!--<module>plugins</module>-->

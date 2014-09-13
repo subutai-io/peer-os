@@ -37,6 +37,14 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- agent-manager -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>agent-manager-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Internal karaf dependencies-->
       <dependency>
@@ -73,6 +81,7 @@
         <artifactId>org.apache.aries.util</artifactId>
         <version>${aries.util.version}</version>
       </dependency>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- subutai-common -->
       <dependency>

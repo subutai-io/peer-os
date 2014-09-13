@@ -16,7 +16,7 @@
 
     <modules>
         <module>agent-manager</module>
-        <module>db-manager</module>
+        <!--<module>db-manager</module>
         <module>communication-manager</module>
         <module>strategy-manager</module>
         <module>container-manager</module>
@@ -36,6 +36,6 @@
         <module>config-point-tracker</module>
         <module>pet_core</module>
         <module>peer-manager</module>
-        <module>command-dispatcher</module>
+        <module>command-dispatcher</module>-->
     </modules>
 </project>
