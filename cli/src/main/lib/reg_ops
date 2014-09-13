@@ -34,7 +34,7 @@ function has_child_templates_registered {
 
   response=`curl -s -XGET $url`
   # response should contain quoted template name
-  if [[ -n "$response" && "$response" == *\"$template\"* ]]; then
+  if [[ -n "$response" && "$response" == *\"*\"* ]]; then
     echo true
   else
     echo false
@@ -159,14 +159,14 @@ function send_n_register {
 
 function delete_n_unregister {
   template=$1
-  local url="`build_rest_url $SUBUTAI_REST_UNREGISTER_PATH`/$template"
+  local url="`build_rest_url $SUBUTAI_REST_REGISTER_PATH`/$template"
 
   if [ "$TEST_MODE" == "true" ]; then
     msg_info "${FUNCNAME[0]} called in TEST mode"
     return
   fi
   
-  response=$(curl --write-out %{http_code} -s --output /dev/null -XGET $url)
+  response=$(curl --write-out %{http_code} -s --output /dev/null -XDELETE $url)
   message="Unregister template $template from site registry"
   if [ $response == "200"  ]; then
     msg_ok "$message"
