@@ -47,7 +47,5 @@ public class CassandraForm extends CustomComponent {
             }
         } );
         verticalLayout.addComponent( sheet );
-
-        manager.refreshClustersInfo();
     }
 }

@@ -104,7 +104,11 @@ public class Manager {
         checkAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                checkAllNodes();
+                if ( config == null ){
+                    show( "There is no installed cluster !" );
+                } else{
+                    checkAllNodes();
+                }
             }
         } );
         controlsContent.addComponent( checkAllBtn );
@@ -116,7 +120,11 @@ public class Manager {
         startAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                startAllNodes();
+                if ( config == null ){
+                    show( "There is no installed cluster !" );
+                } else{
+                    startAllNodes();
+                }
             }
         } );
         controlsContent.addComponent( startAllBtn );
@@ -128,7 +136,11 @@ public class Manager {
         stopAllBtn.addClickListener( new Button.ClickListener() {
             @Override
             public void buttonClick( Button.ClickEvent clickEvent ) {
-                stopAllNodes();
+                if ( config == null ){
+                    show( "There is no installed cluster !" );
+                } else{
+                    stopAllNodes();
+                }
             }
         } );
         controlsContent.addComponent( stopAllBtn );
@@ -414,9 +426,9 @@ public class Manager {
         CassandraClusterConfig clusterInfo = ( CassandraClusterConfig ) clusterCombo.getValue();
         clusterCombo.removeAllItems();
         if ( info != null && info.size() > 0 ) {
-            for ( CassandraClusterConfig mongoInfo : info ) {
-                clusterCombo.addItem( mongoInfo );
-                clusterCombo.setItemCaption( mongoInfo, mongoInfo.getClusterName() );
+            for ( CassandraClusterConfig cassandraInfo : info ) {
+                clusterCombo.addItem( cassandraInfo );
+                clusterCombo.setItemCaption( cassandraInfo, cassandraInfo.getClusterName() );
             }
             if ( clusterInfo != null ) {
                 for ( CassandraClusterConfig cassandraInfo : info ) {
@@ -430,6 +442,7 @@ public class Manager {
                 clusterCombo.setValue( info.iterator().next() );
             }
         }
+        progressIcon.setVisible( false );
     }
 
 
