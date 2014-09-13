@@ -14,25 +14,25 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KALogger.h
- *  @class     KALogger.h
- *  @details   KALogger class is designed for log facilities.
+ *  @brief     SubutaiLogger.h
+ *  @class     SubutaiLogger.h
+ *  @details   SubutaiLogger class is designed for log facilities.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.3
- *  @date      May 02, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
 
-#ifndef KALOGGER_H_
-#define KALOGGER_H_
+#ifndef SUBUTAILOGGER_H_
+#define SUBUTAILOGGER_H_
 #include<stdio.h>
 #include<string>
 #include<boost/date_time/posix_time/posix_time_types.hpp>
 using namespace std;
-class KALogger {
+class SubutaiLogger {
 public:
-	KALogger();
-	virtual ~KALogger();
+	SubutaiLogger();
+	virtual ~SubutaiLogger();
 	string getLocaltime();
 	string toString(int);
 	void writeLog(int,string);
@@ -47,4 +47,4 @@ private:
 	int loglevel;
 };
 
-#endif /* KALOGGER_H_ */
+#endif /* SUBUTAILOGGER_H_ */

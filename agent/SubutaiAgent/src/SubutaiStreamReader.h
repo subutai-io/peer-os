@@ -14,16 +14,16 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KAStreamReader.h
- *  @class     KAStreamReader.h
- *  @details   KAStreamReader Class is used for capturing intermediate responses.
+ *  @brief     SubutaiStreamReader.h
+ *  @class     SubutaiStreamReader.h
+ *  @details   SubutaiStreamReader Class is used for capturing intermediate responses.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.3
- *  @date      Apr 24, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KASTREAMREADER_H_
-#define KASTREAMREADER_H_
+#ifndef SUBUTAISTREAMREADER_H_
+#define SUBUTAISTREAMREADER_H_
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/stat.h>
@@ -45,12 +45,12 @@
 #include <time.h>
 
 using namespace std;
-class KAStreamReader
+class SubutaiStreamReader
 {
 public:
-	KAStreamReader();
-	KAStreamReader(string,string,string);
-	~KAStreamReader();
+	SubutaiStreamReader();
+	SubutaiStreamReader(string,string,string);
+	~SubutaiStreamReader();
 	void setIdentity(string);
 	string& getIdentity();
 	void setMode(string);
@@ -90,4 +90,4 @@ private:
 	struct timeval timeout;
 	FILE* file;
 };
-#endif /* KASTREAMREADER_H_ */
+#endif /* SUBUTAISTREAMREADER_H_ */

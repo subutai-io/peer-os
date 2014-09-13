@@ -14,13 +14,13 @@
  *    @copyright 2014 Safehaus.org
  */
 /**
- *  @brief     KAWatch.h
- *  @class     KAWarch.h
- *  @details   KAWatch Class is designed for monitoring file system folders and files.
+ *  @brief     SubutaiWatch.h
+ *  @class     SubutaiWatch.h
+ *  @details   SubutaiWatch Class is designed for monitoring file system folders and files.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.1
- *  @date      July 02, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
 #ifndef KAWATCH_H_
 #define KAWATCH_H_
@@ -40,9 +40,9 @@
 #include <time.h>
 #include<boost/date_time/posix_time/posix_time_types.hpp>
 #include<string>
-#include "KAConnection.h"
-#include "KAResponsePack.h"
-#include "KALogger.h"
+#include "SubutaiConnection.h"
+#include "SubutaiResponsePack.h"
+#include "SubutaiLogger.h"
 
 using namespace std;
 using std::map;
@@ -54,11 +54,11 @@ using std::endl;
 #define EVENT_BUF_LEN       ( 1024 * ( EVENT_SIZE + NAME_MAX + 1) )
 #define WATCH_FLAGS         ( IN_CREATE | IN_DELETE | IN_MODIFY | IN_ATTRIB)
 
-class KAWatch
+class SubutaiWatch
 {
 public:
-	KAWatch(KAConnection*,KAResponsePack*,KALogger*);
-	virtual ~KAWatch(void );
+	SubutaiWatch(SubutaiConnection*,SubutaiResponsePack*,SubutaiLogger*);
+	virtual ~SubutaiWatch(void );
 	void initialize(unsigned int);
 	bool addWatcher(const string &);
 	bool eraseWatcher(const string &);
@@ -105,8 +105,8 @@ private:
 	int selectResult;
 	int readResult;
 	string sendout;
-	KAResponsePack* watchRepsonse;
-	KAConnection*	watchConnection;
-	KALogger*		watchLogger;
+	SubutaiResponsePack* watchRepsonse;
+	SubutaiConnection*	watchConnection;
+	SubutaiLogger*		watchLogger;
 };
-#endif /* KAWATCH_H_ */
+#endif /* SUBUTAIWATCH_H_ */

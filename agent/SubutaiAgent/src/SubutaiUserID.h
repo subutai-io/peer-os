@@ -14,16 +14,16 @@
  *    @copyright 2013 Safehaus.org
  */
 /**
- *  @brief     KAUserID.h
- *  @class     KAUserID.h
- *  @details   KAUserID class is designed for checking UserID on system it also uses set and undo operations of user rights.
+ *  @brief     SubutaiUserID.h
+ *  @class     SubutaiUserID.h
+ *  @details   SubutaiUserID class is designed for checking UserID on system it also uses set and undo operations of user rights.
  *  @author    Emin INAL
  *  @author    Bilal BAL
- *  @version   1.0.2
- *  @date      Feb 03, 2014
+ *  @version   1.1.0
+ *  @date      Sep 13, 2014
  */
-#ifndef KAUSERID_H_
-#define KAUSERID_H_
+#ifndef SUBUTAIUSERID_H_
+#define SUBUTAIUSERID_H_
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -32,14 +32,14 @@
 #include <pwd.h>
 #include <syslog.h>
 using namespace std;
-class KAUserID
+class SubutaiUserID
 {
 public:
-	KAUserID();
-	virtual ~KAUserID();
+	SubutaiUserID();
+	virtual ~SubutaiUserID();
 	void doSetuid( uid_t &);
 	void undoSetuid( uid_t &);
 	bool getIDs(uid_t&,uid_t&,string);
 	bool checkRootUser();
 };
-#endif /* KAUSERID_H_ */
+#endif /* SUBUTAIUSERID_H_ */

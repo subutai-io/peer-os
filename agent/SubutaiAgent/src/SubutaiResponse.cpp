@@ -13,12 +13,12 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAResponse.h"
+#include "SubutaiResponse.h"
 
 /**
- *  \details   Default constructor of the KAResponse class.
+ *  \details   Default constructor of the SubutaiResponse class.
  */
-KAResponse::KAResponse()
+SubutaiResponse::SubutaiResponse()
 {
 	// TODO Auto-generated constructor stub
 	setType("");
@@ -38,17 +38,17 @@ KAResponse::KAResponse()
 }
 
 /**
- *  \details   Default destructor of the KAResponse class.
+ *  \details   Default destructor of the SubutaiResponse class.
  */
-KAResponse::~KAResponse()
+SubutaiResponse::~SubutaiResponse()
 {
 	// TODO Auto-generated destructor stub
 }
 
 /**
- *  \details   This method clears the all pricate variables in the given KAResponse instance.
+ *  \details   This method clears the all pricate variables in the given SubutaiResponse instance.
  */
-void KAResponse::clear()
+void SubutaiResponse::clear()
 {		//clear the all variables..
 	setType("");
 	setUuid("");
@@ -75,7 +75,7 @@ void KAResponse::clear()
  *  		   It also check the existing variable(NULL or not) when serializing the instance.
  *  		   It returns given reference output strings.
  */
-void KAResponse::serialize(string& output)
+void SubutaiResponse::serialize(string& output)
 {
 	Json::Value environment;
 	Json::Value root;
@@ -149,6 +149,10 @@ void KAResponse::serialize(string& output)
 	{
 		root["response"]["changeType"] = this->getChangeType();
 	}
+	if(!(this->getEnvironmentId().empty()))
+	{
+		root["response"]["environmentId"] = this->getEnvironmentId();
+	}
 	for(unsigned int index=0; index < this->getConfPoints().size(); index++)
 	{
 		if(this->getType() == "INOTIFY_LIST_RESPONSE")
@@ -170,7 +174,7 @@ void KAResponse::serialize(string& output)
  *     		   It also check the existing variable(NULL or not) when serializing the instance.
  *  		   It returns given reference output strings.
  */
-void KAResponse::serializeDone(string& output)
+void SubutaiResponse::serializeDone(string& output)
 {			//Serialize a Done Response  to a Json String
 	Json::Value environment;
 	Json::Value root;
@@ -214,205 +218,221 @@ void KAResponse::serializeDone(string& output)
 }
 
 /**
- *  \details   getting "pid" private variable of KAResponse instance
+ *  \details   getting "pid" private variable of SubutaiResponse instance
  */
-int KAResponse::getPid()
+int SubutaiResponse::getPid()
 {						//getting pid
 	return this->pid;
 }
 
 /**
- *  \details   setting "pid" private variable of KAResponse instance
+ *  \details   setting "pid" private variable of SubutaiResponse instance
  */
-void KAResponse::setPid(int pid)
+void SubutaiResponse::setPid(int pid)
 {			//setting pid
 	this->pid=pid;
 }
 
 /**
- *  \details   getting "exitCode" private variable of KAResponse instance
+ *  \details   getting "exitCode" private variable of SubutaiResponse instance
  */
-int KAResponse::getExitCode()
+int SubutaiResponse::getExitCode()
 {					//getting ExitCode
 	return this->exitCode;
 }
 
 /**
- *  \details   setting "exitCode" private variable of KAResponse instance
+ *  \details   setting "exitCode" private variable of SubutaiResponse instance
  */
-void KAResponse::setExitCode(int exitcode)
+void SubutaiResponse::setExitCode(int exitcode)
 {			//setting ExitCode
 	this->exitCode = exitcode;
 }
 
 /**
- *  \details   getting "type" private variable of KAResponse instance
+ *  \details   getting "type" private variable of SubutaiResponse instance
  */
-string& KAResponse::getType()
+string& SubutaiResponse::getType()
 {								//getting Type
 	return this->type;
 }
 
 /**
- *  \details   setting "type" private variable of KAResponse instance
+ *  \details   setting "type" private variable of SubutaiResponse instance
  */
-void KAResponse::setType(const string& type)
+void SubutaiResponse::setType(const string& type)
 {				//setting Type
 	this->type = type;
 }
 
 /**
- *  \details   getting "uuid" private variable of KAResponse instance
+ *  \details   getting "uuid" private variable of SubutaiResponse instance
  */
-string& KAResponse::getUuid()
+string& SubutaiResponse::getUuid()
 {								//getting uuid
 	return this->uuid;
 }
 
 /**
- *  \details   setting "uuid" private variable of KAResponse instance
+ *  \details   setting "uuid" private variable of SubutaiResponse instance
  */
-void KAResponse::setUuid(const string& uuid)
+void SubutaiResponse::setUuid(const string& uuid)
 {				//setting uuid
 	this->uuid = uuid;
 }
 
 /**
- *  \details   getting "requestSequenceNumber" private variable of KAResponse instance
+ *  \details   getting "requestSequenceNumber" private variable of SubutaiResponse instance
  */
-int KAResponse::getRequestSequenceNumber()
+int SubutaiResponse::getRequestSequenceNumber()
 {								//getting RequestSeqnumber
 	return this->requestSequenceNumber;
 }
 
 /**
- *  \details   setting "requestSequenceNumber" private variable of KAResponse instance
+ *  \details   setting "requestSequenceNumber" private variable of SubutaiResponse instance
  */
-void KAResponse::setRequestSequenceNumber(int requestSequenceNumber)
+void SubutaiResponse::setRequestSequenceNumber(int requestSequenceNumber)
 {	//setting RequestSeqnumber
 	this->requestSequenceNumber = requestSequenceNumber;
 }
 
 /**
- *  \details   getting "responseSequenceNumber" private variable of KAResponse instance
+ *  \details   getting "responseSequenceNumber" private variable of SubutaiResponse instance
  */
-int KAResponse::getResponseSequenceNumber()
+int SubutaiResponse::getResponseSequenceNumber()
 {									//getting ResponseSeqnumber
 	return this->responseSequenceNumber;
 }
 
 /**
- *  \details   setting "responseSequenceNumber" private variable of KAResponse instance
+ *  \details   setting "responseSequenceNumber" private variable of SubutaiResponse instance
  */
-void KAResponse::setResponseSequenceNumber(int responseSequenceNumber)
+void SubutaiResponse::setResponseSequenceNumber(int responseSequenceNumber)
 {			//setting ResponseSeqnumber
 	this->responseSequenceNumber = responseSequenceNumber;
 }
 
 /**
- *  \details   getting "stdErr" private variable of KAResponse instance
+ *  \details   getting "stdErr" private variable of SubutaiResponse instance
  */
-string& KAResponse::getStandardError()
+string& SubutaiResponse::getStandardError()
 {						//getting standard err
 	return this->stdErr;
 }
 /**
- *  \details   setting "stdErr" private variable of KAResponse instance
+ *  \details   setting "stdErr" private variable of SubutaiResponse instance
  */
-void KAResponse::setStandardError(const string& mystderr)
+void SubutaiResponse::setStandardError(const string& mystderr)
 {		//setting standard err
 	this->stdErr = mystderr;
 }
 
 /**
- *  \details   getting "stdOut" private variable of KAResponse instance
+ *  \details   getting "stdOut" private variable of SubutaiResponse instance
  */
-string& KAResponse::getStandardOutput()
+string& SubutaiResponse::getStandardOutput()
 {						//getting standard out
 	return this->stdOut;
 }
 
 /**
- *  \details   setting "stdOut" private variable of KAResponse instance
+ *  \details   setting "stdOut" private variable of SubutaiResponse instance
  */
-void KAResponse::setStandardOutput(const string& mystdout)
+void SubutaiResponse::setStandardOutput(const string& mystdout)
 { 	//setting standard out
 	this->stdOut = mystdout;
 }
 
 /**
- *  \details   getting "parenthostname" private variable of KAResponse instance.
+ *  \details   getting "parenthostname" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getParentHostname()
+string& SubutaiResponse::getParentHostname()
 {
 	return this->parentHostname;
 }
 
 /**
- *  \details   setting "parenthostname" private variable of KAResponse instance.
+ *  \details   setting "parenthostname" private variable of SubutaiResponse instance.
  *  		   This holds the parenthostname of the agent machine
  */
-void KAResponse::setParentHostname(const string& parenthostname)
+void SubutaiResponse::setParentHostname(const string& parenthostname)
 {
 	this->parentHostname = parenthostname;
 }
 
 /**
- *  \details   getting "hostname" private variable of KAResponse instance.
+ *  \details   getting "hostname" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getHostname()
+string& SubutaiResponse::getHostname()
 {
 	return this->hostname;
 }
 
 /**
- *  \details   setting "hostname" private variable of KAResponse instance.
+ *  \details   getting "environmentId" private variable of SubutaiResponse instance.
+ */
+string& SubutaiResponse::getEnvironmentId()
+{
+	return this->environmentId;
+}
+
+/**
+ *  \details   setting "hostname" private variable of SubutaiResponse instance.
  *  		   This holds the hostname of the agent machine
  */
-void KAResponse::setHostname(const string& hostname)
+void SubutaiResponse::setHostname(const string& hostname)
 {
 	this->hostname = hostname;
 }
 
 /**
- *  \details   getting "macAddress" private variable of KAResponse instance.
+ *  \details   getting "macAddress" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getMacAddress()
+string& SubutaiResponse::getMacAddress()
 {
 	return this->macAddress;
 }
 
 /**
- *  \details   setting "macAddress" private variable of KAResponse instance.
+ *  \details   setting "macAddress" private variable of SubutaiResponse instance.
  *  		   This holds the macAddress(eth0) of the agent machine
  */
-void KAResponse::setMacAddress(const string& macAddress)
+void SubutaiResponse::setMacAddress(const string& macAddress)
 {
 	this->macAddress = macAddress;
 }
 
 /**
- *  \details   getting "taskUuid" private variable of KAResponse instance.
+ *  \details   setting "environmentId" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getTaskUuid()
+void SubutaiResponse::setEnvironmentId(const string& envID)
+{
+	this->environmentId = envID;
+}
+
+/**
+ *  \details   getting "taskUuid" private variable of SubutaiResponse instance.
+ */
+string& SubutaiResponse::getTaskUuid()
 {
 	return this->taskUuid;
 }
 
 /**
- *  \details   setting "taskUuid" private variable of KAResponse instance.
+ *  \details   setting "taskUuid" private variable of SubutaiResponse instance.
  *  		   This holds the task uuid of the command
  */
-void KAResponse::setTaskUuid(const string& taskuuid)
+void SubutaiResponse::setTaskUuid(const string& taskuuid)
 {
 	this->taskUuid = taskuuid;
 }
 
 /**
- *  \details   setting "ips" private vector variable of KAResponse instance.
+ *  \details   setting "ips" private vector variable of SubutaiResponse instance.
  *  		   This is the list of ips vector that holds the ip addresses of the machine
  */
-void KAResponse::setIps(vector<string> myvector)
+void SubutaiResponse::setIps(vector<string> myvector)
 {
 	this->ips.clear();
 	for(unsigned int index=0 ; index< myvector.size(); index++)
@@ -422,87 +442,87 @@ void KAResponse::setIps(vector<string> myvector)
 }
 
 /**
- *  \details   getting "ips" private vector variable of KAResponse instance.
+ *  \details   getting "ips" private vector variable of SubutaiResponse instance.
  */
-vector<string>& KAResponse::getIps()
+vector<string>& SubutaiResponse::getIps()
 {					//getting ips vector
 
 	return this->ips;
 }
 
 /**
- *  \details   getting "source" private variable of KAResponse instance.
+ *  \details   getting "source" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getSource()
+string& SubutaiResponse::getSource()
 {
 	return this->source;
 }
 
 /**
- *  \details   setting "source" private variable of KAResponse instance.
+ *  \details   setting "source" private variable of SubutaiResponse instance.
  *  		   This holds the task source information of the response
  */
-void KAResponse::setSource(const string& source)
+void SubutaiResponse::setSource(const string& source)
 {
 	this->source = source;
 }
 
 /**
- *  \details   setting "configPoint" private variable of KAResponse instance.
+ *  \details   setting "configPoint" private variable of SubutaiResponse instance.
  *  		   This holds the task source information of the response
  */
-void KAResponse::setconfigPoint(const string& configPoint)
+void SubutaiResponse::setconfigPoint(const string& configPoint)
 {
 	this->configPoint = configPoint;
 }
 
 /**
- *  \details   getting "configPoint" private variable of KAResponse instance.
+ *  \details   getting "configPoint" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getconfigPoint()
+string& SubutaiResponse::getconfigPoint()
 {
 	return this->configPoint;
 }
 
 /**
- *  \details   setting "dateTime" private variable of KAResponse instance.
+ *  \details   setting "dateTime" private variable of SubutaiResponse instance.
  *  		   This holds the task source information of the response
  */
-void KAResponse::setDateTime(const string& dateTime)
+void SubutaiResponse::setDateTime(const string& dateTime)
 {
 	this->dateTime = dateTime;
 }
 
 /**
- *  \details   getting "dateTime" private variable of KAResponse instance.
+ *  \details   getting "dateTime" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getDateTime()
+string& SubutaiResponse::getDateTime()
 {
 	return this->dateTime;
 }
 
 /**
- *  \details   setting "changeType" private variable of KAResponse instance.
+ *  \details   setting "changeType" private variable of SubutaiResponse instance.
  *  		   This holds the task source information of the response
  */
-void KAResponse::setChangeType(const string& changeType)
+void SubutaiResponse::setChangeType(const string& changeType)
 {
 	this->changeType = changeType;
 }
 
 /**
- *  \details   getting "changeType" private variable of KAResponse instance.
+ *  \details   getting "changeType" private variable of SubutaiResponse instance.
  */
-string& KAResponse::getChangeType()
+string& SubutaiResponse::getChangeType()
 {
 	return this->changeType;
 }
 
 /**
- *  \details   setting "confPoints" private vector variable of KAResponse instance.
+ *  \details   setting "confPoints" private vector variable of SubutaiResponse instance.
  *  		   This is the list of config Points vector that holds the watching points of the agent
  */
-void KAResponse::setConfPoints(vector<string> myvector)
+void SubutaiResponse::setConfPoints(vector<string> myvector)
 {
 	this->confPoints.clear();
 	for(unsigned int index=0 ; index< myvector.size(); index++)
@@ -512,9 +532,9 @@ void KAResponse::setConfPoints(vector<string> myvector)
 }
 
 /**
- *  \details   getting "confPoints" private vector variable of KAResponse instance.
+ *  \details   getting "confPoints" private vector variable of SubutaiResponse instance.
  */
-vector<string>& KAResponse::getConfPoints()
+vector<string>& SubutaiResponse::getConfPoints()
 {					//getting ips vector
 
 	return this->confPoints;

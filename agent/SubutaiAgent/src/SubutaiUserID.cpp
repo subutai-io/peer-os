@@ -13,20 +13,20 @@
  *
  *    @copyright 2014 Safehaus.org
  */
-#include "KAUserID.h"
+#include "SubutaiUserID.h"
 
 /**
- *  \details   Default constructor of the KAUserID class.
+ *  \details   Default constructor of the SubutaiUserID class.
  */
-KAUserID::KAUserID()
+SubutaiUserID::SubutaiUserID()
 {
 	// TODO Auto-generated constructor stub
 }
 
 /**
- *  \details   Default destructor of the KAUserID class.
+ *  \details   Default destructor of the SubutaiUserID class.
  */
-KAUserID::~KAUserID()
+SubutaiUserID::~SubutaiUserID()
 {
 	// TODO Auto-generated destructor stub
 }
@@ -34,7 +34,7 @@ KAUserID::~KAUserID()
 /**
  *  \details   This method set the user rights to the given user.
  */
-void KAUserID::doSetuid (uid_t &euid)
+void SubutaiUserID::doSetuid (uid_t &euid)
 {
 	int status;
 
@@ -53,7 +53,7 @@ void KAUserID::doSetuid (uid_t &euid)
 /**
  *  \details   This method can undo user rights to the root.
  */
-void KAUserID::undoSetuid(uid_t &ruid)
+void SubutaiUserID::undoSetuid(uid_t &ruid)
 {
 	int status;
 
@@ -73,7 +73,7 @@ void KAUserID::undoSetuid(uid_t &ruid)
  *  \details   This method checks given user on the system.
  *  		   If the user found on system it returns true. Otherwise it returns false.
  */
-bool KAUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID on system
+bool SubutaiUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID on system
 {
 	struct passwd *pw;
 	ruid = getuid();
@@ -93,7 +93,7 @@ bool KAUserID::getIDs(uid_t& ruid,uid_t&  euid,string runAs)	//getting UID on sy
  *  \details   This method checks given user is root or not.
  *  		   If the user is root, it returns true. Otherwise it returns false.
  */
-bool KAUserID::checkRootUser()
+bool SubutaiUserID::checkRootUser()
 {
 	uid_t ruid = getuid();	//if the user is root = 0
 	if(ruid==0)
