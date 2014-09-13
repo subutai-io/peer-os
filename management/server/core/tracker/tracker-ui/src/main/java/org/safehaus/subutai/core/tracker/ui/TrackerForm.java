@@ -13,12 +13,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.safehaus.subutai.common.tracker.ProductOperationState;
 import org.safehaus.subutai.common.tracker.ProductOperationView;
+import org.safehaus.subutai.core.tracker.api.Tracker;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -57,9 +60,16 @@ public class TrackerForm extends CustomComponent {
     private List<ProductOperationView> currentOperations = new ArrayList<>();
     private String source;
     private int limit = 10;
+    private final Tracker tracker;
+    private final ExecutorService executor;
 
 
-    public TrackerForm() {
+    public TrackerForm( Tracker tracker, ExecutorService executor ) {
+        Preconditions.checkNotNull( tracker, "Tracker is null" );
+        Preconditions.checkNotNull( executor, "Executor is null" );
+
+        this.tracker = tracker;
+        this.executor = executor;
         content = new GridLayout();
         content.setSpacing( true );
         content.setSizeFull();
@@ -209,7 +219,7 @@ public class TrackerForm extends CustomComponent {
         if ( !track ) {
             track = true;
 
-            TrackerUI.getExecutor().execute( new Runnable() {
+            executor.execute( new Runnable() {
                 @Override
                 public void run() {
                     while ( track ) {
@@ -236,7 +246,7 @@ public class TrackerForm extends CustomComponent {
     private void populateOperations() {
         if ( !Strings.isNullOrEmpty( source ) ) {
             List<ProductOperationView> operations =
-                    TrackerUI.getTracker().getProductOperations( source, fromDateValue, toDateValue, limit );
+                    tracker.getProductOperations( source, fromDateValue, toDateValue, limit );
             if ( operations.isEmpty() ) {
                 trackID = null;
                 outputTxtArea.setValue( "" );
@@ -303,7 +313,7 @@ public class TrackerForm extends CustomComponent {
 
     private void populateLogs() {
         if ( trackID != null && !Strings.isNullOrEmpty( source ) ) {
-            ProductOperationView po = TrackerUI.getTracker().getProductOperation( source, trackID );
+            ProductOperationView po = tracker.getProductOperation( source, trackID );
             if ( po != null ) {
                 setOutput( po.getDescription() + "\nState: " + po.getState() + "\nLogs:\n" + po.getLog() );
                 if ( po.getState() != ProductOperationState.RUNNING ) {
@@ -328,7 +338,7 @@ public class TrackerForm extends CustomComponent {
     void refreshSources() {
         String oldSource = source;
         sourcesCombo.removeAllItems();
-        List<String> sources = TrackerUI.getTracker().getProductOperationSources();
+        List<String> sources = tracker.getProductOperationSources();
         for ( String src : sources ) {
             sourcesCombo.addItem( src );
         }
