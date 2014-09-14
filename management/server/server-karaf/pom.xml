@@ -155,10 +155,14 @@
                   <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
                 </artifactItem>
-                <artifactItem>
+                <dependency>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-all</artifactId>
-                </artifactItem>
+                  <artifactId>activemq-client</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-jms-pool</artifactId>
+                </dependency>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
@@ -176,10 +180,9 @@
           <targetServerDirectory>${assembly.directory}</targetServerDirectory>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>enterprise</feature>
             <feature>war</feature>
             <feature>ssh</feature>
-            <!--<feature>cxf</feature>-->
+            <feature>cxf</feature>
             <feature>webconsole</feature>
             <feature>jms</feature>
           </bootFeatures>

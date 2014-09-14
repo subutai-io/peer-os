@@ -15,7 +15,7 @@ import org.safehaus.subutai.core.communication.api.CommunicationManager;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.AdvisorySupport;
-import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.activemq.jms.pool.PooledConnectionFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

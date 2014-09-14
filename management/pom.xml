@@ -150,9 +150,19 @@
         <version>1.6</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jms_1.1_spec</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>5.10.0</version>
+        <artifactId>activemq-client</artifactId>
+        <version>5.9.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-jms-pool</artifactId>
+        <version>5.9.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
