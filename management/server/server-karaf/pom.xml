@@ -168,6 +168,10 @@
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-jaas</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
