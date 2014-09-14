@@ -58,11 +58,10 @@
         <configuration>
           <instructions>
             <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
-            <!--<Import-Package>*;javax.jms;resolution:=optional</Import-Package>-->
-            <DynamicImport-Package>*</DynamicImport-Package>
+            <Import-Package>*,javax.jms;resolution:=optional</Import-Package>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};{local-packages}.*;version=${project.version};-noimport:=true
+              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
