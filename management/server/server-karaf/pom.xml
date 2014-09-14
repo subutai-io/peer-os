@@ -172,12 +172,16 @@
                   <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </artifactItem>
                 <artifactItem>
-                	<groupId>javax.ejb</groupId>
-                	<artifactId>javax.ejb-api</artifactId>
+                  <groupId>javax.ejb</groupId>
+                  <artifactId>javax.ejb-api</artifactId>
                 </artifactItem>
                 <artifactItem>
-                	<groupId>javax.transaction</groupId>
-                	<artifactId>javax.transaction-api</artifactId>
+                  <groupId>javax.transaction</groupId>
+                  <artifactId>javax.transaction-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>javax.enterprise</groupId>
+                  <artifactId>cdi-api</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
