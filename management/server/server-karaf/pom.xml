@@ -107,28 +107,28 @@
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-dispatcher -->
-                <dependency>
+                <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-dispatcher-api</artifactId>
-                </dependency>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- command-runner -->
-                <dependency>
+                <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>command-runner-api</artifactId>
-                </dependency>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
-                <dependency>
+                <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>communication-manager-api</artifactId>
-                </dependency>
-                <dependency>
+                </artifactItem>
+                <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>communication-manager-impl</artifactId>
-                </dependency>
+                </artifactItem>
 
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
@@ -159,10 +159,10 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-all</artifactId>
                 </artifactItem>
-                <dependency>
+                <artifactItem>
                   <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
-                </dependency>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
