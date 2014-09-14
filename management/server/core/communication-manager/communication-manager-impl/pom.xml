@@ -58,7 +58,8 @@
               *;resolution:=optional
             </Import-Package>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true,
+              !org.slf4j
             </Export-Package>
           </instructions>
         </configuration>
