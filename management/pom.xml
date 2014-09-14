@@ -150,9 +150,14 @@
         <version>1.6</version>
       </dependency>
       <dependency>
-      	<groupId>org.apache.activemq</groupId>
-      	<artifactId>activemq-karaf</artifactId>
-      	<version>5.10.0</version>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-karaf</artifactId>
+        <version>5.10.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-client</artifactId>
+        <version>5.10.0</version>
       </dependency>
       <!--<dependency>
         <groupId>org.apache.activemq</groupId>
