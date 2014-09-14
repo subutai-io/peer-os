@@ -28,16 +28,20 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-pool</artifactId>
+      <artifactId>activemq-broker</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-pool</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
@@ -57,12 +61,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
-            <!--<Import-Package>!javax.jms,*;inline=true</Import-Package>-->
-            <!--<DynamicImport-Package>*</DynamicImport-Package>-->
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>

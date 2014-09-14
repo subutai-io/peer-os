@@ -152,16 +152,20 @@
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- communication-manager -->
                 <artifactItem>
+                  <groupId>commons-pool</groupId>
+                  <artifactId>commons-pool</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-pool</artifactId>
+                  <artifactId>activemq-broker</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-client</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>commons-pool</groupId>
-                  <artifactId>commons-pool</artifactId>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-pool</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>

@@ -145,8 +145,13 @@
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- communication-manager -->
       <dependency>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>1.6</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-pool</artifactId>
+        <artifactId>activemq-broker</artifactId>
         <version>5.10.0</version>
       </dependency>
       <dependency>
@@ -156,13 +161,8 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jms-pool</artifactId>
+        <artifactId>activemq-pool</artifactId>
         <version>5.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-pool</groupId>
-        <artifactId>commons-pool</artifactId>
-        <version>1.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

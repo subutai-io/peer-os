@@ -7,11 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.Session;
+import javax.jms.*;
 
 import org.safehaus.subutai.common.protocol.Request;
 import org.safehaus.subutai.common.protocol.ResponseListener;
