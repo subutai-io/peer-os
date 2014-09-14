@@ -59,7 +59,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Import-Package>
-              resolution:=optional
+              *;resolution:=optional
             </Import-Package>
           </instructions>
         </configuration>
