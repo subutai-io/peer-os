@@ -18,36 +18,31 @@ import org.safehaus.subutai.common.protocol.ResponseListener;
 /**
  * Test utilities
  */
-public class TestUtils
-{
+public class TestUtils {
 
-    public static Request getRequestTemplate( UUID uuid )
-    {
+    public static Request getRequestTemplate( UUID uuid ) {
         return new Request( "SOURCE", RequestType.EXECUTE_REQUEST, // type
-            uuid, //                        !! agent uuid
-            UUID.randomUUID(), //                        !! task uuid
-            1, //                           !! request sequence number
-            "/", //                         cwd
-            "pwd", //                        program
-            OutputRedirection.RETURN, //    std output redirection
-            OutputRedirection.RETURN, //    std error redirection
-            null, //                        stdout capture file path
-            null, //                        stderr capture file path
-            "root", //                      runas
-            null, //                        arg
-            null, //                        env vars
-            null, 30 ); //
+                uuid, //                        !! agent uuid
+                UUID.randomUUID(), //                        !! task uuid
+                1, //                           !! request sequence number
+                "/", //                         cwd
+                "pwd", //                        program
+                OutputRedirection.RETURN, //    std output redirection
+                OutputRedirection.RETURN, //    std error redirection
+                null, //                        stdout capture file path
+                null, //                        stderr capture file path
+                "root", //                      runas
+                null, //                        arg
+                null, //                        env vars
+                null, 30 ); //
     }
 
 
-    public static ResponseListener getResponseListener()
-    {
+    public static ResponseListener getResponseListener() {
 
-        return new ResponseListener()
-        {
+        return new ResponseListener() {
 
-            public void onResponse( Response response )
-            {
+            public void onResponse( Response response ) {
 
             }
         };

@@ -13,10 +13,10 @@ import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.safehaus.subutai.core.communication.api.CommandJson;
-import org.safehaus.subutai.common.protocol.ResponseListener;
 import org.safehaus.subutai.common.enums.ResponseType;
 import org.safehaus.subutai.common.protocol.Response;
+import org.safehaus.subutai.common.protocol.ResponseListener;
+import org.safehaus.subutai.core.communication.api.CommandJson;
 
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.command.RemoveInfo;
