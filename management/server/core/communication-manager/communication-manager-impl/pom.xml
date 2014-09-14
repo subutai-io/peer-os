@@ -37,10 +37,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-pool</artifactId>
     </dependency>
     <dependency>

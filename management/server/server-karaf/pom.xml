@@ -159,10 +159,10 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-broker</artifactId>
                 </artifactItem>
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-client</artifactId>
-                </artifactItem>
+                </artifactItem>-->
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
