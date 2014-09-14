@@ -168,12 +168,12 @@
                   <artifactId>activemq-jms-pool</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.apache.servicemix.bundles</groupId>
-                  <artifactId>org.apache.servicemix.bundles.junit</artifactId>
+                  <groupId>org.apache.activemq</groupId>
+                  <artifactId>activemq-broker</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.glassfish.main.javaee-api</groupId>
-                  <artifactId>javax.jms</artifactId>
+                  <groupId>org.apache.servicemix.bundles</groupId>
+                  <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
               </artifactItems>
             </configuration>

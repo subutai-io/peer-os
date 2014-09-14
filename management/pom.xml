@@ -165,9 +165,9 @@
         <version>5.9.0</version>
       </dependency>
       <dependency>
-      	<groupId>org.glassfish.main.javaee-api</groupId>
-      	<artifactId>javax.jms</artifactId>
-      	<version>3.1.2.2</version>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-broker</artifactId>
+        <version>5.9.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

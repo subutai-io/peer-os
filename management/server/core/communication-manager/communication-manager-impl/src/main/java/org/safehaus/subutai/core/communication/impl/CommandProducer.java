@@ -1,6 +1,14 @@
 package org.safehaus.subutai.core.communication.impl;
 
 
+import javax.jms.Connection;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
 import org.safehaus.subutai.core.communication.api.CommandJson;
 import org.safehaus.subutai.common.enums.RequestType;
 import org.safehaus.subutai.common.protocol.Request;
@@ -8,7 +16,7 @@ import org.safehaus.subutai.common.settings.Common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.*;
+//import javax.jms.*;
 
 //import java.util.logging.Logger;
 
