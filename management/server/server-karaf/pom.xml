@@ -172,10 +172,6 @@
                   <artifactId>geronimo-jms_1.1_spec</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>javax.ejb</groupId>
-                  <artifactId>ejb-api</artifactId>
-                </artifactItem>
-                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
