@@ -202,7 +202,7 @@
             <unpackBundle>true</unpackBundle>
             <instructions>
               <Export-Package>
-                {local-packages};version=${project.version};-noimport:=true
+                {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
               </Export-Package>
             </instructions>
           </configuration>
