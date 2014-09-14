@@ -62,6 +62,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
+            <Import-Package>
+              *;resolution:=optional
+            </Import-Package>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>

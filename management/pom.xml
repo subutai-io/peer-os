@@ -200,11 +200,6 @@
           <configuration>
             <manifestLocation>META-INF</manifestLocation>
             <unpackBundle>true</unpackBundle>
-            <instructions>
-              <Import-Package>
-                *;resolution:=optional
-              </Import-Package>
-            </instructions>
           </configuration>
         </plugin>
         <plugin>
