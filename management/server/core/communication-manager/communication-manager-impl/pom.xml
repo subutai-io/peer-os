@@ -57,7 +57,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <DynamicImport-Package>*</DynamicImport-Package>
+            <!--<DynamicImport-Package>*</DynamicImport-Package>-->
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Import-Packages>javax.jms;resolution:=optional</Import-Packages>
           </instructions>
