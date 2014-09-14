@@ -59,7 +59,7 @@
           <instructions>
             <!--<DynamicImport-Package>*</DynamicImport-Package>-->
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
-            <Import-Packages>javax.jms;resolution:=optional</Import-Packages>
+            <Import-Package>javax.jms;resolution:=optional</Import-Package>
           </instructions>
         </configuration>
       </plugin>
