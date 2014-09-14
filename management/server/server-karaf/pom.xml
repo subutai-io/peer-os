@@ -168,6 +168,10 @@
                   <artifactId>javax.management.j2ee-api</artifactId>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>javax.ejb</groupId>
+                  <artifactId>ejb-api</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
