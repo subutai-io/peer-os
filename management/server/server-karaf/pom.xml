@@ -163,10 +163,12 @@
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
-                <artifactItem>
+                <dependency>
                   <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                </artifactItem>
+                  <artifactId>osgi-over-slf4j</artifactId>
+                  <version>1.7.7</version>
+                </dependency>
+
               </artifactItems>
             </configuration>
           </execution>
