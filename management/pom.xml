@@ -161,7 +161,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jms-pool</artifactId>
+        <artifactId>activemq-pool</artifactId>
         <version>5.9.0</version>
       </dependency>
       <dependency>
