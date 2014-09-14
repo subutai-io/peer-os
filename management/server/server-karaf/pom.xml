@@ -161,7 +161,7 @@
                 </artifactItem>
                 <dependency>
                 	<groupId>org.apache.activemq</groupId>
-                	<artifactId>activemq-console</artifactId>
+                	<artifactId>activemq-client</artifactId>
                 	<version>5.10.0</version>
                 </dependency>
 
