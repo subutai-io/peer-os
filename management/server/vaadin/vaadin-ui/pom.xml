@@ -42,7 +42,7 @@
                         <supportedProjectType>war</supportedProjectType>
                     </supportedProjectTypes>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${project.artifactId}.server.ui</Bundle-SymbolicName>
                         <Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
 
                         <!-- Add Embed lib -->
