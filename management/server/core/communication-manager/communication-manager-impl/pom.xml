@@ -62,10 +62,13 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
-            <Export-Package>
+            <Import-Package>
+              -noimport:=true
+            </Import-Package>
+            <!--<Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <!--org.apache.activemq.pool;-->
+            &lt;!&ndash;org.apache.activemq.pool;&ndash;&gt;-->
           </instructions>
         </configuration>
       </plugin>
