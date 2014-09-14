@@ -84,6 +84,26 @@
             <configuration>
               <outputDirectory>target/assembly/system/subutai</outputDirectory>
               <artifactItems>
+                <artifactItem>
+                  <groupId>org.osgi</groupId>
+                  <artifactId>org.osgi.compendium</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.osgi</groupId>
+                  <artifactId>org.osgi.core</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.aries.blueprint</groupId>
+                  <artifactId>org.apache.aries.blueprint</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.aries.proxy</groupId>
+                  <artifactId>org.apache.aries.proxy</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.aries</groupId>
+                  <artifactId>org.apache.aries.util</artifactId>
+                </artifactItem>
                 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                 <!-- subutai-common -->
                 <artifactItem>
