@@ -157,7 +157,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>apache-activemq</artifactId>
+                  <artifactId>activemq-karaf</artifactId>
                 </artifactItem>
                 <!--<artifactItem>
                   <groupId>org.apache.activemq</groupId>
