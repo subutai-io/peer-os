@@ -161,7 +161,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-all</artifactId>
+                  <artifactId>activemq-client</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
