@@ -151,12 +151,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-karaf</artifactId>
-        <version>5.10.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
+        <artifactId>activemq-all</artifactId>
         <version>5.10.0</version>
       </dependency>
       <!--<dependency>
