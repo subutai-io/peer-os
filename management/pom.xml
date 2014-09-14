@@ -151,13 +151,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-          </exclusion>
-        </exclusions>
+        <artifactId>activemq-core</artifactId>
         <version>5.9.0</version>
       </dependency>
       <dependency>

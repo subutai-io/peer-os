@@ -157,7 +157,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-all</artifactId>
+                  <artifactId>activemq-core</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>

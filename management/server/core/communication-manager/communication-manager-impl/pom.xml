@@ -33,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
+      <artifactId>activemq-core</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-pool</groupId>
