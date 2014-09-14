@@ -155,10 +155,10 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
-                <artifactItem>
+                <!--<artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-all</artifactId>
-                </artifactItem>
+                </artifactItem>-->
                 <artifactItem>
                   <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
