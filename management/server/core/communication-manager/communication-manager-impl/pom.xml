@@ -58,7 +58,7 @@
         <configuration>
           <instructions>
             <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
-            <Import-Package>!javax.jms,*;scope=compile|runtime</Import-Package>
+            <Import-Package>!javax.jms,*;inline=false</Import-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
