@@ -65,10 +65,10 @@
             <Import-Package>
               -noimport:=true
             </Import-Package>
-            <!--<Export-Package>
+            <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            &lt;!&ndash;org.apache.activemq.pool;&ndash;&gt;-->
+            <!--org.apache.activemq.pool;-->
           </instructions>
         </configuration>
       </plugin>
