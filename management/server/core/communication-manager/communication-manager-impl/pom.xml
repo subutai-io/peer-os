@@ -62,7 +62,7 @@
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${pom.version};-noimport:=true,
-              org.apache.activemq
+              org.apache.activemq,javax.jms
             </Export-Package>
           </instructions>
         </configuration>
