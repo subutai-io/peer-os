@@ -58,9 +58,9 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
-            <!--<Export-Package>-->
-            <!--org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true-->
-            <!--</Export-Package>-->
+            <Export-Package>
+              org.apache.activemq.pool;{local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
