@@ -165,11 +165,6 @@
         <version>5.9.0</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-broker</artifactId>
-        <version>5.9.0</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.junit</artifactId>
         <version>4.10_1</version>
