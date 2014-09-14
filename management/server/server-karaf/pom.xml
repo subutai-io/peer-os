@@ -164,6 +164,10 @@
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>javax.management.j2ee</groupId>
+                  <artifactId>javax.management.j2ee-api</artifactId>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
                 </artifactItem>
