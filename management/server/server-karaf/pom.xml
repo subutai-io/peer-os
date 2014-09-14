@@ -155,14 +155,14 @@
                   <groupId>commons-pool</groupId>
                   <artifactId>commons-pool</artifactId>
                 </artifactItem>
-                <dependency>
+                <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-client</artifactId>
-                </dependency>
-                <dependency>
+                </artifactItem>
+                <artifactItem>
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
-                </dependency>
+                </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
