@@ -157,7 +157,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-core</artifactId>
+                  <artifactId>activemq-all</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>commons-pool</groupId>
@@ -184,6 +184,7 @@
             <feature>ssh</feature>
             <feature>cxf</feature>
             <feature>webconsole</feature>
+            <feature>jms</feature>
           </bootFeatures>
         </configuration>
       </plugin>
