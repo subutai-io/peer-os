@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 class CommandProducer implements Runnable {
 
-	//    private static final Logger LOG = Logger.getLogger( CommandProducer.class.getName() );
 	private static final Logger LOG = LoggerFactory.getLogger(CommandProducer.class.getName());
 	private final Request command;
 	private final CommunicationManagerImpl communicationManagerImpl;
@@ -75,7 +74,6 @@ class CommandProducer implements Runnable {
 			TextMessage message = session.createTextMessage(json);
 			producer.send(message);
 		} catch (JMSException e) {
-//            LOG.log( Level.SEVERE, "Error in CommandProducer.run", ex );
 			LOG.error("Error to send a message: ", e);
 		} finally {
 			if (producer != null) {

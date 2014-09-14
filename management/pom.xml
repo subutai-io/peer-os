@@ -200,11 +200,6 @@
           <configuration>
             <manifestLocation>META-INF</manifestLocation>
             <unpackBundle>true</unpackBundle>
-            <instructions>
-              <Export-Package>
-                {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
-              </Export-Package>
-            </instructions>
           </configuration>
         </plugin>
         <plugin>

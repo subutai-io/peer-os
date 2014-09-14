@@ -15,17 +15,17 @@ import org.safehaus.subutai.common.protocol.Response;
  */
 public interface Command {
 
-	/**
-	 * Returns contained request object if any
-	 *
-	 * @return - returns wrapped request or null
-	 */
-	public Request getRequest();
+    /**
+     * Returns contained request object if any
+     *
+     * @return - returns wrapped request or null
+     */
+    public Request getRequest();
 
-	/**
-	 * Returns contained response object if any
-	 *
-	 * @return - returns wrapped response or null
-	 */
-	public Response getResponse();
+    /**
+     * Returns contained response object if any
+     *
+     * @return - returns wrapped response or null
+     */
+    public Response getResponse();
 }

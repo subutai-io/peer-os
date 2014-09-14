@@ -60,6 +60,9 @@
             <!--<DynamicImport-Package>*</DynamicImport-Package>-->
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Import-Package>javax.jms;resolution:=optional</Import-Package>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
           </instructions>
         </configuration>
       </plugin>
