@@ -154,6 +154,11 @@
         <artifactId>activemq-all</artifactId>
         <version>5.10.0</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activeio-core</artifactId>
+        <version>3.1.4</version>
+      </dependency>
       <!--<dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
