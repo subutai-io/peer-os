@@ -157,19 +157,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-broker</artifactId>
-                </artifactItem>
-                <!--<artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-client</artifactId>
-                </artifactItem>-->
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-pool</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.activemq</groupId>
-                  <artifactId>activemq-jaas</artifactId>
+                  <artifactId>activemq-all</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
