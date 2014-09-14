@@ -33,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-client</artifactId>
+      <artifactId>activemq-all</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-pool</groupId>
@@ -61,7 +61,7 @@
             <Import-Package>!javax.jms,*</Import-Package>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+              {local-packages},{local-packages}.*;version=${project.version};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
