@@ -163,26 +163,6 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
-                <!--<artifactItem>
-                  <groupId>javax.management.j2ee</groupId>
-                  <artifactId>javax.management.j2ee-api</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-jms_1.1_spec</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>javax.ejb</groupId>
-                  <artifactId>javax.ejb-api</artifactId>
-                </artifactItem>-->
-                <artifactItem>
-                  <groupId>javax</groupId>
-                  <artifactId>javaee-api</artifactId>
-                </artifactItem>
-                <!--<artifactItem>
-                  <groupId>javax.transaction</groupId>
-                  <artifactId>javax.transaction-api</artifactId>
-                </artifactItem>-->
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
