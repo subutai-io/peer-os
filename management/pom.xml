@@ -222,7 +222,7 @@
             <unpackBundle>true</unpackBundle>
             <instructions>
               <Import-Package>
-                *;resolution:=optional
+                !com.sun.faces.spi,*;resolution:=optional
               </Import-Package>
             </instructions>
           </configuration>
