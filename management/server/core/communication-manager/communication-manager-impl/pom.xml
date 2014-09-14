@@ -61,8 +61,7 @@
             <!--<Import-Package>!javax.jms,!org.slf4j,*</Import-Package>-->
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
-              {local-packages};version=${pom.version};-noimport:=true,
-              org.apache.activemq,javax.jms
+              {local-packages};-noimport:=true
             </Export-Package>
           </instructions>
         </configuration>
