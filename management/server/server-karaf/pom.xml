@@ -187,6 +187,7 @@
             <feature>war</feature>
             <feature>ssh</feature>
             <feature>cxf</feature>
+            <feature>aries-annotation</feature>
           </bootFeatures>
         </configuration>
       </plugin>
