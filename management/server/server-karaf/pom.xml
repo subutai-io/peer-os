@@ -141,10 +141,6 @@
                   <artifactId>guava</artifactId>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                </artifactItem>
-                <artifactItem>
                   <groupId>com.fasterxml.uuid</groupId>
                   <artifactId>java-uuid-generator</artifactId>
                 </artifactItem>
