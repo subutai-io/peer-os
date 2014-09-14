@@ -6,7 +6,7 @@
     <!-- Allow the use of system properties -->
     <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
 
-    <cm:property-placeholder persistent-id="org.apache.activemq" update-strategy="none">
+    <cm:property-placeholder persistent-id="AmqConfig" update-strategy="none">
         <cm:default-properties>
             <cm:property name="amqUrl" value="failover:tcp://localhost:61616"/>
             <cm:property name="amqServiceTopic" value="SERVICE_TOPIC"/>
