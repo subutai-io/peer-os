@@ -58,7 +58,7 @@
         <configuration>
           <instructions>
             <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
-            <!--<Import-Package>!javax.jms,!org.slf4j,*</Import-Package>-->
+            <Import-Package>!javax.jms,*</Import-Package>
             <Bundle-SymbolicName>${project.groupId}.core.communication.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};-noimport:=true
