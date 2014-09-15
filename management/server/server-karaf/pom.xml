@@ -159,11 +159,17 @@
                   <groupId>org.apache.activemq</groupId>
                   <artifactId>activemq-pool</artifactId>
                 </artifactItem>
-                <dependency>
+                <!--<artifactItem>
                   <groupId>javax.management.j2ee</groupId>
                   <artifactId>management-api</artifactId>
                   <version>1.1-rev-1</version>
-                </dependency>
+                </artifactItem>-->
+                <artifactItem>
+                	<groupId>org.apache.activemq</groupId>
+                	<artifactId>activemq-jms-pool</artifactId>
+                	<version>5.10.0</version>
+                </artifactItem>
+
                 <artifactItem>
                   <groupId>org.apache.servicemix.bundles</groupId>
                   <artifactId>org.apache.servicemix.bundles.junit</artifactId>
