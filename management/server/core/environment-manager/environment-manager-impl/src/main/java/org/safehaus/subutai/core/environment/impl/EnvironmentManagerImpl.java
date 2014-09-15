@@ -14,7 +14,6 @@ import org.safehaus.subutai.common.protocol.EnvironmentBlueprint;
 import org.safehaus.subutai.common.protocol.EnvironmentBuildTask;
 import org.safehaus.subutai.core.agent.api.AgentManager;
 import org.safehaus.subutai.core.container.api.container.ContainerManager;
-import org.safehaus.subutai.core.db.api.DBException;
 import org.safehaus.subutai.core.db.api.DbManager;
 import org.safehaus.subutai.core.environment.api.EnvironmentManager;
 import org.safehaus.subutai.core.environment.api.exception.EnvironmentBuildException;
@@ -165,12 +164,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
                 .isNullOrEmpty( environmentBuildTask.getEnvironmentBlueprint().getName() ) ) {
             try {
                 Environment environment = environmentBuilder.build( environmentBuildTask, containerManager );
-                environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
+                return environmentDAO.saveInfo( ENVIRONMENT, environment.getUuid().toString(), environment );
             }
             catch ( EnvironmentBuildException e ) {
-                LOG.info( e.getMessage() );
-            }
-            catch ( DBException e ) {
                 LOG.info( e.getMessage() );
             }
         }
@@ -188,26 +184,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public List<Environment> getEnvironments() {
-        try {
-            return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return null;
+        return environmentDAO.getInfo( ENVIRONMENT, Environment.class );
     }
 
 
     @Override
     public Environment getEnvironmentInfo( final String environmentName ) {
-        try {
-            return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return null;
-        //        .getEnvironment( environmentName );
+        return environmentDAO.getInfo( ENVIRONMENT, environmentName, Environment.class );
     }
 
 
@@ -216,13 +199,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
         Environment environment = getEnvironmentInfo( environmentName );
         try {
             environmentBuilder.destroy( environment );
-            environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
-            return true;
+            return environmentDAO.deleteInfo( ENVIRONMENT, environmentName );
         }
         catch ( EnvironmentDestroyException e ) {
-            LOG.info( e.getMessage() );
-        }
-        catch ( DBException e ) {
             LOG.info( e.getMessage() );
         }
         return false;
@@ -231,44 +210,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     @Override
     public boolean saveBlueprint( String blueprintStr ) {
-        try {
 
-            EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
-            EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
-            environmentBuildTask.setEnvironmentBlueprint( blueprint );
+        EnvironmentBlueprint blueprint = blueprintParser.parseEnvironmentBlueprintText( blueprintStr );
+        EnvironmentBuildTask environmentBuildTask = new EnvironmentBuildTask();
+        environmentBuildTask.setEnvironmentBlueprint( blueprint );
 
-            environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
-            return true;
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return false;
+        return environmentDAO.saveInfo( BLUEPRINT, environmentBuildTask.getUuid().toString(), environmentBuildTask );
     }
 
 
     @Override
     public List<EnvironmentBuildTask> getBlueprints() {
-        try {
-            return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return null;
+        return environmentDAO.getInfo( BLUEPRINT, EnvironmentBuildTask.class );
     }
 
 
     @Override
     public boolean deleteBlueprint( String uuid ) {
-        try {
-            environmentDAO.deleteInfo( BLUEPRINT, uuid );
-            return true;
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return false;
+        return environmentDAO.deleteInfo( BLUEPRINT, uuid );
     }
 
 
@@ -289,24 +248,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
 
     @Override
-    public void saveBuildProcess( final BuildProcess buildProgress ) {
-        try {
-            environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
+    public boolean saveBuildProcess( final BuildProcess buildProgress ) {
+        return environmentDAO.saveInfo( "PROCESS", buildProgress.getUuid().toString(), buildProgress );
     }
 
 
     @Override
     public List<BuildProcess> getBuildProcesses() {
-        try {
-            return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
-        }
-        catch ( DBException e ) {
-            LOG.info( e.getMessage() );
-        }
-        return null;
+        return environmentDAO.getInfo( "PROCESS", BuildProcess.class );
     }
 }

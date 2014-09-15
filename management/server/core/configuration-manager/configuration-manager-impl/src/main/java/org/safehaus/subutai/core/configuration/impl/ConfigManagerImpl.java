@@ -36,93 +36,94 @@ public class ConfigManagerImpl implements ConfigManager {
 
     private final Logger LOG = Logger.getLogger( ConfigManagerImpl.class.getName() );
 
-	private TextInjector textInjector;
+    private TextInjector textInjector;
 
 
-	public TextInjector getTextInjector() {
-		return textInjector;
-	}
+    public TextInjector getTextInjector() {
+        return textInjector;
+    }
 
 
-	public void setTextInjector(final TextInjector textInjector) {
-		this.textInjector = textInjector;
-	}
+    public void setTextInjector( final TextInjector textInjector ) {
+        this.textInjector = textInjector;
+    }
 
 
-	@Override
-	public boolean injectConfiguration(String hostname, String configFilePath, String jsonObjectConfig,
-	                                   ConfigTypeEnum configTypeEnum) {
+    @Override
+    public boolean injectConfiguration( String hostname, String configFilePath, String jsonObjectConfig,
+                                        ConfigTypeEnum configTypeEnum ) {
 
-		//TODO echo to given agent
-		ConfigurationLoader configurationLoader = null;
-		//        Agent agent = agentManager.getAgentByHostname( agentHostname );
+        //TODO echo to given agent
+        ConfigurationLoader configurationLoader = null;
+        //        Agent agent = agentManager.getAgentByHostname( agentHostname );
 
-		String type = "";
-		switch (configTypeEnum) {
-			case YAML: {
-				configurationLoader = new YamConfigurationlLoader(textInjector);
-				break;
-			}
-			case PROPERTIES: {
-				configurationLoader = new PropertiesConfigurationLoader(textInjector);
-				break;
-			}
-			case XML: {
-				configurationLoader = new XMLConfigurationLoader(textInjector);
-				break;
-			}
-			case PLAIN: {
-				//TODO
-				configurationLoader = new PlainConfigurationLoader(textInjector);
-				break;
-			}
-			case SH: {
-				//TODO
-				configurationLoader = new ShellConfigurationLoader(textInjector);
-				break;
-			}
-		}
-		boolean result = configurationLoader.setConfiguration(hostname, configFilePath, jsonObjectConfig);
+        String type = "";
+        switch ( configTypeEnum ) {
+            case YAML: {
+                configurationLoader = new YamConfigurationlLoader( textInjector );
+                break;
+            }
+            case PROPERTIES: {
+                configurationLoader = new PropertiesConfigurationLoader( textInjector );
+                break;
+            }
+            case XML: {
+                configurationLoader = new XMLConfigurationLoader( textInjector );
+                break;
+            }
+            case PLAIN: {
+                //TODO
+                configurationLoader = new PlainConfigurationLoader( textInjector );
+                break;
+            }
+            case SH: {
+                //TODO
+                configurationLoader = new ShellConfigurationLoader( textInjector );
+                break;
+            }
+        }
+        boolean result = configurationLoader.setConfiguration( hostname, configFilePath, jsonObjectConfig );
 
-		return result;
-	}
+        return result;
+    }
 
 
-	@Override
-	public JsonObject getConfiguration(String agentHostname, String configPathFilename,
-	                                   ConfigTypeEnum configTypeEnum) {
-		ConfigurationLoader loader = null;
-		switch (configTypeEnum) {
-			case YAML: {
-				loader = new YamConfigurationlLoader(textInjector);
-				break;
-			}
-			case PROPERTIES: {
-				loader = new PropertiesConfigurationLoader(textInjector);
-				break;
-			}
-			case XML: {
-				loader = new XMLConfigurationLoader(textInjector);
-				break;
-			}
-			case PLAIN: {
-				//TODO
-				loader = new PlainConfigurationLoader(textInjector);
-				break;
-			}
-			case SH: {
-				//TODO
-				loader = new ShellConfigurationLoader(textInjector);
-				break;
-			}
-		}
+    @Override
+    public JsonObject getConfiguration( String agentHostname, String configPathFilename,
+                                        ConfigTypeEnum configTypeEnum ) {
+        ConfigurationLoader loader = null;
+        switch ( configTypeEnum ) {
+            case YAML: {
+                loader = new YamConfigurationlLoader( textInjector );
+                break;
+            }
+            case PROPERTIES: {
+                loader = new PropertiesConfigurationLoader( textInjector );
+                break;
+            }
+            case XML: {
+                loader = new XMLConfigurationLoader( textInjector );
+                break;
+            }
+            case PLAIN: {
+                //TODO
+                loader = new PlainConfigurationLoader( textInjector );
+                break;
+            }
+            case SH: {
+                //TODO
+                loader = new ShellConfigurationLoader( textInjector );
+                break;
+            }
+        }
 
-		return loader.getConfiguration(agentHostname, configPathFilename);
-	}
+        return loader.getConfiguration( agentHostname, configPathFilename );
+    }
 
-	@Override
-	public String getProperty(JsonObject config, String path, ConfigTypeEnum configTypeEnum) {
-	    /*ConfigParser configParser = null;
+
+    @Override
+    public String getProperty( JsonObject config, String path, ConfigTypeEnum configTypeEnum ) {
+        /*ConfigParser configParser = null;
         String content = FileUtil.getContent( configPathFilename, this );
         try {
             switch ( configTypeEnum ) {
@@ -144,11 +145,12 @@ public class ConfigManagerImpl implements ConfigManager {
         catch ( ConfigurationException e ) {
              LOG.info(e.getMessage());
         }*/
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void setProperty(JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum) {
+
+    @Override
+    public void setProperty( JsonObject config, String path, String value, ConfigTypeEnum configTypeEnum ) {
         /*ConfigParser configParser = null;
 //        String content = FileUtil.getContent(configPathFilename , this ); try {
             switch ( configTypeEnum ) {
@@ -170,38 +172,41 @@ public class ConfigManagerImpl implements ConfigManager {
         catch ( ConfigurationException e ) {
              LOG.info(e.getMessage());
         }*/
-	}
+    }
 
-	@Override
-	public JsonObject getJsonObjectFromResources(String configPathFilename, ConfigTypeEnum configTypeEnum) {
-		ConfigParser parser = null;
-		String content = FileUtil.getContent(configPathFilename, this);
-		try {
-			switch (configTypeEnum) {
-				case YAML: {
-					parser = new XmlParser(content);
-					break;
-				}
-				case PROPERTIES: {
-					parser = new IniParser(content);
-					break;
-				}
-				case XML: {
-					parser = new XmlParser(content);
-					break;
-				}
-				case PLAIN: {
-					parser = new PlainParser(content);
-					break;
-				}
-				case SH: {
-					parser = new ShellParser(content);
-				}
-			}
-			return parser.parserConfig(configPathFilename, configTypeEnum);
-		} catch (ConfigurationException e) {
-            LOG.info(e.getMessage());
+
+    @Override
+    public JsonObject getJsonObjectFromResources( String configPathFilename, ConfigTypeEnum configTypeEnum ) {
+        String content = FileUtil.getContent( configPathFilename, this );
+        try {
+            ConfigParser parser = null;
+            switch ( configTypeEnum ) {
+                case YAML: {
+                    parser = new XmlParser( content );
+                    break;
+                }
+                case PROPERTIES: {
+                    parser = new IniParser( content );
+                    break;
+                }
+                case XML: {
+                    parser = new XmlParser( content );
+                    break;
+                }
+                case PLAIN: {
+                    parser = new PlainParser( content );
+                    break;
+                }
+                case SH: {
+                    parser = new ShellParser( content );
+                    break;
+                }
+            }
+            return parser.parserConfig( configPathFilename, configTypeEnum );
         }
-		return null;
-	}
+        catch ( ConfigurationException e ) {
+            LOG.info( e.getMessage() );
+        }
+        return null;
+    }
 }
